@@ -53,10 +53,10 @@ export default {
         },
       },
       fontFamily: {
-        // Lexend for headers, PT Serif for body text
+        // Lexend for headers, Geist for body text
         header: ['Lexend', 'sans-serif'],
-        content: ['PT Serif', 'Georgia', 'serif'],
-        sans: ['PT Serif', 'Georgia', 'serif'],
+        content: ['Geist', 'Georgia', 'serif'],
+        sans: ['Geist', 'Georgia', 'serif'],
         mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       borderRadius: {
