@@ -32,9 +32,9 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
           </Badge>
         </div>
         <div className="absolute top-4 right-4">
-          <Badge 
+          <Badge
             variant={property.availability === "Available" ? "default" : "secondary"}
-            className={property.availability === "Available" ? "bg-green-500" : "bg-orange-500"}
+            className={property.availability === "Available" ? "bg-green-500" : "bg-[#EDB003]"}
           >
             {property.availability}
           </Badge>

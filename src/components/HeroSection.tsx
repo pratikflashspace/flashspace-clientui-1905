@@ -114,10 +114,10 @@ const HeroSection = () => {
       {/* Darker overlay for text readability */}
       {/* <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-black/40 to-slate-800/50 backdrop-blur-sm z-10"></div> */}
       
-      <div className="container mx-auto text-left relative z-20">
+      <div className="container mx-auto text-left relative z-20 pl-24 md:pl-16 lg:pl-8">
         {/* Hero Content */}
         <div className="max-w-4xl mb-8 relative">          
-          <h1 className="text-4xl md:text-7xl font-semibold  mb-6 leading-tight text-black animate-fade-in" style={{ fontFamily: 'instrument-serif' }}>
+          <h1 className="text-4xl md:text-7xl font-semibold  mb-6 leading-tight text-black animate-fade-in" style={{ fontFamily: 'Poppins' }}>
             India's 1st  <span className=" text-[#000000]">AI Enabled,</span>
           </h1>
           

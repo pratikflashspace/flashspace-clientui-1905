@@ -1,4 +1,4 @@
-import { Clock, MapPin, Coffee, Wifi, Users2, Presentation, ChevronDown, Building, Phone, Users, Calendar, Video, Monitor, Headphones } from "lucide-react";
+import { Clock, MapPin, Coffee, Wifi, Users2, Presentation, ChevronDown, Building, Phone, Users, Calendar, Video, Monitor, Headphones, CheckCircle, Star } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -244,12 +244,95 @@ const OnDemand = () => {
               </div>
             </div>
 
+            {/* What is On-Demand Section */}
+            <div className="bg-gradient-to-br from-[#172A3A] to-[#172A3A]/90 rounded-2xl p-8 mb-16 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#EDB003]/10 rounded-full blur-3xl"></div>
+              <div className="relative z-10">
+                <h2 className="text-3xl font-bold text-white mb-6">What are On-Demand Spaces?</h2>
+                <p className="text-gray-200 text-lg mb-6 leading-relaxed">
+                  On-demand workspaces provide instant access to professional meeting rooms, conference facilities,
+                  and private offices when you need them. Book by the hour or day without long-term commitments.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                        <Video className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-semibold mb-2">Video Conferencing</h3>
+                        <p className="text-gray-300 text-sm">State-of-the-art video conferencing facilities with HD cameras, microphones, and seamless connectivity.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                        <Presentation className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-semibold mb-2">Meeting Rooms</h3>
+                        <p className="text-gray-300 text-sm">Professional meeting spaces equipped with projectors, whiteboards, and presentation tools.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                        <Headphones className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-semibold mb-2">Private Phone Booths</h3>
+                        <p className="text-gray-300 text-sm">Soundproof pods for confidential calls and focused work sessions without distractions.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                        <Clock className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-semibold mb-2">Flexible Booking</h3>
+                        <p className="text-gray-300 text-sm">Book spaces hourly, daily, or for specific time slots based on your exact needs.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#EDB003]/20 backdrop-blur-sm border border-[#EDB003]/30 rounded-lg p-4">
+                  <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-[#EDB003]" />
+                    Why Choose On-Demand?
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div className="flex items-center gap-2 text-gray-200">
+                      <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
+                      <span>Pay only for what you use</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-200">
+                      <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
+                      <span>Professional spaces instantly</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-200">
+                      <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
+                      <span>No long-term commitments</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* On-Demand Service Listings */}
             <div className="mb-16">
               <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
                 Available Services in {selectedCity}
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {cityServices.map((service) => (
                   <Card key={service.id} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover-lift border border-gray-200">

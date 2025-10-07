@@ -53,7 +53,12 @@
   src: url("./assets//fonts/Poppins-Regular.ttf") format("truetype");
 }
 
-/* PT Serif is loaded from Google Fonts */
+@font-face {
+  font-family: 'Poppins';
+  src: url('./assets/fonts/Poppins-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
 /* Removed Locomotive Scroll overrides */
 
 /* VirtuHub Connect Design System - FlashSpace Branding */
@@ -138,6 +143,16 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --d-bg: 0 0% 100%;
+
+    --d-muted: 0 0% 90%;
+
+    --d-fg: 0 0% 0%;
+
+    --d-border: 0 0% 90%;
+
+    --d-sheet: 0 0% 98%;
   }
 
   .dark {
@@ -176,6 +191,11 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --d-bg: 0 0% 10%;
+    --d-muted: 0 0% 20%;
+    --d-fg: 0 0% 100%;
+    --d-border: 0 0% 20%;
+    --d-sheet: 0 0% 12%;
   }
 }
 
@@ -309,7 +329,7 @@
   /* Infinite Scroll Animation */
   .infinite-scroll {
     display: flex;
-    animation: scroll-logos 30s linear infinite;
+    animation: scroll-logos 20s linear infinite;
   }
 
   .infinite-scroll:hover {
@@ -369,6 +389,16 @@
   }
 }
 
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
 /* Hero Section Animations */
 @keyframes text-glow {
   0%, 100% {
@@ -422,4 +452,69 @@
 
 .animate-pulse-slow {
   animation: pulse-slow 4s ease-in-out infinite;
+}
+
+/* Chat Page Scrollbar Customization */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-yellow-300 {
+  scrollbar-color: #fcd34d #fef3c7;
+}
+
+.scrollbar-track-yellow-50 {
+  scrollbar-color: #fcd34d #fef3c7;
+}
+
+/* Webkit scrollbar for Chrome/Safari */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #fef3c7;
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #fcd34d;
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #fbbf24;
+}
+
+/* Yellow Glow Effect */
+@keyframes yellow-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), 0 0 40px rgba(251, 191, 36, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.5), 0 0 60px rgba(251, 191, 36, 0.2);
+  }
+}
+
+.hover\:shadow-yellow-glow:hover {
+  animation: yellow-glow 2s ease-in-out infinite;
+}
+
+/* Scrollbar styling - keep visible */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }

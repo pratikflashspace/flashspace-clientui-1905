@@ -251,14 +251,97 @@ const BusinessSetup = () => {
             </div>
           </div>
 
+          {/* What is Business Setup Section */}
+          <div className="bg-gradient-to-br from-[#172A3A] to-[#172A3A]/90 rounded-2xl p-8 mb-16 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#EDB003]/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <h2 className="text-3xl font-bold text-white mb-6">What is Business Setup?</h2>
+              <p className="text-gray-200 text-lg mb-6 leading-relaxed">
+                Business setup services help you establish and register your company legally in India. From company
+                incorporation to GST registration and compliance, we handle all legal formalities so you can focus on growing your business.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Building className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-2">Company Registration</h3>
+                      <p className="text-gray-300 text-sm">Register your Private Limited, LLP, OPC, or Partnership firm with complete legal documentation.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-2">GST & Tax Registration</h3>
+                      <p className="text-gray-300 text-sm">Hassle-free GST registration with expert guidance on tax compliance and filing requirements.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                      <FileCheck className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-2">Licenses & Permits</h3>
+                      <p className="text-gray-300 text-sm">Obtain all necessary business licenses, permits, and certifications required for your industry.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-2">Ongoing Compliance</h3>
+                      <p className="text-gray-300 text-sm">Annual filings, statutory compliance, and regular legal updates to keep your business compliant.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#EDB003]/20 backdrop-blur-sm border border-[#EDB003]/30 rounded-lg p-4">
+                <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-[#EDB003]" />
+                  Why Choose Our Business Setup Services?
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="flex items-center gap-2 text-gray-200">
+                    <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
+                    <span>Expert legal guidance throughout</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-200">
+                    <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
+                    <span>Fast & hassle-free registration</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-200">
+                    <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
+                    <span>Complete compliance management</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Service Packages */}
           <div className="mb-16">
             <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
               Business Setup Packages in {selectedCity}
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* {cityServices.map((service) => (
+              {cityServices.map((service) => (
                 <Card key={service.id} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover-lift border border-gray-200">
                   <CardHeader>
                     <div className="flex justify-between items-start mb-2">
@@ -298,8 +381,7 @@ const BusinessSetup = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))} */}
-              <Card />
+              ))}
             </div>
           </div>
         </div>

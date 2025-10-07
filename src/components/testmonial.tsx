@@ -5,17 +5,17 @@ const TestimonialsSection = () => {
   const isVisible = useScrollAnimation('testimonials');
   
   const companies = [
-    { name: "Addda 24/7", logo: "https://www.adda247.com/images/header-logo.svg" },
-    { name: "Study IQ", logo: "https://www.studyiq.com/" },
-    { name: "Flipkart", logo: "https://static-assets-web.flixcart.com/batman-returns/batman-returns/p/images/fkheaderlogo_exploreplus-44005d.svg" },
-    { name: "Truly Madly", logo: "https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" },
-    { name: "Stage OTT", logo: "https://www.stage.in/_next/image?url=https%3A%2F%2Fmedia.stage.in%2Fstatic%2Fstage_logo_horizontal.webp&w=256&q=75" },
-    { name: "LUV Films", logo: "https://imgs.search.brave.com/7G5C_BpCTzsi0VtrsxHf0c5MLl_TAKS2brJhqLr3sus/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sb2dv/Lmx1c2hhLmNvL2Qv/Y29tcGFueV8yOTc3/NTY4X2xvZ28uanBn" },
-    { name: "Callerdesk", logo: "https://imgs.search.brave.com/RsKEnJSz0P46UAeLN2ncHW4p6Ehae8obqu1of6ZaiD0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jYWxs/ZXJkZXNrLmlvL2lt/Zy9pbWFnZXMvY2Fs/bGVyX2xvZ28uc3Zn" },
-    { name: "Konsalidon", logo: "https://www.konsalidon.com/cdn/shop/files/Logo_-_Full_Height_-_Mono_White_copy_90x@2x.png?v=1642424736" },
-    { name: "CareerGuide.com", logo: "https://imgs.search.brave.com/dY7UddvEwHY109LX8HVNEpyVfQStVh07LOPOTsaU9KA/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvODE0M2M1Y2Vk/YTEwNTJjNGJmNzA4/Y2U1NGViY2UxNWYx/NDQxYzU4YjgxMzVi/M2MzZDA1NzE1ZTg4/MTY2OWVkYi93d3cu/Y2FyZWVyZ3VpZGUu/Y29tLw" },
-    { name: "Meritink", logo: "https://res.cloudinary.com/diwna43hl/image/upload/v1735915447/meritink-logo_plokij.png" },
-    { name: "Anarock", logo: "https://res.cloudinary.com/diwna43hl/image/upload/v1735915447/anarock-logo_mnbvcx.png" },
+    { name: "Adda247", logo: "https://www.adda247.com/jobs/wp-content/themes/adda247/assets/images/logo-main.png", needsInvert: false },
+    { name: "Study IQ", logo: "https://edge.uacdn.net/static/thumbnail/brand/studyiq.png", needsInvert: false },
+    { name: "Flipkart", logo: "https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Logo.png", needsInvert: false },
+    { name: "Truly Madly", logo: "https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp", needsInvert: false },
+    { name: "Stage OTT", logo: "https://storage.googleapis.com/stage-strapi-assets-production/Stage_Logo_Horizontal_1_ff9ba0e86e/Stage_Logo_Horizontal_1_ff9ba0e86e.png", needsInvert: false },
+    { name: "LUV Films", logo: "https://luvfilms.in/wp-content/uploads/2023/03/LUV-FILMS-LOGO-BLACK-2.png", needsInvert: false },
+    { name: "Callerdesk", logo: "https://callerdesk.io/img/images/caller_logo.svg", needsInvert: false },
+    { name: "Konsalidon", logo: "https://www.konsalidon.com/cdn/shop/files/Logo_-_Full_Height_-_Mono_White_copy_90x@2x.png?v=1642424736", needsInvert: true },
+    { name: "CareerGuide", logo: "https://www.careerguide.com/career/wp-content/uploads/2020/02/logo.png", needsInvert: false },
+    { name: "Meritink", logo: "https://www.meritink.com/static/media/logo.png", needsInvert: false },
+    { name: "Anarock", logo: "https://cdn.anarock.com/v2/images/anarock-logo.svg", needsInvert: false },
   ];
 
   // Duplicate the array for seamless infinite scroll
@@ -48,7 +48,7 @@ const TestimonialsSection = () => {
       <div className="container mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${getAnimationClasses(isVisible, 'fadeInUp', 0)}`} style={{ fontFamily: 'Josefin Sans' }}>
+          <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${getAnimationClasses(isVisible, 'fadeInUp', 0)}`} style={{ fontFamily: 'Poppins' }}>
             <span className="text-[#172A3A]">Trusted by Industry Leaders</span>
             <br />
             <span className="text-[#EDB003] text-2xl md:text-3xl">Across India</span>
@@ -71,17 +71,20 @@ const TestimonialsSection = () => {
               {duplicatedCompanies.map((company, index) => (
                 <div
                   key={index}
-                  className="flex-shrink-0 mx-6 flex items-center justify-center w-44 h-20"
+                  className="flex-shrink-0 mx-4 flex items-center justify-center w-52 h-32"
                 >
-                  <div className="bg-white border-2 border-gray-200 p-4 w-full h-full flex items-center justify-center hover:shadow-xl transition-all duration-300 rounded-xl group hover:border-[#EDB003] relative overflow-hidden">
+                  <div className={`${company.needsInvert ? 'bg-[#172A3A]' : 'bg-white'} border-2 border-gray-200 p-6 w-full h-full flex items-center justify-center hover:shadow-xl transition-all duration-300 rounded-xl group hover:border-[#EDB003] relative overflow-hidden`}>
                     <img
                       src={company.logo}
-                      alt={company.logo}
-                      className="max-w-full max-h-full object-contain transition-all duration-300"
+                      alt={company.name}
+                      className="max-w-full max-h-full object-contain transition-all duration-300 group-hover:scale-105"
                       onError={(e) => {
                         // Fallback to text if image fails to load
                         e.currentTarget.style.display = 'none';
-                        e.currentTarget.parentElement!.innerHTML = `<span class=\"text-sm font-bold text-[#172A3A] group-hover:text-[#EDB003] tracking-wider transition-colors duration-300 text-center\">${company.name}</span>`;
+                        const parent = e.currentTarget.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<span class="text-sm font-bold ${company.needsInvert ? 'text-white' : 'text-[#172A3A]'} group-hover:text-[#EDB003] tracking-wider transition-colors duration-300 text-center">${company.name}</span>`;
+                        }
                       }}
                     />
                     {/* Subtle corner accent */}
@@ -95,7 +98,7 @@ const TestimonialsSection = () => {
 
         {/* Client Testimonials */}
         <div className="text-center mb-8 mt-16">
-          <h3 className={`text-2xl md:text-7xl font-black mb-4 text-[#172A3A] ${getAnimationClasses(isVisible, 'fadeInUp', 400)}`} style={{ fontFamily: 'Josefin Sans' }}>
+          <h3 className={`text-3xl md:text-4xl font-bold mb-4 text-[#172A3A] ${getAnimationClasses(isVisible, 'fadeInUp', 400)}`} style={{ fontFamily: 'Poppins' }}>
             Great People <span className="text-[#EDB003]">Trust Us</span>
           </h3>
           <p className={`text-gray-600 font-content ${getAnimationClasses(isVisible, 'fadeInUp', 500)}`}>
@@ -139,30 +142,26 @@ const TestimonialsSection = () => {
         {/* Stats */}
         <Card className={`bg-white border-2 border-gray-200 shadow-lg  ${getAnimationClasses(isVisible, 'fadeInUp', 900)}`}>
             <CardContent className="p-8">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 text-center">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 text-center">
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Josefin Sans' }}>5000+</div>
+                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>5000+</div>
                 <div className="text-gray-600 font-content text-sm">Happy Clients</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Josefin Sans' }}>100+</div>
+                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>100+</div>
                 <div className="text-gray-600 font-content text-sm">Cities Covered</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Josefin Sans' }}>24/7</div>
-                <div className="text-gray-600 font-content text-sm">Support Available</div>
-              </div>
-              <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Josefin Sans' }}>10K+</div>
+                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>10K+</div>
                 <div className="text-gray-600 font-content text-sm">Registrations Done</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Josefin Sans' }}>98%</div>
+                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>98%</div>
                 <div className="text-gray-600 font-content text-sm">Satisfaction Rate</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Josefin Sans' }}>&lt;2min</div>
-                <div className="text-gray-600 font-content text-sm">Avg Response Time</div>
+                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>&lt;3days</div>
+                <div className="text-gray-600 font-content text-sm">Avg Delivery Time</div>
               </div>
             </div>
           </CardContent>

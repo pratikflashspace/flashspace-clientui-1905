@@ -464,7 +464,7 @@ const EventSpaces = () => {
                     {/* Badges */}
                     <div className="absolute top-3 left-3 flex gap-2">
                       {space.popular && (
-                        <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded font-medium">
+                        <span className="bg-[#EDB003] text-white text-xs px-2 py-1 rounded font-medium">
                           🔥 Popular
                         </span>
                       )}

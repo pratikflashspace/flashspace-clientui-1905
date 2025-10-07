@@ -102,7 +102,7 @@ const FAQSection = () => {
       <div className="container mx-auto max-w-5xl relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${getAnimationClasses(isVisible, 'fadeInUp', 0)}`} style={{ fontFamily: 'Josefin Sans' }}>
+          <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${getAnimationClasses(isVisible, 'fadeInUp', 0)}`} style={{ fontFamily: 'Poppins' }}>
             <span className="text-[#172A3A]">Everything You Need to Know</span>
             <br />
             <span className="text-[#EDB003]">Frequently Asked Questions</span>
@@ -116,7 +116,7 @@ const FAQSection = () => {
         {/* Search and Filter */}
         <Card className={`bg-white border-2 border-gray-200 mb-12 shadow-md hover:shadow-xl transition-all duration-300 ${getAnimationClasses(isVisible, 'fadeInUp', 300)}`}>
           <CardHeader className="pb-4">
-            <CardTitle className="text-center text-[#172A3A] text-2xl" style={{ fontFamily: 'Josefin Sans' }}>Find Your Answer</CardTitle>
+            <CardTitle className="text-center text-[#172A3A] text-2xl" style={{ fontFamily: 'Poppins' }}>Find Your Answer</CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
             {/* Search Bar */}
@@ -183,7 +183,7 @@ const FAQSection = () => {
                 <div className="w-20 h-20 bg-gradient-to-r from-[#172A3A]/15 to-[#EDB003]/15 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Search className="w-10 h-10 text-[#172A3A]" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4 text-[#172A3A]" style={{ fontFamily: 'Josefin Sans' }}>No results found</h3>
+                <h3 className="text-xl font-semibold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>No results found</h3>
                 <p className="text-gray-600 text-lg">
                   Try adjusting your search terms or browse different categories.
                 </p>
@@ -205,7 +205,7 @@ const FAQSection = () => {
               Contact Support
             </a>
             <a
-              href="mailto:support@virtuhubconnect.com"
+              href="mailto:support@flashspace.co"
               className="bg-white border-2 border-gray-200 text-[#172A3A] hover:bg-[#172A3A] hover:text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-md"
             >
               Email Us

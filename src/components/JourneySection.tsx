@@ -64,7 +64,7 @@ const JourneySection = () => {
       <div className="container mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#172A3A] mb-4 animate-fade-in" style={{ fontFamily: 'Josefin Sans' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#172A3A] mb-4 animate-fade-in" style={{ fontFamily: 'Poppins' }}>
             Your Success Story Begins Here
             <br />
             <span className="text-[#EDB003]">The FlashSpace Journey</span>
@@ -280,7 +280,7 @@ const JourneySection = () => {
                 transform hover:scale-105 transition-all duration-300
                 shadow-lg hover:shadow-xl animate-fade-in
               `}
-              style={{ animationDelay: '1000ms', fontFamily: 'Josefin Sans' }}
+              style={{ animationDelay: '1000ms', fontFamily: 'Poppins' }}
             >
               START YOUR JOURNEY TODAY
             </Button>
