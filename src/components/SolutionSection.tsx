@@ -186,38 +186,43 @@ const SolutionsSection = () => {
         </div>
 
         {/* Solutions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 max-w-7xl mx-auto">
           {solutions.map((solution, index) => (
             <Link
               key={index}
               to={solution.path}
-              className="block h-full"
+              className="block"
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
               <Card
                 className={`
-                  bg-white border-2 border-gray-200 hover:border-[#EDB003] shadow-md hover:shadow-xl
-                  group cursor-pointer transition-all duration-500 hover:scale-105
-                  relative overflow-hidden h-full flex flex-col rounded-xl ${getAnimationClasses(isVisible, 'fadeInUp', index * 150)}
+                  bg-gradient-to-br from-white via-white to-gray-50 border border-gray-200
+                  hover:border-[#EDB003] hover:shadow-2xl shadow-lg
+                  group cursor-pointer transition-all duration-500 hover:-translate-y-2
+                  relative overflow-hidden rounded-2xl h-full
+                  ${getAnimationClasses(isVisible, 'fadeInUp', index * 150)}
                 `}
               >
-                {/* Dynamic Background Effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#172A3A]/5 to-[#EDB003]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="absolute -top-10 -right-10 w-16 h-16 bg-[#EDB003]/10 rounded-full blur-xl group-hover:bg-[#EDB003]/20 transition-colors duration-500"></div>
-                <div className="absolute -bottom-10 -left-10 w-16 h-16 bg-[#172A3A]/10 rounded-full blur-xl group-hover:bg-[#172A3A]/20 transition-colors duration-500"></div>
+                {/* Animated Background Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#EDB003]/0 via-[#EDB003]/0 to-[#EDB003]/0 group-hover:from-[#EDB003]/5 group-hover:via-[#EDB003]/3 group-hover:to-transparent transition-all duration-700"></div>
 
-                <CardHeader className="space-y-4 p-5 relative z-10 flex-grow ">
+                {/* Decorative Elements */}
+                <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-[#EDB003]/10 to-transparent rounded-full blur-2xl group-hover:from-[#EDB003]/20 transition-all duration-500"></div>
+                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-tr from-[#172A3A]/5 to-transparent rounded-full blur-2xl group-hover:from-[#172A3A]/10 transition-all duration-500"></div>
+
+                <CardContent className="p-6 relative z-10 flex flex-col h-full">
+                  {/* Icon Section */}
                   <motion.div
-                    className="flex items-center justify-center"
-                    animate={hoveredIndex === index ? { scale: 1.05 } : { scale: 1 }}
+                    className="mb-5 flex justify-center"
+                    animate={hoveredIndex === index ? { scale: 1.1 } : { scale: 1 }}
                     transition={{ type: "spring", stiffness: 300, damping: 15 }}
                   >
                     <motion.div
-                      className="w-14 h-14 bg-gradient-to-br from-[#172A3A]/15 to-[#EDB003]/15 rounded-2xl flex items-center justify-center group-hover:from-[#172A3A]/25 group-hover:to-[#EDB003]/25 transition-all duration-500"
+                      className="w-20 h-20 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:shadow-[#EDB003]/30 transition-all duration-500 relative"
                       animate={hoveredIndex === index ? {
-                        rotate: [0, -10, 10, -10, 0],
-                        scale: 1.15
+                        rotate: [0, -5, 5, -5, 0],
+                        scale: 1.05
                       } : {
                         rotate: 0,
                         scale: 1
@@ -227,44 +232,53 @@ const SolutionsSection = () => {
                         scale: { duration: 0.3 }
                       }}
                     >
-                      <span className="text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                      {/* Glow effect on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-2xl blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
+                      <span className="relative z-10">
                         {solution.icon(hoveredIndex === index)}
                       </span>
                     </motion.div>
                   </motion.div>
-                  <div className="text-center flex-grow flex flex-col">
-                    <CardTitle className="text-lg mb-2 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300 font-bold font-header">
-                      {solution.title}
-                    </CardTitle>
-                    <CardDescription className="text-gray-600 leading-snug text-sm font-content">
-                      {solution.description}
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="space-y-4 p-5 pt-0 relative z-10">
-                  {/* Features List */}
-                  <div className="space-y-2.5">
+
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-center mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300 font-header" style={{ fontFamily: 'Poppins' }}>
+                    {solution.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-sm text-gray-600 text-center mb-5 leading-relaxed font-content min-h-[40px]">
+                    {solution.description}
+                  </p>
+
+                  {/* Features List - Compact */}
+                  <div className="space-y-2 mb-5 flex-grow">
                     {solution.features.map((feature, featureIndex) => (
-                      <div 
-                        key={featureIndex} 
-                        className="flex items-center space-x-2 transform transition-all duration-300 group-hover:translate-x-1"
-                        style={{ transitionDelay: `${featureIndex * 50}ms` }}
+                      <motion.div
+                        key={featureIndex}
+                        className="flex items-center gap-2.5 text-xs"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: hoveredIndex === index ? featureIndex * 0.05 : 0 }}
                       >
-                        <div className="w-1.5 h-1.5 bg-[#EDB003] rounded-full group-hover:bg-[#172A3A] transition-colors duration-300 flex-shrink-0"></div>
-                        <span className="text-gray-600 group-hover:text-gray-900 transition-colors duration-300 font-medium font-content text-xs">{feature}</span>
-                      </div>
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#EDB003]/20 to-[#EDB003]/10 flex items-center justify-center flex-shrink-0 group-hover:from-[#EDB003]/30 group-hover:to-[#EDB003]/20 transition-all duration-300">
+                          <div className="w-1.5 h-1.5 bg-[#EDB003] rounded-full"></div>
+                        </div>
+                        <span className="text-gray-700 group-hover:text-gray-900 font-medium transition-colors duration-300">{feature}</span>
+                      </motion.div>
                     ))}
                   </div>
 
-                  {/* CTA Button */}
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-2 border-[#172A3A] text-[#172A3A] hover:bg-[#EDB003] hover:text-white hover:border-[#EDB003] transition-all duration-300 py-2.5 font-semibold text-sm transform group-hover:scale-105 mt-auto"
-                    >
+                  {/* CTA Button - More Prominent */}
+                  <Button
+                    className="w-full bg-[#172A3A] hover:bg-[#EDB003] text-white transition-all duration-300 py-5 font-semibold text-sm rounded-xl shadow-md hover:shadow-lg group/btn relative overflow-hidden"
+                  >
+                    {/* Button Shine Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-700"></div>
+                    <span className="relative z-10 flex items-center justify-center gap-2">
                       Explore Now
-                      <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" />
-                    </Button>
+                      <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                    </span>
+                  </Button>
                 </CardContent>
               </Card>
             </Link>

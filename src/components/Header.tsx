@@ -27,7 +27,11 @@ const socialItems = [
   { label: 'LinkedIn', link: 'https://linkedin.com' }
 ];
 
-const Header = () => {
+interface HeaderProps {
+  forceWhiteBackground?: boolean;
+}
+
+const Header = ({ forceWhiteBackground = false }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -87,7 +91,7 @@ const Header = () => {
     <header
       className={cn(
         "fixed top-0 w-full z-[100] transition-all duration-300 text-md  ", // give header lower z than sidebar overlay (which uses 9999)
-        scrolled
+        scrolled || forceWhiteBackground
           ? "bg-white/95 supports-[backdrop-filter]:bg-white/65 backdrop-blur-md border-b border-border shadow-sm"
           : "bg-transparent backdrop-blur-sm"
 

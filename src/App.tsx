@@ -15,6 +15,11 @@ import OnDemand from "./pages/services/OnDemand";
 import EventSpaces from "./pages/services/EventSpaces";
 import BusinessSetup from "./pages/services/BusinessSetup";
 import StartChatting from "./pages/StartChatting";
+import VirtualOfficeSolution from "./pages/Solutions/virtual-office";
+import CoworkingSpaceSolution from "./pages/Solutions/coworking-space";
+import OnDemandSolution from "./pages/Solutions/on-demand";
+import BusinessSetupSolution from "./pages/Solutions/business-setup";
+import PartnerWithUs from "./pages/PatnerWithUs";
 //
 import MouseFollower from "./components/MouseFollower";
 // import VirtualOfficeSearch from "./pages/solutions/VirtualOfficeSearch";
@@ -40,6 +45,10 @@ const App = () => (
             <Route path="/services/on-demand" element={<OnDemand />} />
             <Route path="/services/event-spaces" element={<EventSpaces />} />
             <Route path="/services/business-setup" element={<BusinessSetup />} />
+            <Route path="/Solutions/virtual-office" element={<VirtualOfficeSolution />} />
+            <Route path="/Solutions/coworking-space" element={<CoworkingSpaceSolution />} />
+            <Route path="/Solutions/on-demand" element={<OnDemandSolution />} />
+            <Route path="/Solutions/business-setup" element={<BusinessSetupSolution />} />
             <Route path="/city-listing" element={<CityListing />} />
             {/* <Route path="/solutions/virtual-office" element={<VirtualOfficeSearch />} />
             <Route path="/solutions/coworking-space" element={<CoworkingSpaceSearch />} />
@@ -47,6 +56,7 @@ const App = () => (
             <Route path="/solutions/business-setup" element={<BusinessSetupSearch />} />
             <Route path="/search-results" element={<SearchResults />} /> */}
             <Route path="/list-your-space" element={<ListYourSpace />} />
+            <Route path="/partner" element={<PartnerWithUs />} />
             <Route path="/coming-soon" element={<ComingSoon />} />
             <Route path="/city/:cityId" element={<CityListing />} />
             <Route path="/start-chatting" element={<StartChatting />} />
