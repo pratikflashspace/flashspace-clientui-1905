@@ -120,19 +120,22 @@ const Splash3dButton = ({
       aria-label="3D Splash Button"
     >
       <span id="splash-wrapper" className="absolute inset-0" />
+      {/* Bottom shadow layer for 3D depth */}
       <span
         className={cn(
-          "absolute inset-0 translate-y-[4px] rounded-md",
-          "bg-d-fg/40",
+          "absolute inset-0 translate-y-[3px] rounded-lg",
+          "bg-gradient-to-b from-black/20 to-black/30 blur-[1px]",
+          isActive && "translate-y-[1px] opacity-60",
         )}
       ></span>
+      {/* Main button surface */}
       <span
         className={cn(
-          "relative flex items-center justify-center rounded-md px-3 py-2.5 inset-shadow-sm will-change-transform select-none",
-          "bg-gray-100 text-sm font-bold text-black/80 dark:bg-gray-800 dark:text-white",
-          "group-hover:translate-y-[-2px] group-hover:[transition-duration:250ms]",
-          "[transition:translate_600ms_ease-out]",
-          isActive && "translate-y-[4px]! [transition-duration:34ms]!",
+          "relative flex items-center justify-center gap-2 rounded-lg will-change-transform select-none",
+          "transition-all duration-150 ease-out",
+          "group-hover:translate-y-[-1px] group-hover:shadow-[0_3px_8px_rgba(0,0,0,0.15),0_1px_3px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-1px_2px_rgba(0,0,0,0.1)]",
+          "shadow-[0_2px_5px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-2px_4px_rgba(0,0,0,0.08)]",
+          isActive && "translate-y-[2px]! shadow-[0_1px_2px_rgba(0,0,0,0.15),inset_0_1px_3px_rgba(0,0,0,0.2)]! [transition-duration:34ms]!",
           className,
         )}
       >

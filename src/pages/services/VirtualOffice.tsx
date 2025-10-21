@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import SimpleGoogleMap from "@/components/Map/SimpleGoogleMap";
+import { cityCenters } from "@/components/Map/locationData.example";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -173,6 +175,24 @@ const VirtualOffice = () => {
 
   // Get unique areas for filtering
   const areas = [...new Set(cityOffices.map(office => office.area))];
+
+  // Resolve map center by selected city (fallback to Delhi)
+  const resolvedCenter = (() => {
+    const cityKeyFromState = selectedCity.trim().toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
+    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
+    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
+    if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
+    if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
+    // Default
+    return cityCenters.delhi;
+  })();
+
+  // Prepare marker data from cityOffices
+  const mapMarkers = cityOffices.map((office) => ({
+    position: office.coordinates || resolvedCenter,
+    title: office.name,
+    info: `<div class='p-2'><strong>${office.name}</strong><br/>${office.address}<br/><span style='color:#EDB003;font-weight:bold;'>${office.price}</span></div>`
+  }));
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
@@ -410,225 +430,127 @@ const VirtualOffice = () => {
           </div>
 
           {/* Split Layout: Cards on Left, Map on Right */}
-          <div className={`flex gap-6 mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            {/* Left Side: Virtual Office Listings */}
-            <div className={`w-[55%] space-y-4 max-h-[calc(100vh-250px)] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-[#EDB003] scrollbar-track-gray-100`}>
-            {cityOffices.map((office) => {
-              let imageSrc = "";
-              switch (office.name) {
-                case "Connaught Place Virtual Office": imageSrc = "https://shorturl.at/Fyr6o"; break;
-                case "Gurgaon Business Center": imageSrc = "https://shorturl.at/LdEgA"; break;
-                case "Nehru Place Office": imageSrc = "https://shorturl.at/S4XWY"; break;
-                case "BKC Premium Office": imageSrc = "https://shorturl.at/NUpzM"; break;
-                case "Lower Parel Business": imageSrc = "https://shorturl.at/LdEgA"; break;
-                case "Andheri East Hub": imageSrc = "https://shorturl.at/S4XWY"; break;
-                case "Koramangala Tech Office": imageSrc = "https://shorturl.at/LdEgA"; break;
-                case "Whitefield Business Center": imageSrc = "https://shorturl.at/Fyr6o"; break;
-                case "Electronic City Office": imageSrc = "https://shorturl.at/NUpzM"; break;
-                case "Hinjewadi IT Park Office": imageSrc = "https://shorturl.at/Fyr6o"; break;
-                case "Koregaon Park Center": imageSrc = "https://shorturl.at/Fyr6o"; break;
-                case "Khan Market Business Hub": imageSrc = "https://shorturl.at/NUpzM"; break;
-                case "Saket Corporate Center": imageSrc = "https://shorturl.at/LdEgA"; break;
-                case "Lajpat Nagar Virtual Office": imageSrc = "https://shorturl.at/S4XWY"; break;
-                case "Worli Business District": imageSrc = "https://shorturl.at/Fyr6o"; break;
-                case "Fort Commercial Center": imageSrc = "https://shorturl.at/NUpzM"; break;
-                case "Indiranagar Corporate Hub": imageSrc = "https://shorturl.at/LdEgA"; break;
-                case "HSR Layout Virtual Office": imageSrc = "https://shorturl.at/S4XWY"; break;
-                case "Baner Business Hub": imageSrc = "https://shorturl.at/Fyr6o"; break;
-                case "Kharadi Tech Center": imageSrc = "https://shorturl.at/NUpzM"; break;
-                default: imageSrc = "/placeholder.svg";
-              }
-              
-              return (
-                <Card key={office.id} className="bg-white shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 rounded-lg overflow-hidden group">
-                  <div className="relative">
-                    <img src={imageSrc} alt={office.name} className="w-full h-48 object-cover" />
-                    
-                    {/* Badges */}
-                    <div className="absolute top-3 left-3 flex gap-2">
-                      {office.popular && (
-                        <span className="bg-[#EDB003] text-white text-xs px-2 py-1 rounded font-medium">
-                          🔥 Popular
-                        </span>
-                      )}
-                    </div>
-                    
-                    <div className="absolute top-3 right-3 bg-green-600 text-white px-2 py-1 rounded flex items-center gap-1 text-xs font-medium">
-                      <Star className="w-3 h-3 fill-current" />
-                      {office.rating}
-                    </div>
+          <div className={`flex gap-4 mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            {/* Left Side: Virtual Office Listings - Compact */}
+            <div className={`w-[55%] space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#EDB003] scrollbar-track-gray-100`}>
+              {cityOffices.map((office) => {
+                let imageSrc = "";
+                switch (office.name) {
+                  case "Connaught Place Virtual Office": imageSrc = "https://shorturl.at/Fyr6o"; break;
+                  case "Gurgaon Business Center": imageSrc = "https://shorturl.at/LdEgA"; break;
+                  case "Nehru Place Office": imageSrc = "https://shorturl.at/S4XWY"; break;
+                  case "BKC Premium Office": imageSrc = "https://shorturl.at/NUpzM"; break;
+                  case "Lower Parel Business": imageSrc = "https://shorturl.at/LdEgA"; break;
+                  case "Andheri East Hub": imageSrc = "https://shorturl.at/S4XWY"; break;
+                  case "Koramangala Tech Office": imageSrc = "https://shorturl.at/LdEgA"; break;
+                  case "Whitefield Business Center": imageSrc = "https://shorturl.at/Fyr6o"; break;
+                  case "Electronic City Office": imageSrc = "https://shorturl.at/NUpzM"; break;
+                  case "Hinjewadi IT Park Office": imageSrc = "https://shorturl.at/Fyr6o"; break;
+                  case "Koregaon Park Center": imageSrc = "https://shorturl.at/Fyr6o"; break;
+                  case "Khan Market Business Hub": imageSrc = "https://shorturl.at/NUpzM"; break;
+                  case "Saket Corporate Center": imageSrc = "https://shorturl.at/LdEgA"; break;
+                  case "Lajpat Nagar Virtual Office": imageSrc = "https://shorturl.at/S4XWY"; break;
+                  case "Worli Business District": imageSrc = "https://shorturl.at/Fyr6o"; break;
+                  case "Fort Commercial Center": imageSrc = "https://shorturl.at/NUpzM"; break;
+                  case "Indiranagar Corporate Hub": imageSrc = "https://shorturl.at/LdEgA"; break;
+                  case "HSR Layout Virtual Office": imageSrc = "https://shorturl.at/S4XWY"; break;
+                  case "Baner Business Hub": imageSrc = "https://shorturl.at/Fyr6o"; break;
+                  case "Kharadi Tech Center": imageSrc = "https://shorturl.at/NUpzM"; break;
+                  default: imageSrc = "/placeholder.svg";
+                }
+                
+                return (
+                  <Card key={office.id} className="bg-white shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 rounded-lg overflow-hidden group">
+                    <div className="relative">
+                      <img src={imageSrc} alt={office.name} className="w-full h-32 object-cover" />
+                      
+                      {/* Badges */}
+                      <div className="absolute top-2 left-2 flex gap-1">
+                        {office.popular && (
+                          <span className="bg-[#EDB003] text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
+                            🔥 Popular
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="absolute top-2 right-2 bg-green-600 text-white px-1.5 py-0.5 rounded flex items-center gap-1 text-[10px] font-medium">
+                        <Star className="w-2.5 h-2.5 fill-current" />
+                        {office.rating}
+                      </div>
 
-                    {/* Availability */}
-                    <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium text-gray-700">
-                      {office.availability}
+                      {/* Availability */}
+                      <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] font-medium text-gray-700">
+                        {office.availability} 
+                      </div>
                     </div>
-                  </div>
-                  
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="font-semibold text-lg text-gray-900 mb-1 group-hover:text-primary transition-colors">
-                          {office.name}
-                        </h3>
-                        <div className="flex items-center gap-1 text-gray-600 text-sm mb-2">
-                          <MapPin className="w-4 h-4 flex-shrink-0" />
-                          <span>{office.address}</span>
+                    
+                    <CardContent className="p-3">
+                      <div className="flex items-start justify-between mb-1.5">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-sm text-gray-900 mb-0.5 group-hover:text-primary transition-colors line-clamp-1">
+                            {office.name}
+                          </h3>
+                          <div className="flex items-center gap-1 text-gray-600 text-xs mb-1">
+                            <MapPin className="w-3 h-3 flex-shrink-0" />
+                            <span className="line-clamp-1">{office.address}</span>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500 h-6 w-6 p-0">
+                          ♡
+                        </Button>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                          <span className="font-medium">{office.rating}</span>
+                          <span className="text-gray-500">({office.reviews})</span>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500">
-                        ♡
-                      </Button>
-                    </div>
 
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="font-medium">{office.rating}</span>
-                        <span className="text-gray-500">({office.reviews} Reviews)</span>
+                      <div className="mb-2">
+                        <p className="text-[10px] text-gray-600 mb-0.5">Quoted price (negotiable)</p>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-lg font-bold text-gray-900">{office.price}</span>
+                          <span className="text-xs text-gray-500 line-through">{office.originalPrice}</span>
+                        </div>
+                        <p className="text-[10px] text-gray-600">/ desk / month</p>
                       </div>
-                    </div>
 
-                    <div className="mb-3">
-                      <p className="text-xs text-gray-600 mb-1">Quoted price (negotiable)</p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-gray-900">{office.price}</span>
-                        <span className="text-sm text-gray-500 line-through">{office.originalPrice}</span>
+                      <div className="mb-2">
+                        <div className="flex flex-wrap gap-1">
+                          {office.features.slice(0, 2).map((feature, idx) => (
+                            <span key={idx} className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded border border-blue-200">
+                              {feature}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-600">/ desk / month</p>
-                    </div>
 
-                    <div className="mb-4">
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {office.features.slice(0, 3).map((feature, idx) => (
-                          <span key={idx} className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-200">
-                            {feature}
-                          </span>
-                        ))}
+                      <div className="flex gap-1.5">
+                        <Button className="flex-1 bg-primary hover:bg-primary/90 text-white text-xs h-8">
+                          Get best price
+                        </Button>
                       </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button className="flex-1 bg-primary hover:bg-primary/90 text-white">
-                        Get best price
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
 
-            {/* Right Side: Google Map Mockup - Full Height */}
+            {/* Right Side: Google Map - Full Height Sticky */}
             <div className="w-[45%] sticky top-4">
-              <div className="relative w-full h-[calc(100vh-200px)] rounded-xl overflow-hidden shadow-xl border-2 border-gray-300">
-                {/* Map Header Controls */}
-                <div className="absolute top-4 left-4 right-4 z-10 flex items-center justify-between">
-                  <div className="bg-white rounded-lg shadow-md px-4 py-2 flex items-center gap-2">
-                    <Search className="w-4 h-4 text-gray-500" />
-                    <input 
-                      type="text" 
-                      placeholder="Search in map..."
-                      className="border-none outline-none text-sm w-64"
-                      disabled
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="secondary" className="bg-white shadow-md">
-                      🗺️ Map
-                    </Button>
-                    <Button size="sm" variant="ghost" className="bg-white shadow-md">
-                      🛰️ Satellite
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Map Image Mockup */}
-                <img 
-                  src="https://miro.medium.com/v2/resize:fit:1400/1*qYUvh-EtES8dtgKiBRiLsA.png" 
-                  alt="Google Maps View" 
-                  className="w-full h-full object-cover"
-                />
-
-                {/* Map Markers Overlay - Simulating pins */}
-                <div className="absolute inset-0 pointer-events-none">
-                  {/* Marker 1 - Top Left */}
-                  <div className="absolute top-[25%] left-[30%]">
-                    <div className="relative animate-bounce">
-                      <MapPin className="w-8 h-8 text-[#EDB003] drop-shadow-lg fill-[#EDB003]" />
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-lg text-xs whitespace-nowrap font-medium">
-                        ₹8,000/mo
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Marker 2 - Center */}
-                  <div className="absolute top-[45%] left-[50%]">
-                    <div className="relative animate-bounce" style={{ animationDelay: '0.2s' }}>
-                      <MapPin className="w-8 h-8 text-[#EDB003] drop-shadow-lg fill-[#EDB003]" />
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-lg text-xs whitespace-nowrap font-medium">
-                        ₹12,500/mo
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Marker 3 - Bottom Right */}
-                  <div className="absolute top-[65%] left-[70%]">
-                    <div className="relative animate-bounce" style={{ animationDelay: '0.4s' }}>
-                      <MapPin className="w-8 h-8 text-[#EDB003] drop-shadow-lg fill-[#EDB003]" />
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-lg text-xs whitespace-nowrap font-medium">
-                        ₹10,000/mo
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Marker 4 - Top Right */}
-                  <div className="absolute top-[20%] left-[75%]">
-                    <div className="relative animate-bounce" style={{ animationDelay: '0.6s' }}>
-                      <MapPin className="w-8 h-8 text-[#EDB003] drop-shadow-lg fill-[#EDB003]" />
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-lg text-xs whitespace-nowrap font-medium">
-                        ₹15,000/mo
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Marker 5 - Bottom Left */}
-                  <div className="absolute top-[70%] left-[25%]">
-                    <div className="relative animate-bounce" style={{ animationDelay: '0.8s' }}>
-                      <MapPin className="w-8 h-8 text-[#EDB003] drop-shadow-lg fill-[#EDB003]" />
-                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white px-2 py-1 rounded shadow-lg text-xs whitespace-nowrap font-medium">
-                        ₹9,500/mo
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Zoom Controls */}
-                <div className="absolute bottom-24 right-4 z-10 flex flex-col gap-2">
-                  <Button size="sm" variant="secondary" className="bg-white shadow-md w-10 h-10 p-0">
-                    +
-                  </Button>
-                  <Button size="sm" variant="secondary" className="bg-white shadow-md w-10 h-10 p-0">
-                    −
-                  </Button>
-                </div>
-
-                {/* My Location Button */}
-                <div className="absolute bottom-4 right-4 z-10">
-                  <Button size="sm" variant="secondary" className="bg-white shadow-md rounded-full w-10 h-10 p-0">
-                    📍
-                  </Button>
-                </div>
-
-                {/* Map Legend */}
-                <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-md px-3 py-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[#EDB003] fill-[#EDB003]" />
-                    <span className="font-medium text-gray-700">Virtual Office Locations</span>
-                  </div>
-                </div>
-              </div>
+              <SimpleGoogleMap
+                center={resolvedCenter}
+                zoom={11}
+                height={`calc(100vh - 200px)`}
+                className="rounded-xl overflow-hidden shadow-xl border-2 border-gray-300"
+                markers={mapMarkers}
+              />
             </div>
           </div>
+
+          {/* Removed Interactive Map Section and extra info */}
 
           {/* Consultant Section */}
           <div className={`bg-white rounded-lg border border-gray-200 p-6 mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
@@ -639,7 +561,7 @@ const VirtualOffice = () => {
                 </h3>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-3">
-                    <img src="https://via.placeholder.com/48x48" alt="Consultant" className="w-12 h-12 rounded-full" />
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face" alt="Consultant" className="w-12 h-12 rounded-full" />
                     <div>
                       <p className="font-semibold text-gray-900">Rahul Sharma</p>
                       <p className="text-sm text-gray-600">+91-98765-43210</p>

@@ -265,7 +265,7 @@ const Header = () => {
             {/* Get in Touch Button */}
             <Splash3dButton
               onClick={() => handleNavigation("#contact")}
-              className="hidden lg:inline-flex relative px-6 py-2.5 text-base rounded-lg font-bold bg-[#ededed] text-[#222] border border-gray-300 shadow-[0_2px_8px_0_rgba(0,0,0,0.10)] hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.13)] active:translate-y-1 transition-all duration-150 before:content-[''] before:absolute before:inset-0 before:rounded-lg before:shadow-[inset_0_1.5px_0_0_#fff,inset_0_-2px_8px_0_#d1d5db] before:pointer-events-none"
+              className="hidden lg:inline-flex px-6 py-2.5 text-sm rounded-lg font-semibold bg-[#e8e8e8] text-[#1a1a1a] border border-[#c4c4c4]/60 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.14),0_1px_3px_rgba(0,0,0,0.1)] transition-all duration-200"
             >
               Get in Touch
             </Splash3dButton>
