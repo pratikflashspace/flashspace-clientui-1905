@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import SimpleGoogleMap from "@/components/Map/SimpleGoogleMap";
+import MapLibreMap from "@/components/Map/MapLibreMap";
 import { cityCenters } from "@/components/Map/locationData.example";
+import Header from "@/components/Header";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,14 +14,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { 
-  City, 
-  BusinessSolution, 
-  VirtualOfficeItem, 
-  VirtualOfficeCityKey, 
-  VirtualOfficesByCity, 
-  ViewMode, 
-  SortBy 
+import {
+  City,
+  BusinessSolution,
+  VirtualOfficeItem,
+  VirtualOfficeCityKey,
+  VirtualOfficesByCity,
+  ViewMode,
+  SortBy
 } from "@/types/services";
 
 const VirtualOffice = () => {
@@ -130,7 +131,7 @@ const VirtualOffice = () => {
   ];
 
   const handleNavigation = (href: string): void => {
-    window.location.href = href;
+    navigate(href);
   };
 
   // Mock data for virtual offices by city
@@ -187,62 +188,56 @@ const VirtualOffice = () => {
     return cityCenters.delhi;
   })();
 
-  // Prepare marker data from cityOffices
-  const mapMarkers = cityOffices.map((office) => ({
-    position: office.coordinates || resolvedCenter,
-    title: office.name,
-    info: `<div class='p-2'><strong>${office.name}</strong><br/>${office.address}<br/><span style='color:#EDB003;font-weight:bold;'>${office.price}</span></div>`
-  }));
+  // Prepare marker data from cityOffices with full details
+  const mapMarkers = cityOffices.map((office) => {
+    // Get image for this office
+    let imageSrc = "";
+    switch (office.name) {
+      case "Connaught Place Virtual Office": imageSrc = "https://shorturl.at/Fyr6o"; break;
+      case "Gurgaon Business Center": imageSrc = "https://shorturl.at/LdEgA"; break;
+      case "Nehru Place Office": imageSrc = "https://shorturl.at/S4XWY"; break;
+      case "BKC Premium Office": imageSrc = "https://shorturl.at/NUpzM"; break;
+      case "Lower Parel Business": imageSrc = "https://shorturl.at/LdEgA"; break;
+      case "Andheri East Hub": imageSrc = "https://shorturl.at/S4XWY"; break;
+      case "Koramangala Tech Office": imageSrc = "https://shorturl.at/LdEgA"; break;
+      case "Whitefield Business Center": imageSrc = "https://shorturl.at/Fyr6o"; break;
+      case "Electronic City Office": imageSrc = "https://shorturl.at/NUpzM"; break;
+      case "Hinjewadi IT Park Office": imageSrc = "https://shorturl.at/Fyr6o"; break;
+      case "Koregaon Park Center": imageSrc = "https://shorturl.at/Fyr6o"; break;
+      case "Khan Market Business Hub": imageSrc = "https://shorturl.at/NUpzM"; break;
+      case "Saket Corporate Center": imageSrc = "https://shorturl.at/LdEgA"; break;
+      case "Lajpat Nagar Virtual Office": imageSrc = "https://shorturl.at/S4XWY"; break;
+      case "Worli Business District": imageSrc = "https://shorturl.at/Fyr6o"; break;
+      case "Fort Commercial Center": imageSrc = "https://shorturl.at/NUpzM"; break;
+      case "Indiranagar Corporate Hub": imageSrc = "https://shorturl.at/LdEgA"; break;
+      case "HSR Layout Virtual Office": imageSrc = "https://shorturl.at/S4XWY"; break;
+      case "Baner Business Hub": imageSrc = "https://shorturl.at/Fyr6o"; break;
+      case "Kharadi Tech Center": imageSrc = "https://shorturl.at/NUpzM"; break;
+      default: imageSrc = "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop";
+    }
+
+    return {
+      position: office.coordinates || resolvedCenter,
+      title: office.name,
+      address: office.address,
+      price: office.price,
+      rating: office.rating,
+      reviews: office.reviews,
+      image: imageSrc,
+      features: office.features,
+    };
+  });
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
-      {/* Search Focus Overlay */}
-      {isSearchFocused && (
-        <div className="fixed inset-0 bg-black/30 z-40 transition-opacity duration-300" />
-      )}
-      
-      {/* Header */}
-      <header className={`bg-white border-b border-gray-200 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="inline-flex items-center gap-2 text-gray-900 hover:text-primary transition-colors group">
-              <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-              Back to Home
-            </Link>
-            
-            {/* <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="text-sm text-gray-700 hover:text-primary transition-colors duration-300 font-medium flex items-center gap-2 border-gray-300"
-                >
-                  Virtual Office
-                  <ChevronDown className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
-                {businessSolutions.map((solution) => (
-                  <DropdownMenuItem 
-                    key={solution.label}
-                    onClick={() => handleNavigation(solution.href)}
-                    className="cursor-pointer p-3 hover:bg-gray-50 transition-colors"
-                  >
-                    <solution.icon className="w-4 h-4 mr-3 text-primary" />
-                    <div className="flex flex-col">
-                      <span className="font-medium text-gray-900">{solution.label}</span>
-                      <span className="text-xs text-gray-500">{solution.description}</span>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu> */}
-          </div>
-        </div>
-      </header>
+    <div className="h-screen bg-gray-50 overflow-hidden">
+      {/* Original Header */}
+      <Header />
 
-      {/* Main Content */}
-      <main className="flex-1">
-        <div className="container mx-auto px-4 py-6">
+      {/* Main Content - Split Layout */}
+      <main className="flex h-screen pt-20">
+        {/* Left Side: Office Listings */}
+        <div className="w-1/2 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400" style={{ height: 'calc(100vh - 5rem)' }}>
+          <div className="px-6 py-6">
           {/* Breadcrumb */}
           <div className={`flex items-center gap-2 text-sm text-gray-600 mb-4 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             <span>Home</span>
@@ -429,10 +424,8 @@ const VirtualOffice = () => {
             </div>
           </div>
 
-          {/* Split Layout: Cards on Left, Map on Right */}
-          <div className={`flex gap-4 mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            {/* Left Side: Virtual Office Listings - Compact */}
-            <div className={`w-[55%] space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#EDB003] scrollbar-track-gray-100`}>
+          {/* Office Cards Grid */}
+          <div className={`grid grid-cols-2 gap-4 mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               {cityOffices.map((office) => {
                 let imageSrc = "";
                 switch (office.name) {
@@ -536,63 +529,20 @@ const VirtualOffice = () => {
                   </Card>
                 );
               })}
-            </div>
-
-            {/* Right Side: Google Map - Full Height Sticky */}
-            <div className="w-[45%] sticky top-4">
-              <SimpleGoogleMap
-                center={resolvedCenter}
-                zoom={11}
-                height={`calc(100vh - 200px)`}
-                className="rounded-xl overflow-hidden shadow-xl border-2 border-gray-300"
-                markers={mapMarkers}
-              />
-            </div>
           </div>
 
-          {/* Removed Interactive Map Section and extra info */}
-
-          {/* Consultant Section */}
-          <div className={`bg-white rounded-lg border border-gray-200 p-6 mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Upgrade your office with our Expert Consultation
-                </h3>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="flex items-center gap-3">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face" alt="Consultant" className="w-12 h-12 rounded-full" />
-                    <div>
-                      <p className="font-semibold text-gray-900">Rahul Sharma</p>
-                      <p className="text-sm text-gray-600">+91-98765-43210</p>
-                      <p className="text-sm text-primary">FlashSpace Consultant</p>
-                    </div>
-                  </div>
-                  <Button className="bg-primary text-white">Contact Expert</Button>
-                </div>
-                
-                <p className="text-gray-600 mb-4">
-                  Our team has assisted 200+ corporates in {selectedCity} to establish their virtual office presence.
-                </p>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Location selection & strategy</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Documentation & legal expertise</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Setup optimization & compliance</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
+        </div>
 
+        {/* Right Side: Map - Full Height Fixed */}
+        <div className="w-1/2 overflow-hidden flex-shrink-0" style={{ height: 'calc(100vh - 5rem)' }}>
+          <MapLibreMap
+            center={resolvedCenter}
+            zoom={11}
+            height="100%"
+            className="w-full h-full"
+            markers={mapMarkers}
+          />
         </div>
       </main>
     </div>

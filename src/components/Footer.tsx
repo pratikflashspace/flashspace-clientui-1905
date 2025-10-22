@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
+import {
   Building,
   FileText,
   Mail,
@@ -18,10 +18,23 @@ import {
   Send
 } from "lucide-react";
 import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-animation";
+import { smoothScrollTo } from "@/lib/lenis";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const isVisible = useScrollAnimation('footer');
+
+  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      try {
+        smoothScrollTo(href, { offset: -90 });
+      } catch {
+        const element = document.querySelector(href);
+        element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
 
   const services = [
     { name: "Virtual Office Solutions", icon: <Building className="w-4 h-4" /> },
@@ -143,7 +156,8 @@ const Footer = () => {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm font-content"
+                    onClick={(e) => handleAnchorClick(e, link.href)}
+                    className="text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm font-content cursor-pointer"
                   >
                     {link.name}
                   </a>
@@ -162,7 +176,8 @@ const Footer = () => {
                 <li key={item.name}>
                   <a
                     href={item.href}
-                    className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm font-content"
+                    onClick={(e) => handleAnchorClick(e, item.href)}
+                    className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm font-content cursor-pointer"
                   >
                     <span className="text-blue-500">
                       {item.icon}

@@ -129,7 +129,7 @@ const EventSpaces = () => {
   ];
 
   const handleNavigation = (href: string): void => {
-    window.location.href = href;
+    navigate(href);
   };
 
   const services: ServiceItem[] = [

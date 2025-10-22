@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { smoothScrollTo } from "@/lib/lenis";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,12 @@ const socialItems = [
   { label: 'LinkedIn', link: 'https://linkedin.com' }
 ];
 
-const Header = () => {
+interface HeaderProps {
+  forceWhiteBackground?: boolean;
+}
+
+const Header = ({ forceWhiteBackground = false }: HeaderProps) => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -77,8 +83,8 @@ const Header = () => {
         element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     } else {
-      // For internal route paths keep existing full page nav for now. Could switch to react-router navigate.
-      window.location.href = href;
+      // Use React Router navigation for internal routes
+      navigate(href);
     }
     setIsMenuOpen(false);
   };
@@ -87,7 +93,7 @@ const Header = () => {
     <header
       className={cn(
         "fixed top-0 w-full z-[100] transition-all duration-300 text-md  ", // give header lower z than sidebar overlay (which uses 9999)
-        scrolled
+        scrolled || forceWhiteBackground
           ? "bg-white/95 supports-[backdrop-filter]:bg-white/65 backdrop-blur-md border-b border-border shadow-sm"
           : "bg-transparent backdrop-blur-sm"
 
@@ -171,7 +177,7 @@ const Header = () => {
                           <button
                             key={item.type}
                             className="flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-accent/10 transition-colors"
-                            onClick={() => { handleNavigation(`/solutions/on-demand?type=${item.type}`); setIsDropdownOpen(false); }}
+                            onClick={() => { handleNavigation(`/Solutions/on-demand?type=${item.type}`); setIsDropdownOpen(false); }}
                           >
                             <span className="text-foreground/80">{item.label}</span>
                             <ArrowRight className="w-4 h-4 text-foreground/40" />
@@ -187,19 +193,19 @@ const Header = () => {
                           icon: Building2,
                           title: 'Virtual Office',
                           desc: 'Business address, mail handling, call forwarding',
-                          href: '/solutions/virtual-space',
+                          href: '/Solutions/virtual-office',
                         },
                         {
                           icon: Users,
                           title: 'Coworking Space',
                           desc: 'Flexible desks, private cabins, team suites',
-                          href: '/solutions/coworking-space',
+                          href: '/Solutions/coworking-space',
                         },
                         {
                           icon: FileText,
                           title: 'Business Setup',
                           desc: 'Company registration, GST, compliance',
-                          href: '/solutions/business-setup',
+                          href: '/Solutions/business-setup',
                         },
                       ].map(({ icon: Icon, title, desc, href }) => (
                         <div
@@ -221,19 +227,13 @@ const Header = () => {
                   </div>
 
                   {/* Bottom CTAs */}
-                  <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div className="mt-4">
                     <button
-                      className="flex items-center justify-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/90 text-black rounded-lg transition-colors font-medium text-sm"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/90 text-black rounded-lg transition-colors font-medium text-sm"
                       onClick={() => { handleNavigation('#contact'); setIsDropdownOpen(false); }}
                     >
                       <UserCheck className="w-4 h-4" />
                       Get Consultation
-                    </button>
-                    <button
-                      className="flex items-center justify-center gap-2 px-4 py-2.5 border border-border rounded-lg hover:bg-accent/5 text-foreground/80 transition-colors font-medium text-sm"
-                      onClick={() => { handleNavigation('#contact'); setIsDropdownOpen(false); }}
-                    >
-                      Share Requirement
                     </button>
                   </div>
                 </div>
@@ -261,18 +261,18 @@ const Header = () => {
             <div className="hidden lg:flex items-center px-3 py-1.5 rounded-md border transition-colors duration-300 border-gray-300 text-black">
               <span className="text-sm font-md">IND</span>
             </div>
-            
+
             {/* Get in Touch Button */}
             <Splash3dButton
               onClick={() => handleNavigation("#contact")}
-              className="hidden lg:inline-flex px-6 py-2.5 text-sm rounded-lg font-semibold bg-[#e8e8e8] text-[#1a1a1a] border border-[#c4c4c4]/60 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.14),0_1px_3px_rgba(0,0,0,0.1)] transition-all duration-200"
+              className="hidden lg:inline-flex relative px-6 py-2.5 text-base rounded-lg font-bold bg-black text-white border border-black shadow-[0_2px_8px_0_rgba(0,0,0,0.10)] hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.13)] active:translate-y-1 transition-all duration-150 before:content-[''] before:absolute before:inset-0 before:rounded-lg before:pointer-events-none"
             >
               Get in Touch
             </Splash3dButton>
-            <Button 
+            <Button
               onClick={() => handleNavigation("/login")}
               variant="outline"
-              className="hidden lg:inline-flex px-4 py-2 text-sm rounded-md  transition-all duration-300 border-gray-300 text-black hover:bg-gray-50"
+              className="hidden lg:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 text-black hover:bg-gray-50"
               style={{ fontFamily: 'Poppins'  }}
             >
               Log in

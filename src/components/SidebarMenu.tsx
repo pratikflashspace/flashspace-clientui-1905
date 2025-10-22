@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { smoothScrollTo } from "@/lib/lenis";
@@ -9,10 +10,11 @@ interface SidebarMenuProps {
 }
 
 const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
+  const navigate = useNavigate();
   const primaryTop = [
     { label: 'Start Chatting', href: '/start-chatting' },
     { label: 'Get WorkSpace', href: '/services/coworking-space' },
-    { label: 'Business Setup', href: '/solutions/business-setup' },
+    { label: 'Business Setup', href: '/Solutions/business-setup' },
   ];
   const middle = [
     { label: 'Your Bookings', href: '/bookings' },
@@ -32,7 +34,8 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
         document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     } else {
-      window.location.href = href;
+      // Use React Router navigation for internal routes
+      navigate(href);
     }
     onClose();
   };

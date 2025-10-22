@@ -128,7 +128,7 @@ const CoworkingSpace = () => {
   ];
 
   const handleNavigation = (href: string): void => {
-    window.location.href = href;
+    navigate(href);
   };
 
   // Enhanced mock data for coworking spaces by city
@@ -523,6 +523,89 @@ const CoworkingSpace = () => {
             })}
           </div>
 
+          {/* What is Coworking Space Section */}
+          <div className={`bg-gradient-to-br from-[#172A3A] to-[#172A3A]/90 rounded-2xl p-8 mb-8 relative z-30 transition-opacity duration-300 overflow-hidden ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#EDB003]/10 rounded-full blur-3xl"></div>
+            <div className="relative z-10">
+              <h2 className="text-3xl font-bold text-white mb-6">What is a Coworking Space?</h2>
+              <p className="text-gray-200 text-lg mb-6 leading-relaxed">
+                Coworking spaces are shared work environments where professionals from different companies work alongside each other.
+                They offer flexible workspace solutions with modern amenities, networking opportunities, and a vibrant community atmosphere.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Wifi className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-2">Modern Amenities</h3>
+                      <p className="text-gray-300 text-sm">High-speed internet, ergonomic furniture, meeting rooms, and all essential office facilities included.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-2">Networking Community</h3>
+                      <p className="text-gray-300 text-sm">Connect with like-minded professionals, attend events, and grow your business network.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Coffee className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-2">Premium Facilities</h3>
+                      <p className="text-gray-300 text-sm">Complimentary coffee, breakout areas, phone booths, and recreational zones for work-life balance.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Calendar className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-2">Flexible Plans</h3>
+                      <p className="text-gray-300 text-sm">Choose from hot desks, dedicated desks, or private cabins with daily, monthly, or yearly plans.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#EDB003]/20 backdrop-blur-sm border border-[#EDB003]/30 rounded-lg p-4">
+                <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-[#EDB003]" />
+                  Why Choose Coworking?
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="flex items-center gap-2 text-gray-200">
+                    <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
+                    <span>Cost-effective & flexible workspace</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-200">
+                    <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
+                    <span>Built-in professional network</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-200">
+                    <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
+                    <span>Boost productivity & creativity</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Consultant Section */}
           <div className={`bg-white rounded-lg border border-gray-200 p-6 mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             <div className="flex items-center justify-between">
@@ -535,13 +618,13 @@ const CoworkingSpace = () => {
                     <img src="https://via.placeholder.com/48x48" alt="Consultant" className="w-12 h-12 rounded-full" />
                     <div>
                       <p className="font-semibold text-gray-900">Nitin Kashyap</p>
-                      <p className="text-sm text-gray-600">+91-98652-44396</p>
+                      <p className="text-sm text-gray-600">+91 8100888777</p>
                       <p className="text-sm text-primary">FlashSpace Consultant</p>
                     </div>
                   </div>
                   <Button className="bg-primary text-white">Contact Nitin</Button>
                 </div>
-                
+
                 <p className="text-gray-600 mb-4">
                   Nitin's team assisted 200+ corporates in {selectedCity} to move into their new office.
                 </p>

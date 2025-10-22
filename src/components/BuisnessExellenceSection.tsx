@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { CheckCircle, TrendingUp, Users, Zap, MapPin, Shield } from "lucide-react";
+import { CheckCircle, TrendingUp, Users, Zap, MapPin, Shield, Building2, ArrowRight } from "lucide-react";
 import { BarPatternChart } from "@/components/ui/bar-pattern-chart";
 
 const BusinessExcellenceSection = () => {
@@ -36,7 +36,7 @@ const BusinessExcellenceSection = () => {
     },
     {
       icon: Shield,
-      title: "Complete Compliance",
+      title: "Reliable Compliance ",
       description: "GST ready addresses with full legal documentation and compliance support included.",
       bgColor: "bg-emerald-50",
       image: "https://plus.unsplash.com/premium_photo-1664475876634-246925214655?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8c2lnbmF0dXJlJTVDfGVufDB8fDB8fHww"
@@ -274,7 +274,7 @@ const BusinessExcellenceSection = () => {
                   </div>
                   <div className="relative z-10">
                     <MapPin className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
-                    <div className="text-2xl font-bold text-[#172A3A] mb-1" style={{ fontFamily: 'Poppins' }}>1,200+</div>
+                    <div className="text-2xl font-bold text-[#172A3A] mb-1" style={{ fontFamily: 'Poppins' }}>100+</div>
                     <div className="text-xs text-gray-600">Workspaces</div>
                   </div>
                 </div>
@@ -286,7 +286,7 @@ const BusinessExcellenceSection = () => {
                   </div>
                   <div className="relative z-10">
                     <Users className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
-                    <div className="text-2xl font-bold text-[#172A3A] mb-1" style={{ fontFamily: 'Poppins' }}>48</div>
+                    <div className="text-2xl font-bold text-[#172A3A] mb-1" style={{ fontFamily: 'Poppins' }}>48+</div>
                     <div className="text-xs text-gray-600">Locations</div>
                   </div>
                 </div>
@@ -310,28 +310,35 @@ const BusinessExcellenceSection = () => {
                   </div>
                   <div className="relative z-10">
                     <Zap className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
-                    <div className="text-2xl font-bold text-[#172A3A] mb-1" style={{ fontFamily: 'Poppins' }}>&lt;2min</div>
-                    <div className="text-xs text-gray-600">Response</div>
+                    <div className="text-2xl font-bold text-[#172A3A] mb-1" style={{ fontFamily: 'Poppins' }}>&lt;3days</div>
+                    <div className="text-xs text-gray-600">Avg Documentation</div>
                   </div>
                 </div>
               </div>
 
-              {/* Attractive Photo Section */}
-              <div className="relative mt-6 overflow-hidden rounded-2xl shadow-xl group">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#EDB003]/90 to-[#EDB003]/70 z-10"></div>
-                <img 
-                  src="https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fG9mZmljZXxlbnwwfHwwfHx8MA%3D%3D" 
-                  alt="Modern Workspace" 
+              {/* Explore Workspaces Section */}
+              <div
+                className="relative mt-6 overflow-hidden rounded-2xl shadow-xl group cursor-pointer"
+                onClick={() => window.location.href = 'https://sales-portal-url.com'}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-[#172A3A]/90 to-[#EDB003]/80 z-10"></div>
+                <img
+                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2000"
+                  alt="Explore Workspaces"
                   className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white p-6">
-                  <Shield className="w-12 h-12 mb-3 opacity-90" />
+                  <Building2 className="w-12 h-12 mb-3 opacity-90 group-hover:scale-110 transition-transform duration-300" />
                   <h4 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Poppins' }}>
-                    Premium Facilities
+                    Explore WorkSpaces
                   </h4>
-                  <p className="text-sm text-center opacity-90">
-                    Experience world-class workspaces designed for success
+                  <p className="text-sm text-center opacity-90 mb-4">
+                    Discover premium workspaces across India
                   </p>
+                  <button className="flex items-center gap-2 px-6 py-2.5 bg-[#EDB003] text-white rounded-lg font-semibold hover:bg-white hover:text-[#172A3A] transition-all duration-300 shadow-lg group-hover:scale-105">
+                    View All Spaces
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                  </button>
                 </div>
               </div>
             </div>

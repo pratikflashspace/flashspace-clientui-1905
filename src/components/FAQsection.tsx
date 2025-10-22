@@ -205,7 +205,7 @@ const FAQSection = () => {
               Contact Support
             </a>
             <a
-              href="mailto:support@virtuhubconnect.com"
+              href="mailto:support@flashspace.co"
               className="bg-white border-2 border-gray-200 text-[#172A3A] hover:bg-[#172A3A] hover:text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-md"
             >
               Email Us

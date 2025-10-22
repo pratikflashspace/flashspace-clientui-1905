@@ -6,14 +6,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { MapPin, Search, ChevronDown, Check } from "lucide-react";
 import { useState } from "react";
+import { useNavigate, NavLink } from "react-router-dom";
 import VideoBackground from "./VideoBackground";
 import { cn } from "@/lib/utils";
 import RippleButton from "@/components/ui/RippleButton/RippleButton";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const [selectedCity, setSelectedCity] = useState("Delhi"); // Default Delhi selected
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedService, setSelectedService] = useState("Virtual Spaces"); 
+  const [selectedService, setSelectedService] = useState("Virtual Spaces");
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSolutionOpen, setIsSolutionOpen] = useState(false);
@@ -93,10 +95,10 @@ const HeroSection = () => {
     if (searchQuery) params.set('location', searchQuery);
     if (selectedService) params.set('service', selectedService);
     
-    // Navigate using React Router instead of window.location
+    // Navigate using React Router
     const url = `${route}?${params.toString()}`;
     console.log('Navigating to:', url); // Debug log
-    window.location.href = url;
+    navigate(url);
   };
 
   return (
@@ -114,7 +116,7 @@ const HeroSection = () => {
       {/* Darker overlay for text readability */}
       {/* <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-black/40 to-slate-800/50 backdrop-blur-sm z-10"></div> */}
       
-      <div className="container mx-auto text-left relative z-20">
+      <div className="container mx-auto text-left relative z-20 pl-24 md:pl-16 lg:pl-8">
         {/* Hero Content */}
         <div className="max-w-4xl mb-8 relative">          
           <h1 className="text-4xl md:text-7xl font-semibold  mb-6 leading-tight text-black animate-fade-in" style={{ fontFamily: 'Poppins' }}>
@@ -138,7 +140,7 @@ const HeroSection = () => {
                hoverTextColor="black"
                hoverFlairColor="#EFAD1A"
                buttonHeight="60px"
-               onClick={() => scrollToSection('#chat-section')}
+               onClick={() => NavLink({ to: '/start-chatting' })}
             />
             <RippleButton 
                text={<span className="flex items-center gap-2 ">

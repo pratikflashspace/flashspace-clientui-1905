@@ -29,7 +29,7 @@ const ImmediateAssistanceSection = () => {
               <p className="text-gray-700 mb-6 sm:mb-8 text-base sm:text-lg md:text-xl font-medium">Our support team is available 24/7 to help you get started</p>
               <Button className="w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-white px-6 sm:px-10 py-4 sm:py-5 text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-xl">
                 <Phone className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3" />
-                <span className="text-sm sm:text-base">Call +91-9876-543-210</span>
+                <span className="text-sm sm:text-base">Call +91 8100888777</span>
               </Button>
             </CardContent>
           </Card>
