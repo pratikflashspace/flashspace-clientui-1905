@@ -1057,7 +1057,7 @@ const VirtualOffice = () => {
                 Get Started Today
               </Button>
 
-              <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-[#172A3A] text-lg px-10 py-7 rounded-full font-bold transition-all duration-300">
+              <Button className="bg-white text-black border-2 border-gray-300 hover:bg-[#FFD43B] hover:text-black hover:border-[#FFD43B] text-lg px-10 py-7 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
                 <Phone className="w-5 h-5 mr-2" />
                 Talk to Expert
               </Button>

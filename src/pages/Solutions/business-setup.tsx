@@ -1,4 +1,4 @@
-import { Building, MapPin, Mail, Phone, FileText, CheckCircle, Star, Users, Award, ChevronDown, Search, ArrowRight, Sparkles, TrendingUp, Shield, Briefcase, Clock, Package, Zap, HeartHandshake, DollarSign, Headphones, FileCheck, Scale } from "lucide-react";
+import { Building, MapPin, Mail, Phone, FileText, CheckCircle, Star, Users, Award, ChevronDown, Search, ArrowRight, Sparkles, TrendingUp, Shield, Briefcase, Clock, Package, Zap, HeartHandshake, DollarSign, Headphones, FileCheck, Scale, IndianRupee } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -22,45 +22,6 @@ const BusinessSetup = () => {
     "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane"
   ];
 
-  const features = [
-    {
-      icon: FileText,
-      title: "Company Registration",
-      description: "Complete support for Pvt Ltd, LLP, OPC, Partnership & Sole Proprietorship registration",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: Shield,
-      title: "GST & Tax Registration",
-      description: "Hassle-free GST, PAN, TAN registration with expert CA guidance and compliance support",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    },
-    {
-      icon: Briefcase,
-      title: "Business Licenses",
-      description: "Assistance with trade licenses, FSSAI, import-export codes, and industry-specific permits",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: Users,
-      title: "Expert Consultation",
-      description: "Dedicated legal and CA experts to guide you through the entire business setup process",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    },
-    {
-      icon: Clock,
-      title: "Fast-Track Processing",
-      description: "Launch your business in just 7-10 working days with our streamlined registration process",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: Award,
-      title: "Post-Setup Support",
-      description: "Ongoing compliance support for annual filings, ROC requirements, and statutory obligations",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    }
-  ];
-
   const whatIsBusinessSetupCards = [
     {
       icon: Building,
@@ -75,12 +36,12 @@ const BusinessSetup = () => {
     {
       icon: Shield,
       title: "Business Licenses",
-      description: "Obtain trade licenses, FSSAI, import-export codes, professional tax, and all industry-specific permits"
+      description: "Obtain trade licenses, FSSAI, IEC (Import-Export Code), Shop & Establishment, MSME/Udyam, Professional Tax, Drug License, Trademark Registration, ISO Certification, and all industry-specific permits"
     },
     {
       icon: Headphones,
-      title: "Compliance Support",
-      description: "Annual ROC filings, board meetings, maintenance of statutory records, and ongoing compliance assistance"
+      title: "Business Setup — Worldwide",
+      description: "Comprehensive global business registration and incorporation services across multiple countries. Expert guidance for international expansion, cross-border compliance, and worldwide entity formation"
     }
   ];
 
@@ -99,8 +60,14 @@ const BusinessSetup = () => {
     },
     {
       number: "03",
+      title: "Make Payment",
+      description: "Complete secure payment through our transparent pricing system with no hidden charges",
+      icon: IndianRupee
+    },
+    {
+      number: "04",
       title: "Registration Complete",
-      description: "Receive your Certificate of Incorporation, PAN, TAN, GST, and all business licenses",
+      description: "Receive your Certificate of Incorporation, PAN, TAN, GST, and all business licenses within 7-10 days",
       icon: CheckCircle
     }
   ];
@@ -141,60 +108,6 @@ const BusinessSetup = () => {
       title: "Multiple Entity Types",
       description: "Support for Pvt Ltd, LLP, OPC, Partnership, and Proprietorship",
       gradient: "from-[#172A3A] to-[#2a4a5a]"
-    }
-  ];
-
-  const servicePackages = [
-    {
-      name: "Startup Package",
-      price: "₹14,999",
-      period: "One-time",
-      description: "Perfect for solo entrepreneurs and small startups",
-      features: [
-        "OPC/Proprietorship Registration",
-        "PAN & TAN Application",
-        "GST Registration",
-        "Basic Business License",
-        "Digital Signature Certificate",
-        "1 Year Post-Setup Support"
-      ],
-      gradient: "from-white to-gray-50",
-      popular: false
-    },
-    {
-      name: "Professional Package",
-      price: "₹24,999",
-      period: "One-time",
-      description: "Ideal for growing businesses and partnerships",
-      features: [
-        "Pvt Ltd/LLP Registration",
-        "PAN, TAN & GST Registration",
-        "Trade License & FSSAI (if applicable)",
-        "Director DSC & DIN",
-        "MOA & AOA Drafting",
-        "2 Years Post-Setup Support",
-        "Annual ROC Filing Assistance"
-      ],
-      gradient: "from-[#EDB003]/10 to-[#f5c242]/5",
-      popular: true
-    },
-    {
-      name: "Enterprise Package",
-      price: "₹44,999",
-      period: "One-time",
-      description: "Complete solution for established businesses",
-      features: [
-        "All Professional Package Features",
-        "Import-Export Code (IEC)",
-        "Professional Tax Registration",
-        "MSME/Udyam Registration",
-        "Trademark Registration (1 Class)",
-        "3 Years Compliance Support",
-        "Dedicated CA & Legal Expert",
-        "Priority Processing"
-      ],
-      gradient: "from-[#172A3A]/5 to-[#2a4a5a]/5",
-      popular: false
     }
   ];
 
@@ -263,37 +176,37 @@ const BusinessSetup = () => {
   const cityLocations = [
     {
       city: "Bangalore",
-      centers: 18,
+      centers: 5,
       image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&q=80",
       description: "Startup hub with streamlined registrations"
     },
     {
       city: "Delhi NCR",
-      centers: 24,
+      centers: 15,
       image: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=80",
       description: "Capital region business setup experts"
     },
     {
       city: "Mumbai",
-      centers: 22,
+      centers: 4,
       image: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80",
       description: "Financial capital registration services"
     },
     {
-      city: "Pune",
-      centers: 12,
-      image: "https://images.unsplash.com/photo-1595659919839-67e5e0e6f47f?w=800&q=80",
+      city: "Kolkata",
+      centers: 8,
+      image: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800&q=80",
       description: "Complete business incorporation support"
     },
     {
       city: "Hyderabad",
-      centers: 15,
+      centers: 4,
       image: "https://images.unsplash.com/photo-1609619385002-f40f7eb3b755?w=800&q=80",
       description: "Tech startup registration specialists"
     },
     {
       city: "Chennai",
-      centers: 10,
+      centers: 2,
       image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=800&q=80",
       description: "Southern region setup assistance"
     }
@@ -312,7 +225,7 @@ const BusinessSetup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
       {/* Header */}
       <Header />
 
@@ -356,7 +269,7 @@ const BusinessSetup = () => {
               <span className="text-[#EDB003]">Made Simple</span>
             </h1>
 
-            <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed">
+            <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
               Complete end-to-end support for company registration, GST filing, licenses, and legal compliance - launch your business in 7-10 days
             </p>
 
@@ -512,7 +425,7 @@ const BusinessSetup = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               What is <span className="text-[#EDB003]">Business Setup</span>?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               FlashSpace Business Setup provides comprehensive end-to-end support for legally establishing your business in India. From company registration to compliance management, we handle everything so you can focus on growing your venture.
             </p>
           </motion.div>
@@ -534,7 +447,7 @@ const BusinessSetup = () => {
                     <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
                       {card.title}
                     </h3>
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
                       {card.description}
                     </p>
                   </CardContent>
@@ -560,7 +473,7 @@ const BusinessSetup = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               How It <span className="text-[#EDB003]">Works</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Launch your business in three simple steps with FlashSpace
             </p>
           </motion.div>
@@ -598,7 +511,7 @@ const BusinessSetup = () => {
                       <h3 className="text-2xl font-bold mb-3 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
                         {step.title}
                       </h3>
-                      <p className="text-gray-600 leading-relaxed text-lg">
+                      <p className="text-gray-600 leading-relaxed text-lg" style={{ fontFamily: 'Geist, sans-serif' }}>
                         {step.description}
                       </p>
                     </div>
@@ -625,7 +538,7 @@ const BusinessSetup = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               Why Choose <span className="text-[#EDB003]">FlashSpace</span> Business Setup
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Trusted by 5000+ entrepreneurs for comprehensive business registration and compliance solutions
             </p>
           </motion.div>
@@ -652,135 +565,8 @@ const BusinessSetup = () => {
                       {reason.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
                       {reason.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Service Packages Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Pricing Plans
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
-              Service <span className="text-[#EDB003]">Packages</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Choose the perfect package for your business needs
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {servicePackages.map((pkg, index) => (
-              <motion.div
-                key={index}
-                className="relative"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.15 }}
-                viewport={{ once: true }}
-              >
-                {pkg.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="bg-gradient-to-r from-[#EDB003] to-[#f5c242] text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <Card className={`border-2 ${pkg.popular ? 'border-[#EDB003] shadow-2xl' : 'border-gray-200 shadow-lg'} hover:shadow-2xl transition-all duration-500 h-full bg-gradient-to-br ${pkg.gradient}`}>
-                  <CardContent className="p-8">
-                    <h3 className="text-2xl font-bold mb-2 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
-                      {pkg.name}
-                    </h3>
-                    <p className="text-gray-600 mb-6 text-sm">
-                      {pkg.description}
-                    </p>
-                    <div className="mb-6">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-bold text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
-                          {pkg.price}
-                        </span>
-                        <span className="text-gray-500 text-sm">/{pkg.period}</span>
-                      </div>
-                    </div>
-
-                    <ul className="space-y-4 mb-8">
-                      {pkg.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-3">
-                          <CheckCircle className="w-5 h-5 text-[#EDB003] flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-700 text-sm">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <Button className={`w-full ${pkg.popular ? 'bg-gradient-to-r from-[#EDB003] to-[#f5c242] hover:from-[#d69f03] hover:to-[#EDB003]' : 'bg-[#172A3A] hover:bg-[#2a4a5a]'} text-white py-6 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300`}>
-                      Get Started
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Our Features
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
-              Complete Business Setup Services
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to launch and legally establish your business with expert guidance
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
-                  <CardContent className="p-8 relative">
-                    {/* Background Gradient */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
-
-                    <div className={`w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <feature.icon className="w-8 h-8 text-white" />
-                    </div>
-
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
-                      {feature.title}
-                    </h3>
-
-                    <p className="text-gray-600 leading-relaxed">
-                      {feature.description}
                     </p>
                   </CardContent>
                 </Card>
@@ -805,7 +591,7 @@ const BusinessSetup = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               What Our <span className="text-[#EDB003]">Clients Say</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Hear from entrepreneurs who successfully launched their businesses with FlashSpace
             </p>
           </motion.div>
@@ -829,7 +615,7 @@ const BusinessSetup = () => {
                     </div>
 
                     {/* Content */}
-                    <p className="text-gray-700 mb-6 leading-relaxed italic">
+                    <p className="text-gray-700 mb-6 leading-relaxed italic" style={{ fontFamily: 'Geist, sans-serif' }}>
                       "{testimonial.content}"
                     </p>
 
@@ -869,7 +655,7 @@ const BusinessSetup = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               <span className="text-[#EDB003]">68+</span> Centers Across <span className="text-[#EDB003]">8</span> Cities
             </h2>
-            <p className="text-xl text-gray-600">Register your business from anywhere in India</p>
+            <p className="text-xl text-gray-600" style={{ fontFamily: 'Geist, sans-serif' }}>Register your business from anywhere in India</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -931,7 +717,7 @@ const BusinessSetup = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               Frequently Asked <span className="text-[#EDB003]">Questions</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Everything you need to know about business registration and setup
             </p>
           </motion.div>
@@ -966,7 +752,7 @@ const BusinessSetup = () => {
                     }`}
                   >
                     <div className="px-8 py-6 bg-gray-50 border-t border-gray-200">
-                      <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                      <p className="text-gray-700 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>{faq.answer}</p>
                     </div>
                   </div>
                 </div>
@@ -1007,7 +793,7 @@ const BusinessSetup = () => {
                 Register Your Business
               </Button>
 
-              <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-[#172A3A] text-lg px-10 py-7 rounded-full font-bold transition-all duration-300">
+              <Button className="bg-white text-black border-2 border-gray-300 hover:bg-[#FFD43B] hover:text-black hover:border-[#FFD43B] text-lg px-10 py-7 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
                 <Phone className="w-5 h-5 mr-2" />
                 Talk to Expert
               </Button>

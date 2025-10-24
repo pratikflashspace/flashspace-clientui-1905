@@ -519,6 +519,48 @@
   background: #9ca3af;
 }
 
+/* Right Panel Scrollbar - FlashSpace Yellow */
+.scrollbar-yellow::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollbar-yellow::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+.scrollbar-yellow::-webkit-scrollbar-thumb {
+  background: #EDB003;
+  border-radius: 10px;
+  border: 2px solid #f3f4f6;
+  transition: all 0.2s ease;
+}
+
+.scrollbar-yellow::-webkit-scrollbar-thumb:hover {
+  background: #d69f03;
+  border: 2px solid #e5e7eb;
+}
+
+/* Firefox scrollbar for right panel */
+.scrollbar-yellow {
+  scrollbar-width: thin;
+  scrollbar-color: #EDB003 #f3f4f6;
+}
+
+/* Ensure smooth scrolling on all devices */
+.scrollbar-yellow {
+  -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+}
+
+/* Prevent scroll on parent when scrolling right panel */
+.scrollbar-yellow::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.05);
+}
+
 /* MapLibre Popup Custom Styling */
 .maplibregl-popup {
   max-width: none !important;

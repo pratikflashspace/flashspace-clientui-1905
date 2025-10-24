@@ -76,10 +76,10 @@ const OnDemand = () => {
       image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80"
     },
     {
-      icon: GraduationCap,
-      title: "Training Rooms",
-      description: "Equipped for workshops, training sessions, and educational programs",
-      capacity: "15-30 people",
+      icon: Calendar,
+      title: "Day Pass",
+      description: "Ideal for freelancers or remote professionals needing a flexible workspae for a single day.",
+      capacity: "1 person",
       image: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80"
     },
     {
@@ -148,12 +148,10 @@ const OnDemand = () => {
   const pricingPlans = [
     {
       title: "Small Meeting Room",
-      capacity: "4-8 People",
-      price: "499",
+      capacity: "4 People",
+      price: "799",
       features: [
         "High-speed WiFi",
-        "LED TV / Projector",
-        "Whiteboard",
         "Tea & Coffee",
         "Power Backup",
         "AC & Comfortable Seating"
@@ -161,23 +159,24 @@ const OnDemand = () => {
       popular: false
     },
     {
-      title: "Large Conference Hall",
-      capacity: "20-30 People",
-      price: "1,499",
+      title: "Conference Hall",
+      capacity: "10–15 People",
+      price: "1,999/hour",
       features: [
         "Premium AV Setup",
         "Video Conferencing",
         "Multiple Screens",
         "Catering Available",
-        "Podium & Mic System",
+        "Whiteboard",
+        "LED Projector",
         "Professional Support"
       ],
       popular: true
     },
     {
-      title: "Training Room",
-      capacity: "15-25 People",
-      price: "999",
+      title: "Event Space",
+      capacity: "30–200 People",
+      price: "Customisable",
       features: [
         "Classroom Style Setup",
         "Projector & Screen",
@@ -255,37 +254,37 @@ const OnDemand = () => {
   const cityLocations = [
     {
       city: "Bangalore",
-      centers: 18,
+      centers: 5,
       image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=800&q=80",
       description: "Professional meeting spaces on-demand"
     },
     {
       city: "Delhi NCR",
-      centers: 24,
+      centers: 15,
       image: "https://images.unsplash.com/photo-1570939274717-7eda259b50ed?w=800&q=80",
       description: "Premium conference rooms by the hour"
     },
     {
       city: "Mumbai",
-      centers: 22,
+      centers: 4,
       image: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80",
       description: "Business meeting spaces available"
     },
     {
-      city: "Pune",
-      centers: 12,
+      city: "Kolkata",
+      centers: 8,
       image: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800&q=80",
       description: "Flexible workspace solutions"
     },
     {
       city: "Hyderabad",
-      centers: 15,
+      centers: 4,
       image: "https://images.unsplash.com/photo-1563656353898-febc9270a0f5?w=800&q=80",
       description: "On-demand meeting facilities"
     },
     {
       city: "Chennai",
-      centers: 10,
+      centers: 2,
       image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
       description: "Professional event spaces"
     }
@@ -294,7 +293,7 @@ const OnDemand = () => {
   const stats = [
     { number: "2000+", label: "Bookings Made", icon: Users },
     { number: "68+", label: "Centers Pan India", icon: Building },
-    { number: "8", label: "Major Cities", icon: MapPin },
+    { number: "50+", label: "Major Cities", icon: MapPin },
     { number: "Instant", label: "Booking Available", icon: Shield }
   ];
 
@@ -304,7 +303,7 @@ const OnDemand = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
       {/* Header Component */}
       <Header />
 
@@ -324,9 +323,9 @@ const OnDemand = () => {
           <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#172A3A]/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
+        <div className="relative z-10 container mx-auto px-4 h-full flex items-center justify-center">
           <motion.div
-            className="max-w-3xl text-white"
+            className="max-w-3xl text-white text-center mx-auto"
             initial="hidden"
             animate="visible"
             variants={fadeInUp}
@@ -348,17 +347,36 @@ const OnDemand = () => {
               <span className="text-[#EDB003]">On Your Schedule</span>
             </h1>
 
-            <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed">
+            <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
               Book professional meeting rooms and conference halls by the hour -
               whenever and wherever you need them
             </p>
 
-            {/* Hero Search Bar */}
+            {/* CTA Buttons */}
             <motion.div
-              className="bg-white rounded-2xl p-2 shadow-2xl max-w-2xl"
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
+            >
+              <Link to="/start-chatting">
+                <Button className="bg-black hover:bg-gray-900 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
+                  Start Chat
+                </Button>
+              </Link>
+              <Link to="/solutions/on-demand">
+                <Button className="bg-transparent hover:bg-[#FFD43B] text-black border-2 border-[#FFD43B] px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
+                  Explore Spaces
+                </Button>
+              </Link>
+            </motion.div>
+
+            {/* Hero Search Bar */}
+            <motion.div
+              className="bg-white rounded-2xl p-2 shadow-2xl max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
             >
               <div className="flex items-center gap-2">
                 <div className="flex-1">
@@ -420,10 +438,10 @@ const OnDemand = () => {
 
             {/* Trust Indicators */}
             <motion.div
-              className="flex items-center gap-8 mt-10"
+              className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-0 mt-10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.8 }}
             >
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
@@ -436,6 +454,9 @@ const OnDemand = () => {
                   <div className="text-gray-300 text-xs">On FlashSpace</div>
                 </div>
               </div>
+
+              {/* Divider - only visible on desktop */}
+              <div className="hidden md:block w-px h-12 bg-white/30 mx-8"></div>
 
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
@@ -489,7 +510,7 @@ const OnDemand = () => {
           </div>
         </div>
       </section>
-
+      
       {/* What is On-Demand Workspace Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
@@ -505,7 +526,7 @@ const OnDemand = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               What is <span className="text-[#EDB003]">On-Demand Workspace?</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Book professional meeting spaces by the hour without any long-term commitments.
               Perfect for client meetings, training sessions, events, and collaborative work.
             </p>
@@ -566,7 +587,7 @@ const OnDemand = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               How <span className="text-[#EDB003]">It Works</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Book your perfect meeting space in three simple steps
             </p>
           </motion.div>
@@ -597,7 +618,7 @@ const OnDemand = () => {
                       {step.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
                       {step.description}
                     </p>
                   </CardContent>
@@ -630,7 +651,7 @@ const OnDemand = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               Why Choose <span className="text-[#EDB003]">FlashSpace On-Demand</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Everything you need for successful meetings without any hassle
             </p>
           </motion.div>
@@ -654,7 +675,7 @@ const OnDemand = () => {
                       {benefit.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
                       {benefit.description}
                     </p>
                   </CardContent>
@@ -680,7 +701,7 @@ const OnDemand = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               Hourly <span className="text-[#EDB003]">Pricing Plans</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Pay only for what you use - no hidden charges, all-inclusive rates
             </p>
           </motion.div>
@@ -705,12 +726,20 @@ const OnDemand = () => {
                     <p className="text-gray-600 mb-4">{plan.capacity}</p>
 
                     <div className="mb-6">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-5xl font-bold text-[#EDB003]" style={{ fontFamily: 'Poppins' }}>
-                          ₹{plan.price}
-                        </span>
-                        <span className="text-gray-600">/hour</span>
-                      </div>
+                      {plan.price === "Customisable" ? (
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-3xl font-bold text-[#EDB003]" style={{ fontFamily: 'Poppins' }}>
+                            Customisable Pricing
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-5xl font-bold text-[#EDB003]" style={{ fontFamily: 'Poppins' }}>
+                            ₹{plan.price}
+                          </span>
+                          <span className="text-gray-600">/hour</span>
+                        </div>
+                      )}
                     </div>
 
                     <ul className="space-y-3 mb-8">
@@ -754,7 +783,7 @@ const OnDemand = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               Premium On-Demand Benefits
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Everything you need for professional meetings without long-term commitments
             </p>
           </motion.div>
@@ -781,7 +810,7 @@ const OnDemand = () => {
                       {feature.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
                       {feature.description}
                     </p>
                   </CardContent>
@@ -807,7 +836,7 @@ const OnDemand = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               What Our <span className="text-[#EDB003]">Clients Say</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Hear from businesses who trust FlashSpace for their on-demand space needs
             </p>
           </motion.div>
@@ -831,7 +860,7 @@ const OnDemand = () => {
                     </div>
 
                     {/* Testimonial Text */}
-                    <p className="text-gray-600 mb-6 leading-relaxed italic">
+                    <p className="text-gray-600 mb-6 leading-relaxed italic" style={{ fontFamily: 'Geist, sans-serif' }}>
                       "{testimonial.text}"
                     </p>
 
@@ -933,7 +962,7 @@ const OnDemand = () => {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
               Frequently Asked <span className="text-[#EDB003]">Questions</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Everything you need to know about our on-demand booking service
             </p>
           </motion.div>
@@ -955,7 +984,7 @@ const OnDemand = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-bold mb-3 text-[#172A3A]">{faq.question}</h3>
-                        <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                        <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>{faq.answer}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -986,7 +1015,7 @@ const OnDemand = () => {
               <span className="text-[#EDB003]">Perfect Meeting Space?</span>
             </h2>
 
-            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
+            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Join 2000+ businesses who trust FlashSpace for their meeting needs.
               Book your space in minutes!
             </p>
@@ -997,7 +1026,7 @@ const OnDemand = () => {
                 Book Now
               </Button>
 
-              <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-[#172A3A] text-lg px-10 py-7 rounded-full font-bold transition-all duration-300">
+              <Button className="bg-white text-black border-2 border-gray-300 hover:bg-[#FFD43B] hover:text-black hover:border-[#FFD43B] text-lg px-10 py-7 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
                 <Phone className="w-5 h-5 mr-2" />
                 Talk to Expert
               </Button>
