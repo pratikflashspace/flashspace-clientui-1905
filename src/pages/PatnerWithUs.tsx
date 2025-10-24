@@ -271,8 +271,7 @@ const PartnerWithUs = () => {
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button
-                variant="outline"
-                className="border-2 border-white/80 text-white hover:bg-white hover:text-black px-10 py-7 text-lg rounded-full backdrop-blur-sm font-semibold transition-all duration-300 hover:scale-105"
+                className="bg-white text-black hover:bg-[#EDB003] hover:text-white px-10 py-7 text-lg rounded-full font-semibold transition-all duration-300 hover:scale-105"
                 style={{ fontFamily: 'Poppins' }}
                 onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })}
               >
@@ -532,9 +531,6 @@ const PartnerWithUs = () => {
           </motion.div>
 
           <div className="relative">
-            {/* Connection Line */}
-            <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 transform -translate-y-1/2"></div>
-
             <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative">
               {processSteps.map((step, index) => (
                 <motion.div
@@ -721,9 +717,9 @@ const PartnerWithUs = () => {
                   <div className={`p-4 bg-gradient-to-br ${contact.gradient} rounded-lg shadow-lg group-hover:scale-110 transition-transform`}>
                     <contact.icon className="w-6 h-6 text-white" />
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-600 font-medium">{contact.label}</p>
-                    <p className="font-bold text-black">{contact.value}</p>
+                    <p className="font-bold text-black break-all">{contact.value}</p>
                   </div>
                 </motion.div>
               ))}

@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Building, MapPin, Mail, Phone, FileText, CheckCircle, Star, Users, Award, ChevronDown, Search, ArrowRight, Sparkles, TrendingUp, Shield, Clock, Zap, Target, Package, HeadphonesIcon, Briefcase, Home, Check, X } from "lucide-react";
+import { Building, MapPin, Mail, Phone, FileText, CheckCircle, Star, Users, Award, ChevronDown, Search, ArrowRight, Sparkles, TrendingUp, Shield, Clock, Zap, Target, Package, HeadphonesIcon, Briefcase, Home, Check, X, Globe2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -18,7 +18,7 @@ const VirtualOffice = () => {
   const cities = [
     "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
     "Kolkata", "Pune", "Ahmedabad", "Jaipur", "Surat",
-    "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane"
+    "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane","Noida"
   ];
 
   const features = [
@@ -73,8 +73,8 @@ const VirtualOffice = () => {
     },
     {
       icon: FileText,
-      title: "GST Support",
-      description: "Complete assistance with GST registration and business compliance documentation"
+      title: "Registration Support",
+      description: "Complete assistance  GST, MCA and more Registrations "
     },
     {
       icon: Briefcase,
@@ -86,18 +86,30 @@ const VirtualOffice = () => {
   const howItWorksSteps = [
     {
       number: "1",
-      title: "Choose Your Plan",
+      title: "Select Location",
+      description: "Choose your preferred business address from our prime locations across major cities in India.",
+      icon: MapPin
+    },
+    {
+      number: "2",
+      title: "Choose Plan",
       description: "Select a virtual office plan that matches your business needs and budget. From basic address services to premium packages.",
       icon: Package
     },
     {
-      number: "2",
+      number: "3",
+      title: "Make Payment",
+      description: "Complete secure online payment with transparent pricing and no hidden charges.",
+      icon: Target
+    },
+    {
+      number: "4",
       title: "Submit Documents",
       description: "Upload required documents online. Our team will verify and process your application within 24 hours.",
       icon: FileText
     },
     {
-      number: "3",
+      number: "5",
       title: "Get Started",
       description: "Receive your business address, start using mail services, and access meeting rooms instantly.",
       icon: Zap
@@ -106,32 +118,32 @@ const VirtualOffice = () => {
 
   const whyChooseFlashSpace = [
     {
-      emoji: "💰",
+      emoji: "💼",
       title: "Save Up to 90%",
       description: "Eliminate expensive office rent, utilities, and maintenance costs while maintaining professional presence"
     },
     {
-      emoji: "🚀",
+      emoji: "📈",
       title: "Instant Flexibility",
       description: "Scale up or down instantly. Work from anywhere while your business address stays permanent"
     },
     {
-      emoji: "⭐",
+      emoji: "🏆",
       title: "Professional Credibility",
       description: "Impress clients with premium business addresses in prime locations across India"
     },
     {
-      emoji: "⚡",
+      emoji: "⏱️",
       title: "Setup in 24 Hours",
       description: "Get your virtual office ready within 24 hours. No lengthy paperwork or waiting periods"
     },
     {
-      emoji: "📋",
+      emoji: "📝",
       title: "GST Registration",
       description: "Complete support for GST registration and business compliance with expert guidance"
     },
     {
-      emoji: "🎯",
+      emoji: "🤝",
       title: "Expert Support",
       description: "Dedicated account manager and 24/7 customer support for all your business needs"
     }
@@ -255,47 +267,47 @@ const VirtualOffice = () => {
   const cityLocations = [
     {
       city: "Bangalore",
-      centers: 18,
+      centers: 5,
       image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=800&q=80",
       description: "Tech hub with premium business addresses"
     },
     {
       city: "Delhi NCR",
-      centers: 24,
+      centers: 15,
       image: "https://images.unsplash.com/photo-1570939274717-7eda259b50ed?w=800&q=80",
       description: "Capital region with prestigious locations"
     },
     {
       city: "Mumbai",
-      centers: 22,
+      centers: 4,
       image: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=800&q=80",
       description: "Financial capital business addresses"
     },
     {
-      city: "Pune",
-      centers: 12,
+      city: "Kolkata",
+      centers: 8,
       image: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800&q=80",
       description: "IT corridor and startup ecosystem"
     },
     {
       city: "Hyderabad",
-      centers: 15,
-      image: "https://images.unsplash.com/photo-1563656353898-febc9270a0f5?w=800&q=80",
+      centers: 4,
+      image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=800&q=80",
       description: "Emerging tech city premium spaces"
     },
     {
       city: "Chennai",
-      centers: 10,
+      centers: 2,
       image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
       description: "Southern business hub locations"
     }
   ];
 
   const stats = [
-    { number: "1000+", label: "Happy Clients", icon: Users },
-    { number: "68+", label: "Centers Pan India", icon: Building },
-    { number: "8", label: "Major Cities", icon: MapPin },
-    { number: "24/7", label: "Support Available", icon: Shield }
+    { number: "5000+", label: "Clients", icon: Users },
+    { number: "68+", label: "Centers ", icon: Building },
+    { number: "50", label: "Major Cities", icon: MapPin },
+    { number: "20", label: "States", icon: Globe2 }
   ];
 
   const fadeInUp = {
@@ -309,7 +321,7 @@ const VirtualOffice = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative h-[85vh] overflow-hidden">
+      <section className="relative h-[85vh] overflow-hidden mt-16">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img
@@ -333,7 +345,7 @@ const VirtualOffice = () => {
             transition={{ duration: 0.8 }}
           >
             <motion.div
-              className="inline-flex items-center gap-2 bg-[#EDB003]/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-[#EDB003]/30"
+              className="inline-flex items-center gap-2 bg-[#EDB003]/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 mt-4 border border-[#EDB003]/30"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
@@ -342,7 +354,7 @@ const VirtualOffice = () => {
               <span className="text-sm font-semibold text-[#EDB003]">Premium Virtual Office Solutions</span>
             </motion.div>
 
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight" style={{ fontFamily: 'Poppins' }}>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight break-words" style={{ fontFamily: 'Poppins' }}>
               Your Business
               <br />
               <span className="text-[#EDB003]">Without Boundaries</span>
@@ -432,7 +444,7 @@ const VirtualOffice = () => {
                   ))}
                 </div>
                 <div className="text-sm">
-                  <div className="font-bold">1000+ Clients</div>
+                  <div className="font-bold">5000+ Clients</div>
                   <div className="text-gray-300 text-xs">Trust FlashSpace</div>
                 </div>
               </div>
@@ -484,59 +496,6 @@ const VirtualOffice = () => {
                   {stat.number}
                 </div>
                 <div className="text-white/90 font-medium">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Why Choose Us
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
-              Premium Virtual Office Benefits
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to establish a professional business presence without the overhead costs
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
-                  <CardContent className="p-8 relative">
-                    {/* Background Gradient */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
-
-                    <div className={`w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <feature.icon className="w-8 h-8 text-white" />
-                    </div>
-
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
-                      {feature.title}
-                    </h3>
-
-                    <p className="text-gray-600 leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </CardContent>
-                </Card>
               </motion.div>
             ))}
           </div>
@@ -608,14 +567,12 @@ const VirtualOffice = () => {
               How It <span className="text-[#EDB003]">Works</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Get your virtual office up and running in just 3 simple steps
+              Get your virtual office up and running in just 5 simple steps
             </p>
           </motion.div>
 
-          <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-              {/* Connection Lines */}
-              <div className="hidden md:block absolute top-24 left-1/4 right-1/4 h-1 bg-gradient-to-r from-[#EDB003] to-[#f5c242] -translate-y-1/2"></div>
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 relative">
 
               {howItWorksSteps.map((step, index) => (
                 <motion.div
@@ -713,114 +670,6 @@ const VirtualOffice = () => {
         </div>
       </section>
 
-      {/* Pricing Plans Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Pricing Plans
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
-              Choose Your <span className="text-[#EDB003]">Perfect Plan</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Transparent pricing with no hidden fees. All plans include GST registration support
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {pricingPlans.map((plan, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className={plan.highlighted ? "md:-translate-y-4" : ""}
-              >
-                <Card className={`border-2 ${plan.highlighted ? 'border-[#EDB003] shadow-2xl' : 'border-gray-200'} hover:shadow-2xl transition-all duration-300 h-full relative overflow-hidden`}>
-                  {plan.highlighted && (
-                    <div className="absolute top-0 right-0 bg-[#EDB003] text-white px-4 py-1 text-sm font-bold">
-                      POPULAR
-                    </div>
-                  )}
-
-                  <CardContent className="p-8">
-                    <div className={`w-16 h-16 bg-gradient-to-br ${plan.gradient} rounded-2xl flex items-center justify-center mb-6 ${plan.highlighted ? 'shadow-xl' : 'shadow-lg'}`}>
-                      <Package className="w-8 h-8 text-white" />
-                    </div>
-
-                    <h3 className="text-2xl font-bold mb-2 text-[#172A3A]">
-                      {plan.name}
-                    </h3>
-                    <p className="text-gray-600 mb-6 text-sm">
-                      {plan.description}
-                    </p>
-
-                    <div className="mb-6">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-5xl font-bold text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
-                          ₹{plan.price}
-                        </span>
-                        <span className="text-gray-500">/{plan.period}</span>
-                      </div>
-                      <p className="text-sm text-gray-500 mt-1">+ GST as applicable</p>
-                    </div>
-
-                    <div className="space-y-3 mb-8">
-                      {plan.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-start gap-3">
-                          <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                          </div>
-                          <span className="text-gray-700 text-sm">{feature}</span>
-                        </div>
-                      ))}
-                      {plan.notIncluded.map((feature, idx) => (
-                        <div key={idx} className="flex items-start gap-3 opacity-50">
-                          <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <X className="w-3.5 h-3.5 text-gray-400" />
-                          </div>
-                          <span className="text-gray-500 text-sm line-through">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <Button
-                      className={`w-full py-6 text-lg font-semibold rounded-xl transition-all duration-300 ${
-                        plan.highlighted
-                          ? 'bg-gradient-to-r from-[#EDB003] to-[#f5c242] hover:from-[#d69f03] hover:to-[#EDB003] text-white shadow-lg hover:shadow-xl'
-                          : 'bg-[#172A3A] hover:bg-[#2a4a5a] text-white'
-                      }`}
-                    >
-                      Get Started
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            className="text-center mt-12"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-gray-600 mb-4">Need a custom plan for your business?</p>
-            <Button variant="outline" className="border-2 border-[#EDB003] text-[#EDB003] hover:bg-[#EDB003] hover:text-white px-8 py-6 rounded-xl font-semibold transition-all duration-300">
-              <Phone className="w-5 h-5 mr-2" />
-              Contact Sales
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Testimonials Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
@@ -878,6 +727,69 @@ const VirtualOffice = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Logo Slider Section */}
+          <motion.div
+            className="mt-20"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="text-center mb-12">
+              <h3 className="text-2xl md:text-3xl font-bold text-[#172A3A] mb-3" style={{ fontFamily: 'Poppins' }}>
+                Trusted by Leading <span className="text-[#EDB003]">Brands</span>
+              </h3>
+              <p className="text-gray-600">Join thousands of companies who trust FlashSpace</p>
+            </div>
+
+            {/* Logo Slider Container */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-gray-50 via-white to-gray-50 py-12">
+              <div className="infinite-scroll">
+                {/* First set of logos */}
+                <div className="flex items-center justify-around min-w-full gap-16 px-8">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
+                    <img src="/Logo/flipkart.png" alt="Flipkart" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
+                    <img src="/Logo/trulymadly.png" alt="TrulyMadly" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                    <img src="/Logo/Stage2.png" alt="Stage OTT" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                    <img src="/Logo/StudyIQ.png" alt="Study IQ" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                    <img src="/Logo/Adda247.png" alt="Adda 24/7" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                    <img src="/Logo/luv.png" alt="LUV Films" className="w-full h-full object-contain" />
+                  </div>
+                </div>
+                {/* Duplicate set for seamless loop */}
+                <div className="flex items-center justify-around min-w-full gap-16 px-8">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
+                    <img src="/Logo/flipkart.png" alt="Flipkart" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
+                    <img src="/Logo/trulymadly.png" alt="TrulyMadly" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                    <img src="/Logo/Stage2.png" alt="Stage OTT" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                    <img src="/Logo/StudyIQ.png" alt="Study IQ" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                    <img src="/Logo/Adda247.png" alt="Adda 24/7" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                    <img src="/Logo/luv.png" alt="LUV Films" className="w-full h-full object-contain" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -977,7 +889,7 @@ const VirtualOffice = () => {
               Our Locations
             </span>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
-              <span className="text-[#EDB003]">68+</span> Centers Across <span className="text-[#EDB003]">8</span> Cities
+              Across <span className="text-[#EDB003]">28+</span> States
             </h2>
             <p className="text-xl text-gray-600">Find your perfect virtual office location</p>
           </motion.div>
@@ -1047,7 +959,7 @@ const VirtualOffice = () => {
             </h2>
 
             <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-              Join 1000+ businesses who trust FlashSpace for their virtual office needs.
+              Join 5000+ businesses who trust FlashSpace for their virtual office needs.
               Get started in less than 24 hours!
             </p>
 
@@ -1057,7 +969,7 @@ const VirtualOffice = () => {
                 Get Started Today
               </Button>
 
-              <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-[#172A3A] text-lg px-10 py-7 rounded-full font-bold transition-all duration-300">
+              <Button variant="outline" className="border-2 border-white bg-white text-[#172A3A] hover:bg-[#EDB003] hover:text-white hover:border-[#EDB003] text-lg px-10 py-7 rounded-full font-bold transition-all duration-300">
                 <Phone className="w-5 h-5 mr-2" />
                 Talk to Expert
               </Button>

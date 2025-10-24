@@ -3,37 +3,58 @@
 @tailwind utilities;
 
 /* Custom Font - c4b700 */
-/* Geist Font (Local or CDN fallback) */
+/* Geist Font (from uploaded fonts) */
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-Regular.woff2') format('woff2');
+  src: url('/fonts/Geist/Geist-Regular.ttf') format('truetype');
   font-weight: 400;
   font-display: swap;
 }
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-Medium.woff2') format('woff2');
+  src: url('/fonts/Geist/Geist-Medium.ttf') format('truetype');
   font-weight: 500;
   font-display: swap;
 }
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-SemiBold.woff2') format('woff2');
+  src: url('/fonts/Geist/Geist-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-display: swap;
 }
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-Bold.woff2') format('woff2');
+  src: url('/fonts/Geist/Geist-Bold.ttf') format('truetype');
   font-weight: 700;
   font-display: swap;
 }
+
+/* Poppins Font (from uploaded fonts) */
 @font-face {
-  font-family: 'Geist Mono';
-  src: url('/fonts/GeistMono-Regular.woff2') format('woff2');
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
   font-weight: 400;
   font-display: swap;
 }
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins/Poppins-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins/Poppins-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'c4b700';
   src: url('./assets/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
@@ -46,18 +67,6 @@
 @font-face {
   font-family: 'new-one';
   src: url('./assets//fonts/e4af272ccee01ff0-s.p.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url("./assets//fonts/Poppins-Regular.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('./assets/fonts/Poppins-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-display: swap;
 }
 /* Removed Locomotive Scroll overrides */
 
