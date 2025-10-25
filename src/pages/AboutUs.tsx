@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 /**
 * AboutUs page that uses the same header/footer and visual style as the home page.
 * Drop into src/pages/AboutUs.tsx and ensure route /about is registered in App.tsx.
-*/
+*//* This line is in branch harshita02*/
 
 export default function AboutUs() {
  const navigate = useNavigate();
