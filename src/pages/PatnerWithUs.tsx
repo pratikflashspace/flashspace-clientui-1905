@@ -569,168 +569,229 @@ const PartnerWithUs = () => {
       </section>
 
       {/* Contact Form Section */}
-      <section id="contact-form" className="py-24 px-4 bg-white">
-        <div className="container mx-auto max-w-4xl">
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-6xl font-bold text-black mb-4" style={{ fontFamily: 'Poppins' }}>
-              Let's Build <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">Together</span>
-            </h2>
-            <p className="text-lg text-gray-600" style={{ fontFamily: 'Geist' }}>
-              Fill out the form below and our partnership team will reach out to you within 24 hours
-            </p>
-          </motion.div>
+<section id="contact-form" className="py-24 px-4 bg-white">
+  {/* 🟢 FORM stays inside narrow container */}
+  <div className="container mx-auto max-w-4xl">
+    <motion.div
+      className="text-center mb-12"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+    >
+      <h2
+        className="text-4xl md:text-6xl font-bold text-black mb-4"
+        style={{ fontFamily: "Poppins" }}
+      >
+        Let's Build{" "}
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">
+          Together
+        </span>
+      </h2>
+      <p className="text-lg text-gray-600" style={{ fontFamily: "Geist" }}>
+        Fill out the form below and our partnership team will reach out to you
+        within 24 hours
+      </p>
+    </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <Card className="border-2 border-gray-100 shadow-2xl hover:shadow-yellow-400/20 transition-shadow duration-300">
-              <CardContent className="p-8 md:p-12">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-gray-700 font-medium flex items-center gap-2">
-                        <Users className="w-4 h-4" />
-                        Full Name *
-                      </Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => handleInputChange("name", e.target.value)}
-                        placeholder="John Doe"
-                        className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-gray-700 font-medium flex items-center gap-2">
-                        <Mail className="w-4 h-4" />
-                        Email *
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
-                        placeholder="john@example.com"
-                        className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-gray-700 font-medium flex items-center gap-2">
-                        <Phone className="w-4 h-4" />
-                        Phone Number *
-                      </Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                        placeholder="+91 XXXXX XXXXX"
-                        className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="company" className="text-gray-700 font-medium flex items-center gap-2">
-                        <Building2 className="w-4 h-4" />
-                        Company Name
-                      </Label>
-                      <Input
-                        id="company"
-                        value={formData.company}
-                        onChange={(e) => handleInputChange("company", e.target.value)}
-                        placeholder="Your Company"
-                        className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="partnershipType" className="text-gray-700 font-medium flex items-center gap-2">
-                      <Handshake className="w-4 h-4" />
-                      Partnership Type *
-                    </Label>
-                    <select
-                      id="partnershipType"
-                      value={formData.partnershipType}
-                      onChange={(e) => handleInputChange("partnershipType", e.target.value)}
-                      className="w-full h-12 px-4 border border-gray-300 rounded-md focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20"
-                      required
-                    >
-                      <option value="">Select partnership type</option>
-                      <option value="Property Partners">Property Partners</option>
-                      <option value="Corporate Partners">Corporate Partners</option>
-                      <option value="Business Associates">Business Associates</option>
-                      <option value="Strategic Alliance">Strategic Alliance</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="message" className="text-gray-700 font-medium">Tell us more about your requirements</Label>
-                    <Textarea
-                      id="message"
-                      value={formData.message}
-                      onChange={(e) => handleInputChange("message", e.target.value)}
-                      placeholder="Share your goals, property details, or any questions you have..."
-                      className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 min-h-[140px]"
-                      rows={5}
-                    />
-                  </div>
-
-                  <div className="flex justify-center pt-6">
-                    <Button
-                      type="submit"
-                      className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black px-12 py-7 text-lg rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
-                      style={{ fontFamily: 'Poppins' }}
-                    >
-                      Submit Partnership Request
-                      <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-
-            {/* Contact Info Cards */}
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { icon: Phone, label: "Call Us", value: "+91 XXX XXX XXXX", gradient: "from-blue-500 to-blue-600" },
-                { icon: Mail, label: "Email Us", value: "partners@flashspace.com", gradient: "from-purple-500 to-purple-600" },
-                { icon: MapPin, label: "Visit Us", value: "Pan India Presence", gradient: "from-pink-500 to-pink-600" }
-              ].map((contact, index) => (
-                <motion.div
-                  key={index}
-                  className="group flex items-center gap-4 p-6 bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-yellow-400"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -5 }}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+    >
+      <Card className="border-2 border-gray-100 shadow-2xl hover:shadow-yellow-400/20 transition-shadow duration-300">
+        <CardContent className="p-8 md:p-12">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="name"
+                  className="text-gray-700 font-medium flex items-center gap-2"
                 >
-                  <div className={`p-4 bg-gradient-to-br ${contact.gradient} rounded-lg shadow-lg group-hover:scale-110 transition-transform`}>
-                    <contact.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 font-medium">{contact.label}</p>
-                    <p className="font-bold text-black">{contact.value}</p>
-                  </div>
-                </motion.div>
-              ))}
+                  <Users className="w-4 h-4" />
+                  Full Name *
+                </Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  placeholder="John Doe"
+                  className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="email"
+                  className="text-gray-700 font-medium flex items-center gap-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  Email *
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  placeholder="john@example.com"
+                  className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                  required
+                />
+              </div>
             </div>
-          </motion.div>
-        </div>
-      </section>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="phone"
+                  className="text-gray-700 font-medium flex items-center gap-2"
+                >
+                  <Phone className="w-4 h-4" />
+                  Phone Number *
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                  placeholder="+91 XXXXX XXXXX"
+                  className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="company"
+                  className="text-gray-700 font-medium flex items-center gap-2"
+                >
+                  <Building2 className="w-4 h-4" />
+                  Company Name
+                </Label>
+                <Input
+                  id="company"
+                  value={formData.company}
+                  onChange={(e) => handleInputChange("company", e.target.value)}
+                  placeholder="Your Company"
+                  className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="partnershipType"
+                className="text-gray-700 font-medium flex items-center gap-2"
+              >
+                <Handshake className="w-4 h-4" />
+                Partnership Type *
+              </Label>
+              <select
+                id="partnershipType"
+                value={formData.partnershipType}
+                onChange={(e) =>
+                  handleInputChange("partnershipType", e.target.value)
+                }
+                className="w-full h-12 px-4 border border-gray-300 rounded-md focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20"
+                required
+              >
+                <option value="">Select partnership type</option>
+                <option value="Property Partners">Property Partners</option>
+                <option value="Corporate Partners">Corporate Partners</option>
+                <option value="Business Associates">Business Associates</option>
+                <option value="Strategic Alliance">Strategic Alliance</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="message"
+                className="text-gray-700 font-medium"
+              >
+                Tell us more about your requirements
+              </Label>
+              <Textarea
+                id="message"
+                value={formData.message}
+                onChange={(e) => handleInputChange("message", e.target.value)}
+                placeholder="Share your goals, property details, or any questions you have..."
+                className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 min-h-[140px]"
+                rows={5}
+              />
+            </div>
+
+            <div className="flex justify-center pt-6">
+              <Button
+                type="submit"
+                className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black px-12 py-7 text-lg rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                style={{ fontFamily: "Poppins" }}
+              >
+                Submit Partnership Request
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </motion.div>
+  </div> {/* ✅ Closed container here */}
+
+  {/* 🟢 Contact Info Cards — moved OUTSIDE container for full width */}
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ delay: 0.2 }}
+    className="mt-16 px-6 md:px-20"
+  >
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 isolate bg-gray-100 py-12 px-8 rounded-3xl shadow-inner">
+      {[
+        {
+          icon: Phone,
+          label: "Call Us",
+          value: "+91 XXX XXX XXXX",
+          gradient: "from-blue-500 to-blue-600",
+        },
+        {
+          icon: Mail,
+          label: "Email Us",
+          value: "partners@flashspace.com",
+          gradient: "from-purple-500 to-purple-600",
+        },
+        {
+          icon: MapPin,
+          label: "Visit Us",
+          value: "Pan India Presence",
+          gradient: "from-pink-500 to-pink-600",
+        },
+      ].map((contact, index) => (
+        <motion.div
+          key={index}
+          className="relative z-0 group flex items-center gap-4 p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl
+                     transition-all duration-300 border border-gray-200 hover:border-yellow-400 hover:z-10 overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: index * 0.1 }}
+          whileHover={{ y: -5 }}
+        >
+          <div
+            className={`p-4 bg-gradient-to-br ${contact.gradient} rounded-lg shadow-lg group-hover:scale-110 transition-transform`}
+          >
+            <contact.icon className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p className="text-sm text-gray-600 font-medium">
+              {contact.label}
+            </p>
+            <p className="font-bold text-black text-sm md:text-base whitespace-nowrap">
+              {contact.value}
+            </p>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </motion.div>
+</section>
+
 
       {/* Final CTA Section with Background */}
       <section className="relative py-24 px-4 overflow-hidden">

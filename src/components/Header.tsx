@@ -12,8 +12,6 @@ import Index from "@/pages/Index";
 import Splash3dButtonDemo from "./ui/3d-splash-button/demo";
 // import FileUploadButton from "./FileUploadButton";
 // Using uploaded FlashSpace logo
-
-
 // Menu and social items for accessibility and SEO
 const menuItems = [
   { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
@@ -40,10 +38,24 @@ const Header = ({ forceWhiteBackground = false }: HeaderProps) => {
   const navItems = [
     { label: "All Solutions", href: "#solutions", hasDropdown: true },
     { label: "Partner with Us", href: "/partner" },
-    { label: "More", href: "#more" },
+    {
+      label: "More",
+      href: "#more",
+      hasDropdown: true,
+      subItems: [
+        { label: "Blog", link: "/blog" },
+        { label: "Career", link: "/career" },
+        { label: "About Us", link: "/aboutus" }
+      ]
+    },
   ];
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // NEW: state + ref for More dropdown
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
 
   // Detect scroll to toggle header background
   useEffect(() => {
@@ -56,22 +68,26 @@ const Header = ({ forceWhiteBackground = false }: HeaderProps) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close dropdown when clicking outside
+  // Close dropdown(s) when clicking outside (handles both dropdowns)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setIsDropdownOpen(false);
+      }
+      if (moreRef.current && !moreRef.current.contains(target)) {
+        setIsMoreOpen(false);
       }
     };
 
-    if (isDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+    if (isDropdownOpen || isMoreOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, isMoreOpen]);
 
   const handleNavigation = (href: string) => {
     if (href.startsWith('#')) {
@@ -92,11 +108,10 @@ const Header = ({ forceWhiteBackground = false }: HeaderProps) => {
   return (
     <header
       className={cn(
-        "fixed top-0 w-full z-[100] transition-all duration-300 text-md  ", // give header lower z than sidebar overlay (which uses 9999)
+        "fixed top-0 w-full z-[100] transition-all duration-300 text-md  ",
         scrolled || forceWhiteBackground
           ? "bg-white/95 supports-[backdrop-filter]:bg-white/65 backdrop-blur-md border-b border-border shadow-sm"
           : "bg-transparent backdrop-blur-sm"
-
       )}
       style={{ fontFamily: 'Poppins' }}
     >
@@ -247,12 +262,53 @@ const Header = ({ forceWhiteBackground = false }: HeaderProps) => {
             >
               Partner with Us
             </button>
-            <button
-              onClick={() => handleNavigation("#more")}
-              className="text-md font-medium font-content transition-colors duration-300 text-black hover:text-primary"
+
+            {/* More dropdown (NEW) */}
+            <div
+              ref={moreRef}
+              className="relative"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') setIsMoreOpen(false);
+              }}
             >
-              More
-            </button>
+              <button
+                onClick={() => setIsMoreOpen((o) => !o)}
+                aria-haspopup="true"
+                aria-expanded={isMoreOpen}
+                className="text-md font-medium font-content transition-colors duration-300 text-black hover:text-primary flex items-center gap-1"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsMoreOpen((o) => !o);
+                  }
+                }}
+              >
+                More
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none" className={`transition-transform duration-300 ${isMoreOpen ? 'rotate-180' : ''}`}>
+                  <path d="M6 8L10 12L14 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
+              {/* More Dropdown content */}
+              <div className={`absolute right-0 top-full mt-2 w-44 bg-white border border-border rounded-md shadow-lg z-40 transition-all duration-200 ${isMoreOpen ? 'opacity-100 pointer-events-auto translate-y-0' : 'opacity-0 pointer-events-none -translate-y-1'}`}>
+                <div className="py-1">
+                  {[
+                    { label: "Blog", link: "/blog" },
+                    { label: "Career", link: "/career" },
+                    { label: "About Us", link: "/aboutus" }
+                  ].map((opt) => (
+                    <button
+                      key={opt.label}
+                      onClick={() => { handleNavigation(opt.link); setIsMoreOpen(false); }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </nav>
 
           {/* Right: Language, CTA Buttons */}
