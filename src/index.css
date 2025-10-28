@@ -36,8 +36,8 @@
 }
 @font-face {
   font-family: 'c4b700';
-  src: url('./assets/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
-       url('./assets/fonts/c4b700dcb2187787-s.p.ttf') format('truetype');
+  src: url('/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
+       url('/fonts/c4b700dcb2187787-s.p.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -45,17 +45,17 @@
 
 @font-face {
   font-family: 'new-one';
-  src: url('./assets//fonts/e4af272ccee01ff0-s.p.woff2') format('woff2');
+  src: url('/fonts/e4af272ccee01ff0-s.p.woff2') format('woff2');
 }
 
 @font-face {
   font-family: 'Poppins';
-  src: url("./assets//fonts/Poppins-Regular.ttf") format("truetype");
+  src: url("/fonts/Poppins-Regular.ttf") format("truetype");
 }
 
 @font-face {
   font-family: 'Poppins';
-  src: url('./assets/fonts/Poppins-Regular.ttf') format('truetype');
+  src: url('/fonts/Poppins-Regular.ttf') format('truetype');
   font-weight: 400;
   font-display: swap;
 }
