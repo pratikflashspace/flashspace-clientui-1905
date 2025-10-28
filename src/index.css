@@ -2,43 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Google Fonts - Poppins for headings */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+/* Import Google Fonts - Poppins and Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
 
-/* Geist Font - Using Vercel's actual font from jsDelivr */
+/* Geist Font - Map to Inter since Geist isn't available on free CDNs */
 @font-face {
   font-family: 'Geist';
-  src: url('https://cdn.jsdelivr.net/npm/geist@1.3.1/fonts/geist-regular.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/npm/geist@1.3.1/fonts/geist-regular.woff') format('woff');
+  src: local('Inter'), local('Inter-Regular');
   font-weight: 400;
-  font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Geist';
-  src: url('https://cdn.jsdelivr.net/npm/geist@1.3.1/fonts/geist-medium.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/npm/geist@1.3.1/fonts/geist-medium.woff') format('woff');
+  src: local('Inter'), local('Inter-Medium');
   font-weight: 500;
-  font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Geist';
-  src: url('https://cdn.jsdelivr.net/npm/geist@1.3.1/fonts/geist-semibold.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/npm/geist@1.3.1/fonts/geist-semibold.woff') format('woff');
+  src: local('Inter'), local('Inter-SemiBold');
   font-weight: 600;
-  font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Geist';
-  src: url('https://cdn.jsdelivr.net/npm/geist@1.3.1/fonts/geist-bold.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/npm/geist@1.3.1/fonts/geist-bold.woff') format('woff');
+  src: local('Inter'), local('Inter-Bold');
   font-weight: 700;
-  font-style: normal;
   font-display: swap;
 }
 @font-face {
@@ -202,55 +194,12 @@
   body {
     @apply bg-background text-foreground font-sans;
     font-family: 'Geist', 'Georgia', 'serif';
-  }
-
-  /* Poppins for all headings */
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-  }
-
-  h1 {
-    @apply text-4xl font-bold;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  h2 {
-    @apply text-3xl font-bold;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  h3 {
-    @apply text-2xl font-bold;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  h4 {
-    @apply text-xl font-bold;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  h5 {
-    @apply text-lg font-bold;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  h6 {
-    @apply text-base font-bold;
-    font-family: 'Poppins', sans-serif;
+    background: hsl(var(--background));
+    min-height: 100vh;
   }
 }
 
 @layer components {
-  /* Font utility classes */
-  .font-poppins {
-    font-family: 'Poppins', sans-serif;
-  }
-
-  .font-geist {
-    font-family: 'Geist', sans-serif;
-  }
-
   /* Glass Card Effect */
   .glass-card {
     background: var(--glass-bg);
