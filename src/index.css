@@ -2,8 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+/* Import Google Fonts - Poppins for headings */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+/* Geist Font from CDN */
+@font-face {
+  font-family: 'Geist';
+  src: url('https://fonts.gstatic.com/s/poppins/v21/pxiGyp8kv8JHgFVrLEFOc.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('https://fonts.gstatic.com/s/poppins/v21/pxiGyp8kv8JHgFVrLEFOc.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('https://fonts.gstatic.com/s/poppins/v21/pxiGzp8kv8JHgFVrLEFOc.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('https://fonts.gstatic.com/s/poppins/v21/pxiGzp8kv8JHgFVrLEFOc.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 @font-face {
   font-family: 'c4b700';
   src: url('/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
@@ -165,8 +198,42 @@
   body {
     @apply bg-background text-foreground font-sans;
     font-family: 'Geist', 'Georgia', 'serif';
-    background: hsl(var(--background));
-    min-height: 100vh;
+  }
+
+  /* Poppins for all headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+  }
+
+  h1 {
+    @apply text-4xl font-bold;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h2 {
+    @apply text-3xl font-bold;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h3 {
+    @apply text-2xl font-bold;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h4 {
+    @apply text-xl font-bold;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h5 {
+    @apply text-lg font-bold;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h6 {
+    @apply text-base font-bold;
+    font-family: 'Poppins', sans-serif;
   }
 }
 
