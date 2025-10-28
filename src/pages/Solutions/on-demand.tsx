@@ -303,7 +303,7 @@ const OnDemand = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
+    <div className="min-h-screen bg-white" className="font-geist">
       {/* Header Component */}
       <Header />
 
@@ -341,13 +341,13 @@ const OnDemand = () => {
               <span className="text-sm font-semibold text-[#EDB003]">Instant Booking Available</span>
             </motion.div>
 
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight" style={{ fontFamily: 'Poppins' }}>
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight" className="font-poppins">
               Meeting Spaces
               <br />
               <span className="text-[#EDB003]">On Your Schedule</span>
             </h1>
 
-            <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed" className="font-geist">
               Book professional meeting rooms and conference halls by the hour -
               whenever and wherever you need them
             </p>
@@ -501,7 +501,7 @@ const OnDemand = () => {
                 viewport={{ once: true }}
               >
                 <stat.icon className="w-8 h-8 text-white mx-auto mb-3" />
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2" style={{ fontFamily: 'Poppins' }}>
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2" className="font-poppins">
                   {stat.number}
                 </div>
                 <div className="text-white/90 font-medium">{stat.label}</div>
@@ -523,10 +523,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               What We Offer
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" className="font-poppins">
               What is <span className="text-[#EDB003]">On-Demand Workspace?</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" className="font-geist">
               Book professional meeting spaces by the hour without any long-term commitments.
               Perfect for client meetings, training sessions, events, and collaborative work.
             </p>
@@ -584,10 +584,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Simple Process
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" className="font-poppins">
               How <span className="text-[#EDB003]">It Works</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" className="font-geist">
               Book your perfect meeting space in three simple steps
             </p>
           </motion.div>
@@ -605,7 +605,7 @@ const OnDemand = () => {
                 <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden relative">
                   <CardContent className="p-8 text-center">
                     {/* Step Number */}
-                    <div className="absolute top-4 right-4 text-6xl font-bold text-[#EDB003]/10" style={{ fontFamily: 'Poppins' }}>
+                    <div className="absolute top-4 right-4 text-6xl font-bold text-[#EDB003]/10" className="font-poppins">
                       {step.step}
                     </div>
 
@@ -618,7 +618,7 @@ const OnDemand = () => {
                       {step.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
+                    <p className="text-gray-600 leading-relaxed" className="font-geist">
                       {step.description}
                     </p>
                   </CardContent>
@@ -648,10 +648,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Why Choose Us
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" className="font-poppins">
               Why Choose <span className="text-[#EDB003]">FlashSpace On-Demand</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" className="font-geist">
               Everything you need for successful meetings without any hassle
             </p>
           </motion.div>
@@ -675,7 +675,7 @@ const OnDemand = () => {
                       {benefit.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
+                    <p className="text-gray-600 leading-relaxed" className="font-geist">
                       {benefit.description}
                     </p>
                   </CardContent>
@@ -698,10 +698,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Transparent Pricing
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" className="font-poppins">
               Hourly <span className="text-[#EDB003]">Pricing Plans</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" className="font-geist">
               Pay only for what you use - no hidden charges, all-inclusive rates
             </p>
           </motion.div>
@@ -728,13 +728,13 @@ const OnDemand = () => {
                     <div className="mb-6">
                       {plan.price === "Customisable" ? (
                         <div className="flex items-baseline gap-2">
-                          <span className="text-3xl font-bold text-[#EDB003]" style={{ fontFamily: 'Poppins' }}>
+                          <span className="text-3xl font-bold text-[#EDB003]" className="font-poppins">
                             Customisable Pricing
                           </span>
                         </div>
                       ) : (
                         <div className="flex items-baseline gap-2">
-                          <span className="text-5xl font-bold text-[#EDB003]" style={{ fontFamily: 'Poppins' }}>
+                          <span className="text-5xl font-bold text-[#EDB003]" className="font-poppins">
                             ₹{plan.price}
                           </span>
                           <span className="text-gray-600">/hour</span>
@@ -780,10 +780,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Premium Features
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" className="font-poppins">
               Premium On-Demand Benefits
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" className="font-geist">
               Everything you need for professional meetings without long-term commitments
             </p>
           </motion.div>
@@ -810,7 +810,7 @@ const OnDemand = () => {
                       {feature.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
+                    <p className="text-gray-600 leading-relaxed" className="font-geist">
                       {feature.description}
                     </p>
                   </CardContent>
@@ -833,10 +833,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Client Success Stories
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" className="font-poppins">
               What Our <span className="text-[#EDB003]">Clients Say</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" className="font-geist">
               Hear from businesses who trust FlashSpace for their on-demand space needs
             </p>
           </motion.div>
@@ -860,7 +860,7 @@ const OnDemand = () => {
                     </div>
 
                     {/* Testimonial Text */}
-                    <p className="text-gray-600 mb-6 leading-relaxed italic" style={{ fontFamily: 'Geist, sans-serif' }}>
+                    <p className="text-gray-600 mb-6 leading-relaxed italic" className="font-geist">
                       "{testimonial.text}"
                     </p>
 
@@ -897,7 +897,7 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Our Locations
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" className="font-poppins">
               <span className="text-[#EDB003]">68+</span> Centers Across <span className="text-[#EDB003]">8</span> Cities
             </h2>
             <p className="text-xl text-gray-600">Find your perfect meeting space location</p>
@@ -927,7 +927,7 @@ const OnDemand = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#EDB003]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform transition-transform duration-500 group-hover:translate-y-0">
-                  <h3 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Poppins' }}>{location.city}</h3>
+                  <h3 className="text-3xl font-bold mb-2" className="font-poppins">{location.city}</h3>
                   <p className="text-white/90 mb-4 text-lg">{location.description}</p>
 
                   <div className="flex items-center justify-between">
@@ -959,10 +959,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Got Questions?
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" className="font-poppins">
               Frequently Asked <span className="text-[#EDB003]">Questions</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto" className="font-geist">
               Everything you need to know about our on-demand booking service
             </p>
           </motion.div>
@@ -984,7 +984,7 @@ const OnDemand = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-bold mb-3 text-[#172A3A]">{faq.question}</h3>
-                        <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>{faq.answer}</p>
+                        <p className="text-gray-600 leading-relaxed" className="font-geist">{faq.answer}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -1009,13 +1009,13 @@ const OnDemand = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" className="font-poppins">
               Ready to Book Your
               <br />
               <span className="text-[#EDB003]">Perfect Meeting Space?</span>
             </h2>
 
-            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto" className="font-geist">
               Join 2000+ businesses who trust FlashSpace for their meeting needs.
               Book your space in minutes!
             </p>
@@ -1042,3 +1042,4 @@ const OnDemand = () => {
 };
 
 export default OnDemand;
+

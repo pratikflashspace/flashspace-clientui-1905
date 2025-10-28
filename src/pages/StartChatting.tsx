@@ -107,7 +107,7 @@ const StartChatting = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
+    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden font-geist">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 lg:left-20">
         <div className="px-4 py-3 flex items-center justify-between">
@@ -138,8 +138,7 @@ const StartChatting = () => {
             <Button
               onClick={() => handleNavigation('/login')}
               variant="outline"
-              className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 text-black hover:bg-gray-50"
-              style={{ fontFamily: 'Poppins' }}
+              className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 text-black hover:bg-gray-50 font-poppins"
             >
               Log in
             </Button>
@@ -211,7 +210,7 @@ const StartChatting = () => {
           </button>
 
           {/* Footer */}
-          <p className="text-[10px] text-gray-400 text-center" style={{ fontFamily: 'Geist, sans-serif' }}>
+          <p className="text-[10px] text-gray-400 text-center" className="font-geist">
             © 2025
           </p>
         </div>
@@ -232,30 +231,30 @@ const StartChatting = () => {
                 </div>
               </div>
 
-              <h2 className="text-xl font-bold text-gray-900 mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              <h2 className="text-xl font-bold text-gray-900 mb-3" className="font-poppins">
                 Need WorkSpace / Business Setup?
               </h2>
-              <p className="text-gray-600 text-sm mb-6 max-w-lg leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
+              <p className="text-gray-600 text-sm mb-6 max-w-lg leading-relaxed" className="font-geist">
                 Hey! I'm here to assist you with end-to-end workspace and compliance requirements. Let's get started!
               </p>
 
               {/* Large Prompt Suggestions */}
               <div className="w-full max-w-2xl grid grid-cols-2 gap-3 mb-6">
                 <button className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group">
-                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Find coworking spaces</div>
-                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" style={{ fontFamily: 'Geist, sans-serif' }}>in Delhi NCR region</div>
+                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" className="font-poppins">Find coworking spaces</div>
+                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" className="font-geist">in Delhi NCR region</div>
                 </button>
                 <button className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group">
-                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>GST Registration</div>
-                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" style={{ fontFamily: 'Geist, sans-serif' }}>Complete registration process</div>
+                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" className="font-poppins">GST Registration</div>
+                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" className="font-geist">Complete registration process</div>
                 </button>
                 <button className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group">
-                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Compare workspace plans</div>
-                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" style={{ fontFamily: 'Geist, sans-serif' }}>Find the best deal</div>
+                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" className="font-poppins">Compare workspace plans</div>
+                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" className="font-geist">Find the best deal</div>
                 </button>
                 <button className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group">
-                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Business compliance</div>
-                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" style={{ fontFamily: 'Geist, sans-serif' }}>Check requirements</div>
+                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" className="font-poppins">Business compliance</div>
+                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" className="font-geist">Check requirements</div>
                 </button>
               </div>
             </div>
@@ -313,7 +312,7 @@ const StartChatting = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-[#EDB003]" />
-                    <h3 className="text-base font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>Popular Spaces in {selectedCity}</h3>
+                    <h3 className="text-base font-bold text-gray-900" className="font-poppins">Popular Spaces in {selectedCity}</h3>
                   </div>
                   <button className="text-xs font-medium text-[#EDB003] hover:text-[#d69f03] flex items-center gap-1 transition-colors">
                     View Map
@@ -342,8 +341,8 @@ const StartChatting = () => {
                         </div>
                       </div>
                       <div className="p-3">
-                        <div className="text-sm font-bold text-gray-900 mb-1 line-clamp-1" style={{ fontFamily: 'Poppins, sans-serif' }}>{space.name}</div>
-                        <div className="text-xs text-gray-600 line-clamp-1 flex items-center gap-1" style={{ fontFamily: 'Geist, sans-serif' }}>
+                        <div className="text-sm font-bold text-gray-900 mb-1 line-clamp-1" className="font-poppins">{space.name}</div>
+                        <div className="text-xs text-gray-600 line-clamp-1 flex items-center gap-1" className="font-geist">
                           <MapPin className="w-3 h-3 text-gray-400" />
                           {space.location}
                         </div>
@@ -355,15 +354,15 @@ const StartChatting = () => {
 
               {/* Get Started Section */}
               <div className="bg-gradient-to-br from-[#FFF9E6] to-[#FFFAED] rounded-2xl p-5 shadow-sm border border-[#FFD43B]/20">
-                <h3 className="text-base font-bold text-gray-900 mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>Get Started</h3>
+                <h3 className="text-base font-bold text-gray-900 mb-4" className="font-poppins">Get Started</h3>
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-10 h-10 bg-[#EDB003]/10 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Sparkles className="w-5 h-5 text-[#EDB003]" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-gray-900 mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>Find Your Perfect Workspace</h4>
-                      <p className="text-xs text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
+                      <h4 className="text-sm font-bold text-gray-900 mb-1" className="font-poppins">Find Your Perfect Workspace</h4>
+                      <p className="text-xs text-gray-600 leading-relaxed" className="font-geist">
                         Take our quick quiz to discover workspaces tailored to your needs.
                       </p>
                     </div>
@@ -378,7 +377,7 @@ const StartChatting = () => {
               {/* Get Inspired Section */}
               <div className="bg-white rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>Get Inspired</h3>
+                  <h3 className="text-base font-bold text-gray-900" className="font-poppins">Get Inspired</h3>
                   <button className="text-xs font-medium text-[#EDB003] hover:text-[#d69f03] transition-colors">
                     See all
                   </button>
@@ -397,10 +396,10 @@ const StartChatting = () => {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-[#EDB003] transition-colors" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                        <h4 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-[#EDB003] transition-colors" className="font-poppins">
                           {card.title}
                         </h4>
-                        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
+                        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed" className="font-geist">
                           {card.description}
                         </p>
                       </div>
@@ -418,3 +417,4 @@ const StartChatting = () => {
 };
 
 export default StartChatting;
+
