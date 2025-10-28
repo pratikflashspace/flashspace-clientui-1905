@@ -3,8 +3,34 @@
 @tailwind utilities;
 
 /* Custom Font - c4b700 */
-/* Geist Font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+/* Geist Font from Vercel CDN */
+@import url('https://rsms.me/inter/inter.css');
+@font-face {
+  font-family: 'Geist';
+  src: url('https://cdn.jsdelivr.net/npm/@geist-ui/react@2.2.6/dist/fonts/geist.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/npm/@geist-ui/react@2.2.6/dist/fonts/geist.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('https://cdn.jsdelivr.net/npm/@geist-ui/react@2.2.6/dist/fonts/geist-bold.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/npm/@geist-ui/react@2.2.6/dist/fonts/geist-bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('https://cdn.jsdelivr.net/npm/@geist-ui/react@2.2.6/dist/fonts/geist-mono.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/npm/@geist-ui/react@2.2.6/dist/fonts/geist-mono.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 @font-face {
   font-family: 'c4b700';
   src: url('/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
