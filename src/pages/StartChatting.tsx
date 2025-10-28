@@ -107,7 +107,7 @@ const StartChatting = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden font-geist">
+    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 lg:left-20">
         <div className="px-4 py-3 flex items-center justify-between">
@@ -138,7 +138,8 @@ const StartChatting = () => {
             <Button
               onClick={() => handleNavigation('/login')}
               variant="outline"
-              className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 text-black hover:bg-gray-50 font-poppins"
+              className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 text-black hover:bg-gray-50"
+              style={{ fontFamily: 'Poppins' }}
             >
               Log in
             </Button>

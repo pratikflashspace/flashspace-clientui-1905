@@ -53,11 +53,10 @@ export default {
         },
       },
       fontFamily: {
-        // Poppins for all headings
+        // Poppins for headers, Inter for body text
         header: ['Poppins', 'sans-serif'],
-        // Geist for body content
-        content: ['Geist', 'sans-serif'],
-        sans: ['Geist', 'sans-serif'],
+        content: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         mono: ['Menlo', 'Courier New', 'monospace'],
       },
       borderRadius: {
