@@ -53,11 +53,11 @@ export default {
         },
       },
       fontFamily: {
-        // Lexend for headers, Geist for body text
-        header: ['Lexend', 'sans-serif'],
-        content: ['Geist', 'Georgia', 'serif'],
-        sans: ['Geist', 'Georgia', 'serif'],
-        mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        // Poppins for headers, Inter for body text
+        header: ['Poppins', 'sans-serif'],
+        content: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        mono: ['Menlo', 'Courier New', 'monospace'],
       },
       borderRadius: {
         lg: "var(--radius)",
