@@ -1,30 +1,46 @@
-import { Building, MapPin, Mail, Phone, FileText, CheckCircle, Star, Users, Award, ChevronDown, Filter, Grid3X3, List, Search, Calendar, Utensils, Camera, Music, Shield } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Building, MapPin, Phone, Users, ChevronDown, Grid3X3, List, CheckCircle, Star, Calendar, Utensils, Camera, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { cityCenters } from "@/components/Map/locationData.example";
+import Header from "@/components/Header";
+import MapSection from "@/components/services/MapSection";
+import SearchHeader from "@/components/services/SearchHeader";
+import ListingCard from "@/components/services/ListingCard";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { 
-  City, 
-  BusinessSolution, 
-  EventSpaceItem, 
-  EventSpaceCityKey, 
-  EventSpacesByCity, 
-  ServiceItem, 
-  ViewMode, 
-  SortBy 
+  City,
+  BusinessSolution,
+  ServiceItem,
+  ViewMode,
+  SortBy
 } from "@/types/services";
+
+// Define EventSpaceItem locally since it's used in this file
+interface EventSpaceItem {
+  _id: string;
+  name: string;
+  address: string;
+  area: string;
+  price: string;
+  originalPrice?: string;
+  rating: number;
+  reviews: number;
+  type: string;
+  capacity: string;
+  features: string[];
+  availability?: string;
+  popular?: boolean;
+  image?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+}
 
 const EventSpaces = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -34,6 +50,9 @@ const EventSpaces = () => {
   const [searchCity, setSearchCity] = useState<string>("");
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [isSearchFocused, setIsSearchFocused] = useState<boolean>(false);
+  const [eventSpaces, setEventSpaces] = useState<EventSpaceItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
   // Available cities for search
   const availableCities: City[] = [
@@ -58,6 +77,24 @@ const EventSpaces = () => {
     setSearchCity(city);
   }, [searchParams]);
 
+  // Disable Lenis smooth scroll for this specific container
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    scrollContainer.setAttribute('data-lenis-prevent', 'true');
+
+    const preventLenis = (e: WheelEvent) => {
+      e.stopPropagation();
+    };
+
+    scrollContainer.addEventListener('wheel', preventLenis, { passive: false });
+
+    return () => {
+      scrollContainer.removeEventListener('wheel', preventLenis);
+    };
+  }, []);
+
   // Filter cities based on search input
   const filteredCities: City[] = availableCities.filter(city =>
     city.name.toLowerCase().includes(searchCity.toLowerCase())
@@ -78,6 +115,12 @@ const EventSpaces = () => {
   // Handle search input change
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setSearchCity(e.target.value);
+    setShowSuggestions(true);
+  };
+
+  // Wrapper for SearchHeader component
+  const handleSearchChange = (value: string): void => {
+    setSearchCity(value);
     setShowSuggestions(true);
   };
 
@@ -195,61 +238,89 @@ const EventSpaces = () => {
   if (["mumbai", "bombay"].includes(cityKey)) cityKey = "mumbai";
   if (["bangalore", "bengaluru"].includes(cityKey)) cityKey = "bangalore";
   if (["pune", "punecity"].includes(cityKey)) cityKey = "pune";
-  const citySpaces = mockEventSpaces[cityKey as EventSpaceCityKey] || mockEventSpaces.delhi;
+  const citySpaces = mockEventSpaces[cityKey] || mockEventSpaces.delhi;
+
+  // Convert mock data to EventSpaceItem format
+  const typedEventSpaces: EventSpaceItem[] = citySpaces.map((space: any) => ({
+    _id: space.id.toString(),
+    name: space.name,
+    address: space.address,
+    area: space.area,
+    price: space.price,
+    originalPrice: space.originalPrice,
+    rating: space.rating,
+    reviews: space.reviews,
+    type: space.type,
+    capacity: space.capacity,
+    features: space.features,
+    availability: space.availability,
+    popular: space.popular,
+    image: undefined,
+    coordinates: undefined
+  }));
 
   // Get unique areas and types for filtering
-  const areas = [...new Set(citySpaces.map(space => space.area))];
-  const types = [...new Set(citySpaces.map(space => space.type))];
+  const areas = [...new Set(citySpaces.map((space: any) => space.area))];
+  const types = [...new Set(citySpaces.map((space: any) => space.type))];
+
+  // Resolve map center by selected city (fallback to Delhi)
+  const resolvedCenter = useMemo(() => {
+    const cityKeyFromState = selectedCity.trim().toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
+    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
+    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
+    if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
+    if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
+    return cityCenters.delhi;
+  }, [selectedCity]);
+
+  // Generate random coordinates around city center if not available
+  const generateRandomCoordinates = (center: { lat: number; lng: number }, index: number) => {
+    // Generate different offsets for each space (0.01 to 0.05 degrees)
+    const seed = index + 1;
+    const latOffset = ((seed * 17) % 50) / 1000 - 0.025; // -0.025 to +0.025
+    const lngOffset = ((seed * 23) % 50) / 1000 - 0.025; // -0.025 to +0.025
+
+    return {
+      lat: center.lat + latOffset,
+      lng: center.lng + lngOffset
+    };
+  };
+
+  // Prepare marker data from event spaces with full details
+  // Memoize to prevent unnecessary recalculations
+  const mapMarkers = useMemo(() => {
+    return typedEventSpaces.map((space, index) => {
+      const imageSrc = space.image || "https://shorturl.at/Fyr6o";
+
+      return {
+        position: space.coordinates || generateRandomCoordinates(resolvedCenter, index),
+        title: space.name,
+        address: space.address,
+        price: space.price,
+        rating: space.rating,
+        reviews: space.reviews,
+        image: imageSrc,
+        features: space.features,
+      };
+    });
+  }, [typedEventSpaces, resolvedCenter]);
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
-      {/* Search Focus Overlay */}
-      {isSearchFocused && (
-        <div className="fixed inset-0 bg-black/30 z-40 transition-opacity duration-300" />
-      )}
-      
+    <div className="flex flex-col h-screen bg-gray-50">
       {/* Header */}
-      <header className={`bg-white border-b border-gray-200 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="inline-flex items-center gap-2 text-gray-900 hover:text-primary transition-colors group">
-              <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-              Back to Home
-            </Link>
-            
-            {/* <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="text-sm text-gray-700 hover:text-primary transition-colors duration-300 font-medium flex items-center gap-2 border-gray-300"
-                >
-                  Event Spaces
-                  <ChevronDown className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
-                {businessSolutions.map((solution) => (
-                  <DropdownMenuItem 
-                    key={solution.label}
-                    onClick={() => handleNavigation(solution.href)}
-                    className="cursor-pointer p-3 hover:bg-gray-50 transition-colors"
-                  >
-                    <solution.icon className="w-4 h-4 mr-3 text-primary" />
-                    <div className="flex flex-col">
-                      <span className="font-medium text-gray-900">{solution.label}</span>
-                      <span className="text-xs text-gray-500">{solution.description}</span>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu> */}
-          </div>
-        </div>
-      </header>
+      <div className="flex-shrink-0">
+        <Header />
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1">
-        <div className="container mx-auto px-4 py-6">
+      {/* Main Content - Split Layout */}
+      <div className="flex flex-1 overflow-hidden mt-20">
+        {/* Left Side: Event Space Listings - Scrollable */}
+        <div
+          ref={scrollContainerRef}
+          className="w-1/2 overflow-y-auto"
+          data-lenis-prevent
+        >
+          <div className="px-6 py-6">
           {/* Breadcrumb */}
           <div className={`flex items-center gap-2 text-sm text-gray-600 mb-4 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             <span>Home</span>
@@ -659,52 +730,18 @@ const EventSpaces = () => {
               </Button>
             </div>
           </div>
-        </div>
-      </main>
 
-      {/* Footer */}
-      <footer className={`bg-gray-900 text-white py-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h4 className="font-bold text-lg mb-4">Event Spaces</h4>
-              <p className="text-gray-400 text-sm">
-                Your trusted partner for finding the perfect event venues across India.
-              </p>
-            </div>
-            <div>
-              <h5 className="font-semibold mb-3">Quick Links</h5>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">How It Works</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-              </ul>
-            </div>
-            <div>
-              <h5 className="font-semibold mb-3">Services</h5>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Virtual Office</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Coworking Space</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Meeting Rooms</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Event Planning</a></li>
-              </ul>
-            </div>
-            <div>
-              <h5 className="font-semibold mb-3">Support</h5>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Refund Policy</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-            <p>&copy; 2024 Event Spaces. All rights reserved.</p>
           </div>
         </div>
-      </footer>
+
+        {/* Right Side: Map - Fixed - Using Optimized MapSection Component */}
+        <MapSection
+          center={resolvedCenter}
+          markers={mapMarkers}
+          zoom={11}
+          height="100%"
+        />
+      </div>
     </div>
   );
 };
