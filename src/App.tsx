@@ -23,6 +23,8 @@ import PartnerWithUs from "./pages/PatnerWithUs";
 //
 import MouseFollower from "./components/MouseFollower";
 // Additional Pages
+
+import Career from "./pages/Career";
 import Login from "./pages/Login";
 import Bookings from "./pages/Bookings";
 import Community from "./pages/Community";
@@ -57,6 +59,7 @@ const App = () => (
             <Route path="/Solutions/on-demand" element={<OnDemandSolution />} />
             <Route path="/Solutions/business-setup" element={<BusinessSetupSolution />} />
             <Route path="/city-listing" element={<CityListing />} />
+            <Route path="/career" element={<Career />} />
             <Route path="/login" element={<Login />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/community" element={<Community />} />

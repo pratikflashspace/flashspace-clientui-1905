@@ -2,15 +2,23 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { getLenis } from "@/lib/lenis.ts";
+ // ✅ Correct import path
+import { ContactModalProvider } from "./components/ui/ContactModalContext";
 
-// Initialize Lenis once on app bootstrap (safe in dev with HMR guard inside getLenis)
-if (typeof window !== 'undefined') {
-	try {
-		getLenis();
-	} catch (e) {
-		// swallow – SSR or unexpected environment
-		console.warn('[Lenis] init skipped:', e);
-    }
+// Initialize Lenis once on app bootstrap
+if (typeof window !== "undefined") {
+  try {
+    getLenis();
+  } catch (e) {
+    console.warn("[Lenis] init skipped:", e);
+  }
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+// ✅ Wrap your App with ContactModalProvider
+createRoot(document.getElementById("root")!).render(
+  <ContactModalProvider>
+    <App />
+  </ContactModalProvider>
+);
+
+
