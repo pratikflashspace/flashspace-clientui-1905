@@ -5,12 +5,12 @@ const TestimonialsSection = () => {
   const isVisible = useScrollAnimation('testimonials');
   
   const companies = [
-    { name: "Adda247", logo: "https://www.adda247.com/jobs/wp-content/themes/adda247/assets/images/logo-main.png", needsInvert: false },
-    { name: "Study IQ", logo: "https://edge.uacdn.net/static/thumbnail/brand/studyiq.png", needsInvert: false },
+    { name: "Adda247", logo: "/Logo/Adda247.png", needsInvert: false },
+    { name: "Study IQ", logo: "/Logo/StudyIQ.png", needsInvert: false },
     { name: "Flipkart", logo: "https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Logo.png", needsInvert: false },
     { name: "Truly Madly", logo: "https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp", needsInvert: false },
-    { name: "Stage OTT", logo: "https://storage.googleapis.com/stage-strapi-assets-production/Stage_Logo_Horizontal_1_ff9ba0e86e/Stage_Logo_Horizontal_1_ff9ba0e86e.png", needsInvert: false },
-    { name: "LUV Films", logo: "https://luvfilms.in/wp-content/uploads/2023/03/LUV-FILMS-LOGO-BLACK-2.png", needsInvert: false },
+    { name: "Stage OTT", logo: "/Logo/Stage2.png", needsInvert: false },
+    { name: "LUV Films", logo: "/Logo/luv.png", needsInvert: false },
     { name: "Callerdesk", logo: "https://callerdesk.io/img/images/caller_logo.svg", needsInvert: false },
     { name: "Konsalidon", logo: "https://www.konsalidon.com/cdn/shop/files/Logo_-_Full_Height_-_Mono_White_copy_90x@2x.png?v=1642424736", needsInvert: true },
     { name: "CareerGuide", logo: "https://www.careerguide.com/career/wp-content/uploads/2020/02/logo.png", needsInvert: false },

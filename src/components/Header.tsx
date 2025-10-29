@@ -4,9 +4,30 @@ import { smoothScrollTo } from "@/lib/lenis";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Splash3dButton from "@/components/ui/3d-splash-button";
-import { Zap, FileText, Users, Building2, UserCheck, ArrowRight } from "lucide-react";
+import { X, Phone, Building2, Users, Zap, FileText, ArrowRight } from "lucide-react";
 import { CiMenuFries } from "react-icons/ci";
 import SidebarMenu from "@/components/SidebarMenu";
+
+// ✅ Country Data
+const countries = [
+  { code: "IND", name: "India", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_India_Flat_Round-128x128.png" },
+  { code: "USA", name: "United States", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_States_Flat_Round-128x128.png" },
+  { code: "UK", name: "United Kingdom", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Kingdom_Flat_Round-128x128.png" },
+  { code: "UAE", name: "United Arab Emirates", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Arab_Emirates_Flat_Round-128x128.png" },
+  { code: "CAN", name: "Canada", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Canada_Flat_Round-128x128.png" },
+  { code: "AUS", name: "Australia", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Australia_Flat_Round-128x128.png" },
+  { code: "GER", name: "Germany", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Germany_Flat_Round-128x128.png" },
+  { code: "FRA", name: "France", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_France_Flat_Round-128x128.png" },
+  { code: "JPN", name: "Japan", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Japan_Flat_Round-128x128.png" },
+  { code: "SGP", name: "Singapore", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Singapore_Flat_Round-128x128.png" },
+];
+
+const menuItems = [
+  { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
+  { label: 'About', ariaLabel: 'Learn about us', link: '/about' },
+  { label: 'Services', ariaLabel: 'View our services', link: '/services' },
+  { label: 'Contact', ariaLabel: 'Get in touch', link: '/contact' }
+];
 
 interface HeaderProps {
   forceWhiteBackground?: boolean;
@@ -19,41 +40,48 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // "More" dropdown state
+  // Dropdowns
+  const [isSolutionsOpen, setIsSolutionsOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const moreRef = useRef<HTMLDivElement>(null);
 
-  // Detect scroll to toggle header background
+  // Country drill dropdown
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+
+  // Popup contact form
+  const [isContactOpen, setIsContactOpen] = useState(false);
+
+  const solutionsRef = useRef<HTMLDivElement>(null);
+  const moreRef = useRef<HTMLDivElement>(null);
+  const countryRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const onScroll = () => {
-      const y = window.scrollY || document.documentElement.scrollTop;
-      setScrolled(y > 10);
+      setScrolled(window.scrollY > 10);
     };
-    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close dropdown(s) on outside click
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
-        setIsDropdownOpen(false);
+      if (solutionsRef.current && !solutionsRef.current.contains(event.target as Node)) {
+        setIsSolutionsOpen(false);
+      }
+      if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
+        setIsMoreOpen(false);
+      }
+      if (countryRef.current && !countryRef.current.contains(event.target as Node)) {
+        setCountryDropdownOpen(false);
       }
       if (moreRef.current && !moreRef.current.contains(target)) {
         setIsMoreOpen(false);
       }
     };
-
-    if (isDropdownOpen || isMoreOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isDropdownOpen, isMoreOpen]);
+  }, []);
 
   const handleNavigation = (href: string) => {
     if (href.startsWith("#")) {
@@ -70,293 +98,393 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
   };
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 w-full z-[100] transition-all duration-300 text-md",
-        scrolled || forceWhiteBackground
-          ? "bg-white/95 supports-[backdrop-filter]:bg-white/65 backdrop-blur-md border-b border-border shadow-sm"
-          : "bg-transparent backdrop-blur-sm"
-      )}
-      style={{ fontFamily: "Poppins" }}
-    >
-      <div className="w-full px-4 py-3">
-        <div className="flex items-center">
-          {/* Left: menu button */}
+    <>
+      <header
+        className={cn(
+          "fixed top-0 w-full z-[100] transition-all duration-300 text-md",
+          scrolled || forceWhiteBackground
+            ? "bg-white/95 supports-[backdrop-filter]:bg-white/65 backdrop-blur-md border-b border-border shadow-sm"
+            : "bg-transparent backdrop-blur-sm"
+        )}
+        style={{ fontFamily: "Poppins" }}
+      >
+        <div className="w-full px-4 py-3">
+          <div className="flex items-center">
+            {/* Menu Button */}
             <button
-            className="p-2 rounded-md hover:bg-black/5 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-black/20 flex-shrink-0 -ml-2"
-            aria-label="Open menu"
-            aria-expanded={isMenuOpen}
-            aria-controls="flashspace-fullmenu"
-            onClick={() => setIsMenuOpen(true)}
-          >
-            <CiMenuFries className={`h-6 w-6 ${(!scrolled && lightText) ? 'text-white' : 'text-black'}`} />
-          </button>
+              className="p-2 rounded-md hover:bg-black/5 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-black/20 flex-shrink-0 -ml-2"
+              aria-label="Open menu"
+              aria-expanded={isMenuOpen}
+              aria-controls="flashspace-fullmenu"
+              onClick={() => setIsMenuOpen(true)}
+            >
+              <CiMenuFries className="h-6 w-6 text-black" />
+            </button>
 
-          {/* Logo */}
-          <div
-            className="text-xl font-bold tracking-tight cursor-pointer w-60 flex-shrink-0 ml-2"
-            onClick={() => handleNavigation("/")}
-          >
-            <span className={`${(!scrolled && lightText) ? 'text-white' : 'text-black'} transition-colors duration-300`}>
+            {/* Logo */}
+            <div
+              className="text-xl font-bold tracking-tight cursor-pointer w-60 flex-shrink-0 ml-2"
+              onClick={() => handleNavigation("/")}
+            >
               <img
                 src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
                 alt="FlashSpace Logo"
                 className="h-8 w-auto"
               />
-            </span>
-          </div>
+            </div>
 
-          {/* Center nav */}
-          <nav className="hidden lg:flex items-center justify-center space-x-8 mx-8 flex-1">
-            {/* All Solutions (mega) */}
-            <div
-              ref={dropdownRef}
-              className="relative"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") setIsDropdownOpen(false);
-              }}
-            >
-              <button
-                className={`text-md font-semibold font-content flex items-center gap-1 cursor-pointer transition-colors duration-300 ${(!scrolled && lightText) ? 'text-white hover:text-white/80' : 'text-black hover:text-primary'}`}
-                onClick={() => setIsDropdownOpen((o) => !o)}
-                aria-haspopup="true"
-                aria-expanded={isDropdownOpen}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setIsDropdownOpen((o) => !o);
-                  }
-                }}
-              >
-                All Solutions
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  className={`transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`}
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center justify-center space-x-8 mx-8 flex-1">
+              {/* === All Solutions Dropdown === */}
+              <div ref={solutionsRef} className="relative">
+                <button
+                  className="text-md font-semibold flex items-center gap-1 cursor-pointer transition-colors text-black hover:text-primary"
+                  onClick={() => setIsSolutionsOpen((prev) => !prev)}
                 >
-                  <path
-                    d="M6 8L10 12L14 8"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+                  All Solutions
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className={`transition-transform duration-300 ${isSolutionsOpen ? "rotate-180" : ""}`}
+                  >
+                    <path
+                      d="M6 8L10 12L14 8"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
 
-              {/* Mega dropdown */}
-              <div
-                className={`absolute left-1/2 top-full w-[600px] bg-white border border-border rounded-lg shadow-lg z-50 mt-2 transition-all duration-300 ${
-                  isDropdownOpen
-                    ? "opacity-100 pointer-events-auto translate-y-0"
-                    : "opacity-0 pointer-events-none -translate-y-2"
-                }`}
-                style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.08)", transform: "translateX(-50%)" }}
-              >
-                <div className="p-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Left: On-Demand */}
-                    <div className="border border-border/50 rounded-lg p-4 bg-white/50">
+                {/* Dropdown Menu */}
+                <div
+                  className={`absolute left-1/2 top-full w-[600px] bg-white border border-border rounded-lg shadow-lg z-50 mt-2 transition-all duration-300 ${
+                    isSolutionsOpen
+                      ? "opacity-100 pointer-events-auto translate-y-0"
+                      : "opacity-0 pointer-events-none -translate-y-2"
+                  }`}
+                  style={{
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                    transform: "translateX(-50%)",
+                  }}
+                >
+                  <div className="p-4 grid grid-cols-2 gap-4">
+                    <div className="border rounded-lg p-4 bg-white/50">
                       <div className="flex items-center gap-2 mb-1">
                         <Zap className="w-4 h-4 text-primary" />
                         <h4 className="text-sm font-semibold">On-Demand</h4>
                       </div>
-                      <p className="text-xs text-foreground/60 mb-3">Book by the hour or day</p>
-                      <div className="flex flex-col">
-                        {[
-                          { label: "Meeting Rooms", type: "meeting-room" },
-                          { label: "Training Rooms", type: "training-room" },
-                          { label: "Phone Booths", type: "phone-booth" },
-                          { label: "Day Offices", type: "day-office" }
-                        ].map((item) => (
-                          <button
-                            key={item.type}
-                            className="flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-accent/10 transition-colors"
-                            onClick={() => {
-                              handleNavigation(`/Solutions/on-demand?type=${item.type}`);
-                              setIsDropdownOpen(false);
-                            }}
-                          >
-                            <span className="text-foreground/80">{item.label}</span>
-                            <ArrowRight className="w-4 h-4 text-foreground/40" />
-                          </button>
-                        ))}
-                      </div>
+                      <p className="text-xs text-gray-500 mb-3">Book by the hour or day</p>
+                      {[
+                        { label: "Meeting Rooms", type: "meeting-room" },
+                        { label: "Training Rooms", type: "training-room" },
+                        { label: "Phone Booths", type: "phone-booth" },
+                        { label: "Day Offices", type: "day-office" },
+                      ].map((item) => (
+                        <button
+                          key={item.type}
+                          className="flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-gray-100"
+                          onClick={() => {
+                            handleNavigation(`/Solutions/on-demand?type=${item.type}`);
+                            setIsSolutionsOpen(false);
+                          }}
+                        >
+                          {item.label}
+                          <ArrowRight className="w-4 h-4 text-gray-400" />
+                        </button>
+                      ))}
                     </div>
 
-                    {/* Right: 3 solution cards */}
-                    <div className="grid grid-cols-1 gap-3">
+                    <div className="grid gap-3">
                       {[
                         {
                           icon: Building2,
                           title: "Virtual Office",
                           desc: "Business address, mail handling, call forwarding",
-                          href: "/Solutions/virtual-office"
+                          href: "/Solutions/virtual-office",
                         },
                         {
                           icon: Users,
                           title: "Coworking Space",
                           desc: "Flexible desks, private cabins, team suites",
-                          href: "/Solutions/coworking-space"
+                          href: "/Solutions/coworking-space",
                         },
                         {
                           icon: FileText,
                           title: "Business Setup",
                           desc: "Company registration, GST, compliance",
-                          href: "/Solutions/business-setup"
-                        }
+                          href: "/Solutions/business-setup",
+                        },
                       ].map(({ icon: Icon, title, desc, href }) => (
                         <div
                           key={title}
-                          className="group flex items-start gap-3 p-4 rounded-lg border border-border/60 hover:bg-accent/10 hover:border-border cursor-pointer transition-colors"
+                          className="flex items-start gap-3 p-4 rounded-lg border hover:bg-gray-50 cursor-pointer"
                           onClick={() => {
                             handleNavigation(href);
-                            setIsDropdownOpen(false);
+                            setIsSolutionsOpen(false);
                           }}
                         >
                           <Icon className="w-5 h-5 text-primary mt-0.5" />
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <h5 className="text-sm font-semibold group-hover:text-primary">{title}</h5>
-                              <ArrowRight className="w-4 h-4 text-foreground/40 group-hover:text-primary" />
-                            </div>
-                            <p className="text-xs text-foreground/60 mt-1">{desc}</p>
+                          <div>
+                            <h5 className="text-sm font-semibold">{title}</h5>
+                            <p className="text-xs text-gray-500 mt-1">{desc}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
-
-                  {/* Bottom CTA */}
-                  <div className="mt-4">
-                    <button
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/90 text-black rounded-lg transition-colors font-medium text-sm"
-                      onClick={() => {
-                        handleNavigation("#contact");
-                        setIsDropdownOpen(false);
-                      }}
-                    >
-                      <UserCheck className="w-4 h-4" />
-                      Get Consultation
-                    </button>
-                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Partner with Us */}
-            <button
-              onClick={() => handleNavigation("/partner")}
-              className={`text-md font-medium font-content transition-colors duration-300 ${(!scrolled && lightText) ? 'text-white hover:text-white/80' : 'text-black hover:text-primary'}`}
-            >
-              Partner with Us
-            </button>
-
-            {/* More (styled translucent dropdown) */}
-            <div
-              ref={moreRef}
-              className="relative"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") setIsMoreOpen(false);
-              }}
-            >
+              {/* Partner with Us */}
               <button
-                onClick={() => setIsMoreOpen((o) => !o)}
-                aria-haspopup="true"
-                aria-expanded={isMoreOpen}
-                className={`text-md font-medium font-content transition-colors duration-300 ${(!scrolled && lightText) ? 'text-white hover:text-white/80' : 'text-black hover:text-primary'} flex items-center gap-1`}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setIsMoreOpen((o) => !o);
-                  }
-                }}
+                onClick={() => handleNavigation("/partner")}
+                className="text-md font-medium transition-colors text-black hover:text-primary"
               >
-                More
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  className={`transition-transform duration-300 ${isMoreOpen ? "rotate-180" : ""}`}
-                >
-                  <path
-                    d="M6 8L10 12L14 8"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                Partner with Us
               </button>
 
-              {/* Translucent dropdown */}
-              <div
-                className={`absolute right-0 top-full mt-2 w-44 
-                bg-black/70 backdrop-blur-md border border-yellow-400/40
-                rounded-md shadow-[0_6px_22px_rgba(0,0,0,0.35)] z-40
-                transition-all duration-300 origin-top-right
-                ${isMoreOpen ? "opacity-100 pointer-events-auto translate-y-0 scale-100" : "opacity-0 pointer-events-none -translate-y-1 scale-95"}`}
+              {/* === More Dropdown === */}
+              <div ref={moreRef} className="relative">
+                <button
+                  className="text-md font-medium flex items-center gap-1 cursor-pointer transition-colors text-black hover:text-primary"
+                  onClick={() => setIsMoreOpen((prev) => !prev)}
+                >
+                  More
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className={`transition-transform duration-300 ${isMoreOpen ? "rotate-180" : ""}`}
+                  >
+                    <path
+                      d="M6 8L10 12L14 8"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                {isMoreOpen && (
+                  <ul className="absolute bg-white border border-border rounded-md shadow-lg mt-2 w-40 py-2 z-50">
+                    {[
+                      { label: "About Us", href: "/about" },
+                      { label: "Career", href: "/career" },
+                      { label: "Blog", href: "/blog" },
+                    ].map((item) => (
+                      <li key={item.label}>
+                        <button
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                          onClick={() => {
+                            handleNavigation(item.href);
+                            setIsMoreOpen(false);
+                          }}
+                        >
+                          {item.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </nav>
+
+            {/* Right Buttons */}
+            <div className="flex items-center space-x-4 ml-auto">
+              {/* ===== Country Dropdown Button (flag + code only, no bold) ===== */}
+              <div ref={countryRef} className="hidden lg:block relative">
+                <button
+                  className="flex items-center px-3 py-1.5 rounded-md border border-gray-300 text-black gap-2 focus:outline-none bg-white"
+                  onClick={() => setCountryDropdownOpen((prev) => !prev)}
+                  aria-haspopup="listbox"
+                  aria-expanded={countryDropdownOpen}
+                >
+                  <img src={selectedCountry.flag} alt={selectedCountry.code} className="h-5 w-5 rounded-full" />
+                  <span className="text-sm">{selectedCountry.code}</span>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className={`ml-2 transition-transform duration-300 ${countryDropdownOpen ? "rotate-180" : ""}`}
+                  >
+                    <path
+                      d="M6 8L10 12L14 8"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+                {countryDropdownOpen && (
+                  <ul
+                    className="absolute left-0 top-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 min-w-[110px] py-1"
+                    role="listbox"
+                  >
+                    {countries.map((country) => (
+                      <li key={country.code}>
+                        <button
+                          className={`flex items-center w-full px-3 py-2 text-left hover:bg-gray-100 gap-2 text-sm`}
+                          onClick={() => {
+                            setSelectedCountry(country);
+                            setCountryDropdownOpen(false);
+                          }}
+                          role="option"
+                          aria-selected={selectedCountry.code === country.code}
+                        >
+                          <img src={country.flag} alt={country.code} className="h-5 w-5 rounded-full" />
+                          <span>{country.code}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              {/* ===== End Country Dropdown Button ===== */}
+
+              <Splash3dButton
+                onClick={() => setIsContactOpen(true)} // opens popup
+                className="hidden lg:inline-flex relative px-6 py-2.5 text-base rounded-lg font-bold bg-black text-white border border-black hover:shadow-md transition-all"
               >
-                <div className="py-2">
-                  {[
-                    { label: "Blog", link: "/blog" },
-                    { label: "Career", link: "/career" },
-                    { label: "About Us", link: "/aboutus" }
-                  ].map((opt) => (
-                    <button
-                      key={opt.label}
-                      onClick={() => {
-                        handleNavigation(opt.link);
-                        setIsMoreOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm
-                      text-yellow-300 hover:text-yellow-400
-                      hover:bg-yellow-400/10 focus:bg-yellow-400/10
-                      focus:outline-none focus:ring-0 transition-all"
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
+                Get in Touch
+              </Splash3dButton>
+
+              <Button
+                onClick={() => handleNavigation("/login")}
+                variant="outline"
+                className="hidden lg:inline-flex px-4 py-2 text-sm rounded-md border-gray-300 text-black hover:bg-gray-50"
+              >
+                Log in
+              </Button>
+            </div>
+          </div>
+
+          {/* Sidebar Menu */}
+          <SidebarMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+        </div>
+      </header>
+
+      {/* === Contact Popup === */}
+      {isContactOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all">
+          {/* ====== Popup Container ====== */}
+          <div className="flex flex-col md:flex-row gap-10 w-[95%] max-w-5xl items-start justify-center">
+            {/* ====== LEFT SIDE CARDS ====== */}
+            <div className="flex flex-col gap-5 w-full md:w-[45%]">
+              {/* Card 1 - Support */}
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                  Support
+                </h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  Need technical help or facing issues with our platform? Our support team is here 24×7 to assist you with queries and troubleshooting.
+                </p>
+                <p className="text-sm text-gray-600 mt-2">
+                  <strong>Support Mail:</strong>&nbsp;
+                  <a href="mailto:support@flashspace.co" className="text-blue-600 hover:underline">
+                    support@flashspace.co
+                  </a>
+                </p>
+              </div>
+              {/* Card 2 - Sales */}
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                  Sales
+                </h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  Want to explore FlashSpace solutions for your business? Our sales experts will help you find the right plan and growth strategy.
+                </p>
+                <p className="text-sm text-gray-600 mt-2">
+                  <strong>Sales Mail:</strong>&nbsp;
+                  <a href="mailto:sales@flashspace.co" className="text-blue-600 hover:underline">
+                    sales@flashspace.co
+                  </a>
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Contact:</strong> 8100888777 
+                </p>
+              </div>
+              {/* Card 3 - Partnership */}
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                  Partnership
+                </h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  Interested in collaborating or becoming a FlashSpace partner? Let’s innovate together and build future-ready digital solutions.
+                </p>
+                <p className="text-sm text-gray-600 mt-2">
+                  <strong>Partnership Mail:</strong>&nbsp;
+                  <a href="mailto:partner@flashspace.co " className="text-blue-600 hover:underline">
+                    partner@flashspace.co
+                  </a>
+                </p>
               </div>
             </div>
-          </nav>
-
-          {/* Right: language + CTAs */}
-            <div className="flex items-center space-x-4 ml-auto">
-            <div className={`hidden lg:flex items-center px-3 py-1.5 rounded-md border transition-colors duration-300 border-gray-300 ${(!scrolled && lightText) ? 'text-white' : 'text-black'}`}>
-              <span className="text-sm font-md">IND</span>
+            {/* ====== RIGHT SIDE FORM (UNCHANGED) ====== */}
+            <div className="bg-white rounded-2xl shadow-2xl w-full md:w-[45%] p-6 relative animate-fade-in">
+              <button
+                onClick={() => setIsContactOpen(false)}
+                className="absolute top-3 right-3 p-2 text-gray-500 hover:text-black transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <h2 className="text-xl font-bold mb-4 text-center">
+                <span className="text-black">Get in </span>
+                <span className="text-yellow-500">Touch</span>
+              </h2>
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                  <input
+                    type="text"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
+                    placeholder="Your Name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Phone Number </label>
+                  <input
+                    type="tel"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
+                    placeholder="+91 9876543210"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Message</label>
+                  <textarea
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
+                    placeholder="How can we help?"
+                    rows={4}
+                  ></textarea>
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full bg-yellow-500 text-black py-2 rounded-md font-semibold hover:bg-yellow-400 transition"
+                >
+                  Send Message
+                </Button>
+              </form>
             </div>
-
-            <Splash3dButton
-              onClick={() => handleNavigation("#contact")}
-              className="hidden lg:inline-flex relative px-6 py-2.5 text-base rounded-lg font-bold bg-black text-white border border-black shadow-[0_2px_8px_0_rgba(0,0,0,0.10)] hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.13)] active:translate-y-1 transition-all duration-150 before:content-[''] before:absolute before:inset-0 before:rounded-lg before:pointer-events-none"
-            >
-              Get in Touch
-            </Splash3dButton>
-
-            <Button
-              onClick={() => handleNavigation("/login")}
-              variant="outline"
-              className={`hidden lg:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 ${loginBlack ? 'text-black hover:bg-gray-50' : ((!scrolled && lightText) ? 'text-white hover:text-white/80' : 'text-black hover:bg-gray-50')}`}
-              style={{ fontFamily: "Poppins" }}
-            >
-              Log in
-            </Button>
           </div>
         </div>
-
-        {/* Full Page Menu Overlay */}
-        <SidebarMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      </div>
-    </header>
+      )}
+    </>
   );
 };
 
 export default Header;
-

@@ -15,24 +15,51 @@
 
 @font-face {
   font-family: 'Geist';
-  src: local('Inter'), local('Inter-Medium');
+  src: url('/fonts/Geist/Geist-Medium.ttf') format('truetype');
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Geist';
-  src: local('Inter'), local('Inter-SemiBold');
+  src: url('/fonts/Geist/Geist-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Geist';
-  src: local('Inter'), local('Inter-Bold');
+  src: url('/fonts/Geist/Geist-Bold.ttf') format('truetype');
   font-weight: 700;
   font-display: swap;
 }
+
+/* Poppins Font (from uploaded fonts) */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins/Poppins-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins/Poppins-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'c4b700';
   src: url('/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
@@ -44,7 +71,7 @@
 
 @font-face {
   font-family: 'new-one';
-  src: url('/fonts/e4af272ccee01ff0-s.p.woff2') format('woff2');
+  src: url('./assets//fonts/e4af272ccee01ff0-s.p.woff2') format('woff2');
 }
 /* Removed Locomotive Scroll overrides */
 

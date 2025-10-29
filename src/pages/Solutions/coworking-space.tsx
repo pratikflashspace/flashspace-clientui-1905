@@ -99,11 +99,25 @@ const CoworkingSpace = () => {
       step: "02",
       title: "Choose Your Plan",
       description: "Select from hot desk, dedicated desk, or private cabin options. Pick daily, weekly, or monthly plans that suit your needs.",
-      icon: CheckCircle,
+      icon: Target,
       gradient: "from-[#172A3A] to-[#2a4a5a]"
     },
     {
       step: "03",
+      title: "Payment",
+      description: "Complete secure online payment with flexible payment options. Get instant confirmation and receipt for your booking.",
+      icon: DollarSign,
+      gradient: "from-[#EDB003] to-[#f5c242]"
+    },
+    {
+      step: "04",
+      title: "Complete Documentation",
+      description: "Submit your KYC documents and complete the onboarding process. Our team will verify and activate your membership.",
+      icon: CheckCircle,
+      gradient: "from-[#172A3A] to-[#2a4a5a]"
+    },
+    {
+      step: "05",
       title: "Start Working",
       description: "Get your access card and start working immediately. Enjoy all amenities, networking events, and community benefits.",
       icon: Zap,
@@ -272,46 +286,46 @@ const CoworkingSpace = () => {
   const cityLocations = [
     {
       city: "Bangalore",
-      centers: 18,
+      centers: 5,
       image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
       description: "Silicon Valley coworking hubs"
     },
     {
       city: "Delhi NCR",
-      centers: 24,
+      centers: 15,
       image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80",
       description: "Premium coworking in capital region"
     },
     {
       city: "Mumbai",
-      centers: 22,
+      centers: 4,
       image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&q=80",
       description: "Business district workspace solutions"
     },
     {
-      city: "Pune",
-      centers: 12,
+      city: "Kolkata",
+      centers: 8,
       image: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80",
-      description: "Tech corridor collaborative spaces"
+      description: "Cultural capital workspace hubs"
     },
     {
       city: "Hyderabad",
-      centers: 15,
+      centers: 4,
       image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800&q=80",
       description: "Innovation district workspaces"
     },
     {
       city: "Chennai",
-      centers: 10,
+      centers: 2,
       image: "https://images.unsplash.com/photo-1497366412874-3415097a27e7?w=800&q=80",
       description: "Southern hub coworking centers"
     }
   ];
 
   const stats = [
-    { number: "3000+", label: "Happy Members", icon: Users },
+    { number: "500+", label: "Clients", icon: Users },
     { number: "68+", label: "Centers Pan India", icon: Building },
-    { number: "8", label: "Major Cities", icon: MapPin },
+    { number: "50+", label: "Cities", icon: MapPin },
     { number: "24/7", label: "Access Available", icon: Shield }
   ];
 
@@ -628,11 +642,11 @@ const CoworkingSpace = () => {
               How It Works
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Get started with FlashSpace coworking in three simple steps
+              Get started with FlashSpace coworking in five simple steps
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 max-w-7xl mx-auto">
             {howItWorks.map((step, index) => (
               <motion.div
                 key={index}
@@ -646,7 +660,7 @@ const CoworkingSpace = () => {
                   <CardContent className="p-8 relative">
                     <div className={`absolute inset-0 bg-gradient-to-br ${step.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
 
-                    <div className="absolute -top-6 -right-6 text-8xl font-bold text-[#EDB003]/10" style={{ fontFamily: 'Poppins' }}>
+                    <div className="absolute top-4 right-4 text-3xl font-bold text-[#EDB003]/20" style={{ fontFamily: 'Poppins' }}>
                       {step.step}
                     </div>
 
@@ -666,8 +680,8 @@ const CoworkingSpace = () => {
 
                 {/* Connector Arrow */}
                 {index < howItWorks.length - 1 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-20">
-                    <ArrowRight className="w-8 h-8 text-[#EDB003]" />
+                  <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-20">
+                    <ArrowRight className="w-6 h-6 text-[#EDB003] opacity-60" />
                   </div>
                 )}
               </motion.div>
@@ -689,7 +703,7 @@ const CoworkingSpace = () => {
               Our Advantages
             </span>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
-              Why Choose <span className="text-[#EDB003]">FlashSpace</span> Coworking
+              Why Choose <span className="text-[#EDB003]">FlashSpace</span> Coworking <span className="text-[#EDB003] text-5xl md:text-6xl">?</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Experience the difference with India's fastest-growing coworking community
@@ -956,7 +970,7 @@ const CoworkingSpace = () => {
               Our Locations
             </span>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
-              <span className="text-[#EDB003]">68+</span> Centers Across <span className="text-[#EDB003]">8</span> Cities
+              Across <span className="text-[#EDB003]">28+</span> States
             </h2>
             <p className="text-xl text-gray-600">Find your perfect coworking space location</p>
           </motion.div>
@@ -1036,7 +1050,7 @@ const CoworkingSpace = () => {
                 Book Free Tour
               </Button>
 
-              <Button className="bg-white text-black border-2 border-gray-300 hover:bg-[#FFD43B] hover:text-black hover:border-[#FFD43B] text-lg px-10 py-7 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
+              <Button className="bg-white hover:bg-[#EDB003] text-black hover:text-white text-lg px-10 py-7 rounded-full font-bold transition-all duration-300">
                 <Phone className="w-5 h-5 mr-2" />
                 Talk to Expert
               </Button>
