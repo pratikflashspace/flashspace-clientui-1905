@@ -30,6 +30,7 @@ import Updates from "./pages/Updates";
 import Settings from "./pages/Settings";
 import CityListing from "./pages/CityListing";
 import AboutUs from "./pages/AboutUs";
+import Blog from "./pages/Blog";
 // import VirtualOfficeSearch from "./pages/solutions/VirtualOfficeSearch";
 // import CoworkingSpaceSearch from "./pages/solutions/CoworkingSpaceSearch";
 // import OnDemandSearch from "./pages/solutions/OnDemandSearch";
@@ -64,6 +65,7 @@ const App = () => (
            <Route path="/updates" element={<Updates />} />
            <Route path="/settings" element={<Settings />} />
             <Route path="/aboutus" element={<AboutUs />} />
+           <Route path="/blog" element={<Blog />} />
            {/* <Route path="/solutions/virtual-office" element={<VirtualOfficeSearch />} />
            <Route path="/solutions/coworking-space" element={<CoworkingSpaceSearch />} />
            <Route path="/solutions/on-demand" element={<OnDemandSearch />} />

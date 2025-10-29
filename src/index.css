@@ -206,7 +206,8 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: 'Geist', 'Georgia', 'serif';
+    /* Primary site font: Poppins (with Geist fallback) */
+    font-family: 'Poppins', 'Geist', 'Georgia', 'serif';
     background: hsl(var(--background));
     min-height: 100vh;
   }
@@ -386,6 +387,30 @@
   }
   50% {
     transform: translateY(-8px);
+  }
+}
+
+/* Horizontal continuous loop for feature cards */
+@keyframes horizontal-loop {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(-50%); }
+}
+
+.horizontal-loop {
+  display: flex;
+  align-items: stretch;
+  gap: 1.25rem; /* same as gap-5 */
+  will-change: transform;
+  animation: horizontal-loop 14s linear infinite;
+}
+
+.horizontal-loop:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .horizontal-loop {
+    animation: none !important;
   }
 }
 
