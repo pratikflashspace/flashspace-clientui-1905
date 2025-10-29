@@ -2,6 +2,44 @@ import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
+// Add styles for popup to prevent it from being hidden
+const popupStyles = `
+  .office-popup {
+    pointer-events: auto !important;
+    z-index: 9999 !important;
+  }
+  
+  .office-popup .maplibregl-popup-content {
+    pointer-events: auto !important;
+    border-radius: 12px;
+    padding: 0 !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+  }
+  
+  .office-popup .maplibregl-popup-tip {
+    border-top-color: white !important;
+    border-bottom-color: white !important;
+    z-index: 9999 !important;
+  }
+  
+  .office-popup .maplibregl-popup-close-button {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 10000 !important;
+  }
+  
+  .maplibregl-popup {
+    z-index: 9999 !important;
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = popupStyles;
+  document.head.appendChild(styleElement);
+}
+
 export type MapStyle =
   | 'osm-bright'
   | 'dark'
@@ -369,7 +407,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
       popup = new maplibregl.Popup({
         offset: 40,
         closeButton: true,
-        closeOnClick: true,
+        closeOnClick: false,
         maxWidth: '320px',
         className: 'office-popup',
         focusAfterOpen: false,
@@ -395,14 +433,19 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           setTimeout(() => {
             const popupEl = popup.getElement();
             if (popupEl) {
+              // Make popup interactive
+              popupEl.style.pointerEvents = 'auto';
+              
               // Mouse enters popup - don't close
               popupEl.addEventListener('mouseenter', () => {
                 clearTimeout(closeTimeout);
               });
 
-              // Mouse leaves popup - close it
+              // Mouse leaves popup - delay closing to prevent accidental close
               popupEl.addEventListener('mouseleave', () => {
-                popup.remove();
+                closeTimeout = setTimeout(() => {
+                  popup.remove();
+                }, 200);
               });
             }
           }, 50);
@@ -413,7 +456,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
       el.addEventListener('mouseleave', () => {
         closeTimeout = setTimeout(() => {
           popup?.remove();
-        }, 300);
+        }, 200);
       });
 
       markersRef.current.push(marker);

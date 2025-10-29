@@ -13,17 +13,31 @@ export interface BusinessSolution {
 
 // Virtual Office specific types
 export interface VirtualOfficeItem {
-  _id: number;
+  _id: string;
   name: string;
   address: string;
+  city: string;
+  area: string;
   price: string;
   originalPrice: string;
+  gstPlanPrice: string;
+  mailingPlanPrice: string;
+  brPlanPrice: string;
   rating: number;
   reviews: number;
   features: string[];
-  area: string;
-  availability: string; // to boolean
+  availability: string;
   popular: boolean;
+  image?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  isDeleted?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
 export type VirtualOfficeCityKey = 'delhi' | 'mumbai' | 'bangalore' | 'pune';
@@ -36,6 +50,9 @@ export interface EventSpaceItem {
   address: string;
   price: string;
   originalPrice: string;
+  gstPlanPrice: string;
+  mailingPlanPrice: string;
+  brPlanPrice: string;
   rating: number;
   reviews: number;
   type: string;
@@ -57,18 +74,32 @@ export type EventSpacesByCity = Record<EventSpaceCityKey, EventSpaceItem[]>;
 
 // Coworking Space specific types
 export interface CoworkingSpaceItem {
-  _id: number;
+  _id: string;
   name: string;
   address: string;
+  city: string;
+  area: string;
   price: string;
   originalPrice: string;
+  gstPlanPrice: string;
+  mailingPlanPrice: string;
+  brPlanPrice: string;
   rating: number;
   reviews: number;
   type: string;
   features: string[];
-  area: string;
   availability: string;
   popular: boolean;
+  image?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  isDeleted?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
 export type CoworkingSpaceCityKey = 'delhi' | 'mumbai' | 'bangalore' | 'pune';

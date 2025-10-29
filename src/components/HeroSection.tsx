@@ -102,7 +102,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="h-screen flex items-center justify-center px-4 relative overflow-hidden">
+    <section className="min-h-screen flex items-center justify-center pt-16 pb-12 px-4 relative overflow-hidden">
       {/* Dynamic Video Background - Only for Hero Section */}
       {/* <VideoBackground /> */}
       <div className="absolute inset-0 z-0">
@@ -116,7 +116,7 @@ const HeroSection = () => {
       {/* Darker overlay for text readability */}
       {/* <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-black/40 to-slate-800/50 backdrop-blur-sm z-10"></div> */}
       
-      <div className="container mx-auto text-center relative z-20 flex flex-col items-center justify-center">
+      <div className="container mx-auto text-left relative z-20 pl-24 md:pl-16 lg:pl-8">
         {/* Hero Content */}
         <div className="max-w-4xl mb-8 relative">          
           <h1 className="text-4xl md:text-7xl font-semibold  mb-6 leading-tight text-black animate-fade-in" style={{ fontFamily: 'Poppins' }}>
@@ -131,21 +131,33 @@ const HeroSection = () => {
           </p>
           <br />
 
-          {/* Hero Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '300ms' }}>
-              <Button
-                onClick={() => navigate('/start-chatting')}
-                className="bg-black text-white hover:bg-gray-800 text-lg px-10 py-7 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
-                Start Chat
-              </Button>
-
-              <Button
-                onClick={() => scrollToSection('#solutions')}
-                className="bg-transparent text-black border-2 border-[#FFD43B] hover:bg-[#FFD43B] hover:text-black text-lg px-10 py-7 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
-                Explore Spaces
-              </Button>
+          {/* Start chating button*/}
+            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: '300ms' }}>
+            <RippleButton 
+               text= "Start chating"
+               background="#000000"
+               textColor="white"
+               hoverTextColor="black"
+               hoverFlairColor="#EFAD1A"
+               buttonHeight="60px"
+               onClick={() => navigate('/start-chatting') }
+            />
+            <RippleButton 
+               text={<span className="flex items-center gap-2 ">
+                 {/* Add this import at top: import { Video } from "lucide-react"; */}
+                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                 <path d="m22 8-6 4 6 4V8Z" />
+                 <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+                 </svg>
+                 <span>Who are we? </span>
+               </span> }
+               background="white"
+               textColor="black"
+               hoverTextColor="black"
+               hoverFlairColor="#EFAD1A"
+               buttonHeight="60px"
+               onClick={() => scrollToSection('#')}
+            />
             </div>
           
           

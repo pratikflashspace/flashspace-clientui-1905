@@ -2,42 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Font - c4b700 */
-/* Geist Font (Local or CDN fallback) */
+/* Import Google Fonts - Poppins (all weights) and Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+/* Geist Font - Map to Inter since Geist isn't available on free CDNs */
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-Regular.woff2') format('woff2');
+  src: local('Inter'), local('Inter-Regular');
   font-weight: 400;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-Medium.woff2') format('woff2');
+  src: local('Inter'), local('Inter-Medium');
   font-weight: 500;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-SemiBold.woff2') format('woff2');
+  src: local('Inter'), local('Inter-SemiBold');
   font-weight: 600;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-Bold.woff2') format('woff2');
+  src: local('Inter'), local('Inter-Bold');
   font-weight: 700;
   font-display: swap;
 }
 @font-face {
-  font-family: 'Geist Mono';
-  src: url('/fonts/GeistMono-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
   font-family: 'c4b700';
-  src: url('./assets/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
-       url('./assets/fonts/c4b700dcb2187787-s.p.ttf') format('truetype');
+  src: url('/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
+       url('/fonts/c4b700dcb2187787-s.p.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -45,19 +44,7 @@
 
 @font-face {
   font-family: 'new-one';
-  src: url('./assets//fonts/e4af272ccee01ff0-s.p.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url("./assets//fonts/Poppins-Regular.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('./assets/fonts/Poppins-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-display: swap;
+  src: url('/fonts/e4af272ccee01ff0-s.p.woff2') format('woff2');
 }
 /* Removed Locomotive Scroll overrides */
 
