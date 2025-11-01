@@ -20,15 +20,16 @@ import CoworkingSpaceSolution from "./pages/Solutions/coworking-space";
 import OnDemandSolution from "./pages/Solutions/on-demand";
 import BusinessSetupSolution from "./pages/Solutions/business-setup";
 import PartnerWithUs from "./pages/PatnerWithUs";
+
 //
 import MouseFollower from "./components/MouseFollower";
 // Additional Pages
-
+import ClientDashboard from "@/pages/ClientDashboard";
 import Career from "./pages/Career";
 import Login from "./pages/Login";
 import Bookings from "./pages/Bookings";
 import Community from "./pages/Community";
-import Updates from "./pages/Updates";
+
 import Settings from "./pages/Settings";
 import CityListing from "./pages/CityListing";
 // import VirtualOfficeSearch from "./pages/solutions/VirtualOfficeSearch";
@@ -47,6 +48,7 @@ const App = () => (
       <BrowserRouter>
       {/* <MouseFollower/> */}
           <Routes>
+            <Route path="/dashboard" element={<ClientDashboard />} />
             <Route path="/" element={<Index />} />
             <Route path="/services" element={<Services />} />
             <Route path="/services/virtual-office" element={<VirtualOffice />} />
@@ -63,7 +65,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/community" element={<Community />} />
-            <Route path="/updates" element={<Updates />} />
+           
             <Route path="/settings" element={<Settings />} />
             {/* <Route path="/solutions/virtual-office" element={<VirtualOfficeSearch />} />
             <Route path="/solutions/coworking-space" element={<CoworkingSpaceSearch />} />

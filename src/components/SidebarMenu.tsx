@@ -1,7 +1,18 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
-import { X, MessageCircle, Briefcase, FileText, Calendar, Users, Bell, Settings as SettingsIcon, MoreHorizontal } from "lucide-react";
+import {
+  X,
+  MessageCircle,
+  Briefcase,
+  FileText,
+  Calendar,
+  Users,
+  Bell,
+  Settings as SettingsIcon,
+  MoreHorizontal
+} from "lucide-react";
+
 import { smoothScrollTo } from "@/lib/lenis";
 
 interface SidebarMenuProps {
@@ -9,53 +20,180 @@ interface SidebarMenuProps {
   onClose: () => void;
 }
 
+const MENU_WIDTH_OPEN = 300;
+const MENU_WIDTH_ICON = 68;
+const UPDATES_WIDTH = 520;
+
+// ------------------------------------------------
+// UpdatesPopup component (no blur / no overlay)
+// ------------------------------------------------
+const UpdatesPopup = ({
+  open,
+  menuWidth,
+  onCloseBoth
+}: {
+  open: boolean;
+  menuWidth: number;
+  onCloseBoth: () => void;
+}) => {
+  if (!open) return null;
+
+  return createPortal(
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: menuWidth,
+        width: UPDATES_WIDTH,
+        height: "100vh",
+        zIndex: 9999,
+        transform: open ? "translateX(0)" : "translateX(120%)",
+        transition: "transform 0.4s cubic-bezier(.7,.22,.26,.98)"
+      }}
+    >
+      <div
+        style={{
+          background: "#fff",
+          borderTopLeftRadius: "0px",
+          borderBottomLeftRadius: "0px",
+          borderTopRightRadius: "22px",
+          borderBottomRightRadius: "22px",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
+          padding: "28px 32px 32px 32px",
+          width: "100%",
+          height: "100%",
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+          position: "relative"
+        }}
+      >
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <h2
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              marginBottom: 18,
+              color: "#222",
+              marginTop: 10,
+              letterSpacing: "0.5px"
+            }}
+          >
+            Update & <span style={{ color: "#FFCC00" }}>Notification</span>
+          </h2>
+          <button
+            onClick={onCloseBoth}
+            aria-label="Close updates"
+            style={{ background: "transparent", border: "none", cursor: "pointer", padding: 8 }}
+          >
+            <X style={{ width: 18, height: 18 }} />
+          </button>
+        </div>
+
+        {/* Updates Content */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.3rem" }}>
+          <div style={{ background: "#f6f7ff", borderRadius: "14px", padding: "18px" }}>
+            <strong>Site Launched!</strong>
+            <p style={{ margin: "10px 0 0 0", color: "#506" }}>
+              We have deployed the first AI-enabled business workspace platform. 🎉
+            </p>
+          </div>
+
+          <div style={{ background: "#f0fff6", borderRadius: "14px", padding: "18px" }}>
+            <strong>New Feature: Flash Tribe</strong>
+            <p style={{ margin: "10px 0 0 0", color: "#265" }}>
+              Now connect with fellow workspace members and grow your professional network.
+            </p>
+          </div>
+
+          <div style={{ background: "#fff8f0", borderRadius: "14px", padding: "18px" }}>
+            <strong>Maintenance Notice</strong>
+            <p style={{ margin: "10px 0 0 0", color: "#a64" }}>
+              There’s scheduled maintenance on Nov 3rd, 2AM to 3AM IST.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+// ------------------------------------------------
+// SidebarMenu component
+// ------------------------------------------------
 const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
   const navigate = useNavigate();
+  const [showUpdates, setShowUpdates] = useState(false);
+
   const primaryTop = [
-    { label: 'Start Chatting', href: '/start-chatting', icon: MessageCircle },
-    { label: 'Get WorkSpace', href: '/services/coworking-space', icon: Briefcase },
-    { label: 'Business Setup', href: '/Solutions/business-setup', icon: FileText },
-  ];
-  const middle = [
-    { label: 'Your Bookings', href: '/bookings', icon: Calendar },
-    { label: 'Flash Tribe', href: '/community', icon: Users },
-  ];
-  const footer = [
-    { label: 'Updates', href: '/updates', icon: Bell },
-    { label: 'Settings', href: '/settings', icon: SettingsIcon },
-    { label: 'More', href: '#more', icon: MoreHorizontal },
+    { label: "Start Chatting", href: "/start-chatting", icon: MessageCircle },
+    { label: "Get WorkSpace", href: "/services/coworking-space", icon: Briefcase },
+    { label: "Business Setup", href: "/Solutions/business-setup", icon: FileText }
   ];
 
-  const handleNavigation = (href: string) => {
-    if (href.startsWith('#')) {
+  const middle = [
+    { label: "Your Bookings", href: "/bookings", icon: Calendar },
+    { label: "Flash Tribe", href: "/community", icon: Users }
+  ];
+
+  const footer = [
+    { label: "Updates", href: "/updates", icon: Bell },
+    { label: "Settings", href: "/settings", icon: SettingsIcon },
+    { label: "More", href: "#more", icon: MoreHorizontal }
+  ];
+
+  useEffect(() => {
+    if (!isOpen && showUpdates) setShowUpdates(false);
+  }, [isOpen, showUpdates]);
+
+  // Close both Sidebar & Updates
+  const closeBoth = () => {
+    setShowUpdates(false);
+    onClose();
+  };
+
+  const handleNavigation = (href: string, label?: string) => {
+    if (label === "Updates") {
+      setShowUpdates((prev) => !prev);
+      return;
+    }
+    if (href.startsWith("#")) {
       try {
         smoothScrollTo(href, { offset: -90 });
       } catch {
-        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelector(href)?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
       }
     } else {
-      // Use React Router navigation for internal routes
       navigate(href);
     }
     onClose();
   };
 
+  // ESC closes both
   useEffect(() => {
-    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    if (isOpen) {
-      document.addEventListener('keydown', esc);
-      document.body.style.overflow = 'hidden';
-      document.body.classList.add('fs-menu-open');
+    const esc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeBoth();
+    };
+    if (isOpen || showUpdates) {
+      document.addEventListener("keydown", esc);
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
-      document.body.classList.remove('fs-menu-open');
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.removeEventListener('keydown', esc);
-      document.body.style.overflow = 'unset';
-      document.body.classList.remove('fs-menu-open');
+      document.removeEventListener("keydown", esc);
+      document.body.style.overflow = "unset";
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, showUpdates]);
+
+  const menuWidth = showUpdates ? MENU_WIDTH_ICON : MENU_WIDTH_OPEN;
+  const hideLogoFooter = showUpdates;
+  const iconOnly = showUpdates;
 
   const content = (
     <div
@@ -63,77 +201,112 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
       role="dialog"
       aria-modal="true"
       aria-hidden={!isOpen}
-      className={`fixed inset-0 z-[9999] overflow-hidden transition-opacity duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+      className={`fixed inset-0 z-[12000] overflow-hidden transition-opacity duration-300 ${
+        isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+      }`}
     >
+      {/* Overlay click closes both, NO blur or dark background */}
       <div
-        onClick={onClose}
-        className={`absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
+        onClick={closeBoth}
+        className="absolute inset-0"
+        style={{
+          background: "transparent",
+          cursor: "pointer"
+        }}
       />
-  <div className={`relative z-10 w-72 h-full bg-white text-black border-r border-neutral-800 shadow-xl transform transition-transform duration-300 ease-out rounded-r-2xl overflow-hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`} style={{ fontFamily: 'Geist' }}>
-        <div className="flex items-center justify-between p-5 border-b border-neutral-800/70">
-          <img
-            src="/Logo/Flashspace Logo.png"
-            alt="FlashSpace Logo"
-            className="h-8 w-auto cursor-pointer select-none"
-            onClick={() => handleNavigation('/')}
-          />
-          <button onClick={onClose} className="p-2 rounded-md hover:bg-black/10 active:scale-95 transition" aria-label="Close menu">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <div className="overflow-y-auto h-full pb-32 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent">
-          <div className="p-5 space-y-8 text-sm tracking-wide">
+
+      {/* Updates Popup */}
+      <UpdatesPopup open={showUpdates} menuWidth={menuWidth} onCloseBoth={closeBoth} />
+
+      {/* Sidebar */}
+      <div
+        className="relative z-20 h-full bg-white text-black border-r border-neutral-200 shadow-xl transform transition-transform duration-300 ease-out overflow-hidden"
+        style={{
+          fontFamily: "Geist",
+          width: `${menuWidth}px`,
+          minWidth: `${menuWidth}px`,
+          maxWidth: `${menuWidth}px`,
+          transition:
+            "width 0.36s cubic-bezier(.7,.22,.26,.98), min-width 0.36s cubic-bezier(.7,.22,.26,.98), max-width 0.36s cubic-bezier(.7,.22,.26,.98)"
+        }}
+      >
+        {/* Header */}
+        {!hideLogoFooter && (
+          <div className="flex items-center justify-between p-5 border-b border-neutral-200" style={{ minHeight: 64 }}>
+            <img
+              src="/Logo/Flashspace Logo.png"
+              alt="FlashSpace Logo"
+              className="h-8 w-auto cursor-pointer select-none"
+              onClick={() => handleNavigation("/")}
+            />
+            <button
+              onClick={closeBoth}
+              className="p-2 rounded-md hover:bg-black/10 active:scale-95 transition"
+              aria-label="Close menu"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+
+        {/* Menu items */}
+        <div className="overflow-y-auto h-full pb-32 flex flex-col">
+          <div className="p-5 space-y-8 text-sm tracking-wide flex-1">
             <nav className="space-y-2">
-              {primaryTop.map(item => (
-                <button key={item.label} onClick={() => handleNavigation(item.href)} className="group flex w-full items-center gap-3 text-left font-medium py-2 px-2 rounded hover:text-yellow-600 focus:outline-none hover:bg-black/5 transition-all duration-300" style={{ fontFamily: 'Geist' }}>
-                  <item.icon className="w-5 h-5 text-gray-600 group-hover:text-yellow-600 transition-colors duration-300" />
-                  <span className="transition-all duration-300 group-hover:scale-110 inline-block origin-left">{item.label}</span>
-                </button>
-              ))}
-              <div className="h-px bg-neutral-700/70 my-3" />
-              {middle.map(item => (
-                <button key={item.label} onClick={() => handleNavigation(item.href)} className="group flex w-full items-center gap-3 text-left font-medium py-2 px-2 rounded hover:text-yellow-600 hover:bg-black/5 transition-all duration-300" style={{ fontFamily: 'Geist' }}>
-                  <item.icon className="w-5 h-5 text-gray-600 group-hover:text-yellow-600 transition-colors duration-300" />
-                  <span className="transition-all duration-300 group-hover:scale-110 inline-block origin-left">{item.label}</span>
-                </button>
-              ))}
-              <div className="h-px bg-neutral-700/70 my-3" />
-              {footer.map(item => (
-                <button key={item.label} onClick={() => handleNavigation(item.href)} className="group flex w-full items-center gap-3 text-left py-2 px-2 text-[13px] font-medium text-black hover:text-yellow-600 rounded hover:bg-black/5 transition-all duration-300" style={{ fontFamily: 'Geist' }}>
-                  <item.icon className="w-4 h-4 text-gray-600 group-hover:text-yellow-600 transition-colors duration-300" />
-                  <span className="transition-all duration-300 group-hover:scale-110 inline-block origin-left">{item.label}</span>
-                </button>
-              ))}
+              {[...primaryTop, { divider: true }, ...middle, { divider: true }, ...footer].map(
+                (item: any, idx) =>
+                  item.divider ? (
+                    <div key={idx} className="h-px bg-neutral-300 my-3" />
+                  ) : (
+                    <button
+                      key={item.label}
+                      onClick={() => handleNavigation(item.href, item.label)}
+                      className={`group flex items-center ${
+                        iconOnly ? "justify-center" : "gap-3 text-left"
+                      } py-2 px-2 text-[13px] font-medium text-black hover:text-yellow-600 rounded hover:bg-black/5 transition-all duration-300`}
+                    >
+                      <item.icon className="w-5 h-5 text-gray-600 group-hover:text-yellow-600 transition-colors duration-300" />
+                      {!iconOnly && <span>{item.label}</span>}
+                    </button>
+                  )
+              )}
             </nav>
-            <div className="flex items-center justify-center py-4">
-              <div className="w-20 h-20 rounded-full border-2 border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden bg-white flex items-center justify-center">
-                <img
-                  src="/Logo/FlashSpace Favicon.png"
-                  alt="FlashSpace Favicon"
-                  className="w-full h-full object-contain p-2"
-                />
-              </div>
-            </div>
-            <div className="space-y-3 pt-2">
-              <button onClick={() => handleNavigation('#contact')} className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition" style={{ fontFamily: 'Poppins' }}>Get Consultation</button>
-              <button onClick={() => handleNavigation('/login')} className="w-full rounded-md border border-neutral-600 text-black py-2 text-sm hover:bg-yellow-400 hover:text-white active:scale-[0.98] transition" style={{ fontFamily: 'Poppins' }}>Log in</button>
-            </div>
+
+            {/* Footer */}
+            {!hideLogoFooter && (
+              <>
+                <div className="flex items-center justify-center py-4">
+                  <div className="w-20 h-20 rounded-full border-2 border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden bg-white flex items-center justify-center">
+                    <img
+                      src="/Logo/FlashSpace Favicon.png"
+                      alt="FlashSpace Favicon"
+                      className="w-full h-full object-contain p-2"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-3 pt-2">,
+                  <button
+                    onClick={() => handleNavigation("#contact")}
+                    className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition"
+                  >
+                    Get Consultation
+                  </button>
+                  <button
+                    onClick={() => handleNavigation("/login")}
+                    className="w-full rounded-md border border-neutral-600 text-black py-2 text-sm hover:bg-yellow-400 hover:text-white active:scale-[0.98] transition"
+                  >
+                    Log in
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-      </div>
-      <div className={`relative z-0 ml-72 h-full bg-[radial-gradient(circle_at_30%_20%,#1d1d1f,#0f0f10)] flex items-center justify-center transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-8'}`}>
-        <div className="text-center text-neutral-400 px-8 max-w-md">
-          <h3 className="text-3xl font-semibold mb-4 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">Everything in one place.</h3>
-          <p className="text-sm leading-relaxed">Pick an action on the left. This panel can later host highlights, product updates, or a live preview. Totally swappable.</p>
-        </div>
-        <button onClick={onClose} className="absolute top-4 right-4 lg:hidden p-2 rounded-full bg-neutral-800 text-white shadow hover:shadow-lg border border-neutral-700 active:scale-95 transition" aria-label="Close menu">
-          <X className="h-5 w-5" />
-        </button>
       </div>
     </div>
   );
 
-  if (typeof document !== 'undefined') return createPortal(content, document.body);
+  if (typeof document !== "undefined") return createPortal(content, document.body);
   return content;
 };
 
