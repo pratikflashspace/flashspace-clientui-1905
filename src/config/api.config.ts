@@ -1,0 +1,64 @@
+// API Configuration
+export const API_CONFIG = {
+  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
+  TIMEOUT: 30000,
+  CREDENTIALS: 'include' as RequestCredentials,
+};
+
+// API Endpoints
+export const API_ENDPOINTS = {
+  // Auth endpoints
+  AUTH: {
+    SIGNUP: '/api/auth/signup',
+    LOGIN: '/api/auth/login',
+    LOGOUT: '/api/auth/logout',
+    LOGOUT_ALL: '/api/auth/logout-all',
+    VERIFY_OTP: '/api/auth/verify-otp',
+    RESEND_OTP: '/api/auth/resend-otp',
+    VERIFY_EMAIL: '/api/auth/verify-email',
+    FORGOT_PASSWORD: '/api/auth/forgot-password',
+    RESET_PASSWORD: '/api/auth/reset-password',
+    CHANGE_PASSWORD: '/api/auth/change-password',
+    REFRESH_TOKEN: '/api/auth/refresh-token',
+    CHECK_AUTH: '/api/auth/check-auth',
+    GET_PROFILE: '/api/auth/profile',
+  },
+  
+  // Contact Form
+  CONTACT: {
+    CREATE: '/api/contactForm/createContactForm',
+    GET_ALL: '/api/contactForm/getAllContactForm',
+    GET_BY_ID: (id: string) => `/api/contactForm/getContactFormById/${id}`,
+    UPDATE: (id: string) => `/api/contactForm/updateContactForm/${id}`,
+    DELETE: (id: string) => `/api/contactForm/deleteContactForm/${id}`,
+  },
+  
+  // Space Provider
+  SPACE_PROVIDER: {
+    CREATE: '/api/spaceProvider/createSpaceProvider',
+    GET_ALL: '/api/spaceProvider/getAllSpaceProviders',
+    GET_BY_ID: (id: string) => `/api/spaceProvider/getSpaceProviderById/${id}`,
+    UPDATE: (id: string) => `/api/spaceProvider/updateSpaceProvider/${id}`,
+    DELETE: (id: string) => `/api/spaceProvider/deleteSpaceProvider/${id}`,
+  },
+  
+  // Virtual Office
+  VIRTUAL_OFFICE: {
+    CREATE: '/api/virtualOffice/create',
+    GET_ALL: '/api/virtualOffice/getAll',
+    GET_BY_CITY: (city: string) => `/api/virtualOffice/getByCity/${city}`,
+    GET_BY_ID: (id: string) => `/api/virtualOffice/getById/${id}`,
+    UPDATE: (id: string) => `/api/virtualOffice/update/${id}`,
+    DELETE: (id: string) => `/api/virtualOffice/delete/${id}`,
+  },
+  
+  // Coworking Space
+  COWORKING_SPACE: {
+    CREATE: '/api/coworkingSpace/create',
+    GET_ALL: '/api/coworkingSpace/getAll',
+    GET_BY_CITY: (city: string) => `/api/coworkingSpace/getByCity/${city}`,
+    GET_BY_ID: (id: string) => `/api/coworkingSpace/getById/${id}`,
+    UPDATE: (id: string) => `/api/coworkingSpace/update/${id}`,
+    DELETE: (id: string) => `/api/coworkingSpace/delete/${id}`,
+  },
+};

@@ -3,11 +3,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import ListYourSpace from "./pages/ListYourSpace";
 import ComingSoon from "./pages/ComingSoon";
-// import CityListing from "./pages/CityListing";
 import NotFound from "./pages/NotFound";
 import VirtualOffice from "./pages/services/VirtualOffice";
 import CoworkingSpace from "./pages/services/CoworkingSpace";
@@ -23,9 +24,11 @@ import PartnerWithUs from "./pages/PatnerWithUs";
 //
 import MouseFollower from "./components/MouseFollower";
 // Additional Pages
-
 import Career from "./pages/Career";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import VerifyOTP from "./pages/VerifyOTP";
+import ForgotPassword from "./pages/ForgotPassword";
 import Bookings from "./pages/Bookings";
 import Community from "./pages/Community";
 import Updates from "./pages/Updates";
@@ -47,8 +50,10 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-      {/* <MouseFollower/> */}
+        <AuthProvider>
+          {/* <MouseFollower/> */}
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/services" element={<Services />} />
             <Route path="/services/virtual-office" element={<VirtualOffice />} />
@@ -62,11 +67,22 @@ const App = () => (
             <Route path="/Solutions/business-setup" element={<BusinessSetupSolution />} />
             <Route path="/city-listing" element={<CityListing />} />
             <Route path="/career" element={<Career />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/blog" element={<Blog />} />
+            
+            {/* Auth Routes */}
             <Route path="/login" element={<Login />} />
-            <Route path="/bookings" element={<Bookings />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/updates" element={<Updates />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/verify-otp" element={<VerifyOTP />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/bookings" element={<Bookings />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/updates" element={<Updates />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
             {/* <Route path="/solutions/virtual-office" element={<VirtualOfficeSearch />} />
             <Route path="/solutions/coworking-space" element={<CoworkingSpaceSearch />} />
             <Route path="/solutions/on-demand" element={<OnDemandSearch />} />
@@ -81,6 +97,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
