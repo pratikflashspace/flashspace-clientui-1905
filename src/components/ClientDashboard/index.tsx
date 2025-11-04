@@ -10,7 +10,7 @@ import {
   FileText,
   Headphones,
   LogOut,
-  User, 
+  User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Dashboard from "./Dashboard";
@@ -23,7 +23,6 @@ import ContractsDocuments from "./ContractsDocuments";
 import Support from "./Support";
 import Logout from "./Logout";
 import Profile from "./Profile";
-
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard },
@@ -50,20 +49,30 @@ export default function ClientDashboard() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  
   function MainContent() {
     switch (activeIndex) {
-      case 0: return <Dashboard />;
-      case 1: return <MyBookings />;
-      case 2: return <OnDemandServices />;
-      case 3: return <VirtualOffices />;
-      case 4: return <Billing />;
-      case 5: return <KYCVerification />;
-      case 6: return <ContractsDocuments />;
-      case 7: return <Support />;
-      case 8: return <Profile />; 
-      case 9: return <Logout />;
-      default: return <Dashboard />;
+      case 0:
+        return <Dashboard />;
+      case 1:
+        return <MyBookings />;
+      case 2:
+        return <OnDemandServices />;
+      case 3:
+        return <VirtualOffices />;
+      case 4:
+        return <Billing />;
+      case 5:
+        return <KYCVerification />;
+      case 6:
+        return <ContractsDocuments />;
+      case 7:
+        return <Support />;
+      case 8:
+        return <Profile />;
+      case 9:
+        return <Logout />;
+      default:
+        return <Dashboard />;
     }
   }
 
@@ -77,7 +86,9 @@ export default function ClientDashboard() {
               {menuItems.map((item, idx) => (
                 <li
                   key={item.name}
-                  className={`sidebar-item${activeIndex === idx ? " active" : ""}`}
+                  className={`sidebar-item${
+                    activeIndex === idx ? " active" : ""
+                  }`}
                   onClick={() => setActiveIndex(idx)}
                 >
                   <item.icon className="sidebar-icon" />
@@ -94,8 +105,63 @@ export default function ClientDashboard() {
       </div>
       {showFooter && <Footer />}
 
-      {/* ✅ Existing styles (no change) */}
-      <style jsx>{`
+      {/* ✅ Font setup for local Geist & Poppins */}
+      <style jsx global>{`
+        /* === LOCAL FONT IMPORTS === */
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-Regular.ttf") format("truetype");
+          font-weight: 400;
+        }
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-SemiBold.ttf") format("truetype");
+          font-weight: 600;
+        }
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-Bold.ttf") format("truetype");
+          font-weight: 700;
+        }
+
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-Regular.ttf") format("truetype");
+          font-weight: 400;
+        }
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-Medium.ttf") format("truetype");
+          font-weight: 500;
+        }
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-SemiBold.ttf") format("truetype");
+          font-weight: 600;
+        }
+
+        :root {
+          --font-heading: "Poppins", sans-serif;
+          --font-body: "Geist", sans-serif;
+        }
+
+        /* === APPLYING FONTS === */
+        body {
+          font-family: var(--font-body);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .section-title,
+        .sidebar-text {
+          font-family: var(--font-heading);
+        }
+
+        /* === EXISTING DASHBOARD STYLES === */
         .dashboard-wrapper {
           min-height: 100vh;
           display: flex;

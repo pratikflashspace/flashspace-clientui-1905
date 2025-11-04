@@ -7,6 +7,7 @@ export default function KYCVerification() {
         justifyContent: "center",
         alignItems: "flex-start",
         padding: "40px 0",
+        fontFamily: "var(--font-body)",
       }}
     >
       <div
@@ -29,10 +30,12 @@ export default function KYCVerification() {
             textAlign: "center",
             borderBottom: "3px solid #f9c909",
             paddingBottom: "10px",
+            fontFamily: "var(--font-heading)",
           }}
         >
           KYC Verification
         </h1>
+
         <div
           className="kyc-info"
           style={{
@@ -46,8 +49,8 @@ export default function KYCVerification() {
             borderLeft: "4px solid #f9c909",
           }}
         >
-          Completing your KYC is a <b>Mandatory Step</b>. Please verify
-          your details online to save time when you arrive.
+          Completing your KYC is a <b>Mandatory Step</b>. Please verify your
+          details online to save time when you arrive.
           <br />
           <span style={{ color: "red" }}>
             FlashSpace reserves the right to not provide service or issue
@@ -56,9 +59,9 @@ export default function KYCVerification() {
           <br />
           <br />
           <b>Please Note:</b> This is a one-time verification process. By
-          clicking <b>Save</b>, you agree to FlashSpace’s Terms of
-          Service.
+          clicking <b>Save</b>, you agree to FlashSpace’s Terms of Service.
         </div>
+
         {/* KYC FORM */}
         <form
           className="kyc-form"
@@ -66,42 +69,117 @@ export default function KYCVerification() {
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: "20px",
+            fontFamily: "var(--font-body)",
           }}
         >
           <label>
             Full Name
-            <input type="text" required placeholder="Enter your full name"
-              style={{width:"100%",padding:"10px",border:"1px solid #ddd",borderRadius:"8px",marginTop:"5px"}} />
+            <input
+              type="text"
+              required
+              placeholder="Enter your full name"
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                marginTop: "5px",
+                fontFamily: "var(--font-body)",
+              }}
+            />
           </label>
           <label>
             Phone Number
-            <input type="text" required placeholder="Enter your phone number"
-              style={{width:"100%",padding:"10px",border:"1px solid #ddd",borderRadius:"8px",marginTop:"5px"}} />
+            <input
+              type="text"
+              required
+              placeholder="Enter your phone number"
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                marginTop: "5px",
+                fontFamily: "var(--font-body)",
+              }}
+            />
           </label>
           <label style={{ gridColumn: "1 / 3" }}>
             Company Name
-            <input type="text" required placeholder="Enter your company name"
-              style={{width:"100%",padding:"10px",border:"1px solid #ddd",borderRadius:"8px",marginTop:"5px"}} />
+            <input
+              type="text"
+              required
+              placeholder="Enter your company name"
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                marginTop: "5px",
+                fontFamily: "var(--font-body)",
+              }}
+            />
           </label>
           <label>
             Industry
-            <input type="text" placeholder="Enter your industry type"
-              style={{width:"100%",padding:"10px",border:"1px solid #ddd",borderRadius:"8px",marginTop:"5px"}} />
+            <input
+              type="text"
+              placeholder="Enter your industry type"
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                marginTop: "5px",
+                fontFamily: "var(--font-body)",
+              }}
+            />
           </label>
           <label>
             Designation
-            <input type="text" placeholder="Enter your job title or position"
-              style={{width:"100%",padding:"10px",border:"1px solid #ddd",borderRadius:"8px",marginTop:"5px"}} />
+            <input
+              type="text"
+              placeholder="Enter your job title or position"
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                marginTop: "5px",
+                fontFamily: "var(--font-body)",
+              }}
+            />
           </label>
           <label>
             No. of Employees
-            <input type="number" min="1" placeholder="Enter total employees"
-              style={{width:"100%",padding:"10px",border:"1px solid #ddd",borderRadius:"8px",marginTop:"5px"}} />
+            <input
+              type="number"
+              min="1"
+              placeholder="Enter total employees"
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                marginTop: "5px",
+                fontFamily: "var(--font-body)",
+              }}
+            />
           </label>
           <label>
             GSTIN
-            <input type="text" placeholder="Enter your GST number"
-              style={{width:"100%",padding:"10px",border:"1px solid #ddd",borderRadius:"8px",marginTop:"5px"}} />
+            <input
+              type="text"
+              placeholder="Enter your GST number"
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                marginTop: "5px",
+                fontFamily: "var(--font-body)",
+              }}
+            />
           </label>
           <label>
             Gender
@@ -113,6 +191,7 @@ export default function KYCVerification() {
                 borderRadius: "8px",
                 marginTop: "5px",
                 color: "#333",
+                fontFamily: "var(--font-body)",
               }}
             >
               <option value="">Select</option>
@@ -123,8 +202,18 @@ export default function KYCVerification() {
           </label>
           <label>
             Date of Birth
-            <input type="date" required 
-              style={{width:"100%",padding:"10px",border:"1px solid #ddd",borderRadius:"8px",marginTop:"5px"}} />
+            <input
+              type="date"
+              required
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                marginTop: "5px",
+                fontFamily: "var(--font-body)",
+              }}
+            />
           </label>
           <div
             style={{
@@ -159,19 +248,56 @@ export default function KYCVerification() {
                 cursor: "pointer",
                 boxShadow: "0 3px 6px rgba(0,0,0,0.15)",
                 transition: "0.2s",
+                fontFamily: "var(--font-heading)",
               }}
-              onMouseOver={(e) =>
-                (e.currentTarget.style.opacity = "0.9")
-              }
-              onMouseOut={(e) =>
-                (e.currentTarget.style.opacity = "1")
-              }
+              onMouseOver={(e) => (e.currentTarget.style.opacity = "0.9")}
+              onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
             >
               Save & Complete KYC
             </button>
           </div>
         </form>
       </div>
+
+      {/* ✅ Global Font Setup */}
+      <style jsx global>{`
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-Regular.ttf") format("truetype");
+          font-weight: 400;
+        }
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-SemiBold.ttf") format("truetype");
+          font-weight: 600;
+        }
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-Bold.ttf") format("truetype");
+          font-weight: 700;
+        }
+
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-Regular.ttf") format("truetype");
+          font-weight: 400;
+        }
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-Medium.ttf") format("truetype");
+          font-weight: 500;
+        }
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-SemiBold.ttf") format("truetype");
+          font-weight: 600;
+        }
+
+        :root {
+          --font-heading: "Poppins", sans-serif;
+          --font-body: "Geist", sans-serif;
+        }
+      `}</style>
     </section>
   );
 }

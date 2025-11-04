@@ -29,15 +29,26 @@ const Profile = () => {
   };
 
   return (
-    <div className="business-profile">
-     <h2 className="section-title">Business <span style={{ color: "#FFD600" }}>Profile</span></h2>
-
+    <div
+      className="business-profile"
+      style={{ fontFamily: "var(--font-body)" }}
+    >
+      <h2
+        className="section-title"
+        style={{
+          fontFamily: "var(--font-heading)",
+        }}
+      >
+        Business <span style={{ color: "#FFD600" }}>Profile</span>
+      </h2>
 
       <div className="profile-card">
         {/* Top Header */}
         <div className="profile-header">
           <div className="header-info">
-            <h3>Vibe Coders Pvt. Ltd.</h3>
+            <h3 style={{ fontFamily: "var(--font-heading)" }}>
+              Vibe Coders Pvt. Ltd.
+            </h3>
             <p>Client ID: VC-10432</p>
             <span className="status-badge active">
               <ShieldCheck size={16} /> Verified Client
@@ -67,7 +78,9 @@ const Profile = () => {
 
         {/* Company Information */}
         <div className="profile-section">
-          <h4>Company Information</h4>
+          <h4 style={{ fontFamily: "var(--font-heading)" }}>
+            Company Information
+          </h4>
           <div className="info-grid">
             <div>
               <span>Company Name</span>
@@ -90,7 +103,9 @@ const Profile = () => {
 
         {/* Contact Information */}
         <div className="profile-section">
-          <h4>Contact Information</h4>
+          <h4 style={{ fontFamily: "var(--font-heading)" }}>
+            Contact Information
+          </h4>
           {!isEditing ? (
             <div className="info-grid contact-info">
               <div className="contact-item">
@@ -100,13 +115,14 @@ const Profile = () => {
                 <Phone size={16} /> <span>{contactInfo.phone}</span>
               </div>
               <div className="contact-item">
-                <User size={16} /> <span>Contact Person: {contactInfo.contactPerson}</span>
+                <User size={16} />{" "}
+                <span>Contact Person: {contactInfo.contactPerson}</span>
               </div>
             </div>
           ) : (
             <div className="info-grid contact-info edit-mode">
               <div className="contact-item">
-                <Mail size={16} /> 
+                <Mail size={16} />
                 <input
                   type="email"
                   value={contactInfo.email}
@@ -128,7 +144,9 @@ const Profile = () => {
                 <input
                   type="text"
                   value={contactInfo.contactPerson}
-                  onChange={(e) => handleChange("contactPerson", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("contactPerson", e.target.value)
+                  }
                   placeholder="Enter contact person"
                 />
               </div>
@@ -138,7 +156,9 @@ const Profile = () => {
 
         {/* Subscription / Plan Info */}
         <div className="profile-section">
-          <h4>Subscription Details</h4>
+          <h4 style={{ fontFamily: "var(--font-heading)" }}>
+            Subscription Details
+          </h4>
           <div className="info-grid">
             <div>
               <span>Plan Type</span>
@@ -161,20 +181,72 @@ const Profile = () => {
 
         {/* Buttons */}
         {!isEditing ? (
-          <button className="update-btn" onClick={() => setIsEditing(true)}>
+          <button
+            className="update-btn"
+            style={{ fontFamily: "var(--font-heading)" }}
+            onClick={() => setIsEditing(true)}
+          >
             Update Business Info
           </button>
         ) : (
           <div className="btn-group">
-            <button className="save-btn" onClick={handleSave}>
+            <button
+              className="save-btn"
+              onClick={handleSave}
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
               Save Changes
             </button>
-            <button className="cancel-btn" onClick={() => setIsEditing(false)}>
+            <button
+              className="cancel-btn"
+              onClick={() => setIsEditing(false)}
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
               Cancel
             </button>
           </div>
         )}
       </div>
+
+      {/* ✅ Font setup and component styles */}
+      <style jsx global>{`
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-Regular.ttf") format("truetype");
+          font-weight: 400;
+        }
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-SemiBold.ttf") format("truetype");
+          font-weight: 600;
+        }
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-Bold.ttf") format("truetype");
+          font-weight: 700;
+        }
+
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-Regular.ttf") format("truetype");
+          font-weight: 400;
+        }
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-Medium.ttf") format("truetype");
+          font-weight: 500;
+        }
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-SemiBold.ttf") format("truetype");
+          font-weight: 600;
+        }
+
+        :root {
+          --font-heading: "Poppins", sans-serif;
+          --font-body: "Geist", sans-serif;
+        }
+      `}</style>
 
       <style jsx>{`
         .business-profile {
@@ -301,6 +373,7 @@ const Profile = () => {
           border: 1px solid #ccc;
           border-radius: 6px;
           font-size: 0.9rem;
+          font-family: var(--font-body);
         }
 
         .update-btn,

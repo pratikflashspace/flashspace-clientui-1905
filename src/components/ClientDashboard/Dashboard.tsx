@@ -118,7 +118,61 @@ export default function Dashboard() {
         </ul>
       </div>
 
-      <style jsx>{`
+      {/* ✅ Fonts & Styling */}
+      <style jsx global>{`
+        /* === LOCAL FONT IMPORTS === */
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-Regular.ttf") format("truetype");
+          font-weight: 400;
+        }
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-SemiBold.ttf") format("truetype");
+          font-weight: 600;
+        }
+        @font-face {
+          font-family: "Poppins";
+          src: url("/fonts/Poppins-Bold.ttf") format("truetype");
+          font-weight: 700;
+        }
+
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-Regular.ttf") format("truetype");
+          font-weight: 400;
+        }
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-Medium.ttf") format("truetype");
+          font-weight: 500;
+        }
+        @font-face {
+          font-family: "Geist";
+          src: url("/fonts/Geist-SemiBold.ttf") format("truetype");
+          font-weight: 600;
+        }
+
+        :root {
+          --font-heading: "Poppins", sans-serif;
+          --font-body: "Geist", sans-serif;
+        }
+
+        /* === APPLYING FONTS === */
+        body {
+          font-family: var(--font-body);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+          font-family: var(--font-heading);
+        }
+
+        /* === DASHBOARD STYLES === */
         .summary-cards {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -133,11 +187,13 @@ export default function Dashboard() {
           border-radius: 10px;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
           text-align: center;
+          font-family: var(--font-body);
         }
         .summary-card h4 {
           color: #666;
           font-size: 1rem;
           margin-bottom: 8px;
+          font-family: var(--font-heading);
         }
         .summary-card p {
           font-size: 1.3rem;
@@ -157,6 +213,13 @@ export default function Dashboard() {
           padding: 20px;
           border-radius: 10px;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+          font-family: var(--font-body);
+        }
+        .chart-card h3 {
+          font-family: var(--font-heading);
+          font-size: 1.25rem;
+          margin-bottom: 15px;
+          color: #111;
         }
         .updates-section {
           background: #fff;
@@ -166,6 +229,12 @@ export default function Dashboard() {
           max-width: 1200px;
           margin-inline: auto;
           margin-bottom: 50px;
+          font-family: var(--font-body);
+        }
+        .updates-section h3 {
+          font-family: var(--font-heading);
+          font-size: 1.25rem;
+          margin-bottom: 10px;
         }
         .updates-section ul {
           margin-top: 10px;
