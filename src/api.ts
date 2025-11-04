@@ -1,5 +1,10 @@
+// Central API config (legacy consumers)
+// Normalized to use Vite env; endpoints already include '/api' prefix
+const RAW_BASE = import.meta?.env?.VITE_API_URL || "http://localhost:5000";
+const BASE = RAW_BASE.replace(/\/$/, '');
+
 export const API = {
-  domain: process.env.NEXT_PUBLIC_DOMAIN || "http://localhost:4000",
+  domain: BASE,
 
   endPoints: {
     //ContactForm 

@@ -5,7 +5,9 @@ import axios from 'axios';
  * Handles all HTTP requests with centralized error handling and base URL management
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Ensure base URL always includes the '/api' prefix expected by the backend
+const RAW_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = RAW_BASE_URL.endsWith('/api') ? RAW_BASE_URL : `${RAW_BASE_URL.replace(/\/$/, '')}/api`;
 
 console.log('🌍 API Base URL:', API_BASE_URL);
 
@@ -13,6 +15,7 @@ console.log('🌍 API Base URL:', API_BASE_URL);
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
