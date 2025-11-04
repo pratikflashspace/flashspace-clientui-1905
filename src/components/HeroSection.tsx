@@ -105,15 +105,14 @@ const HeroSection = () => {
     <section className="min-h-screen flex items-center justify-center pt-16 pb-12 px-4 relative overflow-hidden">
       {/* Dynamic Video Background - Only for Hero Section */}
       {/* <VideoBackground /> */}
-     <div className="absolute inset-0 z-0">
+    <div className="absolute inset-0 z-0">
   <video
     autoPlay
-    
     muted
     playsInline
     className="w-full h-full object-cover"
   >
-    <source src="/Logo/Corporate_AI_Office_Background_Video.mp4" type="video/mp4" />
+    <source src="/Logo/kapkap_20251104165351377_sys.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 </div>
@@ -138,33 +137,69 @@ const HeroSection = () => {
           <br />
 
           {/* Start chating button*/}
-            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: '300ms' }}>
-            <RippleButton 
-               text= "Start chating"
-               background="#000000"
-               textColor="white"
-               hoverTextColor="black"
-               hoverFlairColor="#EFAD1A"
-               buttonHeight="60px"
-               onClick={() => NavLink({ to: '/start-chatting' })}
-            />
-            <RippleButton 
-               text={<span className="flex items-center gap-2 ">
-                 {/* Add this import at top: import { Video } from "lucide-react"; */}
-                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                 <path d="m22 8-6 4 6 4V8Z" />
-                 <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
-                 </svg>
-                 <span>Who are we? </span>
-               </span> }
-               background="white"
-               textColor="black"
-               hoverTextColor="black"
-               hoverFlairColor="#EFAD1A"
-               buttonHeight="60px"
-               onClick={() => scrollToSection('#')}
-            />
-            </div>
+          {/* ✅ Buttons with identical Poppins font styling */}
+<div
+  className="flex flex-col sm:flex-row gap-4 animate-fade-in"
+  style={{ animationDelay: "300ms" }}
+>
+  {/* Start Chatting Button */}
+  <RippleButton
+    text={
+      <span
+        className="flex items-center justify-center"
+        style={{
+          fontFamily: "'Poppins', sans-serif",
+          fontWeight: 500,
+          letterSpacing: "0.3px",
+        }}
+      >
+        Start Chatting
+      </span>
+    }
+    background="#000000"
+    textColor="white"
+    hoverTextColor="black"
+    hoverFlairColor="#EFAD1A"
+    buttonHeight="60px"
+    onClick={() => navigate("/start-chatting")}
+  />
+
+  {/* Who Are We Button */}
+  <RippleButton
+    text={
+      <span
+        className="flex items-center gap-2 justify-center"
+        style={{
+          fontFamily: "'Poppins', sans-serif",
+          fontWeight: 600,
+          letterSpacing: "0.3px",
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m22 8-6 4 6 4V8Z" />
+          <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+        </svg>
+        <span>Who are we?</span>
+      </span>
+    }
+    background="white"
+    textColor="black"
+    hoverTextColor="black"
+    hoverFlairColor="#EFAD1A"
+    buttonHeight="60px"
+    onClick={() => scrollToSection("#about")}
+  />
+</div>
+
           
           
           {/* 
