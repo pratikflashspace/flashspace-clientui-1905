@@ -4,9 +4,10 @@ import { smoothScrollTo } from "@/lib/lenis";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Splash3dButton from "@/components/ui/3d-splash-button";
-import { X, Phone, Building2, Users, Zap, FileText, ArrowRight } from "lucide-react";
+import { X, Phone, Building2, Users, Zap, FileText, ArrowRight, LayoutDashboard, LogOut, User as UserIcon, Settings, ChevronDown } from "lucide-react";
 import { CiMenuFries } from "react-icons/ci";
 import SidebarMenu from "@/components/SidebarMenu";
+import { useAuth } from "@/contexts/AuthContext";
 
 // ✅ Country Data
 const countries = [
@@ -37,12 +38,14 @@ interface HeaderProps {
 
 const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = false }: HeaderProps) => {
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   // Dropdowns
   const [isSolutionsOpen, setIsSolutionsOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // Country drill dropdown
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
@@ -54,8 +57,9 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
   const solutionsRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
   const countryRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useEffect(() => { 
     const onScroll = () => {
       setScrolled(window.scrollY > 10);
     };
@@ -75,8 +79,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
       if (countryRef.current && !countryRef.current.contains(event.target as Node)) {
         setCountryDropdownOpen(false);
       }
-      if (moreRef.current && !moreRef.current.contains(target)) {
-        setIsMoreOpen(false);
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -356,13 +360,105 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 Get in Touch
               </Splash3dButton>
 
-              <Button
-                onClick={() => handleNavigation("/login")}
-                variant="outline"
-                className="hidden lg:inline-flex px-4 py-2 text-sm rounded-md border-gray-300 text-black hover:bg-gray-50"
-              >
-                Log in
-              </Button>
+              {/* User Authentication - Profile Dropdown or Login */}
+              {isAuthenticated ? (
+                <div ref={userMenuRef} className="relative hidden lg:block">
+                  <button
+                    onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 border border-gray-200 bg-yellow-50"
+                  >
+                    {/* User Avatar */}
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                      {user?.fullName?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                    {/* User Name */}
+                    <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
+                      {user?.fullName || 'User'}
+                    </span>
+                    {/* Dropdown Icon */}
+                    <ChevronDown 
+                      className={cn(
+                        "h-4 w-4 text-gray-500 transition-transform duration-200",
+                        isUserMenuOpen && "rotate-180"
+                      )} 
+                    />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                      {/* User Info Header */}
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {user?.fullName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {user?.email}
+                        </p>
+                      </div>
+
+                      {/* Menu Items */}
+                      <div className="py-1">
+                        <button
+                          onClick={() => {
+                            handleNavigation("/dashboard");
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+                        >
+                          <LayoutDashboard className="h-4 w-4" />
+                          <span className="font-medium">Dashboard</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            handleNavigation("/dashboard/profile");
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+                        >
+                          <UserIcon className="h-4 w-4" />
+                          <span className="font-medium">My Profile</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            handleNavigation("/settings");
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+                        >
+                          <Settings className="h-4 w-4" />
+                          <span className="font-medium">Settings</span>
+                        </button>
+                      </div>
+
+                      {/* Logout Section */}
+                      <div className="border-t border-gray-100 pt-1">
+                        <button
+                          onClick={async () => {
+                            await logout();
+                            setIsUserMenuOpen(false);
+                            handleNavigation("/");
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          <span className="font-medium">Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Button
+                  onClick={() => handleNavigation("/login")}
+                  variant="outline"
+                  className="hidden lg:inline-flex px-4 py-2 text-sm rounded-md border-gray-300 text-black hover:bg-gray-50"
+                >
+                  Log in
+                </Button>
+              )}
             </div>
           </div>
 

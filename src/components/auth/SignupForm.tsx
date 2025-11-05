@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Eye, EyeOff, Loader2, User, Mail, Phone, Lock, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Loader2, User, Mail, Phone, Lock, ArrowRight } from 'lucide-react';
 
 export const SignupForm = () => {
   const navigate = useNavigate();
@@ -70,17 +70,17 @@ export const SignupForm = () => {
     }
   };
 
-  const inputClass = (hasError: boolean) => `w-full pl-12 pr-4 py-3.5 border rounded-xl bg-white/50 backdrop-blur-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/50 focus:border-[#4DA1FF] focus:bg-white placeholder:text-slate-400 text-[#172A3A] font-medium ${hasError ? 'border-red-400 bg-red-50/50 focus:ring-red-400/50' : 'border-slate-200 hover:border-slate-300'}`;
+  const inputClass = () => `w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/20 focus:border-[#4DA1FF] placeholder:text-slate-400 text-[#172A3A]`;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" style={{ fontFamily: 'Poppins' }}>
+    <form onSubmit={handleSubmit} className="space-y-4" style={{ fontFamily: 'Poppins' }}>
       {/* Full Name Field */}
       <div className="space-y-2">
-        <label htmlFor="fullName" className="block text-sm font-semibold text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+        <label htmlFor="fullName" className="block text-sm font-semibold text-[#586A7E]">
           Full Name
         </label>
         <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10">
             <User size={20} />
           </div>
           <input
@@ -91,23 +91,18 @@ export const SignupForm = () => {
             value={formData.fullName}
             onChange={handleChange}
             disabled={isLoading}
-            className={inputClass(!!errors.fullName)}
+            className={inputClass()}
           />
         </div>
-        {errors.fullName && (
-          <p className="text-sm text-red-600 flex items-center gap-1.5 mt-1 font-medium">
-            <span className="text-xs">⚠</span> {errors.fullName}
-          </p>
-        )}
       </div>
 
       {/* Email Field */}
       <div className="space-y-2">
-        <label htmlFor="email" className="block text-sm font-semibold text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+        <label htmlFor="email" className="block text-sm font-semibold text-[#586A7E]">
           Email Address
         </label>
         <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10">
             <Mail size={20} />
           </div>
           <input
@@ -118,23 +113,18 @@ export const SignupForm = () => {
             value={formData.email}
             onChange={handleChange}
             disabled={isLoading}
-            className={inputClass(!!errors.email)}
+            className={inputClass()}
           />
         </div>
-        {errors.email && (
-          <p className="text-sm text-red-600 flex items-center gap-1.5 mt-1 font-medium">
-            <span className="text-xs">⚠</span> {errors.email}
-          </p>
-        )}
       </div>
 
       {/* Phone Number Field */}
       <div className="space-y-2">
-        <label htmlFor="phoneNumber" className="block text-sm font-semibold text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+        <label htmlFor="phoneNumber" className="block text-sm font-semibold text-[#586A7E]">
           Phone Number <span className="text-slate-400 font-normal text-xs">(Optional)</span>
         </label>
         <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10">
             <Phone size={20} />
           </div>
           <input
@@ -145,18 +135,18 @@ export const SignupForm = () => {
             value={formData.phoneNumber}
             onChange={handleChange}
             disabled={isLoading}
-            className={inputClass(false)}
+            className={inputClass()}
           />
         </div>
       </div>
 
       {/* Password Field */}
       <div className="space-y-2">
-        <label htmlFor="password" className="block text-sm font-semibold text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+        <label htmlFor="password" className="block text-sm font-semibold text-[#586A7E]">
           Password
         </label>
         <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10">
             <Lock size={20} />
           </div>
           <input
@@ -167,30 +157,25 @@ export const SignupForm = () => {
             value={formData.password}
             onChange={handleChange}
             disabled={isLoading}
-            className={inputClass(!!errors.password)}
+            className="w-full pl-12 pr-12 py-3.5 border border-slate-200 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/20 focus:border-[#4DA1FF] placeholder:text-slate-400 text-[#172A3A]"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#4DA1FF] transition-colors duration-200"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#172A3A] transition-colors duration-200 z-10"
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-sm text-red-600 flex items-center gap-1.5 mt-1 font-medium">
-            <span className="text-xs">⚠</span> {errors.password}
-          </p>
-        )}
       </div>
 
       {/* Confirm Password Field */}
       <div className="space-y-2">
-        <label htmlFor="confirmPassword" className="block text-sm font-semibold text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+        <label htmlFor="confirmPassword" className="block text-sm font-semibold text-[#586A7E]">
           Confirm Password
         </label>
         <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10">
             <Lock size={20} />
           </div>
           <input
@@ -201,40 +186,34 @@ export const SignupForm = () => {
             value={formData.confirmPassword}
             onChange={handleChange}
             disabled={isLoading}
-            className={inputClass(!!errors.confirmPassword)}
+            className="w-full pl-12 pr-12 py-3.5 border border-slate-200 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/20 focus:border-[#4DA1FF] placeholder:text-slate-400 text-[#172A3A]"
           />
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#4DA1FF] transition-colors duration-200"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#172A3A] transition-colors duration-200 z-10"
           >
             {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         </div>
-        {errors.confirmPassword && (
-          <p className="text-sm text-red-600 flex items-center gap-1.5 mt-1 font-medium">
-            <span className="text-xs">⚠</span> {errors.confirmPassword}
-          </p>
-        )}
       </div>
 
       {/* Submit Button */}
       <Button 
         type="submit" 
-        className="w-full bg-gradient-to-r from-[#4DA1FF] to-[#3B82F6] hover:from-[#4DA1FF]/90 hover:to-[#3B82F6]/90 text-white font-bold py-6 rounded-xl shadow-lg shadow-[#4DA1FF]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#4DA1FF]/40 hover:-translate-y-0.5 mt-6 text-base" 
-        style={{ fontFamily: 'Poppins' }}
+        className="w-full bg-[#EDB003] hover:bg-[#d99f03] text-white font-bold py-3.5 rounded-xl shadow-md transition-all duration-200 hover:shadow-lg text-base border-0 mt-6" 
         disabled={isLoading}
       >
         {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Creating account...
-          </>
+          <div className="flex items-center justify-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span>Creating account...</span>
+          </div>
         ) : (
-          <>
-            <Sparkles className="mr-2 h-5 w-5" />
-            Create Account
-          </>
+          <div className="flex items-center justify-center gap-2">
+            <span>Create Account</span>
+            <ArrowRight className="h-5 w-5" />
+          </div>
         )}
       </Button>
     </form>

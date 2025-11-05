@@ -105,14 +105,19 @@ const HeroSection = () => {
     <section className="min-h-screen flex items-center justify-center pt-16 pb-12 px-4 relative overflow-hidden">
       {/* Dynamic Video Background - Only for Hero Section */}
       {/* <VideoBackground /> */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="https://res.cloudinary.com/diwna43hl/image/upload/v1758960556/AlbedoBase_XL_Minimalist_abstract_2D_digital_artwork_solid_gol_0_j2heau.jpg" 
-          alt="Hero Background" 
-          className="w-full h-full object-cover"
-        />
-      </div>
-      
+    <div className="absolute inset-0 z-0">
+  <video
+    autoPlay
+    muted
+    playsInline
+    className="w-full h-full object-cover"
+  >
+    <source src="/Logo/kapkap_20251104165351377_sys.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+
       {/* Darker overlay for text readability */}
       {/* <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-black/40 to-slate-800/50 backdrop-blur-sm z-10"></div> */}
       

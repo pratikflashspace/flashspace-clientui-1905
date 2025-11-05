@@ -31,7 +31,6 @@ import VerifyOTP from "./pages/VerifyOTP";
 import ForgotPassword from "./pages/ForgotPassword";
 import Bookings from "./pages/Bookings";
 import Community from "./pages/Community";
-import Updates from "./pages/Updates";
 import Settings from "./pages/Settings";
 import CityListing from "./pages/CityListing";
 import AboutUs from "./pages/AboutUs";
@@ -41,6 +40,23 @@ import Blog from "./pages/Blog";
 // import OnDemandSearch from "./pages/solutions/OnDemandSearch";
 // import BusinessSetupSearch from "./pages/solutions/BusinessSetupSearch";
 // import SearchResults from "./pages/SearchResult";
+
+// --- Import all ClientDashboard pages! ---
+import ClientDashboard from "./components/ClientDashboard";
+import Dashboard from "./components/ClientDashboard/Dashboard";
+import MyBookings from "./components/ClientDashboard/MyBookings";
+import OnDemandServices from "./components/ClientDashboard/OnDemandServices";
+import VirtualOffices from "./components/ClientDashboard/VirtualOffices";
+import Billing from "./components/ClientDashboard/Billing";
+import KYCVerification from "./components/ClientDashboard/KYCVerification";
+import ContractsDocuments from "./components/ClientDashboard/ContractsDocuments";
+import Support from "./components/ClientDashboard/Support";
+import Logout from "./components/ClientDashboard/Logout";
+import Profile from "./components/ClientDashboard/Profile";
+// import { LoginForm, SignupForm } from "./components/auth";
+
+
+// --- end dashboard imports ---
 
 const queryClient = new QueryClient();
 
@@ -80,8 +96,21 @@ const App = () => (
             <Route element={<ProtectedRoute />}>
               <Route path="/bookings" element={<Bookings />} />
               <Route path="/community" element={<Community />} />
-              <Route path="/updates" element={<Updates />} />
+              {/* <Route path="/updates" element={<Updates />} /> */}
               <Route path="/settings" element={<Settings />} />
+              
+              {/* Client Dashboard Routes - Protected */}
+              <Route path="/dashboard" element={<ClientDashboard />} />
+              <Route path="/dashboard/overview" element={<Dashboard />} />
+              <Route path="/dashboard/my-bookings" element={<MyBookings />} />
+              <Route path="/dashboard/on-demand-services" element={<OnDemandServices />} />
+              <Route path="/dashboard/virtual-offices" element={<VirtualOffices />} />
+              <Route path="/dashboard/billing" element={<Billing />} />
+              <Route path="/dashboard/kyc-verification" element={<KYCVerification />} />
+              <Route path="/dashboard/contracts-documents" element={<ContractsDocuments />} />
+              <Route path="/dashboard/support" element={<Support />} />
+              <Route path="/dashboard/profile" element={<Profile />} />
+              <Route path="/dashboard/logout" element={<Logout />} />
             </Route>
             {/* <Route path="/solutions/virtual-office" element={<VirtualOfficeSearch />} />
             <Route path="/solutions/coworking-space" element={<CoworkingSpaceSearch />} />
