@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,13 @@ import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
 export const LoginForm = () => {
   const navigate = useNavigate();
   const { login, isLoading, isAuthenticated } = useAuth();
-  
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -41,9 +47,7 @@ export const LoginForm = () => {
 
     try {
       await login(formData.email, formData.password);
-      if (isAuthenticated) {
-        navigate('/dashboard');
-      }
+      // navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
     }
