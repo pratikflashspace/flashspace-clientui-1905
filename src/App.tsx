@@ -30,8 +30,6 @@ import CityListing from "./pages/CityListing";
 import ClientDashboard from "./components/ClientDashboard";
 import Dashboard from "./components/ClientDashboard/Dashboard";
 import MyBookings from "./components/ClientDashboard/MyBookings";
-import OnDemandServices from "./components/ClientDashboard/OnDemandServices";
-import VirtualOffices from "./components/ClientDashboard/VirtualOffices";
 import Billing from "./components/ClientDashboard/Billing";
 import KYCVerification from "./components/ClientDashboard/KYCVerification";
 import ContractsDocuments from "./components/ClientDashboard/ContractsDocuments";
@@ -55,8 +53,6 @@ const App = () => (
           <Route path="/dashboard" element={<ClientDashboard />}>
             <Route index element={<Dashboard />} />
             <Route path="bookings" element={<MyBookings />} />
-            <Route path="on-demand-services" element={<OnDemandServices />} />
-            <Route path="virtual-offices" element={<VirtualOffices />} />
             <Route path="billing" element={<Billing />} />
             <Route path="kyc-verification" element={<KYCVerification />} />
             <Route path="contracts-documents" element={<ContractsDocuments />} />
