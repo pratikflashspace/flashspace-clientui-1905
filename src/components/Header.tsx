@@ -31,9 +31,11 @@ const menuItems = [
 
 interface HeaderProps {
   forceWhiteBackground?: boolean;
+  lightText?: boolean;
+  loginBlack?: boolean;
 }
 
-const Header = ({ forceWhiteBackground = false }: HeaderProps) => {
+const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = false }: HeaderProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -72,6 +74,9 @@ const Header = ({ forceWhiteBackground = false }: HeaderProps) => {
       }
       if (countryRef.current && !countryRef.current.contains(event.target as Node)) {
         setCountryDropdownOpen(false);
+      }
+      if (moreRef.current && !moreRef.current.contains(target)) {
+        setIsMoreOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);

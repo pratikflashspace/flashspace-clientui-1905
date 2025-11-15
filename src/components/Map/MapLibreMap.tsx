@@ -2,14 +2,87 @@ import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
+// Add styles for popup to prevent it from being hidden
+const popupStyles = `
+  .office-popup {
+    pointer-events: auto !important;
+    z-index: 9999 !important;
+  }
+  
+  .office-popup .maplibregl-popup-content {
+    pointer-events: auto !important;
+    border-radius: 12px;
+    padding: 0 !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+  }
+  
+  .office-popup .maplibregl-popup-tip {
+    border-top-color: white !important;
+    border-bottom-color: white !important;
+    z-index: 9999 !important;
+  }
+  
+  .office-popup .maplibregl-popup-close-button {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 10000 !important;
+  }
+  
+  .maplibregl-popup {
+    z-index: 9999 !important;
+  }
+  
+  /* Marker animations */
+  .custom-marker {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .custom-marker:hover {
+    z-index: 1000 !important;
+  }
+  
+  .marker-icon {
+    transition: all 0.2s ease !important;
+  }
+  
+  /* Marker entrance animation */
+  @keyframes markerDrop {
+    0% {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+    60% {
+      transform: translateY(5px);
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .marker-container {
+    animation: markerDrop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = popupStyles;
+  document.head.appendChild(styleElement);
+}
+
 export type MapStyle =
-  | 'osm-bright'
+  | 'vibrant'
+  | 'colorful'
   | 'dark'
   | 'light'
   | 'satellite'
   | 'streets'
   | 'outdoor'
-  | 'toner';
+  | 'neon'
+  | 'retro'
+  | 'candy';
 
 interface MapLibreMapProps {
   center?: { lat: number; lng: number };
@@ -32,42 +105,67 @@ interface MapLibreMapProps {
   showStyleSelector?: boolean;
 }
 
-// MapLibre-compatible open source map styles
-const MAP_STYLES: Record<MapStyle, { url: string; name: string; description: string }> = {
-  'osm-bright': {
-    url: 'https://tiles.openfreemap.org/styles/bright',
-    name: 'Bright',
-    description: 'Clean and colorful street map',
+// MapLibre-compatible open source map styles - Colorful & Vibrant
+const MAP_STYLES: Record<MapStyle, { url: string; name: string; description: string; emoji: string }> = {
+  'vibrant': {
+    url: 'https://tiles.openfreemap.org/styles/liberty',
+    name: '🎨 Vibrant',
+    description: 'Colorful and detailed',
+    emoji: '🎨'
+  },
+  'colorful': {
+    url: 'https://tiles.openfreemap.org/styles/liberty',
+    name: ' Vibrant',
+    description: 'Rich colors with blue rivers',
+    emoji: '🌈'
   },
   'streets': {
-    url: 'https://tiles.openfreemap.org/styles/liberty',
-    name: 'Streets',
+    url: 'https://demotiles.maplibre.org/style.json',
+    name: '🗺️ Classic Streets',
     description: 'Detailed street map view',
+    emoji: '🗺️'
   },
   'dark': {
     url: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-    name: 'Dark Mode',
-    description: 'Dark theme for low-light viewing',
+    name: '🌙 Dark Mode',
+    description: 'Sleek dark theme',
+    emoji: '🌙'
   },
   'light': {
-    url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-    name: 'Light',
-    description: 'Minimal light theme',
+    url: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+    name: '☀️ Light & Fresh',
+    description: 'Clean with nice colors',
+    emoji: '☀️'
   },
   'outdoor': {
-    url: 'https://tiles.openfreemap.org/styles/positron',
-    name: 'Outdoor',
-    description: 'Terrain and outdoor features',
+    url: 'https://tiles.openfreemap.org/styles/bright',
+    name: '🏔️ Outdoor',
+    description: 'Bright with terrain features',
+    emoji: '🏔️'
   },
   'satellite': {
-    url: 'https://api.maptiler.com/maps/hybrid/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
-    name: 'Satellite',
-    description: 'Satellite imagery view',
+    url: 'https://tiles.openfreemap.org/styles/bright',
+    name: '🛰️ Satellite',
+    description: 'High-detail aerial view',
+    emoji: '🛰️'
   },
-  'toner': {
+  'neon': {
+    url: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+    name: '⚡ Neon City',
+    description: 'Futuristic neon style',
+    emoji: '⚡'
+  },
+  'retro': {
+    url: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+    name: '🎮 Retro',
+    description: 'Vintage map style',
+    emoji: '🎮'
+  },
+  'candy': {
     url: 'https://tiles.openfreemap.org/styles/positron',
-    name: 'Monochrome',
-    description: 'High contrast B&W',
+    name: '🍭 Candy',
+    description: 'Sweet pastel colors',
+    emoji: '🍭'
   },
 };
 
@@ -78,7 +176,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
   width = '100%',
   className = '',
   markers = [],
-  mapStyle = 'toner',
+  mapStyle = 'colorful',
   showStyleSelector = false,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -173,43 +271,50 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     markers.forEach((markerData) => {
       if (!map.current) return;
 
-      // Create custom marker element - Google Maps style circular icons
+      // Create custom marker element - Colorful circular icons like the screenshot
       const el = document.createElement('div');
       el.className = 'custom-marker';
+      
+      // Random colorful backgrounds for different markers
+      const colors = ['#4285F4', '#EA4335', '#FBBC04', '#34A853', '#FF6D00', '#9C27B0', '#00BCD4'];
+      const randomColor = colors[markers.indexOf(markerData) % colors.length];
+      
       el.innerHTML = `
         <div style="
           position: relative;
           cursor: pointer;
+          transition: transform 0.2s ease;
         " class="marker-container">
-          <!-- Simple circular marker like Google Maps -->
+          <!-- Colorful circular marker with icon -->
           <div style="
-            width: 36px;
-            height: 36px;
-            background: white;
+            width: 40px;
+            height: 40px;
+            background: ${randomColor};
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            border: 2px solid #f0f0f0;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            border: 3px solid white;
             position: relative;
-          ">
-            <!-- Building/Office Icon -->
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368">
+            transition: all 0.2s ease;
+          " class="marker-icon">
+            <!-- Building/Office Icon in white -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
               <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
             </svg>
           </div>
-          <!-- Bottom shadow -->
+          <!-- Bottom shadow (subtle) -->
           <div style="
             position: absolute;
-            bottom: -4px;
+            bottom: -3px;
             left: 50%;
             transform: translateX(-50%);
-            width: 24px;
-            height: 6px;
-            background: rgba(0,0,0,0.15);
+            width: 28px;
+            height: 5px;
+            background: rgba(0,0,0,0.2);
             border-radius: 50%;
-            filter: blur(3px);
+            filter: blur(4px);
           "></div>
         </div>
       `;
@@ -369,7 +474,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
       popup = new maplibregl.Popup({
         offset: 40,
         closeButton: true,
-        closeOnClick: true,
+        closeOnClick: false,
         maxWidth: '320px',
         className: 'office-popup',
         focusAfterOpen: false,
@@ -384,9 +489,19 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
       let closeTimeout: NodeJS.Timeout;
 
-      // Mouse enters marker - show popup
+      // Add hover effect to marker
+      const markerIcon = el.querySelector('.marker-icon') as HTMLElement;
+      
+      // Mouse enters marker - show popup and scale up
       el.addEventListener('mouseenter', () => {
         clearTimeout(closeTimeout);
+        
+        // Scale up animation
+        if (markerIcon) {
+          markerIcon.style.transform = 'scale(1.15)';
+          markerIcon.style.boxShadow = '0 5px 12px rgba(0,0,0,0.4)';
+        }
+        
         if (popup && map.current) {
           popup.setLngLat([markerData.position.lng, markerData.position.lat]);
           popup.addTo(map.current);
@@ -395,14 +510,19 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           setTimeout(() => {
             const popupEl = popup.getElement();
             if (popupEl) {
+              // Make popup interactive
+              popupEl.style.pointerEvents = 'auto';
+              
               // Mouse enters popup - don't close
               popupEl.addEventListener('mouseenter', () => {
                 clearTimeout(closeTimeout);
               });
 
-              // Mouse leaves popup - close it
+              // Mouse leaves popup - delay closing to prevent accidental close
               popupEl.addEventListener('mouseleave', () => {
-                popup.remove();
+                closeTimeout = setTimeout(() => {
+                  popup.remove();
+                }, 200);
               });
             }
           }, 50);
@@ -411,9 +531,15 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
       // Mouse leaves marker - delay closing (so user can move to popup)
       el.addEventListener('mouseleave', () => {
+        // Scale back down
+        if (markerIcon) {
+          markerIcon.style.transform = 'scale(1)';
+          markerIcon.style.boxShadow = '0 3px 8px rgba(0,0,0,0.3)';
+        }
+        
         closeTimeout = setTimeout(() => {
           popup?.remove();
-        }, 300);
+        }, 200);
       });
 
       markersRef.current.push(marker);
@@ -435,24 +561,38 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
       {/* Style Selector */}
       {showStyleSelector && (
-        <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg border border-gray-300 overflow-hidden z-10">
-          <div className="flex flex-col">
+        <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-10 max-w-xs">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3">
+            <h3 className="text-sm font-bold flex items-center gap-2">
+              <span>🎨</span>
+              <span>Map Themes</span>
+            </h3>
+          </div>
+          <div className="flex flex-col max-h-96 overflow-y-auto">
             {Object.entries(MAP_STYLES).map(([key, value]) => (
               <button
                 key={key}
                 onClick={() => handleStyleChange(key as MapStyle)}
-                className={`px-4 py-2.5 text-left transition-colors ${
+                className={`px-4 py-3 text-left transition-all duration-200 border-b border-gray-100 last:border-b-0 ${
                   currentStyle === key
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-inner'
+                    : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50'
                 }`}
                 title={value.description}
               >
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold">{value.name}</span>
-                  <span className={`text-xs ${currentStyle === key ? 'text-blue-100' : 'text-gray-500'}`}>
-                    {value.description}
-                  </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{value.emoji}</span>
+                  <div className="flex-1">
+                    <div className={`text-sm font-semibold ${currentStyle === key ? 'text-white' : 'text-gray-900'}`}>
+                      {value.name}
+                    </div>
+                    <div className={`text-xs mt-0.5 ${currentStyle === key ? 'text-white/90' : 'text-gray-500'}`}>
+                      {value.description}
+                    </div>
+                  </div>
+                  {currentStyle === key && (
+                    <span className="text-white text-lg">✓</span>
+                  )}
                 </div>
               </button>
             ))}

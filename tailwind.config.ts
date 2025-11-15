@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 import animatePlugin from 'tailwindcss-animate';
-import scrollbarPlugin from 'tailwind-scrollbar';
+import scrollbarHidePlugin from 'tailwind-scrollbar-hide';
 
 export default {
   darkMode: ["class"],
@@ -54,10 +54,10 @@ export default {
         },
       },
       fontFamily: {
-        // Lexend for headers, Geist for body text
-        header: ['Lexend', 'sans-serif'],
-        content: ['Geist', 'Georgia', 'serif'],
-        sans: ['Geist', 'Georgia', 'serif'],
+        // Use Geist for headings and Poppins for body text (both provided via local fonts)
+        header: ['Geist', 'Poppins', 'sans-serif'],
+        content: ['Poppins', 'Geist', 'Georgia', 'serif'],
+        sans: ['Poppins', 'Geist', 'Georgia', 'serif'],
         mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       borderRadius: {
@@ -132,5 +132,5 @@ export default {
       },
     },
   },
-  plugins: [animatePlugin, scrollbarPlugin],
+  plugins: [animatePlugin, scrollbarHidePlugin],
 } satisfies Config;

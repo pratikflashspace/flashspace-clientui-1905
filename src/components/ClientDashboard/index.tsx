@@ -9,16 +9,17 @@ import {
   Headphones,
   LogOut,
   User,
+  Eye,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Dashboard from "./Dashboard";
 import MyBookings from "./MyBookings";
 import Billing from "./Billing";
 import KYCVerification from "./KYCVerification";
-import ContractsDocuments from "./ContractsDocuments";
 import Support from "./Support";
 import Logout from "./Logout";
 import Profile from "./Profile";
+import Viewdetails from "./Viewdetails"; // ✅ Added import
 
 const menuItems = [
   { name: "Profile", icon: User },
@@ -26,8 +27,8 @@ const menuItems = [
   { name: "My Bookings", icon: Calendar },
   { name: "Billing", icon: CreditCard },
   { name: "KYC Verification", icon: ShieldCheck },
-  { name: "Contracts & Documents", icon: FileText },
   { name: "Support", icon: Headphones },
+  { name: "View Details", icon: Eye }, // ✅ Added View Details menu
   { name: "Logout", icon: LogOut },
 ];
 
@@ -56,9 +57,9 @@ export default function ClientDashboard() {
       case 4:
         return <KYCVerification />;
       case 5:
-        return <ContractsDocuments />;
-      case 6:
         return <Support />;
+      case 6:
+        return <Viewdetails />; // ✅ Added Viewdetails rendering
       case 7:
         return <Logout />;
       default:
@@ -98,7 +99,7 @@ export default function ClientDashboard() {
 
       {showFooter && <Footer />}
 
-      {/* ✅ Font setup for local Geist & Poppins */}
+      {/* ✅ Fonts and Styling */}
       <style jsx global>{`
         @font-face {
           font-family: "Poppins";

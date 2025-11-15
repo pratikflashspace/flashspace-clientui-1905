@@ -492,7 +492,7 @@ const VirtualOffice = () => {
                 viewport={{ once: true }}
               >
                 <stat.icon className="w-8 h-8 text-white mx-auto mb-3" />
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2" style={{ fontFamily: 'Poppins' }}>
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2" >
                   {stat.number}
                 </div>
                 <div className="text-white/90 font-medium">{stat.label}</div>
@@ -514,7 +514,7 @@ const VirtualOffice = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Understanding Virtual Office
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#172A3A]" >
               What is a <span className="text-[#EDB003]">Virtual Office?</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -563,7 +563,7 @@ const VirtualOffice = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Simple Process
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
               How It <span className="text-[#EDB003]">Works</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -588,7 +588,7 @@ const VirtualOffice = () => {
                       {/* Step Number Circle */}
                       <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
                         <div className="w-16 h-16 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-full flex items-center justify-center shadow-xl border-4 border-white">
-                          <span className="text-2xl font-bold text-white" style={{ fontFamily: 'Poppins' }}>
+                          <span className="text-2xl font-bold text-white" >
                             {step.number}
                           </span>
                         </div>
@@ -634,7 +634,7 @@ const VirtualOffice = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/20 text-[#EDB003] rounded-full text-sm font-semibold mb-4 border border-[#EDB003]/30">
               Why FlashSpace
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white" >
               Why Choose <span className="text-[#EDB003]">FlashSpace</span> Virtual Office?
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -682,7 +682,7 @@ const VirtualOffice = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Customer Stories
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
               What Our <span className="text-[#EDB003]">Clients Say</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -805,7 +805,7 @@ const VirtualOffice = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Got Questions?
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
               Frequently Asked <span className="text-[#EDB003]">Questions</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -918,7 +918,7 @@ const VirtualOffice = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#EDB003]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform transition-transform duration-500 group-hover:translate-y-0">
-                  <h3 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Poppins' }}>{location.city}</h3>
+                  <h3 className="text-3xl font-bold mb-2" >{location.city}</h3>
                   <p className="text-white/90 mb-4 text-lg">{location.description}</p>
 
                   <div className="flex items-center justify-between">
@@ -952,7 +952,7 @@ const VirtualOffice = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" >
               Ready to Establish Your
               <br />
               <span className="text-[#EDB003]">Business Presence?</span>
@@ -985,3 +985,4 @@ const VirtualOffice = () => {
 };
 
 export default VirtualOffice;
+

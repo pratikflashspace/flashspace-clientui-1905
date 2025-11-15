@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// --- Main Pages ---
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import ListYourSpace from "./pages/ListYourSpace";
@@ -25,21 +27,21 @@ import Bookings from "./pages/Bookings";
 import Community from "./pages/Community";
 import Settings from "./pages/Settings";
 import CityListing from "./pages/CityListing";
+import AboutUs from "./pages/AboutUs";
+import Blog from "./pages/Blog";
 
-// --- Import all ClientDashboard pages! ---
+// --- Client Dashboard Pages ---
 import ClientDashboard from "./components/ClientDashboard";
 import Dashboard from "./components/ClientDashboard/Dashboard";
 import MyBookings from "./components/ClientDashboard/MyBookings";
 import Billing from "./components/ClientDashboard/Billing";
 import KYCVerification from "./components/ClientDashboard/KYCVerification";
-import ContractsDocuments from "./components/ClientDashboard/ContractsDocuments";
 import Support from "./components/ClientDashboard/Support";
 import Logout from "./components/ClientDashboard/Logout";
 import Profile from "./components/ClientDashboard/Profile";
+import Viewdetails from "./components/ClientDashboard/Viewdetails"; // ✅ Important for routing
 
-
-// --- end dashboard imports ---
-
+// --- React Query setup ---
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -49,19 +51,19 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Dashboard routes - every page is nested under /dashboard */}
+          {/* ✅ Dashboard with nested routes */}
           <Route path="/dashboard" element={<ClientDashboard />}>
             <Route index element={<Dashboard />} />
             <Route path="bookings" element={<MyBookings />} />
+            <Route path="viewdetails" element={<Viewdetails />} /> {/* ✅ Fix: nested path */}
             <Route path="billing" element={<Billing />} />
             <Route path="kyc-verification" element={<KYCVerification />} />
-            <Route path="contracts-documents" element={<ContractsDocuments />} />
             <Route path="support" element={<Support />} />
             <Route path="logout" element={<Logout />} />
-            <Route path="Profile" element={<Profile />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
-          
-          {/* Your other app pages below */}
+
+          {/* ✅ Other website routes */}
           <Route path="/" element={<Index />} />
           <Route path="/services" element={<Services />} />
           <Route path="/services/virtual-office" element={<VirtualOffice />} />
@@ -69,11 +71,17 @@ const App = () => (
           <Route path="/services/on-demand" element={<OnDemand />} />
           <Route path="/services/event-spaces" element={<EventSpaces />} />
           <Route path="/services/business-setup" element={<BusinessSetup />} />
-          <Route path="/Solutions/virtual-office" element={<VirtualOfficeSolution />} />
-          <Route path="/Solutions/coworking-space" element={<CoworkingSpaceSolution />} />
-          <Route path="/Solutions/on-demand" element={<OnDemandSolution />} />
-          <Route path="/Solutions/business-setup" element={<BusinessSetupSolution />} />
+
+          {/* ✅ Solutions routes */}
+          <Route path="/solutions/virtual-office" element={<VirtualOfficeSolution />} />
+          <Route path="/solutions/coworking-space" element={<CoworkingSpaceSolution />} />
+          <Route path="/solutions/on-demand" element={<OnDemandSolution />} />
+          <Route path="/solutions/business-setup" element={<BusinessSetupSolution />} />
+
+          {/* ✅ Static pages */}
           <Route path="/city-listing" element={<CityListing />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/blog" element={<Blog />} />
           <Route path="/career" element={<Career />} />
           <Route path="/login" element={<Login />} />
           <Route path="/bookings" element={<Bookings />} />
@@ -83,6 +91,8 @@ const App = () => (
           <Route path="/partner" element={<PartnerWithUs />} />
           <Route path="/coming-soon" element={<ComingSoon />} />
           <Route path="/start-chatting" element={<StartChatting />} />
+
+          {/* 404 fallback */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
