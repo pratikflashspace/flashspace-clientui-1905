@@ -10,10 +10,13 @@ import {
   Users,
   Bell,
   Settings as SettingsIcon,
-  MoreHorizontal
+  MoreHorizontal,
+  LayoutDashboard,
+  LogOut
 } from "lucide-react";
 
 import { smoothScrollTo } from "@/lib/lenis";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarMenuProps {
   isOpen: boolean;
@@ -125,6 +128,7 @@ const UpdatesPopup = ({
 // ------------------------------------------------
 const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   const [showUpdates, setShowUpdates] = useState(false);
 
   const primaryTop = [
@@ -275,29 +279,92 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
             {/* Footer */}
             {!hideLogoFooter && (
               <>
-                <div className="flex items-center justify-center py-4">
-                  <div className="w-20 h-20 rounded-full border-2 border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden bg-white flex items-center justify-center">
-                    <img
-                      src="/Logo/FlashSpace Favicon.png"
-                      alt="FlashSpace Favicon"
-                      className="w-full h-full object-contain p-2"
-                    />
+                {/* User Profile Section - Only for Authenticated Users */}
+                {isAuthenticated ? (
+                  <div className="mb-4">
+                    {/* User Profile Card */}
+                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100 shadow-sm">
+                      <div className="flex items-center gap-3 mb-3">
+                        {/* Avatar */}
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
+                          {user?.fullName?.charAt(0).toUpperCase() || 'U'}
+                        </div>
+                        {/* User Info */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate">
+                            {user?.fullName || 'User Account'}
+                          </p>
+                          <p className="text-xs text-gray-600 truncate">
+                            {user?.email || 'user@example.com'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => handleNavigation("/dashboard")}
+                          className="w-full rounded-lg bg-blue-600 text-white font-semibold py-2.5 text-sm hover:bg-blue-700 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm"
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          Go to Dashboard
+                        </button>
+                        
+                        <button
+                          onClick={async () => {
+                            await logout();
+                            closeBoth();
+                            navigate("/");
+                          }}
+                          className="w-full rounded-lg border-2 border-red-200 text-red-600 font-semibold py-2.5 text-sm hover:bg-red-600 hover:text-white hover:border-red-600 active:scale-[0.98] transition flex items-center justify-center gap-2"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Logout
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-3 pt-2">,
-                  <button
-                    onClick={() => handleNavigation("#contact")}
-                    className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition"
-                  >
-                    Get Consultation
-                  </button>
-                  <button
-                    onClick={() => handleNavigation("/login")}
-                    className="w-full rounded-md border border-neutral-600 text-black py-2 text-sm hover:bg-yellow-400 hover:text-white active:scale-[0.98] transition"
-                  >
-                    Log in
-                  </button>
-                </div>
+                ) : (
+                  // Not Authenticated - Show Logo and Login
+                  <>
+                    <div className="flex items-center justify-center py-4">
+                      <div className="w-20 h-20 rounded-full border-2 border-gray-300 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden bg-white flex items-center justify-center">
+                        <img
+                          src="/Logo/FlashSpace Favicon.png"
+                          alt="FlashSpace Favicon"
+                          className="w-full h-full object-contain p-2"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-3 pt-2">
+                      <button
+                        onClick={() => handleNavigation("#contact")}
+                        className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition"
+                      >
+                        Get Consultation
+                      </button>
+                      
+                      <button
+                        onClick={() => handleNavigation("/login")}
+                        className="w-full rounded-md border border-neutral-600 text-black py-2 text-sm hover:bg-yellow-400 hover:text-white active:scale-[0.98] transition"
+                      >
+                        Log in
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* Get Consultation Button - Always Show for Authenticated Users */}
+                {isAuthenticated && (
+                  <div className="mt-3">
+                    <button
+                      onClick={() => handleNavigation("#contact")}
+                      className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition"
+                    >
+                      Get Consultation
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>

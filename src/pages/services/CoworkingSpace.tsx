@@ -207,11 +207,22 @@ const CoworkingSpace = () => {
   // Prepare marker data from coworkingSpaces with full details
   // Memoize to prevent unnecessary recalculations
   const mapMarkers = useMemo(() => {
+    const isValidCoordinates = (coords: any): coords is { lat: number; lng: number } => {
+      return (
+        coords &&
+        typeof coords.lat === 'number' && !Number.isNaN(coords.lat) &&
+        typeof coords.lng === 'number' && !Number.isNaN(coords.lng)
+      );
+    };
+
     return coworkingSpaces.map((space, index) => {
-      const imageSrc = space.image || "https://shorturl.at/Fyr6o";
+      const imageSrc = space.image || "/Logo/Stage.png";
+      const position = isValidCoordinates(space.coordinates)
+        ? space.coordinates
+        : generateRandomCoordinates(resolvedCenter, index);
 
       return {
-        position: space.coordinates || generateRandomCoordinates(resolvedCenter, index),
+        position,
         title: space.name,
         address: space.address,
         price: space.price,
@@ -468,7 +479,7 @@ const CoworkingSpace = () => {
                 </h3>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-3">
-                    <img src="https://via.placeholder.com/48x48" alt="Consultant" className="w-12 h-12 rounded-full" />
+                    <img src="/Logo/Stage.png" alt="Consultant" className="w-12 h-12 rounded-full object-cover" />
                     <div>
                       <p className="font-semibold text-gray-900">Nitin Kashyap</p>
                       <p className="text-sm text-gray-600">+91 8100888777</p>

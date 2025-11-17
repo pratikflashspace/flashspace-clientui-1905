@@ -1,7 +1,7 @@
-import { LoginForm } from '@/components/auth/LoginForm';
+import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm';
 import { Link } from 'react-router-dom';
 
-const Login = () => {
+const ForgotPassword = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center px-4 py-12" style={{ fontFamily: 'Poppins' }}>
       <div className="w-full max-w-lg">
@@ -14,22 +14,22 @@ const Login = () => {
               <span className="text-[#EDB003]">Space</span>
             </h1>
             <h2 className="text-3xl font-bold text-[#172A3A] mb-2">
-              Welcome Back
+              Forgot Password?
             </h2>
             <p className="text-slate-600 text-base font-medium">
-              Sign in to access your virtual office
+              Enter your email to receive a reset link
             </p>
           </div>
 
           {/* Form */}
-          <LoginForm />
+          <ForgotPasswordForm />
 
           {/* Footer Links */}
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600">
-              Don't have an account?{' '}
-              <Link to="/signup" className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200">
-                Sign up for free
+              Remember your password?{' '}
+              <Link to="/login" className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200">
+                Sign in
               </Link>
             </p>
           </div>
@@ -37,11 +37,11 @@ const Login = () => {
 
         {/* Bottom Text */}
         <p className="text-center text-sm text-slate-500 mt-8 font-medium">
-          🔒 Secure login powered by FlashSpace
+          🔒 We'll send you a secure password reset link
         </p>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default ForgotPassword;

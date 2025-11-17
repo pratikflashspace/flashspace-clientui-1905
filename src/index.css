@@ -651,3 +651,11 @@
   z-index: 1000;
 }
 
+/* Background Grid Pattern for Auth Pages */
+.bg-grid-slate-100 {
+  background-image: 
+    linear-gradient(to right, rgb(241 245 249 / 0.5) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(241 245 249 / 0.5) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
