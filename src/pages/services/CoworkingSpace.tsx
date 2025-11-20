@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import MapSection from "@/components/services/MapSection";
 import SearchHeader from "@/components/services/SearchHeader";
 import ListingCard from "@/components/services/ListingCard";
+import ResizableMapLayout from "@/components/services/ResizableMapLayout";
 import { getCoworkingSpacesByCity } from "@/services/coworkingSpace.service";
 import {
   City,
@@ -188,6 +189,10 @@ const CoworkingSpace = () => {
     if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
     if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
     if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
+    if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
+    if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
+    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
+    if (["ahmedabad", "amdavad"].includes(cityKeyFromState)) return cityCenters.ahmedabad;
     return cityCenters.delhi;
   }, [selectedCity]);
 
@@ -235,32 +240,44 @@ const CoworkingSpace = () => {
   }, [coworkingSpaces, resolvedCenter]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header */}
       <div className="flex-shrink-0">
         <Header />
       </div>
 
-      {/* Main Content - Split Layout */}
-      <div className="flex flex-1 overflow-hidden mt-20">
-        {/* Left Side: Coworking Space Listings - Scrollable */}
-        <div
-          ref={scrollContainerRef}
-          className="w-1/2 overflow-y-auto"
-          data-lenis-prevent
+      {/* Main Content - Responsive Layout with Resizable Map */}
+      <div className="flex flex-1 overflow-hidden mt-16 md:mt-20">
+        <ResizableMapLayout
+          defaultListingWidth={50}
+          mapContent={
+            <MapSection
+              key="coworking-map"
+              center={resolvedCenter}
+              markers={mapMarkers}
+              zoom={11}
+              height="100%"
+            />
+          }
         >
-          <div className="px-6 py-6">
+          {/* Listings Content */}
+          <div
+            ref={scrollContainerRef}
+            className="w-full h-full overflow-y-auto"
+            data-lenis-prevent
+          >
+            <div className="px-4 sm:px-6 py-4 sm:py-6">
           {/* Breadcrumb */}
-          <div className={`flex items-center gap-2 text-sm text-gray-600 mb-4 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+          <div className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             <span>Home</span>
-            <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
+            <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
             <span>Coworking</span>
-            <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
-            <span className="text-gray-900 font-medium">{selectedCity}</span>
+            <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
+            <span className="text-gray-900 font-medium truncate">{selectedCity}</span>
           </div>
 
           {/* Page Title */}
-          <h1 className={`text-3xl font-bold text-gray-900 mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             Coworking Space In {selectedCity}
           </h1>
 
@@ -328,54 +345,56 @@ const CoworkingSpace = () => {
           </div> */}
 
           {/* Results Header */}
-          <div className={`flex items-center justify-between mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            <div className="flex items-center gap-4">
-              <p className="text-gray-600">
+          <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+              <p className="text-xs sm:text-sm text-gray-600">
                 Showing <span className="font-semibold text-gray-900">{coworkingSpaces.length} result(s)</span> for coworking space in {selectedCity}
               </p>
-              <Button variant="ghost" size="sm" className="text-primary text-sm">
-                📍 Compare Workspaces
-              </Button>
-              <Button variant="ghost" size="sm" className="text-primary text-sm">
-                💡 Find the ideal solution for you
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm h-8 px-2 sm:px-3">
+                  📍 Compare
+                </Button>
+                <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm h-8 px-2 sm:px-3 hidden sm:flex">
+                  💡 Find ideal solution
+                </Button>
+              </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
               <Button 
                 variant={viewMode === "list" ? "default" : "ghost"} 
                 size="sm" 
                 onClick={() => setViewMode("list")}
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 text-xs sm:text-sm h-8"
               >
-                <List className="w-4 h-4" />
-                List
+                <List className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">List</span>
               </Button>
               <Button 
                 variant={viewMode === "grid" ? "default" : "ghost"} 
                 size="sm" 
                 onClick={() => setViewMode("grid")}
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 text-xs sm:text-sm h-8"
               >
-                <Grid3X3 className="w-4 h-4" />
-                Grid
+                <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Grid</span>
               </Button>
             </div>
           </div>
 
           {/* Coworking Space Listings - Using Optimized ListingCard Component */}
-          <div className={`grid grid-cols-2 gap-4 mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             {loading ? (
-              <div className="col-span-full text-center py-12">
-                <p className="text-gray-600">Loading coworking spaces...</p>
+              <div className="col-span-full text-center py-8 sm:py-12">
+                <p className="text-sm sm:text-base text-gray-600">Loading coworking spaces...</p>
               </div>
             ) : error ? (
-              <div className="col-span-full text-center py-12">
-                <p className="text-red-600">{error}</p>
+              <div className="col-span-full text-center py-8 sm:py-12">
+                <p className="text-sm sm:text-base text-red-600">{error}</p>
               </div>
             ) : coworkingSpaces.length === 0 ? (
-              <div className="col-span-full text-center py-12">
-                <p className="text-gray-600">No coworking spaces found for {selectedCity}</p>
+              <div className="col-span-full text-center py-8 sm:py-12">
+                <p className="text-sm sm:text-base text-gray-600">No coworking spaces found for {selectedCity}</p>
               </div>
             ) : coworkingSpaces.map((space) => (
               <ListingCard
@@ -388,7 +407,7 @@ const CoworkingSpace = () => {
           </div>
 
           {/* What is Coworking Space Section */}
-          <div className={`bg-gradient-to-br from-[#172A3A] to-[#172A3A]/90 rounded-2xl p-8 mb-8 relative z-30 transition-opacity duration-300 overflow-hidden ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+          {/* <div className={`bg-gradient-to-br from-[#172A3A] to-[#172A3A]/90 rounded-2xl p-8 mb-8 relative z-30 transition-opacity duration-300 overflow-hidden ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#EDB003]/10 rounded-full blur-3xl"></div>
             <div className="relative z-10">
               <h2 className="text-3xl font-bold text-white mb-6">What is a Coworking Space?</h2>
@@ -468,59 +487,50 @@ const CoworkingSpace = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Consultant Section */}
-          <div className={`bg-white rounded-lg border border-gray-200 p-6 mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Upgrade your office with Nitin Kashyap & team
-                </h3>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="flex items-center gap-3">
-                    <img src="/Logo/Stage.png" alt="Consultant" className="w-12 h-12 rounded-full object-cover" />
-                    <div>
-                      <p className="font-semibold text-gray-900">Nitin Kashyap</p>
-                      <p className="text-sm text-gray-600">+91 8100888777</p>
-                      <p className="text-sm text-primary">FlashSpace Consultant</p>
-                    </div>
+          <div className={`bg-white rounded-lg border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <div className="flex flex-col gap-4">
+              <h3 className="text-base sm:text-xl font-bold text-gray-900">
+                Upgrade your office with Nitin Kashyap & team
+              </h3>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <img src="/Logo/Stage.png" alt="Consultant" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900 text-sm sm:text-base">Nitin Kashyap</p>
+                    <p className="text-xs sm:text-sm text-gray-600">+91 8100888777</p>
+                    <p className="text-xs sm:text-sm text-primary">FlashSpace Consultant</p>
                   </div>
-                  <Button className="bg-primary text-white">Contact Nitin</Button>
                 </div>
+                <Button className="bg-primary text-white w-full sm:w-auto text-sm h-9">Contact Nitin</Button>
+              </div>
 
-                <p className="text-gray-600 mb-4">
-                  Nitin's team assisted 200+ corporates in {selectedCity} to move into their new office.
-                </p>
+              <p className="text-sm sm:text-base text-gray-600">
+                Nitin's team assisted 200+ corporates in {selectedCity} to move into their new office.
+              </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Brand selection & location strategy</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Office scouting, tours & local expertise</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>Layout optimization & design consultancy</span>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs sm:text-sm">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                  <span>Brand selection & location strategy</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                  <span>Office scouting, tours & local expertise</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                  <span>Layout optimization & design consultancy</span>
                 </div>
               </div>
             </div>
           </div>
 
+            </div>
           </div>
-        </div>
-
-        {/* Right Side: Map - Fixed - Using Optimized MapSection Component */}
-        <MapSection
-          center={resolvedCenter}
-          markers={mapMarkers}
-          zoom={11}
-          height="100%"
-        />
+        </ResizableMapLayout>
       </div>
     </div>
   );

@@ -212,6 +212,12 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
       map.current.on('load', () => {
         setIsLoaded(true);
+        // Trigger resize to ensure map renders correctly
+        if (map.current) {
+          setTimeout(() => {
+            map.current?.resize();
+          }, 100);
+        }
       });
 
       // Prevent page scroll when mouse is over map
@@ -235,6 +241,32 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     }
   }, []);
 
+  // Resize map when container size changes - debounced for performance
+  useEffect(() => {
+    if (!map.current || !isLoaded) return;
+
+    let resizeTimeout: NodeJS.Timeout;
+
+    const resizeObserver = new ResizeObserver(() => {
+      // Debounce resize calls to avoid excessive reflows
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (map.current) {
+          map.current.resize();
+        }
+      }, 100);
+    });
+
+    if (mapContainer.current) {
+      resizeObserver.observe(mapContainer.current);
+    }
+
+    return () => {
+      clearTimeout(resizeTimeout);
+      resizeObserver.disconnect();
+    };
+  }, [isLoaded]);
+
   // Update map style
   useEffect(() => {
     if (!map.current || !isLoaded) return;
@@ -242,7 +274,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     try {
       map.current.setStyle(MAP_STYLES[currentStyle].url);
     } catch (err) {
-      console.error('Failed to change map style:', err);
+      console.error('Failed to change map :', err);
     }
   }, [currentStyle, isLoaded]);
 
@@ -268,54 +300,55 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     popupsRef.current = [];
 
     // Add new markers
-    markers.forEach((markerData) => {
+    markers.forEach((markerData, index) => {
       if (!map.current) return;
 
-      // Create custom marker element - Colorful circular icons like the screenshot
+      // Create custom marker element - pill style like the reference screenshot
       const el = document.createElement('div');
       el.className = 'custom-marker';
-      
-      // Random colorful backgrounds for different markers
-      const colors = ['#4285F4', '#EA4335', '#FBBC04', '#34A853', '#FF6D00', '#9C27B0', '#00BCD4'];
-      const randomColor = colors[markers.indexOf(markerData) % colors.length];
-      
+
+      const primary = '#1A73E8';
+
       el.innerHTML = `
-        <div style="
-          position: relative;
+        <div class="marker-container" style="
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: #ffffff;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+          border: 1px solid rgba(0,0,0,0.08);
           cursor: pointer;
-          transition: transform 0.2s ease;
-        " class="marker-container">
-          <!-- Colorful circular marker with icon -->
-          <div style="
-            width: 40px;
-            height: 40px;
-            background: ${randomColor};
-            border-radius: 50%;
-            display: flex;
+          white-space: nowrap;
+        ">
+          <!-- Left icon circle -->
+          <span class="marker-icon" style="
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            background: ${primary}10;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-            border: 3px solid white;
-            position: relative;
-            transition: all 0.2s ease;
-          " class="marker-icon">
-            <!-- Building/Office Icon in white -->
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-              <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
+            color: ${primary};
+          ">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 21V5h9v4h9v12h-4v-4H7v4H3zm6-6h2v-2H9v2zm0-4h2V9H9v2z" />
             </svg>
-          </div>
-          <!-- Bottom shadow (subtle) -->
-          <div style="
-            position: absolute;
-            bottom: -3px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 28px;
-            height: 5px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 50%;
-            filter: blur(4px);
-          "></div>
+          </span>
+
+          <!-- Title / label -->
+          <span style="
+            font-size: 12px;
+            font-weight: 600;
+            color: #202124;
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          ">
+            ${markerData.title || 'Office Space'}
+          </span>
         </div>
       `;
 

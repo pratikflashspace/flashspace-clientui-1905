@@ -50,7 +50,7 @@ const ListingCard = memo<ListingCardProps>(
     const handleToggleFavorite = () => {
       if (onToggleFavorite) {
         onToggleFavorite(item._id);
-      }
+      } 
     };
 
     return (

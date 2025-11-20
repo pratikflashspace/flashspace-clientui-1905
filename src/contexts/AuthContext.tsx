@@ -10,6 +10,7 @@ interface AuthContextType extends AuthState {
   verifyOTP: (email: string, otp: string) => Promise<void>;
   checkAuthStatus: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  googleLogin: (idToken: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -233,6 +234,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const googleLogin = async (idToken: string) => {
+    try {
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      
+      const response = await authService.googleLogin(idToken);
+      
+      if (response.success && response.data?.user) {
+        setState({
+          user: response.data.user,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+        });
+
+        toast({
+          title: 'Login Successful',
+          description: response.message || 'Welcome!',
+        });
+      } else {
+        const errorMsg = response.message || 'Google login failed';
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: errorMsg,
+        }));
+
+        toast({
+          title: 'Login Failed',
+          description: errorMsg,
+          variant: 'destructive',
+        });
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Google login failed';
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage,
+      }));
+
+      toast({
+        title: 'Login Failed',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -243,6 +292,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         verifyOTP,
         checkAuthStatus,
         refreshProfile,
+        googleLogin,
       }}
     >
       {children}

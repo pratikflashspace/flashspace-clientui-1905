@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff, Loader2, User, Mail, Phone, Lock, ArrowRight } from 'lucide-react';
+import { GoogleLoginButton } from './GoogleLoginButton';
 
 export const SignupForm = () => {
   const navigate = useNavigate();
@@ -216,6 +217,22 @@ export const SignupForm = () => {
           </div>
         )}
       </Button>
+
+      {/* Social Login */}
+      <div className="mt-6">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-slate-200"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-4 bg-white text-slate-500">or continue with</span>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <GoogleLoginButton onSuccess={() => navigate('/dashboard')} />
+        </div>
+      </div>
     </form>
   );
 };

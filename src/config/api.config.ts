@@ -22,6 +22,8 @@ export const API_ENDPOINTS = {
     REFRESH_TOKEN: '/api/auth/refresh-token',
     CHECK_AUTH: '/api/auth/check-auth',
     GET_PROFILE: '/api/auth/profile',
+    GOOGLE: '/api/auth/google',
+    GOOGLE_CALLBACK: '/api/auth/google/callback',
   },
   
   // Contact Form

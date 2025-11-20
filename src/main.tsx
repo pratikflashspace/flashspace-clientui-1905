@@ -1,8 +1,8 @@
 import { createRoot } from "react-dom/client";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import App from "./App.tsx";
 import "./index.css";
 import { getLenis } from "@/lib/lenis.ts";
- // ✅ Correct import path
 import { ContactModalProvider } from "./components/ui/ContactModalContext";
 
 // Initialize Lenis once on app bootstrap
@@ -14,11 +14,19 @@ if (typeof window !== "undefined") {
   }
 }
 
-// ✅ Wrap your App with ContactModalProvider
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+if (!GOOGLE_CLIENT_ID) {
+  console.error('VITE_GOOGLE_CLIENT_ID is not defined in environment variables');
+}
+
+// Wrap your App with Google OAuth and ContactModal providers
 createRoot(document.getElementById("root")!).render(
-  <ContactModalProvider>
-    <App />
-  </ContactModalProvider>
+  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+    <ContactModalProvider>
+      <App />
+    </ContactModalProvider>
+  </GoogleOAuthProvider>
 );
 
 

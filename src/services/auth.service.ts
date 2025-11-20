@@ -196,6 +196,21 @@ class AuthService {
       } as AuthResponse<{ accessToken: string; refreshToken: string }>;
     }
   }
+
+  /**
+   * Google OAuth - Authenticate with Google ID token
+   */
+  async googleLogin(idToken: string): Promise<AuthResponse<LoginResponse>> {
+    try {
+      const response = await axiosInstance.post(API_ENDPOINTS.AUTH.GOOGLE, { idToken });
+      return response.data as AuthResponse<LoginResponse>;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || 'Google login failed',
+      } as AuthResponse<LoginResponse>;
+    }
+  }
 }
 
 export const authService = new AuthService();

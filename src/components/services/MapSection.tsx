@@ -32,7 +32,7 @@ const MapSection = memo<MapSectionProps>(({
   height = "100%"
 }) => {
   return (
-    <div className="w-1/2 overflow-visible relative z-50">
+    <div className="w-full h-full overflow-visible relative">
       <MapLibreMap
         center={center}
         zoom={zoom}
@@ -44,13 +44,27 @@ const MapSection = memo<MapSectionProps>(({
   );
 }, (prevProps, nextProps) => {
   // Custom comparison function for better performance
-  // Only re-render if center coordinates or number of markers change
-  return (
+  // Only re-render if center coordinates, markers data, or zoom change
+  // Deep comparison for markers array to prevent unnecessary re-renders
+  const centerUnchanged = 
     prevProps.center.lat === nextProps.center.lat &&
-    prevProps.center.lng === nextProps.center.lng &&
+    prevProps.center.lng === nextProps.center.lng;
+  
+  const zoomUnchanged = prevProps.zoom === nextProps.zoom;
+  
+  const markersUnchanged = 
     prevProps.markers.length === nextProps.markers.length &&
-    prevProps.zoom === nextProps.zoom
-  );
+    prevProps.markers.every((marker, idx) => {
+      const nextMarker = nextProps.markers[idx];
+      return (
+        marker.position.lat === nextMarker.position.lat &&
+        marker.position.lng === nextMarker.position.lng &&
+        marker.title === nextMarker.title
+      );
+    });
+  
+  // Return true if nothing changed (prevents re-render)
+  return centerUnchanged && zoomUnchanged && markersUnchanged;
 });
 
 MapSection.displayName = 'MapSection';

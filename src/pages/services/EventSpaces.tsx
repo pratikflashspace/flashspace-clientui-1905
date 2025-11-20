@@ -1,5 +1,13 @@
-import { Building, MapPin, Phone, Users, ChevronDown, Grid3X3, List, CheckCircle, Star, Calendar, Utensils, Camera, Music } from "lucide-react";
+import { Building, MapPin, Phone, Users, ChevronDown, Grid3X3, List, CheckCircle, Star, Calendar, Utensils, Camera, Music, Shield, Award, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { cityCenters } from "@/components/Map/locationData.example";
@@ -208,27 +216,27 @@ const EventSpaces = () => {
     }
   ];
 
-  // Mock data for event spaces by city
+  // Mock data for event spaces by city with proper coordinates
   const mockEventSpaces: any = {
     delhi: [
-      { id: 1, name: "Grand Imperial Hall", address: "Connaught Place, New Delhi", price: "₹50,000/day", originalPrice: "₹65,000", rating: 4.8, reviews: 156, type: "Conference Hall", capacity: "500-800", features: ["Premium AV Setup", "Catering Kitchen", "VIP Lounge", "Parking"], area: "Connaught Place", availability: "Available Now", popular: true },
-      { id: 2, name: "Tech Summit Center", address: "Gurgaon Cyber Hub", price: "₹75,000/day", originalPrice: "₹95,000", rating: 4.9, reviews: 234, type: "Convention Center", capacity: "1000-1500", features: ["Latest Tech", "Multiple Halls", "Exhibition Space", "Hospitality Suite"], area: "Gurgaon", availability: "Available Now", popular: true },
-      { id: 3, name: "Heritage Banquet", address: "Khan Market, Delhi", price: "₹35,000/day", originalPrice: "₹45,000", rating: 4.6, reviews: 98, type: "Banquet Hall", capacity: "200-300", features: ["Traditional Decor", "Garden Area", "Premium Catering", "Valet Service"], area: "Khan Market", availability: "Available Now", popular: false },
-      { id: 4, name: "Modern Event Space", address: "Saket, New Delhi", price: "₹40,000/day", originalPrice: "₹52,000", rating: 4.7, reviews: 167, type: "Multi-purpose Hall", capacity: "300-500", features: ["Flexible Layout", "LED Walls", "Sound System", "Climate Control"], area: "Saket", availability: "Available Now", popular: false },
+      { id: 1, name: "Grand Imperial Hall", address: "Connaught Place, New Delhi", price: "₹50,000/day", originalPrice: "₹65,000", rating: 4.8, reviews: 156, type: "Conference Hall", capacity: "500-800", features: ["Premium AV Setup", "Catering Kitchen", "VIP Lounge", "Parking"], area: "Connaught Place", availability: "Available Now", popular: true, coordinates: { lat: 28.6329, lng: 77.2197 } },
+      { id: 2, name: "Tech Summit Center", address: "Gurgaon Cyber Hub", price: "₹75,000/day", originalPrice: "₹95,000", rating: 4.9, reviews: 234, type: "Convention Center", capacity: "1000-1500", features: ["Latest Tech", "Multiple Halls", "Exhibition Space", "Hospitality Suite"], area: "Gurgaon", availability: "Available Now", popular: true, coordinates: { lat: 28.4595, lng: 77.0266 } },
+      { id: 3, name: "Heritage Banquet", address: "Khan Market, Delhi", price: "₹35,000/day", originalPrice: "₹45,000", rating: 4.6, reviews: 98, type: "Banquet Hall", capacity: "200-300", features: ["Traditional Decor", "Garden Area", "Premium Catering", "Valet Service"], area: "Khan Market", availability: "Available Now", popular: false, coordinates: { lat: 28.5986, lng: 77.2316 } },
+      { id: 4, name: "Modern Event Space", address: "Saket, New Delhi", price: "₹40,000/day", originalPrice: "₹52,000", rating: 4.7, reviews: 167, type: "Multi-purpose Hall", capacity: "300-500", features: ["Flexible Layout", "LED Walls", "Sound System", "Climate Control"], area: "Saket", availability: "Available Now", popular: false, coordinates: { lat: 28.5244, lng: 77.2066 } },
     ],
     mumbai: [
-      { id: 5, name: "BKC Grand Ballroom", address: "Bandra Kurla Complex", price: "₹85,000/day", originalPrice: "₹110,000", rating: 4.9, reviews: 298, type: "Ballroom", capacity: "800-1200", features: ["Ocean View", "Premium Interiors", "Full Service", "Concierge"], area: "BKC", availability: "Available Now", popular: true },
-      { id: 6, name: "Worli Convention Hall", address: "Worli, Mumbai", price: "₹60,000/day", originalPrice: "₹78,000", rating: 4.7, reviews: 189, type: "Convention Hall", capacity: "600-900", features: ["Sea Link View", "Modern AV", "Exhibition Space", "Breakout Rooms"], area: "Worli", availability: "Available Now", popular: false },
-      { id: 7, name: "Andheri Event Center", address: "Andheri East, Mumbai", price: "₹45,000/day", originalPrice: "₹58,000", rating: 4.5, reviews: 134, type: "Event Center", capacity: "400-600", features: ["Airport Proximity", "Multiple Configurations", "Catering Facilities", "Ample Parking"], area: "Andheri East", availability: "Available Now", popular: false },
+      { id: 5, name: "BKC Grand Ballroom", address: "Bandra Kurla Complex", price: "₹85,000/day", originalPrice: "₹110,000", rating: 4.9, reviews: 298, type: "Ballroom", capacity: "800-1200", features: ["Ocean View", "Premium Interiors", "Full Service", "Concierge"], area: "BKC", availability: "Available Now", popular: true, coordinates: { lat: 19.0596, lng: 72.8656 } },
+      { id: 6, name: "Worli Convention Hall", address: "Worli, Mumbai", price: "₹60,000/day", originalPrice: "₹78,000", rating: 4.7, reviews: 189, type: "Convention Hall", capacity: "600-900", features: ["Sea Link View", "Modern AV", "Exhibition Space", "Breakout Rooms"], area: "Worli", availability: "Available Now", popular: false, coordinates: { lat: 19.0176, lng: 72.8156 } },
+      { id: 7, name: "Andheri Event Center", address: "Andheri East, Mumbai", price: "₹45,000/day", originalPrice: "₹58,000", rating: 4.5, reviews: 134, type: "Event Center", capacity: "400-600", features: ["Airport Proximity", "Multiple Configurations", "Catering Facilities", "Ample Parking"], area: "Andheri East", availability: "Available Now", popular: false, coordinates: { lat: 19.1136, lng: 72.8697 } },
     ],
     bangalore: [
-      { id: 8, name: "Tech Valley Auditorium", address: "Koramangala, Bangalore", price: "₹55,000/day", originalPrice: "₹70,000", rating: 4.8, reviews: 223, type: "Auditorium", capacity: "700-1000", features: ["Tech Hub Location", "Advanced AV", "Startup Friendly", "Innovation Labs"], area: "Koramangala", availability: "Available Now", popular: true },
-      { id: 9, name: "Whitefield Conference", address: "Whitefield, Bangalore", price: "₹42,000/day", originalPrice: "₹55,000", rating: 4.6, reviews: 167, type: "Conference Center", capacity: "300-500", features: ["IT Corridor", "Modern Facilities", "Video Conferencing", "Business Lounge"], area: "Whitefield", availability: "Available Now", popular: false },
-      { id: 10, name: "HSR Event Plaza", address: "HSR Layout, Bangalore", price: "₹38,000/day", originalPrice: "₹48,000", rating: 4.4, reviews: 112, type: "Event Plaza", capacity: "250-400", features: ["Residential Area", "Community Events", "Flexible Timing", "Local Cuisine"], area: "HSR Layout", availability: "Available Now", popular: false },
+      { id: 8, name: "Tech Valley Auditorium", address: "Koramangala, Bangalore", price: "₹55,000/day", originalPrice: "₹70,000", rating: 4.8, reviews: 223, type: "Auditorium", capacity: "700-1000", features: ["Tech Hub Location", "Advanced AV", "Startup Friendly", "Innovation Labs"], area: "Koramangala", availability: "Available Now", popular: true, coordinates: { lat: 12.9352, lng: 77.6245 } },
+      { id: 9, name: "Whitefield Conference", address: "Whitefield, Bangalore", price: "₹42,000/day", originalPrice: "₹55,000", rating: 4.6, reviews: 167, type: "Conference Center", capacity: "300-500", features: ["IT Corridor", "Modern Facilities", "Video Conferencing", "Business Lounge"], area: "Whitefield", availability: "Available Now", popular: false, coordinates: { lat: 12.9698, lng: 77.7500 } },
+      { id: 10, name: "HSR Event Plaza", address: "HSR Layout, Bangalore", price: "₹38,000/day", originalPrice: "₹48,000", rating: 4.4, reviews: 112, type: "Event Plaza", capacity: "250-400", features: ["Residential Area", "Community Events", "Flexible Timing", "Local Cuisine"], area: "HSR Layout", availability: "Available Now", popular: false, coordinates: { lat: 12.9116, lng: 77.6473 } },
     ],
     pune: [
-      { id: 11, name: "Hinjewadi IT Convention", address: "Hinjewadi, Pune", price: "₹48,000/day", originalPrice: "₹62,000", rating: 4.7, reviews: 189, type: "IT Convention", capacity: "500-750", features: ["IT Park Location", "Corporate Events", "Modern Tech", "Executive Services"], area: "Hinjewadi", availability: "Available Now", popular: true },
-      { id: 12, name: "Koregaon Premium Hall", address: "Koregaon Park, Pune", price: "₹52,000/day", originalPrice: "₹68,000", rating: 4.8, reviews: 156, type: "Premium Hall", capacity: "400-600", features: ["Upscale Location", "Luxury Amenities", "Fine Dining", "Concierge Service"], area: "Koregaon Park", availability: "Available Now", popular: false },
+      { id: 11, name: "Hinjewadi IT Convention", address: "Hinjewadi, Pune", price: "₹48,000/day", originalPrice: "₹62,000", rating: 4.7, reviews: 189, type: "IT Convention", capacity: "500-750", features: ["IT Park Location", "Corporate Events", "Modern Tech", "Executive Services"], area: "Hinjewadi", availability: "Available Now", popular: true, coordinates: { lat: 18.5912, lng: 73.7389 } },
+      { id: 12, name: "Koregaon Premium Hall", address: "Koregaon Park, Pune", price: "₹52,000/day", originalPrice: "₹68,000", rating: 4.8, reviews: 156, type: "Premium Hall", capacity: "400-600", features: ["Upscale Location", "Luxury Amenities", "Fine Dining", "Concierge Service"], area: "Koregaon Park", availability: "Available Now", popular: false, coordinates: { lat: 18.5362, lng: 73.8958 } },
     ]
   };
 
@@ -270,21 +278,12 @@ const EventSpaces = () => {
     if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
     if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
     if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
+    if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
+    if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
+    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
+    if (["ahmedabad", "amdavad"].includes(cityKeyFromState)) return cityCenters.ahmedabad;
     return cityCenters.delhi;
   }, [selectedCity]);
-
-  // Generate random coordinates around city center if not available
-  const generateRandomCoordinates = (center: { lat: number; lng: number }, index: number) => {
-    // Generate different offsets for each space (0.01 to 0.05 degrees)
-    const seed = index + 1;
-    const latOffset = ((seed * 17) % 50) / 1000 - 0.025; // -0.025 to +0.025
-    const lngOffset = ((seed * 23) % 50) / 1000 - 0.025; // -0.025 to +0.025
-
-    return {
-      lat: center.lat + latOffset,
-      lng: center.lng + lngOffset
-    };
-  };
 
   // Prepare marker data from event spaces with full details
   // Memoize to prevent unnecessary recalculations
@@ -293,7 +292,7 @@ const EventSpaces = () => {
       const imageSrc = space.image || "https://shorturl.at/Fyr6o";
 
       return {
-        position: space.coordinates || generateRandomCoordinates(resolvedCenter, index),
+        position: space.coordinates || resolvedCenter,
         title: space.name,
         address: space.address,
         price: space.price,

@@ -41,15 +41,12 @@ import Blog from "./pages/Blog";
 // import BusinessSetupSearch from "./pages/solutions/BusinessSetupSearch";
 // import SearchResults from "./pages/SearchResult";
 
-// --- Import all ClientDashboard pages! ---
+// --- Client Dashboard Pages ---
 import ClientDashboard from "./components/ClientDashboard";
 import Dashboard from "./components/ClientDashboard/Dashboard";
 import MyBookings from "./components/ClientDashboard/MyBookings";
-import OnDemandServices from "./components/ClientDashboard/OnDemandServices";
-import VirtualOffices from "./components/ClientDashboard/VirtualOffices";
 import Billing from "./components/ClientDashboard/Billing";
 import KYCVerification from "./components/ClientDashboard/KYCVerification";
-import ContractsDocuments from "./components/ClientDashboard/ContractsDocuments";
 import Support from "./components/ClientDashboard/Support";
 import Logout from "./components/ClientDashboard/Logout";
 import Profile from "./components/ClientDashboard/Profile";
@@ -58,6 +55,9 @@ import Profile from "./components/ClientDashboard/Profile";
 
 // --- end dashboard imports ---
 
+import Viewdetails from "./components/ClientDashboard/Viewdetails"; // ✅ Important for routing
+
+// --- React Query setup ---
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -67,65 +67,51 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          {/* <MouseFollower/> */}
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/services/virtual-office" element={<VirtualOffice />} />
-            <Route path="/services/coworking-space" element={<CoworkingSpace />} />
-            <Route path="/services/on-demand" element={<OnDemand />} />
-            <Route path="/services/event-spaces" element={<EventSpaces />} />
-            <Route path="/services/business-setup" element={<BusinessSetup />} />
-            <Route path="/Solutions/virtual-office" element={<VirtualOfficeSolution />} />
-            <Route path="/Solutions/coworking-space" element={<CoworkingSpaceSolution />} />
-            <Route path="/Solutions/on-demand" element={<OnDemandSolution />} />
-            <Route path="/Solutions/business-setup" element={<BusinessSetupSolution />} />
-            <Route path="/city-listing" element={<CityListing />} />
-            <Route path="/career" element={<Career />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/blog" element={<Blog />} />
-            
-            {/* Auth Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/verify-otp" element={<VerifyOTP />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/bookings" element={<Bookings />} />
-              <Route path="/community" element={<Community />} />
-              {/* <Route path="/updates" element={<Updates />} /> */}
-              <Route path="/settings" element={<Settings />} />
-              
-              {/* Client Dashboard Routes - Protected */}
-              <Route path="/dashboard" element={<ClientDashboard />} />
-              <Route path="/dashboard/overview" element={<Dashboard />} />
-              <Route path="/dashboard/my-bookings" element={<MyBookings />} />
-              <Route path="/dashboard/on-demand-services" element={<OnDemandServices />} />
-              <Route path="/dashboard/virtual-offices" element={<VirtualOffices />} />
-              <Route path="/dashboard/billing" element={<Billing />} />
-              <Route path="/dashboard/kyc-verification" element={<KYCVerification />} />
-              <Route path="/dashboard/contracts-documents" element={<ContractsDocuments />} />
-              <Route path="/dashboard/support" element={<Support />} />
-              <Route path="/dashboard/profile" element={<Profile />} />
-              <Route path="/dashboard/logout" element={<Logout />} />
-            </Route>
-            {/* <Route path="/solutions/virtual-office" element={<VirtualOfficeSearch />} />
-            <Route path="/solutions/coworking-space" element={<CoworkingSpaceSearch />} />
-            <Route path="/solutions/on-demand" element={<OnDemandSearch />} />
-            <Route path="/solutions/business-setup" element={<BusinessSetupSearch />} />
-            <Route path="/search-results" element={<SearchResults />} /> */}
-            <Route path="/list-your-space" element={<ListYourSpace />} />
-            <Route path="/partner" element={<PartnerWithUs />} />
-            <Route path="/coming-soon" element={<ComingSoon />} />
-            {/* <Route path="/city/:cityId" element={<CityListing />} /> */}
-            <Route path="/start-chatting" element={<StartChatting />} />
-            {/* <Route path="/get-in-touch" element={<GetInTouch />} /> */}
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+        <Routes>
+          {/* ✅ Dashboard with nested routes */}
+          <Route path="/dashboard" element={<ClientDashboard />}>
+            <Route index element={<Dashboard />} />
+            <Route path="bookings" element={<MyBookings />} />
+            <Route path="viewdetails" element={<Viewdetails />} /> {/* ✅ Fix: nested path */}
+            <Route path="billing" element={<Billing />} />
+            <Route path="kyc-verification" element={<KYCVerification />} />
+            <Route path="support" element={<Support />} />
+            <Route path="logout" element={<Logout />} />
+            <Route path="profile" element={<Profile />} />
+          </Route>
+
+          {/* ✅ Other website routes */}
+          <Route path="/" element={<Index />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/services/virtual-office" element={<VirtualOffice />} />
+          <Route path="/services/coworking-space" element={<CoworkingSpace />} />
+          <Route path="/services/on-demand" element={<OnDemand />} />
+          <Route path="/services/event-spaces" element={<EventSpaces />} />
+          <Route path="/services/business-setup" element={<BusinessSetup />} />
+
+          {/* ✅ Solutions routes */}
+          <Route path="/solutions/virtual-office" element={<VirtualOfficeSolution />} />
+          <Route path="/solutions/coworking-space" element={<CoworkingSpaceSolution />} />
+          <Route path="/solutions/on-demand" element={<OnDemandSolution />} />
+          <Route path="/solutions/business-setup" element={<BusinessSetupSolution />} />
+
+          {/* ✅ Static pages */}
+          <Route path="/city-listing" element={<CityListing />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/career" element={<Career />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/bookings" element={<Bookings />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/list-your-space" element={<ListYourSpace />} />
+          <Route path="/partner" element={<PartnerWithUs />} />
+          <Route path="/coming-soon" element={<ComingSoon />} />
+          <Route path="/start-chatting" element={<StartChatting />} />
+
+          {/* 404 fallback */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
@@ -133,5 +119,3 @@ const App = () => (
 );
 
 export default App;
-
-

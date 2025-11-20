@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import MapSection from "@/components/services/MapSection";
 import SearchHeader from "@/components/services/SearchHeader";
 import ListingCard from "@/components/services/ListingCard";
+import ResizableMapLayout from "@/components/services/ResizableMapLayout";
 import { getVirtualOfficesByCity } from "@/services/virtualOffice.service";
 import {
   City,
@@ -189,6 +190,10 @@ const VirtualOffice = () => {
     if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
     if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
     if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
+    if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
+    if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
+    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
+    if (["ahmedabad", "amdavad"].includes(cityKeyFromState)) return cityCenters.ahmedabad;
     // Default
     return cityCenters.delhi;
   })();
@@ -226,34 +231,46 @@ const VirtualOffice = () => {
   }, [virtualOffices, resolvedCenter]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Original Header */}
       <div className="flex-shrink-0">
         <Header />
       </div>
 
-      {/* Main Content - Split Layout */}
-      <div className="flex flex-1 overflow-hidden mt-20">
-        {/* Left Side: Office Listings - Scrollable */}
-        <div 
-          ref={scrollContainerRef}
-          className="w-1/2 overflow-y-auto"
-          data-lenis-prevent
+      {/* Main Content - Responsive Layout with Resizable Map */}
+      <div className="flex flex-1 overflow-hidden mt-16 md:mt-20">
+        <ResizableMapLayout
+          defaultListingWidth={50}
+          mapContent={
+            <MapSection
+              key="virtual-office-map"
+              center={resolvedCenter}
+              markers={mapMarkers}
+              zoom={11}
+              height="100%"
+            />
+          }
         >
-          <div className="px-6 py-6">
-          {/* Breadcrumb */}
-          <div className={`flex items-center gap-2 text-sm text-gray-600 mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            <span>Home</span>
-            <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
-            <span>Virtual Office</span>
-            <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
-            <span className="text-gray-900 font-medium">{selectedCity}</span>
-          </div>
+          {/* Listings Content */}
+          <div 
+            ref={scrollContainerRef}
+            className="w-full h-full overflow-y-auto"
+            data-lenis-prevent
+          >
+            <div className="px-4 sm:px-6 py-4 sm:py-6">
+            {/* Breadcrumb */}
+            <div className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+              <span>Home</span>
+              <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
+              <span>Virtual Office</span>
+              <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
+              <span className="text-gray-900 font-medium truncate">{selectedCity}</span>
+            </div>
 
-          {/* Page Title */}
-          <h1 className={`text-3xl font-bold text-gray-900 mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            Virtual Office Space In {selectedCity}
-          </h1>
+            {/* Page Title */}
+            <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+              Virtual Office Space In {selectedCity}
+            </h1>
           
           {/* City Search Section - Using Optimized SearchHeader Component */}
           <SearchHeader
@@ -318,55 +335,57 @@ const VirtualOffice = () => {
             </div>
           </div> */}
 
-          {/* Results Header */}
-          <div className={`flex items-center justify-between mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            <div className="flex items-center gap-4">
-              <p className="text-gray-600">
-                Showing <span className="font-semibold text-gray-900">{virtualOffices.length} result(s)</span> for virtual office space in {selectedCity}
-              </p>
-              <Button variant="ghost" size="sm" className="text-primary text-sm">
-                📍 Compare Workspaces
-              </Button>
-              <Button variant="ghost" size="sm" className="text-primary text-sm">
-                💡 Find the ideal solution for you
-              </Button>
+            {/* Results Header */}
+            <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                <p className="text-xs sm:text-sm text-gray-600">
+                  Showing <span className="font-semibold text-gray-900">{virtualOffices.length} result(s)</span> for virtual office space in {selectedCity}
+                </p>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm h-8 px-2 sm:px-3">
+                    📍 Compare
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm h-8 px-2 sm:px-3 hidden sm:flex">
+                    💡 Find ideal solution
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                <Button 
+                  variant={viewMode === "list" ? "default" : "ghost"} 
+                  size="sm" 
+                  onClick={() => setViewMode("list")}
+                  className="flex items-center gap-1 text-xs sm:text-sm h-8"
+                >
+                  <List className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">List</span>
+                </Button>
+                <Button 
+                  variant={viewMode === "grid" ? "default" : "ghost"} 
+                  size="sm" 
+                  onClick={() => setViewMode("grid")}
+                  className="flex items-center gap-1 text-xs sm:text-sm h-8"
+                >
+                  <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Grid</span>
+                </Button>
+              </div>
             </div>
-            
-            <div className="flex items-center gap-2">
-              <Button 
-                variant={viewMode === "list" ? "default" : "ghost"} 
-                size="sm" 
-                onClick={() => setViewMode("list")}
-                className="flex items-center gap-1"
-              >
-                <List className="w-4 h-4" />
-                List
-              </Button>
-              <Button 
-                variant={viewMode === "grid" ? "default" : "ghost"} 
-                size="sm" 
-                onClick={() => setViewMode("grid")}
-                className="flex items-center gap-1"
-              >
-                <Grid3X3 className="w-4 h-4" />
-                Grid
-              </Button>
-            </div>
-          </div>
 
-          {/* Office Cards Grid - Using Optimized ListingCard Component */}
-          <div className={`grid grid-cols-2 gap-4 mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            {/* Office Cards Grid - Using Optimized ListingCard Component */}
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               {loading ? (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-gray-600">Loading virtual offices...</p>
+                <div className="col-span-full text-center py-8 sm:py-12">
+                  <p className="text-sm sm:text-base text-gray-600">Loading virtual offices...</p>
                 </div>
               ) : error ? (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-red-600">{error}</p>
+                <div className="col-span-full text-center py-8 sm:py-12">
+                  <p className="text-sm sm:text-base text-red-600">{error}</p>
                 </div>
               ) : virtualOffices.length === 0 ? (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-gray-600">No virtual offices found for {selectedCity}</p>
+                <div className="col-span-full text-center py-8 sm:py-12">
+                  <p className="text-sm sm:text-base text-gray-600">No virtual offices found for {selectedCity}</p>
                 </div>
               ) : virtualOffices.map((office) => (
                 <ListingCard
@@ -376,18 +395,11 @@ const VirtualOffice = () => {
                   onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
                 />
               ))}
-          </div>
+            </div>
 
+            </div>
           </div>
-        </div>
-
-        {/* Right Side: Map - Fixed - Using Optimized MapSection Component */}
-        <MapSection
-          center={resolvedCenter}
-          markers={mapMarkers}
-          zoom={11}
-          height="100%"
-        />
+        </ResizableMapLayout>
       </div>
     </div>
   );
