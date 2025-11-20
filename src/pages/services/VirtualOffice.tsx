@@ -231,14 +231,14 @@ const VirtualOffice = () => {
   }, [virtualOffices, resolvedCenter]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-gray-50">
       {/* Original Header */}
       <div className="flex-shrink-0">
         <Header />
       </div>
 
       {/* Main Content - Responsive Layout with Resizable Map */}
-      <div className="flex flex-1 overflow-hidden mt-16 md:mt-20">
+      <div className="flex overflow-hidden mt-16 md:mt-20" style={{ height: 'calc(100vh - 4rem)' }}>
         <ResizableMapLayout
           defaultListingWidth={50}
           mapContent={

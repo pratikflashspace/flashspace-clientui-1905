@@ -15,6 +15,7 @@ import Header from "@/components/Header";
 import MapSection from "@/components/services/MapSection";
 import SearchHeader from "@/components/services/SearchHeader";
 import ListingCard from "@/components/services/ListingCard";
+import ResizableMapLayout from "@/components/services/ResizableMapLayout";
 import {
   City,
   BusinessSolution,
@@ -289,7 +290,7 @@ const EventSpaces = () => {
   // Memoize to prevent unnecessary recalculations
   const mapMarkers = useMemo(() => {
     return typedEventSpaces.map((space, index) => {
-      const imageSrc = space.image || "https://shorturl.at/Fyr6o";
+      const imageSrc = space.image || "https://images.unsplash.com/photo-1519167758481-83f29da8c6ca?w=800&q=80&fit=crop";
 
       return {
         position: space.coordinates || resolvedCenter,
@@ -311,15 +312,27 @@ const EventSpaces = () => {
         <Header />
       </div>
 
-      {/* Main Content - Split Layout */}
-      <div className="flex flex-1 overflow-hidden mt-20">
-        {/* Left Side: Event Space Listings - Scrollable */}
-        <div
-          ref={scrollContainerRef}
-          className="w-1/2 overflow-y-auto"
-          data-lenis-prevent
+      {/* Main Content - Resizable Layout */}
+      <div className="flex overflow-hidden mt-20" style={{ height: 'calc(100vh - 5rem)' }}>
+        <ResizableMapLayout
+          defaultListingWidth={50}
+          mapContent={
+            <MapSection
+              key="event-spaces-map"
+              center={resolvedCenter}
+              markers={mapMarkers}
+              zoom={11}
+              height="100%"
+            />
+          }
         >
-          <div className="px-6 py-6">
+          {/* Event Space Listings Content */}
+          <div
+            ref={scrollContainerRef}
+            className="w-full h-full overflow-y-auto"
+            data-lenis-prevent
+          >
+            <div className="px-6 py-6">
           {/* Breadcrumb */}
           <div className={`flex items-center gap-2 text-sm text-gray-600 mb-4 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             <span>Home</span>
@@ -511,19 +524,19 @@ const EventSpaces = () => {
             {citySpaces.map((space) => {
               let imageSrc = "";
               switch (space.name) {
-                case "Grand Imperial Hall": imageSrc = "https://shorturl.at/Fyr6o"; break;
-                case "Tech Summit Center": imageSrc = "https://shorturl.at/LdEgA"; break;
-                case "Heritage Banquet": imageSrc = "https://shorturl.at/S4XWY"; break;
-                case "Modern Event Space": imageSrc = "https://shorturl.at/NUpzM"; break;
-                case "BKC Grand Ballroom": imageSrc = "https://shorturl.at/Fyr6o"; break;
-                case "Worli Convention Hall": imageSrc = "https://shorturl.at/LdEgA"; break;
-                case "Andheri Event Center": imageSrc = "https://shorturl.at/S4XWY"; break;
-                case "Tech Valley Auditorium": imageSrc = "https://shorturl.at/NUpzM"; break;
-                case "Whitefield Conference": imageSrc = "https://shorturl.at/Fyr6o"; break;
-                case "HSR Event Plaza": imageSrc = "https://shorturl.at/LdEgA"; break;
-                case "Hinjewadi IT Convention": imageSrc = "https://shorturl.at/S4XWY"; break;
-                case "Koregaon Premium Hall": imageSrc = "https://shorturl.at/NUpzM"; break;
-                default: imageSrc = "/placeholder.svg";
+                case "Grand Imperial Hall": imageSrc = "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80&fit=crop&auto=format"; break;
+                case "Tech Summit Center": imageSrc = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80&fit=crop&auto=format"; break;
+                case "Heritage Banquet": imageSrc = "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&q=80&fit=crop&auto=format"; break;
+                case "Modern Event Space": imageSrc = "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80&fit=crop&auto=format"; break;
+                case "BKC Grand Ballroom": imageSrc = "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80&fit=crop&auto=format"; break;
+                case "Worli Convention Hall": imageSrc = "https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=800&q=80&fit=crop&auto=format"; break;
+                case "Andheri Event Center": imageSrc = "https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=800&q=80&fit=crop&auto=format"; break;
+                case "Tech Valley Auditorium": imageSrc = "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80&fit=crop&auto=format"; break;
+                case "Whitefield Conference": imageSrc = "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800&q=80&fit=crop&auto=format"; break;
+                case "HSR Event Plaza": imageSrc = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80&fit=crop&auto=format"; break;
+                case "Hinjewadi IT Convention": imageSrc = "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&q=80&fit=crop&auto=format"; break;
+                case "Koregaon Premium Hall": imageSrc = "https://images.unsplash.com/photo-1569012871812-f38ee64cd54c?w=800&q=80&fit=crop&auto=format"; break;
+                default: imageSrc = "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80&fit=crop&auto=format";
               }
               
               return (
@@ -730,16 +743,9 @@ const EventSpaces = () => {
             </div>
           </div>
 
+            </div>
           </div>
-        </div>
-
-        {/* Right Side: Map - Fixed - Using Optimized MapSection Component */}
-        <MapSection
-          center={resolvedCenter}
-          markers={mapMarkers}
-          zoom={11}
-          height="100%"
-        />
+        </ResizableMapLayout>
       </div>
     </div>
   );
