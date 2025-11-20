@@ -279,7 +279,7 @@ const OnDemand = () => {
     {
       city: "Hyderabad",
       centers: 4,
-      image: "https://images.unsplash.com/photo-1563656353898-febc9270a0f5?w=800&q=80",
+      image: "https://images.unsplash.com/photo-1551161242-b5af797b7233?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8SHlkZXJhYmFkfGVufDB8fDB8fHww",
       description: "On-demand meeting facilities"
     },
     {
@@ -308,7 +308,7 @@ const OnDemand = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative h-[85vh] overflow-hidden mt-16">
+      <section className="relative h-[93vh] overflow-hidden mt-16">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img
@@ -341,14 +341,14 @@ const OnDemand = () => {
               <span className="text-sm font-semibold text-[#EDB003]">Instant Booking Available</span>
             </motion.div>
 
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight" >
-              Meeting Spaces
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight" >
+              On-Demand Business Solutions
               <br />
               <span className="text-[#EDB003]">On Your Schedule</span>
             </h1>
 
             <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed" >
-              Book professional meeting rooms and conference halls by the hour -
+              Book professional meeting rooms, day pass and conference halls by the hour -
               whenever and wherever you need them
             </p>
 
@@ -365,9 +365,9 @@ const OnDemand = () => {
                 </Button>
               </Link>
               <Link to="/solutions/on-demand">
-                <Button className="bg-transparent hover:bg-[#FFD43B] text-black border-2 border-[#FFD43B] px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto">
-                  Explore Spaces
-                </Button>
+                <Button className="bg-[#FFD43B] text-black px-8 py-4 text-lg font-semibold rounded-lg shadow-lg w-full sm:w-auto hover:bg-[#FFD43B] active:bg-[#FFD43B] focus:bg-[#FFD43B] focus:ring-0 focus:outline-none">
+                  Explore Spaces</Button>
+
               </Link>
             </motion.div>
 

@@ -21,6 +21,12 @@ import CoworkingSpaceSolution from "./pages/Solutions/coworking-space";
 import OnDemandSolution from "./pages/Solutions/on-demand";
 import BusinessSetupSolution from "./pages/Solutions/business-setup";
 import PartnerWithUs from "./pages/PatnerWithUs";
+import MeetingsRoom from "./pages/Solutions/meetingsroom";
+import Dayoffice from "./pages/Solutions/Dayoffice";
+import EventSpacePage from "./pages/Solutions/Eventspace";
+
+
+
 //
 import MouseFollower from "./components/MouseFollower";
 // Additional Pages
@@ -78,6 +84,11 @@ const App = () => (
             <Route path="/Solutions/coworking-space" element={<CoworkingSpaceSolution />} />
             <Route path="/Solutions/on-demand" element={<OnDemandSolution />} />
             <Route path="/Solutions/business-setup" element={<BusinessSetupSolution />} />
+            <Route path="/Solutions/meetingsroom" element={<MeetingsRoom />} />
+            <Route path="/Solutions/day-office" element={<Dayoffice />} />
+            <Route path="/Solutions/eventspace" element={<EventSpacePage />} />
+
+
             <Route path="/city-listing" element={<CityListing />} />
             <Route path="/career" element={<Career />} />
             <Route path="/about" element={<AboutUs />} />
@@ -100,11 +111,11 @@ const App = () => (
               <Route path="/dashboard" element={<ClientDashboard />} />
               <Route path="/dashboard/overview" element={<Dashboard />} />
               <Route path="/dashboard/my-bookings" element={<MyBookings />} />
-              <Route path="/dashboard/on-demand-services" element={<OnDemandServices />} />
-              <Route path="/dashboard/virtual-offices" element={<VirtualOffices />} />
+              {/* <Route path="/dashboard/on-demand-services" element={<OnDemandServices />} /> */}
+              {/* <Route path="/dashboard/virtual-offices" element={<VirtualOffices />} /> */}
               <Route path="/dashboard/billing" element={<Billing />} />
               <Route path="/dashboard/kyc-verification" element={<KYCVerification />} />
-              <Route path="/dashboard/contracts-documents" element={<ContractsDocuments />} />
+              {/* <Route path="/dashboard/contracts-documents" element={<ContractsDocuments />} /> */}
               <Route path="/dashboard/support" element={<Support />} />
               <Route path="/dashboard/profile" element={<Profile />} />
               <Route path="/dashboard/logout" element={<Logout />} />
