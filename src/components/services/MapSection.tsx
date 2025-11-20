@@ -32,11 +32,11 @@ const MapSection = memo<MapSectionProps>(({
   height = "100%"
 }) => {
   return (
-    <div className="w-full h-full overflow-visible relative">
+    <div className="w-full h-full relative" style={{ overflow: 'hidden', maxHeight: '100%' }}>
       <MapLibreMap
         center={center}
         zoom={zoom}
-        height={height}
+        height="100%"
         className="w-full h-full"
         markers={markers}
       />

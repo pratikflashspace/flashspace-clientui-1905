@@ -8,7 +8,10 @@ export interface User {
   role: 'user' | 'admin' | 'vendor';
   isEmailVerified: boolean;
   profilePicture?: string;
+  authProvider?: 'local' | 'google';
+  lastLogin?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface AuthTokens {

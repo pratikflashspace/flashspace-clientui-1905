@@ -37,7 +37,15 @@ class AuthService {
   async login(data: LoginRequest): Promise<AuthResponse<LoginResponse>> {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGIN, data);
-      return response.data as AuthResponse<LoginResponse>;
+      const result = response.data as AuthResponse<LoginResponse>;
+      
+      // Store tokens if login successful
+      if (result.success && result.data?.tokens) {
+        const { tokenStorage } = await import('@/lib/axios');
+        tokenStorage.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
+      }
+      
+      return result;
     } catch (error: any) {
       return {
         success: false,
@@ -52,7 +60,15 @@ class AuthService {
   async verifyOTP(data: VerifyOTPRequest): Promise<AuthResponse<VerifyOTPResponse>> {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.VERIFY_OTP, data);
-      return response.data as AuthResponse<VerifyOTPResponse>;
+      const result = response.data as AuthResponse<VerifyOTPResponse>;
+      
+      // Store tokens if verification successful
+      if (result.success && result.data?.tokens) {
+        const { tokenStorage } = await import('@/lib/axios');
+        tokenStorage.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
+      }
+      
+      return result;
     } catch (error: any) {
       return {
         success: false,
@@ -127,8 +143,17 @@ class AuthService {
   async logout(): Promise<AuthResponse> {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGOUT);
+      
+      // Clear stored tokens
+      const { tokenStorage } = await import('@/lib/axios');
+      tokenStorage.clearTokens();
+      
       return response.data as AuthResponse;
     } catch (error: any) {
+      // Always clear tokens even if logout fails
+      const { tokenStorage } = await import('@/lib/axios');
+      tokenStorage.clearTokens();
+      
       return {
         success: false,
         message: error.response?.data?.message || error.message || 'Failed to logout',
@@ -142,8 +167,17 @@ class AuthService {
   async logoutAll(): Promise<AuthResponse> {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGOUT_ALL);
+      
+      // Clear stored tokens
+      const { tokenStorage } = await import('@/lib/axios');
+      tokenStorage.clearTokens();
+      
       return response.data as AuthResponse;
     } catch (error: any) {
+      // Always clear tokens even if logout fails
+      const { tokenStorage } = await import('@/lib/axios');
+      tokenStorage.clearTokens();
+      
       return {
         success: false,
         message: error.response?.data?.message || error.message || 'Failed to logout from all devices',
@@ -203,7 +237,15 @@ class AuthService {
   async googleLogin(idToken: string): Promise<AuthResponse<LoginResponse>> {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.GOOGLE, { idToken });
-      return response.data as AuthResponse<LoginResponse>;
+      const result = response.data as AuthResponse<LoginResponse>;
+      
+      // Store tokens if Google login successful
+      if (result.success && result.data?.tokens) {
+        const { tokenStorage } = await import('@/lib/axios');
+        tokenStorage.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
+      }
+      
+      return result;
     } catch (error: any) {
       return {
         success: false,

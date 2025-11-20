@@ -110,14 +110,16 @@ const ResizableMapLayout = memo<ResizableMapLayoutProps>(({
   return (
     <>
       {/* Desktop & Tablet Landscape - Split View with Resizable Panels */}
-      <div className="hidden lg:flex flex-1 overflow-hidden relative">
+      <div className="hidden lg:flex w-full h-full overflow-hidden relative">
         {/* Listings Panel */}
         <div
           style={{ 
             width: `${listingWidth}%`,
+            height: '100%',
+            maxHeight: '100%',
             willChange: isDragging ? 'width' : 'auto'
           }}
-          className={`overflow-y-auto ${isDragging ? '' : 'transition-all duration-300 ease-out'}`}
+          className={`overflow-y-auto flex-shrink-0 ${isDragging ? '' : 'transition-all duration-300 ease-out'}`}
         >
           {children}
         </div>
@@ -142,11 +144,15 @@ const ResizableMapLayout = memo<ResizableMapLayoutProps>(({
         <div
           style={{ 
             width: `${mapWidth}%`,
+            height: '100%',
+            maxHeight: '100%',
             willChange: isDragging ? 'width' : 'auto'
           }}
-          className={`relative overflow-hidden ${isDragging ? '' : 'transition-all duration-300 ease-out'}`}
+          className={`relative flex-shrink-0 ${isDragging ? '' : 'transition-all duration-300 ease-out'}`}
         >
-          {mapContent}
+          <div className="w-full h-full overflow-hidden">
+            {mapContent}
+          </div>
 
           {/* Map Control Buttons */}
           <div className="absolute top-4 right-4 z-[100] flex flex-col gap-2">

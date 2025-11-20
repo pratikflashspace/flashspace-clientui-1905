@@ -47,6 +47,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: null,
         });
       } else {
+        // Not authenticated - clear tokens
+        const { tokenStorage } = await import('@/lib/axios');
+        tokenStorage.clearTokens();
+        
         setState({
           user: null,
           isAuthenticated: false,
@@ -55,6 +59,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       }
     } catch (error: any) {
+      // Clear tokens on auth check failure
+      const { tokenStorage } = await import('@/lib/axios');
+      tokenStorage.clearTokens();
+      
       setState({
         user: null,
         isAuthenticated: false,
@@ -205,7 +213,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         description: 'You have been successfully logged out.',
       });
     } catch (error: any) {
-      // Even if logout fails on server, clear local state
+      // Even if logout fails on server, clear local state and tokens
+      const { tokenStorage } = await import('@/lib/axios');
+      tokenStorage.clearTokens();
+      
       setState({
         user: null,
         isAuthenticated: false,

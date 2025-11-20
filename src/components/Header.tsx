@@ -178,22 +178,21 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 >
                   <div className="p-4 grid grid-cols-2 gap-4">
                     <div className="border rounded-lg p-4 bg-white/50">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 cursor-pointer" onClick={() => { handleNavigation("/Solutions/on-demand"); setIsSolutionsOpen(false); }}>
                         <Zap className="w-4 h-4 text-primary" />
-                        <h4 className="text-sm font-semibold">On-Demand</h4>
+                        <h4 className="text-sm font-semibold hover:text-primary transition-colors">On-Demand</h4>
                       </div>
                       <p className="text-xs text-gray-500 mb-3">Book by the hour or day</p>
                       {[
-                        { label: "Meeting Rooms", type: "meeting-room" },
-                        { label: "Training Rooms", type: "training-room" },
-                        { label: "Phone Booths", type: "phone-booth" },
-                        { label: "Day Offices", type: "day-office" },
+                        { label: "Meeting Rooms", type: "meeting-room", href: "/Solutions/meetingsroom" },
+                        { label: "Event Space", type: "training-room", href: "/Solutions/eventspace" },
+                        { label: "Day Offices", type: "day-office", href: "/Solutions/day-office" },
                       ].map((item) => (
                         <button
                           key={item.type}
                           className="flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-gray-100"
                           onClick={() => {
-                            handleNavigation(`/Solutions/on-demand?type=${item.type}`);
+                            handleNavigation(item.href);
                             setIsSolutionsOpen(false);
                           }}
                         >

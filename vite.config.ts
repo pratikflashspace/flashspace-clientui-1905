@@ -14,4 +14,17 @@ export default defineConfig({
     port: 5173,
     host: true,
   },
+  optimizeDeps: {
+    include: ['maplibre-gl'],
+    esbuildOptions: {
+      target: 'es2020',
+    },
+  },
+  build: {
+    target: 'es2020',
+    commonjsOptions: {
+      include: [/maplibre-gl/, /node_modules/],
+      transformMixedEsModules: true,
+    },
+  },
 })
