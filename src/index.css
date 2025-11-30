@@ -540,22 +540,35 @@
 }
 
 /* Scrollbar styling - keep visible */
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f3f4f6;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
 .scrollbar-custom::-webkit-scrollbar {
   width: 8px;
+  background-color: #f3f4f6;
 }
 
 .scrollbar-custom::-webkit-scrollbar-track {
   background: #f3f4f6;
   border-radius: 10px;
+  margin: 2px 0;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
   background: #d1d5db;
   border-radius: 10px;
+  border: 1px solid #f3f4f6;
+  transition: all 0.2s ease;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+  border: 1px solid #e5e7eb;
 }
 
 /* Right Panel Scrollbar - FlashSpace Yellow */
@@ -590,7 +603,6 @@
 /* Ensure smooth scrolling on all devices */
 .scrollbar-yellow {
   -webkit-overflow-scrolling: touch;
-  overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   scroll-behavior: smooth;
 }
@@ -657,5 +669,37 @@
     linear-gradient(to right, rgb(241 245 249 / 0.5) 1px, transparent 1px),
     linear-gradient(to bottom, rgb(241 245 249 / 0.5) 1px, transparent 1px);
   background-size: 40px 40px;
+}
+
+/* Fix mouse wheel scrolling issues */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure chat container can scroll with mouse wheel */
+.chat-container {
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Disable Lenis inside explicitly prevented regions */
+[data-lenis-prevent],
+[data-lenis-prevent-wheel],
+[data-lenis-prevent-touch] {
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+/* Force scrollable containers to respond to mouse wheel */
+[style*="overflow-y: scroll"], 
+[style*="overflowY: scroll"] {
+  overscroll-behavior: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
 }
 

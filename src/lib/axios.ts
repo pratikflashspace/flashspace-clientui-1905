@@ -1,65 +1,24 @@
 import axios from 'axios';
 import { API_CONFIG } from '@/config/api.config';
 
-// Token storage helper
-const TOKEN_KEY = 'auth_access_token';
-const REFRESH_TOKEN_KEY = 'auth_refresh_token';
-
-export const tokenStorage = {
-  getAccessToken: (): string | null => {
-    try {
-      return localStorage.getItem(TOKEN_KEY);
-    } catch (error) {
-      console.error('Error reading access token:', error);
-      return null;
-    }
-  },
-  
-  getRefreshToken: (): string | null => {
-    try {
-      return localStorage.getItem(REFRESH_TOKEN_KEY);
-    } catch (error) {
-      console.error('Error reading refresh token:', error);
-      return null;
-    }
-  },
-  
-  setTokens: (accessToken: string, refreshToken: string): void => {
-    try {
-      localStorage.setItem(TOKEN_KEY, accessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-    } catch (error) {
-      console.error('Error storing tokens:', error);
-    }
-  },
-  
-  clearTokens: (): void => {
-    try {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(REFRESH_TOKEN_KEY);
-    } catch (error) {
-      console.error('Error clearing tokens:', error);
-    }
-  },
-};
+// No longer need localStorage - tokens are managed via HttpOnly cookies
+// This is more secure as cookies are not accessible to JavaScript (XSS protection)
 
 // Create axios instance with default config
 export const axiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
   timeout: API_CONFIG.TIMEOUT,
-  withCredentials: true, // Important for cookies
+  withCredentials: true, // Critical: enables sending cookies with cross-origin requests
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor - add token to all requests
+// Request interceptor - cookies are automatically included by the browser
 axiosInstance.interceptors.request.use(
   (config: any) => {
-    const token = tokenStorage.getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // No need to manually add Authorization header
+    // Cookies are automatically sent by the browser when withCredentials is true
     return config;
   },
   (error: any) => {
@@ -71,12 +30,12 @@ axiosInstance.interceptors.request.use(
 let isRefreshing = false;
 let failedQueue: Array<{resolve: (value?: any) => void; reject: (reason?: any) => void}> = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: any) => {
   failedQueue.forEach(prom => {
     if (error) {
       prom.reject(error);
     } else {
-      prom.resolve(token);
+      prom.resolve();
     }
   });
   failedQueue = [];
@@ -115,33 +74,14 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = tokenStorage.getRefreshToken();
-      
-      if (!refreshToken) {
-        // No refresh token, clear everything and redirect
-        tokenStorage.clearTokens();
-        processQueue(new Error('No refresh token'), null);
-        window.location.href = '/login';
-        return Promise.reject(error);
-      }
-
       try {
-        // Try to refresh token
-        const response = await axiosInstance.post('/api/auth/refresh-token', {}, {
-          headers: {
-            'Authorization': `Bearer ${refreshToken}`
-          }
-        });
+        // Try to refresh token - refresh token is in HttpOnly cookie
+        const response = await axiosInstance.post('/api/auth/refresh-token');
 
         const responseData = response.data as any;
-        if (responseData.success && responseData.data?.tokens) {
-          const { accessToken, refreshToken: newRefreshToken } = responseData.data.tokens;
-          tokenStorage.setTokens(accessToken, newRefreshToken);
-          
-          // Update original request with new token
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          
-          processQueue(null, accessToken);
+        if (responseData.success) {
+          // New tokens are set in cookies by the server
+          processQueue(null);
           isRefreshing = false;
           
           // Retry original request
@@ -150,10 +90,9 @@ axiosInstance.interceptors.response.use(
           throw new Error('Token refresh failed');
         }
       } catch (refreshError) {
-        // Refresh failed, clear tokens and redirect
-        processQueue(refreshError, null);
+        // Refresh failed, redirect to login
+        processQueue(refreshError);
         isRefreshing = false;
-        tokenStorage.clearTokens();
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }

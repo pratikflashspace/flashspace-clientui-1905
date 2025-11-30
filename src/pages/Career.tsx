@@ -638,8 +638,8 @@ const OpenPositions: React.FC = () => {
 
       {/* FULL SCREEN APPLY FORM */}
       {showApply && (
-        <div className="fixed inset-0 z-[999] bg-white overflow-y-auto overscroll-contain custom-scrollbar" style={{ height: "100vh" }}>
-          <div className="max-w-4xl mx-auto px-6 pt-10 pb-20 min-h-full">
+        <div className="fixed inset-0 z-[999] bg-white overflow-y-scroll custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div className="max-w-4xl mx-auto px-6 py-10 min-h-screen">
             <button onClick={closeAll} className="text-3xl text-slate-600 absolute top-6 right-8 hover:text-black transition">&times;</button>
             <h2 className="text-4xl font-bold mb-2 text-slate-800">Apply for <span className="text-yellow-400">{selectedJob?.title}</span></h2>
             <p className="text-slate-500 mb-10 font-bold">JOB ID: {selectedJob?.id}</p>
@@ -784,11 +784,7 @@ const OpenPositions: React.FC = () => {
       )}
     </section>
   );
-};
-
-// ===============================================
-// ContactForm Component
-// ===============================================
+}
 
 // ===============================================
 // ContactForm Component

@@ -224,9 +224,8 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
 
       {/* Sidebar */}
       <div
-        className="relative z-20 h-full bg-white text-black border-r border-neutral-200 shadow-xl transform transition-transform duration-300 ease-out overflow-hidden"
+        className="relative z-20 h-full bg-white text-black border-r border-neutral-200 shadow-xl transform transition-transform duration-300 ease-out overflow-hidden font-geist"
         style={{
-          fontFamily: "Geist",
           width: `${menuWidth}px`,
           minWidth: `${menuWidth}px`,
           maxWidth: `${menuWidth}px`,
@@ -267,7 +266,7 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
                       onClick={() => handleNavigation(item.href, item.label)}
                       className={`group flex items-center ${
                         iconOnly ? "justify-center" : "gap-3 text-left"
-                      } py-2 px-2 text-[13px] font-medium text-black hover:text-yellow-600 rounded hover:bg-black/5 transition-all duration-300`}
+                      } py-2 px-2 text-[13px] font-medium text-black hover:text-yellow-600 rounded hover:bg-black/5 transition-all duration-300 font-poppins`}
                     >
                       <item.icon className="w-5 h-5 text-gray-600 group-hover:text-yellow-600 transition-colors duration-300" />
                       {!iconOnly && <span>{item.label}</span>}
@@ -291,10 +290,10 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
                         </div>
                         {/* User Info */}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 truncate">
+                          <p className="text-sm font-semibold text-gray-900 truncate font-poppins">
                             {user?.fullName || 'User Account'}
                           </p>
-                          <p className="text-xs text-gray-600 truncate">
+                          <p className="text-xs text-gray-600 truncate font-geist">
                             {user?.email || 'user@example.com'}
                           </p>
                         </div>
@@ -304,7 +303,7 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
                       <div className="space-y-2">
                         <button
                           onClick={() => handleNavigation("/dashboard")}
-                          className="w-full rounded-lg bg-blue-600 text-white font-semibold py-2.5 text-sm hover:bg-blue-700 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm"
+                          className="w-full rounded-lg bg-blue-600 text-white font-semibold py-2.5 text-sm hover:bg-blue-700 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm font-poppins"
                         >
                           <LayoutDashboard className="w-4 h-4" />
                           Go to Dashboard
@@ -316,7 +315,7 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
                             closeBoth();
                             navigate("/");
                           }}
-                          className="w-full rounded-lg border-2 border-red-200 text-red-600 font-semibold py-2.5 text-sm hover:bg-red-600 hover:text-white hover:border-red-600 active:scale-[0.98] transition flex items-center justify-center gap-2"
+                          className="w-full rounded-lg border-2 border-red-200 text-red-600 font-semibold py-2.5 text-sm hover:bg-red-600 hover:text-white hover:border-red-600 active:scale-[0.98] transition flex items-center justify-center gap-2 font-poppins"
                         >
                           <LogOut className="w-4 h-4" />
                           Logout
@@ -339,14 +338,14 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
                     <div className="space-y-3 pt-2">
                       <button
                         onClick={() => handleNavigation("#contact")}
-                        className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition"
+                        className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition font-poppins"
                       >
                         Get Consultation
                       </button>
                       
                       <button
                         onClick={() => handleNavigation("/login")}
-                        className="w-full rounded-md border border-neutral-600 text-black py-2 text-sm hover:bg-yellow-400 hover:text-white active:scale-[0.98] transition"
+                        className="w-full rounded-md border border-neutral-600 text-black py-2 text-sm hover:bg-yellow-400 hover:text-white active:scale-[0.98] transition font-poppins font-semibold"
                       >
                         Log in
                       </button>
@@ -359,7 +358,7 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
                   <div className="mt-3">
                     <button
                       onClick={() => handleNavigation("#contact")}
-                      className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition"
+                      className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition font-poppins"
                     >
                       Get Consultation
                     </button>

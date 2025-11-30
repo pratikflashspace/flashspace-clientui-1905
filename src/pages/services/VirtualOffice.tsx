@@ -180,6 +180,27 @@ const VirtualOffice = () => {
     navigate(href);
   };
 
+  // Map space names to their routes
+  const spaceRoutes: Record<string, string> = {
+    "Stirring Minds": "/space/stirring-minds",
+    "Virtualexcel": "/space/virtualexcel",
+    "Work & Beyond": "/space/work-and-beyond",
+    "Work &amp; Beyond": "/space/work-and-beyond",
+    "Okhla Alt F": "/space/okhla-alt-f",
+    "Budha Coworking": "/space/budha-coworking",
+    "Mytime Cowork": "/space/mytime-cowork",
+    "Getset Spaces": "/space/getset-spaces",
+    "CP Alt F": "/space/cp-alt-f",
+    "WBB Office": "/space/wbb-office"
+  };
+
+  const handleGetBestPrice = (spaceName: string): void => {
+    const route = spaceRoutes[spaceName];
+    if (route) {
+      navigate(route);
+    }
+  };
+
   // Get unique areas for filtering
   const areas = [...new Set(virtualOffices.map(office => office.area))];
 
@@ -391,7 +412,7 @@ const VirtualOffice = () => {
                 <ListingCard
                   key={office._id}
                   item={office}
-                  onGetBestPrice={(itemId) => console.log('Get best price for:', itemId)}
+                  onGetBestPrice={() => handleGetBestPrice(office.name)}
                   onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
                 />
               ))}

@@ -39,11 +39,8 @@ class AuthService {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGIN, data);
       const result = response.data as AuthResponse<LoginResponse>;
       
-      // Store tokens if login successful
-      if (result.success && result.data?.tokens) {
-        const { tokenStorage } = await import('@/lib/axios');
-        tokenStorage.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
-      }
+      // Tokens are automatically stored in HttpOnly cookies by the server
+      // No need to manually store tokens - more secure!
       
       return result;
     } catch (error: any) {
@@ -62,11 +59,8 @@ class AuthService {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.VERIFY_OTP, data);
       const result = response.data as AuthResponse<VerifyOTPResponse>;
       
-      // Store tokens if verification successful
-      if (result.success && result.data?.tokens) {
-        const { tokenStorage } = await import('@/lib/axios');
-        tokenStorage.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
-      }
+      // Tokens are automatically stored in HttpOnly cookies by the server
+      // No need to manually store tokens - more secure!
       
       return result;
     } catch (error: any) {
@@ -144,16 +138,11 @@ class AuthService {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGOUT);
       
-      // Clear stored tokens
-      const { tokenStorage } = await import('@/lib/axios');
-      tokenStorage.clearTokens();
+      // Cookies are cleared by the server
+      // No need to manually clear tokens
       
       return response.data as AuthResponse;
     } catch (error: any) {
-      // Always clear tokens even if logout fails
-      const { tokenStorage } = await import('@/lib/axios');
-      tokenStorage.clearTokens();
-      
       return {
         success: false,
         message: error.response?.data?.message || error.message || 'Failed to logout',
@@ -168,16 +157,11 @@ class AuthService {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGOUT_ALL);
       
-      // Clear stored tokens
-      const { tokenStorage } = await import('@/lib/axios');
-      tokenStorage.clearTokens();
+      // Cookies are cleared by the server
+      // No need to manually clear tokens
       
       return response.data as AuthResponse;
     } catch (error: any) {
-      // Always clear tokens even if logout fails
-      const { tokenStorage } = await import('@/lib/axios');
-      tokenStorage.clearTokens();
-      
       return {
         success: false,
         message: error.response?.data?.message || error.message || 'Failed to logout from all devices',
@@ -239,11 +223,8 @@ class AuthService {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.GOOGLE, { idToken });
       const result = response.data as AuthResponse<LoginResponse>;
       
-      // Store tokens if Google login successful
-      if (result.success && result.data?.tokens) {
-        const { tokenStorage } = await import('@/lib/axios');
-        tokenStorage.setTokens(result.data.tokens.accessToken, result.data.tokens.refreshToken);
-      }
+      // Tokens are automatically stored in HttpOnly cookies by the server
+      // No need to manually store tokens - more secure!
       
       return result;
     } catch (error: any) {

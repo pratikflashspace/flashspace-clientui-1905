@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { getLenis } from '@/lib/lenis.ts';
 import { useNavigate } from 'react-router-dom';
 import {
   Send, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
@@ -36,6 +37,16 @@ interface ContactForm {
   phone: string;
   email: string;
 }
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+// n8n Webhook Configuration
+const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://your-n8n-instance.com/webhook/chatbot';
 
 interface SidebarMenuItem {
   label: string;
@@ -168,6 +179,9 @@ const StartChatting = () => {
     phone: '',
     email: ''
   });
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const [selectedCity] = useState('Delhi');
 
@@ -244,16 +258,131 @@ const StartChatting = () => {
     };
   }, [showUpdates, isSidebarOpen]); // [NEW] Added isSidebarOpen as dependency
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      console.log('Sending message:', message);
-      setMessage('');
+  // Pause Lenis globally while this page is mounted to keep native wheel behavior snappy
+  useEffect(() => {
+    let lenis: any;
+    try {
+      // prefer existing instance if present
+      // @ts-ignore
+      lenis = (window as any).__lenis ?? getLenis();
+      lenis?.stop?.();
+    } catch {
+      // ignore if lenis not available
+    }
+    return () => {
+      try {
+        lenis?.start?.();
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
+
+  const handleSendMessage = async () => {
+    if (!message.trim() || isLoading) return;
+
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: message.trim(),
+      timestamp: new Date()
+    };
+
+    // Add user message to chat
+    setChatMessages(prev => [...prev, userMessage]);
+    setMessage('');
+    setIsLoading(true);
+
+    try {
+      // Call n8n webhook
+      const response = await fetch(N8N_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userMessage.content,
+          sessionId: getSessionId(),
+          timestamp: userMessage.timestamp.toISOString()
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from chatbot');
+      }
+
+      const data = await response.json();
+      console.log('n8n response:', data); // Debug log
+      
+      // Try multiple possible response formats from n8n
+      let aiResponseText = '';
+      
+      if (Array.isArray(data)) {
+        // If response is an array, get first item
+        const firstItem = data[0];
+        aiResponseText = firstItem?.output || firstItem?.response || firstItem?.text || firstItem?.message || JSON.stringify(firstItem);
+      } else if (typeof data === 'object') {
+        // Try different possible field names
+        aiResponseText = data.output || data.response || data.text || data.message || data.result || data.answer || JSON.stringify(data);
+      } else {
+        aiResponseText = String(data);
+      }
+      
+      // Add AI response to chat
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: aiResponseText || 'I apologize, but I encountered an error. Please try again.',
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error sending message to n8n:', error);
+      
+      // Add error message
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'I apologize, but I\'m having trouble connecting right now. Please try again in a moment.',
+        timestamp: new Date()
+      };
+      
+      setChatMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  // Generate or retrieve session ID for conversation tracking
+  const getSessionId = () => {
+    let sessionId = sessionStorage.getItem('chat_session_id');
+    if (!sessionId) {
+      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      sessionStorage.setItem('chat_session_id', sessionId);
+    }
+    return sessionId;
+  };
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
 
   const handleContactSubmit = () => {
     console.log('Contact form submitted:', contactForm);
     setContactForm({ name: '', phone: '', email: '' });
+  };
+
+  const handleQuickAction = (actionMessage: string) => {
+    setMessage(actionMessage);
+    // Auto-send the message
+    setTimeout(() => {
+      const event = new KeyboardEvent('keypress', { key: 'Enter' });
+      handleSendMessage();
+    }, 100);
   };
 
   const handleNavigation = (href: string) => {
@@ -384,19 +513,19 @@ const StartChatting = () => {
                 <PopoverContent className="w-48" side="right" align="start" sideOffset={10}>
                   <div className="flex flex-col space-y-1 p-1">
                     <button
-                      onClick={() => handleNavigation('/AboutUs')}
+                      onClick={() => handleNavigation('/about')}
                       className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                     >
                       About Us
                     </button>
                     <button
-                      onClick={() => handleNavigation('/Career')}
+                      onClick={() => handleNavigation('/career')}
                       className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                     >
                       Career
                     </button>
                     <button
-                      onClick={() => handleNavigation('/Blog')}
+                      onClick={() => handleNavigation('/blog')}
                       className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                     >
                       Blog
@@ -412,8 +541,7 @@ const StartChatting = () => {
         <div className="border-t border-gray-100 p-4 flex-shrink-0 space-y-3">
           {/* Profile Button */}
           <button
-            onClick={() => handleNavigation('/solutions/aboutus')}
-
+            onClick={() => handleNavigation('/about')}
             className="w-full flex items-center justify-center py-3 hover:bg-gray-50 rounded-lg transition-all duration-200"
             title="Profile"
           >
@@ -433,43 +561,113 @@ const StartChatting = () => {
       <div className="flex-1 lg:ml-20 pt-16 flex flex-col lg:flex-row">
         <div className="flex flex-col lg:flex-row w-full h-[calc(100vh-4rem)]">
 
-          {/* Left Panel - Chat Interface - 60-65% - Fixed/Static (No Scroll) */}
-          <div className="w-full lg:w-[60%] xl:w-[65%] h-full flex flex-col bg-white border-r border-gray-200 overflow-hidden">
+          {/* Left Panel - Chat Interface - 60-65% - Scrollable Chat Area */}
+          <div className="w-full lg:w-[60%] xl:w-[65%] h-full flex flex-col bg-white border-r border-gray-200">
 
-            {/* Chat Content - Empty State */}
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white">
-              <div className="relative mb-6">
-                <div className="w-20 h-20 bg-[#EDB003] rounded-xl flex items-center justify-center shadow-sm">
-                  <Building2 className="w-10 h-10 text-white" />
+            {/* Chat Content */}
+            <div 
+              ref={chatContainerRef}
+              className="flex-1 p-4 sm:p-6 bg-white chat-container overflow-y-auto"
+              style={{
+                height: '100%'
+              }}
+              tabIndex={0}
+              role="region"
+              aria-label="Chat messages"
+              data-lenis-prevent
+              data-lenis-prevent-wheel
+              data-lenis-prevent-touch
+            >
+              {chatMessages.length === 0 ? (
+                // Empty State
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <div className="relative mb-6">
+                    <div className="w-20 h-20 bg-[#EDB003] rounded-xl flex items-center justify-center shadow-sm">
+                      <Building2 className="w-10 h-10 text-white" />
+                    </div>
+                  </div>
+
+                  <h2 className="text-xl font-bold text-gray-900 mb-3">
+                    Need WorkSpace / Business Setup?
+                  </h2>
+                  <p className="text-gray-600 text-sm mb-6 max-w-lg leading-relaxed">
+                    Hey! I'm here to assist you with end-to-end workspace and compliance requirements. Let's get started!
+                  </p>
+
+                  {/* Large Prompt Suggestions */}
+                  <div className="w-full max-w-2xl grid grid-cols-2 gap-3 mb-6">
+                    <button 
+                      onClick={() => handleQuickAction('Find coworking spaces in Delhi NCR region')}
+                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
+                    >
+                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">Find coworking spaces</div>
+                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">in Delhi NCR region</div>
+                    </button>
+                    <button 
+                      onClick={() => handleQuickAction('Help me with GST Registration complete registration process')}
+                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
+                    >
+                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">GST Registration</div>
+                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">Complete registration process</div>
+                    </button>
+                    <button 
+                      onClick={() => handleQuickAction('Compare workspace plans and find the best deal')}
+                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
+                    >
+                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">Compare workspace plans</div>
+                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">Find the best deal</div>
+                    </button>
+                    <button 
+                      onClick={() => handleQuickAction('Check business compliance requirements')}
+                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
+                    >
+                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">Business compliance</div>
+                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">Check requirements</div>
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              <h2 className="text-xl font-bold text-gray-900 mb-3" >
-                Need WorkSpace / Business Setup?
-              </h2>
-              <p className="text-gray-600 text-sm mb-6 max-w-lg leading-relaxed" >
-                Hey! I'm here to assist you with end-to-end workspace and compliance requirements. Let's get started!
-              </p>
-
-              {/* Large Prompt Suggestions */}
-              <div className="w-full max-w-2xl grid grid-cols-2 gap-3 mb-6">
-                <button className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group">
-                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" >Find coworking spaces</div>
-                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" >in Delhi NCR region</div>
-                </button>
-                <button className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group">
-                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" >GST Registration</div>
-                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" >Complete registration process</div>
-                </button>
-                <button className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group">
-                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" >Compare workspace plans</div>
-                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" >Find the best deal</div>
-                </button>
-                <button className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group">
-                  <div className="text-sm font-semibold text-gray-900 group-hover:text-white" >Business compliance</div>
-                  <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1" >Check requirements</div>
-                </button>
-              </div>
+              ) : (
+                // Chat Messages
+                <div className="space-y-4 max-w-4xl mx-auto">
+                  {chatMessages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                          msg.role === 'user'
+                            ? 'bg-[#EDB003] text-white'
+                            : 'bg-gray-100 text-gray-900'
+                        }`}
+                      >
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                        <p className={`text-xs mt-1 ${
+                          msg.role === 'user' ? 'text-white/70' : 'text-gray-500'
+                        }`}>
+                          {new Date(msg.timestamp).toLocaleTimeString('en-US', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {/* Loading indicator */}
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-gray-100 rounded-2xl px-4 py-3">
+                        <div className="flex gap-2">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Chat Input */}
@@ -511,12 +709,15 @@ const StartChatting = () => {
 
           {/* Right Panel - Sidebar - 35-40% - Scrollable Vertically */}
           <div
-            className="w-full lg:w-[40%] xl:w-[35%] h-full bg-gray-50 overflow-y-auto overflow-x-hidden p-6 scroll-smooth scrollbar-yellow"
+            className="w-full lg:w-[40%] xl:w-[35%] h-full bg-gray-50 overflow-y-auto overflow-x-hidden p-6 scrollbar-yellow"
             style={{
               WebkitOverflowScrolling: 'touch',
               overscrollBehavior: 'contain',
               touchAction: 'pan-y'
             }}
+            data-lenis-prevent
+            data-lenis-prevent-wheel
+            data-lenis-prevent-touch
           >
             <div className="space-y-6 max-w-xl mx-auto min-h-full">
 

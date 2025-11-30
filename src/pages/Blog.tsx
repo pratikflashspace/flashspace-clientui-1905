@@ -1,456 +1,541 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
-// Minimal scaffolded Blog page: preserves look & feel but simplified structure.
+/*
+  Blog_Full_Design.tsx
+  - Contains:
+    1) BlogPage (listing) with About-Us Option B hero style (already applied earlier)
+    2) SinglePostPage (Option C: Full Banner Hero + Split Layout)
+    3) HomepageBlogSection (3-card grid to include on homepage)
+    4) FeaturedCategorySlider component
+    5) SEO helper that injects meta tags + JSON-LD
 
+  Drop-in single-file (copy / paste). Uses Tailwind, Framer Motion, existing Header/Footer and UI primitives.
+*/
+
+// ----------------------
+// Theme constants
+// ----------------------
+const ACCENT = "#FFD400";
+const ACCENT_DARK = "#FFB300";
+
+// ----------------------
+// Sample posts (shared)
+// ----------------------
 type Post = {
   id: string;
   title: string;
   category: string;
   region: string;
-  cities: string[];
-  country: string;
   excerpt: string;
-  authorName: string;
-  date: string; // ISO
-  readMinutes: number;
-  popularity?: number;
+  hero?: string;
+  content?: string;
+  author?: string;
+  date?: string; // ISO
+  readMinutes?: number;
   featured?: boolean;
+  popularity?: number;
 };
 
-// Sample posts (kept short & similar to previous content)
 const SAMPLE_POSTS: Post[] = [
-  { id: "1", title: "The Future of Flexible Workspaces", category: "Guides", region: "India", cities: ["Mumbai"], country: "India", excerpt: "Exploring how modern businesses are adapting...", authorName: "Aditi Verma", date: "2025-10-25T08:00:00.000Z", readMinutes: 6, popularity: 80, featured: true },
-  { id: "2", title: "5 Tips for Choosing a Virtual Office", category: "Tips", region: "APAC", cities: ["Singapore"], country: "Singapore", excerpt: "Key factors to consider when selecting a virtual office...", authorName: "Rohit Nair", date: "2025-10-20T08:00:00.000Z", readMinutes: 4, popularity: 54 },
-  { id: "3", title: "Coworking Culture: Building Community", category: "Case Studies", region: "EMEA", cities: ["London"], country: "UK", excerpt: "How shared workspaces are fostering collaboration...", authorName: "Priya Sharma", date: "2025-10-15T08:00:00.000Z", readMinutes: 5, popularity: 66 },
-  { id: "4", title: "Business Setup Guide: Dubai Edition", category: "Guides", region: "EMEA", cities: ["Dubai"], country: "UAE", excerpt: "A guide to establishing presence in Dubai...", authorName: "Nandita Rao", date: "2025-10-10T08:00:00.000Z", readMinutes: 7, popularity: 72 },
-  { id: "5", title: "Event Space Trends in 2025", category: "News", region: "APAC", cities: ["Bengaluru"], country: "India", excerpt: "Latest trends shaping event spaces...", authorName: "Rhea Das", date: "2025-10-05T08:00:00.000Z", readMinutes: 3, popularity: 30 },
-  { id: "6", title: "Remote Work: The New Normal", category: "Tips", region: "Americas", cities: ["New York"], country: "USA", excerpt: "Understanding the lasting impact of remote work...", authorName: "Laura Kim", date: "2025-10-01T08:00:00.000Z", readMinutes: 5, popularity: 50 },
-  // add a few more posts to populate grid
-  { id: "7", title: "Warehouse Space Guide: Navi Mumbai vs. Bhiwandi", category: "Guides", region: "India", cities: ["Navi Mumbai","Bhiwandi"], country: "India", excerpt: "Compare logistics access and costs...", authorName: "Karan Mehta", date: "2025-09-18T08:00:00.000Z", readMinutes: 7, popularity: 82 },
-  { id: "8", title: "How We Helped a D2C Brand Scale in Delhi NCR", category: "Case Studies", region: "India", cities: ["Gurgaon","Noida"], country: "India", excerpt: "A case study covering inventory placement...", authorName: "Meera Iyer", date: "2025-08-18T08:00:00.000Z", readMinutes: 6, popularity: 71 },
-  { id: "9", title: "2025 Pricing Trends: Co-working in APAC", category: "Pricing", region: "APAC", cities: ["Singapore","Bengaluru"], country: "Singapore", excerpt: "An analysis of pricing pressure...", authorName: "Sahil Gupta", date: "2025-07-04T08:00:00.000Z", readMinutes: 8, popularity: 64 },
+  {
+    id: "1",
+    title: "The Future of Flexible Workspaces",
+    category: "Guides",
+    region: "India",
+    excerpt: "Exploring how modern businesses are adapting to hybrid-first strategies and flexible work models.",
+    hero: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=1600",
+    content:
+      `<p>Flexible workspaces are transforming how companies think about real estate, talent and culture. In this article we cover trends, pricing models and operational tips for scaling your hybrid program.</p>
+      
+      <h2>The Rise of Hybrid Work Models</h2>
+      <p>The pandemic accelerated a shift that was already underway. Companies are now embracing flexible workspace solutions that allow employees to work from anywhere while maintaining productivity and collaboration. This new model offers significant cost savings on traditional office leases while providing employees with the flexibility they desire.</p>
+      
+      <h2>Key Benefits of Flexible Workspaces</h2>
+      <p>Organizations adopting flexible workspace strategies report improved employee satisfaction, reduced overhead costs, and access to talent pools beyond their immediate geographic area. These spaces offer modern amenities, networking opportunities, and the ability to scale up or down based on business needs.</p>
+      
+      <h2>Choosing the Right Solution</h2>
+      <p>When selecting a flexible workspace provider, consider factors such as location accessibility, available amenities, community culture, and pricing flexibility. The right choice can significantly impact your team's productivity and overall business success.</p>
+      
+      <h2>Future Trends</h2>
+      <p>As we look ahead, expect to see more integration of technology, sustainability initiatives, and wellness-focused designs in flexible workspaces. The future of work is flexible, and businesses that adapt early will have a competitive advantage.</p>`,
+    author: "Aditi Verma",
+    date: "2025-10-25T08:00:00.000Z",
+    readMinutes: 6,
+    featured: true,
+    popularity: 88,
+  },
+  {
+    id: "2",
+    title: "5 Tips for Choosing a Virtual Office",
+    category: "Tips",
+    region: "APAC",
+    excerpt: "Key factors to consider when selecting a virtual office to build credibility and keep costs low.",
+    hero: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1600",
+    content: `<p>Virtual offices can be a powerful tool for businesses looking to establish a professional presence without the overhead of a physical office. Here are the key factors to consider.</p>
+    
+    <h2>1. Location and Address Prestige</h2>
+    <p>Choose a virtual office in a prestigious business district to enhance your company's credibility. A premium address can make a significant difference in how clients perceive your business.</p>
+    
+    <h2>2. Mail Handling Services</h2>
+    <p>Ensure your provider offers reliable mail forwarding and package handling. This is crucial for maintaining professional communication with clients and partners.</p>
+    
+    <h2>3. Call Answering and Routing</h2>
+    <p>Professional call handling services ensure you never miss important business calls. Look for providers that offer personalized greetings and efficient call routing.</p>
+    
+    <h2>4. Meeting Room Access</h2>
+    <p>Even with a virtual office, you'll occasionally need physical meeting spaces. Choose a provider that offers flexible access to professional meeting rooms.</p>
+    
+    <h2>5. Local Compliance and Registration</h2>
+    <p>Verify that the virtual office address can be used for business registration and meets all local regulatory requirements for your industry.</p>`,
+    author: "Rohit Nair",
+    date: "2025-10-20T08:00:00.000Z",
+    readMinutes: 4,
+    popularity: 54,
+  },
+  {
+    id: "3",
+    title: "Coworking Culture: Building Community",
+    category: "Case Studies",
+    region: "EMEA",
+    excerpt: "How shared workspaces are fostering collaboration and cross-pollination across teams.",
+    hero: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1600",
+    content: `<p>Community-first programming drives member retention and creates value beyond just desk space. Here are practical strategies and real-world examples.</p>
+    
+    <h2>The Power of Community</h2>
+    <p>Successful coworking spaces understand that they're not just renting desks—they're building communities. Members stay longer and refer more business when they feel connected to their workspace community.</p>
+    
+    <h2>Event Programming That Works</h2>
+    <p>Regular networking events, skill-sharing workshops, and social gatherings help members connect. The most successful spaces host 2-3 events per week, ranging from casual coffee meetups to professional development sessions.</p>
+    
+    <h2>Case Study: Tech Startup Hub</h2>
+    <p>One coworking space in Berlin increased member retention by 40% after implementing a structured community program. They introduced weekly founder lunches, monthly pitch nights, and quarterly industry conferences.</p>
+    
+    <h2>Creating Collaboration Opportunities</h2>
+    <p>Design your space to encourage spontaneous interactions. Common areas, shared kitchens, and collaborative zones naturally bring people together and spark conversations that lead to business opportunities.</p>
+    
+    <h2>Measuring Community Success</h2>
+    <p>Track metrics like event attendance, member referrals, and collaboration projects to gauge the health of your community. Regular surveys help you understand what members value most.</p>`,
+    author: "Priya Sharma",
+    date: "2025-10-15T08:00:00.000Z",
+    readMinutes: 5,
+    popularity: 66,
+  },
 ];
 
-function slugify(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+// ----------------------
+// SEO helper (sets title/meta and injects JSON-LD)
+// ----------------------
+function useSEO({ title, description, url, article }: { title: string; description: string; url?: string; article?: Post | null }) {
+  useEffect(() => {
+    if (title) document.title = title;
+
+    // basic meta tags
+    const metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+    if (metaDesc) metaDesc.content = description;
+    else {
+      const m = document.createElement("meta");
+      m.name = "description";
+      m.content = description;
+      document.head.appendChild(m);
+    }
+
+    // OpenGraph
+    const ogTitle = setOrCreateMeta('property', 'og:title', title);
+    const ogDesc = setOrCreateMeta('property', 'og:description', description);
+    if (url) setOrCreateMeta('property', 'og:url', url);
+    setOrCreateMeta('property', 'og:type', article ? 'article' : 'website');
+
+    // Twitter
+    setOrCreateMeta('name', 'twitter:card', 'summary_large_image');
+    setOrCreateMeta('name', 'twitter:title', title);
+    setOrCreateMeta('name', 'twitter:description', description);
+
+    // JSON-LD article
+    if (article) {
+      const ld = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: article.title,
+        description: article.excerpt,
+        author: { "@type": "Person", name: article.author || "FlashSpace" },
+        datePublished: article.date,
+        publisher: { "@type": "Organization", name: "FlashSpace", logo: { "@type": "ImageObject", url: "https://flashspace.example/logo.png" } },
+      };
+
+      let script = document.getElementById("ld-json") as HTMLScriptElement | null;
+      if (!script) {
+        script = document.createElement("script");
+        script.id = "ld-json";
+        script.type = "application/ld+json";
+        document.head.appendChild(script);
+      }
+      script.text = JSON.stringify(ld);
+    }
+
+    function setOrCreateMeta(selectorType: 'name' | 'property', selector: string, value: string) {
+      const sel = selectorType === 'name' ? `meta[name="${selector}"]` : `meta[property="${selector}"]`;
+      let el = document.querySelector(sel) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        if (selectorType === 'name') el.setAttribute('name', selector); else el.setAttribute('property', selector);
+        el.content = value;
+        document.head.appendChild(el);
+      } else {
+        el.content = value;
+      }
+      return el;
+    }
+
+  }, [title, description, url, article]);
 }
 
-function formatDate(iso: string) {
-  try { return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }); }
-  catch { return iso; }
-}
-
-export default function Blog(): JSX.Element {
-  // minimal state
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [selectedRegion, setSelectedRegion] = useState<string>('All');
-  // removed city chips per request
-  const [sortBy, setSortBy] = useState<string>('Newest');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [page, setPage] = useState<number>(1);
-  const pageSize = 6;
-
-  const categories = useMemo(() => ['All', 'Guides', 'Case Studies', 'News', 'Pricing', 'Tips'], []);
-  const regions = useMemo(() => ['All', 'India', 'APAC', 'EMEA', 'Americas'], []);
-  // cityOptions removed
-
-  // derived posts
-  const filtered = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    let list = SAMPLE_POSTS.slice();
-    if (selectedCategory !== 'All') list = list.filter(p => p.category === selectedCategory);
-    if (selectedRegion !== 'All') list = list.filter(p => p.region === selectedRegion);
-  // city filters removed
-    if (q) list = list.filter(p => p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q));
-    if (sortBy === 'Newest') list.sort((a,b) => +new Date(b.date) - +new Date(a.date));
-    if (sortBy === 'Popular') list.sort((a,b) => (b.popularity||0) - (a.popularity||0));
-    return list;
-  }, [selectedCategory, selectedRegion, searchQuery, sortBy]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const visible = filtered.slice((page-1)*pageSize, page*pageSize);
-
-  // city chips removed per request
-
-  // Simple stub components (kept inside file per instructions)
-  function Hero() {
-    return (
-      <section className="pt-32 pb-8 px-4 md:px-6 bg-gradient-to-br bg-[#FFD400] relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-12">
-            <div className="flex-1">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-black">FlashBlog: Workspace Insights & Industry Trends</h1>
-              <p className="mt-4 text-lg text-gray-800">Expert insights on flexible workspaces, warehousing solutions, and the future of work. Stay updated with the latest trends and practical guides.</p>
-              <div className="mt-6 flex gap-3">
-                <NavLink to="/spaces"><Button className="bg-black text-white hover:bg-[#b27e02]">Find Your Space</Button></NavLink>
-                <NavLink to="/contact"><Button className="bg-black text-white hover:bg-[#b27e02]" variant="outline">Get Updates</Button></NavLink>
+// ----------------------
+// FeaturedCategorySlider
+// ----------------------
+function FeaturedCategorySlider({ categories }: { categories: { title: string; desc: string; img?: string }[] }) {
+  return (
+    <div className="py-12">
+      <div className="max-w-7xl mx-auto px-6">
+        <h2 className="text-2xl font-bold mb-6">Featured Categories</h2>
+        <div className="flex gap-4 overflow-x-auto no-scrollbar py-2">
+          {categories.map((c, i) => (
+            <div key={i} className="min-w-[260px] bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-xl transition">
+              <div className="h-40 rounded-lg overflow-hidden mb-3 bg-gray-100">
+                {c.img ? <img src={c.img} alt={c.title} className="w-full h-full object-cover" /> : null}
               </div>
-              
-              {/* Newsletter signup in hero */}
-              <div className="mt-12 p-6 bg-white rounded-xl shadow-sm">
-                <h3 className="text-lg font-semibold mb-2">Subscribe to Our Newsletter</h3>
-                <p className="text-sm text-gray-600 mb-4">Get monthly insights on workspace trends and exclusive offers.</p>
-                <form onSubmit={(e)=>{ e.preventDefault(); alert('Thank you for subscribing!'); }} className="flex gap-2">
-                  <Input aria-label="email" placeholder="Enter your email" className="flex-1 border-[#FFB300]" />
-                  <Button type="submit" className="bg-[#FFD400] text-black hover:bg-[#FFB300]">Subscribe</Button>
-                </form>
-              </div>
+              <h3 className="font-semibold mb-1">{c.title}</h3>
+              <p className="text-sm text-gray-600 line-clamp-3">{c.desc}</p>
             </div>
-            
-            {/* Featured article preview */}
-            {filtered.find(p => p.featured) && (
-              <div className="flex-1">
-                <div className="relative">
-                  <div className="absolute -top-2 -right-2 z-10">
-                    <span className="px-3 py-1 rounded-full text-sm font-medium bg-[#FFF4CC] text-[#8a4b00]">Featured</span>
-                  </div>
-                  <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                    <div className="aspect-[16/10] overflow-hidden">
-                      <img src="https://i0.wp.com/microflexspace.com/wp-content/uploads/free-coworking-space-birmingham-ultimate-guide-image.jpg?fit=1536%2C1024&ssl=1" alt="Featured" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-xs px-2 py-1 rounded-full bg-[#FFF4CC] text-[#8a4b00]">
-                          {filtered.find(p => p.featured)?.category}
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          {formatDate(filtered.find(p => p.featured)?.date || '')}
-                        </span>
-                      </div>
-                      <h2 className="text-xl font-semibold mb-2">{filtered.find(p => p.featured)?.title}</h2>
-                      <p className="text-gray-600 text-sm mb-4">{filtered.find(p => p.featured)?.excerpt}</p>
-                        <NavLink to={slugify(filtered.find(p => p.featured)?.title || '')}>
-                        <Button variant="outline" className="w-full bg-[#FFD400] text-black hover:bg-[#FFB300]">Read Article</Button>
-                      </NavLink>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  function FiltersBar() {
-    return (
-      <section className="px-4 md:px-6 sticky top-16 bg-white z-20 border-b">
-        <div className="max-w-7xl mx-auto py-4 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
-            <div className="relative w-full sm:w-64">
-                <Input 
-                value={searchQuery} 
-                onChange={(e: React.ChangeEvent<HTMLInputElement>)=>setSearchQuery(e.target.value)} 
-                placeholder="Search articles..." 
-                aria-label="Search articles"
-                className="pl-10 bg-[#FFF9E6] border-[#FFB300]" 
-              />
-              <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            
-            {/* Sort control next to search */}
-            <div className="w-full sm:w-48">
-              <label className="sr-only">Sort articles</label>
-              <select
-                value={sortBy}
-                onChange={e => setSortBy(e.target.value)}
-                className="w-full px-3 py-2 rounded border text-sm bg-[#FFF9E6] border-[#FFB300]"
-              >
-                <option value="Newest">Sort: Newest First</option>
-                <option value="Popular">Sort: Most Popular</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <span>{filtered.length} article{filtered.length !== 1 ? 's' : ''}</span>
-              {(selectedCategory !== 'All' || selectedRegion !== 'All' || searchQuery) && (
-                <span>• Filtered results</span>
-              )}
-            </div>
-
-            <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                onClick={()=>{ 
-                  setSelectedCategory('All'); 
-                  setSelectedRegion('All'); 
-                  setSortBy('Newest'); 
-                  setSearchQuery(''); 
-                }}
-                className="text-sm bg-[#FFD400] text-black hover:bg-[#FFB300]"
-              >
-                Reset All
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  function FeaturedPost({ post }: { post: Post }) {
-    return (
-      <section className="px-4 md:px-6">
-        <div className="max-w-7xl mx-auto mb-6">
-          <article className="rounded-2xl overflow-hidden shadow-sm">
-            <div className="aspect-[16/7] bg-gray-100 flex items-center justify-center">Image placeholder</div>
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs px-2 py-1 rounded-full bg-[#FFF4CC] text-[#8a4b00]">{post.category}</span>
-                <span className="text-sm text-gray-500">{formatDate(post.date)}</span>
-              </div>
-              <h2 className="text-2xl font-semibold mb-2">{post.title}</h2>
-              <p className="text-gray-600 mb-4">{post.excerpt}</p>
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-700">{post.authorName} · {post.readMinutes} min read</div>
-                <NavLink to={slugify(post.title)}><Button className="bg-[#FFD400] text-black hover:bg-[#FFB300]">Read more</Button></NavLink>
-              </div>
-            </div>
-          </article>
-        </div>
-      </section>
-    );
-  }
-
-  function PostCard({ post }: { post: Post }) {
-    return (
-      <article 
-        className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200" 
-        aria-labelledby={`post-${post.id}`}
-      >
-        <NavLink to={slugify(post.title)} className="block">
-          <div className="aspect-[16/9] rounded-t-xl overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-[rgba(255,212,0,0.06)] to-[rgba(255,179,0,0.06)] group-hover:from-[rgba(255,212,0,0.08)] group-hover:to-[rgba(255,179,0,0.08)] transition-colors duration-200" />
-          </div>
-          <div className="p-6">
-              <div className="flex items-center gap-3 mb-3">
-              <span className="text-xs px-2.5 py-1 rounded-full bg-[#FFF4CC] text-[#8a4b00] font-medium">
-                {post.category}
-              </span>
-              {post.popularity && post.popularity > 70 && (
-                <span className="inline-flex items-center text-xs text-[#8a4b00] font-medium">
-                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" />
-                  </svg>
-                  Trending
-                </span>
-              )}
-            </div>
-            <h3 
-              id={`post-${post.id}`} 
-              className="font-semibold text-lg mb-2 text-gray-900 group-hover:text-[#FFB300] transition-colors line-clamp-2"
-            >
-              {post.title}
-            </h3>
-            <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-              {post.excerpt}
-            </p>
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center text-gray-500">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                {post.authorName}
-              </div>
-              <div className="flex items-center text-gray-500">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                {formatDate(post.date)}
-              </div>
-            </div>
-          </div>
-        </NavLink>
-      </article>
-    );
-  }
-
-  function PostsGrid() {
-    return (
-      <section className="px-4 md:px-6 py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar */}
-            <aside className="w-full lg:w-64 flex-shrink-0">
-              <div className="sticky top-32">
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                  <h3 className="font-semibold mb-4">Categories</h3>
-                  <div className="space-y-2">
-                    {/* Render 'All' first, then the rest of categories */}
-                    {categories.includes('All') ? (
-                      <>
-                        <button
-                          key="All"
-                          onClick={() => setSelectedCategory('All')}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                              selectedCategory === 'All' ? 'bg-[#FFF4CC] text-[#8a4b00]' : 'hover:bg-gray-50'
-                            }`}
-                        >
-                          All
-                        </button>
-
-                        {categories.filter(c => c !== 'All').map(cat => (
-                          <button
-                            key={cat}
-                            onClick={() => setSelectedCategory(cat)}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                                selectedCategory === cat ? 'bg-[#FFF4CC] text-[#8a4b00]' : 'hover:bg-gray-50'
-                              }`}
-                          >
-                            {cat}
-                          </button>
-                        ))}
-                      </>
-                    ) : (
-                      categories.map(cat => (
-                        <button
-                          key={cat}
-                          onClick={() => setSelectedCategory(cat)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                            selectedCategory === cat ? 'bg-[#FFF4CC] text-[#8a4b00]' : 'hover:bg-gray-50'
-                          }`}
-                        >
-                          {cat}
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                  <h3 className="font-semibold mb-4">Regions</h3>
-                  <div className="space-y-2">
-                    {regions.map(reg => (
-                      <button
-                        key={reg}
-                        onClick={() => setSelectedRegion(reg)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                          selectedRegion === reg 
-                            ? 'bg-[#FFF4CC] text-[#8a4b00]' 
-                            : 'hover:bg-gray-50'
-                        }`}
-                      >
-                        {reg}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-[#FFF9E6] to-[#FFF2CC] rounded-xl p-6">
-                  <h3 className="font-semibold mb-2">Need Help?</h3>
-                  <p className="text-sm text-gray-600 mb-4">Get personalized workspace recommendations from our experts.</p>
-                  <NavLink to="/contact">
-                    <Button variant="outline" className="w-full bg-[#FFD400] text-black hover:bg-[#FFB300]">Contact Sales</Button>
-                  </NavLink>
-                </div>
-              </div>
-            </aside>
-
-            {/* Main Content */}
-            <div className="flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {visible.map(p => <PostCard key={p.id} post={p} />)}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-8 flex justify-center gap-2">
-                  <button 
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="px-3 py-2 rounded bg-[#FFD400] text-black border"
-                  >
-                    Previous
-                  </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                    <button
-                      key={p}
-                      onClick={() => setPage(p)}
-                      className={p === page ? 'px-3 py-2 rounded bg-[#FFB300] text-black border' : 'px-3 py-2 rounded bg-[#FFD400] text-black border'}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                  <button 
-                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                    className="px-3 py-2 rounded bg-[#FFD400] text-black border"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  function Sidebar() {
-    return (
-      <aside className="px-4 md:px-6 mt-6">
-        <div className="max-w-7xl mx-auto">
-        </div>
-      </aside>
-    );
-  }
-
-  function Pagination() {
-    return (
-      <div className="px-4 md:px-6">
-        <div className="max-w-7xl mx-auto my-8 flex items-center justify-center gap-3">
-            <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1} className="px-3 py-2 rounded bg-white border border-black">Previous</button>
-          <div className="text-sm text-gray-600">Page {page} of {totalPages}</div>
-          <button onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page===totalPages} className="px-3 py-2 rounded bg-white border border-black">Next</button>
+          ))}
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-  function FooterCTA() {
-    return (
-      <section className="bg-[#FFD400] text-black py-8 mt-8">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <h3 className="text-xl font-semibold">Need space in a new city?</h3>
-            <p className="text-sm">Talk to an expert to source offices, warehouses and coworking space.</p>
-          </div>
-          <div className="flex gap-3">
-            <NavLink to="/contact"><Button className="bg-[#FFD400] text-black hover:bg-[#FFB300]">Talk to an Expert</Button></NavLink>
-            <NavLink to="/cities"><Button className="bg-[#FFD400] text-black hover:bg-[#FFB300]" variant="outline">Browse Cities</Button></NavLink>
-          </div>
+// ----------------------
+// HomepageBlogSection (3-card grid)
+// ----------------------
+function HomepageBlogSection({ posts }: { posts: Post[] }) {
+  return (
+    <section className="bg-white py-16">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold">From the Blog</h2>
+          <NavLink to="/blog" className="text-sm font-semibold text-gray-700">View all articles →</NavLink>
         </div>
-      </section>
-    );
-  }
 
-  // featured pick: first featured or newest
-  const featured = useMemo(() => SAMPLE_POSTS.find(p=>p.featured) ?? SAMPLE_POSTS[0], []);
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {posts.slice(0, 3).map(p => (
+            <motion.article key={p.id} whileHover={{ translateY: -6 }} className="rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-white">
+              <div className="aspect-[16/9] bg-gray-200 overflow-hidden">
+                {p.hero ? <img src={p.hero} alt={p.title} className="w-full h-full object-cover" /> : null}
+              </div>
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">{p.category}</span>
+                  <span className="text-sm text-gray-500">{new Date(p.date || '').toLocaleDateString()}</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{p.title}</h3>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{p.excerpt}</p>
+                <div className="flex items-center justify-between">
+                  <NavLink to={`/blog/${p.id}`} className="text-sm font-semibold" >Read more →</NavLink>
+                  <div className="text-sm text-gray-500">{p.readMinutes} min</div>
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ----------------------
+// SinglePostPage (Option C) - Full banner hero + split layout
+// ----------------------
+function SinglePostPageInternal({ posts }: { posts: Post[] }) {
+  const params = useParams();
+  const id = params['id'] || '';
+  const navigate = useNavigate();
+
+  const post = posts.find(p => p.id === id) ?? posts[0];
+
+  // SEO
+  useSEO({ title: `${post.title} — FlashBlog`, description: post.excerpt, url: window.location.href, article: post });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   return (
-    <div className="min-h-screen bg-white text-foreground">
+    <div className="min-h-screen bg-white text-gray-900 font-sans antialiased">
       <Header />
-      <main>
-        <Hero />
-  <FiltersBar />
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <PostsGrid />
-          <Pagination />
+
+      {/* HERO BANNER */}
+      <header className="relative">
+        <div className="absolute inset-0">
+          <div className="w-full h-[420px] overflow-hidden">
+            <img src={post.hero} alt={post.title} className="w-full h-full object-cover brightness-90" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30" />
+          </div>
         </div>
-        <FooterCTA />
+
+        <div className="relative max-w-6xl mx-auto px-6 py-24">
+          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+            <div className="inline-block px-3 py-1 rounded-full text-sm font-semibold mb-4" style={{ backgroundColor: ACCENT }}>
+              {post.category}
+            </div>
+
+            <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-white drop-shadow-lg">{post.title}</h1>
+
+            <div className="mt-4 flex items-center gap-4 text-sm text-gray-200">
+              <div>{post.author}</div>
+              <div>•</div>
+              <div>{new Date(post.date || '').toLocaleDateString()}</div>
+              <div>•</div>
+              <div>{post.readMinutes} min read</div>
+            </div>
+
+            <div className="mt-6">
+              <Button onClick={() => navigate('/blog')} className="bg-white text-black rounded-xl">Back to articles</Button>
+            </div>
+          </motion.div>
+        </div>
+      </header>
+
+      {/* ARTICLE + SIDEBAR */}
+      <main className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
+        {/* Article */}
+        <article className="lg:col-span-2">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12">
+            <style dangerouslySetInnerHTML={{ __html: `
+              .article-content h2 {
+                font-size: 1.75rem;
+                font-weight: 700;
+                margin-top: 2.5rem;
+                margin-bottom: 1rem;
+                color: #1f2937;
+                padding-bottom: 0.5rem;
+                border-bottom: 2px solid #ffd400;
+              }
+              .article-content p {
+                font-size: 1.125rem;
+                line-height: 1.8;
+                color: #4b5563;
+                margin-bottom: 1.5rem;
+              }
+              .article-content p:first-of-type {
+                font-size: 1.25rem;
+                color: #374151;
+                font-weight: 500;
+              }
+            ` }} />
+            <div className="article-content" dangerouslySetInnerHTML={{ __html: post.content || '<p>No content</p>' }} />
+          </div>
+
+          {/* Author card & share CTA */}
+          <div className="mt-12 p-6 rounded-2xl bg-white shadow-md border border-gray-100 flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">👤</div>
+            <div>
+              <div className="font-semibold">{post.author}</div>
+              <div className="text-sm text-gray-500">Writer at FlashBlog</div>
+            </div>
+            <div className="ml-auto flex gap-2">
+              <Button className="bg-yellow-100 text-yellow-800">Share</Button>
+              <Button variant="outline" className="bg-white">Subscribe</Button>
+            </div>
+          </div>
+
+        </article>
+
+        {/* Sidebar */}
+        <aside className="space-y-6">
+          <div className="p-6 rounded-2xl bg-white shadow-md border border-gray-100">
+            <h4 className="font-semibold mb-3">Latest Posts</h4>
+            <div className="space-y-3">
+              {posts.slice(0, 4).map(p => (
+                <NavLink key={p.id} to={`/blog/${p.id}`} className="block py-2 hover:bg-gray-50 rounded">
+                  <div className="text-sm font-medium">{p.title}</div>
+                  <div className="text-xs text-gray-500">{p.author} • {new Date(p.date || '').toLocaleDateString()}</div>
+                </NavLink>
+              ))}
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-white shadow-md border border-gray-100">
+            <h4 className="font-semibold mb-3">Table of contents</h4>
+            <div className="text-sm text-gray-600">Auto-generated TOC would appear here for long guides.</div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-yellow-50 border border-yellow-100">
+            <h4 className="font-semibold mb-2">Need help selecting a workspace?</h4>
+            <p className="text-sm text-gray-700 mb-4">Talk to our experts and get a tailor-made recommendation.</p>
+            <NavLink to="/contact"><Button className="bg-black text-white">Contact sales</Button></NavLink>
+          </div>
+
+        </aside>
       </main>
+
       <Footer />
     </div>
   );
 }
+
+// ----------------------
+// Blog Listing Page (redesigned, Option B hero already applied earlier but adapted)
+// ----------------------
+export function BlogPage() {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedRegion, setSelectedRegion] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("Newest");
+  const [page, setPage] = useState(1);
+  const pageSize = 6;
+
+  const categories = useMemo(() => ["All", "Guides", "Case Studies", "News", "Pricing", "Tips"], []);
+  const regions = useMemo(() => ["All", "India", "APAC", "EMEA", "Americas"], []);
+
+  const filtered = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    let list = SAMPLE_POSTS.slice();
+    if (selectedCategory !== "All") list = list.filter(p => p.category === selectedCategory);
+    if (selectedRegion !== "All") list = list.filter(p => p.region === selectedRegion);
+    if (q) list = list.filter(p => p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q));
+    if (sortBy === "Newest") list.sort((a, b) => +new Date(b.date || 0) - +new Date(a.date || 0));
+    if (sortBy === "Popular") list.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+    return list;
+  }, [selectedCategory, selectedRegion, searchQuery, sortBy]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const visible = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+  // SEO for listing
+  useSEO({ title: "Blog — FlashBlog", description: "Insights on flexible workspaces, virtual offices and hybrid strategies.", url: window.location.href, article: null });
+
+  return (
+    <div className="min-h-screen bg-white text-gray-900 font-sans antialiased">
+      <Header />
+
+      {/* HERO */}
+      <section className="relative bg-gradient-to-b from-white to-gray-50 pt-32 pb-20">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-100 rounded-full blur-3xl opacity-20" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-200 rounded-full blur-3xl opacity-20" />
+
+        <div className="relative max-w-4xl mx-auto text-center px-6">
+          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <div className="inline-block px-4 py-2 mb-5 rounded-full text-sm font-semibold" style={{ backgroundColor: ACCENT }}>
+              📚 FlashBlog
+            </div>
+            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 leading-tight">Insights, Stories & Guides</h1>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Explore expert articles on coworking, virtual offices, hybrid work, leasing & more.</p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Filters */}
+      <section className="sticky top-16 bg-white z-30 shadow-sm border-b py-4">
+        <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-4 items-center justify-between">
+          <div className="relative w-full sm:w-72">
+            <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search articles..." className="pl-10 bg-white border-gray-300 rounded-xl" />
+            <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="px-4 py-2 rounded-xl border bg-white border-gray-300">
+            <option value="Newest">Newest First</option>
+            <option value="Popular">Most Popular</option>
+          </select>
+
+          <Button onClick={() => { setSelectedCategory("All"); setSelectedRegion("All"); setSortBy("Newest"); setSearchQuery(""); }} className="bg-black text-white px-6 py-2 rounded-xl hover:bg-gray-800">Reset</Button>
+        </div>
+      </section>
+
+      {/* Main grid */}
+      <main className="py-16">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-4 gap-12">
+          {/* Sidebar */}
+          <aside className="lg:col-span-1 space-y-6">
+            <div className="p-6 rounded-2xl bg-white shadow-md border border-gray-100">
+              <h3 className="font-semibold mb-3">Categories</h3>
+              <div className="space-y-2">
+                {categories.map(cat => (
+                  <button key={cat} className={`block w-full text-left px-3 py-2 rounded-lg ${selectedCategory === cat ? "bg-yellow-100 text-yellow-800" : "hover:bg-gray-100"}`} onClick={() => setSelectedCategory(cat)}>{cat}</button>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-white shadow-md border border-gray-100">
+              <h3 className="font-semibold mb-3">Regions</h3>
+              <div className="space-y-2">
+                {regions.map(r => (
+                  <button key={r} className={`block w-full text-left px-3 py-2 rounded-lg ${selectedRegion === r ? "bg-yellow-100 text-yellow-800" : "hover:bg-gray-100"}`} onClick={() => setSelectedRegion(r)}>{r}</button>
+                ))}
+              </div>
+            </div>
+
+          </aside>
+
+          {/* Posts grid */}
+          <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filtered.slice(0, 12).map(p => (
+              <motion.article key={p.id} whileHover={{ translateY: -6 }} className="rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-white flex flex-col">
+                <div className="aspect-[16/9] bg-gray-200 overflow-hidden">
+                  {p.hero ? <img src={p.hero} alt={p.title} className="w-full h-full object-cover" /> : null}
+                </div>
+                <div className="p-6 flex flex-col flex-grow">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">{p.category}</span>
+                    <span className="text-sm text-gray-500">{new Date(p.date || '').toLocaleDateString()}</span>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{p.title}</h3>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">{p.excerpt}</p>
+                  <div className="mt-auto pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-sm font-semibold">{p.author?.charAt(0) || 'F'}</div>
+                        <span className="text-sm text-gray-700">{p.author || 'FlashSpace Team'}</span>
+                      </div>
+                      <div className="text-sm text-gray-500">{p.readMinutes} min read</div>
+                    </div>
+                    <NavLink to={`/blog/${p.id}`} className="block w-full text-center py-2 px-4 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-semibold transition-colors">Read Article →</NavLink>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      {/* Featured Category Slider */}
+      <FeaturedCategorySlider categories={[
+        { title: 'Guides', desc: 'Practical how-to guides for workspace managers.', img: SAMPLE_POSTS[0].hero },
+        { title: 'Tips', desc: 'Quick operational tips and checklists.', img: SAMPLE_POSTS[1].hero },
+        { title: 'Case Studies', desc: 'Real stories from businesses using flexible spaces.', img: SAMPLE_POSTS[2].hero },
+      ]} />
+
+      {/* Homepage small blog section */}
+      <HomepageBlogSection posts={SAMPLE_POSTS} />
+
+      <Footer />
+    </div>
+  );
+}
+
+// ----------------------
+// Router-friendly exports
+// ----------------------
+// Export components for your router to mount
+export function SinglePostPage(props: { posts?: Post[] }) {
+  const posts = props.posts ?? SAMPLE_POSTS;
+  return <SinglePostPageInternal posts={posts} />;
+}
+
+export default BlogPage;

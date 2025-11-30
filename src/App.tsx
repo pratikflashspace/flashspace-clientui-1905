@@ -40,7 +40,9 @@ import Community from "./pages/Community";
 import Settings from "./pages/Settings";
 import CityListing from "./pages/CityListing";
 import AboutUs from "./pages/AboutUs";
-import Blog from "./pages/Blog";
+import Blog, { SinglePostPage } from "./pages/Blog";
+
+
 // import VirtualOfficeSearch from "./pages/solutions/VirtualOfficeSearch";
 // import CoworkingSpaceSearch from "./pages/solutions/CoworkingSpaceSearch";
 // import OnDemandSearch from "./pages/solutions/OnDemandSearch";
@@ -57,6 +59,10 @@ import Support from "./components/ClientDashboard/Support";
 import Logout from "./components/ClientDashboard/Logout";
 import Profile from "./components/ClientDashboard/Profile";
 // import { LoginForm, SignupForm } from "./components/auth";
+
+//-----------spaces---------
+import SpaceComponent from './components/Spaces/SpaceComponent';
+
 
 
 // --- end dashboard imports ---
@@ -90,18 +96,26 @@ const App = () => (
             <Route path="/Solutions/meetingsroom" element={<MeetingsRoom />} />
             <Route path="/Solutions/day-office" element={<Dayoffice />} />
             <Route path="/Solutions/eventspace" element={<EventSpacePage />} />
+           
+           {/* Spaces*/}
+
+           {/* <Route path="/SpaceComponent" element={<SpaceComponent />} />*/}
+            <Route path="/space/:id" element={<SpaceComponent />} />
 
 
             <Route path="/city-listing" element={<CityListing />} />
             <Route path="/career" element={<Career />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:id" element={<SinglePostPage />} />
             
             {/* Auth Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/verify-otp" element={<VerifyOTP />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+
+          
             
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
