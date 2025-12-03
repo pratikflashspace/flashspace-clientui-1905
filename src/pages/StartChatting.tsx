@@ -302,6 +302,7 @@ const StartChatting = () => {
         },
         body: JSON.stringify({
           message: userMessage.content,
+          // response: userMessage.content,
           sessionId: getSessionId(),
           timestamp: userMessage.timestamp.toISOString()
         })
@@ -323,7 +324,7 @@ const StartChatting = () => {
         aiResponseText = firstItem?.output || firstItem?.response || firstItem?.text || firstItem?.message || JSON.stringify(firstItem);
       } else if (typeof data === 'object') {
         // Try different possible field names
-        aiResponseText = data.output || data.response || data.text || data.message || data.result || data.answer || JSON.stringify(data);
+        aiResponseText = data.Response || data.output || data.response || data.text || data.message || data.result || data.answer || JSON.stringify(data);
       } else {
         aiResponseText = String(data);
       }

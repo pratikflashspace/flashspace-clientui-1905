@@ -34,19 +34,17 @@ const CoworkingSpace = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // Available cities for search
+  // Available cities for search - only cities with actual coworking space data
   const availableCities: City[] = [
-    { name: "Delhi", key: "delhi" },
-    { name: "Mumbai", key: "mumbai" },
-    { name: "Bangalore", key: "bangalore" },
-    { name: "Pune", key: "pune" },
-    { name: "Chennai", key: "chennai" },
-    { name: "Hyderabad", key: "hyderabad" },
-    { name: "Kolkata", key: "kolkata" },
     { name: "Ahmedabad", key: "ahmedabad" },
+    { name: "Bangalore", key: "bangalore" },
+    { name: "Chennai", key: "chennai" },
+    { name: "Delhi", key: "delhi" },
+    { name: "Dharamshala", key: "dharamshala" },
+    { name: "Gurgaon", key: "gurgaon" },
+    { name: "Hyderabad", key: "hyderabad" },
     { name: "Jaipur", key: "jaipur" },
-    { name: "Surat", key: "surat" },
-    { name: "Lucknow", key: "lucknow" }
+    { name: "Jammu", key: "jammu" }
   ];
 
   useEffect(() => {
@@ -185,14 +183,15 @@ const CoworkingSpace = () => {
   // Resolve map center by selected city (fallback to Delhi)
   const resolvedCenter = useMemo(() => {
     const cityKeyFromState = selectedCity.trim().toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
-    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
-    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
-    if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
-    if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
-    if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
-    if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
-    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
     if (["ahmedabad", "amdavad"].includes(cityKeyFromState)) return cityCenters.ahmedabad;
+    if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
+    if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
+    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
+    if (["dharamshala", "dharamsala"].includes(cityKeyFromState)) return cityCenters.dharamshala;
+    if (["gurgaon", "gurugram"].includes(cityKeyFromState)) return cityCenters.gurgaon;
+    if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
+    if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
+    if (["jammu"].includes(cityKeyFromState)) return cityCenters.jammu;
     return cityCenters.delhi;
   }, [selectedCity]);
 

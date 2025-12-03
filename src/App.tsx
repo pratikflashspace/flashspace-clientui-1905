@@ -27,7 +27,7 @@ import EventSpacePage from "./pages/Solutions/Eventspace";
 
 
 
-//
+//Mouse Follower
 import MouseFollower from "./components/MouseFollower";
 // Additional Pages
 import Career from "./pages/Career";

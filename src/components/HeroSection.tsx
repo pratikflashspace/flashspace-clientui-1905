@@ -149,7 +149,7 @@ const HeroSection = () => {
         className="flex items-center justify-center"
         style={{
           fontFamily: "'Poppins', sans-serif",
-          fontWeight: 500,
+          fontWeight: 100,
           letterSpacing: "0.3px",
         }}
       >
@@ -171,7 +171,7 @@ const HeroSection = () => {
         className="flex items-center gap-2 justify-center"
         style={{
           fontFamily: "'Poppins', sans-serif",
-          fontWeight: 600,
+          fontWeight: 100,
           letterSpacing: "0.3px",
         }}
       >

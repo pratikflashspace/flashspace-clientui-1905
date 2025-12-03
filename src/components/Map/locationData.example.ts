@@ -82,12 +82,13 @@ export const virtualOfficeLocations = [
 
 // Example coordinates for major Indian cities:
 export const cityCenters = {
-  delhi: { lat: 28.6139, lng: 77.2090 },
-  mumbai: { lat: 19.0760, lng: 72.8777 },
-  bangalore: { lat: 12.9716, lng: 77.5946 },
-  hyderabad: { lat: 17.3850, lng: 78.4867 },
-  pune: { lat: 18.5204, lng: 73.8567 },
-  chennai: { lat: 13.0827, lng: 80.2707 },
-  kolkata: { lat: 22.5726, lng: 88.3639 },
   ahmedabad: { lat: 23.0225, lng: 72.5714 },
+  bangalore: { lat: 12.9716, lng: 77.5946 },
+  chennai: { lat: 13.0827, lng: 80.2707 },
+  delhi: { lat: 28.6139, lng: 77.2090 },
+  dharamshala: { lat: 32.2190, lng: 76.3234 },
+  gurgaon: { lat: 28.4595, lng: 77.0266 },
+  hyderabad: { lat: 17.3850, lng: 78.4867 },
+  jaipur: { lat: 26.9124, lng: 75.7873 },
+  jammu: { lat: 32.7266, lng: 74.8570 },
 };
