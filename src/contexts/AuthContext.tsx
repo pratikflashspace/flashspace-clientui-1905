@@ -47,10 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: null,
         });
       } else {
-        // Not authenticated - clear tokens
-        const { tokenStorage } = await import('@/lib/axios');
-        tokenStorage.clearTokens();
-        
+        // Not authenticated - cookies will be cleared by backend
         setState({
           user: null,
           isAuthenticated: false,
@@ -59,9 +56,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
       }
     } catch (error: any) {
-      // Clear tokens on auth check failure
-      const { tokenStorage } = await import('@/lib/axios');
-      tokenStorage.clearTokens();
+      // Auth check failed - cookies are invalid or expired
       
       setState({
         user: null,
@@ -201,6 +196,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await authService.logout();
       
+      // Backend clears cookies, just update state
       setState({
         user: null,
         isAuthenticated: false,
@@ -213,10 +209,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         description: 'You have been successfully logged out.',
       });
     } catch (error: any) {
-      // Even if logout fails on server, clear local state and tokens
-      const { tokenStorage } = await import('@/lib/axios');
-      tokenStorage.clearTokens();
-      
+      // Even if logout fails on server, clear local state
+      // Cookies will be invalid anyway
       setState({
         user: null,
         isAuthenticated: false,
