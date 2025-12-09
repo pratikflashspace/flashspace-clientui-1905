@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
+import { submitPartnerInquiry } from "@/services/partnerInquiry.service";
 
 const PartnerWithUs = () => {
   const [formData, setFormData] = useState({
@@ -43,22 +44,43 @@ const PartnerWithUs = () => {
     partnershipType: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Thank you for your interest! Our partnership team will contact you within 24 hours.");
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      partnershipType: "",
-      message: "",
-    });
+    setIsSubmitting(true);
+
+    try {
+      await submitPartnerInquiry({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        company: formData.company,
+        partnershipType: formData.partnershipType,
+        message: formData.message,
+      });
+      
+      toast.success("Thank you for your interest! Our partnership team will contact you within 24 hours.");
+      
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        partnershipType: "",
+        message: "",
+      });
+    } catch (error: any) {
+      console.error('Partnership submission error:', error);
+      toast.error(error.message || "Failed to submit partnership request. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const partnershipTypes = [
@@ -717,11 +739,21 @@ const PartnerWithUs = () => {
             <div className="flex justify-center pt-6">
               <Button
                 type="submit"
-                className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black px-12 py-7 text-lg rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                disabled={isSubmitting}
+                className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black px-12 py-7 text-lg rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ fontFamily: "Poppins" }}
               >
-                Submit Partnership Request
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                {isSubmitting ? (
+                  <>
+                    <span className="animate-spin mr-2">⏳</span>
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    Submit Partnership Request
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
               </Button>
             </div>
           </form>
