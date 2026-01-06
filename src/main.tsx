@@ -4,6 +4,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { getLenis } from "@/lib/lenis.ts";
 import { ContactModalProvider } from "./components/ui/ContactModalContext";
+import { DarkModeProvider } from "./contexts/DarkModeContext.tsx";
 
 // Initialize Lenis once on app bootstrap
 if (typeof window !== "undefined") {
@@ -24,7 +25,11 @@ if (!GOOGLE_CLIENT_ID) {
 createRoot(document.getElementById("root")!).render(
   <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <ContactModalProvider>
+
+      {/* Wrap up App by dark mode provider */}
+      <DarkModeProvider>
       <App />
+      </DarkModeProvider>
     </ContactModalProvider>
   </GoogleOAuthProvider>
 );
