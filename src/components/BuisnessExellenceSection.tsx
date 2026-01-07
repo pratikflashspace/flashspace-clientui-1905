@@ -51,14 +51,14 @@ const BusinessExcellenceSection = () => {
   ];
 
   return (
-    <section id="business-excellence" className="py-20 px-4 relative overflow-hidden bg-[#ffffff]">
+    <section id="business-excellence" className="py-20 px-4 relative overflow-hidden bg-[#ffffff] dark:bg-[#0a0a0a] transition-colors duration-300">
       <div className="container mx-auto relative z-10 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'poppins' }}>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'poppins' }}>
             Why Choose <span className="text-[#EDB003]">FlashSpace</span>?
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             India's most trusted workspace solution with premium quality and service
           </p>
         </div>
@@ -72,7 +72,7 @@ const BusinessExcellenceSection = () => {
                 key={index}
                 className={`
                   group relative overflow-hidden cursor-pointer
-                  ${reason.bgColor} border-0 rounded-3xl
+                  ${reason.bgColor} dark:bg-opacity-10 dark:bg-white/5 border-0 rounded-3xl
                   transition-all duration-500
                   hover:shadow-xl hover:-translate-y-1
                   ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}
@@ -99,17 +99,17 @@ const BusinessExcellenceSection = () => {
 
                   <div className="px-8 pb-8 flex flex-col flex-grow">
                     {/* Title */}
-                    <h3 className="text-2xl font-bold text-[#172A3A] mb-4" style={{ fontFamily: 'poppins' }}>
+                    <h3 className="text-2xl font-bold text-[#172A3A] dark:text-white mb-4" style={{ fontFamily: 'poppins' }}>
                       {reason.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-gray-700 leading-relaxed mb-6 text-base">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 text-base">
                       {reason.description}
                     </p>
 
                     {/* Learn More Link */}
-                    <button className="text-[#172A3A] text-left underline hover:text-[#EDB003] transition-colors duration-300 mt-auto">
+                    <button className="text-[#172A3A] dark:text-gray-200 text-left underline hover:text-[#EDB003] dark:hover:text-[#EDB003] transition-colors duration-300 mt-auto">
                       Learn More →
                     </button>
                   </div>
@@ -126,10 +126,10 @@ const BusinessExcellenceSection = () => {
             <div className="space-y-8">
               {/* Section Title */}
               <div className="mb-10">
-                <h3 className="text-4xl font-bold text-[#172A3A] mb-4" style={{ fontFamily: 'Poppins' }}>
+                <h3 className="text-4xl font-bold text-[#172A3A] dark:text-white mb-4" style={{ fontFamily: 'Poppins' }}>
                   Performance <span className="text-[#EDB003]">Analytics</span>
                 </h3>
-                <p className="text-gray-600 text-base leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-400 text-base leading-relaxed">
                   Data-driven insights showcasing our commitment to excellence and continuous growth across all metrics.
                 </p>
               </div>
@@ -137,9 +137,9 @@ const BusinessExcellenceSection = () => {
               {/* Attractive Visual Banner */}
               <div className="relative mb-8 overflow-hidden rounded-2xl shadow-xl group">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#172A3A]/85 to-[#EDB003]/85 z-10"></div>
-                <img 
-                  src="https://images.unsplash.com/photo-1535957998253-26ae1ef29506?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fG9mZmljZXxlbnwwfHwwfHx8MA%3D%3D" 
-                  alt="FlashSpace Office" 
+                <img
+                  src="https://images.unsplash.com/photo-1535957998253-26ae1ef29506?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fG9mZmljZXxlbnwwfHwwfHx8MA%3D%3D"
+                  alt="FlashSpace Office"
                   className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 z-20 flex items-center justify-between px-8">
@@ -161,11 +161,11 @@ const BusinessExcellenceSection = () => {
             {/* Right: Beautiful Pie Chart & Stats */}
             <div className="space-y-8">
               {/* Pie Chart Visualization */}
-              <div className="bg-gradient-to-br from-[#EDB003]/5 via-white to-[#EDB003]/10 p-8 rounded-3xl border-2 border-[#EDB003]/20 shadow-lg">
-                <h4 className="text-lg font-semibold text-[#172A3A] mb-6 text-center" style={{ fontFamily: 'Poppins' }}>
+              <div className="bg-gradient-to-br from-[#EDB003]/5 via-white to-[#EDB003]/10 dark:from-[#EDB003]/10 dark:via-[#1a1a1a] dark:to-[#EDB003]/5 p-8 rounded-3xl border-2 border-[#EDB003]/20 shadow-lg">
+                <h4 className="text-lg font-semibold text-[#172A3A] dark:text-white mb-6 text-center" style={{ fontFamily: 'Poppins' }}>
                   Service Distribution
                 </h4>
-                
+
                 {/* Pie Chart (CSS-based) */}
                 <div className="flex items-center justify-center mb-8">
                   <div className="relative w-48 h-48">
@@ -223,42 +223,42 @@ const BusinessExcellenceSection = () => {
                         className="transition-all duration-500 hover:opacity-40"
                       />
                     </svg>
-                    
+
                     {/* Center Label */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <div className="text-3xl font-bold text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>100%</div>
-                      <div className="text-xs text-gray-600">Coverage</div>
+                      <div className="text-3xl font-bold text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>100%</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Coverage</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Legend */}
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-white rounded-lg hover:shadow-md transition-shadow duration-300">
+                  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1f1f1f] rounded-lg hover:shadow-md transition-shadow duration-300">
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 rounded-full bg-[#EDB003]"></div>
-                      <span className="text-sm font-medium text-[#172A3A]">Virtual Office</span>
+                      <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">Virtual Office</span>
                     </div>
                     <span className="text-sm font-bold text-[#EDB003]">35%</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-white rounded-lg hover:shadow-md transition-shadow duration-300">
+                  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1f1f1f] rounded-lg hover:shadow-md transition-shadow duration-300">
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 rounded-full bg-[#EDB003] opacity-75"></div>
-                      <span className="text-sm font-medium text-[#172A3A]">Coworking Space</span>
+                      <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">Coworking Space</span>
                     </div>
                     <span className="text-sm font-bold text-[#EDB003]">30%</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-white rounded-lg hover:shadow-md transition-shadow duration-300">
+                  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1f1f1f] rounded-lg hover:shadow-md transition-shadow duration-300">
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 rounded-full bg-[#EDB003] opacity-50"></div>
-                      <span className="text-sm font-medium text-[#172A3A]">On Demand</span>
+                      <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">On Demand</span>
                     </div>
                     <span className="text-sm font-bold text-[#EDB003]">25%</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-white rounded-lg hover:shadow-md transition-shadow duration-300">
+                  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1f1f1f] rounded-lg hover:shadow-md transition-shadow duration-300">
                     <div className="flex items-center gap-3">
                       <div className="w-4 h-4 rounded-full bg-[#EDB003] opacity-25"></div>
-                      <span className="text-sm font-medium text-[#172A3A]">Business Setup</span>
+                      <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">Business Setup</span>
                     </div>
                     <span className="text-sm font-bold text-[#EDB003]">10%</span>
                   </div>
@@ -268,50 +268,50 @@ const BusinessExcellenceSection = () => {
               {/* Key Stats Cards - Compact with Background Images */}
               <div className="grid grid-cols-2 gap-3">
                 {/* Workspaces Card */}
-                <div className="relative overflow-hidden bg-white p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
+                <div className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
                   <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
                     <MapPin className="w-full h-full text-[#EDB003]" />
                   </div>
                   <div className="relative z-10">
                     <MapPin className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
-                    <div className="text-2xl font-bold text-[#172A3A] mb-1" style={{ fontFamily: 'Poppins' }}>100+</div>
-                    <div className="text-xs text-gray-600">Workspaces</div>
+                    <div className="text-2xl font-bold text-[#172A3A] dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>100+</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Workspaces</div>
                   </div>
                 </div>
 
                 {/* Locations Card */}
-                <div className="relative overflow-hidden bg-white p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
+                <div className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
                   <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
                     <Users className="w-full h-full text-[#EDB003]" />
                   </div>
                   <div className="relative z-10">
                     <Users className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
-                    <div className="text-2xl font-bold text-[#172A3A] mb-1" style={{ fontFamily: 'Poppins' }}>48+</div>
-                    <div className="text-xs text-gray-600">Locations</div>
+                    <div className="text-2xl font-bold text-[#172A3A] dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>48+</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Locations</div>
                   </div>
                 </div>
 
                 {/* Satisfaction Card */}
-                <div className="relative overflow-hidden bg-white p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
+                <div className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
                   <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
                     <CheckCircle className="w-full h-full text-[#EDB003]" />
                   </div>
                   <div className="relative z-10">
                     <CheckCircle className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
-                    <div className="text-2xl font-bold text-[#172A3A] mb-1" style={{ fontFamily: 'Poppins' }}>98%</div>
-                    <div className="text-xs text-gray-600">Satisfaction</div>
+                    <div className="text-2xl font-bold text-[#172A3A] dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>98%</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Satisfaction</div>
                   </div>
                 </div>
 
                 {/* Response Time Card */}
-                <div className="relative overflow-hidden bg-white p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
+                <div className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
                   <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
                     <Zap className="w-full h-full text-[#EDB003]" />
                   </div>
                   <div className="relative z-10">
                     <Zap className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
-                    <div className="text-2xl font-bold text-[#172A3A] mb-1" style={{ fontFamily: 'Poppins' }}>&lt;3days</div>
-                    <div className="text-xs text-gray-600">Avg Documentation</div>
+                    <div className="text-2xl font-bold text-[#172A3A] dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>&lt;3days</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Avg Documentation</div>
                   </div>
                 </div>
               </div>
@@ -347,9 +347,9 @@ const BusinessExcellenceSection = () => {
 
         {/* Bottom Badge */}
         <div className="text-center mt-16">
-          <div className="inline-flex items-center gap-3 px-8 py-4 bg-white rounded-full shadow-lg border-2 border-gray-200">
+          <div className="inline-flex items-center gap-3 px-8 py-4 bg-white dark:bg-[#1f1f1f] rounded-full shadow-lg border-2 border-gray-200 dark:border-white/10">
             <CheckCircle className="w-5 h-5 text-[#EDB003]" />
-            <span className="text-[#172A3A] font-semibold text-xl" style={{ fontFamily: 'poppins' }}>
+            <span className="text-[#172A3A] dark:text-white font-semibold text-xl" style={{ fontFamily: 'poppins' }}>
               Trusted by <span className="text-[#EDB003]">10,000+</span> businesses across India
             </span>
           </div>

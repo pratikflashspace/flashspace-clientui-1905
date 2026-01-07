@@ -8,7 +8,7 @@
 /* Geist Font - Map to Inter since Geist isn't available on free CDNs */
 @font-face {
   font-family: 'Geist';
-  src: local('Inter'), local('Inter-Regular');
+  src: url('/fonts/Geist/Geist-Regular.ttf') format('truetype');
   font-weight: 400;
   font-display: swap;
 }
@@ -41,18 +41,21 @@
   font-weight: 400;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Poppins';
   src: url('/fonts/Poppins/Poppins-Medium.ttf') format('truetype');
   font-weight: 500;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Poppins';
   src: url('/fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Poppins';
   src: url('/fonts/Poppins/Poppins-Bold.ttf') format('truetype');
@@ -63,7 +66,7 @@
 @font-face {
   font-family: 'c4b700';
   src: url('/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
-       url('/fonts/c4b700dcb2187787-s.p.ttf') format('truetype');
+    url('/fonts/c4b700dcb2187787-s.p.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -73,6 +76,7 @@
   font-family: 'new-one';
   src: url('./assets//fonts/e4af272ccee01ff0-s.p.woff2') format('woff2');
 }
+
 /* Removed Locomotive Scroll overrides */
 
 /* VirtuHub Connect Design System - FlashSpace Branding */
@@ -223,11 +227,15 @@
     /* Primary site font: Poppins (with Geist fallback) */
     font-family: 'Poppins', 'Geist', 'Georgia', 'serif';
     background: hsl(var(--background));
+    color: hsl(var(--foreground));
     min-height: 100vh;
   }
+
+
 }
 
 @layer components {
+
   /* Glass Card Effect */
   .glass-card {
     background: var(--glass-bg);
@@ -328,7 +336,7 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     transition: left 0.5s;
   }
 
@@ -353,24 +361,39 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { 
+
+  0%,
+  100% {
     box-shadow: 0 0 0 0 hsl(var(--primary-glow) / 0.7);
     transform: translate(-50%, -50%) scale(1);
   }
-  50% { 
+
+  50% {
     box-shadow: 0 0 0 20px hsl(var(--primary-glow) / 0);
     transform: translate(-50%, -50%) scale(1.1);
   }
 }
 
 @keyframes scroll-logos {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes fade-in-up {
@@ -378,6 +401,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -389,6 +413,7 @@
     opacity: 0;
     transform: translateX(100px) rotateY(45deg);
   }
+
   to {
     opacity: 1;
     transform: translateX(0) rotateY(0deg);
@@ -396,9 +421,12 @@
 }
 
 @keyframes gentle-bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -406,14 +434,20 @@
 
 /* Horizontal continuous loop for feature cards */
 @keyframes horizontal-loop {
-  from { transform: translateX(0%); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0%);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .horizontal-loop {
   display: flex;
   align-items: stretch;
-  gap: 1.25rem; /* same as gap-5 */
+  gap: 1.25rem;
+  /* same as gap-5 */
   will-change: transform;
   animation: horizontal-loop 14s linear infinite;
 }
@@ -434,43 +468,57 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
+
 /* Hero Section Animations */
 @keyframes text-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     text-shadow: 0 0 40px rgba(251, 191, 36, 0.4), 0 0 80px rgba(251, 191, 36, 0.2);
   }
+
   50% {
     text-shadow: 0 0 60px rgba(251, 191, 36, 0.6), 0 0 100px rgba(251, 191, 36, 0.3);
   }
 }
 
 @keyframes card-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-12px);
   }
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0;
   }
+
   50% {
     opacity: 0.2;
   }
 }
 
 @keyframes pulse-slow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.3;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.5;
     transform: scale(1.1);
@@ -527,9 +575,12 @@
 
 /* Yellow Glow Effect */
 @keyframes yellow-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), 0 0 40px rgba(251, 191, 36, 0.1);
   }
+
   50% {
     box-shadow: 0 0 30px rgba(251, 191, 36, 0.5), 0 0 60px rgba(251, 191, 36, 0.2);
   }
@@ -609,7 +660,7 @@
 
 /* Prevent scroll on parent when scrolling right panel */
 .scrollbar-yellow::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.05);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
 }
 
 /* MapLibre Popup Custom Styling */
@@ -665,7 +716,7 @@
 
 /* Background Grid Pattern for Auth Pages */
 .bg-grid-slate-100 {
-  background-image: 
+  background-image:
     linear-gradient(to right, rgb(241 245 249 / 0.5) 1px, transparent 1px),
     linear-gradient(to bottom, rgb(241 245 249 / 0.5) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -696,10 +747,9 @@
 }
 
 /* Force scrollable containers to respond to mouse wheel */
-[style*="overflow-y: scroll"], 
+[style*="overflow-y: scroll"],
 [style*="overflowY: scroll"] {
   overscroll-behavior: auto !important;
   -webkit-overflow-scrolling: touch !important;
   touch-action: pan-y !important;
 }
-

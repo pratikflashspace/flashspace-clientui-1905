@@ -72,7 +72,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer id="footer" className="bg-white border-t border-gray-200">
+    <footer id="footer" className="bg-white dark:bg-[#0a0a0a] border-t border-gray-200 dark:border-white/10 transition-colors duration-300">
       <div className="container mx-auto px-6">
         {/* Main Footer Content */}
         <div className="py-12 grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -85,9 +85,9 @@ const Footer = () => {
                 className="h-10 w-auto"
               />
             </div>
-            
-            <p className="text-gray-600 leading-relaxed font-content text-sm">
-              Empowering businesses across India with premium virtual office solutions, 
+
+            <p className="text-gray-600 dark:text-gray-400 leading-relaxed font-content text-sm">
+              Empowering businesses across India with premium virtual office solutions,
               professional services, and growth-focused support to accelerate success.
             </p>
 
@@ -97,7 +97,7 @@ const Footer = () => {
                 <a
                   key={social.name}
                   href={social.href}
-                  className="w-10 h-10 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center transition-colors duration-300"
+                  className="w-10 h-10 bg-blue-50 dark:bg-[#1f1f1f] hover:bg-blue-100 dark:hover:bg-[#EDB003]/20 rounded-lg flex items-center justify-center transition-colors duration-300"
                   aria-label={social.name}
                 >
                   <span className="text-blue-600">
@@ -109,11 +109,11 @@ const Footer = () => {
 
             {/* Newsletter Signup */}
             <div className="space-y-3">
-              <h4 className="font-semibold text-gray-900 font-header">Stay Updated</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-white font-header">Stay Updated</h4>
               <div className="flex space-x-2">
                 <Input
                   placeholder="Enter your email"
-                  className="bg-gray-50 border-gray-200 focus:border-blue-500 flex-1 text-sm"
+                  className="bg-gray-50 dark:bg-black/30 border-gray-200 dark:border-white/10 focus:border-blue-500 flex-1 text-sm dark:text-white dark:placeholder:text-gray-500"
                 />
                 <Button size="sm" className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-4">
                   <Send className="w-4 h-4" />
@@ -124,17 +124,17 @@ const Footer = () => {
 
           {/* VirtuHub Services */}
           <div className={getAnimationClasses(isVisible, 'slideUp', 100)}>
-            <h3 className="text-lg font-bold text-blue-600 mb-6 font-header">
+            <h3 className="text-lg font-bold text-blue-600 dark:text-[#EDB003] mb-6 font-header">
               VirtuHub Services
             </h3>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4 font-header">Connect</h4>
-            <p className="text-xs text-yellow-600 mb-3 font-content">Powered by FlashSpace</p>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 font-header">Connect</h4>
+            <p className="text-xs text-yellow-600 dark:text-[#EDB003] mb-3 font-content">Powered by FlashSpace</p>
             <ul className="space-y-3">
               {services.slice(0, 6).map((service) => (
                 <li key={service.name}>
                   <a
                     href="#"
-                    className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm font-content"
+                    className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-[#EDB003] transition-colors duration-300 text-sm font-content"
                   >
                     <span className="text-blue-500">
                       {service.icon}
@@ -148,7 +148,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div className={getAnimationClasses(isVisible, 'slideUp', 200)}>
-            <h3 className="text-lg font-bold text-blue-600 mb-6 font-header">
+            <h3 className="text-lg font-bold text-blue-600 dark:text-[#EDB003] mb-6 font-header">
               Quick Links
             </h3>
             <ul className="space-y-3">
@@ -157,7 +157,7 @@ const Footer = () => {
                   <a
                     href={link.href}
                     onClick={(e) => handleAnchorClick(e, link.href)}
-                    className="text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm font-content cursor-pointer"
+                    className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-[#EDB003] transition-colors duration-300 text-sm font-content cursor-pointer"
                   >
                     {link.name}
                   </a>
@@ -168,7 +168,7 @@ const Footer = () => {
 
           {/* Support & Contact */}
           <div className={getAnimationClasses(isVisible, 'slideUp', 300)}>
-            <h3 className="text-lg font-bold text-blue-600 mb-6 font-header">
+            <h3 className="text-lg font-bold text-blue-600 dark:text-[#EDB003] mb-6 font-header">
               Support & Legal
             </h3>
             <ul className="space-y-3 mb-6">
@@ -177,7 +177,7 @@ const Footer = () => {
                   <a
                     href={item.href}
                     onClick={(e) => handleAnchorClick(e, item.href)}
-                    className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm font-content cursor-pointer"
+                    className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-[#EDB003] transition-colors duration-300 text-sm font-content cursor-pointer"
                   >
                     <span className="text-blue-500">
                       {item.icon}
@@ -191,20 +191,20 @@ const Footer = () => {
         </div>
 
         {/* Bottom Footer */}
-        <div className={`py-6 border-t border-gray-200 ${getAnimationClasses(isVisible, 'fadeIn', 400)}`}>
+        <div className={`py-6 border-t border-gray-200 dark:border-white/10 ${getAnimationClasses(isVisible, 'fadeIn', 400)}`}>
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
             <div className="text-center md:text-left">
-              <p className="text-gray-600 text-sm font-content">
-                © {currentYear} VirtuHub Connect. All rights reserved. 
-                <span className="text-blue-600 font-medium"> Powered by FlashSpace Technology.</span>
+              <p className="text-gray-600 dark:text-gray-400 text-sm font-content">
+                © {currentYear} VirtuHub Connect. All rights reserved.
+                <span className="text-blue-600 dark:text-blue-400 font-medium"> Powered by FlashSpace Technology.</span>
               </p>
             </div>
 
             {/* Security Badges */}
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-xs text-gray-600">
-                <Shield className="w-4 h-4 text-blue-600" />
+              <div className="flex items-center space-x-2 text-xs text-gray-600 dark:text-gray-400">
+                <Shield className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <span>SSL Secured</span>
               </div>
               <div className="text-xs">
