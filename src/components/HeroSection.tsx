@@ -159,13 +159,13 @@ const HeroSection = () => {
           >
             {/* Primary CTA */}
             <ModernFlairButton
-              onClick={() => navigate("/book-tour")}
+              onClick={() => navigate("/start-chatting")}
               className="group px-8 py-4 bg-[#0a0a0a] text-white rounded-full transition-all duration-300 transform hover:scale-[1.02] hover:shadow-[0_0_30px_-5px_rgba(239,173,26,0.3)] border border-white/5 active:scale-95 overflow-hidden"
               flairColor="rgba(239, 173, 26, 0.3)"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-[#EFAD1A]/0 via-[#EFAD1A]/10 to-[#EFAD1A]/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700 ease-in-out"></div>
               <span className="relative flex items-center gap-3 font-medium tracking-wide" style={{ fontFamily: "Geist" }}>
-                Book a Tour
+                Start Chatting
                 <span className="relative flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EFAD1A] opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-[#EFAD1A]"></span>
@@ -175,7 +175,7 @@ const HeroSection = () => {
 
             {/* Secondary CTA */}
             <ModernFlairButton
-              onClick={() => scrollToSection("#about")}
+              onClick={() => navigate("/services/virtual-office")}
               className="group px-8 py-4 bg-white/80 backdrop-blur-md border border-white/50 text-black rounded-full transition-all duration-300 hover:bg-white hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
               flairColor="rgba(0, 0, 0, 0.1)"
             >
