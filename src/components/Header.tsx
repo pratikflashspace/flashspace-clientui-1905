@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { smoothScrollTo } from "@/lib/lenis";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import Splash3dButton from "@/components/ui/3d-splash-button";
-import { Phone, Building2, Users, Zap, FileText, ArrowRight, LayoutDashboard, LogOut, User as UserIcon, Settings, ChevronDown, X } from "lucide-react";
+import ModernFlairButton from "@/components/ui/ModernFlairButton";
+
+import { Phone, Building2, Users, Zap, FileText, ArrowRight, LayoutDashboard, LogOut, User as UserIcon, Settings, ChevronDown, X, Sun, Moon } from "lucide-react";
 import { CiMenuFries } from "react-icons/ci";
 import SidebarMenu from "@/components/SidebarMenu";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDarkMode } from "@/contexts/DarkModeContext";
 import GetInTouch from "@/pages/GetInTouch";
 
 // ✅ Country Data
@@ -38,6 +40,7 @@ interface HeaderProps {
 }
 
 const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = false }: HeaderProps) => {
+  const { darkMode, toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -60,7 +63,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
   const countryRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { 
+  useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 10);
     };
@@ -108,7 +111,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         className={cn(
           "fixed top-0 w-full z-[100] transition-all duration-300 text-md",
           scrolled || forceWhiteBackground
-            ? "bg-white/95 supports-[backdrop-filter]:bg-white/65 backdrop-blur-md border-b border-border shadow-sm"
+            ? "bg-white/95 dark:bg-[#0a0a0a]/90 supports-[backdrop-filter]:bg-white/65 dark:supports-[backdrop-filter]:bg-black/60 backdrop-blur-md border-b border-border dark:border-white/10 shadow-sm"
             : "bg-transparent backdrop-blur-sm"
         )}
         style={{ fontFamily: "Poppins" }}
@@ -123,7 +126,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               aria-controls="flashspace-fullmenu"
               onClick={() => setIsMenuOpen(true)}
             >
-              <CiMenuFries className="h-6 w-6 text-black" />
+              <CiMenuFries className="h-6 w-6 text-black dark:text-white" />
             </button>
 
             {/* Logo */}
@@ -143,34 +146,24 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               {/* === All Solutions Dropdown === */}
               <div ref={solutionsRef} className="relative">
                 <button
-                  className="text-md font-semibold flex items-center gap-1 cursor-pointer transition-colors text-black hover:text-primary"
+                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors relative ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-black dark:hover:text-gray-700"}`}
                   onClick={() => setIsSolutionsOpen((prev) => !prev)}
                 >
-                  All Solutions
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    className={`transition-transform duration-300 ${isSolutionsOpen ? "rotate-180" : ""}`}
-                  >
-                    <path
-                      d="M6 8L10 12L14 8"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <span className="relative">
+                    All Solutions
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#EFAD1A] transition-all duration-300 group-hover:w-full"></span>
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-300 group-hover:text-[#EFAD1A] ${isSolutionsOpen ? "rotate-180" : ""}`}
+                  />
                 </button>
 
                 {/* Dropdown Menu */}
                 <div
-                  className={`absolute left-1/2 top-full w-[600px] bg-white border border-border rounded-lg shadow-lg z-50 mt-2 transition-all duration-300 ${
-                    isSolutionsOpen
-                      ? "opacity-100 pointer-events-auto translate-y-0"
-                      : "opacity-0 pointer-events-none -translate-y-2"
-                  }`}
+                  className={`absolute left-1/2 top-full w-[600px] bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-lg shadow-lg z-50 mt-2 transition-all duration-300 ${isSolutionsOpen
+                    ? "opacity-100 pointer-events-auto translate-y-0"
+                    : "opacity-0 pointer-events-none -translate-y-2"
+                    }`}
                   style={{
                     boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
                     transform: "translateX(-50%)",
@@ -246,37 +239,31 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               {/* Partner with Us */}
               <button
                 onClick={() => handleNavigation("/partner")}
-                className="text-md font-medium transition-colors text-black hover:text-primary"
+                className={`group relative px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-black dark:hover:text-gray-700"}`}
               >
-                Partner with Us
+                <span className="relative">
+                  Partner with Us
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#EFAD1A] transition-all duration-300 group-hover:w-full"></span>
+                </span>
               </button>
 
               {/* === More Dropdown === */}
               <div ref={moreRef} className="relative">
                 <button
-                  className="text-md font-medium flex items-center gap-1 cursor-pointer transition-colors text-black hover:text-primary"
+                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors relative ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-black dark:hover:text-gray-700"}`}
                   onClick={() => setIsMoreOpen((prev) => !prev)}
                 >
-                  More
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    className={`transition-transform duration-300 ${isMoreOpen ? "rotate-180" : ""}`}
-                  >
-                    <path
-                      d="M6 8L10 12L14 8"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <span className="relative">
+                    More
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#EFAD1A] transition-all duration-300 group-hover:w-full"></span>
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-300 group-hover:text-[#EFAD1A] ${isMoreOpen ? "rotate-180" : ""}`}
+                  />
                 </button>
 
                 {isMoreOpen && (
-                  <ul className="absolute bg-white border border-border rounded-md shadow-lg mt-2 w-40 py-2 z-50">
+                  <ul className="absolute bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50">
                     {[
                       { label: "About Us", href: "/about" },
                       { label: "Career", href: "/career" },
@@ -304,28 +291,16 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               {/* ===== Country Dropdown Button (flag + code only, no bold) ===== */}
               <div ref={countryRef} className="hidden lg:block relative">
                 <button
-                  className="flex items-center px-2  py-2  rounded-md border border-gray-300 text-black gap-2 focus:outline-none bg-white"
+                  className="flex items-center px-3 py-2 rounded-full border border-gray-200 dark:border-white/10 text-black dark:text-white gap-2 focus:outline-none bg-white/50 dark:bg-black/50 backdrop-blur-sm hover:bg-white dark:hover:bg-white/10 hover:shadow-sm transition-all duration-300"
                   onClick={() => setCountryDropdownOpen((prev) => !prev)}
                   aria-haspopup="listbox"
                   aria-expanded={countryDropdownOpen}
                 >
-                  <img src={selectedCountry.flag} alt={selectedCountry.code} className="h-5 w-5 rounded-full" />
-                  <span className="text-sm">{selectedCountry.code}</span>
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    className={`ml-2 transition-transform duration-300 ${countryDropdownOpen ? "rotate-180" : ""}`}
-                  >
-                    <path
-                      d="M6 8L10 12L14 8"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <img src={selectedCountry.flag} alt={selectedCountry.code} className="h-5 w-5 rounded-full object-cover ring-1 ring-gray-100" />
+                  <span className="text-sm font-medium">{selectedCountry.code}</span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-300 ${countryDropdownOpen ? "rotate-180" : ""}`}
+                  />
                 </button>
                 {countryDropdownOpen && (
                   <ul
@@ -353,12 +328,28 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               </div>
               {/* ===== End Country Dropdown Button ===== */}
 
-              <Splash3dButton
-                onClick={() => setIsContactOpen(true)} // opens popup
-                className="hidden lg:inline-flex relative px-6 py-2  text-base rounded-lg font-bold bg-black text-white hover:shadow-md transition-all"
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={toggleDarkMode}
+                className="hidden lg:flex items-center justify-center p-2 rounded-full border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-black/50 backdrop-blur-sm hover:bg-white dark:hover:bg-white/10 hover:shadow-sm transition-all duration-300"
+                aria-label="Toggle Dark Mode"
               >
-                Get in Touch
-              </Splash3dButton>
+                {darkMode ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5" />}
+              </button>
+
+
+
+              <ModernFlairButton
+                onClick={() => setIsContactOpen(true)}
+                className="hidden lg:inline-flex group px-6 py-2.5 bg-[#0a0a0a] text-white text-sm font-medium rounded-full transition-all duration-300 hover:shadow-[0_0_20px_-5px_rgba(239,173,26,0.3)] border border-white/10 active:scale-95 overflow-hidden"
+                flairColor="rgba(239, 173, 26, 0.3)"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-[#EFAD1A]/0 via-[#EFAD1A]/10 to-[#EFAD1A]/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700 ease-in-out"></div>
+                <span className="relative flex items-center gap-2">
+                  Get in Touch
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </span>
+              </ModernFlairButton>
 
               {/* User Authentication - Profile Dropdown or Login */}
               {isAuthenticated ? (
@@ -376,11 +367,11 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                       {user?.fullName || 'User'}
                     </span>
                     {/* Dropdown Icon */}
-                    <ChevronDown 
+                    <ChevronDown
                       className={cn(
                         "h-4 w-4 text-gray-500 transition-transform duration-200",
                         isUserMenuOpen && "rotate-180"
-                      )} 
+                      )}
                     />
                   </button>
 
@@ -451,13 +442,16 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                   )}
                 </div>
               ) : (
-                <Button
+                <ModernFlairButton
                   onClick={() => handleNavigation("/login")}
-                  variant="outline"
-                  className="hidden lg:inline-flex px-6 py-2.5 text-base rounded-md border-gray-300 text-black hover:bg-gray-50"
+                  className="hidden lg:inline-flex group px-6 py-2.5 bg-white/50 backdrop-blur-sm text-black text-sm font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-white hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
+                  flairColor="rgba(0, 0, 0, 0.05)"
                 >
-                  Log in
-                </Button>
+                  <span className="flex items-center gap-2">
+                    <UserIcon className="w-3.5 h-3.5 text-gray-500 group-hover:text-[#EFAD1A] transition-colors" />
+                    Log in
+                  </span>
+                </ModernFlairButton>
               )}
             </div>
           </div>
@@ -504,7 +498,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                   </a>
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>Contact:</strong> 8100888777 
+                  <strong>Contact:</strong> 8100888777
                 </p>
               </div>
               {/* Card 3 - Partnership */}

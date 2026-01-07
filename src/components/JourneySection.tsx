@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { 
-  MapPin, 
-  Building2, 
-  CreditCard, 
-  FileCheck, 
+import {
+  MapPin,
+  Building2,
+  CreditCard,
+  FileCheck,
   CheckCircle2,
   Sparkles
 } from "lucide-react";
@@ -34,7 +34,7 @@ const JourneySection = () => {
     {
       icon: <Building2 className="w-8 h-8 text-primary" />,
       title: "Choose Your Space",
-      step: "STEP 2", 
+      step: "STEP 2",
       delay: 200
     },
     {
@@ -58,18 +58,18 @@ const JourneySection = () => {
   ];
 
   return (
-    <section id="journey" className="py-20 px-4 bg-[#ffffff] overflow-hidden relative">
+    <section id="journey" className="py-20 px-4 bg-[#ffffff] dark:bg-[#0a0a0a] overflow-hidden relative transition-colors duration-300">
       {/* Background Elements - Removed for clean white background */}
 
       <div className="container mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#172A3A] mb-4 animate-fade-in" style={{ fontFamily: 'Poppins' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#172A3A] dark:text-white mb-4 animate-fade-in" style={{ fontFamily: 'Poppins' }}>
             Your Success Story Begins Here
             <br />
             <span className="text-[#EDB003]">The FlashSpace Journey</span>
           </h2>
-          <div className="flex items-center justify-center gap-2 text-xl text-gray-600 font-medium animate-fade-in font-content" style={{ animationDelay: '200ms' }}>
+          <div className="flex items-center justify-center gap-2 text-xl text-gray-600 dark:text-gray-400 font-medium animate-fade-in font-content" style={{ animationDelay: '200ms' }}>
             <Sparkles className="w-6 h-6 text-[#EDB003] animate-pulse" />
           </div>
         </div>
@@ -83,9 +83,9 @@ const JourneySection = () => {
                 {/* Step Circle */}
                 <div
                   className={`
-                    w-32 h-32 rounded-full border-4 border-gray-200 bg-white
+                    w-32 h-32 rounded-full border-4 border-gray-200 dark:border-white/10 bg-white dark:bg-[#1f1f1f]
                     flex flex-col items-center justify-center mb-6 relative group shadow-md
-                    transform transition-all duration-700 hover:scale-110 hover:border-[#EDB003] hover:shadow-xl
+                    transform transition-all duration-700 hover:scale-110 hover:border-[#EDB003] dark:hover:border-[#EDB003] hover:shadow-xl
                     ${isVisible
                       ? 'translate-y-0 opacity-100 scale-100'
                       : 'translate-y-10 opacity-0 scale-95'
@@ -100,22 +100,22 @@ const JourneySection = () => {
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#EDB003]/10 to-[#172A3A]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                   {/* Icon */}
-                  <div className="relative z-10 mb-2 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                  <div className="relative z-10 mb-2 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] dark:group-hover:text-[#EDB003] transition-colors duration-300">
                     {step.icon}
                   </div>
 
                   {/* Step Number */}
-                  <span className="text-[#EDB003] font-bold text-sm relative z-10 group-hover:text-[#172A3A] transition-colors duration-300">
+                  <span className="text-[#EDB003] font-bold text-sm relative z-10 group-hover:text-[#172A3A] dark:group-hover:text-white transition-colors duration-300">
                     {step.step}
                   </span>
-                  
+
                   {/* Curved Arrow Connection */}
                   {index < journeySteps.length - 1 && (
                     <div className="absolute top-1/2 left-full w-20 h-16 transform -translate-y-1/2 z-0 flex items-center justify-center">
-                      <svg 
-                        width="80" 
-                        height="64" 
-                        viewBox="0 0 80 64" 
+                      <svg
+                        width="80"
+                        height="64"
+                        viewBox="0 0 80 64"
                         className="absolute inset-0"
                       >
                         {/* Base curved path */}
@@ -159,7 +159,7 @@ const JourneySection = () => {
                           </linearGradient>
                         </defs>
                       </svg>
-                      
+
                       {/* Sparkle Effects */}
                       <div
                         className={`
@@ -190,7 +190,7 @@ const JourneySection = () => {
                 {/* Step Title */}
                 <div
                   className={`
-                    text-center text-[#172A3A] font-semibold text-lg max-w-32
+                    text-center text-[#172A3A] dark:text-white font-semibold text-lg max-w-32
                     transform transition-all duration-700
                     ${isVisible
                       ? 'translate-y-0 opacity-100'
@@ -209,25 +209,25 @@ const JourneySection = () => {
           <div className="md:hidden space-y-8 mb-12">
             {journeySteps.map((step, index) => (
               <div key={index} className="flex items-center gap-6 relative">
-                <div className="w-20 h-20 rounded-full border-3 border-gray-200 bg-white flex flex-col items-center justify-center flex-shrink-0 shadow-md">
-                  <div className="mb-1 text-[#172A3A]">
+                <div className="w-20 h-20 rounded-full border-3 border-gray-200 dark:border-white/10 bg-white dark:bg-[#1f1f1f] flex flex-col items-center justify-center flex-shrink-0 shadow-md">
+                  <div className="mb-1 text-[#172A3A] dark:text-white">
                     {step.icon}
                   </div>
                   <span className="text-[#EDB003] font-bold text-xs">
                     {step.step}
                   </span>
                 </div>
-                <div className="text-[#172A3A] font-semibold text-lg">
+                <div className="text-[#172A3A] dark:text-white font-semibold text-lg">
                   {step.title}
                 </div>
-                
+
                 {/* Mobile Curved Arrow */}
                 {index < journeySteps.length - 1 && (
                   <div className="absolute left-10 top-full w-8 h-16 transform translate-y-2">
-                    <svg 
-                      width="32" 
-                      height="64" 
-                      viewBox="0 0 32 64" 
+                    <svg
+                      width="32"
+                      height="64"
+                      viewBox="0 0 32 64"
                       className="absolute inset-0"
                     >
                       {/* Base curved path */}

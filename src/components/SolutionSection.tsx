@@ -168,7 +168,7 @@ const SolutionsSection = () => {
   ];
 
   return (
-    <section id="solutions" className="py-20 px-4 bg-[#ffffff] relative overflow-hidden">
+    <section id="solutions" className="py-20 px-4 bg-[#ffffff] dark:bg-[#0a0a0a] relative overflow-hidden transition-colors duration-300">
       {/* Removed gradient & decorative blobs for pure white background */}
 
       <div className="container mx-auto relative z-10">
@@ -179,8 +179,8 @@ const SolutionsSection = () => {
             <br />
             <span className="text-[#EDB003]">at Your Fingertips</span>
           </h2>
-          <p className={`text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed font-content font-geist ${getAnimationClasses(isVisible, 'fadeInUp', 200)}`}>
-            Transform your business operations with our comprehensive suite of virtual office solutions 
+          <p className={`text-xl text-muted-foreground dark:text-gray-400 max-w-4xl mx-auto leading-relaxed font-content font-geist ${getAnimationClasses(isVisible, 'fadeInUp', 200)}`}>
+            Transform your business operations with our comprehensive suite of virtual office solutions
             designed to scale with your ambitions.
           </p>
         </div>
@@ -198,7 +198,8 @@ const SolutionsSection = () => {
               <Card
                 className={`
                   bg-gradient-to-br from-white via-white to-gray-50 border border-gray-200
-                  hover:border-[#EDB003] hover:shadow-2xl shadow-lg
+                  dark:from-[#171717] dark:via-[#171717] dark:to-[#1a1a1a] dark:border-white/10
+                  hover:border-[#EDB003] dark:hover:border-[#EDB003] hover:shadow-2xl shadow-lg
                   group cursor-pointer transition-all duration-500 hover:-translate-y-2
                   relative overflow-hidden rounded-2xl h-full
                   ${getAnimationClasses(isVisible, 'fadeInUp', index * 150)}
@@ -241,12 +242,12 @@ const SolutionsSection = () => {
                   </motion.div>
 
                   {/* Title */}
-                  <h3 className="text-xl font-bold text-center mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300 font-header" style={{ fontFamily: 'Poppins' }}>
+                  <h3 className="text-xl font-bold text-center mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300 font-header" style={{ fontFamily: 'Poppins' }}>
                     {solution.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-sm text-gray-600 text-center mb-5 leading-relaxed font-content min-h-[40px]">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-5 leading-relaxed font-content min-h-[40px]">
                     {solution.description}
                   </p>
 
@@ -263,7 +264,7 @@ const SolutionsSection = () => {
                         <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#EDB003]/20 to-[#EDB003]/10 flex items-center justify-center flex-shrink-0 group-hover:from-[#EDB003]/30 group-hover:to-[#EDB003]/20 transition-all duration-300">
                           <div className="w-1.5 h-1.5 bg-[#EDB003] rounded-full"></div>
                         </div>
-                        <span className="text-gray-700 group-hover:text-gray-900 font-medium transition-colors duration-300">{feature}</span>
+                        <span className="text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white font-medium transition-colors duration-300">{feature}</span>
                       </motion.div>
                     ))}
                   </div>

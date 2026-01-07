@@ -6,15 +6,15 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  HelpCircle, 
-  BookOpen, 
-  Lightbulb, 
-  FileText, 
-  Shield, 
-  DollarSign, 
-  Zap, 
+import {
+  Search,
+  HelpCircle,
+  BookOpen,
+  Lightbulb,
+  FileText,
+  Shield,
+  DollarSign,
+  Zap,
   Building2,
   Sparkles
 } from "lucide-react";
@@ -33,7 +33,7 @@ const FAQSection = () => {
       category: "basics"
     },
     {
-      id: "item-2", 
+      id: "item-2",
       question: "Why should I choose a virtual office over a traditional office space?",
       answer: "Virtual offices offer significant cost savings (up to 80% less than traditional offices), complete flexibility, premium business addresses, and professional services - perfect for startups, freelancers, and growing businesses. You eliminate overhead costs like rent, utilities, and maintenance while maintaining a professional business presence.",
       category: "benefits"
@@ -91,32 +91,32 @@ const FAQSection = () => {
 
   const filteredFaqs = faqs.filter(faq => {
     const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         faq.answer.toLowerCase().includes(searchTerm.toLowerCase());
+      faq.answer.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || faq.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   return (
-    <section id="faq" className="py-20 px-4 relative overflow-hidden bg-[#ffffff]">
+    <section id="faq" className="py-20 px-4 relative overflow-hidden bg-[#ffffff] dark:bg-[#0a0a0a] transition-colors duration-300">
 
       <div className="container mx-auto max-w-5xl relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${getAnimationClasses(isVisible, 'fadeInUp', 0)}`} style={{ fontFamily: 'Poppins' }}>
-            <span className="text-[#172A3A]">Everything You Need to Know</span>
+            <span className="text-[#172A3A] dark:text-white">Everything You Need to Know</span>
             <br />
             <span className="text-[#EDB003]">Frequently Asked Questions</span>
           </h2>
-          <div className={`flex items-center justify-center gap-2 text-xl text-gray-600 max-w-3xl mx-auto ${getAnimationClasses(isVisible, 'fadeInUp', 200)}`}>
+          <div className={`flex items-center justify-center gap-2 text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto ${getAnimationClasses(isVisible, 'fadeInUp', 200)}`}>
             <span>Get instant answers to the most common questions about our virtual office solutions and services.</span>
             <Sparkles className="w-6 h-6 text-[#EDB003] animate-pulse" />
           </div>
         </div>
 
         {/* Search and Filter */}
-        <Card className={`bg-white border-2 border-gray-200 mb-12 shadow-md hover:shadow-xl transition-all duration-300 ${getAnimationClasses(isVisible, 'fadeInUp', 300)}`}>
+        <Card className={`bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 mb-12 shadow-md hover:shadow-xl transition-all duration-300 ${getAnimationClasses(isVisible, 'fadeInUp', 300)}`}>
           <CardHeader className="pb-4">
-            <CardTitle className="text-center text-[#172A3A] text-2xl" style={{ fontFamily: 'Poppins' }}>Find Your Answer</CardTitle>
+            <CardTitle className="text-center text-[#172A3A] dark:text-white text-2xl" style={{ fontFamily: 'Poppins' }}>Find Your Answer</CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
             {/* Search Bar */}
@@ -125,7 +125,7 @@ const FAQSection = () => {
                 placeholder="Search for questions, topics, or keywords..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="py-3 bg-gray-50 border-2 border-gray-200 focus:border-[#EDB003] rounded-xl text-lg"
+                className="py-3 bg-gray-50 dark:bg-black/30 border-2 border-gray-200 dark:border-white/10 focus:border-[#EDB003] dark:focus:border-[#EDB003] rounded-xl text-lg text-[#172A3A] dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-500"
               />
             </div>
 
@@ -141,7 +141,7 @@ const FAQSection = () => {
                       group px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 justify-center
                       ${selectedCategory === category.key
                         ? 'bg-[#EDB003] text-white shadow-lg transform scale-105'
-                        : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-[#EDB003] hover:text-[#172A3A] hover:scale-105'
+                        : 'bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-[#EDB003] dark:hover:border-[#EDB003] hover:text-[#172A3A] dark:hover:text-white hover:scale-105'
                       }
                     `}
                   >
@@ -155,7 +155,7 @@ const FAQSection = () => {
         </Card>
 
         {/* FAQ Accordion */}
-        <Card className={`bg-white border-2 border-gray-200 shadow-md hover:shadow-xl transition-all duration-300 ${getAnimationClasses(isVisible, 'fadeInUp', 500)}`}>
+        <Card className={`bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 shadow-md hover:shadow-xl transition-all duration-300 ${getAnimationClasses(isVisible, 'fadeInUp', 500)}`}>
           <CardContent className="p-0">
             {filteredFaqs.length > 0 ? (
               <Accordion type="single" collapsible className="w-full">
@@ -163,15 +163,15 @@ const FAQSection = () => {
                   <AccordionItem
                     key={faq.id}
                     value={faq.id}
-                    className="border-b border-gray-200 last:border-b-0"
+                    className="border-b border-gray-200 dark:border-white/10 last:border-b-0"
                   >
                     <AccordionTrigger className="px-8 py-6 text-left hover:bg-gradient-to-r hover:from-[#EDB003]/5 hover:to-transparent transition-all duration-300 group">
-                      <span className="font-semibold text-[#172A3A] pr-4 group-hover:text-[#EDB003] transition-colors duration-300 text-lg">
+                      <span className="font-semibold text-[#172A3A] dark:text-white pr-4 group-hover:text-[#EDB003] dark:group-hover:text-[#EDB003] transition-colors duration-300 text-lg">
                         {faq.question}
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="px-8 pb-6">
-                      <div className="text-gray-600 leading-relaxed text-lg bg-gray-50 p-4 rounded-lg">
+                      <div className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg bg-gray-50 dark:bg-black/30 p-4 rounded-lg">
                         {faq.answer}
                       </div>
                     </AccordionContent>
@@ -194,7 +194,7 @@ const FAQSection = () => {
 
         {/* Contact Support */}
         <div className="text-center mt-16">
-          <p className="text-gray-600 mb-6 text-xl">
+          <p className="text-gray-600 dark:text-gray-400 mb-6 text-xl">
             Still have questions? Our support team is here to help!
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
@@ -206,7 +206,7 @@ const FAQSection = () => {
             </a>
             <a
               href="mailto:support@flashspace.co"
-              className="bg-white border-2 border-gray-200 text-[#172A3A] hover:bg-[#172A3A] hover:text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-md"
+              className="bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 text-[#172A3A] dark:text-white hover:bg-[#172A3A] hover:text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-md"
             >
               Email Us
             </a>

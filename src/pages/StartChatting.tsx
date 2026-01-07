@@ -703,7 +703,7 @@ const StartChatting = () => {
                 </div>
               </div>
               <p className="text-xs text-gray-400 text-center mt-3">
-                FlashSpace can make mistakes. Check important info.
+                FlashSpace Chat Agent can make mistakes. Check important info.
               </p>
             </div>
           </div>

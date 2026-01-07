@@ -3,7 +3,7 @@ import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-anim
 
 const TestimonialsSection = () => {
   const isVisible = useScrollAnimation('testimonials');
-  
+
   const companies = [
     { name: "Adda247", logo: "/Logo/Adda247.png", needsInvert: false },
     { name: "Study IQ", logo: "/Logo/StudyIQ.png", needsInvert: false },
@@ -36,24 +36,24 @@ const TestimonialsSection = () => {
     },
     {
       text: "24/7 support and lightning-fast setup helped us launch our business operations in just one day. Truly exceptional service!",
-      author: "Amit Patel", 
+      author: "Amit Patel",
       position: "Director, Global Ventures",
       company: "Delhi"
     }
   ];
 
   return (
-    <section id="testimonials" className="py-20 px-4 relative overflow-hidden bg-[#ffffff]">
+    <section id="testimonials" className="py-20 px-4 relative overflow-hidden bg-[#ffffff] dark:bg-[#0a0a0a] transition-colors duration-300">
 
       <div className="container mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${getAnimationClasses(isVisible, 'fadeInUp', 0)}`} style={{ fontFamily: 'Poppins' }}>
-            <span className="text-[#172A3A]">Trusted by Industry Leaders</span>
+            <span className="text-[#172A3A] dark:text-white">Trusted by Industry Leaders</span>
             <br />
             <span className="text-[#EDB003] text-2xl md:text-3xl">Across India</span>
           </h2>
-          <p className={`text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed font-content ${getAnimationClasses(isVisible, 'fadeInUp', 200)}`}>
+          <p className={`text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8 leading-relaxed font-content ${getAnimationClasses(isVisible, 'fadeInUp', 200)}`}>
             Join thousands of successful businesses who chose FlashSpace to accelerate their growth
             and establish their market presence with confidence.
           </p>
@@ -63,8 +63,8 @@ const TestimonialsSection = () => {
         <div className={`mb-12 overflow-hidden ${getAnimationClasses(isVisible, 'fadeIn', 300)}`}>
           <div className="relative">
             {/* Gradient Overlays */}
-            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white to-transparent z-10"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent z-10"></div>
+            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white dark:from-[#0a0a0a] to-transparent z-10"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white dark:from-[#0a0a0a] to-transparent z-10"></div>
 
             {/* Scrolling Logos */}
             <div className="infinite-scroll">
@@ -98,10 +98,10 @@ const TestimonialsSection = () => {
 
         {/* Client Testimonials */}
         <div className="text-center mb-8 mt-16">
-          <h3 className={`text-3xl md:text-4xl font-bold mb-4 text-[#172A3A] ${getAnimationClasses(isVisible, 'fadeInUp', 400)}`} style={{ fontFamily: 'Poppins' }}>
+          <h3 className={`text-3xl md:text-4xl font-bold mb-4 text-[#172A3A] dark:text-white ${getAnimationClasses(isVisible, 'fadeInUp', 400)}`} style={{ fontFamily: 'Poppins' }}>
             Great People <span className="text-[#EDB003]">Trust Us</span>
           </h3>
-          <p className={`text-gray-600 font-content ${getAnimationClasses(isVisible, 'fadeInUp', 500)}`}>
+          <p className={`text-gray-600 dark:text-gray-400 font-content ${getAnimationClasses(isVisible, 'fadeInUp', 500)}`}>
             Real stories from real businesses who transformed their operations with FlashSpace
           </p>
         </div>
@@ -110,26 +110,26 @@ const TestimonialsSection = () => {
           {testimonials.map((testimonial, index) => (
             <Card
               key={index}
-              className={`bg-white shadow-md hover:shadow-xl hover:scale-105 border-2 border-gray-200 hover:border-[#EDB003] transition-all duration-500 ${getAnimationClasses(isVisible, 'fadeInUp', 600 + index * 100)}`}
+              className={`bg-white dark:bg-[#1f1f1f] shadow-md hover:shadow-xl hover:scale-105 border-2 border-gray-200 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] transition-all duration-500 ${getAnimationClasses(isVisible, 'fadeInUp', 600 + index * 100)}`}
             >
               <CardContent className="p-6">
                 {/* Quote */}
                 <div className="text-6xl text-[#EDB003]/20 mb-4 font-serif">"</div>
-                <p className="text-gray-600 leading-relaxed mb-4 font-content">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4 font-content">
                   {testimonial.text}
                 </p>
 
                 {/* Author Info */}
-                <div className="border-t border-gray-200 pt-6">
+                <div className="border-t border-gray-200 dark:border-white/10 pt-6">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-gradient-to-br from-[#172A3A]/15 to-[#EDB003]/15 rounded-full flex items-center justify-center">
-                      <span className="text-[#172A3A] font-bold text-lg">
+                      <span className="text-[#172A3A] dark:text-white font-bold text-lg">
                         {testimonial.author.split(' ').map(name => name[0]).join('')}
                       </span>
                     </div>
                     <div>
-                      <div className="font-semibold text-[#172A3A] font-content">{testimonial.author}</div>
-                      <div className="text-sm text-gray-600 font-content">{testimonial.position}</div>
+                      <div className="font-semibold text-[#172A3A] dark:text-white font-content">{testimonial.author}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400 font-content">{testimonial.position}</div>
                       <div className="text-sm text-[#EDB003] font-content">{testimonial.company}</div>
                     </div>
                   </div>
@@ -140,28 +140,28 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Stats */}
-        <Card className={`bg-white border-2 border-gray-200 shadow-lg  ${getAnimationClasses(isVisible, 'fadeInUp', 900)}`}>
-            <CardContent className="p-8">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 text-center">
+        <Card className={`bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 shadow-lg  ${getAnimationClasses(isVisible, 'fadeInUp', 900)}`}>
+          <CardContent className="p-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 text-center">
               <div className="group">
                 <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>5000+</div>
-                <div className="text-gray-600 font-content text-sm">Happy Clients</div>
+                <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Happy Clients</div>
               </div>
               <div className="group">
                 <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>100+</div>
-                <div className="text-gray-600 font-content text-sm">Cities Covered</div>
+                <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Cities Covered</div>
               </div>
               <div className="group">
                 <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>10K+</div>
-                <div className="text-gray-600 font-content text-sm">Registrations Done</div>
+                <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Registrations Done</div>
               </div>
               <div className="group">
                 <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>98%</div>
-                <div className="text-gray-600 font-content text-sm">Satisfaction Rate</div>
+                <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Satisfaction Rate</div>
               </div>
               <div className="group">
                 <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>&lt;3days</div>
-                <div className="text-gray-600 font-content text-sm">Avg Delivery Time</div>
+                <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Avg Delivery Time</div>
               </div>
             </div>
           </CardContent>
