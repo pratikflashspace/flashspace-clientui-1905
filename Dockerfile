@@ -3,6 +3,16 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Build arguments (ye docker-compose se aayenge)
+ARG VITE_API_URL
+ARG VITE_GOOGLE_CLIENT_ID
+ARG VITE_GOOGLE_MAPS_API_KEY
+
+# Environment variables set karo build ke liye
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+ENV VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
+
 # Package files copy karo
 COPY package*.json ./
 
