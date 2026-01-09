@@ -309,6 +309,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
       const primary = '#1A73E8';
 
+      // Custom Marker - Standard Style (Restored)
       el.innerHTML = `
         <div class="marker-container" style="
           display: inline-flex;
@@ -495,7 +496,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
                   font-weight: 500;
                   cursor: pointer;
                   transition: background 0.2s;
-                " onmouseover="this.style.background='#1557b0'" onmouseout="this.style.background='#1a73e8'">
+                " class="view-details-btn" onmouseover="this.style.background='#1557b0'" onmouseout="this.style.background='#1a73e8'">
                   View Details
                 </button>
               </div>
@@ -524,17 +525,17 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
       // Add hover effect to marker
       const markerIcon = el.querySelector('.marker-icon') as HTMLElement;
-      
+
       // Mouse enters marker - show popup and scale up
       el.addEventListener('mouseenter', () => {
         clearTimeout(closeTimeout);
-        
+
         // Scale up animation
         if (markerIcon) {
           markerIcon.style.transform = 'scale(1.15)';
           markerIcon.style.boxShadow = '0 5px 12px rgba(0,0,0,0.4)';
         }
-        
+
         if (popup && map.current) {
           popup.setLngLat([markerData.position.lng, markerData.position.lat]);
           popup.addTo(map.current);
@@ -545,7 +546,20 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
             if (popupEl) {
               // Make popup interactive
               popupEl.style.pointerEvents = 'auto';
-              
+
+              // Handle "View Details" click
+              const viewDetailsBtn = popupEl.querySelector('.view-details-btn');
+              if (viewDetailsBtn) {
+                viewDetailsBtn.addEventListener('click', (e) => {
+                  e.stopPropagation(); // Prevent map click
+                  // Determine route based on some data or default to generic space
+                  // Assuming markerData.id is unique and we can route to it.
+                  // We might need to know if it's a coworking space or virtual office.
+                  // For now, defaulting to /space/:id which seems to be the pattern
+                  window.location.href = `/space/${markerData.id}`;
+                });
+              }
+
               // Mouse enters popup - don't close
               popupEl.addEventListener('mouseenter', () => {
                 clearTimeout(closeTimeout);
@@ -569,7 +583,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           markerIcon.style.transform = 'scale(1)';
           markerIcon.style.boxShadow = '0 3px 8px rgba(0,0,0,0.3)';
         }
-        
+
         closeTimeout = setTimeout(() => {
           popup?.remove();
         }, 200);
@@ -606,11 +620,10 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
               <button
                 key={key}
                 onClick={() => handleStyleChange(key as MapStyle)}
-                className={`px-4 py-3 text-left transition-all duration-200 border-b border-gray-100 last:border-b-0 ${
-                  currentStyle === key
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-inner'
-                    : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50'
-                }`}
+                className={`px-4 py-3 text-left transition-all duration-200 border-b border-gray-100 last:border-b-0 ${currentStyle === key
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-inner'
+                  : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50'
+                  }`}
                 title={value.description}
               >
                 <div className="flex items-center gap-3">

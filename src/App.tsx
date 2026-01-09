@@ -99,8 +99,8 @@ const App = () => (
               <Route path="/blog/:id" element={<SinglePostPage />} />
 
               {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Index openLogin={true} />} />
+              <Route path="/signup" element={<Index openSignup={true} />} />
               <Route path="/verify-otp" element={<VerifyOTP />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
 

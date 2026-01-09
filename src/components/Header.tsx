@@ -1,16 +1,17 @@
-﻿import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { smoothScrollTo } from "@/lib/lenis";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import ModernFlairButton from "@/components/ui/ModernFlairButton";
-
 import { Phone, Building2, Users, Zap, FileText, ArrowRight, LayoutDashboard, LogOut, User as UserIcon, Settings, ChevronDown, X, Sun, Moon } from "lucide-react";
 import { CiMenuFries } from "react-icons/ci";
 import SidebarMenu from "@/components/SidebarMenu";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDarkMode } from "@/contexts/DarkModeContext";
 import GetInTouch from "@/pages/GetInTouch";
+import { LoginModal } from "@/components/auth/LoginModal";
+import { SignupModal } from "@/components/auth/SignupModal";
 
 // ✅ Country Data
 const countries = [
@@ -37,9 +38,11 @@ interface HeaderProps {
   forceWhiteBackground?: boolean;
   lightText?: boolean;
   loginBlack?: boolean;
+  openLogin?: boolean;
+  openSignup?: boolean;
 }
 
-const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = false }: HeaderProps) => {
+const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = false, openLogin = false, openSignup = false }: HeaderProps): ReactNode => {
   const { darkMode, toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
@@ -57,6 +60,17 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
   // Popup contact form
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
+  const [isSignupOpen, setIsSignupOpen] = useState(openSignup);
+
+  // Sync props to state
+  useEffect(() => {
+    setIsLoginOpen(openLogin);
+  }, [openLogin]);
+
+  useEffect(() => {
+    setIsSignupOpen(openSignup);
+  }, [openSignup]);
 
   const solutionsRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
@@ -443,7 +457,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 </div>
               ) : (
                 <ModernFlairButton
-                  onClick={() => handleNavigation("/login")}
+                  onClick={() => setIsLoginOpen(true)}
                   className="hidden lg:inline-flex group px-6 py-2.5 bg-white/50 backdrop-blur-sm text-black text-sm font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-white hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
                   flairColor="rgba(0, 0, 0, 0.05)"
                 >
@@ -464,7 +478,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
       {/* === Contact Popup === */}
       {isContactOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all">
-          {/* ====== Popup Container ====== */}
+          {/* ... (existing contact popup content) ... */}
           <div className="flex flex-col md:flex-row gap-10 w-[95%] max-w-5xl items-start justify-center">
             {/* ====== LEFT SIDE CARDS ====== */}
             <div className="flex flex-col gap-5 w-full md:w-[45%]">
@@ -517,7 +531,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 </p>
               </div>
             </div>
-            {/* ====== RIGHT SIDE FORM (UNCHANGED) ====== */}
+            {/* ====== RIGHT SIDE FORM ====== */}
             <div className="bg-white rounded-2xl shadow-2xl w-full md:w-[45%] p-8 relative animate-fade-in">
               <button
                 onClick={() => setIsContactOpen(false)}
@@ -573,8 +587,15 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
           </div>
         </div>
       )}
+
+      {/* === Login Modal === */}
+      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+
+      {/* === Signup Modal === */}
+      <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} />
     </>
   );
 };
+
 
 export default Header;
