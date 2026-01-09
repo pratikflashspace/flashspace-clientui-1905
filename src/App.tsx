@@ -54,6 +54,7 @@ import Profile from "./components/ClientDashboard/Profile";
 
 //-----------spaces---------
 import SpaceComponent from './components/Spaces/SpaceComponent';
+import CoworkingSpaceComponent from './components/Spaces/CoworkingSpaceComponent';
 
 // --- end dashboard imports ---
 
@@ -90,6 +91,7 @@ const App = () => (
 
               {/* Spaces*/}
               <Route path="/space/:id" element={<SpaceComponent />} />
+              <Route path="/coworking-space/:id" element={<CoworkingSpaceComponent />} />
 
 
               <Route path="/city-listing" element={<CityListing />} />

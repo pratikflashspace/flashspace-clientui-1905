@@ -6,9 +6,10 @@ import { cityCenters } from "@/components/Map/locationData.example";
 import Header from "@/components/Header";
 import MapSection from "@/components/services/MapSection";
 import SearchHeader from "@/components/services/SearchHeader";
-import ListingCard from "@/components/services/ListingCard";
+import ListingCardModern from "@/components/services/ListingCardModern";
 import ResizableMapLayout from "@/components/services/ResizableMapLayout";
 import { getVirtualOfficesByCity } from "@/services/virtualOffice.service";
+import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import {
   City,
   BusinessSolution,
@@ -178,25 +179,9 @@ const VirtualOffice = () => {
     navigate(href);
   };
 
-  // Map space names to their routes
-  const spaceRoutes: Record<string, string> = {
-    "Stirring Minds": "/space/stirring-minds",
-    "Virtualexcel": "/space/virtualexcel",
-    "Work & Beyond": "/space/work-and-beyond",
-    "Work &amp; Beyond": "/space/work-and-beyond",
-    "Okhla Alt F": "/space/okhla-alt-f",
-    "Budha Coworking": "/space/budha-coworking",
-    "Mytime Cowork": "/space/mytime-cowork",
-    "Getset Spaces": "/space/getset-spaces",
-    "CP Alt F": "/space/cp-alt-f",
-    "WBB Office": "/space/wbb-office"
-  };
-
-  const handleGetBestPrice = (spaceName: string): void => {
-    const route = spaceRoutes[spaceName];
-    if (route) {
-      navigate(route);
-    }
+  // Navigate to space detail page using MongoDB _id
+  const handleGetBestPrice = (spaceId: string): void => {
+    navigate(`/space/${spaceId}`);
   };
 
   // Get unique areas for filtering
@@ -214,6 +199,12 @@ const VirtualOffice = () => {
     if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
     if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
     if (["jammu"].includes(cityKeyFromState)) return cityCenters.jammu;
+    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
+    if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
+    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
+    if (["lucknow"].includes(cityKeyFromState)) return cityCenters.lucknow;
+    if (["surat"].includes(cityKeyFromState)) return cityCenters.surat;
+    if (["noida"].includes(cityKeyFromState)) return cityCenters.noida;
     // Default
     return cityCenters.delhi;
   })();
@@ -251,7 +242,7 @@ const VirtualOffice = () => {
   }, [virtualOffices, resolvedCenter]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-white">
       {/* Original Header */}
       <div className="flex-shrink-0">
         <Header />
@@ -357,21 +348,11 @@ const VirtualOffice = () => {
 
             {/* Results Header */}
             <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
-                <p className="text-xs sm:text-sm text-gray-600">
-                  Showing <span className="font-semibold text-gray-900">{virtualOffices.length} result(s)</span> for virtual office space in {selectedCity}
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm h-8 px-2 sm:px-3">
-                    📍 Compare
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm h-8 px-2 sm:px-3 hidden sm:flex">
-                    💡 Find ideal solution
-                  </Button>
-                </div>
-              </div>
+              <p className="text-sm text-gray-600">
+                Showing <span className="font-semibold text-gray-900">{virtualOffices.length} result(s)</span> for virtual office space in {selectedCity}
+              </p>
               
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+              <div className="flex items-center gap-2">
                 <Button 
                   variant={viewMode === "list" ? "default" : "ghost"} 
                   size="sm" 
@@ -393,12 +374,10 @@ const VirtualOffice = () => {
               </div>
             </div>
 
-            {/* Office Cards Grid - Using Optimized ListingCard Component */}
-            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            {/* Office Cards Grid - Modern MindTrip Style Cards */}
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               {loading ? (
-                <div className="col-span-full text-center py-8 sm:py-12">
-                  <p className="text-sm sm:text-base text-gray-600">Loading virtual offices...</p>
-                </div>
+                <SkeletonCardGrid count={6} />
               ) : error ? (
                 <div className="col-span-full text-center py-8 sm:py-12">
                   <p className="text-sm sm:text-base text-red-600">{error}</p>
@@ -408,10 +387,10 @@ const VirtualOffice = () => {
                   <p className="text-sm sm:text-base text-gray-600">No virtual offices found for {selectedCity}</p>
                 </div>
               ) : virtualOffices.map((office) => (
-                <ListingCard
+                <ListingCardModern
                   key={office._id}
                   item={office}
-                  onGetBestPrice={() => handleGetBestPrice(office.name)}
+                  onGetBestPrice={() => handleGetBestPrice(office._id)}
                   onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
                 />
               ))}

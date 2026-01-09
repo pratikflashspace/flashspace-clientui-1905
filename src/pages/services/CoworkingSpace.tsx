@@ -6,9 +6,10 @@ import { cityCenters } from "@/components/Map/locationData.example";
 import Header from "@/components/Header";
 import MapSection from "@/components/services/MapSection";
 import SearchHeader from "@/components/services/SearchHeader";
-import ListingCard from "@/components/services/ListingCard";
+import ListingCardModern from "@/components/services/ListingCardModern";
 import ResizableMapLayout from "@/components/services/ResizableMapLayout";
 import { getCoworkingSpacesByCity } from "@/services/coworkingSpace.service";
+import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import {
   City,
   BusinessSolution,
@@ -192,6 +193,12 @@ const CoworkingSpace = () => {
     if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
     if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
     if (["jammu"].includes(cityKeyFromState)) return cityCenters.jammu;
+    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
+    if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
+    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
+    if (["lucknow"].includes(cityKeyFromState)) return cityCenters.lucknow;
+    if (["surat"].includes(cityKeyFromState)) return cityCenters.surat;
+    if (["noida"].includes(cityKeyFromState)) return cityCenters.noida;
     return cityCenters.delhi;
   }, [selectedCity]);
 
@@ -239,7 +246,7 @@ const CoworkingSpace = () => {
   }, [coworkingSpaces, resolvedCenter]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-white">
       {/* Header */}
       <div className="flex-shrink-0">
         <Header />
@@ -345,19 +352,9 @@ const CoworkingSpace = () => {
 
           {/* Results Header */}
           <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
-              <p className="text-xs sm:text-sm text-gray-600">
-                Showing <span className="font-semibold text-gray-900">{coworkingSpaces.length} result(s)</span> for coworking space in {selectedCity}
-              </p>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm h-8 px-2 sm:px-3">
-                  📍 Compare
-                </Button>
-                <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm h-8 px-2 sm:px-3 hidden sm:flex">
-                  💡 Find ideal solution
-                </Button>
-              </div>
-            </div>
+            <p className="text-xs sm:text-sm text-gray-600">
+              Showing <span className="font-semibold text-gray-900">{coworkingSpaces.length} result(s)</span> for coworking space in {selectedCity}
+            </p>
             
             <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
               <Button 
@@ -384,9 +381,7 @@ const CoworkingSpace = () => {
           {/* Coworking Space Listings - Using Optimized ListingCard Component */}
           <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             {loading ? (
-              <div className="col-span-full text-center py-8 sm:py-12">
-                <p className="text-sm sm:text-base text-gray-600">Loading coworking spaces...</p>
-              </div>
+              <SkeletonCardGrid count={6} />
             ) : error ? (
               <div className="col-span-full text-center py-8 sm:py-12">
                 <p className="text-sm sm:text-base text-red-600">{error}</p>
@@ -395,12 +390,12 @@ const CoworkingSpace = () => {
               <div className="col-span-full text-center py-8 sm:py-12">
                 <p className="text-sm sm:text-base text-gray-600">No coworking spaces found for {selectedCity}</p>
               </div>
-            ) : coworkingSpaces.map((space) => (
-              <ListingCard
+            ) : coworkingSpaces.map((space, index) => (
+              <ListingCardModern
                 key={space._id}
                 item={space}
-                onGetBestPrice={(itemId) => console.log('Get best price for:', itemId)}
-                onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
+                index={index}
+                onClick={() => navigate(`/coworking-space/${space._id}`)}
               />
             ))}
           </div>

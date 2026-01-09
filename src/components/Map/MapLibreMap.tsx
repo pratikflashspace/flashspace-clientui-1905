@@ -39,6 +39,7 @@ const popupStyles = `
   
   .custom-marker:hover {
     z-index: 1000 !important;
+    transform: scale(1.05);
   }
   
   .marker-icon {
@@ -132,9 +133,9 @@ const MAP_STYLES: Record<MapStyle, { url: string; name: string; description: str
     emoji: '🌙'
   },
   'light': {
-    url: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-    name: '☀️ Light & Fresh',
-    description: 'Clean with nice colors',
+    url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+    name: '☀️ Light & Minimal',
+    description: 'Clean muted style like MindTrip',
     emoji: '☀️'
   },
   'outdoor': {
@@ -162,7 +163,7 @@ const MAP_STYLES: Record<MapStyle, { url: string; name: string; description: str
     emoji: '🎮'
   },
   'candy': {
-    url: 'https://tiles.openfreemap.org/styles/positron',
+    url: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
     name: '🍭 Candy',
     description: 'Sweet pastel colors',
     emoji: '🍭'
@@ -176,7 +177,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
   width = '100%',
   className = '',
   markers = [],
-  mapStyle = 'colorful',
+  mapStyle = 'retro',
   showStyleSelector = false,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -303,11 +304,11 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     markers.forEach((markerData, index) => {
       if (!map.current) return;
 
-      // Create custom marker element - pill style like the reference screenshot
+      // Create custom marker element - Simple pill style with name
       const el = document.createElement('div');
       el.className = 'custom-marker';
 
-      const primary = '#1A73E8';
+      const primary = '#FBBC04'; // yellow color for accents
 
       el.innerHTML = `
         <div class="marker-container" style="

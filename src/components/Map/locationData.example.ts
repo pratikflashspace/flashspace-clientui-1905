@@ -80,15 +80,22 @@ export const virtualOfficeLocations = [
 // 4. Click on the coordinates to copy them
 // 5. Format: { lat: LATITUDE, lng: LONGITUDE }
 
-// Example coordinates for major Indian cities:
+// Correct Google Maps coordinates for major Indian cities:
+// To verify: Go to Google Maps, search for the city, right-click on the center point
 export const cityCenters = {
-  ahmedabad: { lat: 23.0225, lng: 72.5714 },
-  bangalore: { lat: 12.9716, lng: 77.5946 },
-  chennai: { lat: 13.0827, lng: 80.2707 },
-  delhi: { lat: 28.6139, lng: 77.2090 },
-  dharamshala: { lat: 32.2190, lng: 76.3234 },
-  gurgaon: { lat: 28.4595, lng: 77.0266 },
-  hyderabad: { lat: 17.3850, lng: 78.4867 },
-  jaipur: { lat: 26.9124, lng: 75.7873 },
-  jammu: { lat: 32.7266, lng: 74.8570 },
+  ahmedabad: { lat: 23.0225, lng: 72.5714 },    // Ahmedabad, Gujarat
+  bangalore: { lat: 12.9716, lng: 77.5946 },    // Bengaluru, Karnataka
+  chennai: { lat: 13.0827, lng: 80.2707 },      // Chennai, Tamil Nadu
+  delhi: { lat: 28.6139, lng: 77.2090 },        // New Delhi
+  dharamshala: { lat: 32.2190, lng: 76.3234 },  // Dharamshala, Himachal Pradesh
+  gurgaon: { lat: 28.4595, lng: 77.0266 },      // Gurugram, Haryana
+  hyderabad: { lat: 17.3850, lng: 78.4867 },    // Hyderabad, Telangana
+  jaipur: { lat: 26.9124, lng: 75.7873 },       // Jaipur, Rajasthan
+  jammu: { lat: 32.7266, lng: 74.8570 },        // Jammu, J&K
+  mumbai: { lat: 19.0760, lng: 72.8777 },       // Mumbai, Maharashtra
+  pune: { lat: 18.5204, lng: 73.8567 },         // Pune, Maharashtra
+  kolkata: { lat: 22.5726, lng: 88.3639 },      // Kolkata, West Bengal
+  lucknow: { lat: 26.8467, lng: 80.9462 },      // Lucknow, Uttar Pradesh
+  surat: { lat: 21.1702, lng: 72.8311 },        // Surat, Gujarat
+  noida: { lat: 28.5355, lng: 77.3910 },        // Noida, Uttar Pradesh
 };
