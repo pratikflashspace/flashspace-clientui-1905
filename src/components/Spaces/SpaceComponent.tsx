@@ -5,7 +5,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getVirtualOfficeById } from '@/services/virtualOffice.service';
 import { VirtualOfficeItem } from '@/types/services';
+import { getVirtualOfficePricing } from '@/utils/priceUtils';
 import { SpaceDetailSkeleton } from '@/components/ui/skeleton-loaders';
+import ImageGalleryModal from '../ui/ImageGalleryModal';
 
 // Default photos for spaces that don't have images
 const DEFAULT_PHOTOS = [
@@ -25,10 +27,11 @@ const SpaceComponent = () => {
   const [error, setError] = useState<string>("");
   
   // UI State
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [selectedPlan, setSelectedPlan] = useState('gst');
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
 
-  // Fetch space details from API
+  // Fetch space details from API 
   useEffect(() => {
     const fetchSpaceDetails = async () => {
       if (!id) return;
@@ -65,48 +68,21 @@ const SpaceComponent = () => {
   };
 
   // Generate pricing from API data
-  const getPricing = () => {
-    if (!spaceDetails) return null;
-    
-    // Parse price string to get numeric value (e.g., "₹800/month" -> 800)
-    const parsePrice = (priceStr: string) => {
-      const match = priceStr?.match(/[\d,]+/);
-      return match ? parseInt(match[0].replace(/,/g, '')) : 0;
-    };
-
-    const gstPrice = parsePrice(spaceDetails.gstPlanPrice || spaceDetails.price);
-    const mailingPrice = parsePrice(spaceDetails.mailingPlanPrice || spaceDetails.price);
-    const brPrice = parsePrice(spaceDetails.brPlanPrice || spaceDetails.price);
-
-    return {
-      gst: { 
-        name: "GST Plan", 
-        monthly: gstPrice, 
-        yearly: Math.round(gstPrice * 12 * 0.9), // 10% discount on yearly
-        features: ["Virtual Address", "GST Registration", "Mail Handling"] 
-      },
-      mailing: { 
-        name: "Mailing Plan", 
-        monthly: mailingPrice, 
-        yearly: Math.round(mailingPrice * 12 * 0.9),
-        features: ["Mail Handling", "Courier Receipt"] 
-      },
-      br: { 
-        name: "BR Plan", 
-        monthly: brPrice, 
-        yearly: Math.round(brPrice * 12 * 0.9),
-        features: ["Business Registration", "Lounge Access", "Meeting Rooms"] 
-      },
-    };
-  };
-
-  const pricing = getPricing();
+  const pricing = getVirtualOfficePricing(spaceDetails);
 
   // Get price based on selected plan
-  const getPrice = (planKey: string) => {
+  const getPrice = (planKey?: string) => {
     if (!pricing) return 0;
-    const plan = pricing[planKey as keyof typeof pricing];
-    return billingCycle === 'monthly' ? plan.monthly : plan.yearly;
+    const key = planKey || selectedPlan;
+    // @ts-ignore
+    const plan = pricing[key as keyof typeof pricing];
+    if (!plan) return 0;
+    return plan.yearlyPrice;
+  };
+
+  // Check if pricing is simple (single price) or complex (multiple plans)
+  const isSimplePricing = (pricingData: any) => {
+    return typeof pricingData === 'number' || typeof pricingData === 'string';
   };
 
   // Get photos - use API image or fallback to defaults
@@ -117,8 +93,8 @@ const SpaceComponent = () => {
   };
 
   const handleBookNow = () => {
-    if (!spaceDetails) return;
-    alert(`Booking Confirmed!\nSpace: ${spaceDetails.name}\nPlan: ${selectedPlan.toUpperCase()}\nCycle: ${billingCycle}\nTotal: ₹${getPrice(selectedPlan)}`);
+    if (!spaceDetails || !pricing) return;
+    navigate(`/booking/${spaceDetails._id}?plan=${selectedPlan}`);
   };
 
   // Loading State - Show Skeleton
@@ -157,23 +133,19 @@ const SpaceComponent = () => {
 
   const photos = getPhotos();
 
-  return (
-    <div className="flex flex-col min-h-screen">
-      {/* 1. Header at the top */}
+  return (      <div className="flex flex-col min-h-screen">
       <Header />
+      <main className="flex-grow bg-white dark:bg-[#0a0a0a] pt-20 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 py-10 font-poppins text-gray-800 dark:text-gray-100">
 
-      {/* 2. Main Content Area */}
-      <main className="flex-grow bg-white pt-20">
-        <div className="max-w-7xl mx-auto px-4 py-10 font-poppins text-gray-800">
-          
           {/* --- HEADER SECTION --- */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2 font-geist">{spaceDetails.name}</h1>
-            <div className="flex items-center justify-between text-sm text-gray-600">
+            <h1 className="text-3xl font-bold mb-2 font-geist text-black dark:text-white">{spaceDetails.name}</h1>
+            <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold text-black">{spaceDetails.rating}</span>
+                  <span className="font-semibold text-black dark:text-white">{spaceDetails.rating}</span>
                   <span className="underline">({spaceDetails.reviews} reviews)</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -181,8 +153,7 @@ const SpaceComponent = () => {
                   <span>{spaceDetails.address}</span>
                 </div>
               </div>
-              {/* Back Button */}
-              <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-black transition">
+              <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition">
                 <ArrowLeft className="w-4 h-4" />
                 Back to Spaces
               </button>
@@ -192,21 +163,46 @@ const SpaceComponent = () => {
           {/* --- PHOTO GRID --- */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[400px] mb-8 rounded-2xl overflow-hidden">
             <div className="md:col-span-2 h-full">
-              <img src={photos[0]} alt="Main Space" className="w-full h-full object-cover hover:opacity-95 transition cursor-pointer" />
+              <img 
+                src={photos[0]} 
+                alt="Main Space" 
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+                onClick={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}
+              />
             </div>
             <div className="md:col-span-1 grid grid-rows-2 gap-2 h-full">
-              <img src={photos[1]} alt="Detail 1" className="w-full h-full object-cover hover:opacity-95 transition cursor-pointer" />
-              <img src={photos[2]} alt="Detail 2" className="w-full h-full object-cover hover:opacity-95 transition cursor-pointer" />
+              <img 
+                src={photos[1]} 
+                alt="Detail 1" 
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+                onClick={() => { setGalleryInitialIndex(1); setIsGalleryOpen(true); }}
+              />
+              <img 
+                src={photos[2]} 
+                alt="Detail 2" 
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+                onClick={() => { setGalleryInitialIndex(2); setIsGalleryOpen(true); }}
+              />
             </div>
             <div className="md:col-span-1 h-full relative">
-              <img src={photos[3]} alt="Detail 3" className="w-full h-full object-cover hover:opacity-95 transition cursor-pointer" />
-              <button className="absolute bottom-4 right-4 bg-white px-4 py-2 rounded-lg shadow-md text-sm font-semibold">Show all photos</button>
+              <img 
+                src={photos[3]} 
+                alt="Detail 3" 
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+                onClick={() => { setGalleryInitialIndex(3); setIsGalleryOpen(true); }}
+              />
+              <button 
+                onClick={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}
+                className="absolute bottom-4 right-4 bg-white hover:bg-gray-100 px-4 py-2 rounded-lg shadow-md text-sm font-semibold transition-colors"
+              >
+                Show all photos
+              </button>
             </div>
           </div>
 
           {/* --- MAIN CONTENT LAYOUT --- */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            
+
             {/* LEFT COLUMN: Info */}
             <div className="lg:col-span-2">
               <div className="border-b pb-8 mb-8">
@@ -217,8 +213,8 @@ const SpaceComponent = () => {
                 </p>
               </div>
 
-              <div className="border-b pb-8 mb-8">
-                <h2 className="text-xl font-semibold mb-4 font-geist">What this place offers</h2>
+              <div className="border-b dark:border-white/10 pb-8 mb-8">
+                <h2 className="text-xl font-semibold mb-4 font-geist text-black dark:text-white">What this place offers</h2>
                 <div className="grid grid-cols-2 gap-4">
                   {(spaceDetails.features || []).map((item, index) => (
                     <div key={index} className="flex items-center gap-3 text-gray-700">
@@ -248,45 +244,16 @@ const SpaceComponent = () => {
 
             {/* RIGHT COLUMN: Sticky Booking Card */}
             <div className="relative">
-              <div className="sticky top-24 border rounded-xl shadow-xl p-6 bg-white z-10">
+              <div className="sticky top-24 border dark:border-white/10 rounded-xl shadow-xl dark:shadow-none p-6 bg-white dark:bg-[#1f1f1f] z-10 transition-colors duration-300">
                 <div className="flex justify-between items-end mb-6">
                   <div>
-                    <span className="text-2xl font-bold">₹{getPrice(selectedPlan)}</span>
-                    <span className="text-gray-500"> / {billingCycle}</span>
+                    <span className="text-2xl font-bold text-black dark:text-white">₹{getPrice()}</span>
+                    <span className="text-gray-500 dark:text-gray-400"> / year</span>
                   </div>
-                  <div className="flex items-center gap-1 text-sm">
+                  <div className="flex items-center gap-1 text-sm dark:text-gray-300">
                     <span>⭐</span>
                     <span className="font-semibold">{spaceDetails.rating}</span>
                   </div>
-                </div>
-
-                <div className="relative inline-flex items-center bg-gray-100 rounded-full p-1 mb-6 w-full">
-                  <button 
-                    onClick={() => setBillingCycle('monthly')}
-                    className={`flex-1 py-2.5 text-sm font-semibold rounded-full transition-all duration-300 relative z-10 ${
-                      billingCycle === 'monthly' 
-                        ? 'text-white' 
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Monthly
-                  </button>
-                  <button 
-                    onClick={() => setBillingCycle('yearly')}
-                    className={`flex-1 py-2.5 text-sm font-semibold rounded-full transition-all duration-300 relative z-10 flex items-center justify-center gap-1.5 ${
-                      billingCycle === 'yearly' 
-                        ? 'text-black' 
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Yearly
-                    <span className="text-[9px] font-extrabold bg-red-500 text-white px-1.5 py-0.5 rounded-md shadow-sm">10% OFF</span>
-                  </button>
-                  <div 
-                    className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full transition-all duration-300 ease-out shadow-lg ${
-                      billingCycle === 'yearly' ? 'translate-x-[calc(100%+8px)]' : 'translate-x-0'
-                    }`}
-                  />
                 </div>
 
                 <div className="space-y-3 mb-6">
@@ -299,7 +266,7 @@ const SpaceComponent = () => {
                     >
                       <div className="flex justify-between items-center">
                         <span className="font-semibold">{plan.name}</span>
-                        <span className="font-bold">₹{billingCycle === 'monthly' ? plan.monthly : plan.yearly}</span>
+                        <span className="font-bold">₹{plan.yearlyPrice}/year</span>
                       </div>
                       <ul className="mt-2 text-xs text-gray-500 list-disc pl-4">
                         {plan.features.map((f, i) => <li key={i}>{f}</li>)}
@@ -317,13 +284,16 @@ const SpaceComponent = () => {
                 <p className="text-center text-xs text-gray-400 mt-4">You won't be charged yet</p>
               </div>
             </div>
-
           </div>
         </div>
       </main>
-
-      {/* 3. Footer at the bottom */}
       <Footer />
+      <ImageGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        images={spaceDetails?.photos || getPhotos()}
+        initialIndex={galleryInitialIndex}
+      />
     </div>
   );
 };

@@ -57,7 +57,7 @@ export interface EventSpaceItem {
   reviews: number;
   type: string;
   capacity: string;
-  features: string[];           
+  features: string[];
   area: string;
   availability: string;
   popular: boolean;
@@ -81,9 +81,6 @@ export interface CoworkingSpaceItem {
   area: string;
   price: string;
   originalPrice: string;
-  gstPlanPrice: string;
-  mailingPlanPrice: string;
-  brPlanPrice: string;
   rating: number;
   reviews: number;
   type: string;

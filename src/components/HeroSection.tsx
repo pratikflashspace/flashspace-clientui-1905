@@ -118,14 +118,15 @@ const HeroSection = () => {
 
 
       {/* Darker overlay for text readability */}
-      {/* <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-black/40 to-slate-800/50 backdrop-blur-sm z-10"></div> */}
+      {/* Darker overlay for text readability in dark mode */}
+      <div className="absolute inset-0 bg-transparent dark:bg-black/70 z-10 transition-colors duration-300"></div>
 
       <div className="container mx-auto text-left relative z-20 pl-24 md:pl-16 lg:pl-8">
         <div className="max-w-4xl mb-8 relative">
 
           {/* Eyebrow / Context line */}
           <p
-            className="mb-4 text-sm uppercase tracking-widest text-gray-600 animate-fade-in"
+            className="mb-4 text-sm uppercase tracking-widest text-gray-600 dark:text-gray-400 animate-fade-in"
             style={{ fontFamily: "Geist" }}
           >
             AI-Enabled Coworking & Virtual Offices
@@ -133,7 +134,7 @@ const HeroSection = () => {
 
           {/* Headline */}
           <h1
-            className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight text-black animate-fade-in"
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight text-black dark:text-white animate-fade-in"
             style={{ fontFamily: "Geist" }}
           >
             India’s First <span className="text-[#EFAD1A]">AI-Powered</span><br />
@@ -142,7 +143,7 @@ const HeroSection = () => {
 
           {/* Subheading */}
           <p
-            className="mt-6 text-lg md:text-xl text-black leading-relaxed max-w-2xl animate-fade-in"
+            className="mt-6 text-lg md:text-xl text-black dark:text-gray-100 leading-relaxed max-w-2xl animate-fade-in"
             style={{
               animationDelay: "200ms",
               fontFamily: "Geist",
@@ -159,7 +160,7 @@ const HeroSection = () => {
           >
             {/* Primary CTA */}
             <ModernFlairButton
-              onClick={() => navigate("/start-chatting")}
+              onClick={() => navigate("/book-tour")}
               className="group px-8 py-4 bg-[#0a0a0a] text-white rounded-full transition-all duration-300 transform hover:scale-[1.02] hover:shadow-[0_0_30px_-5px_rgba(239,173,26,0.3)] border border-white/5 active:scale-95 overflow-hidden"
               flairColor="rgba(239, 173, 26, 0.3)"
             >
@@ -175,14 +176,14 @@ const HeroSection = () => {
 
             {/* Secondary CTA */}
             <ModernFlairButton
-              onClick={() => navigate("/services/virtual-office")}
+              onClick={() => scrollToSection("#about")}
               className="group px-8 py-4 bg-white/80 backdrop-blur-md border border-white/50 text-black rounded-full transition-all duration-300 hover:bg-white hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
               flairColor="rgba(0, 0, 0, 0.1)"
             >
               <span className="flex items-center gap-2 font-medium" style={{ fontFamily: "Geist" }}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5 text-gray-600 group-hover:text-[#EFAD1A] transition-colors duration-300"
+                  className="w-5 h-5 text-gray-600 group-hover:text-[#EFAD1A] dark:text-gray-300 transition-colors duration-300"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -200,7 +201,7 @@ const HeroSection = () => {
           </div>
 
           {/* Trust Signals */}
-          <div className="mt-8 flex flex-wrap gap-6 text-sm text-black">
+          <div className="mt-8 flex flex-wrap gap-6 text-sm text-black dark:text-gray-200">
             <span>✔ AI Compliance</span>
             <span>✔ Prime Locations</span>
             <span>✔ Enterprise-Ready</span>

@@ -225,7 +225,7 @@ const BusinessSetup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
       {/* Header */}
       <Header />
 
@@ -275,7 +275,7 @@ const BusinessSetup = () => {
 
             {/* Hero Search Bar */}
             <motion.div
-              className="bg-white rounded-2xl p-2 shadow-2xl max-w-2xl"
+              className="bg-white dark:bg-[#1f1f1f] rounded-2xl p-2 shadow-2xl max-w-2xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -287,7 +287,7 @@ const BusinessSetup = () => {
                       <Button
                         variant="ghost"
                         role="combobox"
-                        className="w-full justify-between h-16 text-gray-900 hover:bg-gray-50 rounded-xl"
+                        className="w-full justify-between h-16 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-black/20 rounded-xl"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-[#EDB003]/10 rounded-lg flex items-center justify-center">
@@ -301,11 +301,11 @@ const BusinessSetup = () => {
                         <ChevronDown className="ml-2 h-5 w-5 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 bg-white shadow-xl border-2 border-gray-100">
-                      <Command className="bg-white">
-                        <CommandInput placeholder="Search city..." className="bg-white" />
-                        <CommandList className="bg-white">
-                          <CommandEmpty>No city found.</CommandEmpty>
+                    <PopoverContent className="w-[300px] p-0 bg-white dark:bg-[#1f1f1f] shadow-xl border-2 border-gray-100 dark:border-white/10">
+                      <Command className="bg-white dark:bg-[#1f1f1f]">
+                        <CommandInput placeholder="Search city..." className="bg-white dark:bg-[#1f1f1f] dark:text-white" />
+                        <CommandList className="bg-white dark:bg-[#1f1f1f]">
+                          <CommandEmpty className="dark:text-white">No city found.</CommandEmpty>
                           <CommandGroup>
                             {cities.map((city) => (
                               <CommandItem
@@ -315,6 +315,7 @@ const BusinessSetup = () => {
                                   setSelectedCity(city);
                                   setIsLocationOpen(false);
                                 }}
+                                className="dark:text-white dark:aria-selected:bg-white/10"
                               >
                                 <Check
                                   className={cn(
@@ -347,7 +348,7 @@ const BusinessSetup = () => {
             >
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
-                  {[1,2,3,4].map((i) => (
+                  {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#EDB003] to-[#f5c242] border-2 border-white"></div>
                   ))}
                 </div>
@@ -359,7 +360,7 @@ const BusinessSetup = () => {
 
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
-                  {[1,2,3,4,5].map((i) => (
+                  {[1, 2, 3, 4, 5].map((i) => (
                     <Star key={i} className="w-4 h-4 fill-[#EDB003] text-[#EDB003]" />
                   ))}
                 </div>
@@ -411,7 +412,7 @@ const BusinessSetup = () => {
       </section>
 
       {/* What is Business Setup Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -422,10 +423,10 @@ const BusinessSetup = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Our Services
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               What is <span className="text-[#EDB003]">Business Setup</span>?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               FlashSpace Business Setup provides comprehensive end-to-end support for legally establishing your business in India. From company registration to compliance management, we handle everything so you can focus on growing your venture.
             </p>
           </motion.div>
@@ -439,15 +440,15 @@ const BusinessSetup = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-2 border-gray-100 hover:border-[#EDB003] transition-all duration-500 group hover:shadow-xl h-full">
+                <Card className="border-2 border-gray-100 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] transition-all duration-500 group hover:shadow-xl h-full bg-white dark:bg-[#1f1f1f]">
                   <CardContent className="p-8">
                     <div className="w-16 h-16 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                       <card.icon className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
                       {card.title}
                     </h3>
-                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
                       {card.description}
                     </p>
                   </CardContent>
@@ -459,7 +460,7 @@ const BusinessSetup = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -470,10 +471,10 @@ const BusinessSetup = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Simple Process
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               How It <span className="text-[#EDB003]">Works</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Launch your business in three simple steps with FlashSpace
             </p>
           </motion.div>
@@ -502,16 +503,16 @@ const BusinessSetup = () => {
                 </div>
 
                 {/* Step Content */}
-                <div className="flex-1 bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border-2 border-gray-100 hover:border-[#EDB003]">
+                <div className="flex-1 bg-white dark:bg-[#1f1f1f] rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border-2 border-gray-100 dark:border-white/10 hover:border-[#EDB003]">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-[#EDB003]/10 rounded-lg flex items-center justify-center flex-shrink-0">
                       <step.icon className="w-6 h-6 text-[#EDB003]" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold mb-3 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+                      <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
                         {step.title}
                       </h3>
-                      <p className="text-gray-600 leading-relaxed text-lg" style={{ fontFamily: 'Geist, sans-serif' }}>
+                      <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg" style={{ fontFamily: 'Geist, sans-serif' }}>
                         {step.description}
                       </p>
                     </div>
@@ -524,7 +525,7 @@ const BusinessSetup = () => {
       </section>
 
       {/* Why Choose FlashSpace Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -535,10 +536,10 @@ const BusinessSetup = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Why Choose Us
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               Why Choose <span className="text-[#EDB003]">FlashSpace</span> Business Setup
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Trusted by 5000+ entrepreneurs for comprehensive business registration and compliance solutions
             </p>
           </motion.div>
@@ -552,7 +553,7 @@ const BusinessSetup = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
                   <CardContent className="p-8 relative">
                     {/* Background Gradient */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${reason.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
@@ -561,11 +562,11 @@ const BusinessSetup = () => {
                       <reason.icon className="w-8 h-8 text-white" />
                     </div>
 
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
                       {reason.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
                       {reason.description}
                     </p>
                   </CardContent>
@@ -577,7 +578,7 @@ const BusinessSetup = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -588,10 +589,10 @@ const BusinessSetup = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Success Stories
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               What Our <span className="text-[#EDB003]">Clients Say</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Hear from entrepreneurs who successfully launched their businesses with FlashSpace
             </p>
           </motion.div>
@@ -605,7 +606,7 @@ const BusinessSetup = () => {
                 transition={{ delay: index * 0.15 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-500 h-full">
+                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-500 h-full bg-white dark:bg-[#1f1f1f]">
                   <CardContent className="p-8">
                     {/* Stars */}
                     <div className="flex gap-1 mb-4">
@@ -615,7 +616,7 @@ const BusinessSetup = () => {
                     </div>
 
                     {/* Content */}
-                    <p className="text-gray-700 mb-6 leading-relaxed italic" style={{ fontFamily: 'Geist, sans-serif' }}>
+                    <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed italic" style={{ fontFamily: 'Geist, sans-serif' }}>
                       "{testimonial.content}"
                     </p>
 
@@ -627,8 +628,8 @@ const BusinessSetup = () => {
                         className="w-14 h-14 rounded-full object-cover"
                       />
                       <div>
-                        <h4 className="font-bold text-[#172A3A]">{testimonial.name}</h4>
-                        <p className="text-sm text-gray-600">{testimonial.role}</p>
+                        <h4 className="font-bold text-[#172A3A] dark:text-white">{testimonial.name}</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{testimonial.role}</p>
                         <p className="text-xs text-[#EDB003]">{testimonial.company}</p>
                       </div>
                     </div>
@@ -641,7 +642,7 @@ const BusinessSetup = () => {
       </section>
 
       {/* Location Grid Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -652,10 +653,10 @@ const BusinessSetup = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Our Locations
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               <span className="text-[#EDB003]">68+</span> Centers Across <span className="text-[#EDB003]">8</span> Cities
             </h2>
-            <p className="text-xl text-gray-600" style={{ fontFamily: 'Geist, sans-serif' }}>Register your business from anywhere in India</p>
+            <p className="text-xl text-gray-600 dark:text-gray-300" style={{ fontFamily: 'Geist, sans-serif' }}>Register your business from anywhere in India</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -703,7 +704,7 @@ const BusinessSetup = () => {
       </section>
 
       {/* FAQs Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -714,10 +715,10 @@ const BusinessSetup = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Have Questions?
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               Frequently Asked <span className="text-[#EDB003]">Questions</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
               Everything you need to know about business registration and setup
             </p>
           </motion.div>
@@ -732,27 +733,25 @@ const BusinessSetup = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-gray-100 hover:border-[#EDB003] transition-all duration-300">
+                <div className="bg-white dark:bg-[#1f1f1f] rounded-xl shadow-lg overflow-hidden border-2 border-gray-100 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] transition-all duration-300">
                   <button
-                    className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-black/20 transition-colors"
                     onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
                   >
-                    <h3 className="text-lg font-bold text-[#172A3A] pr-8">
+                    <h3 className="text-lg font-bold text-[#172A3A] dark:text-white pr-8">
                       {faq.question}
                     </h3>
                     <ChevronDown
-                      className={`w-6 h-6 text-[#EDB003] flex-shrink-0 transition-transform duration-300 ${
-                        openFaqIndex === index ? 'rotate-180' : ''
-                      }`}
+                      className={`w-6 h-6 text-[#EDB003] flex-shrink-0 transition-transform duration-300 ${openFaqIndex === index ? 'rotate-180' : ''
+                        }`}
                     />
                   </button>
                   <div
-                    className={`overflow-hidden transition-all duration-300 ${
-                      openFaqIndex === index ? 'max-h-96' : 'max-h-0'
-                    }`}
+                    className={`overflow-hidden transition-all duration-300 ${openFaqIndex === index ? 'max-h-96' : 'max-h-0'
+                      }`}
                   >
-                    <div className="px-8 py-6 bg-gray-50 border-t border-gray-200">
-                      <p className="text-gray-700 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>{faq.answer}</p>
+                    <div className="px-8 py-6 bg-gray-50 dark:bg-black/20 border-t border-gray-200 dark:border-white/10">
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>{faq.answer}</p>
                     </div>
                   </div>
                 </div>

@@ -55,6 +55,9 @@ import Profile from "./components/ClientDashboard/Profile";
 //-----------spaces---------
 import SpaceComponent from './components/Spaces/SpaceComponent';
 import CoworkingSpaceComponent from './components/Spaces/CoworkingSpaceComponent';
+import BookingPage from './pages/BookingPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentFailedPage from './pages/PaymentFailedPage';
 
 // --- end dashboard imports ---
 
@@ -92,7 +95,11 @@ const App = () => (
               {/* Spaces*/}
               <Route path="/space/:id" element={<SpaceComponent />} />
               <Route path="/coworking-space/:id" element={<CoworkingSpaceComponent />} />
+              <Route path="/booking/:id" element={<BookingPage />} />
 
+              {/* Payment Routes */}
+              <Route path="/payment/success" element={<PaymentSuccessPage />} />
+              <Route path="/payment/failed" element={<PaymentFailedPage />} />
 
               <Route path="/city-listing" element={<CityListing />} />
               <Route path="/career" element={<Career />} />

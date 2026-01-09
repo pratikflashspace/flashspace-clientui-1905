@@ -10,7 +10,7 @@ const CityListing = () => {
   const service = searchParams.get('service') || 'workspaces';
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Header />
 
       <main className="flex-grow container mx-auto px-4 py-16">

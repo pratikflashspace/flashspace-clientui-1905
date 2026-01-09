@@ -250,7 +250,7 @@ const ServicePageTemplate = () => {
   }, [items, resolvedCenter]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-black transition-colors duration-300">
       {/* Header */}
       <div className="flex-shrink-0">
         <Header />
@@ -266,16 +266,16 @@ const ServicePageTemplate = () => {
         >
           <div className="px-6 py-6">
             {/* Breadcrumb */}
-            <div className={`flex items-center gap-2 text-sm text-gray-600 mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <div className={`flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               <span>Home</span>
               <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
               <span>Your Service</span> {/* TODO: Update this */}
               <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
-              <span className="text-gray-900 font-medium">{selectedCity}</span>
+              <span className="text-gray-900 dark:text-white font-medium">{selectedCity}</span>
             </div>
 
             {/* Page Title */}
-            <h1 className={`text-3xl font-bold text-gray-900 mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <h1 className={`text-3xl font-bold text-gray-900 dark:text-white mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               Your Service In {selectedCity} {/* TODO: Update this */}
             </h1>
 
@@ -298,8 +298,8 @@ const ServicePageTemplate = () => {
             {/* Results Header */}
             <div className={`flex items-center justify-between mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               <div className="flex items-center gap-4">
-                <p className="text-gray-600">
-                  Showing <span className="font-semibold text-gray-900">{items.length} result(s)</span> for your service in {selectedCity}
+                <p className="text-gray-600 dark:text-gray-400">
+                  Showing <span className="font-semibold text-gray-900 dark:text-white">{items.length} result(s)</span> for your service in {selectedCity}
                 </p>
               </div>
 
@@ -329,15 +329,15 @@ const ServicePageTemplate = () => {
             <div className={`grid grid-cols-2 gap-4 mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               {loading ? (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-gray-600">Loading...</p>
+                  <p className="text-gray-600 dark:text-gray-400">Loading...</p>
                 </div>
               ) : error ? (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-red-600">{error}</p>
+                  <p className="text-red-600 dark:text-red-400">{error}</p>
                 </div>
               ) : items.length === 0 ? (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-gray-600">No items found for {selectedCity}</p>
+                  <p className="text-gray-600 dark:text-gray-400">No items found for {selectedCity}</p>
                 </div>
               ) : items.map((item) => (
                 <ListingCardModern

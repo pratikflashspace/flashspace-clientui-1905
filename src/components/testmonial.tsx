@@ -73,7 +73,7 @@ const TestimonialsSection = () => {
                   key={index}
                   className="flex-shrink-0 mx-4 flex items-center justify-center w-52 h-32"
                 >
-                  <div className={`${company.needsInvert ? 'bg-[#172A3A]' : 'bg-white'} border-2 border-gray-200 p-6 w-full h-full flex items-center justify-center hover:shadow-xl transition-all duration-300 rounded-xl group hover:border-[#EDB003] relative overflow-hidden`}>
+                  <div className={`${company.needsInvert ? 'bg-[#172A3A]' : 'bg-white'} border-2 border-gray-200 dark:border-white/10 p-6 w-full h-full flex items-center justify-center hover:shadow-xl transition-all duration-300 rounded-xl group hover:border-[#EDB003] relative overflow-hidden`}>
                     <img
                       src={company.logo}
                       alt={company.name}

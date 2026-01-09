@@ -63,9 +63,9 @@ const PartnerWithUs = () => {
         partnershipType: formData.partnershipType,
         message: formData.message,
       });
-      
+
       toast.success("Thank you for your interest! Our partnership team will contact you within 24 hours.");
-      
+
       // Reset form
       setFormData({
         name: "",
@@ -215,7 +215,7 @@ const PartnerWithUs = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
+    <div className="min-h-screen bg-white dark:bg-black overflow-hidden transition-colors duration-300">
       <Header forceWhiteBackground={true} />
 
       {/* Hero Section with Background Image */}
@@ -327,11 +327,11 @@ const PartnerWithUs = () => {
       </section>
 
       {/* Partnership Types Section with Images */}
-      <section className="py-24 px-4 bg-gradient-to-br from-gray-50 via-white to-amber-50/30 relative">
+      <section className="py-24 px-4 bg-gradient-to-br from-gray-50 via-white to-amber-50/30 dark:from-gray-900 dark:via-black dark:to-[#1a1a1a] relative transition-colors duration-300">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.1) 1px, transparent 0)`,
             backgroundSize: '40px 40px'
           }}></div>
         </div>
@@ -343,10 +343,10 @@ const PartnerWithUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-black mb-4" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4" style={{ fontFamily: 'Poppins' }}>
               Partnership <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">Opportunities</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
               Choose the partnership model that aligns with your business vision
             </p>
           </motion.div>
@@ -360,7 +360,7 @@ const PartnerWithUs = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="group hover:shadow-2xl transition-all duration-500 border-2 hover:border-yellow-400 overflow-hidden h-full">
+                <Card className="group hover:shadow-2xl transition-all duration-500 border-2 hover:border-yellow-400 overflow-hidden h-full bg-white dark:bg-[#1a1a1a] dark:border-white/10">
                   {/* Image Section */}
                   <div className="relative h-56 overflow-hidden">
                     <img
@@ -375,10 +375,10 @@ const PartnerWithUs = () => {
                   </div>
 
                   <CardContent className="p-8 relative">
-                    <h3 className="text-2xl font-bold text-black mb-3 group-hover:text-yellow-600 transition-colors" style={{ fontFamily: 'Poppins' }}>
+                    <h3 className="text-2xl font-bold text-black dark:text-white mb-3 group-hover:text-yellow-600 transition-colors" style={{ fontFamily: 'Poppins' }}>
                       {type.title}
                     </h3>
-                    <p className="text-gray-600 mb-6 leading-relaxed" style={{ fontFamily: 'Geist' }}>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed" style={{ fontFamily: 'Geist' }}>
                       {type.description}
                     </p>
 
@@ -388,7 +388,7 @@ const PartnerWithUs = () => {
                           <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
                             <CheckCircle2 className="w-4 h-4 text-green-600" />
                           </div>
-                          <span className="text-gray-700" style={{ fontFamily: 'Geist' }}>{benefit}</span>
+                          <span className="text-gray-700 dark:text-gray-300" style={{ fontFamily: 'Geist' }}>{benefit}</span>
                         </div>
                       ))}
                     </div>
@@ -413,7 +413,7 @@ const PartnerWithUs = () => {
       </section>
 
       {/* Benefits Section with Enhanced Visuals */}
-      <section id="benefits" className="py-24 px-4 bg-white relative overflow-hidden">
+      <section id="benefits" className="py-24 px-4 bg-white dark:bg-black relative overflow-hidden transition-colors duration-300">
         {/* Decorative Background */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl"></div>
@@ -425,10 +425,10 @@ const PartnerWithUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-black mb-4" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4" style={{ fontFamily: 'Poppins' }}>
               Why Partner with <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">Us?</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
               Experience the FlashSpace advantage and accelerate your business growth
             </p>
           </motion.div>
@@ -447,10 +447,10 @@ const PartnerWithUs = () => {
                 <div className={`inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br ${benefit.gradient} rounded-2xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg`}>
                   <benefit.icon className="w-12 h-12 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-black mb-3 group-hover:text-yellow-600 transition-colors" style={{ fontFamily: 'Poppins' }}>
+                <h3 className="text-xl font-bold text-black dark:text-white mb-3 group-hover:text-yellow-600 transition-colors" style={{ fontFamily: 'Poppins' }}>
                   {benefit.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Geist' }}>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed" style={{ fontFamily: 'Geist' }}>
                   {benefit.description}
                 </p>
               </motion.div>
@@ -536,7 +536,7 @@ const PartnerWithUs = () => {
       </section>
 
       {/* Process Timeline Section */}
-      <section className="py-24 px-4 bg-gradient-to-br from-amber-50 via-white to-yellow-50/30 relative">
+      <section className="py-24 px-4 bg-gradient-to-br from-amber-50 via-white to-yellow-50/30 dark:from-[#1a1a1a] dark:via-black dark:to-[#111] relative transition-colors duration-300">
         <div className="container mx-auto max-w-7xl">
           <motion.div
             className="text-center mb-16"
@@ -544,10 +544,10 @@ const PartnerWithUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-black mb-4" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4" style={{ fontFamily: 'Poppins' }}>
               Partnership <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">Process</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
               Your journey to becoming a FlashSpace partner in 5 simple steps
             </p>
           </motion.div>
@@ -573,10 +573,10 @@ const PartnerWithUs = () => {
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-bold text-black mb-2" style={{ fontFamily: 'Poppins' }}>
+                  <h3 className="text-lg font-bold text-black dark:text-white mb-2" style={{ fontFamily: 'Poppins' }}>
                     {step.title}
                   </h3>
-                  <p className="text-sm text-gray-600" style={{ fontFamily: 'Geist' }}>
+                  <p className="text-sm text-gray-600 dark:text-gray-400" style={{ fontFamily: 'Geist' }}>
                     {step.description}
                   </p>
                 </motion.div>
@@ -587,238 +587,238 @@ const PartnerWithUs = () => {
       </section>
 
       {/* Contact Form Section */}
-<section id="contact-form" className="py-24 px-4 bg-white">
-  {/* 🟢 FORM stays inside narrow container */}
-  <div className="container mx-auto max-w-4xl">
-    <motion.div
-      className="text-center mb-12"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-    >
-      <h2
-        className="text-4xl md:text-6xl font-bold text-black mb-4"
-        style={{ fontFamily: "Poppins" }}
-      >
-        Let's Build{" "}
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">
-          Together
-        </span>
-      </h2>
-      <p className="text-lg text-gray-600" style={{ fontFamily: "Geist" }}>
-        Fill out the form below and our partnership team will reach out to you
-        within 24 hours
-      </p>
-    </motion.div>
+      <section id="contact-form" className="py-24 px-4 bg-white dark:bg-black transition-colors duration-300">
+        {/* 🟢 FORM stays inside narrow container */}
+        <div className="container mx-auto max-w-4xl">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2
+              className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4"
+              style={{ fontFamily: "Poppins" }}
+            >
+              Let's Build{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">
+                Together
+              </span>
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400" style={{ fontFamily: "Geist" }}>
+              Fill out the form below and our partnership team will reach out to you
+              within 24 hours
+            </p>
+          </motion.div>
 
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-    >
-      <Card className="border-2 border-gray-100 shadow-2xl hover:shadow-yellow-400/20 transition-shadow duration-300">
-        <CardContent className="p-8 md:p-12">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="name"
-                  className="text-gray-700 font-medium flex items-center gap-2"
-                >
-                  <Users className="w-4 h-4" />
-                  Full Name *
-                </Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  placeholder="John Doe"
-                  className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="email"
-                  className="text-gray-700 font-medium flex items-center gap-2"
-                >
-                  <Mail className="w-4 h-4" />
-                  Email *
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="john@example.com"
-                  className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
-                  required
-                />
-              </div>
-            </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Card className="border-2 border-gray-100 dark:border-white/10 shadow-2xl hover:shadow-yellow-400/20 transition-shadow duration-300 bg-white dark:bg-[#1a1a1a]">
+              <CardContent className="p-8 md:p-12">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="name"
+                        className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2"
+                      >
+                        <Users className="w-4 h-4" />
+                        Full Name *
+                      </Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange("name", e.target.value)}
+                        placeholder="John Doe"
+                        className="border-gray-300 dark:border-white/20 dark:bg-black/30 dark:text-white focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="email"
+                        className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2"
+                      >
+                        <Mail className="w-4 h-4" />
+                        Email *
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        placeholder="john@example.com"
+                        className="border-gray-300 dark:border-white/20 dark:bg-black/30 dark:text-white focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                        required
+                      />
+                    </div>
+                  </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="phone"
-                  className="text-gray-700 font-medium flex items-center gap-2"
-                >
-                  <Phone className="w-4 h-4" />
-                  Phone Number *
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                  placeholder="+91 XXXXX XXXXX"
-                  className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
-                  htmlFor="company"
-                  className="text-gray-700 font-medium flex items-center gap-2"
-                >
-                  <Building2 className="w-4 h-4" />
-                  Company Name
-                </Label>
-                <Input
-                  id="company"
-                  value={formData.company}
-                  onChange={(e) => handleInputChange("company", e.target.value)}
-                  placeholder="Your Company"
-                  className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
-                />
-              </div>
-            </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="phone"
+                        className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2"
+                      >
+                        <Phone className="w-4 h-4" />
+                        Phone Number *
+                      </Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange("phone", e.target.value)}
+                        placeholder="+91 XXXXX XXXXX"
+                        className="border-gray-300 dark:border-white/20 dark:bg-black/30 dark:text-white focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="company"
+                        className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2"
+                      >
+                        <Building2 className="w-4 h-4" />
+                        Company Name
+                      </Label>
+                      <Input
+                        id="company"
+                        value={formData.company}
+                        onChange={(e) => handleInputChange("company", e.target.value)}
+                        placeholder="Your Company"
+                        className="border-gray-300 dark:border-white/20 dark:bg-black/30 dark:text-white focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                      />
+                    </div>
+                  </div>
 
-            <div className="space-y-2">
-              <Label
-                htmlFor="partnershipType"
-                className="text-gray-700 font-medium flex items-center gap-2"
-              >
-                <Handshake className="w-4 h-4" />
-                Partnership Type *
-              </Label>
-              <select
-                id="partnershipType"
-                value={formData.partnershipType}
-                onChange={(e) =>
-                  handleInputChange("partnershipType", e.target.value)
-                }
-                className="w-full h-12 px-4 border border-gray-300 rounded-md focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20"
-                required
-              >
-                <option value="">Select partnership type</option>
-                <option value="Property Partners">Property Partners</option>
-                <option value="Corporate Partners">Corporate Partners</option>
-                <option value="Business Associates">Business Associates</option>
-                <option value="Strategic Alliance">Strategic Alliance</option>
-              </select>
-            </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="partnershipType"
+                      className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2"
+                    >
+                      <Handshake className="w-4 h-4" />
+                      Partnership Type *
+                    </Label>
+                    <select
+                      id="partnershipType"
+                      value={formData.partnershipType}
+                      onChange={(e) =>
+                        handleInputChange("partnershipType", e.target.value)
+                      }
+                      className="w-full h-12 px-4 border border-gray-300 dark:border-white/20 rounded-md focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 bg-white dark:bg-black/30 dark:text-white"
+                      required
+                    >
+                      <option value="">Select partnership type</option>
+                      <option value="Property Partners">Property Partners</option>
+                      <option value="Corporate Partners">Corporate Partners</option>
+                      <option value="Business Associates">Business Associates</option>
+                      <option value="Strategic Alliance">Strategic Alliance</option>
+                    </select>
+                  </div>
 
-            <div className="space-y-2">
-              <Label
-                htmlFor="message"
-                className="text-gray-700 font-medium"
-              >
-                Tell us more about your requirements
-              </Label>
-              <Textarea
-                id="message"
-                value={formData.message}
-                onChange={(e) => handleInputChange("message", e.target.value)}
-                placeholder="Share your goals, property details, or any questions you have..."
-                className="border-gray-300 focus:border-yellow-400 focus:ring-yellow-400/20 min-h-[140px]"
-                rows={5}
-              />
-            </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="message"
+                      className="text-gray-700 dark:text-gray-300 font-medium"
+                    >
+                      Tell us more about your requirements
+                    </Label>
+                    <Textarea
+                      id="message"
+                      value={formData.message}
+                      onChange={(e) => handleInputChange("message", e.target.value)}
+                      placeholder="Share your goals, property details, or any questions you have..."
+                      className="border-gray-300 dark:border-white/20 dark:bg-black/30 dark:text-white focus:border-yellow-400 focus:ring-yellow-400/20 min-h-[140px]"
+                      rows={5}
+                    />
+                  </div>
 
-            <div className="flex justify-center pt-6">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black px-12 py-7 text-lg rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ fontFamily: "Poppins" }}
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="animate-spin mr-2">⏳</span>
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    Submit Partnership Request
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </motion.div>
-  </div> {/* ✅ Closed container here */}
+                  <div className="flex justify-center pt-6">
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black px-12 py-7 text-lg rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ fontFamily: "Poppins" }}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <span className="animate-spin mr-2">⏳</span>
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          Submit Partnership Request
+                          <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div> {/* ✅ Closed container here */}
 
-  {/* 🟢 Contact Info Cards — moved OUTSIDE container for full width */}
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ delay: 0.2 }}
-    className="mt-16 px-6 md:px-20"
-  >
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 isolate bg-gray-100 py-12 px-8 rounded-3xl shadow-inner">
-      {[
-        {
-          icon: Phone,
-          label: "Call Us",
-          value: "+91 XXX XXX XXXX",
-          gradient: "from-blue-500 to-blue-600",
-        },
-        {
-          icon: Mail,
-          label: "Email Us",
-          value: "partners@flashspace.com",
-          gradient: "from-purple-500 to-purple-600",
-        },
-        {
-          icon: MapPin,
-          label: "Visit Us",
-          value: "Pan India Presence",
-          gradient: "from-pink-500 to-pink-600",
-        },
-      ].map((contact, index) => (
+        {/* 🟢 Contact Info Cards — moved OUTSIDE container for full width */}
         <motion.div
-          key={index}
-          className="relative z-0 group flex items-center gap-4 p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl
-                     transition-all duration-300 border border-gray-200 hover:border-yellow-400 hover:z-10 overflow-hidden"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: index * 0.1 }}
-          whileHover={{ y: -5 }}
+          transition={{ delay: 0.2 }}
+          className="mt-16 px-6 md:px-20"
         >
-          <div
-            className={`p-4 bg-gradient-to-br ${contact.gradient} rounded-lg shadow-lg group-hover:scale-110 transition-transform`}
-          >
-            <contact.icon className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-600 font-medium">
-              {contact.label}
-            </p>
-            <p className="font-bold text-black text-sm md:text-base whitespace-nowrap">
-              {contact.value}
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 isolate bg-gray-100 dark:bg-[#111] py-12 px-8 rounded-3xl shadow-inner transition-colors duration-300">
+            {[
+              {
+                icon: Phone,
+                label: "Call Us",
+                value: "+91 XXX XXX XXXX",
+                gradient: "from-blue-500 to-blue-600",
+              },
+              {
+                icon: Mail,
+                label: "Email Us",
+                value: "partners@flashspace.com",
+                gradient: "from-purple-500 to-purple-600",
+              },
+              {
+                icon: MapPin,
+                label: "Visit Us",
+                value: "Pan India Presence",
+                gradient: "from-pink-500 to-pink-600",
+              },
+            ].map((contact, index) => (
+              <motion.div
+                key={index}
+                className="relative z-0 group flex items-center gap-4 p-8 bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-lg hover:shadow-2xl
+                     transition-all duration-300 border border-gray-200 dark:border-white/10 hover:border-yellow-400 hover:z-10 overflow-hidden"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+              >
+                <div
+                  className={`p-4 bg-gradient-to-br ${contact.gradient} rounded-lg shadow-lg group-hover:scale-110 transition-transform`}
+                >
+                  <contact.icon className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">
+                    {contact.label}
+                  </p>
+                  <p className="font-bold text-black text-sm md:text-base whitespace-nowrap">
+                    {contact.value}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
-      ))}
-    </div>
-  </motion.div>
-</section>
+      </section>
 
 
       {/* Final CTA Section with Background */}

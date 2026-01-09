@@ -31,7 +31,8 @@ const SolutionsSection = () => {
           xmlns="http://www.w3.org/2000/svg"
         >
           <motion.rect
-            x="6" y="12" width="36" height="28" rx="4" fill="#E6F0FA"
+            x="6" y="12" width="36" height="28" rx="4"
+            className="fill-[#E6F0FA] dark:fill-[#1f1f1f]"
             animate={isHovered ? { scale: 1.05, rotate: -2 } : { scale: 1, rotate: 0 }}
             transition={{ duration: 0.3 }}
           />
@@ -41,7 +42,8 @@ const SolutionsSection = () => {
             transition={{ duration: 0.3, ease: "easeOut" }}
           />
           <motion.rect
-            x="18" y="24" width="12" height="6" rx="1" fill="#fff"
+            x="18" y="24" width="12" height="6" rx="1"
+            className="fill-[#fff] dark:fill-[#2a2a2a]"
             animate={isHovered ? { opacity: 0.8, scale: 1.1 } : { opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
           />
@@ -67,7 +69,8 @@ const SolutionsSection = () => {
           xmlns="http://www.w3.org/2000/svg"
         >
           <motion.rect
-            x="8" y="18" width="32" height="18" rx="4" fill="#E6F0FA"
+            x="8" y="18" width="32" height="18" rx="4"
+            className="fill-[#E6F0FA] dark:fill-[#1f1f1f]"
             animate={isHovered ? { scale: 1.08 } : { scale: 1 }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
           />
@@ -77,12 +80,14 @@ const SolutionsSection = () => {
             transition={{ duration: 0.3 }}
           />
           <motion.rect
-            x="20" y="28" width="8" height="2" rx="1" fill="#fff"
+            x="20" y="28" width="8" height="2" rx="1"
+            className="fill-[#fff] dark:fill-[#2a2a2a]"
             animate={isHovered ? { scaleY: 1.3 } : { scaleY: 1 }}
             transition={{ duration: 0.2, repeat: isHovered ? Infinity : 0, repeatType: "reverse" }}
           />
           <motion.rect
-            x="18" y="14" width="12" height="6" rx="2" fill="#172A3A"
+            x="18" y="14" width="12" height="6" rx="2"
+            className="fill-[#172A3A] dark:fill-[#333]"
             animate={isHovered ? { y: 12 } : { y: 14 }}
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
           />
@@ -108,12 +113,14 @@ const SolutionsSection = () => {
             transition={{ duration: 0.4, ease: "easeOut" }}
           />
           <motion.circle
-            cx="32" cy="20" r="6" fill="#E6F0FA"
+            cx="32" cy="20" r="6"
+            className="fill-[#E6F0FA] dark:fill-[#1f1f1f]"
             animate={isHovered ? { scale: 1.15, y: -2 } : { scale: 1, y: 0 }}
             transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
           />
           <motion.ellipse
-            cx="16" cy="32" rx="10" ry="6" fill="#E6F0FA"
+            cx="16" cy="32" rx="10" ry="6"
+            className="fill-[#E6F0FA] dark:fill-[#1f1f1f]"
             animate={isHovered ? { scaleX: 1.1 } : { scaleX: 1 }}
             transition={{ duration: 0.3 }}
           />
@@ -139,7 +146,8 @@ const SolutionsSection = () => {
           xmlns="http://www.w3.org/2000/svg"
         >
           <motion.rect
-            x="14" y="18" width="20" height="16" rx="4" fill="#E6F0FA"
+            x="14" y="18" width="20" height="16" rx="4"
+            className="fill-[#E6F0FA] dark:fill-[#1f1f1f]"
             animate={isHovered ? { rotate: 5, scale: 1.05 } : { rotate: 0, scale: 1 }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
           />
@@ -149,7 +157,8 @@ const SolutionsSection = () => {
             transition={{ duration: 0.3 }}
           />
           <motion.circle
-            cx="24" cy="26" r="2" fill="#fff"
+            cx="24" cy="26" r="2"
+            className="fill-[#fff] dark:fill-[#2a2a2a]"
             animate={isHovered ? { scale: 1.3 } : { scale: 1 }}
             transition={{ duration: 0.2, repeat: isHovered ? Infinity : 0, repeatType: "reverse" }}
           />

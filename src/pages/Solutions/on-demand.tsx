@@ -303,7 +303,7 @@ const OnDemand = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white" >
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
       {/* Header Component */}
       <Header />
 
@@ -373,7 +373,7 @@ const OnDemand = () => {
 
             {/* Hero Search Bar */}
             <motion.div
-              className="bg-white rounded-2xl p-2 shadow-2xl max-w-2xl mx-auto"
+              className="bg-white dark:bg-[#1f1f1f] rounded-2xl p-2 shadow-2xl max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
@@ -385,7 +385,7 @@ const OnDemand = () => {
                       <Button
                         variant="ghost"
                         role="combobox"
-                        className="w-full justify-between h-16 text-gray-900 hover:bg-gray-50 rounded-xl"
+                        className="w-full justify-between h-16 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-black/20 rounded-xl"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-[#EDB003]/10 rounded-lg flex items-center justify-center">
@@ -399,11 +399,11 @@ const OnDemand = () => {
                         <ChevronDown className="ml-2 h-5 w-5 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 bg-white shadow-xl border-2 border-gray-100">
-                      <Command className="bg-white">
-                        <CommandInput placeholder="Search city..." className="bg-white" />
-                        <CommandList className="bg-white">
-                          <CommandEmpty>No city found.</CommandEmpty>
+                    <PopoverContent className="w-[300px] p-0 bg-white dark:bg-[#1f1f1f] shadow-xl border-2 border-gray-100 dark:border-white/10">
+                      <Command className="bg-white dark:bg-[#1f1f1f]">
+                        <CommandInput placeholder="Search city..." className="bg-white dark:bg-[#1f1f1f] dark:text-white" />
+                        <CommandList className="bg-white dark:bg-[#1f1f1f]">
+                          <CommandEmpty className="dark:text-white">No city found.</CommandEmpty>
                           <CommandGroup>
                             {cities.map((city) => (
                               <CommandItem
@@ -413,6 +413,7 @@ const OnDemand = () => {
                                   setSelectedCity(city);
                                   setIsLocationOpen(false);
                                 }}
+                                className="dark:text-white dark:aria-selected:bg-white/10"
                               >
                                 <Check
                                   className={cn(
@@ -445,7 +446,7 @@ const OnDemand = () => {
             >
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
-                  {[1,2,3,4].map((i) => (
+                  {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#EDB003] to-[#f5c242] border-2 border-white"></div>
                   ))}
                 </div>
@@ -460,7 +461,7 @@ const OnDemand = () => {
 
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
-                  {[1,2,3,4,5].map((i) => (
+                  {[1, 2, 3, 4, 5].map((i) => (
                     <Star key={i} className="w-4 h-4 fill-[#EDB003] text-[#EDB003]" />
                   ))}
                 </div>
@@ -510,9 +511,9 @@ const OnDemand = () => {
           </div>
         </div>
       </section>
-      
+
       {/* What is On-Demand Workspace Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -523,7 +524,7 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               What We Offer
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" >
               What is <span className="text-[#EDB003]">On-Demand Workspace?</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto" >
@@ -541,7 +542,7 @@ const OnDemand = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
                   <div className="relative h-48 overflow-hidden">
                     <img
                       src={space.image}
@@ -556,10 +557,10 @@ const OnDemand = () => {
                     </div>
                   </div>
                   <CardContent className="p-6">
-                    <h3 className="text-xl font-bold mb-2 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                    <h3 className="text-xl font-bold mb-2 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
                       {space.title}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-3">{space.description}</p>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">{space.description}</p>
                     <div className="flex items-center gap-2 text-[#EDB003] font-semibold">
                       <Users className="w-4 h-4" />
                       <span className="text-sm">{space.capacity}</span>
@@ -573,7 +574,7 @@ const OnDemand = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -584,10 +585,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Simple Process
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" >
               How <span className="text-[#EDB003]">It Works</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" >
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" >
               Book your perfect meeting space in three simple steps
             </p>
           </motion.div>
@@ -602,7 +603,7 @@ const OnDemand = () => {
                 transition={{ delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden relative">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden relative">
                   <CardContent className="p-8 text-center">
                     {/* Step Number */}
                     <div className="absolute top-4 right-4 text-6xl font-bold text-[#EDB003]/10" >
@@ -614,11 +615,11 @@ const OnDemand = () => {
                       <step.icon className="w-10 h-10 text-white" />
                     </div>
 
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
                       {step.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed" >
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed" >
                       {step.description}
                     </p>
                   </CardContent>
@@ -637,7 +638,7 @@ const OnDemand = () => {
       </section>
 
       {/* Why Choose FlashSpace Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -648,10 +649,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Why Choose Us
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" >
               Why Choose <span className="text-[#EDB003]">FlashSpace On-Demand</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" >
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" >
               Everything you need for successful meetings without any hassle
             </p>
           </motion.div>
@@ -665,17 +666,17 @@ const OnDemand = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
                   <CardContent className="p-8 relative">
                     <div className="w-16 h-16 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
                       <benefit.icon className="w-8 h-8 text-white" />
                     </div>
 
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
                       {benefit.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed" >
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed" >
                       {benefit.description}
                     </p>
                   </CardContent>
@@ -687,7 +688,7 @@ const OnDemand = () => {
       </section>
 
       {/* Pricing Plans Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -698,10 +699,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Transparent Pricing
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" >
               Hourly <span className="text-[#EDB003]">Pricing Plans</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" >
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" >
               Pay only for what you use - no hidden charges, all-inclusive rates
             </p>
           </motion.div>
@@ -715,15 +716,15 @@ const OnDemand = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className={`border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full overflow-hidden relative ${plan.popular ? 'ring-4 ring-[#EDB003]' : ''}`}>
+                <Card className={`border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full overflow-hidden relative ${plan.popular ? 'ring-4 ring-[#EDB003]' : ''} bg-white dark:bg-[#1f1f1f]`}>
                   {plan.popular && (
                     <div className="absolute top-0 right-0 bg-[#EDB003] text-white px-4 py-1 text-sm font-bold rounded-bl-lg">
                       POPULAR
                     </div>
                   )}
                   <CardContent className="p-8">
-                    <h3 className="text-2xl font-bold mb-2 text-[#172A3A]">{plan.title}</h3>
-                    <p className="text-gray-600 mb-4">{plan.capacity}</p>
+                    <h3 className="text-2xl font-bold mb-2 text-[#172A3A] dark:text-white">{plan.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">{plan.capacity}</p>
 
                     <div className="mb-6">
                       {plan.price === "Customisable" ? (
@@ -737,7 +738,7 @@ const OnDemand = () => {
                           <span className="text-5xl font-bold text-[#EDB003]" >
                             ₹{plan.price}
                           </span>
-                          <span className="text-gray-600">/hour</span>
+                          <span className="text-gray-600 dark:text-gray-400">/hour</span>
                         </div>
                       )}
                     </div>
@@ -746,17 +747,16 @@ const OnDemand = () => {
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-2">
                           <CheckCircle className="w-5 h-5 text-[#EDB003] flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-600">{feature}</span>
+                          <span className="text-gray-600 dark:text-gray-300">{feature}</span>
                         </li>
                       ))}
                     </ul>
 
                     <Button
-                      className={`w-full py-6 text-lg font-bold rounded-xl transition-all duration-300 ${
-                        plan.popular
+                      className={`w-full py-6 text-lg font-bold rounded-xl transition-all duration-300 ${plan.popular
                           ? 'bg-gradient-to-r from-[#EDB003] to-[#f5c242] hover:from-[#d69f03] hover:to-[#EDB003] text-white shadow-lg'
                           : 'bg-white hover:bg-[#EDB003] text-[#172A3A] hover:text-white border-2 border-[#EDB003]'
-                      }`}
+                        }`}
                     >
                       Book Now
                     </Button>
@@ -769,7 +769,7 @@ const OnDemand = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -780,10 +780,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Premium Features
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" >
               Premium On-Demand Benefits
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" >
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" >
               Everything you need for professional meetings without long-term commitments
             </p>
           </motion.div>
@@ -797,7 +797,7 @@ const OnDemand = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
                   <CardContent className="p-8 relative">
                     {/* Background Gradient */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
@@ -806,11 +806,11 @@ const OnDemand = () => {
                       <feature.icon className="w-8 h-8 text-white" />
                     </div>
 
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
                       {feature.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed" >
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed" >
                       {feature.description}
                     </p>
                   </CardContent>
@@ -822,7 +822,7 @@ const OnDemand = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -833,10 +833,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Client Success Stories
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" >
               What Our <span className="text-[#EDB003]">Clients Say</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" >
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" >
               Hear from businesses who trust FlashSpace for their on-demand space needs
             </p>
           </motion.div>
@@ -850,7 +850,7 @@ const OnDemand = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
                   <CardContent className="p-8">
                     {/* Rating Stars */}
                     <div className="flex gap-1 mb-4">
@@ -860,20 +860,20 @@ const OnDemand = () => {
                     </div>
 
                     {/* Testimonial Text */}
-                    <p className="text-gray-600 mb-6 leading-relaxed italic" >
+                    <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed italic" >
                       "{testimonial.text}"
                     </p>
 
                     {/* Author Info */}
-                    <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-4 pt-4 border-t border-gray-100 dark:border-white/10">
                       <img
                         src={testimonial.image}
                         alt={testimonial.name}
                         className="w-12 h-12 rounded-full object-cover"
                       />
                       <div>
-                        <h4 className="font-bold text-[#172A3A]">{testimonial.name}</h4>
-                        <p className="text-sm text-gray-600">{testimonial.role}</p>
+                        <h4 className="font-bold text-[#172A3A] dark:text-white">{testimonial.name}</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{testimonial.role}</p>
                         <p className="text-sm text-[#EDB003] font-semibold">{testimonial.company}</p>
                       </div>
                     </div>
@@ -886,7 +886,7 @@ const OnDemand = () => {
       </section>
 
       {/* Location Grid Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -897,10 +897,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Our Locations
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" >
               <span className="text-[#EDB003]">68+</span> Centers Across <span className="text-[#EDB003]">8</span> Cities
             </h2>
-            <p className="text-xl text-gray-600">Find your perfect meeting space location</p>
+            <p className="text-xl text-gray-600 dark:text-gray-300">Find your perfect meeting space location</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -948,7 +948,7 @@ const OnDemand = () => {
       </section>
 
       {/* FAQs Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -959,10 +959,10 @@ const OnDemand = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Got Questions?
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" >
               Frequently Asked <span className="text-[#EDB003]">Questions</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" >
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" >
               Everything you need to know about our on-demand booking service
             </p>
           </motion.div>
@@ -976,15 +976,15 @@ const OnDemand = () => {
                 transition={{ delay: index * 0.05 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden bg-white dark:bg-[#1f1f1f]">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <div className="w-8 h-8 bg-[#EDB003] rounded-lg flex items-center justify-center flex-shrink-0">
                         <span className="text-white font-bold">Q</span>
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold mb-3 text-[#172A3A]">{faq.question}</h3>
-                        <p className="text-gray-600 leading-relaxed" >{faq.answer}</p>
+                        <h3 className="text-xl font-bold mb-3 text-[#172A3A] dark:text-white">{faq.question}</h3>
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed" >{faq.answer}</p>
                       </div>
                     </div>
                   </CardContent>

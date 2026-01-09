@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { getCoworkingSpaceById } from '@/services/coworkingSpace.service';
 import { CoworkingSpaceItem } from '@/types/services';
 import { SpaceDetailSkeleton } from '@/components/ui/skeleton-loaders';
+import ImageGalleryModal from '../ui/ImageGalleryModal';
 
 // Default photos for spaces that don't have images
 const DEFAULT_PHOTOS = [
@@ -29,6 +30,8 @@ const CoworkingSpaceComponent = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
 
   // Fetch space details from API
   useEffect(() => {
@@ -177,15 +180,40 @@ const CoworkingSpaceComponent = () => {
           {/* --- PHOTO GRID --- */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[400px] mb-8 rounded-2xl overflow-hidden">
             <div className="md:col-span-2 h-full">
-              <img src={photos[0]} alt="Main Space" className="w-full h-full object-cover hover:opacity-95 transition cursor-pointer" />
+              <img 
+                src={photos[0]} 
+                alt="Main Space" 
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+                onClick={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}
+              />
             </div>
             <div className="md:col-span-1 grid grid-rows-2 gap-2 h-full">
-              <img src={photos[1]} alt="Detail 1" className="w-full h-full object-cover hover:opacity-95 transition cursor-pointer" />
-              <img src={photos[2]} alt="Detail 2" className="w-full h-full object-cover hover:opacity-95 transition cursor-pointer" />
+              <img 
+                src={photos[1]} 
+                alt="Detail 1" 
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+                onClick={() => { setGalleryInitialIndex(1); setIsGalleryOpen(true); }}
+              />
+              <img 
+                src={photos[2]} 
+                alt="Detail 2" 
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+                onClick={() => { setGalleryInitialIndex(2); setIsGalleryOpen(true); }}
+              />
             </div>
             <div className="md:col-span-1 h-full relative">
-              <img src={photos[3]} alt="Detail 3" className="w-full h-full object-cover hover:opacity-95 transition cursor-pointer" />
-              <button className="absolute bottom-4 right-4 bg-white px-4 py-2 rounded-lg shadow-md text-sm font-semibold">Show all photos</button>
+              <img 
+                src={photos[3]} 
+                alt="Detail 3" 
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+                onClick={() => { setGalleryInitialIndex(3); setIsGalleryOpen(true); }}
+              />
+              <button 
+                onClick={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}
+                className="absolute bottom-4 right-4 bg-white hover:bg-gray-100 px-4 py-2 rounded-lg shadow-md text-sm font-semibold transition-colors"
+              >
+                Show all photos
+              </button>
             </div>
           </div>
 
@@ -388,6 +416,14 @@ const CoworkingSpaceComponent = () => {
 
       {/* 3. Footer at the bottom */}
       <Footer />
+      
+      {/* Image Gallery Modal */}
+      <ImageGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        images={photos}
+        initialIndex={galleryInitialIndex}
+      />
     </div>
   );
 };

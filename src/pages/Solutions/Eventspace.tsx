@@ -185,7 +185,7 @@ const EventSpacePage: React.FC = () => {
   const toggleFAQ = (index: number) => setFaqOpenIndex(faqOpenIndex === index ? null : index);
 
   return (
-    <div className="w-full min-h-screen bg-white">
+    <div className="w-full min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
       <Header />
 
       {/* HERO */}
@@ -236,7 +236,7 @@ const EventSpacePage: React.FC = () => {
                 <button onClick={() => window.location.href = '/start-chatting'} className="bg-black text-white px-8 py-3.5 rounded-full font-bold font-poppins hover:bg-gray-900 transition-all shadow-lg active:scale-95">Start Chat</button>
                 <button className="bg-[#FFD43B] text-black px-8 py-3.5 rounded-full font-bold font-poppins hover:bg-[#eec635] transition-all shadow-lg active:scale-95">Explore Venues</button>
               </div>
-               
+
               {/* Stats Section */}
               <div className="mt-5 w-full max-w-xl bg-black/30 backdrop-blur-sm rounded-lg p-4 flex justify-between text-center">
                 <div>
@@ -258,14 +258,14 @@ const EventSpacePage: React.FC = () => {
 
           {/* RIGHT FORM */}
           <div className="w-full lg:w-1/2 max-w-md">
-            <div className="bg-white rounded-xl shadow-2xl p-6 md:p-8">
-              <h3 className="text-xl font-geist font-bold text-gray-900"> Get a Call Back for <span className="text-[#FFD43B]">Event Spaces</span> </h3>
-              <p className="text-sm text-gray-500 mt-1">Conference halls, seminar rooms and launch venues across premium locations</p>
+            <div className="bg-white dark:bg-[#1f1f1f] rounded-xl shadow-2xl p-6 md:p-8">
+              <h3 className="text-xl font-geist font-bold text-gray-900 dark:text-white"> Get a Call Back for <span className="text-[#FFD43B]">Event Spaces</span> </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Conference halls, seminar rooms and launch venues across premium locations</p>
 
               <form className="mt-6 space-y-4" onSubmit={handleHeroSubmit}>
-                <input name="name" value={heroForm.name} onChange={onHeroChange} required placeholder="Name*" className="w-full border border-gray-200 rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
-                <input name="mobile" value={heroForm.mobile} onChange={onHeroChange} required placeholder="Mobile number*" inputMode="tel" className="w-full border border-gray-200 rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
-                <input name="email" value={heroForm.email} onChange={onHeroChange} required placeholder="Email*" type="email" className="w-full border border-gray-200 rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
+                <input name="name" value={heroForm.name} onChange={onHeroChange} required placeholder="Name*" className="w-full border border-gray-200 dark:border-white/10 dark:bg-[#0a0a0a] dark:text-white rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
+                <input name="mobile" value={heroForm.mobile} onChange={onHeroChange} required placeholder="Mobile number*" inputMode="tel" className="w-full border border-gray-200 dark:border-white/10 dark:bg-[#0a0a0a] dark:text-white rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
+                <input name="email" value={heroForm.email} onChange={onHeroChange} required placeholder="Email*" type="email" className="w-full border border-gray-200 dark:border-white/10 dark:bg-[#0a0a0a] dark:text-white rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
 
                 <div className="grid grid-cols-2 gap-3">
                   <CurvedSelect value={heroForm.city} onChange={(val: string) => onHeroChange({ target: { name: "city", value: val } })} options={CITIES} noScroll />
@@ -283,52 +283,52 @@ const EventSpacePage: React.FC = () => {
       </section>
 
       {/* STATS */}
-      <div className="w-full bg-[#F5F6FA] py-16 px-6 md:px-16">
-        <h2 className="text-center text-3xl md:text-4xl font-geist font-bold text-black mb-14">India’s Leading Event Venues <span className="text-[#FFD43B]">for Professional Events</span></h2>
+      <div className="w-full bg-[#F5F6FA] dark:bg-[#111] py-16 px-6 md:px-16 transition-colors duration-300">
+        <h2 className="text-center text-3xl md:text-4xl font-geist font-bold text-black dark:text-white mb-14">India’s Leading Event Venues <span className="text-[#FFD43B]">for Professional Events</span></h2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10 text-center max-w-6xl mx-auto">
           <div className="flex flex-col items-center">
             <div className="w-24 h-24 rounded-full bg-[#E8EAFB] flex items-center justify-center mb-4"><Users className="w-10 h-10 text-black" /></div>
-            <h3 className="text-2xl font-bold text-black">10,000+</h3>
-            <p className="text-gray-700 font-poppins text-sm">Events Hosted</p>
+            <h3 className="text-2xl font-bold text-black dark:text-white">10,000+</h3>
+            <p className="text-gray-700 dark:text-gray-300 font-poppins text-sm">Events Hosted</p>
           </div>
           <div className="flex flex-col items-center">
             <div className="w-24 h-24 rounded-full bg-[#E8EAFB] flex items-center justify-center mb-4"><Scan className="w-10 h-10 text-black" /></div>
-            <h3 className="text-2xl font-bold text-black">2,500+</h3>
-            <p className="text-gray-700 font-poppins text-sm">Verified Venues</p>
+            <h3 className="text-2xl font-bold text-black dark:text-white">2,500+</h3>
+            <p className="text-gray-700 dark:text-gray-300 font-poppins text-sm">Verified Venues</p>
           </div>
           <div className="flex flex-col items-center">
             <div className="w-24 h-24 rounded-full bg-[#E8EAFB] flex items-center justify-center mb-4"><Building2 className="w-10 h-10 text-black" /></div>
-            <h3 className="text-2xl font-bold text-black">200+</h3>
-            <p className="text-gray-700 font-poppins text-sm">Cities & Hubs</p>
+            <h3 className="text-2xl font-bold text-black dark:text-white">200+</h3>
+            <p className="text-gray-700 dark:text-gray-300 font-poppins text-sm">Cities & Hubs</p>
           </div>
           <div className="flex flex-col items-center">
             <div className="w-24 h-24 rounded-full bg-[#E8EAFB] flex items-center justify-center mb-4"><MapPin className="w-10 h-10 text-black" /></div>
-            <h3 className="text-2xl font-bold text-black">150+</h3>
-            <p className="text-gray-700 font-poppins text-sm">Prime Locations</p>
+            <h3 className="text-2xl font-bold text-black dark:text-white">150+</h3>
+            <p className="text-gray-700 dark:text-gray-300 font-poppins text-sm">Prime Locations</p>
           </div>
           <div className="flex flex-col items-center">
             <div className="w-24 h-24 rounded-full bg-[#E8EAFB] flex items-center justify-center mb-4"><DollarSign className="w-10 h-10 text-black" /></div>
-            <h3 className="text-2xl font-bold text-black">Transparent</h3>
-            <p className="text-gray-700 font-poppins text-sm">Pricing & Quotes</p>
+            <h3 className="text-2xl font-bold text-black dark:text-white">Transparent</h3>
+            <p className="text-gray-700 dark:text-gray-300 font-poppins text-sm">Pricing & Quotes</p>
           </div>
         </div>
       </div>
 
       {/* EVENT TYPES */}
-      <div className="w-full bg-white py-20 px-6 md:px-16">
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300">
         <div className="text-center max-w-4xl mx-auto mb-14">
-          <h2 className="text-4xl font-geist font-bold text-black">Popular <span className="text-[#FFD43B]">Event Spaces</span></h2>
-          <p className="text-gray-600 mt-3 text-lg font-poppins">Spaces built for conferences, launches, workshops and corporate gatherings.</p>
+          <h2 className="text-4xl font-geist font-bold text-black dark:text-white">Popular <span className="text-[#FFD43B]">Event Spaces</span></h2>
+          <p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Spaces built for conferences, launches, workshops and corporate gatherings.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
           {EVENT_CARDS.map((card) => (
-            <div key={card.name} className="bg-white shadow-lg hover:shadow-2xl transition-all duration-300 rounded-xl overflow-hidden border border-gray-100 flex flex-col">
+            <div key={card.name} className="bg-white dark:bg-[#1f1f1f] shadow-lg hover:shadow-2xl transition-all duration-300 rounded-xl overflow-hidden border border-gray-100 dark:border-white/10 flex flex-col">
               <div className="h-48 overflow-hidden"><img src={card.image} alt={card.name} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" /></div>
               <div className="p-6 flex flex-col flex-1">
-                <h3 className="text-xl font-geist font-bold text-black">{card.name}</h3>
-                <div className="mt-2 text-sm text-gray-500 font-poppins">{card.price}</div>
-                <ul className="mt-4 space-y-3 text-gray-600 font-poppins text-sm flex-1">{card.points.map((p: string, idx: number) => (<li key={idx} className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-[#FFD43B] mt-0.5 flex-shrink-0" /><span>{p}</span></li>))}</ul>
+                <h3 className="text-xl font-geist font-bold text-black dark:text-white">{card.name}</h3>
+                <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-poppins">{card.price}</div>
+                <ul className="mt-4 space-y-3 text-gray-600 dark:text-gray-300 font-poppins text-sm flex-1">{card.points.map((p: string, idx: number) => (<li key={idx} className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-[#FFD43B] mt-0.5 flex-shrink-0" /><span>{p}</span></li>))}</ul>
 
                 <div className="mt-6 flex gap-3">
                   <Button onClick={() => openModal(card)} className="w-[70%] bg-[#FFD43B] border-2 border-[#FFD43B] text-black font-semibold py-2 rounded-lg hover:bg-[#e6c234] transition-colors">{card.btn}</Button>
@@ -354,7 +354,7 @@ const EventSpacePage: React.FC = () => {
                 <div>
                   <h4 className="font-geist text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">Trusted by thousands of professionals</h4>
                   <div className="grid grid-cols-3 gap-1 mb-8">
-                    
+
                     <img src="/Logo/trulymadly.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="trulymadly" />
                     <img src="/Logo/StudyIQ.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="StudyIQ" />
                     <img src="/Logo/Stage2.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="Stage2" />
@@ -368,7 +368,7 @@ const EventSpacePage: React.FC = () => {
                     <li className="flex items-center gap-3"><div className="bg-[#FFD43B]/20 p-2 rounded-full"><CheckCircle className="w-5 h-5 text-[#FFD43B]" /></div><span className="font-medium">Flexible seating & layout</span></li>
                   </ul>
                 </div>
-                   <div className="mt-10 flex justify-center">
+                <div className="mt-10 flex justify-center">
                   <img
                     src="/Logo/FlashSpace Favicon.png"
                     className="h-14 w-14 rounded-full border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg"
@@ -392,10 +392,10 @@ const EventSpacePage: React.FC = () => {
       )}
 
       {/* TOP CITIES */}
-      <div className="w-full bg-white py-20 px-6 md:px-16">
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <h2 className="text-4xl font-geist font-bold text-black">Event Venues in <span className="text-[#FFD43B]">Top Locations</span></h2>
-          <p className="text-gray-600 mt-3 text-lg font-poppins">Premium event spaces available across prime business hubs.</p>
+          <h2 className="text-4xl font-geist font-bold text-black dark:text-white">Event Venues in <span className="text-[#FFD43B]">Top Locations</span></h2>
+          <p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Premium event spaces available across prime business hubs.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:h-[600px]">
@@ -418,34 +418,34 @@ const EventSpacePage: React.FC = () => {
       </div>
 
       {/* AMENITIES */}
-      <div className="w-full bg-white py-20 px-6 md:px-16">
-        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black">Amenities for <span className="text-[#FFD43B]">Event Hosts</span></h2><p className="text-gray-600 mt-3 text-lg font-poppins">Everything you need to run a successful event.</p></div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-10 text-center">{AMENITIES.map((item, idx) => { const Icon = item.icon; return (<div key={idx} className="flex flex-col items-center gap-4 group p-4 hover:bg-gray-50 rounded-xl transition-all duration-300"><div className="w-20 h-20 bg-gray-100 group-hover:bg-white group-hover:shadow-md border border-transparent group-hover:border-gray-200 transition-all duration-300 rounded-full flex items-center justify-center"><Icon className="w-10 h-10 text-gray-600 group-hover:text-[#FFD43B] transition-colors" /></div><h3 className="text-md font-poppins text-gray-800 font-semibold group-hover:text-black">{item.title}</h3></div>); })}</div>
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300">
+        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black dark:text-white">Amenities for <span className="text-[#FFD43B]">Event Hosts</span></h2><p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Everything you need to run a successful event.</p></div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-10 text-center">{AMENITIES.map((item, idx) => { const Icon = item.icon; return (<div key={idx} className="flex flex-col items-center gap-4 group p-4 hover:bg-gray-50 dark:hover:bg-black/20 rounded-xl transition-all duration-300"><div className="w-20 h-20 bg-gray-100 dark:bg-[#1f1f1f] group-hover:bg-white dark:group-hover:bg-[#0a0a0a] group-hover:shadow-md border border-transparent group-hover:border-gray-200 dark:group-hover:border-white/10 transition-all duration-300 rounded-full flex items-center justify-center"><Icon className="w-10 h-10 text-gray-600 group-hover:text-[#FFD43B] transition-colors" /></div><h3 className="text-md font-poppins text-gray-800 dark:text-gray-200 font-semibold group-hover:text-black dark:group-hover:text-white">{item.title}</h3></div>); })}</div>
       </div>
 
       {/* WHY EVENT SPACE NEEDED */}
-      <div className="w-full bg-gray-50 py-20 px-6 md:px-16">
-        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black">Why an <span className="text-[#FFD43B]">Event Space</span> is Needed</h2><p className="text-gray-600 mt-3 text-lg font-poppins">Choose a purpose-built venue to ensure your event succeeds — here’s why it matters.</p></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">{WHY_EVENT.map((item, i) => { const Icon = item.icon; return (<div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"><div className="w-14 h-14 flex items-center justify-center bg-[#FFD43B] rounded-xl mb-6"><Icon className="w-7 h-7 text-black" /></div><h3 className="text-xl font-geist font-bold text-black mb-3">{item.title}</h3><p className="text-gray-600 font-poppins leading-relaxed text-sm">{item.desc}</p></div>); })}</div>
+      <div className="w-full bg-gray-50 dark:bg-[#111] py-20 px-6 md:px-16 transition-colors duration-300">
+        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black dark:text-white">Why an <span className="text-[#FFD43B]">Event Space</span> is Needed</h2><p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Choose a purpose-built venue to ensure your event succeeds — here’s why it matters.</p></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">{WHY_EVENT.map((item, i) => { const Icon = item.icon; return (<div key={i} className="bg-white dark:bg-[#1f1f1f] p-8 rounded-2xl shadow-sm border border-gray-200 dark:border-white/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"><div className="w-14 h-14 flex items-center justify-center bg-[#FFD43B] rounded-xl mb-6"><Icon className="w-7 h-7 text-black" /></div><h3 className="text-xl font-geist font-bold text-black dark:text-white mb-3">{item.title}</h3><p className="text-gray-600 dark:text-gray-300 font-poppins leading-relaxed text-sm">{item.desc}</p></div>); })}</div>
       </div>
 
       {/* BENEFITS */}
-      <div className="w-full bg-white py-20 px-6 md:px-16">
-        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black">Benefits of Using Our <span className="text-[#FFD43B]">Event Spaces</span></h2><p className="text-gray-600 mt-3 text-lg font-poppins">Practical advantages designed for event organisers.</p></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">{BENEFITS.map((item, i) => { const Icon = item.icon; return (<div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"><div className="w-14 h-14 flex items-center justify-center bg-[#FFD43B] rounded-xl mb-6"><Icon className="w-7 h-7 text-black" /></div><h3 className="text-xl font-geist font-bold text-black mb-3">{item.title}</h3><p className="text-gray-600 font-poppins leading-relaxed text-sm">{item.desc}</p></div>); })}</div>
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300">
+        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black dark:text-white">Benefits of Using Our <span className="text-[#FFD43B]">Event Spaces</span></h2><p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Practical advantages designed for event organisers.</p></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">{BENEFITS.map((item, i) => { const Icon = item.icon; return (<div key={i} className="bg-white dark:bg-[#1f1f1f] p-8 rounded-2xl shadow-sm border border-gray-200 dark:border-white/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"><div className="w-14 h-14 flex items-center justify-center bg-[#FFD43B] rounded-xl mb-6"><Icon className="w-7 h-7 text-black" /></div><h3 className="text-xl font-geist font-bold text-black dark:text-white mb-3">{item.title}</h3><p className="text-gray-600 dark:text-gray-300 font-poppins leading-relaxed text-sm">{item.desc}</p></div>); })}</div>
       </div>
 
       {/* TESTIMONIALS */}
-      <div className="w-full bg-white py-20 px-6 md:px-16">
-        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black">What Our Clients <span className="text-[#FFD43B]">Say</span></h2><p className="text-gray-600 mt-3 text-lg font-poppins">Real feedback from event hosts and organisers.</p></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">{TESTIMONIALS.map((item, idx) => (<div key={idx} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"><div className="p-8"><div className="text-[#FFD43B] mb-4"><svg width="32" height="32" fill="#FFD43B" viewBox="0 0 24 24"><path d="M7.17 6A5.17 5.17 0 0 0 2 11.17v6.33A.5.5 0 0 0 2.5 18H8a.5.5 0 0 0 .5-.5v-6.33A5.17 5.17 0 0 0 3.33 6zm10 0A5.17 5.17 0 0 0 12 11.17v6.33a.5.5 0 0 0 .5.5H18a.5.5 0 0 0 .5-.5v-6.33A5.17 5.17 0 0 0 17.17 6z"/></svg></div><p className="text-gray-800 font-poppins leading-relaxed italic font-semibold mb-4">{item.text}</p></div><div className="relative bg-[#FFF9DB] border-t-4 border-[#FFD43B] p-6 pt-10"><img src={item.image} className="absolute -top-10 right-6 w-20 h-20 rounded-full object-cover border-4 border-white shadow-md" /><h4 className="text-lg font-geist font-bold text-black mb-1">{item.name}</h4><p className="text-sm text-gray-700 font-poppins mb-1">{item.role}</p></div></div>))}</div>
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300">
+        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black dark:text-white">What Our Clients <span className="text-[#FFD43B]">Say</span></h2><p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Real feedback from event hosts and organisers.</p></div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">{TESTIMONIALS.map((item, idx) => (<div key={idx} className="bg-white dark:bg-[#1f1f1f] rounded-xl border border-gray-200 dark:border-white/10 shadow-sm overflow-hidden"><div className="p-8"><div className="text-[#FFD43B] mb-4"><svg width="32" height="32" fill="#FFD43B" viewBox="0 0 24 24"><path d="M7.17 6A5.17 5.17 0 0 0 2 11.17v6.33A.5.5 0 0 0 2.5 18H8a.5.5 0 0 0 .5-.5v-6.33A5.17 5.17 0 0 0 3.33 6zm10 0A5.17 5.17 0 0 0 12 11.17v6.33a.5.5 0 0 0 .5.5H18a.5.5 0 0 0 .5-.5v-6.33A5.17 5.17 0 0 0 17.17 6z" /></svg></div><p className="text-gray-800 dark:text-gray-200 font-poppins leading-relaxed italic font-semibold mb-4">{item.text}</p></div><div className="relative bg-[#FFF9DB] dark:bg-[#2a2510] border-t-4 border-[#FFD43B] p-6 pt-10"><img src={item.image} className="absolute -top-10 right-6 w-20 h-20 rounded-full object-cover border-4 border-white shadow-md" /><h4 className="text-lg font-geist font-bold text-black dark:text-white mb-1">{item.name}</h4><p className="text-sm text-gray-700 dark:text-gray-300 font-poppins mb-1">{item.role}</p></div></div>))}</div>
       </div>
 
       {/* FAQ */}
-      <div className="w-full bg-white py-20 px-6 md:px-16"><div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black">Frequently Asked <span className="text-[#FFD43B]">Questions</span></h2><p className="text-gray-600 mt-3 text-lg font-poppins">Answers to common questions about our event venues.</p></div><div className="max-w-3xl mx-auto space-y-4">{FAQ_DATA.map((item, i) => (<div key={i} className={`border rounded-xl transition-all duration-300 ${faqOpenIndex === i ? 'border-[#FFD43B] shadow-md bg-[#FFD43B]/5' : 'border-gray-200 hover:border-gray-300'}`}><button onClick={() => toggleFAQ(i)} className="w-full flex justify-between items-center p-5 text-left"><span className="text-lg font-geist font-semibold text-black">{item.q}</span><ChevronDown className={`w-5 h-5 text-black transition-transform duration-300 ${faqOpenIndex === i ? "rotate-180" : ""}`} /></button><div className={`overflow-hidden transition-all duration-300 ${faqOpenIndex === i ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}><p className="text-gray-600 font-poppins leading-relaxed px-5 pb-5 text-sm">{item.a}</p></div></div>))}</div></div>
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300"><div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black dark:text-white">Frequently Asked <span className="text-[#FFD43B]">Questions</span></h2><p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Answers to common questions about our event venues.</p></div><div className="max-w-3xl mx-auto space-y-4">{FAQ_DATA.map((item, i) => (<div key={i} className={`border rounded-xl transition-all duration-300 ${faqOpenIndex === i ? 'border-[#FFD43B] shadow-md bg-[#FFD43B]/5 dark:bg-[#FFD43B]/10' : 'border-gray-200 dark:border-white/10 hover:border-gray-300'}`}><button onClick={() => toggleFAQ(i)} className="w-full flex justify-between items-center p-5 text-left"><span className="text-lg font-geist font-semibold text-black dark:text-white">{item.q}</span><ChevronDown className={`w-5 h-5 text-black dark:text-white transition-transform duration-300 ${faqOpenIndex === i ? "rotate-180" : ""}`} /></button><div className={`overflow-hidden transition-all duration-300 ${faqOpenIndex === i ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}><p className="text-gray-600 dark:text-gray-300 font-poppins leading-relaxed px-5 pb-5 text-sm">{item.a}</p></div></div>))}</div></div>
 
       {/* FOOTER */}
-      <div className="w-full bg-white"><Footer /></div>
+      <div className="w-full bg-white dark:bg-[#0a0a0a]"><Footer /></div>
     </div>
   );
 };

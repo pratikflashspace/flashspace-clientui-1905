@@ -24,28 +24,28 @@ const BusinessExcellenceSection = () => {
       icon: TrendingUp,
       title: "Instant Setup",
       description: "Get your business address activated in less than 24 hours with our streamlined onboarding process.",
-      bgColor: "bg-blue-50",
+      bgColor: "bg-blue-50 dark:bg-blue-900/10",
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop&auto=format"
     },
     {
       icon: MapPin,
       title: "Prime Locations",
       description: "Establish your presence in India's most prestigious business districts across 100+ cities.",
-      bgColor: "bg-purple-50",
+      bgColor: "bg-purple-50 dark:bg-purple-900/10",
       image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop&auto=format"
     },
     {
       icon: Shield,
       title: "Reliable Compliance ",
       description: "GST ready addresses with full legal documentation and compliance support included.",
-      bgColor: "bg-emerald-50",
+      bgColor: "bg-emerald-50 dark:bg-emerald-900/10",
       image: "https://plus.unsplash.com/premium_photo-1664475876634-246925214655?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8c2lnbmF0dXJlJTVDfGVufDB8fDB8fHww"
     },
     {
       icon: Users,
       title: "98% Satisfaction",
       description: "Join thousands of happy businesses who trust FlashSpace for their virtual office needs.",
-      bgColor: "bg-[#EDB003]/10",
+      bgColor: "bg-[#EDB003]/10 dark:bg-[#EDB003]/5",
       image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400&h=300&fit=crop&auto=format"
     }
   ];
@@ -72,7 +72,7 @@ const BusinessExcellenceSection = () => {
                 key={index}
                 className={`
                   group relative overflow-hidden cursor-pointer
-                  ${reason.bgColor} dark:bg-opacity-10 dark:bg-white/5 border-0 rounded-3xl
+                  ${reason.bgColor} border-0 rounded-3xl
                   transition-all duration-500
                   hover:shadow-xl hover:-translate-y-1
                   ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}

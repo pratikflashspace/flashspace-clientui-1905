@@ -11,7 +11,7 @@ type IconProps = {
   [key: string]: any;
 };
 
-const BSIcon: React.FC<{iconName: string} & IconProps> = ({ iconName, ...props }) => (
+const BSIcon: React.FC<{ iconName: string } & IconProps> = ({ iconName, ...props }) => (
   <i className={`bi ${iconName} ${props.className || ''}`} {...props} />
 );
 
@@ -143,7 +143,7 @@ const Hero: React.FC = () => {
   return (
     <section className="relative text-white overflow-hidden min-h-screen pt-20 md:pt-24 flex items-center justify-center">
       <style>{styleBlock}</style>
-      <div className="absolute top-0 left-0 w-full h-15 cvnmd:h-15 bg-white z-10" />
+      <div className="absolute top-0 left-0 w-full h-15 cvnmd:h-15 bg-white dark:bg-black z-10" />
       <div className="absolute inset-0 -z-0">
         <div
           ref={bgRef}
@@ -239,11 +239,10 @@ const StatCard3D: React.FC<StatCardProps> = ({ emoji, value, label }) => {
       ref={ref}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      className="relative rounded-2xl p-8 md:p-10 transition-transform duration-200 ease-out preserve-3d flex flex-col items-center justify-center text-center"
+      className="relative rounded-2xl p-8 md:p-10 transition-transform duration-200 ease-out preserve-3d flex flex-col items-center justify-center text-center bg-gradient-to-br from-[#FFFBE6]/65 to-[#FFF5E6]/45 dark:from-[#1a1a1a]/80 dark:to-[#0a0a0a]/80"
       style={{
         transform: style.transform,
         boxShadow: style.boxShadow,
-        background: "linear-gradient(135deg, rgba(255, 250, 230, 0.65), rgba(255, 245, 230, 0.45))",
         border: "1px solid rgba(255,255,255,0.12)",
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
@@ -253,8 +252,8 @@ const StatCard3D: React.FC<StatCardProps> = ({ emoji, value, label }) => {
       <div className="card-sheen absolute inset-0 rounded-2xl pointer-events-none" />
       <div className="flex flex-col items-center justify-center">
         <div className="text-5xl mb-3">{emoji}</div>
-        <p className="text-4xl md:text-5xl font-bold text-slate-900">{value}</p>
-        <p className="mt-2 text-slate-800 font-medium">{label}</p>
+        <p className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">{value}</p>
+        <p className="mt-2 text-slate-800 dark:text-slate-300 font-medium">{label}</p>
       </div>
       <div aria-hidden className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: "inset 0 1px 30px rgba(255, 214, 80, 0.04)" }} />
     </div>
@@ -270,7 +269,7 @@ const Stats: React.FC = () => {
   ];
 
   return (
-    <section className="bg-flash-dark relative py-20">
+    <section className="bg-[#0a0a0a] relative py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           {stats.map((stat, index) => (
@@ -292,13 +291,13 @@ interface FeatureCardProps {
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => (
-  <div className="relative bg-slate-50/80 backdrop-blur-sm rounded-2xl p-6 transition-all duration-300 border border-slate-200/50 hover:border-flash-yellow hover:shadow-xl hover:shadow-yellow-500/20 hover:-translate-y-2">
+  <div className="relative bg-slate-50/80 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-6 transition-all duration-300 border border-slate-200/50 dark:border-white/10 hover:border-flash-yellow hover:shadow-xl hover:shadow-yellow-500/20 hover:-translate-y-2">
     <div className="card-sheen" />
     <div className="bg-yellow-100 text-flash-yellow rounded-xl p-3 inline-block mb-4">
       {icon}
     </div>
-    <h3 className="text-xl font-semibold mb-2">{title}</h3>
-    <p className="text-slate-600">{description}</p>
+    <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">{title}</h3>
+    <p className="text-slate-600 dark:text-gray-300">{description}</p>
   </div>
 );
 
@@ -313,14 +312,14 @@ const WhyPartner: React.FC = () => {
   ];
 
   return (
-    <section className="relative overflow-hidden py-16 md:py-24 bg-white">
+    <section className="relative overflow-hidden py-16 md:py-24 bg-white dark:bg-[#0a0a0a]">
       <div className="absolute -top-48 -right-48 w-[40rem] h-[40rem] bg-yellow-300/20 rounded-full blur-3xl filter" aria-hidden="true"></div>
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold">
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">
             Why Careers with <span className="text-yellow-400">FlashSpace?</span>
           </h2>
-          <p className="mt-4 text-lg text-slate-600">
+          <p className="mt-4 text-lg text-slate-600 dark:text-gray-300">
             Join a team that's redefining the future of work. We're looking for passionate individuals to grow with us.
           </p>
         </div>
@@ -346,13 +345,13 @@ const howItWorksSteps = [
 
 const HowItWorks: React.FC = () => {
   return (
-    <section className="py-16 md:py-24 bg-slate-100/70">
+    <section className="py-16 md:py-24 bg-slate-100/70 dark:bg-black/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-800">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-800 dark:text-white">
             How to work in <span className="text-yellow-400">FlashSpace</span>
           </h2>
-          <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+          <p className="text-lg text-slate-600 dark:text-gray-300 max-w-3xl mx-auto">
             Joining FlashSpace is simple. Follow these four easy steps to start your career with us.
           </p>
         </div>
@@ -362,13 +361,13 @@ const HowItWorks: React.FC = () => {
               {index < howItWorksSteps.length - 1 && (
                 <div className="hidden lg:block absolute top-16 left-1/2 w-full h-0.5 bg-yellow-300/70 -z-0" style={{ transform: 'translateX(1.5rem)' }} />
               )}
-              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-slate-200 h-full relative z-10 preserve-3d">
+              <div className="bg-white dark:bg-[#1f1f1f] p-8 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-slate-200 dark:border-white/10 h-full relative z-10 preserve-3d">
                 <div className="text-6xl font-bold text-flash-yellow/20 mb-4">{step.step}</div>
-                <div className="w-16 h-16 bg-yellow-100 rounded-xl flex items-center justify-center mb-5">
+                <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/40 rounded-xl flex items-center justify-center mb-5">
                   <span className="text-4xl" role="img" aria-label={step.title}>{step.emoji}</span>
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-slate-800">{step.title}</h3>
-                <p className="text-slate-600 leading-relaxed">{step.description}</p>
+                <h3 className="text-xl font-bold mb-3 text-slate-800 dark:text-white">{step.title}</h3>
+                <p className="text-slate-600 dark:text-gray-300 leading-relaxed">{step.description}</p>
               </div>
             </div>
           ))}
@@ -391,18 +390,18 @@ interface Testimonial {
 
 const QuoteIcon = () => (
   <svg width="60" height="46" viewBox="0 0 60 46" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute top-6 right-6 text-slate-200/80">
-    <path d="M59.25 23.375C59.25 34.625 51.5 45.125 38 45.125C24.5 45.125 14.25 34.875 14.25 22.875C14.25 10.875 25.25 0.875 38.75 0.875C42.25 0.875 45.5 1.625 48.25 3.125L44.75 10.375C43 9.875 41 9.625 38.75 9.625C30.25 9.625 23.5 15.625 23.5 23.125C23.5 30.625 29.5 36.375 37.25 36.375C44.75 36.375 50.5 30.375 50.5 22.875L50.5 18.125H38.75V9.125H59.25V23.375ZM20.5 23.375C20.5 34.625 12.75 45.125 -0.75 45.125C-14.25 45.125 -24.5 34.875 -24.5 22.875C-24.5 10.875 -13.5 0.875 0 0.875C3.5 0.875 6.75 1.625 9.5 3.125L6 10.375C4.25 9.875 2.25 9.625 0 9.625C-8.5 9.625 -15.25 15.625 -15.25 23.125C-15.25 30.625 -9.25 36.375 -1.5 36.375C6 36.375 11.75 30.375 11.75 22.875L11.75 18.125H-0.75V9.125H20.5V23.375Z" fill="currentColor"/>
+    <path d="M59.25 23.375C59.25 34.625 51.5 45.125 38 45.125C24.5 45.125 14.25 34.875 14.25 22.875C14.25 10.875 25.25 0.875 38.75 0.875C42.25 0.875 45.5 1.625 48.25 3.125L44.75 10.375C43 9.875 41 9.625 38.75 9.625C30.25 9.625 23.5 15.625 23.5 23.125C23.5 30.625 29.5 36.375 37.25 36.375C44.75 36.375 50.5 30.375 50.5 22.875L50.5 18.125H38.75V9.125H59.25V23.375ZM20.5 23.375C20.5 34.625 12.75 45.125 -0.75 45.125C-14.25 45.125 -24.5 34.875 -24.5 22.875C-24.5 10.875 -13.5 0.875 0 0.875C3.5 0.875 6.75 1.625 9.5 3.125L6 10.375C4.25 9.875 2.25 9.625 0 9.625C-8.5 9.625 -15.25 15.625 -15.25 23.125C-15.25 30.625 -9.25 36.375 -1.5 36.375C6 36.375 11.75 30.375 11.75 22.875L11.75 18.125H-0.75V9.125H20.5V23.375Z" fill="currentColor" />
   </svg>
 );
 
 const TestimonialCard: React.FC<Testimonial> = ({ quote, name, role, location, revenue }) => (
-  <div className="bg-slate-50/80 backdrop-blur-sm rounded-2xl p-8 pt-10 border border-slate-200/50 relative transition-all duration-300 hover:border-flash-yellow hover:shadow-xl hover:shadow-yellow-500/20 hover:-translate-y-2">
-    <div className="absolute top-0 -mt-4 bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1.5 rounded-full">{revenue}</div>
+  <div className="bg-slate-50/80 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-8 pt-10 border border-slate-200/50 dark:border-white/10 relative transition-all duration-300 hover:border-flash-yellow hover:shadow-xl hover:shadow-yellow-500/20 hover:-translate-y-2">
+    <div className="absolute top-0 -mt-4 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400 text-sm font-semibold px-3 py-1.5 rounded-full">{revenue}</div>
     <QuoteIcon />
-    <p className="relative z-10 text-slate-600 mb-6">"{quote}"</p>
+    <p className="relative z-10 text-slate-600 dark:text-gray-300 mb-6">"{quote}"</p>
     <div>
-      <p className="font-semibold text-slate-900">{name}</p>
-      <p className="text-sm text-slate-500">{role}, {location}</p>
+      <p className="font-semibold text-slate-900 dark:text-white">{name}</p>
+      <p className="text-sm text-slate-500 dark:text-gray-400">{role}, {location}</p>
     </div>
   </div>
 );
@@ -415,12 +414,12 @@ const SuccessStories: React.FC = () => {
   ];
 
   return (
-    <section className="relative overflow-hidden py-16 md:py-24 bg-white">
+    <section className="relative overflow-hidden py-16 md:py-24 bg-white dark:bg-[#0a0a0a]">
       <div className="absolute -bottom-48 -right-48 w-[40rem] h-[40rem] bg-yellow-300/20 rounded-full blur-3xl filter" aria-hidden="true"></div>
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold">Success <span className="text-yellow-400">Stories</span></h2>
-          <p className="mt-4 text-lg text-slate-600">Read stories from our team members about their growth, experiences, and journey at FlashSpace.</p>
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">Success <span className="text-yellow-400">Stories</span></h2>
+          <p className="mt-4 text-lg text-slate-600 dark:text-gray-300">Read stories from our team members about their growth, experiences, and journey at FlashSpace.</p>
         </div>
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
@@ -550,63 +549,63 @@ const OpenPositions: React.FC = () => {
   );
 
   return (
-    <section className="relative overflow-hidden py-20 bg-slate-100/70">
+    <section className="relative overflow-hidden py-20 bg-slate-100/70 dark:bg-black/50">
       <div className="container mx-auto px-4">
 
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <h2 className="text-4xl md:text-5xl font-bold">Open <span className="text-yellow-400">Positions</span></h2>
-          <p className="mt-4 text-lg text-slate-600">Search and apply for roles at FlashSpace.</p>
+          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">Open <span className="text-yellow-400">Positions</span></h2>
+          <p className="mt-4 text-lg text-slate-600 dark:text-gray-300">Search and apply for roles at FlashSpace.</p>
         </div>
 
         {/* SEARCH BAR SECTION */}
         <div className="max-w-7xl mx-auto mb-12">
-            <label className="block text-lg font-semibold text-slate-700 mb-3 ml-2">Search Jobs</label>
-            <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                    <SearchIcon className="text-slate-400 text-xl" />
-                </div>
-                <input 
-                    type="text" 
-                    placeholder="Search by Job Title, Department, or Location..." 
-                    value={search} 
-                    onChange={(e) => setSearch(e.target.value)} 
-                    className="w-full pl-14 pr-6 py-4 rounded-2xl border border-slate-300 focus:ring-4 focus:ring-yellow-400/30 focus:border-yellow-400 shadow-sm text-slate-700 text-lg transition-all" 
-                />
+          <label className="block text-lg font-semibold text-slate-700 dark:text-slate-300 mb-3 ml-2">Search Jobs</label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+              <SearchIcon className="text-slate-400 text-xl" />
             </div>
+            <input
+              type="text"
+              placeholder="Search by Job Title, Department, or Location..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-14 pr-6 py-4 rounded-2xl border border-slate-300 dark:border-white/20 bg-white dark:bg-black/50 focus:ring-4 focus:ring-yellow-400/30 focus:border-yellow-400 shadow-sm text-slate-700 dark:text-white text-lg transition-all"
+            />
+          </div>
         </div>
 
         {/* WIDER JOB CARD CONTAINER (max-w-7xl) */}
         <div className="space-y-6 mx-auto max-w-7xl">
           {filteredJobs.map((job) => (
-            <div 
-                key={job.id} 
-                onClick={() => setSelectedJob(job)} 
-                className="relative group w-full p-8 bg-white border border-slate-200 border-b-4 border-b-slate-200 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 hover:border-b-yellow-400 transition-all duration-300 cursor-pointer overflow-hidden"
+            <div
+              key={job.id}
+              onClick={() => setSelectedJob(job)}
+              className="relative group w-full p-8 bg-white dark:bg-[#1f1f1f] border border-slate-200 dark:border-white/10 border-b-4 border-b-slate-200 dark:border-b-white/10 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 hover:border-b-yellow-400 dark:hover:border-b-yellow-400 transition-all duration-300 cursor-pointer overflow-hidden"
             >
-                {/* Hover Background Gradient Reveal */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-yellow-50/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              {/* Hover Background Gradient Reveal */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-yellow-50/40 dark:to-yellow-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                {/* Job ID - Moved down, Bold, Uppercase, Black Text */}
-                <span className="absolute top-8 right-10 font-bold text-black text-xs tracking-wider uppercase">
-                    Job ID: {job.id}
+              {/* Job ID - Moved down, Bold, Uppercase, Black Text */}
+              <span className="absolute top-8 right-10 font-bold text-black dark:text-white text-xs tracking-wider uppercase">
+                Job ID: {job.id}
+              </span>
+
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-white group-hover:text-black dark:group-hover:text-white transition-colors">{job.title}</h3>
+
+              {/* Badges */}
+              <div className="mt-4 flex flex-wrap gap-3 text-sm font-bold">
+                <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
+                  <BuildingOfficeIcon className="w-4 h-4" /> {job.department}
                 </span>
+                <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 shadow-sm">
+                  <ClockIcon className="w-4 h-4" /> {job.type}
+                </span>
+                <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+                  <MapPinIcon className="w-4 h-4" /> {job.location}
+                </span>
+              </div>
 
-                <h3 className="text-2xl font-bold text-slate-800 group-hover:text-black transition-colors">{job.title}</h3>
-                
-                {/* Badges */}
-                <div className="mt-4 flex flex-wrap gap-3 text-sm font-bold">
-                    <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
-                    <BuildingOfficeIcon className="w-4 h-4" /> {job.department}
-                    </span>
-                    <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 shadow-sm">
-                    <ClockIcon className="w-4 h-4" /> {job.type}
-                    </span>
-                    <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
-                    <MapPinIcon className="w-4 h-4" /> {job.location}
-                    </span>
-                </div>
-
-                <p className="mt-4 text-slate-600 text-lg leading-relaxed">{job.description}</p>
+              <p className="mt-4 text-slate-600 text-lg leading-relaxed">{job.description}</p>
             </div>
           ))}
         </div>
@@ -616,20 +615,20 @@ const OpenPositions: React.FC = () => {
 
       {/* FULL SCREEN JOB DETAILS */}
       {selectedJob && !showApply && (
-        <div className="fixed inset-0 bg-black/60 z-[999] flex justify-center items-start pt-10 overflow-y-auto custom-scrollbar">
-          <div className="bg-white w-full max-w-3xl rounded-2xl p-8 relative mt-10 mb-10 shadow-2xl">
-            <button onClick={closeAll} className="absolute top-4 right-4 text-3xl text-slate-500 hover:text-black">&times;</button>
-            <h1 className="text-3xl font-bold mb-1">{selectedJob.title}</h1>
-            <p className="text-sm text-slate-500 mb-4 font-bold">JOB ID: {selectedJob.id}</p>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex justify-center items-start pt-10 overflow-y-auto custom-scrollbar">
+          <div className="bg-white dark:bg-[#1f1f1f] w-full max-w-3xl rounded-2xl p-8 relative mt-10 mb-10 shadow-2xl transition-colors duration-300">
+            <button onClick={closeAll} className="absolute top-4 right-4 text-3xl text-slate-500 hover:text-black dark:hover:text-white">&times;</button>
+            <h1 className="text-3xl font-bold mb-1 text-slate-900 dark:text-white">{selectedJob.title}</h1>
+            <p className="text-sm text-slate-500 dark:text-gray-400 mb-4 font-bold">JOB ID: {selectedJob.id}</p>
             <div className="flex flex-wrap gap-2 mb-6">
-                <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-sm font-medium border border-slate-200">{selectedJob.department}</span>
-                <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-sm font-medium border border-slate-200">{selectedJob.type}</span>
-                <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-sm font-medium border border-slate-200">{selectedJob.location}</span>
+              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-gray-200 text-sm font-medium border border-slate-200 dark:border-white/10">{selectedJob.department}</span>
+              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-gray-200 text-sm font-medium border border-slate-200 dark:border-white/10">{selectedJob.type}</span>
+              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-gray-200 text-sm font-medium border border-slate-200 dark:border-white/10">{selectedJob.location}</span>
             </div>
             <div className="space-y-8">
-              <div><h3 className="text-xl font-semibold mb-2">Job Description</h3><p className="text-slate-700">{selectedJob.description}</p></div>
-              <div><h3 className="text-xl font-semibold mb-2">Requirements</h3><ul className="list-disc pl-5 text-slate-700 space-y-1"><li>Strong communication & teamwork skills</li><li>Ability to work in a fast-paced environment</li><li>Role-specific technical skills</li></ul></div>
-              <div><h3 className="text-xl font-semibold mb-2">Qualifications</h3><ul className="list-disc pl-5 text-slate-700 space-y-1"><li>Bachelor's degree or relevant experience</li><li>Strong problem-solving ability</li></ul></div>
+              <div><h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Job Description</h3><p className="text-slate-700 dark:text-gray-300">{selectedJob.description}</p></div>
+              <div><h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Requirements</h3><ul className="list-disc pl-5 text-slate-700 dark:text-gray-300 space-y-1"><li>Strong communication & teamwork skills</li><li>Ability to work in a fast-paced environment</li><li>Role-specific technical skills</li></ul></div>
+              <div><h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Qualifications</h3><ul className="list-disc pl-5 text-slate-700 dark:text-gray-300 space-y-1"><li>Bachelor's degree or relevant experience</li><li>Strong problem-solving ability</li></ul></div>
             </div>
             <button onClick={() => setShowApply(true)} className="mt-10 bg-yellow-400 text-black font-semibold px-8 py-3 rounded-full hover:bg-yellow-500 hover:shadow-lg hover:scale-105 transition-all">Apply Now →</button>
           </div>
@@ -638,60 +637,60 @@ const OpenPositions: React.FC = () => {
 
       {/* FULL SCREEN APPLY FORM */}
       {showApply && (
-        <div className="fixed inset-0 z-[999] bg-white overflow-y-scroll custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="fixed inset-0 z-[999] bg-white dark:bg-[#0a0a0a] overflow-y-scroll custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
           <div className="max-w-4xl mx-auto px-6 py-10 min-h-screen">
-            <button onClick={closeAll} className="text-3xl text-slate-600 absolute top-6 right-8 hover:text-black transition">&times;</button>
-            <h2 className="text-4xl font-bold mb-2 text-slate-800">Apply for <span className="text-yellow-400">{selectedJob?.title}</span></h2>
-            <p className="text-slate-500 mb-10 font-bold">JOB ID: {selectedJob?.id}</p>
+            <button onClick={closeAll} className="text-3xl text-slate-600 dark:text-gray-300 absolute top-6 right-8 hover:text-black dark:hover:text-white transition">&times;</button>
+            <h2 className="text-4xl font-bold mb-2 text-slate-800 dark:text-white">Apply for <span className="text-yellow-400">{selectedJob?.title}</span></h2>
+            <p className="text-slate-500 dark:text-gray-400 mb-10 font-bold">JOB ID: {selectedJob?.id}</p>
 
             <div className="flex gap-4 mb-10">
-              <div className={`flex-1 py-3 text-center rounded-xl font-semibold transition-all ${step === 1 ? "bg-yellow-300 shadow-md scale-105" : "bg-slate-100 text-slate-500"}`}>Personal Details</div>
-              <div className={`flex-1 py-3 text-center rounded-xl font-semibold transition-all ${step === 2 ? "bg-yellow-300 shadow-md scale-105" : "bg-slate-100 text-slate-500"}`}>Qualification</div>
-              <div className={`flex-1 py-3 text-center rounded-xl font-semibold transition-all ${step === 3 ? "bg-yellow-300 shadow-md scale-105" : "bg-slate-100 text-slate-500"}`}>Experience</div>
+              <div className={`flex-1 py-3 text-center rounded-xl font-semibold transition-all ${step === 1 ? "bg-yellow-300 shadow-md scale-105" : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-gray-400"}`}>Personal Details</div>
+              <div className={`flex-1 py-3 text-center rounded-xl font-semibold transition-all ${step === 2 ? "bg-yellow-300 shadow-md scale-105" : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-gray-400"}`}>Qualification</div>
+              <div className={`flex-1 py-3 text-center rounded-xl font-semibold transition-all ${step === 3 ? "bg-yellow-300 shadow-md scale-105" : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-gray-400"}`}>Experience</div>
             </div>
 
             {/* STEP 1 */}
             {step === 1 && (
               <div className="space-y-6 animate-fade-in-fast">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Full Name <span className="text-red-500">*</span></label>
-                  <input name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Enter your full name" />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Full Name <span className="text-red-500">*</span></label>
+                  <input name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Enter your full name" />
                 </div>
                 <div className="flex gap-4">
                   <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700">Date of Birth <span className="text-red-500">*</span></label>
-                    <input type="date" name="dob" value={formData.dob} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" />
+                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Date of Birth <span className="text-red-500">*</span></label>
+                    <input type="date" name="dob" value={formData.dob} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white dark:fill-white" />
                   </div>
                   <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700">Gender <span className="text-red-500">*</span></label>
-                    <select name="gender" value={formData.gender} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none">
+                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Gender <span className="text-red-500">*</span></label>
+                    <select name="gender" value={formData.gender} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white">
                       <option value="">Select Gender</option><option>Male</option><option>Female</option><option>Other</option>
                     </select>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Contact Number <span className="text-red-500">*</span></label>
-                  <input name="contact" value={formData.contact} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Enter phone number" />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Contact Number <span className="text-red-500">*</span></label>
+                  <input name="contact" value={formData.contact} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Enter phone number" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Email Address <span className="text-red-500">*</span></label>
-                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Enter email address" />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Email Address <span className="text-red-500">*</span></label>
+                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Enter email address" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Current Address <span className="text-red-500">*</span></label>
-                  <textarea name="currentAddress" value={formData.currentAddress} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Full address with city, state, pin code"></textarea>
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Current Address <span className="text-red-500">*</span></label>
+                  <textarea name="currentAddress" value={formData.currentAddress} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Full address with city, state, pin code"></textarea>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Permanent Address <span className="text-red-500">*</span></label>
-                  <textarea name="permanentAddress" value={formData.permanentAddress} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="If same as current address, type SAME"></textarea>
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Permanent Address <span className="text-red-500">*</span></label>
+                  <textarea name="permanentAddress" value={formData.permanentAddress} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="If same as current address, type SAME"></textarea>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Nationality <span className="text-red-500">*</span></label>
-                  <input name="nationality" value={formData.nationality} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Indian / Other" />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Nationality <span className="text-red-500">*</span></label>
+                  <input name="nationality" value={formData.nationality} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Indian / Other" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Photo (Optional)</label>
-                  <input type="file" className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Photo (Optional)</label>
+                  <input type="file" className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" />
                 </div>
                 <button onClick={handleNextStep} className="w-full bg-yellow-400 py-3 rounded-xl font-semibold hover:bg-yellow-500 hover:shadow-lg transition-all">Next →</button>
               </div>
@@ -701,43 +700,43 @@ const OpenPositions: React.FC = () => {
             {step === 2 && (
               <div className="space-y-6 animate-fade-in-fast">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Degree / Qualification <span className="text-red-500">*</span></label>
-                  <input name="degree" value={formData.degree} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="B.Tech / BCA / B.Sc / Diploma" />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Degree / Qualification <span className="text-red-500">*</span></label>
+                  <input name="degree" value={formData.degree} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="B.Tech / BCA / B.Sc / Diploma" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Major / Field of Study <span className="text-red-500">*</span></label>
-                  <input name="major" value={formData.major} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Computer Science, IT, Marketing, etc." />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Major / Field of Study <span className="text-red-500">*</span></label>
+                  <input name="major" value={formData.major} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Computer Science, IT, Marketing, etc." />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">University / Institute Name <span className="text-red-500">*</span></label>
-                  <input name="institute" value={formData.institute} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Enter institute name" />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">University / Institute Name <span className="text-red-500">*</span></label>
+                  <input name="institute" value={formData.institute} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Enter institute name" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Institute Location <span className="text-red-500">*</span></label>
-                  <input name="location" value={formData.location} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="City, State, Country" />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Institute Location <span className="text-red-500">*</span></label>
+                  <input name="location" value={formData.location} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="City, State, Country" />
                 </div>
                 <div className="flex gap-4">
                   <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700">Start Date</label>
-                    <input type="month" name="startDate" value={formData.startDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" />
+                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Start Date</label>
+                    <input type="month" name="startDate" value={formData.startDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white dark:fill-white" />
                   </div>
                   <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700">Completion Date</label>
-                    <input type="month" name="completionDate" value={formData.completionDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" />
+                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Completion Date</label>
+                    <input type="month" name="completionDate" value={formData.completionDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white dark:fill-white" />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Current Status <span className="text-red-500">*</span></label>
-                  <select name="status" value={formData.status} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none">
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Current Status <span className="text-red-500">*</span></label>
+                  <select name="status" value={formData.status} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white">
                     <option value="">Select Status</option><option>Completed</option><option>Pursuing</option><option>Dropped</option>
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Percentage / CGPA <span className="text-red-500">*</span></label>
-                  <input name="cgpa" value={formData.cgpa} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="8.2 CGPA / 85%" />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Percentage / CGPA <span className="text-red-500">*</span></label>
+                  <input name="cgpa" value={formData.cgpa} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="8.2 CGPA / 85%" />
                 </div>
                 <div className="flex justify-between">
-                  <button onClick={() => setStep(1)} className="px-6 py-2 bg-slate-200 rounded-xl hover:bg-slate-300 transition">← Back</button>
+                  <button onClick={() => setStep(1)} className="px-6 py-2 bg-slate-200 dark:bg-white/10 dark:text-white rounded-xl hover:bg-slate-300 dark:hover:bg-white/20 transition">← Back</button>
                   <button onClick={handleNextStep} className="px-6 py-2 bg-yellow-400 rounded-xl hover:bg-yellow-500 hover:shadow-lg transition">Next →</button>
                 </div>
               </div>
@@ -747,33 +746,33 @@ const OpenPositions: React.FC = () => {
             {step === 3 && (
               <div className="space-y-6 animate-fade-in-fast">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Job Title <span className="text-red-500">*</span></label>
-                  <input name="jobTitle" value={formData.jobTitle} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Data Analyst Intern, Developer, etc." />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Job Title <span className="text-red-500">*</span></label>
+                  <input name="jobTitle" value={formData.jobTitle} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Data Analyst Intern, Developer, etc." />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Company / Organization Name <span className="text-red-500">*</span></label>
-                  <input name="company" value={formData.company} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Enter company name" />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Company / Organization Name <span className="text-red-500">*</span></label>
+                  <input name="company" value={formData.company} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Enter company name" />
                 </div>
                 <div className="flex gap-4">
                   <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700">Start Date</label>
-                    <input type="month" name="expStartDate" value={formData.expStartDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" />
+                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Start Date</label>
+                    <input type="month" name="expStartDate" value={formData.expStartDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white dark:fill-white" />
                   </div>
                   <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700">End Date / Present</label>
-                    <input type="month" name="expEndDate" value={formData.expEndDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" />
+                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">End Date / Present</label>
+                    <input type="month" name="expEndDate" value={formData.expEndDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white dark:fill-white" />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Responsibilities <span className="text-red-500">*</span></label>
-                  <textarea name="responsibilities" value={formData.responsibilities} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Describe your tasks and achievements"></textarea>
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Responsibilities <span className="text-red-500">*</span></label>
+                  <textarea name="responsibilities" value={formData.responsibilities} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Describe your tasks and achievements"></textarea>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Skills Used <span className="text-red-500">*</span></label>
-                  <input name="skills" value={formData.skills} onChange={handleInputChange} className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Python, SQL, Power BI, Excel, Communication..." />
+                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Skills Used <span className="text-red-500">*</span></label>
+                  <input name="skills" value={formData.skills} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Python, SQL, Power BI, Excel, Communication..." />
                 </div>
                 <div className="flex justify-between">
-                  <button onClick={() => setStep(2)} className="px-6 py-2 bg-slate-200 rounded-xl hover:bg-slate-300 transition">← Back</button>
+                  <button onClick={() => setStep(2)} className="px-6 py-2 bg-slate-200 dark:bg-white/10 dark:text-white rounded-xl hover:bg-slate-300 dark:hover:bg-white/20 transition">← Back</button>
                   <button onClick={handleSubmitApp} className="px-6 py-2 bg-yellow-400 rounded-xl hover:bg-yellow-500 hover:shadow-lg transition">Submit Application</button>
                 </div>
               </div>
@@ -796,7 +795,7 @@ const ContactForm: React.FC = () => {
   };
 
   return (
-    <section className="bg-gradient-to-b from-white to-yellow-50 py-16 md:py-24">
+    <section className="bg-gradient-to-b from-white to-yellow-50 dark:from-[#0a0a0a] dark:to-[#111] py-16 md:py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-stretch">
           <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col justify-between h-full">
@@ -815,15 +814,15 @@ const ContactForm: React.FC = () => {
                 </div>
                 <input type="url" placeholder="Portfolio / LinkedIn URL" className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 bg-white text-slate-900" />
                 <textarea placeholder="Why do you want to join FlashSpace?" rows={4} className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 bg-white text-slate-900"></textarea>
-                
+
                 {/* UPDATED BUTTON */}
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="w-full bg-yellow-400 text-black font-bold py-3 rounded-xl hover:bg-yellow-500 hover:shadow-lg transition-all duration-300"
                 >
                   Submit Application
                 </button>
-                
+
               </form>
             </div>
             <div className="mt-6 text-center text-sm text-slate-600 font-sans">

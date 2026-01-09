@@ -83,7 +83,7 @@ const UpdatesPopup = ({
         width: UPDATES_WIDTH,
         height: "100vh",
         // [MODIFIED] Lower Z-index than sidebar (Sidebar is z-[60])
-        zIndex: 50, 
+        zIndex: 50,
         // [MODIFIED] Slide logic: 0 is visible, -100% hides it to the left (under sidebar)
         transform: open ? "translateX(0)" : "translateX(-100%)",
         // [MODIFIED] Add opacity for smoother fade
@@ -92,18 +92,11 @@ const UpdatesPopup = ({
         pointerEvents: open ? "auto" : "none",
         transition: "transform 0.4s cubic-bezier(.25,.8,.25,1), opacity 0.3s ease-in-out",
         // [MODIFIED] Shadow to give depth when sliding out
-        boxShadow: "10px 0 30px rgba(0,0,0,0.1)" 
+        boxShadow: "10px 0 30px rgba(0,0,0,0.1)"
       }}
     >
       <div
         style={{
-          background: "#fff",
-          borderTopLeftRadius: "0px",
-          borderBottomLeftRadius: "0px",
-          borderTopRightRadius: "22px",
-          borderBottomRightRadius: "22px",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-          padding: "28px 32px 32px 32px",
           width: "100%",
           height: "100%",
           overflowY: "auto",
@@ -111,6 +104,7 @@ const UpdatesPopup = ({
           flexDirection: "column",
           position: "relative"
         }}
+        className="bg-white dark:bg-[#0a0a0a] text-black dark:text-white"
       >
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
@@ -119,10 +113,10 @@ const UpdatesPopup = ({
               fontSize: "1.5rem",
               fontWeight: "bold",
               marginBottom: 18,
-              color: "#222",
               marginTop: 10,
               letterSpacing: "0.5px"
             }}
+            className="text-[#222] dark:text-white"
           >
             Update & <span style={{ color: "#FFCC00" }}>Notification</span>
           </h2>
@@ -131,29 +125,29 @@ const UpdatesPopup = ({
             aria-label="Close updates"
             style={{ background: "transparent", border: "none", cursor: "pointer", padding: 8 }}
           >
-            <X style={{ width: 18, height: 18 }} />
+            <X style={{ width: 18, height: 18 }} className="text-black dark:text-white" />
           </button>
         </div>
 
         {/* Updates Content */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1.3rem" }}>
-          <div style={{ background: "#f6f7ff", borderRadius: "14px", padding: "18px" }}>
-            <strong>Site Launched!</strong>
-            <p style={{ margin: "10px 0 0 0", color: "#506" }}>
+          <div className="bg-[#f6f7ff] dark:bg-[#1a1a2e] rounded-[14px] p-[18px]">
+            <strong className="text-black dark:text-white">Site Launched!</strong>
+            <p className="mt-[10px] m-0 text-[#506] dark:text-[#a080ff]">
               We have deployed the first AI-enabled business workspace platform. 🎉
             </p>
           </div>
 
-          <div style={{ background: "#f0fff6", borderRadius: "14px", padding: "18px" }}>
-            <strong>New Feature: Flash Tribe</strong>
-            <p style={{ margin: "10px 0 0 0", color: "#265" }}>
+          <div className="bg-[#f0fff6] dark:bg-[#1a2e22] rounded-[14px] p-[18px]">
+            <strong className="text-black dark:text-white">New Feature: Flash Tribe</strong>
+            <p className="mt-[10px] m-0 text-[#265] dark:text-[#50e090]">
               Now connect with fellow workspace members and grow your professional network.
             </p>
           </div>
 
-          <div style={{ background: "#fff8f0", borderRadius: "14px", padding: "18px" }}>
-            <strong>Maintenance Notice</strong>
-            <p style={{ margin: "10px 0 0 0", color: "#a64" }}>
+          <div className="bg-[#fff8f0] dark:bg-[#2e241a] rounded-[14px] p-[18px]">
+            <strong className="text-black dark:text-white">Maintenance Notice</strong>
+            <p className="mt-[10px] m-0 text-[#a64] dark:text-[#ffa060]">
               There’s scheduled maintenance on Nov 3rd, 2AM to 3AM IST.
             </p>
           </div>
@@ -222,7 +216,7 @@ const StartChatting = () => {
 
   const sidebarMenuItems: SidebarMenuItem[] = [
     { label: 'Start Chatting', icon: MessageSquare, onClick: () => handleNavigation('/start-chatting') },
-    { label: 'Get Workspace', icon: Building2, onClick: () => handleNavigation('/solutions/on-demand') },
+    { label: 'Get Workspace', icon: Building2, onClick: () => handleNavigation('/services/virtual-office') },
     { label: 'Business Setup', icon: Briefcase, onClick: () => handleNavigation('/solutions/business-setup') },
     { label: 'Your Bookings', icon: Calendar, onClick: () => handleNavigation('/bookings') },
     { label: 'Flash Tribe', icon: Users, onClick: () => handleNavigation('/community') },
@@ -314,10 +308,10 @@ const StartChatting = () => {
 
       const data = await response.json();
       console.log('n8n response:', data); // Debug log
-      
+
       // Try multiple possible response formats from n8n
       let aiResponseText = '';
-      
+
       if (Array.isArray(data)) {
         // If response is an array, get first item
         const firstItem = data[0];
@@ -328,7 +322,7 @@ const StartChatting = () => {
       } else {
         aiResponseText = String(data);
       }
-      
+
       // Add AI response to chat
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -340,7 +334,7 @@ const StartChatting = () => {
       setChatMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message to n8n:', error);
-      
+
       // Add error message
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -348,7 +342,7 @@ const StartChatting = () => {
         content: 'I apologize, but I\'m having trouble connecting right now. Please try again in a moment.',
         timestamp: new Date()
       };
-      
+
       setChatMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -391,9 +385,9 @@ const StartChatting = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] flex flex-col overflow-x-hidden transition-colors duration-300" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 lg:left-20">
+      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-white/10 z-50 lg:left-20 transition-colors duration-300">
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* Main Text Logo */}
@@ -406,7 +400,7 @@ const StartChatting = () => {
           </div>
           <div className="flex items-center gap-3">
             {/* IND Button */}
-            <div className="hidden sm:flex items-center px-3 py-1.5 rounded-md border transition-colors duration-300 border-gray-300 text-black">
+            <div className="hidden sm:flex items-center px-3 py-1.5 rounded-md border transition-colors duration-300 border-gray-300 dark:border-white/20 text-black dark:text-white">
               <span className="text-sm font-md">IND</span>
             </div>
 
@@ -422,7 +416,7 @@ const StartChatting = () => {
             <Button
               onClick={() => handleNavigation('/login')}
               variant="outline"
-              className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 text-black hover:bg-gray-50"
+              className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 dark:border-white/20 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-white/10 bg-transparent"
               style={{ fontFamily: 'Poppins' }}
             >
               Log in
@@ -460,9 +454,8 @@ const StartChatting = () => {
       {/* [MODIFIED] Increased z-index to z-[60] so it sits ON TOP of the Updates Popup (z-50) */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-screen w-20 bg-white border-r border-gray-200 shadow-sm z-[60] flex flex-col overflow-hidden lg:translate-x-0 transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-0 left-0 h-screen w-20 bg-white dark:bg-[#0a0a0a] border-r border-gray-200 dark:border-white/10 shadow-sm z-[60] flex flex-col overflow-hidden lg:translate-x-0 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
         style={{ fontFamily: 'Geist, Poppins, sans-serif' }}
       >
         {/* Logo Section */}
@@ -491,10 +484,10 @@ const StartChatting = () => {
                         setIsSidebarOpen(false);
                       }
                     }}
-                    className="w-full flex items-center justify-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 group"
+                    className="w-full flex items-center justify-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg transition-all duration-200 group hover:bg-gray-50 dark:hover:bg-white/5"
                     title={item.label}
                   >
-                    <Icon className="w-6 h-6 text-gray-700 group-hover:text-black group-hover:fill-[#EDB003] group-hover:scale-125 transition-all duration-200" strokeWidth={2} />
+                    <Icon className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-black dark:group-hover:text-white group-hover:fill-[#EDB003] group-hover:scale-125 transition-all duration-200" strokeWidth={2} />
                   </button>
                 </li>
               );
@@ -505,10 +498,10 @@ const StartChatting = () => {
               <Popover>
                 <PopoverTrigger asChild>
                   <button
-                    className="w-full flex items-center justify-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 group"
+                    className="w-full flex items-center justify-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg transition-all duration-200 group hover:bg-gray-50 dark:hover:bg-white/5"
                     title="More"
                   >
-                    <MoreHorizontal className="w-6 h-6 text-gray-700 group-hover:text-black group-hover:fill-[#EDB003] group-hover:scale-125 transition-all duration-200" strokeWidth={2} />
+                    <MoreHorizontal className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-black dark:group-hover:text-white group-hover:fill-[#EDB003] group-hover:scale-125 transition-all duration-200" strokeWidth={2} />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-48" side="right" align="start" sideOffset={10}>
@@ -539,11 +532,11 @@ const StartChatting = () => {
         </nav>
 
         {/* Bottom Section - Profile & Footer */}
-        <div className="border-t border-gray-100 p-4 flex-shrink-0 space-y-3">
+        <div className="border-t border-gray-100 dark:border-white/10 p-4 flex-shrink-0 space-y-3">
           {/* Profile Button */}
           <button
             onClick={() => handleNavigation('/about')}
-            className="w-full flex items-center justify-center py-3 hover:bg-gray-50 rounded-lg transition-all duration-200"
+            className="w-full flex items-center justify-center py-3 hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg transition-all duration-200"
             title="Profile"
           >
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#EDB003] to-[#f5c242] flex items-center justify-center text-white font-semibold">
@@ -563,12 +556,12 @@ const StartChatting = () => {
         <div className="flex flex-col lg:flex-row w-full h-[calc(100vh-4rem)]">
 
           {/* Left Panel - Chat Interface - 60-65% - Scrollable Chat Area */}
-          <div className="w-full lg:w-[60%] xl:w-[65%] h-full flex flex-col bg-white border-r border-gray-200">
+          <div className="w-full lg:w-[60%] xl:w-[65%] h-full flex flex-col bg-white dark:bg-[#0a0a0a] border-r border-gray-200 dark:border-white/10">
 
             {/* Chat Content */}
-            <div 
+            <div
               ref={chatContainerRef}
-              className="flex-1 p-4 sm:p-6 bg-white chat-container overflow-y-auto"
+              className="flex-1 p-4 sm:p-6 bg-white dark:bg-[#0a0a0a] chat-container overflow-y-auto"
               style={{
                 height: '100%'
               }}
@@ -588,42 +581,42 @@ const StartChatting = () => {
                     </div>
                   </div>
 
-                  <h2 className="text-xl font-bold text-gray-900 mb-3">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                     Need WorkSpace / Business Setup?
                   </h2>
-                  <p className="text-gray-600 text-sm mb-6 max-w-lg leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 max-w-lg leading-relaxed">
                     Hey! I'm here to assist you with end-to-end workspace and compliance requirements. Let's get started!
                   </p>
 
                   {/* Large Prompt Suggestions */}
                   <div className="w-full max-w-2xl grid grid-cols-2 gap-3 mb-6">
-                    <button 
+                    <button
                       onClick={() => handleQuickAction('Find coworking spaces in Delhi NCR region')}
-                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
+                      className="p-4 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] hover:bg-[#EDB003] dark:hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
                     >
-                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">Find coworking spaces</div>
-                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">in Delhi NCR region</div>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-white">Find coworking spaces</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-white/90 mt-1">in Delhi NCR region</div>
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleQuickAction('Help me with GST Registration complete registration process')}
-                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
+                      className="p-4 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] hover:bg-[#EDB003] dark:hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
                     >
-                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">GST Registration</div>
-                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">Complete registration process</div>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-white">GST Registration</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-white/90 mt-1">Complete registration process</div>
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleQuickAction('Compare workspace plans and find the best deal')}
-                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
+                      className="p-4 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] hover:bg-[#EDB003] dark:hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
                     >
-                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">Compare workspace plans</div>
-                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">Find the best deal</div>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-white">Compare workspace plans</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-white/90 mt-1">Find the best deal</div>
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleQuickAction('Check business compliance requirements')}
-                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
+                      className="p-4 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] hover:bg-[#EDB003] dark:hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
                     >
-                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">Business compliance</div>
-                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">Check requirements</div>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-white">Business compliance</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-white/90 mt-1">Check requirements</div>
                     </button>
                   </div>
                 </div>
@@ -636,29 +629,27 @@ const StartChatting = () => {
                       className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                          msg.role === 'user'
-                            ? 'bg-[#EDB003] text-white'
-                            : 'bg-gray-100 text-gray-900'
-                        }`}
+                        className={`max-w-[80%] rounded-2xl px-4 py-3 ${msg.role === 'user'
+                          ? 'bg-[#EDB003] text-white'
+                          : 'bg-gray-100 dark:bg-[#1a1a1a] text-gray-900 dark:text-gray-100'
+                          }`}
                       >
                         <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                        <p className={`text-xs mt-1 ${
-                          msg.role === 'user' ? 'text-white/70' : 'text-gray-500'
-                        }`}>
-                          {new Date(msg.timestamp).toLocaleTimeString('en-US', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
+                        <p className={`text-xs mt-1 ${msg.role === 'user' ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'
+                          }`}>
+                          {new Date(msg.timestamp).toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
                           })}
                         </p>
                       </div>
                     </div>
                   ))}
-                  
+
                   {/* Loading indicator */}
                   {isLoading && (
                     <div className="flex justify-start">
-                      <div className="bg-gray-100 rounded-2xl px-4 py-3">
+                      <div className="bg-gray-100 dark:bg-[#1a1a1a] rounded-2xl px-4 py-3">
                         <div className="flex gap-2">
                           <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                           <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -672,14 +663,14 @@ const StartChatting = () => {
             </div>
 
             {/* Chat Input */}
-            <div className="p-4 border-t border-gray-200 bg-white">
+            <div className="p-4 border-t border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a]">
               <div className="relative">
                 <input
                   type="text"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Ask anything..."
-                  className="w-full px-14 py-4 bg-gray-50 border border-gray-300 rounded-xl outline-none text-gray-900 placeholder-gray-400 focus:border-[#EDB003] focus:bg-white transition-all"
+                  className="w-full px-14 py-4 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-300 dark:border-white/10 rounded-xl outline-none text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#EDB003] focus:bg-white dark:focus:bg-[#1f1f1f] transition-all"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -687,12 +678,12 @@ const StartChatting = () => {
                     }
                   }}
                 />
-                <button className="absolute left-4 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                  <Plus className="w-5 h-5 text-gray-500" />
+                <button className="absolute left-4 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-200 dark:hover:bg-white/10 rounded-lg transition-colors">
+                  <Plus className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2">
-                  <button className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                    <Mic className="w-5 h-5 text-gray-500" />
+                  <button className="p-2 hover:bg-gray-200 dark:hover:bg-white/10 rounded-lg transition-colors">
+                    <Mic className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                   </button>
                   <button
                     onClick={handleSendMessage}
@@ -710,7 +701,7 @@ const StartChatting = () => {
 
           {/* Right Panel - Sidebar - 35-40% - Scrollable Vertically */}
           <div
-            className="w-full lg:w-[40%] xl:w-[35%] h-full bg-gray-50 overflow-y-auto overflow-x-hidden p-6 scrollbar-yellow"
+            className="w-full lg:w-[40%] xl:w-[35%] h-full bg-gray-50 dark:bg-[#111] overflow-y-auto overflow-x-hidden p-6 scrollbar-yellow"
             style={{
               WebkitOverflowScrolling: 'touch',
               overscrollBehavior: 'contain',
@@ -723,11 +714,11 @@ const StartChatting = () => {
             <div className="space-y-6 max-w-xl mx-auto min-h-full">
 
               {/* Popular Spaces Section */}
-              <div className="bg-white rounded-2xl p-5 shadow-sm">
+              <div className="bg-white dark:bg-[#1f1f1f] rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-[#EDB003]" />
-                    <h3 className="text-base font-bold text-gray-900" >Popular Spaces in {selectedCity}</h3>
+                    <h3 className="text-base font-bold text-gray-900 dark:text-white" >Popular Spaces in {selectedCity}</h3>
                   </div>
                   <button className="text-xs font-medium text-[#EDB003] hover:text-[#d69f03] flex items-center gap-1 transition-colors">
                     View Map
@@ -738,9 +729,9 @@ const StartChatting = () => {
                   {popularSpaces.map((space, index) => (
                     <div
                       key={index}
-                      className="bg-white border border-gray-200 hover:border-[#EDB003] rounded-xl overflow-hidden cursor-pointer transition-all group hover:shadow-md hover:scale-[1.02] duration-200"
+                      className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] rounded-xl overflow-hidden cursor-pointer transition-all group hover:shadow-md hover:scale-[1.02] duration-200"
                     >
-                      <div className="h-32 relative overflow-hidden bg-gray-100">
+                      <div className="h-32 relative overflow-hidden bg-gray-100 dark:bg-gray-800">
                         {space.image && (
                           <img
                             src={space.image}
@@ -756,8 +747,8 @@ const StartChatting = () => {
                         </div>
                       </div>
                       <div className="p-3">
-                        <div className="text-sm font-bold text-gray-900 mb-1 line-clamp-1" >{space.name}</div>
-                        <div className="text-xs text-gray-600 line-clamp-1 flex items-center gap-1" >
+                        <div className="text-sm font-bold text-gray-900 dark:text-white mb-1 line-clamp-1" >{space.name}</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1 flex items-center gap-1" >
                           <MapPin className="w-3 h-3 text-gray-400" />
                           {space.location}
                         </div>
@@ -768,16 +759,16 @@ const StartChatting = () => {
               </div>
 
               {/* Get Started Section */}
-              <div className="bg-gradient-to-br from-[#FFF9E6] to-[#FFFAED] rounded-2xl p-5 shadow-sm border border-[#FFD43B]/20">
-                <h3 className="text-base font-bold text-gray-900 mb-4" >Get Started</h3>
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+              <div className="bg-gradient-to-br from-[#FFF9E6] to-[#FFFAED] dark:from-[#1a1a1a] dark:to-[#0a0a0a] rounded-2xl p-5 shadow-sm border border-[#FFD43B]/20 dark:border-white/10">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4" >Get Started</h3>
+                <div className="bg-white dark:bg-[#1f1f1f] rounded-xl p-4 shadow-sm border border-gray-100 dark:border-white/10">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-10 h-10 bg-[#EDB003]/10 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Sparkles className="w-5 h-5 text-[#EDB003]" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-gray-900 mb-1" >Find Your Perfect Workspace</h4>
-                      <p className="text-xs text-gray-600 leading-relaxed" >
+                      <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-1" >Find Your Perfect Workspace</h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed" >
                         Take our quick quiz to discover workspaces tailored to your needs.
                       </p>
                     </div>
@@ -790,9 +781,9 @@ const StartChatting = () => {
               </div>
 
               {/* Get Inspired Section */}
-              <div className="bg-white rounded-2xl p-5 shadow-sm">
+              <div className="bg-white dark:bg-[#1f1f1f] rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base font-bold text-gray-900" >Get Inspired</h3>
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white" >Get Inspired</h3>
                   <button className="text-xs font-medium text-[#EDB003] hover:text-[#d69f03] transition-colors">
                     See all
                   </button>

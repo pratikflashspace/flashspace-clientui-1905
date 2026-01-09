@@ -335,7 +335,7 @@ const CoworkingSpace = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
       {/* Header */}
       <Header />
 
@@ -385,7 +385,7 @@ const CoworkingSpace = () => {
 
             {/* Hero Search Bar */}
             <motion.div
-              className="bg-white rounded-2xl p-2 shadow-2xl max-w-2xl"
+              className="bg-white dark:bg-[#1f1f1f] rounded-2xl p-2 shadow-2xl max-w-2xl transition-colors duration-300"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -397,7 +397,7 @@ const CoworkingSpace = () => {
                       <Button
                         variant="ghost"
                         role="combobox"
-                        className="w-full justify-between h-16 text-gray-900 hover:bg-gray-50 rounded-xl"
+                        className="w-full justify-between h-16 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-black/20 rounded-xl"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-[#EDB003]/10 rounded-lg flex items-center justify-center">
@@ -411,11 +411,11 @@ const CoworkingSpace = () => {
                         <ChevronDown className="ml-2 h-5 w-5 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 bg-white shadow-xl border-2 border-gray-100">
-                      <Command className="bg-white">
-                        <CommandInput placeholder="Search city..." className="bg-white" />
-                        <CommandList className="bg-white">
-                          <CommandEmpty>No city found.</CommandEmpty>
+                    <PopoverContent className="w-[300px] p-0 bg-white dark:bg-[#1f1f1f] shadow-xl border-2 border-gray-100 dark:border-white/10">
+                      <Command className="bg-white dark:bg-[#1f1f1f]">
+                        <CommandInput placeholder="Search city..." className="bg-white dark:bg-[#1f1f1f] dark:text-white" />
+                        <CommandList className="bg-white dark:bg-[#1f1f1f]">
+                          <CommandEmpty className="dark:text-white">No city found.</CommandEmpty>
                           <CommandGroup>
                             {cities.map((city) => (
                               <CommandItem
@@ -425,6 +425,7 @@ const CoworkingSpace = () => {
                                   setSelectedCity(city);
                                   setIsLocationOpen(false);
                                 }}
+                                className="dark:text-white dark:aria-selected:bg-white/10"
                               >
                                 <Check
                                   className={cn(
@@ -457,7 +458,7 @@ const CoworkingSpace = () => {
             >
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
-                  {[1,2,3,4].map((i) => (
+                  {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#EDB003] to-[#f5c242] border-2 border-white"></div>
                   ))}
                 </div>
@@ -469,7 +470,7 @@ const CoworkingSpace = () => {
 
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
-                  {[1,2,3,4,5].map((i) => (
+                  {[1, 2, 3, 4, 5].map((i) => (
                     <Star key={i} className="w-4 h-4 fill-[#EDB003] text-[#EDB003]" />
                   ))}
                 </div>
@@ -521,7 +522,7 @@ const CoworkingSpace = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-20 bg-gradient-to-b from-white to-gray-50 dark:from-[#0a0a0a] dark:to-[#111] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -532,10 +533,10 @@ const CoworkingSpace = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Why Choose Us
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               Premium Coworking Benefits
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Everything you need for a productive and collaborative work experience
             </p>
           </motion.div>
@@ -549,7 +550,7 @@ const CoworkingSpace = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
                   <CardContent className="p-8 relative">
                     {/* Background Gradient */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
@@ -558,11 +559,11 @@ const CoworkingSpace = () => {
                       <feature.icon className="w-8 h-8 text-white" />
                     </div>
 
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
                       {feature.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                       {feature.description}
                     </p>
                   </CardContent>
@@ -574,7 +575,7 @@ const CoworkingSpace = () => {
       </section>
 
       {/* What is Coworking Space Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -585,10 +586,10 @@ const CoworkingSpace = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Understanding Coworking
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               What is Coworking Space?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Coworking spaces are shared work environments where individuals and teams from different companies work side-by-side.
               It's a modern alternative to traditional offices, offering flexibility, community, and cost savings.
             </p>
@@ -603,7 +604,7 @@ const CoworkingSpace = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
                   <CardContent className="p-8 relative">
                     <div className={`absolute inset-0 bg-gradient-to-br ${type.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
 
@@ -611,11 +612,11 @@ const CoworkingSpace = () => {
                       <type.icon className="w-8 h-8 text-white" />
                     </div>
 
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
                       {type.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                       {type.description}
                     </p>
                   </CardContent>
@@ -627,7 +628,7 @@ const CoworkingSpace = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -638,10 +639,10 @@ const CoworkingSpace = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Simple Process
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               How It Works
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Get started with FlashSpace coworking in five simple steps
             </p>
           </motion.div>
@@ -656,7 +657,7 @@ const CoworkingSpace = () => {
                 viewport={{ once: true }}
                 className="relative"
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
                   <CardContent className="p-8 relative">
                     <div className={`absolute inset-0 bg-gradient-to-br ${step.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
 
@@ -668,11 +669,11 @@ const CoworkingSpace = () => {
                       <step.icon className="w-8 h-8 text-white" />
                     </div>
 
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300 relative z-10">
+                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300 relative z-10">
                       {step.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed relative z-10">
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed relative z-10">
                       {step.description}
                     </p>
                   </CardContent>
@@ -691,7 +692,7 @@ const CoworkingSpace = () => {
       </section>
 
       {/* Why Choose FlashSpace Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -702,10 +703,10 @@ const CoworkingSpace = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Our Advantages
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               Why Choose <span className="text-[#EDB003]">FlashSpace</span> Coworking <span className="text-[#EDB003] text-5xl md:text-6xl">?</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Experience the difference with India's fastest-growing coworking community
             </p>
           </motion.div>
@@ -719,7 +720,7 @@ const CoworkingSpace = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
                   <CardContent className="p-8 relative">
                     <div className={`absolute inset-0 bg-gradient-to-br ${benefit.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
 
@@ -727,11 +728,11 @@ const CoworkingSpace = () => {
                       <benefit.icon className="w-8 h-8 text-white" />
                     </div>
 
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] group-hover:text-[#EDB003] transition-colors duration-300">
+                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
                       {benefit.title}
                     </h3>
 
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                       {benefit.description}
                     </p>
                   </CardContent>
@@ -743,7 +744,7 @@ const CoworkingSpace = () => {
       </section>
 
       {/* Membership Plans Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -754,10 +755,10 @@ const CoworkingSpace = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Flexible Pricing
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               Membership Plans
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Choose the plan that fits your work style and budget
             </p>
           </motion.div>
@@ -780,21 +781,21 @@ const CoworkingSpace = () => {
                   </div>
                 )}
 
-                <Card className={`border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden ${plan.popular ? 'ring-2 ring-[#EDB003]' : ''}`}>
+                <Card className={`border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden ${plan.popular ? 'ring-2 ring-[#EDB003]' : ''}`}>
                   <CardContent className="p-8 relative">
                     <div className={`absolute inset-0 bg-gradient-to-br ${plan.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
 
-                    <h3 className="text-3xl font-bold mb-2 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+                    <h3 className="text-3xl font-bold mb-2 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
                       {plan.name}
                     </h3>
 
-                    <p className="text-gray-600 mb-6">{plan.description}</p>
+                    <p className="text-gray-600 dark:text-gray-300 mb-6">{plan.description}</p>
 
                     <div className="mb-8">
-                      <span className="text-5xl font-bold text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+                      <span className="text-5xl font-bold text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
                         ₹{plan.price}
                       </span>
-                      <span className="text-gray-600 ml-2">/{plan.period}</span>
+                      <span className="text-gray-600 dark:text-gray-400 ml-2">/{plan.period}</span>
                     </div>
 
                     <ul className="space-y-4 mb-8">
@@ -830,7 +831,7 @@ const CoworkingSpace = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -841,10 +842,10 @@ const CoworkingSpace = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Success Stories
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               What Our Members Say
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Join thousands of satisfied professionals who've transformed their work life with FlashSpace
             </p>
           </motion.div>
@@ -858,7 +859,7 @@ const CoworkingSpace = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white overflow-hidden">
+                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
                   <CardContent className="p-8 relative">
                     <div className={`absolute inset-0 bg-gradient-to-br ${testimonial.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
 
@@ -870,7 +871,7 @@ const CoworkingSpace = () => {
                       ))}
                     </div>
 
-                    <p className="text-gray-700 leading-relaxed mb-6 italic">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 italic">
                       "{testimonial.text}"
                     </p>
 
@@ -879,7 +880,7 @@ const CoworkingSpace = () => {
                         {testimonial.avatar}
                       </div>
                       <div>
-                        <h4 className="font-bold text-[#172A3A]">{testimonial.name}</h4>
+                        <h4 className="font-bold text-[#172A3A] dark:text-white">{testimonial.name}</h4>
                         <p className="text-sm text-gray-600">{testimonial.role}</p>
                         <p className="text-xs text-gray-500">{testimonial.company}</p>
                       </div>
@@ -893,7 +894,7 @@ const CoworkingSpace = () => {
       </section>
 
       {/* FAQs Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -904,10 +905,10 @@ const CoworkingSpace = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Got Questions?
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               Frequently Asked Questions
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Everything you need to know about coworking at FlashSpace
             </p>
           </motion.div>
@@ -921,17 +922,17 @@ const CoworkingSpace = () => {
                 transition={{ delay: index * 0.05 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
+                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-[#1f1f1f]">
                   <CardContent className="p-8">
                     <div className="flex items-start gap-4">
                       <div className="w-8 h-8 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-full flex items-center justify-center flex-shrink-0">
                         <span className="text-white font-bold text-sm">Q</span>
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold mb-3 text-[#172A3A]">
+                        <h3 className="text-xl font-bold mb-3 text-[#172A3A] dark:text-white">
                           {faq.question}
                         </h3>
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                           {faq.answer}
                         </p>
                       </div>
@@ -958,7 +959,7 @@ const CoworkingSpace = () => {
       </section>
 
       {/* Location Grid Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -969,10 +970,10 @@ const CoworkingSpace = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Our Locations
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               Across <span className="text-[#EDB003]">28+</span> States
             </h2>
-            <p className="text-xl text-gray-600">Find your perfect coworking space location</p>
+            <p className="text-xl text-gray-600 dark:text-gray-300">Find your perfect coworking space location</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">

@@ -202,15 +202,15 @@ function FeaturedCategorySlider({ categories }: { categories: { title: string; d
   return (
     <div className="py-12">
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-2xl font-bold mb-6">Featured Categories</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Featured Categories</h2>
         <div className="flex gap-4 overflow-x-auto no-scrollbar py-2">
           {categories.map((c, i) => (
-            <div key={i} className="min-w-[260px] bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-xl transition">
-              <div className="h-40 rounded-lg overflow-hidden mb-3 bg-gray-100">
+            <div key={i} className="min-w-[260px] bg-white dark:bg-[#1f1f1f] rounded-2xl p-4 shadow-md border border-gray-100 dark:border-white/10 hover:shadow-xl transition-all duration-300">
+              <div className="h-40 rounded-lg overflow-hidden mb-3 bg-gray-100 dark:bg-gray-800">
                 {c.img ? <img src={c.img} alt={c.title} className="w-full h-full object-cover" /> : null}
               </div>
-              <h3 className="font-semibold mb-1">{c.title}</h3>
-              <p className="text-sm text-gray-600 line-clamp-3">{c.desc}</p>
+              <h3 className="font-semibold mb-1 text-gray-900 dark:text-white">{c.title}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">{c.desc}</p>
             </div>
           ))}
         </div>
@@ -224,29 +224,29 @@ function FeaturedCategorySlider({ categories }: { categories: { title: string; d
 // ----------------------
 function HomepageBlogSection({ posts }: { posts: Post[] }) {
   return (
-    <section className="bg-white py-16">
+    <section className="bg-white dark:bg-[#0a0a0a] py-16 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold">From the Blog</h2>
-          <NavLink to="/blog" className="text-sm font-semibold text-gray-700">View all articles →</NavLink>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">From the Blog</h2>
+          <NavLink to="/blog" className="text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors">View all articles →</NavLink>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {posts.slice(0, 3).map(p => (
-            <motion.article key={p.id} whileHover={{ translateY: -6 }} className="rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-white">
-              <div className="aspect-[16/9] bg-gray-200 overflow-hidden">
+            <motion.article key={p.id} whileHover={{ translateY: -6 }} className="rounded-2xl overflow-hidden shadow-md border border-gray-100 dark:border-white/10 bg-white dark:bg-[#1f1f1f] transition-all duration-300">
+              <div className="aspect-[16/9] bg-gray-200 dark:bg-gray-800 overflow-hidden">
                 {p.hero ? <img src={p.hero} alt={p.title} className="w-full h-full object-cover" /> : null}
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">{p.category}</span>
-                  <span className="text-sm text-gray-500">{new Date(p.date || '').toLocaleDateString()}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{new Date(p.date || '').toLocaleDateString()}</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{p.title}</h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{p.excerpt}</p>
+                <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{p.title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">{p.excerpt}</p>
                 <div className="flex items-center justify-between">
-                  <NavLink to={`/blog/${p.id}`} className="text-sm font-semibold" >Read more →</NavLink>
-                  <div className="text-sm text-gray-500">{p.readMinutes} min</div>
+                  <NavLink to={`/blog/${p.id}`} className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline" >Read more →</NavLink>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{p.readMinutes} min read</div>
                 </div>
               </div>
             </motion.article>
@@ -275,7 +275,7 @@ function SinglePostPageInternal({ posts }: { posts: Post[] }) {
   }, [id]);
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans antialiased">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-100 font-sans antialiased">
       <Header />
 
       {/* HERO BANNER */}
@@ -304,7 +304,7 @@ function SinglePostPageInternal({ posts }: { posts: Post[] }) {
             </div>
 
             <div className="mt-6">
-              <Button onClick={() => navigate('/blog')} className="bg-white text-black rounded-xl">Back to articles</Button>
+              <Button onClick={() => navigate('/blog')} className="bg-white text-black rounded-xl hover:bg-gray-200 transition-colors">Back to articles</Button>
             </div>
           </motion.div>
         </div>
@@ -314,8 +314,9 @@ function SinglePostPageInternal({ posts }: { posts: Post[] }) {
       <main className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Article */}
         <article className="lg:col-span-2">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12">
-            <style dangerouslySetInnerHTML={{ __html: `
+          <div className="bg-white dark:bg-[#1f1f1f] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 p-8 md:p-12 transition-colors duration-300">
+            <style dangerouslySetInnerHTML={{
+              __html: `
               .article-content h2 {
                 font-size: 1.75rem;
                 font-weight: 700;
@@ -325,31 +326,40 @@ function SinglePostPageInternal({ posts }: { posts: Post[] }) {
                 padding-bottom: 0.5rem;
                 border-bottom: 2px solid #ffd400;
               }
+              .dark .article-content h2 {
+                color: #f3f4f6;
+              }
               .article-content p {
                 font-size: 1.125rem;
                 line-height: 1.8;
                 color: #4b5563;
                 margin-bottom: 1.5rem;
               }
+              .dark .article-content p {
+                color: #d1d5db;
+              }
               .article-content p:first-of-type {
                 font-size: 1.25rem;
                 color: #374151;
                 font-weight: 500;
+              }
+              .dark .article-content p:first-of-type {
+                color: #e5e7eb;
               }
             ` }} />
             <div className="article-content" dangerouslySetInnerHTML={{ __html: post.content || '<p>No content</p>' }} />
           </div>
 
           {/* Author card & share CTA */}
-          <div className="mt-12 p-6 rounded-2xl bg-white shadow-md border border-gray-100 flex items-center gap-4">
+          <div className="mt-12 p-6 rounded-2xl bg-white dark:bg-[#1f1f1f] shadow-md border border-gray-100 dark:border-white/10 flex items-center gap-4 text-gray-900 dark:text-gray-100 transition-colors duration-300">
             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">👤</div>
             <div>
               <div className="font-semibold">{post.author}</div>
               <div className="text-sm text-gray-500">Writer at FlashBlog</div>
             </div>
             <div className="ml-auto flex gap-2">
-              <Button className="bg-yellow-100 text-yellow-800">Share</Button>
-              <Button variant="outline" className="bg-white">Subscribe</Button>
+              <Button className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400">Share</Button>
+              <Button variant="outline" className="bg-white dark:bg-transparent dark:border-white/20 dark:text-white dark:hover:bg-white/10">Subscribe</Button>
             </div>
           </div>
 
@@ -357,11 +367,11 @@ function SinglePostPageInternal({ posts }: { posts: Post[] }) {
 
         {/* Sidebar */}
         <aside className="space-y-6">
-          <div className="p-6 rounded-2xl bg-white shadow-md border border-gray-100">
+          <div className="p-6 rounded-2xl bg-white dark:bg-[#1f1f1f] shadow-md border border-gray-100 dark:border-white/10 transition-colors duration-300">
             <h4 className="font-semibold mb-3">Latest Posts</h4>
             <div className="space-y-3">
               {posts.slice(0, 4).map(p => (
-                <NavLink key={p.id} to={`/blog/${p.id}`} className="block py-2 hover:bg-gray-50 rounded">
+                <NavLink key={p.id} to={`/blog/${p.id}`} className="block py-2 hover:bg-gray-50 dark:hover:bg-white/5 rounded text-gray-900 dark:text-gray-100 transition-colors">
                   <div className="text-sm font-medium">{p.title}</div>
                   <div className="text-xs text-gray-500">{p.author} • {new Date(p.date || '').toLocaleDateString()}</div>
                 </NavLink>
@@ -369,15 +379,15 @@ function SinglePostPageInternal({ posts }: { posts: Post[] }) {
             </div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-white shadow-md border border-gray-100">
-            <h4 className="font-semibold mb-3">Table of contents</h4>
+          <div className="p-6 rounded-2xl bg-white dark:bg-[#1f1f1f] shadow-md border border-gray-100 dark:border-white/10 transition-colors duration-300">
+            <h4 className="font-semibold mb-3 text-gray-900 dark:text-gray-100">Table of contents</h4>
             <div className="text-sm text-gray-600">Auto-generated TOC would appear here for long guides.</div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-yellow-50 border border-yellow-100">
-            <h4 className="font-semibold mb-2">Need help selecting a workspace?</h4>
-            <p className="text-sm text-gray-700 mb-4">Talk to our experts and get a tailor-made recommendation.</p>
-            <NavLink to="/contact"><Button className="bg-black text-white">Contact sales</Button></NavLink>
+          <div className="p-6 rounded-2xl bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-500/20 transition-colors duration-300">
+            <h4 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">Need help selecting a workspace?</h4>
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">Talk to our experts and get a tailor-made recommendation.</p>
+            <NavLink to="/contact"><Button className="bg-black dark:bg-white text-white dark:text-black hover:opacity-90">Contact sales</Button></NavLink>
           </div>
 
         </aside>
@@ -420,41 +430,41 @@ export function BlogPage() {
   useSEO({ title: "Blog — FlashBlog", description: "Insights on flexible workspaces, virtual offices and hybrid strategies.", url: window.location.href, article: null });
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans antialiased">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-300">
       <Header />
 
       {/* HERO */}
-      <section className="relative bg-gradient-to-b from-white to-gray-50 pt-32 pb-20">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-100 rounded-full blur-3xl opacity-20" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-200 rounded-full blur-3xl opacity-20" />
+      <section className="relative bg-gradient-to-b from-white to-gray-50 dark:from-[#0a0a0a] dark:to-[#1a1a1a] pt-32 pb-20 transition-colors duration-300">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-100 dark:bg-yellow-700/10 rounded-full blur-3xl opacity-20" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-yellow-200 dark:bg-yellow-600/10 rounded-full blur-3xl opacity-20" />
 
         <div className="relative max-w-4xl mx-auto text-center px-6">
           <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="inline-block px-4 py-2 mb-5 rounded-full text-sm font-semibold" style={{ backgroundColor: ACCENT }}>
               📚 FlashBlog
             </div>
-            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 leading-tight">Insights, Stories & Guides</h1>
-            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Explore expert articles on coworking, virtual offices, hybrid work, leasing & more.</p>
+            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 dark:text-white leading-tight">Insights, Stories & Guides</h1>
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">Explore expert articles on coworking, virtual offices, hybrid work, leasing & more.</p>
           </motion.div>
         </div>
       </section>
 
       {/* Filters */}
-      <section className="sticky top-16 bg-white z-30 shadow-sm border-b py-4">
+      <section className="sticky top-16 bg-white dark:bg-[#0a0a0a]/95 backdrop-blur-sm z-30 shadow-sm border-b dark:border-white/10 py-4 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-4 items-center justify-between">
           <div className="relative w-full sm:w-72">
-            <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search articles..." className="pl-10 bg-white border-gray-300 rounded-xl" />
+            <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search articles..." className="pl-10 bg-white dark:bg-black/50 border-gray-300 dark:border-white/20 rounded-xl dark:text-white dark:placeholder:text-gray-500 focus:border-yellow-400 dark:focus:border-yellow-400" />
             <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
 
-          <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="px-4 py-2 rounded-xl border bg-white border-gray-300">
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="px-4 py-2 rounded-xl border bg-white dark:bg-black/80 border-gray-300 dark:border-white/20 dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-400">
             <option value="Newest">Newest First</option>
             <option value="Popular">Most Popular</option>
           </select>
 
-          <Button onClick={() => { setSelectedCategory("All"); setSelectedRegion("All"); setSortBy("Newest"); setSearchQuery(""); }} className="bg-black text-white px-6 py-2 rounded-xl hover:bg-gray-800">Reset</Button>
+          <Button onClick={() => { setSelectedCategory("All"); setSelectedRegion("All"); setSortBy("Newest"); setSearchQuery(""); }} className="bg-black dark:bg-white text-white dark:text-black px-6 py-2 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">Reset</Button>
         </div>
       </section>
 
@@ -463,20 +473,20 @@ export function BlogPage() {
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-4 gap-12">
           {/* Sidebar */}
           <aside className="lg:col-span-1 space-y-6">
-            <div className="p-6 rounded-2xl bg-white shadow-md border border-gray-100">
-              <h3 className="font-semibold mb-3">Categories</h3>
+            <div className="p-6 rounded-2xl bg-white dark:bg-[#1f1f1f] shadow-md border border-gray-100 dark:border-white/10 transition-colors duration-300">
+              <h3 className="font-semibold mb-3 text-gray-900 dark:text-white">Categories</h3>
               <div className="space-y-2">
                 {categories.map(cat => (
-                  <button key={cat} className={`block w-full text-left px-3 py-2 rounded-lg ${selectedCategory === cat ? "bg-yellow-100 text-yellow-800" : "hover:bg-gray-100"}`} onClick={() => setSelectedCategory(cat)}>{cat}</button>
+                  <button key={cat} className={`block w-full text-left px-3 py-2 rounded-lg transition-colors ${selectedCategory === cat ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" : "hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300"}`} onClick={() => setSelectedCategory(cat)}>{cat}</button>
                 ))}
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white shadow-md border border-gray-100">
-              <h3 className="font-semibold mb-3">Regions</h3>
+            <div className="p-6 rounded-2xl bg-white dark:bg-[#1f1f1f] shadow-md border border-gray-100 dark:border-white/10 transition-colors duration-300">
+              <h3 className="font-semibold mb-3 text-gray-900 dark:text-white">Regions</h3>
               <div className="space-y-2">
                 {regions.map(r => (
-                  <button key={r} className={`block w-full text-left px-3 py-2 rounded-lg ${selectedRegion === r ? "bg-yellow-100 text-yellow-800" : "hover:bg-gray-100"}`} onClick={() => setSelectedRegion(r)}>{r}</button>
+                  <button key={r} className={`block w-full text-left px-3 py-2 rounded-lg transition-colors ${selectedRegion === r ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400" : "hover:bg-gray-100 dark:hover:bg-white/10 text-gray-600 dark:text-gray-300"}`} onClick={() => setSelectedRegion(r)}>{r}</button>
                 ))}
               </div>
             </div>
@@ -486,26 +496,26 @@ export function BlogPage() {
           {/* Posts grid */}
           <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
             {filtered.slice(0, 12).map(p => (
-              <motion.article key={p.id} whileHover={{ translateY: -6 }} className="rounded-2xl overflow-hidden shadow-md border border-gray-100 bg-white flex flex-col">
-                <div className="aspect-[16/9] bg-gray-200 overflow-hidden">
+              <motion.article key={p.id} whileHover={{ translateY: -6 }} className="rounded-2xl overflow-hidden shadow-md border border-gray-100 dark:border-white/10 bg-white dark:bg-[#1f1f1f] flex flex-col transition-colors duration-300">
+                <div className="aspect-[16/9] bg-gray-200 dark:bg-gray-800 overflow-hidden">
                   {p.hero ? <img src={p.hero} alt={p.title} className="w-full h-full object-cover" /> : null}
                 </div>
                 <div className="p-6 flex flex-col flex-grow">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">{p.category}</span>
-                    <span className="text-sm text-gray-500">{new Date(p.date || '').toLocaleDateString()}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{new Date(p.date || '').toLocaleDateString()}</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{p.title}</h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">{p.excerpt}</p>
-                  <div className="mt-auto pt-4 border-t border-gray-100">
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{p.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">{p.excerpt}</p>
+                  <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/10">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-sm font-semibold">{p.author?.charAt(0) || 'F'}</div>
-                        <span className="text-sm text-gray-700">{p.author || 'FlashSpace Team'}</span>
+                        <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-sm font-semibold text-yellow-800">{p.author?.charAt(0) || 'F'}</div>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{p.author || 'FlashSpace Team'}</span>
                       </div>
-                      <div className="text-sm text-gray-500">{p.readMinutes} min read</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{p.readMinutes} min read</div>
                     </div>
-                    <NavLink to={`/blog/${p.id}`} className="block w-full text-center py-2 px-4 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-semibold transition-colors">Read Article →</NavLink>
+                    <NavLink to={`/blog/${p.id}`} className="block w-full text-center py-2 px-4 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-sm font-semibold transition-colors text-gray-900 dark:text-white">Read Article →</NavLink>
                   </div>
                 </div>
               </motion.article>

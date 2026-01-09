@@ -107,7 +107,7 @@ const CoworkingSpace = () => {
     setSearchCity(cityName);
     setSelectedCity(cityName);
     setShowSuggestions(false);
-    
+
     // Update URL with new city
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set('city', cityName);
@@ -154,14 +154,14 @@ const CoworkingSpace = () => {
       description: "Professional business address solutions"
     },
     {
-      label: "Coworking Space", 
+      label: "Coworking Space",
       href: "/services/coworking-space",
       icon: Users,
       description: "Flexible workspace solutions"
     },
     {
       label: "On Demand",
-      href: "/services/on-demand", 
+      href: "/services/on-demand",
       icon: Phone,
       description: "Meeting rooms & services"
     },
@@ -175,6 +175,22 @@ const CoworkingSpace = () => {
 
   const handleNavigation = (href: string): void => {
     navigate(href);
+  };
+
+  // Map space names to their routes
+  const spaceRoutes: Record<string, string> = {
+    "Stirring Minds": "/space/stirring-minds",
+    "Virtualexcel": "/space/virtualexcel",
+    "Work & Beyond": "/space/work-and-beyond",
+    "Work &amp; Beyond": "/space/work-and-beyond",
+    "Okhla Alt F": "/space/okhla-alt-f",
+    "Budha Coworking": "/space/budha-coworking",
+    "Mytime Cowork": "/space/mytime-cowork"
+  };
+
+  const handleGetBestPrice = (space: CoworkingSpaceItem): void => {
+    const route = spaceRoutes[space.name] || `/space/${space._id}`;
+    navigate(route, { state: { type: 'coworking' } });
   };
 
   // Get unique areas and types for filtering
@@ -248,12 +264,12 @@ const CoworkingSpace = () => {
   return (
     <div className="flex flex-col h-screen bg-white">
       {/* Header */}
-      <div className="flex-shrink-0">
+      < div className="flex-shrink-0" >
         <Header />
-      </div>
+      </div >
 
       {/* Main Content - Responsive Layout with Resizable Map */}
-      <div className="flex overflow-hidden mt-16 md:mt-20" style={{ height: 'calc(100vh - 4rem)' }}>
+      < div className="flex overflow-hidden mt-16 md:mt-20" style={{ height: 'calc(100vh - 4rem)' }}>
         <ResizableMapLayout
           defaultListingWidth={50}
           mapContent={
@@ -273,38 +289,38 @@ const CoworkingSpace = () => {
             data-lenis-prevent
           >
             <div className="px-4 sm:px-6 py-4 sm:py-6">
-          {/* Breadcrumb */}
-          <div className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            <span>Home</span>
-            <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
-            <span>Coworking</span>
-            <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
-            <span className="text-gray-900 font-medium truncate">{selectedCity}</span>
-          </div>
+              {/* Breadcrumb */}
+              <div className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                <span>Home</span>
+                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
+                <span>Coworking</span>
+                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
+                <span className="text-gray-900 font-medium truncate">{selectedCity}</span>
+              </div>
 
-          {/* Page Title */}
-          <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            Coworking Space In {selectedCity}
-          </h1>
+              {/* Page Title */}
+              <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                Coworking Space In {selectedCity}
+              </h1>
 
-          {/* City Search Section - Using Optimized SearchHeader Component */}
-          <SearchHeader
-            searchCity={searchCity}
-            onSearchChange={handleSearchChange}
-            onCitySelect={handleCitySearch}
-            onSearchSubmit={handleSearchSubmit}
-            onSearchFocus={handleSearchFocus}
-            onSearchBlur={handleSearchBlur}
-            isSearchFocused={isSearchFocused}
-            showSuggestions={showSuggestions}
-            filteredCities={filteredCities}
-            currentService="Coworking Space"
-            businessSolutions={businessSolutions}
-            onServiceNavigation={handleNavigation}
-          />
+              {/* City Search Section - Using Optimized SearchHeader Component */}
+              <SearchHeader
+                searchCity={searchCity}
+                onSearchChange={handleSearchChange}
+                onCitySelect={handleCitySearch}
+                onSearchSubmit={handleSearchSubmit}
+                onSearchFocus={handleSearchFocus}
+                onSearchBlur={handleSearchBlur}
+                isSearchFocused={isSearchFocused}
+                showSuggestions={showSuggestions}
+                filteredCities={filteredCities}
+                currentService="Coworking Space"
+                businessSolutions={businessSolutions}
+                onServiceNavigation={handleNavigation}
+              />
 
-          {/* Filters Row */}
-          {/* <div className={`bg-white rounded-lg border border-gray-200 p-4 mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+              {/* Filters Row */}
+              {/* <div className={`bg-white rounded-lg border border-gray-200 p-4 mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
                 <Filter className="w-4 h-4" />
@@ -400,8 +416,8 @@ const CoworkingSpace = () => {
             ))}
           </div>
 
-          {/* What is Coworking Space Section */}
-          {/* <div className={`bg-gradient-to-br from-[#172A3A] to-[#172A3A]/90 rounded-2xl p-8 mb-8 relative z-30 transition-opacity duration-300 overflow-hidden ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+              {/* What is Coworking Space Section */}
+              {/* <div className={`bg-gradient-to-br from-[#172A3A] to-[#172A3A]/90 rounded-2xl p-8 mb-8 relative z-30 transition-opacity duration-300 overflow-hidden ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#EDB003]/10 rounded-full blur-3xl"></div>
             <div className="relative z-10">
               <h2 className="text-3xl font-bold text-white mb-6">What is a Coworking Space?</h2>
@@ -483,50 +499,50 @@ const CoworkingSpace = () => {
             </div>
           </div> */}
 
-          {/* Consultant Section */}
-          <div className={`bg-white rounded-lg border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            <div className="flex flex-col gap-4">
-              <h3 className="text-base sm:text-xl font-bold text-gray-900">
-                Upgrade your office with Nitin Kashyap & team
-              </h3>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <img src="/Logo/Stage.png" alt="Consultant" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-900 text-sm sm:text-base">Nitin Kashyap</p>
-                    <p className="text-xs sm:text-sm text-gray-600">+91 8100888777</p>
-                    <p className="text-xs sm:text-sm text-primary">FlashSpace Consultant</p>
+              {/* Consultant Section */}
+              <div className={`bg-white rounded-lg border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                <div className="flex flex-col gap-4">
+                  <h3 className="text-base sm:text-xl font-bold text-gray-900">
+                    Upgrade your office with Nitin Kashyap & team
+                  </h3>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                      <img src="/Logo/Stage.png" alt="Consultant" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 text-sm sm:text-base">Nitin Kashyap</p>
+                        <p className="text-xs sm:text-sm text-gray-600">+91 8100888777</p>
+                        <p className="text-xs sm:text-sm text-primary">FlashSpace Consultant</p>
+                      </div>
+                    </div>
+                    <Button className="bg-primary text-white w-full sm:w-auto text-sm h-9">Contact Nitin</Button>
+                  </div>
+
+                  <p className="text-sm sm:text-base text-gray-600">
+                    Nitin's team assisted 200+ corporates in {selectedCity} to move into their new office.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs sm:text-sm">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      <span>Brand selection & location strategy</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      <span>Office scouting, tours & local expertise</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      <span>Layout optimization & design consultancy</span>
+                    </div>
                   </div>
                 </div>
-                <Button className="bg-primary text-white w-full sm:w-auto text-sm h-9">Contact Nitin</Button>
               </div>
-
-              <p className="text-sm sm:text-base text-gray-600">
-                Nitin's team assisted 200+ corporates in {selectedCity} to move into their new office.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs sm:text-sm">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span>Brand selection & location strategy</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span>Office scouting, tours & local expertise</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  <span>Layout optimization & design consultancy</span>
-                </div>
-              </div>
-            </div>
-          </div>
 
             </div>
           </div>
         </ResizableMapLayout>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

@@ -216,25 +216,25 @@ const DayOfficePage: React.FC = () => {
   const toggleFAQ = (index: number) => setFaqOpenIndex(faqOpenIndex === index ? null : index);
 
   return (
-    <div className="w-full min-h-screen bg-white">
+    <div className="w-full min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
       <Header />
 
       {/* ==================== HERO (same layout & form structure as Meeting Rooms) ==================== */}
-         <section className="relative w-full h-screen overflow-hidden">
-  {/* Background Image */}
-  <div 
-    className="absolute inset-0 bg-center bg-cover" 
-    style={{ backgroundImage: "url(https://images.unsplash.com/photo-1556761175-4b46a572b786?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)" }} 
-    aria-hidden="true" 
-  />
-  <div className="absolute inset-0 bg-black/50" />
+      <section className="relative w-full h-screen overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-center bg-cover"
+          style={{ backgroundImage: "url(https://images.unsplash.com/photo-1556761175-4b46a572b786?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)" }}
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 h-full flex flex-col lg:flex-row gap-12 items-center justify-center lg:justify-between pt-20 lg:pt-0">
-          
+
           {/* LEFT SIDE CONTENT */}
           <div className="w-full lg:w-2/3 text-white lg:-ml-16">
             <div className="max-w-2xl">
-              
+
               {/* Badge */}
               <div className="inline-flex items-center gap-2 rounded-full border border-[#FFD43B] bg-white/10 backdrop-blur-md px-6 py-2 shadow-sm">
                 <Sparkles className="w-4 h-4 text-[#FFD43B] fill-[#FFD43B]" />
@@ -246,7 +246,7 @@ const DayOfficePage: React.FC = () => {
                 Professional Day Offices <br />
                 <span className="text-[#FFD43B]">On Your Schedule</span>
               </h1>
-              
+
               <p className="mt-4 text-lg md:text-xl text-gray-100 font-poppins max-w-xl">
                 Book premium private offices and cabins by the hour or day.
               </p>
@@ -298,35 +298,35 @@ const DayOfficePage: React.FC = () => {
 
           {/* RIGHT SIDE FORM (modified: office dropdown added above date) */}
           <div className="w-full lg:w-1/2 max-w-md">
-            <div className="bg-white rounded-xl shadow-2xl p-6 md:p-8">
-              <h3 className="text-xl font-geist font-bold text-gray-900"> Get a Call Back for <span className="text-[#FFD43B]">Day Offices</span> </h3>
-              <p className="text-sm text-gray-500 mt-1">Available by the hour, day or as long as you need</p>
+            <div className="bg-white dark:bg-[#1f1f1f] rounded-xl shadow-2xl p-6 md:p-8">
+              <h3 className="text-xl font-geist font-bold text-gray-900 dark:text-white"> Get a Call Back for <span className="text-[#FFD43B]">Day Offices</span> </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Available by the hour, day or as long as you need</p>
               <form className="mt-6 space-y-4" onSubmit={handleHeroSubmit}>
-                <input name="name" value={heroForm.name} onChange={onHeroChange} required placeholder="Name*" className="w-full border border-gray-200 rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
-                <input name="mobile" value={heroForm.mobile} onChange={onHeroChange} required placeholder="Mobile number*" inputMode="tel" className="w-full border border-gray-200 rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
-                <input name="email" value={heroForm.email} onChange={onHeroChange} required placeholder="Email*" type="email" className="w-full border border-gray-200 rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
-                 <div className="grid grid-cols-2 gap-3">
+                <input name="name" value={heroForm.name} onChange={onHeroChange} required placeholder="Name*" className="w-full border border-gray-200 dark:border-white/10 dark:bg-[#0a0a0a] dark:text-white rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
+                <input name="mobile" value={heroForm.mobile} onChange={onHeroChange} required placeholder="Mobile number*" inputMode="tel" className="w-full border border-gray-200 dark:border-white/10 dark:bg-[#0a0a0a] dark:text-white rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
+                <input name="email" value={heroForm.email} onChange={onHeroChange} required placeholder="Email*" type="email" className="w-full border border-gray-200 dark:border-white/10 dark:bg-[#0a0a0a] dark:text-white rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
+                <div className="grid grid-cols-2 gap-3">
                   <CurvedSelect
-                  value={heroForm.city}
-                  onChange={(val) =>
-                    onHeroChange({ target: { name: "city", value: val } })
-                  }
-                  options={CITIES}
-                  noScroll={true}
-                />
+                    value={heroForm.city}
+                    onChange={(val) =>
+                      onHeroChange({ target: { name: "city", value: val } })
+                    }
+                    options={CITIES}
+                    noScroll={true}
+                  />
 
 
 
 
-                <CurvedSelect
-                  value={heroForm.seats}
-                  onChange={(val) =>
-                    onHeroChange({ target: { name: "seats", value: val } })
-                  }
-                  options={SEAT_OPTIONS.map((s) => `${s}`)}
-                />
+                  <CurvedSelect
+                    value={heroForm.seats}
+                    onChange={(val) =>
+                      onHeroChange({ target: { name: "seats", value: val } })
+                    }
+                    options={SEAT_OPTIONS.map((s) => `${s}`)}
+                  />
 
-              </div>
+                </div>
 
                 {/* Office Name dropdown depends on selected city */}
                 <CurvedSelect
@@ -347,10 +347,10 @@ const DayOfficePage: React.FC = () => {
       </section>
 
       {/* ==================== SECTION : MARKETPLACE STATS ==================== */}
-      <div className="w-full bg-[#F5F6FA] py-16 px-6 md:px-16">
+      <div className="w-full bg-[#F5F6FA] dark:bg-[#111] py-16 px-6 md:px-16 transition-colors duration-300">
 
         {/* Title */}
-        <h2 className="text-center text-3xl md:text-4xl font-geist font-bold text-black mb-14">
+        <h2 className="text-center text-3xl md:text-4xl font-geist font-bold text-black dark:text-white mb-14">
           India’s Best Day Office Network
           <span className="text-[#FFD43B]"> for Focused Work</span>
         </h2>
@@ -363,8 +363,8 @@ const DayOfficePage: React.FC = () => {
             <div className="w-24 h-24 rounded-full bg-[#E8EAFB] flex items-center justify-center mb-4">
               <Users className="w-10 h-10 text-black" />
             </div>
-            <h3 className="text-2xl font-bold text-black">25,000+</h3>
-            <p className="text-gray-700 font-poppins text-sm">Bookings</p>
+            <h3 className="text-2xl font-bold text-black dark:text-white">25,000+</h3>
+            <p className="text-gray-700 dark:text-gray-300 font-poppins text-sm">Bookings</p>
           </div>
 
           {/* ITEM 2 */}
@@ -372,8 +372,8 @@ const DayOfficePage: React.FC = () => {
             <div className="w-24 h-24 rounded-full bg-[#E8EAFB] flex items-center justify-center mb-4">
               <Scan className="w-10 h-10 text-black" />
             </div>
-            <h3 className="text-2xl font-bold text-black">2,000+</h3>
-            <p className="text-gray-700 font-poppins text-sm">Verified Offices</p>
+            <h3 className="text-2xl font-bold text-black dark:text-white">2,000+</h3>
+            <p className="text-gray-700 dark:text-gray-300 font-poppins text-sm">Verified Offices</p>
           </div>
 
           {/* ITEM 3 */}
@@ -381,8 +381,8 @@ const DayOfficePage: React.FC = () => {
             <div className="w-24 h-24 rounded-full bg-[#E8EAFB] flex items-center justify-center mb-4">
               <Building2 className="w-10 h-10 text-black" />
             </div>
-            <h3 className="text-2xl font-bold text-black">150+</h3>
-            <p className="text-gray-700 font-poppins text-sm">Cities & Hubs</p>
+            <h3 className="text-2xl font-bold text-black dark:text-white">150+</h3>
+            <p className="text-gray-700 dark:text-gray-300 font-poppins text-sm">Cities & Hubs</p>
           </div>
 
           {/* ITEM 4 */}
@@ -390,8 +390,8 @@ const DayOfficePage: React.FC = () => {
             <div className="w-24 h-24 rounded-full bg-[#E8EAFB] flex items-center justify-center mb-4">
               <MapPin className="w-10 h-10 text-black" />
             </div>
-            <h3 className="text-2xl font-bold text-black">150+</h3>
-            <p className="text-gray-700 font-poppins text-sm">Prime Locations</p>
+            <h3 className="text-2xl font-bold text-black dark:text-white">150+</h3>
+            <p className="text-gray-700 dark:text-gray-300 font-poppins text-sm">Prime Locations</p>
           </div>
 
           {/* ITEM 5 */}
@@ -399,42 +399,42 @@ const DayOfficePage: React.FC = () => {
             <div className="w-24 h-24 rounded-full bg-[#E8EAFB] flex items-center justify-center mb-4">
               <DollarSign className="w-10 h-10 text-black" />
             </div>
-            <h3 className="text-2xl font-bold text-black">Affordable</h3>
-            <p className="text-gray-700 font-poppins text-sm">Transparent pricing</p>
+            <h3 className="text-2xl font-bold text-black dark:text-white">Affordable</h3>
+            <p className="text-gray-700 dark:text-gray-300 font-poppins text-sm">Transparent pricing</p>
           </div>
 
         </div>
       </div>
 
       {/* ==================== OFFICE TYPES (conversion-focused cards) ==================== */}
-      <div className="w-full bg-white py-20 px-6 md:px-16">
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300">
         <div className="text-center max-w-4xl mx-auto mb-14">
-          <h2 className="text-4xl font-geist font-bold text-black">
+          <h2 className="text-4xl font-geist font-bold text-black dark:text-white">
             Flexible <span className="text-[#FFD43B]">Day Offices</span> for Every Need
           </h2>
-          <p className="text-gray-600 mt-3 text-lg font-poppins">Choose a workspace that fits your day — private, premium or team-ready.</p>
+          <p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Choose a workspace that fits your day — private, premium or team-ready.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
           {OFFICE_CARDS.map((card) => (
-            <div 
-              key={card.name} 
-              className="bg-white shadow-lg hover:shadow-2xl transition-all duration-300 rounded-xl overflow-hidden border border-gray-100 flex flex-col"
+            <div
+              key={card.name}
+              className="bg-white dark:bg-[#1f1f1f] shadow-lg hover:shadow-2xl transition-all duration-300 rounded-xl overflow-hidden border border-gray-100 dark:border-white/10 flex flex-col"
             >
               <div className="h-48 overflow-hidden">
-                <img 
-                  src={card.image} 
-                  alt={card.name} 
-                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" 
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                 />
               </div>
 
               <div className="p-6 flex flex-col flex-1">
-                <h3 className="text-xl font-geist font-bold text-black">{card.name}</h3>
+                <h3 className="text-xl font-geist font-bold text-black dark:text-white">{card.name}</h3>
 
-                <div className="mt-2 text-sm text-gray-500 font-poppins">{card.price}</div>
+                <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-poppins">{card.price}</div>
 
-                <ul className="mt-4 space-y-3 text-gray-600 font-poppins text-sm flex-1">
+                <ul className="mt-4 space-y-3 text-gray-600 dark:text-gray-300 font-poppins text-sm flex-1">
                   {card.points.map((p: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-[#FFD43B] mt-0.5 flex-shrink-0" />
@@ -444,20 +444,20 @@ const DayOfficePage: React.FC = () => {
                 </ul>
 
                 <div className="mt-6 flex gap-3">
-                  <Button 
-                      onClick={() => openModal(card)} 
-                      className="w-[70%] bg-[#FFD43B] border-2 border-[#FFD43B] text-black font-semibold py-2 rounded-lg hover:bg-[#e6c234] transition-colors"
-                       >
-                      {card.btn}
+                  <Button
+                    onClick={() => openModal(card)}
+                    className="w-[70%] bg-[#FFD43B] border-2 border-[#FFD43B] text-black font-semibold py-2 rounded-lg hover:bg-[#e6c234] transition-colors"
+                  >
+                    {card.btn}
                   </Button>
 
-                   <button
-                       className="w-[30%] border border-gray-200 rounded-lg py-2 font-medium hover:shadow-sm"
-                       onClick={() => alert("Added to itinerary")}
-                         >
-                        Save
-                   </button>
-                    </div>
+                  <button
+                    className="w-[30%] border border-gray-200 rounded-lg py-2 font-medium hover:shadow-sm"
+                    onClick={() => alert("Added to itinerary")}
+                  >
+                    Save
+                  </button>
+                </div>
 
               </div>
             </div>
@@ -473,8 +473,8 @@ const DayOfficePage: React.FC = () => {
             {/* MODAL HEADER */}
             <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
               <h3 className="text-xl font-geist font-bold">Book {selectedOffice.name}</h3>
-              <button 
-                className="text-gray-500 hover:text-black bg-gray-200 rounded-full p-1" 
+              <button
+                className="text-gray-500 hover:text-black bg-gray-200 rounded-full p-1"
                 onClick={() => setShowModal(false)}
               >
                 <X className="w-5 h-5" />
@@ -570,13 +570,13 @@ const DayOfficePage: React.FC = () => {
             </div>
           </div>
         </div>
-      )} 
+      )}
 
       {/* ==================== SECTION 3: TOP CITIES (FIXED LAYOUT) ==================== */}
-      <div className="w-full bg-white py-20 px-6 md:px-16">
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <h2 className="text-4xl font-geist font-bold text-black">Premium Day Offices in  <span className="text-[#FFD43B]">Prime Business Locations</span></h2>
-          <p className="text-gray-600 mt-3 text-lg font-poppins">Discover premium day office spaces across major business hubs.</p>
+          <h2 className="text-4xl font-geist font-bold text-black dark:text-white">Premium Day Offices in  <span className="text-[#FFD43B]">Prime Business Locations</span></h2>
+          <p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Discover premium day office spaces across major business hubs.</p>
         </div>
 
         {/* Grid Container: Fixed height of 600px on Desktop */}
@@ -618,20 +618,20 @@ const DayOfficePage: React.FC = () => {
       </div>
 
       {/* ==================== SECTION 4: AMENITIES ==================== */}
-      <div className="w-full bg-white py-20 px-6 md:px-16">
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300">
         <div className="text-center max-w-3xl mx-auto mb-14">
-           <h2 className="text-4xl font-geist font-bold text-black">Enjoy these amenities  <span className="text-[#FFD43B]"> with your booking.</span></h2>
-          <p className="text-gray-600 mt-3 text-lg font-poppins">Focus on what matters to you, and we’ll handle the rest to ensure a smooth and efficient working experience.</p>
+          <h2 className="text-4xl font-geist font-bold text-black dark:text-white">Enjoy these amenities  <span className="text-[#FFD43B]"> with your booking.</span></h2>
+          <p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Focus on what matters to you, and we’ll handle the rest to ensure a smooth and efficient working experience.</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-10 text-center">
           {AMENITIES.map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div key={idx} className="flex flex-col items-center gap-4 group p-4 hover:bg-gray-50 rounded-xl transition-all duration-300">
-                <div className="w-20 h-20 bg-gray-100 group-hover:bg-white group-hover:shadow-md border border-transparent group-hover:border-gray-200 transition-all duration-300 rounded-full flex items-center justify-center">
+              <div key={idx} className="flex flex-col items-center gap-4 group p-4 hover:bg-gray-50 dark:hover:bg-black/20 rounded-xl transition-all duration-300">
+                <div className="w-20 h-20 bg-gray-100 dark:bg-[#1f1f1f] group-hover:bg-white dark:group-hover:bg-[#0a0a0a] group-hover:shadow-md border border-transparent group-hover:border-gray-200 dark:border-white/10 transition-all duration-300 rounded-full flex items-center justify-center">
                   <Icon className="w-10 h-10 text-gray-600 group-hover:text-[#FFD43B] transition-colors" />
                 </div>
-                <h3 className="text-md font-poppins text-gray-800 font-semibold group-hover:text-black">{item.title}</h3>
+                <h3 className="text-md font-poppins text-gray-800 dark:text-gray-200 font-semibold group-hover:text-black dark:group-hover:text-white">{item.title}</h3>
               </div>
             );
           })}
@@ -639,22 +639,22 @@ const DayOfficePage: React.FC = () => {
       </div>
 
       {/* ==================== SECTION Why book ==================== */}
-      <div className="w-full bg-gray-50 py-20 px-6 md:px-16">
-        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black">Why book Day Offices with <span className="text-[#FFD43B]">Flashspace</span></h2><p className="text-gray-600 mt-3 text-lg font-poppins">Smart, reliable and well-equipped spaces designed to support every type of workday.</p></div>
+      <div className="w-full bg-gray-50 dark:bg-[#111] py-20 px-6 md:px-16 transition-colors duration-300">
+        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black dark:text-white">Why book Day Offices with <span className="text-[#FFD43B]">Flashspace</span></h2><p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Smart, reliable and well-equipped spaces designed to support every type of workday.</p></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {BENEFITS.map((item, i) => { const Icon = item.icon; return ( <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"> <div className="w-14 h-14 flex items-center justify-center bg-[#FFD43B] rounded-xl mb-6"> <Icon className="w-7 h-7 text-black" /> </div> <h3 className="text-xl font-geist font-bold text-black mb-3"> {item.title} </h3> <p className="text-gray-600 font-poppins leading-relaxed text-sm"> {item.desc} </p> </div> ); })}
+          {BENEFITS.map((item, i) => { const Icon = item.icon; return (<div key={i} className="bg-white dark:bg-[#1f1f1f] p-8 rounded-2xl shadow-sm border border-gray-200 dark:border-white/10 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"> <div className="w-14 h-14 flex items-center justify-center bg-[#FFD43B] rounded-xl mb-6"> <Icon className="w-7 h-7 text-black" /> </div> <h3 className="text-xl font-geist font-bold text-black dark:text-white mb-3"> {item.title} </h3> <p className="text-gray-600 dark:text-gray-300 font-poppins leading-relaxed text-sm"> {item.desc} </p> </div>); })}
         </div>
       </div>
 
-     {/* ==================== SECTION 6  clients have to say ==================== */}
-      <div className="w-full bg-white py-20 px-6 md:px-16">
+      {/* ==================== SECTION 6  clients have to say ==================== */}
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300">
 
         {/* SECTION TITLE */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <h2 className="text-4xl font-geist font-bold text-black">
+          <h2 className="text-4xl font-geist font-bold text-black dark:text-white">
             What our clients <span className="text-[#FFD43B]">have to say</span>
           </h2>
-          <p className="text-gray-600 font-poppins mt-3 text-lg">
+          <p className="text-gray-600 dark:text-gray-300 font-poppins mt-3 text-lg">
             Real experiences from teams and professionals who trust Flashspace for their important workdays.
           </p>
         </div>
@@ -663,56 +663,46 @@ const DayOfficePage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
           {TESTIMONIALS.map((item, idx) => (
-            <div 
-              key={idx} 
-              className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+            <div
+              key={idx}
+              className="bg-white dark:bg-[#1f1f1f] rounded-xl border border-gray-200 dark:border-white/10 shadow-sm overflow-hidden"
             >
-              
+
               {/* CARD TOP */}
               <div className="p-8">
 
                 {/* YELLOW QUOTE ICON */}
                 <div className="text-[#FFD43B] mb-4">
                   <svg width="32" height="32" fill="#FFD43B" viewBox="0 0 24 24">
-                    <path d="M7.17 6A5.17 5.17 0 0 0 2 11.17v6.33A.5.5 0 0 0 2.5 18H8a.5.5 0 0 0 .5-.5v-6.33A5.17 5.17 0 0 0 3.33 6zm10 0A5.17 5.17 0 0 0 12 11.17v6.33a.5.5 0 0 0 .5.5H18a.5.5 0 0 0 .5-.5v-6.33A5.17 5.17 0 0 0 17.17 6z"/>
+                    <path d="M7.17 6A5.17 5.17 0 0 0 2 11.17v6.33A.5.5 0 0 0 2.5 18H8a.5.5 0 0 0 .5-.5v-6.33A5.17 5.17 0 0 0 3.33 6zm10 0A5.17 5.17 0 0 0 12 11.17v6.33a.5.5 0 0 0 .5.5H18a.5.5 0 0 0 .5-.5v-6.33A5.17 5.17 0 0 0 17.17 6z" />
                   </svg>
                 </div>
 
                 {/* MAIN TEXT */}
-                <p className="text-gray-800 font-poppins leading-relaxed italic font-semibold mb-4">
+                <p className="text-gray-800 dark:text-gray-200 font-poppins leading-relaxed italic font-semibold mb-4">
                   {item.text}
                 </p>
 
-                <p className="text-gray-600 font-poppins leading-relaxed mb-3">
-                  {item.subtext}
-                </p>
 
-                <p className="text-gray-600 font-poppins leading-relaxed">
-                  {item.more}
-                </p>
 
               </div>
 
               {/* BOTTOM SECTION */}
-              <div className="relative bg-[#FFF9DB] border-t-4 border-[#FFD43B] p-6 pt-10">
-                
+              <div className="relative bg-[#FFF9DB] dark:bg-[#2a2510] border-t-4 border-[#FFD43B] p-6 pt-10">
+
                 {/* IMAGE */}
-                <img 
-                  src={item.image} 
+                <img
+                  src={item.image}
                   className="absolute -top-10 right-6 w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
                 />
 
                 {/* NAME + ROLE + COMPANY (3 different lines) */}
-                <h4 className="text-lg font-geist font-bold text-black mb-1">
+                <h4 className="text-lg font-geist font-bold text-black dark:text-white mb-1">
                   {item.name}
                 </h4>
 
-                <p className="text-sm text-gray-700 font-poppins mb-1">
+                <p className="text-sm text-gray-700 dark:text-gray-300 font-poppins mb-1">
                   {item.role}
-                </p>
-
-                <p className="text-sm text-gray-500 font-poppins">
-                  {item.company}
                 </p>
 
               </div>
@@ -724,16 +714,16 @@ const DayOfficePage: React.FC = () => {
 
       </div>
 
-     {/* ==================== SECTION 7 F&Q ==================== */}
-      <div className="w-full bg-white py-20 px-6 md:px-16">
-        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black">Frequently Asked <span className="text-[#FFD43B]">Questions</span></h2><p className="text-gray-600 mt-3 text-lg font-poppins">Find answers to the most common questions about our day office services.</p></div>
+      {/* ==================== SECTION 7 F&Q ==================== */}
+      <div className="w-full bg-white dark:bg-[#0a0a0a] py-20 px-6 md:px-16 transition-colors duration-300">
+        <div className="text-center max-w-3xl mx-auto mb-14"><h2 className="text-4xl font-geist font-bold text-black dark:text-white">Frequently Asked <span className="text-[#FFD43B]">Questions</span></h2><p className="text-gray-600 dark:text-gray-300 mt-3 text-lg font-poppins">Find answers to the most common questions about our day office services.</p></div>
         <div className="max-w-3xl mx-auto space-y-4">
-          {FAQ_DATA.map((item, i) => ( <div key={i} className={`border rounded-xl transition-all duration-300 ${faqOpenIndex === i ? 'border-[#FFD43B] shadow-md bg-[#FFD43B]/5' : 'border-gray-200 hover:border-gray-300'}`}> <button onClick={() => toggleFAQ(i)} className="w-full flex justify-between items-center p-5 text-left"> <span className="text-lg font-geist font-semibold text-black"> {item.q} </span> <ChevronDown className={`w-5 h-5 text-black transition-transform duration-300 ${faqOpenIndex === i ? "rotate-180" : ""}`} /> </button> <div className={`overflow-hidden transition-all duration-300 ${faqOpenIndex === i ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}> <p className="text-gray-600 font-poppins leading-relaxed px-5 pb-5 text-sm"> {item.a} </p> </div> </div> ))}
+          {FAQ_DATA.map((item, i) => (<div key={i} className={`border rounded-xl transition-all duration-300 ${faqOpenIndex === i ? 'border-[#FFD43B] shadow-md bg-[#FFD43B]/5 dark:bg-[#FFD43B]/10' : 'border-gray-200 dark:border-white/10 hover:border-gray-300'}`}> <button onClick={() => toggleFAQ(i)} className="w-full flex justify-between items-center p-5 text-left"> <span className="text-lg font-geist font-semibold text-black dark:text-white"> {item.q} </span> <ChevronDown className={`w-5 h-5 text-black dark:text-white transition-transform duration-300 ${faqOpenIndex === i ? "rotate-180" : ""}`} /> </button> <div className={`overflow-hidden transition-all duration-300 ${faqOpenIndex === i ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}> <p className="text-gray-600 dark:text-gray-300 font-poppins leading-relaxed px-5 pb-5 text-sm"> {item.a} </p> </div> </div>))}
         </div>
       </div>
 
       {/* ==================== SECTION  8  footer ==================== */}
-      <div className="w-full bg-white"><Footer /></div>
+      <div className="w-full bg-white dark:bg-[#0a0a0a]"><Footer /></div>
     </div>
   );
 };

@@ -18,7 +18,7 @@ const VirtualOffice = () => {
   const cities = [
     "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
     "Kolkata", "Pune", "Ahmedabad", "Jaipur", "Surat",
-    "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane","Noida"
+    "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Noida"
   ];
 
   const features = [
@@ -316,7 +316,7 @@ const VirtualOffice = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
       {/* Header Component */}
       <Header />
 
@@ -367,7 +367,7 @@ const VirtualOffice = () => {
 
             {/* Hero Search Bar */}
             <motion.div
-              className="bg-white rounded-2xl p-2 shadow-2xl max-w-2xl"
+              className="bg-white dark:bg-[#1f1f1f] rounded-2xl p-2 shadow-2xl max-w-2xl transition-colors duration-300"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -379,7 +379,7 @@ const VirtualOffice = () => {
                       <Button
                         variant="ghost"
                         role="combobox"
-                        className="w-full justify-between h-16 text-gray-900 hover:bg-gray-50 rounded-xl"
+                        className="w-full justify-between h-16 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-black/20 rounded-xl"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-[#EDB003]/10 rounded-lg flex items-center justify-center">
@@ -393,11 +393,11 @@ const VirtualOffice = () => {
                         <ChevronDown className="ml-2 h-5 w-5 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 bg-white shadow-xl border-2 border-gray-100">
-                      <Command className="bg-white">
-                        <CommandInput placeholder="Search city..." className="bg-white" />
-                        <CommandList className="bg-white">
-                          <CommandEmpty>No city found.</CommandEmpty>
+                    <PopoverContent className="w-[300px] p-0 bg-white dark:bg-[#1f1f1f] shadow-xl border-2 border-gray-100 dark:border-white/10">
+                      <Command className="bg-white dark:bg-[#1f1f1f]">
+                        <CommandInput placeholder="Search city..." className="bg-white dark:bg-[#1f1f1f] dark:text-white" />
+                        <CommandList className="bg-white dark:bg-[#1f1f1f]">
+                          <CommandEmpty className="dark:text-white">No city found.</CommandEmpty>
                           <CommandGroup>
                             {cities.map((city) => (
                               <CommandItem
@@ -407,6 +407,7 @@ const VirtualOffice = () => {
                                   setSelectedCity(city);
                                   setIsLocationOpen(false);
                                 }}
+                                className="dark:text-white dark:aria-selected:bg-white/10"
                               >
                                 <Check
                                   className={cn(
@@ -439,7 +440,7 @@ const VirtualOffice = () => {
             >
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
-                  {[1,2,3,4].map((i) => (
+                  {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#EDB003] to-[#f5c242] border-2 border-white"></div>
                   ))}
                 </div>
@@ -451,7 +452,7 @@ const VirtualOffice = () => {
 
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
-                  {[1,2,3,4,5].map((i) => (
+                  {[1, 2, 3, 4, 5].map((i) => (
                     <Star key={i} className="w-4 h-4 fill-[#EDB003] text-[#EDB003]" />
                   ))}
                 </div>
@@ -503,7 +504,7 @@ const VirtualOffice = () => {
       </section>
 
       {/* What is Virtual Office Section */}
-      <section className="py-20 bg-gradient-to-br from-[#EDB003]/5 via-white to-[#172A3A]/5">
+      <section className="py-20 bg-gradient-to-br from-[#EDB003]/5 via-white to-[#172A3A]/5 dark:via-black dark:to-black transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -514,10 +515,10 @@ const VirtualOffice = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Understanding Virtual Office
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#172A3A]" >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#172A3A] dark:text-white" >
               What is a <span className="text-[#EDB003]">Virtual Office?</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
               A virtual office gives your business a professional identity without the cost of physical office space.
               Get a prestigious business address, mail handling, GST support, and meeting room access - all without renting an actual office!
             </p>
@@ -532,15 +533,15 @@ const VirtualOffice = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 h-full bg-white shadow-lg hover:shadow-xl group">
+                <Card className="border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 h-full bg-white dark:bg-[#1f1f1f] dark:border-white/10 dark:hover:border-[#EDB003] shadow-lg hover:shadow-xl group">
                   <CardContent className="p-6 text-center">
                     <div className="w-16 h-16 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                       <item.icon className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold mb-3 text-[#172A3A]">
+                    <h3 className="text-xl font-bold mb-3 text-[#172A3A] dark:text-white">
                       {item.title}
                     </h3>
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                       {item.description}
                     </p>
                   </CardContent>
@@ -552,7 +553,7 @@ const VirtualOffice = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -583,11 +584,11 @@ const VirtualOffice = () => {
                   transition={{ delay: index * 0.2 }}
                   viewport={{ once: true }}
                 >
-                  <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-white h-full">
+                  <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-white dark:bg-[#1f1f1f] h-full">
                     <CardContent className="p-8 text-center relative">
                       {/* Step Number Circle */}
                       <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                        <div className="w-16 h-16 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-full flex items-center justify-center shadow-xl border-4 border-white">
+                        <div className="w-16 h-16 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-full flex items-center justify-center shadow-xl border-4 border-white dark:border-[#1f1f1f]">
                           <span className="text-2xl font-bold text-white" >
                             {step.number}
                           </span>
@@ -595,15 +596,15 @@ const VirtualOffice = () => {
                       </div>
 
                       <div className="mt-8">
-                        <div className="w-16 h-16 bg-[#172A3A]/5 rounded-xl flex items-center justify-center mx-auto mb-6">
-                          <step.icon className="w-8 h-8 text-[#172A3A]" />
+                        <div className="w-16 h-16 bg-[#172A3A]/5 dark:bg-white/5 rounded-xl flex items-center justify-center mx-auto mb-6">
+                          <step.icon className="w-8 h-8 text-[#172A3A] dark:text-white" />
                         </div>
 
-                        <h3 className="text-2xl font-bold mb-4 text-[#172A3A]">
+                        <h3 className="text-2xl font-bold mb-4 text-[#172A3A] dark:text-white">
                           {step.title}
                         </h3>
 
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                           {step.description}
                         </p>
                       </div>
@@ -671,7 +672,7 @@ const VirtualOffice = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -682,10 +683,10 @@ const VirtualOffice = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Customer Stories
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" >
               What Our <span className="text-[#EDB003]">Clients Say</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Real experiences from businesses who chose FlashSpace
             </p>
           </motion.div>
@@ -699,7 +700,7 @@ const VirtualOffice = () => {
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card className="border-2 border-gray-100 hover:border-[#EDB003]/30 transition-all duration-300 h-full shadow-lg hover:shadow-xl">
+                <Card className="border-2 border-gray-100 dark:border-white/10 hover:border-[#EDB003]/30 transition-all duration-300 h-full shadow-lg hover:shadow-xl bg-white dark:bg-[#1f1f1f]">
                   <CardContent className="p-8">
                     <div className="flex gap-1 mb-4">
                       {[...Array(testimonial.rating)].map((_, i) => (
@@ -707,7 +708,7 @@ const VirtualOffice = () => {
                       ))}
                     </div>
 
-                    <p className="text-gray-700 mb-6 leading-relaxed italic">
+                    <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed italic">
                       "{testimonial.text}"
                     </p>
 
@@ -718,8 +719,8 @@ const VirtualOffice = () => {
                         className="w-14 h-14 rounded-full object-cover border-2 border-[#EDB003]"
                       />
                       <div>
-                        <h4 className="font-bold text-[#172A3A]">{testimonial.name}</h4>
-                        <p className="text-sm text-gray-600">{testimonial.company}</p>
+                        <h4 className="font-bold text-[#172A3A] dark:text-white">{testimonial.name}</h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{testimonial.company}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -736,54 +737,54 @@ const VirtualOffice = () => {
             viewport={{ once: true }}
           >
             <div className="text-center mb-12">
-              <h3 className="text-2xl md:text-3xl font-bold text-[#172A3A] mb-3" style={{ fontFamily: 'Poppins' }}>
+              <h3 className="text-2xl md:text-3xl font-bold text-[#172A3A] dark:text-white mb-3" style={{ fontFamily: 'Poppins' }}>
                 Trusted by Leading <span className="text-[#EDB003]">Brands</span>
               </h3>
-              <p className="text-gray-600">Join thousands of companies who trust FlashSpace</p>
+              <p className="text-gray-600 dark:text-gray-300">Join thousands of companies who trust FlashSpace</p>
             </div>
 
             {/* Logo Slider Container */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-gray-50 via-white to-gray-50 py-12">
+            <div className="relative overflow-hidden bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-[#0a0a0a] dark:via-[#111] dark:to-[#0a0a0a] py-12 transition-colors duration-300">
               <div className="infinite-scroll">
                 {/* First set of logos */}
                 <div className="flex items-center justify-around min-w-full gap-16 px-8">
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
                     <img src="/Logo/flipkart.png" alt="Flipkart" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
                     <img src="/Logo/trulymadly.png" alt="TrulyMadly" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
                     <img src="/Logo/Stage2.png" alt="Stage OTT" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
                     <img src="/Logo/StudyIQ.png" alt="Study IQ" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
                     <img src="/Logo/Adda247.png" alt="Adda 24/7" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
                     <img src="/Logo/luv.png" alt="LUV Films" className="w-full h-full object-contain" />
                   </div>
                 </div>
                 {/* Duplicate set for seamless loop */}
                 <div className="flex items-center justify-around min-w-full gap-16 px-8">
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
                     <img src="/Logo/flipkart.png" alt="Flipkart" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
                     <img src="/Logo/trulymadly.png" alt="TrulyMadly" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
                     <img src="/Logo/Stage2.png" alt="Stage OTT" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
                     <img src="/Logo/StudyIQ.png" alt="Study IQ" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
                     <img src="/Logo/Adda247.png" alt="Adda 24/7" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-3">
                     <img src="/Logo/luv.png" alt="LUV Films" className="w-full h-full object-contain" />
                   </div>
                 </div>
@@ -794,7 +795,7 @@ const VirtualOffice = () => {
       </section>
 
       {/* FAQs Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -823,11 +824,10 @@ const VirtualOffice = () => {
                 viewport={{ once: true }}
               >
                 <Card
-                  className={`border-2 transition-all duration-300 cursor-pointer ${
-                    openFaqIndex === index
-                      ? 'border-[#EDB003] shadow-lg'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`border-2 transition-all duration-300 cursor-pointer ${openFaqIndex === index
+                    ? 'border-[#EDB003] shadow-lg'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
                   onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
                 >
                   <CardContent className="p-6">
@@ -836,9 +836,8 @@ const VirtualOffice = () => {
                         {faq.question}
                       </h3>
                       <ChevronDown
-                        className={`w-5 h-5 text-[#EDB003] flex-shrink-0 transition-transform duration-300 ${
-                          openFaqIndex === index ? 'rotate-180' : ''
-                        }`}
+                        className={`w-5 h-5 text-[#EDB003] flex-shrink-0 transition-transform duration-300 ${openFaqIndex === index ? 'rotate-180' : ''
+                          }`}
                       />
                     </div>
 
@@ -877,7 +876,7 @@ const VirtualOffice = () => {
       </section>
 
       {/* Location Grid Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -888,10 +887,10 @@ const VirtualOffice = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Our Locations
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
               Across <span className="text-[#EDB003]">28+</span> States
             </h2>
-            <p className="text-xl text-gray-600">Find your perfect virtual office location</p>
+            <p className="text-xl text-gray-600 dark:text-gray-300">Find your perfect virtual office location</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">

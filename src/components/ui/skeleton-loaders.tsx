@@ -176,3 +176,85 @@ export const SkeletonCardGrid = memo<{ count?: number }>(({ count = 6 }) => {
 SkeletonCardGrid.displayName = "SkeletonCardGrid";
 
 export default SkeletonCard;
+
+/**
+ * Skeleton loader for Booking Page
+ */
+export const BookingPageSkeleton = memo(() => {
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8 animate-pulse">
+      {/* Back Button Skeleton */}
+      <div className="h-4 w-32 bg-gray-200 rounded mb-6" />
+
+      {/* Title Check */}
+      <div className="h-8 w-64 bg-gray-200 rounded mb-2" />
+      <div className="h-4 w-48 bg-gray-200 rounded mb-8" />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* LEFT: Tenure Cards */}
+        <div className="lg:col-span-2">
+          <div className="h-6 w-32 bg-gray-200 rounded mb-4" />
+          
+          {/* Tenure Option Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-48 rounded-xl bg-gray-200 p-5 flex flex-col justify-between">
+                 <div>
+                    <div className="h-6 w-16 bg-gray-300 rounded mb-3" />
+                    <div className="h-8 w-24 bg-gray-300 rounded" />
+                 </div>
+                 <div className="h-4 w-32 bg-gray-300 rounded" />
+              </div>
+            ))}
+          </div>
+
+          {/* Plan Features */}
+          <div className="mt-8 border border-gray-200 rounded-xl p-6 bg-white">
+            <div className="h-6 w-48 bg-gray-200 rounded mb-4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+               {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gray-200 rounded-full flex-shrink-0" />
+                    <div className="h-4 w-full max-w-[200px] bg-gray-200 rounded" />
+                  </div>
+               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT: Order Summary */}
+        <div className="lg:col-span-1">
+           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div className="h-40 bg-gray-200" />
+              <div className="p-5 space-y-4">
+                 <div className="h-6 w-32 bg-gray-200 rounded" />
+                 <div className="space-y-3">
+                    <div className="flex justify-between">
+                       <div className="h-4 w-12 bg-gray-200 rounded" />
+                       <div className="h-4 w-20 bg-gray-200 rounded" />
+                    </div>
+                    <div className="flex justify-between">
+                       <div className="h-4 w-12 bg-gray-200 rounded" />
+                       <div className="h-4 w-16 bg-gray-200 rounded" />
+                    </div>
+                     <div className="flex justify-between">
+                       <div className="h-4 w-16 bg-gray-200 rounded" />
+                       <div className="h-4 w-12 bg-gray-200 rounded" />
+                    </div>
+                 </div>
+                 <div className="border-t border-gray-100 pt-3">
+                    <div className="flex justify-between">
+                       <div className="h-5 w-24 bg-gray-200 rounded" />
+                       <div className="h-6 w-24 bg-gray-200 rounded" />
+                    </div>
+                 </div>
+                 <div className="h-12 w-full bg-gray-200 rounded mt-2" />
+              </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+BookingPageSkeleton.displayName = "BookingPageSkeleton";
