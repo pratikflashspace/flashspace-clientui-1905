@@ -160,7 +160,7 @@ const HeroSection = () => {
           >
             {/* Primary CTA */}
             <ModernFlairButton
-              onClick={() => navigate("/book-tour")}
+              onClick={() => navigate("/start-chatting")}
               className="group px-8 py-4 bg-[#0a0a0a] text-white rounded-full transition-all duration-300 transform hover:scale-[1.02] hover:shadow-[0_0_30px_-5px_rgba(239,173,26,0.3)] border border-white/5 active:scale-95 overflow-hidden"
               flairColor="rgba(239, 173, 26, 0.3)"
             >
