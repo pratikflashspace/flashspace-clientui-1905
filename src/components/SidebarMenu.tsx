@@ -111,7 +111,7 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
   ];
 
   const middle = [
-    { label: "Your Bookings", href: "/bookings", icon: Calendar },
+    { label: "Your Bookings", href: "/dashboard/my-bookings", icon: Calendar },
     { label: "Flash Tribe", href: "/community", icon: Users }
   ];
 

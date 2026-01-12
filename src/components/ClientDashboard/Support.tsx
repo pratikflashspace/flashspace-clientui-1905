@@ -1,234 +1,607 @@
-// Support.tsx
-import React, { useState } from "react";
-import { MessageCircle, Briefcase, Handshake } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import userDashboardService, { SupportTicket } from "@/services/userDashboard.service";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  MessageCircle,
+  Phone,
+  Mail,
+  Send,
+  ChevronDown,
+  ChevronUp,
+  Headphones,
+  FileText,
+  Building2,
+  CreditCard,
+  HelpCircle,
+  CheckCircle2,
+  ExternalLink,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+  ArrowLeft,
+  Clock,
+} from "lucide-react";
 
+const faqs = [
+  {
+    category: "Virtual Office",
+    questions: [
+      {
+        q: "How do I get my virtual office address proof?",
+        a: "Once your KYC is verified, you can download the address proof from My Bookings > View Details > Documents section. The address proof is valid for GST registration and bank account opening.",
+      },
+      {
+        q: "Can I use this address for GST registration?",
+        a: "Yes, our virtual office addresses are fully compliant for GST registration. We provide NOC and utility bills required for the GST application process.",
+      },
+      {
+        q: "How is mail handled at my virtual office?",
+        a: "All mail and courier delivered to your virtual office address is scanned and notified via email within 24 hours. Physical mail can be collected or forwarded to your preferred address.",
+      },
+    ],
+  },
+  {
+    category: "Billing & Payments",
+    questions: [
+      {
+        q: "How can I download my invoices?",
+        a: "Go to Billing > Invoices tab where you can view and download all your invoices in PDF format. GST invoices are automatically generated.",
+      },
+      {
+        q: "What payment methods do you accept?",
+        a: "We accept all major payment methods including UPI, credit/debit cards, net banking, and wallet payments through our secure Razorpay integration.",
+      },
+    ],
+  },
+  {
+    category: "KYC & Documents",
+    questions: [
+      {
+        q: "What documents are required for KYC?",
+        a: "Required documents include: PAN Card, Aadhaar Card, GST Certificate (if applicable), and Address Proof. For companies, additional documents like COI and MOA may be required.",
+      },
+      {
+        q: "How long does KYC verification take?",
+        a: "KYC verification typically takes 24-48 hours after all documents are submitted. You will receive email updates on the verification status.",
+      },
+    ],
+  },
+];
 
-const Support: React.FC = () => {
+const contactOptions = [
+  {
+    icon: Phone,
+    title: "Call Us",
+    description: "Mon-Sat, 9 AM - 7 PM",
+    value: "+91 8100 888 777",
+    action: "tel:+918100888777",
+    color: "bg-green-100 text-green-600",
+  },
+  {
+    icon: Mail,
+    title: "Email Support",
+    description: "24/7 Support",
+    value: "support@flashspace.co",
+    action: "mailto:support@flashspace.co",
+    color: "bg-blue-100 text-blue-600",
+  },
+  {
+    icon: MessageCircle,
+    title: "Live Chat",
+    description: "Instant Response",
+    value: "Start Chat",
+    action: "#chat",
+    color: "bg-purple-100 text-purple-600",
+  },
+];
+
+export default function Support() {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<"help" | "tickets" | "contact">("help");
+  const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
+  const [showNewTicket, setShowNewTicket] = useState(false);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [replyMessage, setReplyMessage] = useState("");
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
     subject: "",
-    message: "",
+    category: "",
+    priority: "medium" as "low" | "medium" | "high",
+    description: "",
   });
   const [submitted, setSubmitted] = useState(false);
-  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const fetchTickets = async () => {
+    setLoading(true);
+    try {
+      const response = await userDashboardService.getTickets();
+      if (response.success && response.data) {
+        setTickets(response.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch tickets");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (activeTab === "tickets") {
+      fetchTickets();
+    }
+  }, [activeTab]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
+    setSubmitting(true);
+    try {
+      const response = await userDashboardService.createTicket({
+        subject: formData.subject,
+        category: formData.category as any,
+        priority: formData.priority,
+        message: formData.description,
+      });
+      if (response.success) {
+        setSubmitted(true);
+        fetchTickets();
+        setTimeout(() => {
+          setSubmitted(false);
+          setShowNewTicket(false);
+          setFormData({ subject: "", category: "", priority: "medium", description: "" });
+        }, 3000);
+      }
+    } catch (err) {
+      console.error("Failed to create ticket");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const contactSections = [
-    {
-      title: "Support",
-      desc: "Need help or facing issues with our platform? Our support team is always ready to assist you with queries and troubleshooting.",
-      mail: "support@flashspace.co",
-      icon: <MessageCircle className="w-6 h-6 text-yellow-400" />,
-    },
-    {
-      title: "Sales",
-      desc: "Want to explore FlashSpace solutions for your business? Our experts will help you find the right plan and growth strategy.",
-      mail: "sales@flashspace.co",
-      contact: "8100888777",
-      icon: <Briefcase className="w-6 h-6 text-yellow-400" />,
-    },
-    {
-      title: "Partnership",
-      desc: "Interested in collaborating or becoming a FlashSpace partner? Let’s innovate together and build future-ready solutions.",
-      mail: "partner@flashspace.co",
-      icon: <Handshake className="w-6 h-6 text-yellow-400" />,
-    },
-  ];
+  const handleReply = async () => {
+    if (!selectedTicket || !replyMessage.trim()) return;
+    setSubmitting(true);
+    try {
+      const response = await userDashboardService.replyToTicket(selectedTicket._id, replyMessage);
+      if (response.success && response.data) {
+        setSelectedTicket(response.data);
+        setReplyMessage("");
+        fetchTickets();
+      }
+    } catch (err) {
+      console.error("Failed to reply");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-  const faqs = [
-    {
-      q: "How do I check my booking status?",
-      a: "You can check your booking status anytime under the 'My Bookings' section in your FlashSpace dashboard.",
-    },
-    {
-      q: "How can I renew my subscription?",
-      a: "Renewal options are available in the 'Subscription Details' tab. You can also contact sales@flashspace.co for assistance.",
-    },
-    {
-      q: "How do I upload KYC documents?",
-      a: "Navigate to the 'KYC & Agreement Details' section in your dashboard and upload the required documents directly.",
-    },
-    {
-      q: "What is the response time for support?",
-      a: "Our support team is available 24×7. We usually respond within 24 hours via email or chat.",
-    },
-  ];
+  const viewTicketDetails = async (ticketId: string) => {
+    try {
+      const response = await userDashboardService.getTicketById(ticketId);
+      if (response.success && response.data) {
+        setSelectedTicket(response.data);
+      }
+    } catch (err) {
+      console.error("Failed to load ticket");
+    }
+  };
+
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case "open":
+        return { bg: "bg-blue-100", text: "text-blue-700", label: "Open" };
+      case "in_progress":
+        return { bg: "bg-yellow-100", text: "text-yellow-700", label: "In Progress" };
+      case "resolved":
+        return { bg: "bg-green-100", text: "text-green-700", label: "Resolved" };
+      case "closed":
+        return { bg: "bg-gray-100", text: "text-gray-600", label: "Closed" };
+      default:
+        return { bg: "bg-gray-100", text: "text-gray-600", label: status };
+    }
+  };
+
+  const getPriorityConfig = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return { bg: "bg-red-100", text: "text-red-700" };
+      case "medium":
+        return { bg: "bg-yellow-100", text: "text-yellow-700" };
+      case "low":
+        return { bg: "bg-gray-100", text: "text-gray-600" };
+      default:
+        return { bg: "bg-gray-100", text: "text-gray-600" };
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 py-8 px-4 font-[Poppins] flex justify-center">
-      <div className="w-full max-w-5xl">
-        {/* HEADER */}
-        <header className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl font-[Geist] font-extrabold tracking-tight mb-3">
-            <span className="text-black">FlashSpace</span>{" "}
-            <span className="text-yellow-400">Support Center</span>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold font-[Poppins] text-gray-900">
+            Help & <span className="text-yellow-500">Support</span>
           </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            We’re here to help with your workspace, billing, and technical needs.  
-            Our team is available <span className="text-yellow-500 font-semibold">24×7</span> to assist you.
-          </p>
-        </header>
+          <p className="text-gray-500 mt-2">Get help with your virtual office and coworking services</p>
+        </div>
 
-        {/* CONTACT SECTIONS */}
-        <section className="grid md:grid-cols-3 gap-6 mb-12">
-          {contactSections.map((info, i) => (
-            <div
-              key={i}
-              className="border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 bg-white"
+        {/* Quick Contact Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {contactOptions.map((option, idx) => (
+            <a
+              key={idx}
+              href={option.action}
+              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-yellow-300 transition-all group"
             >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2.5 bg-yellow-50 rounded-full">{info.icon}</div>
-                <h2 className="text-xl font-[Geist] font-semibold text-gray-900">{info.title}</h2>
+              <div className={`w-12 h-12 rounded-xl ${option.color} flex items-center justify-center mb-4`}>
+                <option.icon className="w-6 h-6" />
               </div>
-              <p className="text-gray-700 mb-3 text-sm leading-relaxed">{info.desc}</p>
-              <p className="font-semibold text-sm">
-                {info.title} Mail:{" "}
-                <a href={`mailto:${info.mail}`} className="text-blue-600 hover:underline font-[Poppins]">
-                  {info.mail}
-                </a>
+              <h3 className="font-semibold text-gray-900 mb-1">{option.title}</h3>
+              <p className="text-sm text-gray-500 mb-2">{option.description}</p>
+              <p className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700 flex items-center gap-1">
+                {option.value}
+                <ExternalLink className="w-3 h-3" />
               </p>
-              {info.contact && (
-                <p className="font-semibold text-sm mt-1">
-                  Contact: <span className="text-gray-900">{info.contact}</span>
-                </p>
-              )}
-            </div>
+            </a>
           ))}
-        </section>
+        </div>
 
-        {/* SUPPORT FORM */} 
-        <section>
-          <h2 className="text-2xl sm:text-2xl font-[Geist] font-bold text-black mb-3">
-            Submit a Support Request
-          </h2>
-          <div className="w-14 h-[3px] bg-yellow-400 mb-5 rounded"></div>
-          <p className="text-gray-600 mb-6 max-w-2xl text-sm">
-            Fill out the form below and our support team will reach out to you shortly.
-          </p>
-
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-5"
-          >
-            <div className="grid sm:grid-cols-2 gap-5">
-              <input
-                type="text"
-                name="name"
-                placeholder="Your Name"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 outline-none transition-all"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Your Email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 outline-none transition-all"
-              />
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-5">
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Your Phone Number"
-                required
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 outline-none transition-all"
-              />
-              <input
-                type="text"
-                name="subject"
-                placeholder="Subject"
-                required
-                value={formData.subject}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 outline-none transition-all"
-              />
-            </div>
-
-            <textarea
-              name="message"
-              placeholder="Type your message here..."
-              rows={5}
-              required
-              value={formData.message}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 outline-none transition-all resize-none"
-            ></textarea>
-
-            <div className="flex justify-end">
+        {/* Tabs */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-1">
+          <div className="flex gap-1">
+            {[
+              { id: "help", label: "Help Center", icon: HelpCircle },
+              { id: "tickets", label: "My Tickets", icon: FileText },
+              { id: "contact", label: "Contact Form", icon: Send },
+            ].map((tab) => (
               <button
-                type="submit"
-                className="px-6 py-2 font-[Geist] font-semibold bg-yellow-400 text-black rounded-lg hover:bg-yellow-500 transition"
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? "bg-yellow-400 text-black"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
               >
-                Submit Request
+                <tab.icon className="w-4 h-4" />
+                <span className="hidden sm:inline">{tab.label}</span>
               </button>
-            </div>
-
-            {submitted && (
-              <p className="text-green-600 font-semibold">
-                ✅ Thank you! Your message has been received.
-              </p>
-            )}
-          </form>
-        </section>
-
-        {/* FAQ SECTION */}
-        <section className="mt-16">
-          <h2 className="text-2xl sm:text-2xl font-[Geist] font-bold text-black mb-3">
-            Frequently Asked Questions
-          </h2>
-          <div className="w-14 h-[3px] bg-yellow-400 mb-5 rounded"></div>
-
-          <div className="space-y-3">
-            {faqs.map((faq, index) => (
-              <div
-                key={index}
-                className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-sm transition"
-              >
-                <button
-                  onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
-                  className="w-full text-left px-4 py-2.5 bg-gray-50 hover:bg-yellow-50 font-[Geist] flex justify-between items-center text-sm sm:text-base"
-                >
-                  <span>{faq.q}</span>
-                  <span className="text-lg">{openFAQ === index ? "−" : "+"}</span>
-                </button>
-                {openFAQ === index && (
-                  <p className="px-4 py-2.5 text-gray-700 bg-white text-sm sm:text-base">{faq.a}</p>
-                )}
-              </div>
             ))}
           </div>
-        </section>
+        </div>
 
-        {/* FOOTER */}
-        <footer className="text-center mt-16 text-gray-600 text-xs sm:text-sm border-t border-gray-200 pt-5">
-          Still can’t find what you’re looking for? Reach out at{" "}
-          <a href="mailto:support@flashspace.co" className="text-blue-600 hover:underline font-[Poppins]">
-            support@flashspace.co
-          </a>{" "}
-          — we usually respond within 24 hours.
-        </footer>
+        {/* Help Center Tab */}
+        {activeTab === "help" && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <HelpCircle className="w-5 h-5 text-yellow-500" /> Frequently Asked Questions
+              </h2>
+
+              {faqs.map((category, catIdx) => (
+                <div key={catIdx} className="mb-6 last:mb-0">
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
+                    {category.category === "Virtual Office" && <Building2 className="w-4 h-4" />}
+                    {category.category === "Billing & Payments" && <CreditCard className="w-4 h-4" />}
+                    {category.category === "KYC & Documents" && <FileText className="w-4 h-4" />}
+                    {category.category}
+                  </h3>
+                  <div className="space-y-2">
+                    {category.questions.map((faq, faqIdx) => {
+                      const faqId = `${catIdx}-${faqIdx}`;
+                      const isExpanded = expandedFaq === faqId;
+                      return (
+                        <div
+                          key={faqIdx}
+                          className="border border-gray-200 rounded-lg overflow-hidden"
+                        >
+                          <button
+                            onClick={() => setExpandedFaq(isExpanded ? null : faqId)}
+                            className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
+                          >
+                            <span className="font-medium text-gray-900">{faq.q}</span>
+                            {isExpanded ? (
+                              <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                            ) : (
+                              <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                            )}
+                          </button>
+                          {isExpanded && (
+                            <div className="px-4 pb-4 text-gray-600 text-sm leading-relaxed">
+                              {faq.a}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tickets Tab */}
+        {activeTab === "tickets" && (
+          <div className="space-y-4">
+            {/* Ticket Detail View */}
+            {selectedTicket ? (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <button
+                  onClick={() => setSelectedTicket(null)}
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back to Tickets
+                </button>
+                
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <p className="text-sm font-mono text-gray-500">{selectedTicket.ticketNumber}</p>
+                    <h2 className="text-xl font-semibold text-gray-900 mt-1">{selectedTicket.subject}</h2>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusConfig(selectedTicket.status).bg} ${getStatusConfig(selectedTicket.status).text}`}>
+                        {getStatusConfig(selectedTicket.status).label}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityConfig(selectedTicket.priority).bg} ${getPriorityConfig(selectedTicket.priority).text}`}>
+                        {selectedTicket.priority.charAt(0).toUpperCase() + selectedTicket.priority.slice(1)} Priority
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Messages */}
+                <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                  {selectedTicket.messages?.map((msg, idx) => (
+                    <div
+                      key={idx}
+                      className={`p-4 rounded-lg ${msg.sender === "user" ? "bg-yellow-50 ml-8" : "bg-gray-50 mr-8"}`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-900">
+                          {msg.sender === "user" ? "You" : "Support Team"}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {new Date(msg.createdAt).toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                      <p className="text-gray-700">{msg.message}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Reply Form */}
+                {selectedTicket.status !== "closed" && (
+                  <div className="border-t border-gray-100 pt-4">
+                    <div className="flex gap-3">
+                      <textarea
+                        value={replyMessage}
+                        onChange={(e) => setReplyMessage(e.target.value)}
+                        placeholder="Type your reply..."
+                        rows={3}
+                        className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      />
+                      <button
+                        onClick={handleReply}
+                        disabled={submitting || !replyMessage.trim()}
+                        className="px-6 py-2.5 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50 self-end"
+                      >
+                        {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold text-gray-900">Support Tickets</h2>
+                  <button
+                    onClick={() => setShowNewTicket(true)}
+                    className="px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors"
+                  >
+                    + New Ticket
+                  </button>
+                </div>
+
+                {/* New Ticket Form */}
+                {showNewTicket && (
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h3 className="font-semibold text-gray-900 mb-4">Create New Support Ticket</h3>
+                    {submitted ? (
+                      <div className="text-center py-8">
+                        <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                        <p className="text-gray-900 font-medium">Ticket Submitted Successfully!</p>
+                        <p className="text-sm text-gray-500 mt-1">We will respond within 24 hours</p>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm text-gray-600 mb-1">Subject</label>
+                            <input
+                              type="text"
+                              required
+                              value={formData.subject}
+                              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                              placeholder="Brief description of your issue"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm text-gray-600 mb-1">Category</label>
+                            <select
+                              required
+                              value={formData.category}
+                              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            >
+                              <option value="">Select Category</option>
+                              <option value="virtual_office">Virtual Office</option>
+                              <option value="coworking">Coworking</option>
+                              <option value="billing">Billing & Payments</option>
+                              <option value="kyc">KYC & Documents</option>
+                              <option value="technical">Technical Issue</option>
+                              <option value="other">Other</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-600 mb-1">Description</label>
+                          <textarea
+                            required
+                            rows={4}
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            placeholder="Please provide detailed information about your issue..."
+                          />
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            type="submit"
+                            disabled={submitting}
+                            className="px-6 py-2.5 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50"
+                          >
+                            {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Submit Ticket"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowNewTicket(false)}
+                            className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                )}
+
+                {/* Ticket List */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                  {loading ? (
+                    <div className="text-center py-12">
+                      <Loader2 className="w-8 h-8 text-yellow-500 animate-spin mx-auto mb-3" />
+                      <p className="text-gray-500">Loading tickets...</p>
+                    </div>
+                  ) : tickets.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Headphones className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                      <p className="text-gray-500">No support tickets yet</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-gray-100">
+                      {tickets.map((ticket) => {
+                        const statusConfig = getStatusConfig(ticket.status);
+                        const priorityConfig = getPriorityConfig(ticket.priority);
+                        return (
+                          <div key={ticket._id} className="p-5 hover:bg-gray-50 transition-colors">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-sm font-mono text-gray-500">{ticket.ticketNumber}</span>
+                                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
+                                    {statusConfig.label}
+                                  </span>
+                                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${priorityConfig.bg} ${priorityConfig.text}`}>
+                                    {ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)} Priority
+                                  </span>
+                                </div>
+                                <p className="font-medium text-gray-900">{ticket.subject}</p>
+                                <p className="text-xs text-gray-400 mt-1">
+                                  Created: {new Date(ticket.createdAt).toLocaleDateString("en-IN")} - Last updated: {new Date(ticket.updatedAt).toLocaleDateString("en-IN")}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => viewTicketDetails(ticket._id)}
+                                className="px-4 py-2 text-sm font-medium text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 rounded-lg transition-colors"
+                              >
+                                View Details
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Contact Form Tab */}
+        {activeTab === "contact" && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">Send us a Message</h2>
+            <p className="text-gray-500 text-sm mb-6">For general inquiries and feedback</p>
+
+            {submitted ? (
+              <div className="text-center py-12">
+                <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
+                <p className="text-gray-500">Thank you for contacting us. We will get back to you within 24 hours.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Your Name</label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      placeholder="Enter your name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      required
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    placeholder="+91 XXXXX XXXXX"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Subject</label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    placeholder="What is this regarding?"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Message</label>
+                  <textarea
+                    required
+                    rows={5}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    placeholder="Tell us more about your inquiry..."
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-yellow-400 text-black rounded-xl font-semibold hover:bg-yellow-500 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Send className="w-5 h-5" /> Send Message
+                </button>
+              </form>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default Support;
+}

@@ -44,13 +44,6 @@ import Blog, { SinglePostPage } from "./pages/Blog";
 
 // --- Client Dashboard Pages ---
 import ClientDashboard from "./components/ClientDashboard";
-import Dashboard from "./components/ClientDashboard/Dashboard";
-import MyBookings from "./components/ClientDashboard/MyBookings";
-import Billing from "./components/ClientDashboard/Billing";
-import KYCVerification from "./components/ClientDashboard/KYCVerification";
-import Support from "./components/ClientDashboard/Support";
-import Logout from "./components/ClientDashboard/Logout";
-import Profile from "./components/ClientDashboard/Profile";
 
 //-----------spaces---------
 import SpaceComponent from './components/Spaces/SpaceComponent';
@@ -58,10 +51,6 @@ import CoworkingSpaceComponent from './components/Spaces/CoworkingSpaceComponent
 import BookingPage from './pages/BookingPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentFailedPage from './pages/PaymentFailedPage';
-
-// --- end dashboard imports ---
-
-import Viewdetails from "./components/ClientDashboard/Viewdetails";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -108,8 +97,8 @@ const App = () => (
               <Route path="/blog/:id" element={<SinglePostPage />} />
 
               {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Index openLogin={true} />} />
+              <Route path="/signup" element={<Index openSignup={true} />} />
               <Route path="/verify-otp" element={<VerifyOTP />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
 
@@ -121,13 +110,7 @@ const App = () => (
 
                 {/* Client Dashboard Routes - Protected */}
                 <Route path="/dashboard" element={<ClientDashboard />} />
-                <Route path="/dashboard/overview" element={<Dashboard />} />
-                <Route path="/dashboard/my-bookings" element={<MyBookings />} />
-                <Route path="/dashboard/billing" element={<Billing />} />
-                <Route path="/dashboard/kyc-verification" element={<KYCVerification />} />
-                <Route path="/dashboard/support" element={<Support />} />
-                <Route path="/dashboard/profile" element={<Profile />} />
-                <Route path="/dashboard/logout" element={<Logout />} />
+                <Route path="/dashboard/*" element={<ClientDashboard />} />
               </Route>
 
               <Route path="/list-your-space" element={<ListYourSpace />} />

@@ -9,10 +9,15 @@ import ContactSection from "@/components/ConactSection";
 import ImmediateAssistanceSection from "@/components/ImmediateAssistanceSection";
 import Footer from "@/components/Footer";
 
-const Index = () => {
+interface IndexProps {
+  openLogin?: boolean;
+  openSignup?: boolean;
+}
+
+const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
-      <Header />
+    <div className="min-h-screen">
+      <Header openLogin={openLogin} openSignup={openSignup} />
       <main>
         <HeroSection />
         <SolutionsSection />

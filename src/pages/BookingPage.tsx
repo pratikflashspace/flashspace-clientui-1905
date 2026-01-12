@@ -178,37 +178,7 @@ const BookingPage = () => {
         paymentType: "virtual_office",
       });
 
-      // DEV MODE: Skip Razorpay checkout, directly mark as success
-      if (orderData.devMode) {
-        try {
-          // Verify payment in dev mode
-          const verificationResult = await verifyPayment({
-            razorpay_order_id: orderData.orderId,
-            razorpay_payment_id: `pay_dev_${Date.now()}`,
-            razorpay_signature: "dev_signature",
-            devMode: true,
-          });
-
-          toast({
-            title: "Payment Successful! 🎉 (Dev Mode)",
-            description: "Your booking has been confirmed",
-          });
-
-          // Navigate to success page
-          navigate(`/payment/success?orderId=${orderData.orderId}&paymentId=${orderData.paymentId}`);
-        } catch (verifyError: any) {
-          toast({
-            title: "Error",
-            description: verifyError.message || "Something went wrong",
-            variant: "destructive",
-          });
-        } finally {
-          setPaymentLoading(false);
-        }
-        return;
-      }
-
-      // PRODUCTION MODE: Open Razorpay checkout
+      // Open Razorpay checkout
       await openRazorpayCheckout({
         orderId: orderData.orderId,
         amount: orderData.amount,

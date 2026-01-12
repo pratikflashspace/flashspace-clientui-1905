@@ -91,6 +91,7 @@ interface MapLibreMapProps {
   width?: string;
   className?: string;
   markers?: Array<{
+    id?: string;
     position: { lat: number; lng: number };
     title?: string;
     info?: string;
@@ -309,6 +310,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
       const primary = '#FBBC04'; // yellow color for accents
 
+      // Custom Marker - Standard Style (Restored)
       el.innerHTML = `
         <div class="marker-container" style="
           display: inline-flex;
@@ -569,6 +571,19 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
             if (popupEl) {
               // Make popup interactive
               popupEl.style.pointerEvents = 'auto';
+
+              // Handle "View Details" click
+              const viewDetailsBtn = popupEl.querySelector('.view-details-btn');
+              if (viewDetailsBtn) {
+                viewDetailsBtn.addEventListener('click', (e) => {
+                  e.stopPropagation(); // Prevent map click
+                  // Determine route based on some data or default to generic space
+                  // Assuming markerData.id is unique and we can route to it.
+                  // We might need to know if it's a coworking space or virtual office.
+                  // For now, defaulting to /space/:id which seems to be the pattern
+                  window.location.href = `/space/${markerData.id}`;
+                });
+              }
 
               // Mouse enters popup - don't close
               popupEl.addEventListener('mouseenter', () => {

@@ -63,4 +63,24 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/api/coworkingSpace/update/${id}`,
     DELETE: (id: string) => `/api/coworkingSpace/delete/${id}`,
   },
+
+  // User Dashboard
+  USER: {
+    DASHBOARD: '/api/user/dashboard',
+    // Bookings
+    BOOKINGS: '/api/user/bookings',
+    BOOKING_BY_ID: (id: string) => `/api/user/bookings/${id}`,
+    BOOKING_AUTO_RENEW: (id: string) => `/api/user/bookings/${id}/auto-renew`,
+    // KYC
+    KYC: '/api/user/kyc',
+    KYC_BUSINESS_INFO: '/api/user/kyc/business-info',
+    KYC_UPLOAD: '/api/user/kyc/upload',
+    // Invoices
+    INVOICES: '/api/user/invoices',
+    INVOICE_BY_ID: (id: string) => `/api/user/invoices/${id}`,
+    // Support
+    TICKETS: '/api/user/support/tickets',
+    TICKET_BY_ID: (id: string) => `/api/user/support/tickets/${id}`,
+    TICKET_REPLY: (id: string) => `/api/user/support/tickets/${id}/reply`,
+  },
 };

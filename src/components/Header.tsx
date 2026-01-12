@@ -1,16 +1,17 @@
-﻿import { useState, useEffect, useRef } from "react";
+﻿import { useState, useEffect, useRef, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { smoothScrollTo } from "@/lib/lenis";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import ModernFlairButton from "@/components/ui/ModernFlairButton";
-
 import { Phone, Building2, Users, Zap, FileText, ArrowRight, LayoutDashboard, LogOut, User as UserIcon, Settings, ChevronDown, X, Sun, Moon } from "lucide-react";
 import { CiMenuFries } from "react-icons/ci";
 import SidebarMenu from "@/components/SidebarMenu";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDarkMode } from "@/contexts/DarkModeContext";
 import GetInTouch from "@/pages/GetInTouch";
+import { LoginModal } from "@/components/auth/LoginModal";
+import { SignupModal } from "@/components/auth/SignupModal";
 
 // ✅ Country Data
 const countries = [
@@ -37,9 +38,11 @@ interface HeaderProps {
   forceWhiteBackground?: boolean;
   lightText?: boolean;
   loginBlack?: boolean;
+  openLogin?: boolean;
+  openSignup?: boolean;
 }
 
-const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = false }: HeaderProps) => {
+const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = false, openLogin = false, openSignup = false }: HeaderProps): ReactNode => {
   const { darkMode, toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
@@ -57,6 +60,17 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
   // Popup contact form
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
+  const [isSignupOpen, setIsSignupOpen] = useState(openSignup);
+
+  // Sync props to state
+  useEffect(() => {
+    setIsLoginOpen(openLogin);
+  }, [openLogin]);
+
+  useEffect(() => {
+    setIsSignupOpen(openSignup);
+  }, [openSignup]);
 
   const solutionsRef = useRef<HTMLDivElement>(null);
   const moreRef = useRef<HTMLDivElement>(null);
@@ -111,7 +125,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         className={cn(
           "fixed top-0 w-full z-[100] transition-all duration-300 text-md",
           scrolled || forceWhiteBackground
-            ? "bg-white/95 dark:bg-black/90 supports-[backdrop-filter]:bg-white/65 dark:supports-[backdrop-filter]:bg-black/60 backdrop-blur-md border-b border-border dark:border-white/10 shadow-sm"
+            ? "bg-white/95 dark:bg-[#0a0a0a]/90 supports-[backdrop-filter]:bg-white/65 dark:supports-[backdrop-filter]:bg-black/60 backdrop-blur-md border-b border-border dark:border-white/10 shadow-sm"
             : "bg-transparent backdrop-blur-sm"
         )}
         style={{ fontFamily: "Poppins" }}
@@ -146,7 +160,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               {/* === All Solutions Dropdown === */}
               <div ref={solutionsRef} className="relative">
                 <button
-                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors relative ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-white dark:hover:text-gray-300"}`}
+                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors relative ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-black dark:hover:text-gray-700"}`}
                   onClick={() => setIsSolutionsOpen((prev) => !prev)}
                 >
                   <span className="relative">
@@ -160,7 +174,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
                 {/* Dropdown Menu */}
                 <div
-                  className={`absolute left-1/2 top-full w-[600px] bg-white dark:bg-zinc-900 border border-border dark:border-white/10 rounded-lg shadow-lg z-50 mt-2 transition-all duration-300 ${isSolutionsOpen
+                  className={`absolute left-1/2 top-full w-[600px] bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-lg shadow-lg z-50 mt-2 transition-all duration-300 ${isSolutionsOpen
                     ? "opacity-100 pointer-events-auto translate-y-0"
                     : "opacity-0 pointer-events-none -translate-y-2"
                     }`}
@@ -170,12 +184,12 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                   }}
                 >
                   <div className="p-4 grid grid-cols-2 gap-4">
-                    <div className="border border-gray-100 dark:border-zinc-800 rounded-lg p-4 bg-white/50 dark:bg-zinc-900/50">
+                    <div className="border rounded-lg p-4 bg-white/50">
                       <div className="flex items-center gap-2 mb-1 cursor-pointer" onClick={() => { handleNavigation("/Solutions/on-demand"); setIsSolutionsOpen(false); }}>
                         <Zap className="w-4 h-4 text-primary" />
-                        <h4 className="text-sm font-semibold hover:text-primary transition-colors text-gray-900 dark:text-gray-100">On-Demand</h4>
+                        <h4 className="text-sm font-semibold hover:text-primary transition-colors">On-Demand</h4>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Book by the hour or day</p>
+                      <p className="text-xs text-gray-500 mb-3">Book by the hour or day</p>
                       {[
                         { label: "Meeting Rooms", type: "meeting-room", href: "/Solutions/meetingsroom" },
                         { label: "Event Space", type: "training-room", href: "/Solutions/eventspace" },
@@ -183,7 +197,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                       ].map((item) => (
                         <button
                           key={item.type}
-                          className="flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 transition-colors"
+                          className="flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-gray-100"
                           onClick={() => {
                             handleNavigation(item.href);
                             setIsSolutionsOpen(false);
@@ -218,7 +232,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                       ].map(({ icon: Icon, title, desc, href }) => (
                         <div
                           key={title}
-                          className="flex items-start gap-3 p-4 rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
+                          className="flex items-start gap-3 p-4 rounded-lg border hover:bg-gray-50 cursor-pointer"
                           onClick={() => {
                             handleNavigation(href);
                             setIsSolutionsOpen(false);
@@ -226,8 +240,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                         >
                           <Icon className="w-5 h-5 text-primary mt-0.5" />
                           <div>
-                            <h5 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{title}</h5>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{desc}</p>
+                            <h5 className="text-sm font-semibold">{title}</h5>
+                            <p className="text-xs text-gray-500 mt-1">{desc}</p>
                           </div>
                         </div>
                       ))}
@@ -239,7 +253,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               {/* Partner with Us */}
               <button
                 onClick={() => handleNavigation("/partner")}
-                className={`group relative px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-white dark:hover:text-gray-300"}`}
+                className={`group relative px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-black dark:hover:text-gray-700"}`}
               >
                 <span className="relative">
                   Partner with Us
@@ -250,7 +264,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               {/* === More Dropdown === */}
               <div ref={moreRef} className="relative">
                 <button
-                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors relative ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-white dark:hover:text-gray-300"}`}
+                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors relative ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-black dark:hover:text-gray-700"}`}
                   onClick={() => setIsMoreOpen((prev) => !prev)}
                 >
                   <span className="relative">
@@ -263,7 +277,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 </button>
 
                 {isMoreOpen && (
-                  <ul className="absolute bg-white dark:bg-zinc-900 border border-border dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50">
+                  <ul className="absolute bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50">
                     {[
                       { label: "About Us", href: "/about" },
                       { label: "Career", href: "/career" },
@@ -271,7 +285,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                     ].map((item) => (
                       <li key={item.label}>
                         <button
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300 transition-colors"
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
                           onClick={() => {
                             handleNavigation(item.href);
                             setIsMoreOpen(false);
@@ -304,13 +318,13 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 </button>
                 {countryDropdownOpen && (
                   <ul
-                    className="absolute left-0 top-full mt-2 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-white/10 rounded-lg shadow-lg z-50 min-w-[110px] py-1"
+                    className="absolute left-0 top-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 min-w-[110px] py-1"
                     role="listbox"
                   >
                     {countries.map((country) => (
                       <li key={country.code}>
                         <button
-                          className={`flex items-center w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-zinc-800 gap-2 text-sm text-gray-700 dark:text-gray-300`}
+                          className={`flex items-center w-full px-3 py-2 text-left hover:bg-gray-100 gap-2 text-sm`}
                           onClick={() => {
                             setSelectedCountry(country);
                             setCountryDropdownOpen(false);
@@ -356,14 +370,14 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 <div ref={userMenuRef} className="relative hidden lg:block">
                   <button
                     onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all duration-200 border border-gray-200 dark:border-white/10 bg-yellow-50 dark:bg-zinc-900"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 border border-gray-200 bg-yellow-50"
                   >
                     {/* User Avatar */}
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-md">
                       {user?.fullName?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     {/* User Name */}
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 max-w-[120px] truncate">
+                    <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
                       {user?.fullName || 'User'}
                     </span>
                     {/* Dropdown Icon */}
@@ -377,13 +391,13 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
                   {/* Dropdown Menu */}
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-gray-200 dark:border-white/10 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                       {/* User Info Header */}
-                      <div className="px-4 py-3 border-b border-gray-100 dark:border-zinc-800">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
                           {user?.fullName}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        <p className="text-xs text-gray-500 truncate">
                           {user?.email}
                         </p>
                       </div>
@@ -395,7 +409,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                             handleNavigation("/dashboard");
                             setIsUserMenuOpen(false);
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
                         >
                           <LayoutDashboard className="h-4 w-4" />
                           <span className="font-medium">Dashboard</span>
@@ -406,7 +420,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                             handleNavigation("/dashboard/profile");
                             setIsUserMenuOpen(false);
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
                         >
                           <UserIcon className="h-4 w-4" />
                           <span className="font-medium">My Profile</span>
@@ -417,7 +431,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                             handleNavigation("/settings");
                             setIsUserMenuOpen(false);
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
                         >
                           <Settings className="h-4 w-4" />
                           <span className="font-medium">Settings</span>
@@ -432,7 +446,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                             setIsUserMenuOpen(false);
                             handleNavigation("/");
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-150"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
                         >
                           <LogOut className="h-4 w-4" />
                           <span className="font-medium">Logout</span>
@@ -443,7 +457,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 </div>
               ) : (
                 <ModernFlairButton
-                  onClick={() => handleNavigation("/login")}
+                  onClick={() => setIsLoginOpen(true)}
                   className="hidden lg:inline-flex group px-6 py-2.5 bg-white/50 backdrop-blur-sm text-black text-sm font-medium rounded-full border border-gray-200 transition-all duration-300 hover:bg-white hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
                   flairColor="rgba(0, 0, 0, 0.05)"
                 >
@@ -464,7 +478,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
       {/* === Contact Popup === */}
       {isContactOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all">
-          {/* ====== Popup Container ====== */}
+          {/* ... (existing contact popup content) ... */}
           <div className="flex flex-col md:flex-row gap-10 w-[95%] max-w-5xl items-start justify-center">
             {/* ====== LEFT SIDE CARDS ====== */}
             <div className="flex flex-col gap-5 w-full md:w-[45%]">
@@ -473,10 +487,10 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   Support
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                <p className="text-sm text-gray-600 mt-2">
                   Need technical help or facing issues with our platform? Our support team is here 24×7 to assist you with queries and troubleshooting.
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                <p className="text-sm text-gray-600 mt-2">
                   <strong>Support Mail:</strong>&nbsp;
                   <a href="mailto:support@flashspace.co" className="text-blue-600 hover:underline">
                     support@flashspace.co
@@ -484,32 +498,32 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 </p>
               </div>
               {/* Card 2 - Sales */}
-              <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10 p-5 hover:shadow-xl transition">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   Sales
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                <p className="text-sm text-gray-600 mt-2">
                   Want to explore FlashSpace solutions for your business? Our sales experts will help you find the right plan and growth strategy.
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                <p className="text-sm text-gray-600 mt-2">
                   <strong>Sales Mail:</strong>&nbsp;
                   <a href="mailto:sales@flashspace.co" className="text-blue-600 hover:underline">
                     sales@flashspace.co
                   </a>
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600">
                   <strong>Contact:</strong> 8100888777
                 </p>
               </div>
               {/* Card 3 - Partnership */}
-              <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10 p-5 hover:shadow-xl transition">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   Partnership
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                <p className="text-sm text-gray-600 mt-2">
                   Interested in collaborating or becoming a FlashSpace partner? Let’s innovate together and build future-ready digital solutions.
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                <p className="text-sm text-gray-600 mt-2">
                   <strong>Partnership Mail:</strong>&nbsp;
                   <a href="mailto:partner@flashspace.co " className="text-blue-600 hover:underline">
                     partner@flashspace.co
@@ -517,47 +531,47 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 </p>
               </div>
             </div>
-            {/* ====== RIGHT SIDE FORM (UNCHANGED) ====== */}
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full md:w-[45%] p-8 relative animate-fade-in">
+            {/* ====== RIGHT SIDE FORM ====== */}
+            <div className="bg-white rounded-2xl shadow-2xl w-full md:w-[45%] p-8 relative animate-fade-in">
               <button
                 onClick={() => setIsContactOpen(false)}
-                className="absolute top-3 right-3 p-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition"
+                className="absolute top-3 right-3 p-2 text-gray-500 hover:text-black transition"
               >
                 <X className="w-5 h-5" />
               </button>
               <h2 className="text-xl font-bold mb-4 text-center">
-                <span className="text-black dark:text-white">Get in </span>
+                <span className="text-black">Get in </span>
                 <span className="text-yellow-500">Touch</span>
               </h2>
               <form className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700">Full Name</label>
                   <input
                     type="text"
-                    className="w-full border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-zinc-800 text-black dark:text-white"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
                     placeholder="Your Name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number </label>
+                  <label className="block text-sm font-medium text-gray-700">Phone Number </label>
                   <input
                     type="tel"
-                    className="w-full border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-zinc-800 text-black dark:text-white"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
                     placeholder="+91 9876543210"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
                   <input
                     type="email"
-                    className="w-full border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-zinc-800 text-black dark:text-white"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
                     placeholder="you@example.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Message</label>
+                  <label className="block text-sm font-medium text-gray-700">Message</label>
                   <textarea
-                    className="w-full border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white bg-white dark:bg-zinc-800 text-black dark:text-white"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
                     placeholder="How can we help?"
                     rows={4}
                   ></textarea>
@@ -573,8 +587,15 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
           </div>
         </div>
       )}
+
+      {/* === Login Modal === */}
+      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+
+      {/* === Signup Modal === */}
+      <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} />
     </>
   );
 };
+
 
 export default Header;
