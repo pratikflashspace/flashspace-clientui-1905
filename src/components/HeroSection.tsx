@@ -176,7 +176,7 @@ const HeroSection = () => {
 
             {/* Secondary CTA */}
             <ModernFlairButton
-              onClick={() => scrollToSection("#about")}
+              onClick={() => navigate("/services/virtual-office")}
               className="group px-8 py-4 bg-white/80 backdrop-blur-md border border-white/50 text-black rounded-full transition-all duration-300 hover:bg-white hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
               flairColor="rgba(0, 0, 0, 0.1)"
             >
