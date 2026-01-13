@@ -51,6 +51,9 @@ import CoworkingSpaceComponent from './components/Spaces/CoworkingSpaceComponent
 import BookingPage from './pages/BookingPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentFailedPage from './pages/PaymentFailedPage';
+import AdminDashboard from "./pages/admin/Dashboard";
+import { AdminRoute } from "./components/auth/AdminRoute";
+import AdminLayout from "./components/layouts/AdminLayout";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -109,14 +112,22 @@ const App = () => (
                 <Route path="/settings" element={<Settings />} />
 
                 {/* Client Dashboard Routes - Protected */}
-                <Route path="/dashboard" element={<ClientDashboard />} />
                 <Route path="/dashboard/*" element={<ClientDashboard />} />
+              </Route>
+
+              {/* Admin Routes - Protected (RBAC) */}
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="*" element={<AdminDashboard />} />
+                </Route>
               </Route>
 
               <Route path="/list-your-space" element={<ListYourSpace />} />
               <Route path="/partner" element={<PartnerWithUs />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
               <Route path="/start-chatting" element={<StartChatting />} />
+
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
