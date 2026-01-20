@@ -30,6 +30,7 @@ export interface SpaceSnapshot {
   city?: string;
   area?: string;
   image?: string;
+  images?: string[];
   coordinates?: { lat: number; lng: number };
 }
 
@@ -47,6 +48,7 @@ export interface Booking {
     discount?: number;
     tenure: number;
     tenureUnit?: string;
+    gstIncluded?: boolean;
   };
   timeline?: Array<{
     status: string;
@@ -69,7 +71,11 @@ export interface Booking {
 }
 
 export interface KYCData {
+  _id?: string; // Profile ID
+  profileName?: string; // e.g., "TechCorp Pvt Ltd" or "John Doe (Personal)"
+  linkedBookings?: string[]; // Array of booking IDs
   overallStatus: 'not_started' | 'pending' | 'approved' | 'rejected' | 'resubmit';
+  kycType?: 'individual' | 'business';
   progress: number;
   personalInfo?: {
     fullName?: string;
@@ -215,19 +221,25 @@ class UserDashboardService {
 
   // ========== KYC ==========
 
-  async getKYC(): Promise<ApiResponse<KYCData>> {
+  // Get KYC status - now returns all profiles or specific profile
+  async getKYC(profileId?: string): Promise<ApiResponse<KYCData | KYCData[]>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<KYCData>>(API_ENDPOINTS.USER.KYC);
+      const params = profileId ? { profileId } : {};
+      const response = await axiosInstance.get<ApiResponse<KYCData | KYCData[]>>(API_ENDPOINTS.USER.KYC, { params });
       return response.data;
     } catch (error: any) {
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch KYC status',
+        message: error.response?.data?.message || 'Failed to fetch KYC data',
       };
     }
   }
 
+  // Update business info - now works with profiles
   async updateBusinessInfo(data: {
+    profileId?: string;
+    profileName?: string;
+    kycType?: string;
     companyName?: string;
     companyType?: string;
     gstNumber?: string;
@@ -247,13 +259,16 @@ class UserDashboardService {
     }
   }
 
+  // Upload KYC document - now requires profileId
   async uploadKYCDocument(
-    docType: string,
-    file: File
+    documentType: string,
+    file: File,
+    profileId: string
   ): Promise<ApiResponse<{ type: string; status: string; uploadedAt: string }>> {
     try {
       const formData = new FormData();
-      formData.append('documentType', docType);
+      formData.append('documentType', documentType);
+      formData.append('profileId', profileId);
       formData.append('file', file);
 
       const response = await axiosInstance.post<ApiResponse<{ type: string; status: string; uploadedAt: string }>>(
@@ -270,6 +285,46 @@ class UserDashboardService {
       return {
         success: false,
         message: error.response?.data?.message || 'Failed to upload document',
+      };
+    }
+  }
+
+  // Delete KYC document
+  async deleteKYCDocument(
+    documentType: string,
+    profileId: string
+  ): Promise<ApiResponse<void>> {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<void>>(
+        API_ENDPOINTS.USER.KYC_UPLOAD,
+        {
+          data: {
+            documentType,
+            profileId,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to delete document',
+      };
+    }
+  }
+
+  // Link booking to profile
+  async linkBookingToProfile(bookingId: string, profileId: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        `/user/bookings/${bookingId}/link-profile`,
+        { profileId }
+      );
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to link booking',
       };
     }
   }

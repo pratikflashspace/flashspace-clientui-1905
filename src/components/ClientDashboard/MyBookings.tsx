@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import userDashboardService, { Booking } from "@/services/userDashboard.service";
 import {
   Building2,
@@ -19,13 +20,15 @@ import {
   Loader2,
   ToggleLeft,
   ToggleRight,
+  ShieldCheck,
 } from "lucide-react";
 
 // Type definitions
-type BookingType = "virtual_office" | "coworking";
-type BookingStatus = "active" | "expired" | "pending" | "pending_kyc" | "cancelled";
+type BookingType = "virtual_office" | "coworking_space";
+type BookingStatus = "active" | "expired" | "pending" | "pending_kyc" | "cancelled" | "pending_payment";
 
 const MyBookings: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"all" | BookingType>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | BookingStatus>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,13 +84,25 @@ const MyBookings: React.FC = () => {
     }
   };
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (selectedBooking) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [selectedBooking]);
+
   // Filter bookings client-side for search
   const filteredBookings = bookings.filter((b) => {
     const matchSearch =
       searchQuery === "" ||
-      b.spaceSnapshot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.spaceSnapshot?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       b.bookingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.spaceSnapshot.city.toLowerCase().includes(searchQuery.toLowerCase());
+      b.spaceSnapshot?.city?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchSearch;
   });
 
@@ -114,8 +129,10 @@ const MyBookings: React.FC = () => {
       case "expired":
         return { bg: "bg-gray-100", text: "text-gray-600", icon: Clock, label: "Expired" };
       case "pending":
+      case "pending_payment":
+        return { bg: "bg-yellow-100", text: "text-yellow-700", icon: AlertCircle, label: "Payment Pending" };
       case "pending_kyc":
-        return { bg: "bg-yellow-100", text: "text-yellow-700", icon: AlertCircle, label: status === "pending_kyc" ? "Pending KYC" : "Pending" };
+        return { bg: "bg-yellow-100", text: "text-yellow-700", icon: AlertCircle, label: "Pending KYC" };
       case "cancelled":
         return { bg: "bg-red-100", text: "text-red-700", icon: X, label: "Cancelled" };
       default:
@@ -135,7 +152,7 @@ const MyBookings: React.FC = () => {
     total: bookings.length,
     active: bookings.filter((b) => b.status === "active").length,
     virtualOffice: bookings.filter((b) => b.type === "virtual_office").length,
-    coworking: bookings.filter((b) => b.type === "coworking").length,
+    coworking: bookings.filter((b) => b.type === "coworking_space").length,
   };
 
   if (loading) {
@@ -214,16 +231,15 @@ const MyBookings: React.FC = () => {
               {[
                 { id: "all", label: "All", icon: null },
                 { id: "virtual_office", label: "Virtual Office", icon: Building2 },
-                { id: "coworking", label: "Coworking", icon: Briefcase },
+                { id: "coworking_space", label: "Coworking", icon: Briefcase },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? "bg-yellow-400 text-black"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
+                    ? "bg-yellow-400 text-black"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
                 >
                   {tab.icon && <tab.icon className="w-4 h-4" />}
                   {tab.label}
@@ -262,9 +278,8 @@ const MyBookings: React.FC = () => {
                         setStatusFilter(status as typeof statusFilter);
                         setShowFilters(false);
                       }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
-                        statusFilter === status ? "bg-yellow-50 text-yellow-700" : ""
-                      }`}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${statusFilter === status ? "bg-yellow-50 text-yellow-700" : ""
+                        }`}
                     >
                       {status.charAt(0).toUpperCase() + status.slice(1)}
                     </button>
@@ -294,7 +309,7 @@ const MyBookings: React.FC = () => {
           <div className="space-y-4">
             {filteredBookings.map((booking) => {
               const statusConfig = getStatusConfig(booking.status);
-              const daysRemaining = calculateDaysRemaining(booking.timeline.endDate);
+              const daysRemaining = calculateDaysRemaining(booking.endDate || "");
               const isExpiring = booking.status === "active" && daysRemaining <= 30;
 
               return (
@@ -306,17 +321,16 @@ const MyBookings: React.FC = () => {
                     {/* Image */}
                     <div className="md:w-48 h-32 md:h-auto relative">
                       <img
-                        src={booking.spaceSnapshot.images?.[0] || "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"}
-                        alt={booking.spaceSnapshot.name}
+                        src={booking.spaceSnapshot?.images?.[0] || booking.spaceSnapshot?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"}
+                        alt={booking.spaceSnapshot?.name || "Space"}
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute top-3 left-3">
                         <span
-                          className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                            booking.type === "virtual_office"
-                              ? "bg-yellow-400 text-black"
-                              : "bg-blue-500 text-white"
-                          }`}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium ${booking.type === "virtual_office"
+                            ? "bg-yellow-400 text-black"
+                            : "bg-blue-500 text-white"
+                            }`}
                         >
                           {booking.type === "virtual_office" ? "Virtual Office" : "Coworking"}
                         </span>
@@ -329,23 +343,23 @@ const MyBookings: React.FC = () => {
                         {/* Left Info */}
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-lg font-semibold text-gray-900">{booking.spaceSnapshot.name}</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">{booking.spaceSnapshot?.name}</h3>
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
                               <statusConfig.icon className="w-3 h-3" />
                               {statusConfig.label}
                             </span>
                           </div>
                           <p className="text-sm text-gray-500 flex items-center gap-1 mb-2">
-                            <MapPin className="w-3.5 h-3.5" /> {booking.spaceSnapshot.address}, {booking.spaceSnapshot.city}
+                            <MapPin className="w-3.5 h-3.5" /> {booking.spaceSnapshot?.address}, {booking.spaceSnapshot?.city}
                           </p>
 
                           <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-3">
                             <span className="flex items-center gap-1">
                               <Calendar className="w-4 h-4 text-gray-400" />
-                              {formatDate(booking.timeline.startDate)} - {formatDate(booking.timeline.endDate)}
+                              {formatDate(booking.startDate || "")} - {formatDate(booking.endDate || "")}
                             </span>
                             <span className="font-medium">Plan: {booking.plan.name}</span>
-                            <span className="font-semibold text-gray-900">{formatCurrency(booking.plan.price)}/{booking.plan.duration}</span>
+                            <span className="font-semibold text-gray-900">{formatCurrency(booking.plan.price)}/{booking.plan.tenure} {booking.plan.tenureUnit}</span>
                           </div>
 
                           {/* Features Pills */}
@@ -372,6 +386,14 @@ const MyBookings: React.FC = () => {
                           >
                             <Eye className="w-4 h-4" /> View Details
                           </button>
+                          {booking.status === "pending_kyc" && (
+                            <button
+                              onClick={() => navigate(`/dashboard/kyc-verification?linkBookingId=${booking._id}`)}
+                              className="flex items-center gap-1.5 px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors"
+                            >
+                              <ShieldCheck className="w-4 h-4" /> Verify Now
+                            </button>
+                          )}
                           {booking.documents && booking.documents.length > 0 && (
                             <button className="flex items-center gap-1.5 px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors">
                               <Download className="w-4 h-4" /> Documents
@@ -405,12 +427,12 @@ const MyBookings: React.FC = () => {
 
         {/* Booking Detail Modal */}
         {selectedBooking && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
               <div className="relative">
                 <img
-                  src={selectedBooking.spaceSnapshot.images?.[0] || "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"}
-                  alt={selectedBooking.spaceSnapshot.name}
+                  src={selectedBooking.spaceSnapshot?.images?.[0] || selectedBooking.spaceSnapshot?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"}
+                  alt={selectedBooking.spaceSnapshot?.name}
                   className="w-full h-48 object-cover"
                 />
                 <button
@@ -421,11 +443,10 @@ const MyBookings: React.FC = () => {
                 </button>
                 <div className="absolute bottom-4 left-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      selectedBooking.type === "virtual_office"
-                        ? "bg-yellow-400 text-black"
-                        : "bg-blue-500 text-white"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${selectedBooking.type === "virtual_office"
+                      ? "bg-yellow-400 text-black"
+                      : "bg-blue-500 text-white"
+                      }`}
                   >
                     {selectedBooking.type === "virtual_office" ? "Virtual Office" : "Coworking"}
                   </span>
@@ -435,44 +456,43 @@ const MyBookings: React.FC = () => {
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">{selectedBooking.spaceSnapshot.name}</h2>
+                    <h2 className="text-xl font-bold text-gray-900">{selectedBooking.spaceSnapshot?.name}</h2>
                     <p className="text-gray-500 flex items-center gap-1 mt-1">
-                      <MapPin className="w-4 h-4" /> {selectedBooking.spaceSnapshot.address}
+                      <MapPin className="w-4 h-4" /> {selectedBooking.spaceSnapshot?.address}
                     </p>
                   </div>
                   <span
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-                      getStatusConfig(selectedBooking.status).bg
-                    } ${getStatusConfig(selectedBooking.status).text}`}
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${getStatusConfig(selectedBooking.status).bg
+                      } ${getStatusConfig(selectedBooking.status).text}`}
                   >
                     {getStatusConfig(selectedBooking.status).label}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-500">Booking ID</p>
-                    <p className="font-semibold">{selectedBooking.bookingNumber}</p>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">Booking ID</p>
+                    <p className="text-sm font-semibold">{selectedBooking.bookingNumber}</p>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-500">Plan</p>
-                    <p className="font-semibold">{selectedBooking.plan.name}</p>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">Plan</p>
+                    <p className="text-sm font-semibold">{selectedBooking.plan.name}</p>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-500">Start Date</p>
-                    <p className="font-semibold">{formatDate(selectedBooking.timeline.startDate)}</p>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">Start Date</p>
+                    <p className="text-sm font-semibold">{formatDate(selectedBooking.startDate || "")}</p>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-500">End Date</p>
-                    <p className="font-semibold">{formatDate(selectedBooking.timeline.endDate)}</p>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">End Date</p>
+                    <p className="text-sm font-semibold">{formatDate(selectedBooking.endDate || "")}</p>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-500">Amount</p>
-                    <p className="font-semibold text-lg">{formatCurrency(selectedBooking.plan.price)}/{selectedBooking.plan.duration}</p>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">Amount</p>
+                    <p className="text-sm font-semibold">{formatCurrency(selectedBooking.plan.price)}/{selectedBooking.plan.tenure} {selectedBooking.plan.tenureUnit}</p>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-500">City</p>
-                    <p className="font-semibold">{selectedBooking.spaceSnapshot.city}</p>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">City</p>
+                    <p className="text-sm font-semibold">{selectedBooking.spaceSnapshot?.city}</p>
                   </div>
                 </div>
 
@@ -514,11 +534,10 @@ const MyBookings: React.FC = () => {
                     <button
                       onClick={() => handleToggleAutoRenew(selectedBooking._id, selectedBooking.autoRenew)}
                       disabled={togglingAutoRenew === selectedBooking._id}
-                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                        selectedBooking.autoRenew
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-200 text-gray-600"
-                      }`}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedBooking.autoRenew
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 text-gray-600"
+                        }`}
                     >
                       {togglingAutoRenew === selectedBooking._id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />

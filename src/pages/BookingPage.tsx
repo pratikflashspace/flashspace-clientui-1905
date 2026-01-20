@@ -10,11 +10,11 @@ import { getVirtualOfficePricing, PlanDetails } from '@/utils/priceUtils';
 import { BookingPageSkeleton } from '@/components/ui/skeleton-loaders';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  createPaymentOrder, 
-  openRazorpayCheckout, 
-  verifyPayment, 
-  reportPaymentFailure 
+import {
+  createPaymentOrder,
+  openRazorpayCheckout,
+  verifyPayment,
+  reportPaymentFailure
 } from '@/services/payment.service';
 
 const BookingPage = () => {
@@ -51,16 +51,16 @@ const BookingPage = () => {
         setLoading(true);
         // Using the service to fetch fresh data from backend
         const data = await getVirtualOfficeById(id);
-        
+
         if (!data) {
           setError("Space not found");
         } else {
           setSpaceDetails(data);
-          
+
           // Calculate pricing using utility
           const pricing = getVirtualOfficePricing(data);
           if (pricing && planKeyId in pricing) {
-             // @ts-ignore - we know Key exists
+            // @ts-ignore - we know Key exists
             setSelectedPlanDetails(pricing[planKeyId as keyof typeof pricing]);
           } else {
             // Fallback if plan invalid
@@ -84,7 +84,7 @@ const BookingPage = () => {
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-grow bg-white pt-20">
-            <BookingPageSkeleton />
+          <BookingPageSkeleton />
         </main>
         <Footer />
       </div>
@@ -243,14 +243,59 @@ const BookingPage = () => {
     }
   };
 
+  const handleSimulatePayment = async () => {
+    if (!isAuthenticated || !user) {
+      toast({ title: "Login Required", description: "Please login first", variant: "destructive" });
+      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}`);
+      return;
+    }
+    if (!spaceDetails || !selectedPlanDetails) return;
+
+    try {
+      setPaymentLoading(true);
+      // Create order
+      const orderData = await createPaymentOrder({
+        userId: user.id,
+        userEmail: user.email,
+        userName: user.fullName || user.email.split('@')[0],
+        userPhone: user.phoneNumber,
+        spaceId: spaceDetails._id,
+        spaceName: spaceName,
+        planName: planName,
+        planKey: planKeyId,
+        tenure: selectedTenure,
+        yearlyPrice: yearlyPrice,
+        totalAmount: selectedOption.totalPrice,
+        discountPercent: selectedOption.savingsPercent,
+        discountAmount: selectedOption.savings,
+        paymentType: "virtual_office",
+      });
+
+      // Verify immediately (Simulated)
+      await verifyPayment({
+        razorpay_order_id: orderData.orderId,
+        razorpay_payment_id: "pay_simulated_" + Date.now(),
+        razorpay_signature: "simulated_signature",
+        devMode: true,
+      });
+
+      toast({ title: "Simulation Successful", description: "Payment simulated in DEV mode" });
+      navigate(`/payment/success?orderId=${orderData.orderId}`);
+    } catch (error: any) {
+      toast({ title: "Simulation Failed", description: error.message, variant: "destructive" });
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
       <main className="flex-grow pt-20">
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Back Button */}
-          <button 
-            onClick={() => navigate(-1)} 
+          <button
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-gray-600 hover:text-black mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -265,17 +310,16 @@ const BookingPage = () => {
             {/* LEFT: Tenure Cards */}
             <div className="lg:col-span-2">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Tenure</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {tenureOptions.map((option) => (
                   <div
                     key={option.years}
                     onClick={() => setSelectedTenure(option.years as 1 | 2 | 3)}
-                    className={`relative border-2 rounded-xl p-5 cursor-pointer transition-all duration-300 ${
-                      selectedTenure === option.years
+                    className={`relative border-2 rounded-xl p-5 cursor-pointer transition-all duration-300 ${selectedTenure === option.years
                         ? 'border-yellow-400 bg-yellow-50 shadow-lg scale-[1.02]'
                         : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
-                    }`}
+                      }`}
                   >
                     {/* Popular Badge */}
                     {option.popular && (
@@ -285,24 +329,23 @@ const BookingPage = () => {
                     )}
 
                     {/* Selection Indicator */}
-                    <div className={`absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                      selectedTenure === option.years
+                    <div className={`absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedTenure === option.years
                         ? 'border-yellow-500 bg-yellow-400'
                         : 'border-gray-300 bg-white'
-                    }`}>
+                      }`}>
                       {selectedTenure === option.years && <Check className="w-3 h-3 text-black" />}
                     </div>
 
                     <div className="mt-2">
                       <h3 className="text-xl font-bold text-gray-900 mb-1">{option.label}</h3>
-                      
+
                       <div className="mb-3">
                         <span className="text-2xl font-bold text-gray-900">₹{option.totalPrice.toLocaleString()}</span>
                         <span className="text-gray-500 text-sm"> Total</span>
                       </div>
 
                       <div className="text-sm text-gray-600 mb-3">
-                         Valid for {option.years} Year{option.years > 1 ? 's' : ''}
+                        Valid for {option.years} Year{option.years > 1 ? 's' : ''}
                       </div>
 
                       {option.savings > 0 && (
@@ -353,8 +396,8 @@ const BookingPage = () => {
               <div className="sticky top-20 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-lg">
                 {/* Space Image */}
                 <div className="relative h-40 overflow-hidden">
-                  <img 
-                    src={spaceImage || "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"} 
+                  <img
+                    src={spaceImage || "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80"}
                     alt={spaceName}
                     className="w-full h-full object-cover"
                   />
@@ -381,7 +424,7 @@ const BookingPage = () => {
                       <span className="text-gray-600">Tenure</span>
                       <span className="font-medium text-gray-900">{selectedTenure} Year{selectedTenure > 1 ? 's' : ''}</span>
                     </div>
-                    
+
                     {selectedOption.savings > 0 && (
                       <div className="flex justify-between text-green-600">
                         <span>Discount ({selectedOption.savingsPercent}%)</span>
@@ -400,7 +443,7 @@ const BookingPage = () => {
                     </div>
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={handleProceedToPayment}
                     disabled={paymentLoading}
                     className="w-full mt-6 bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
@@ -418,6 +461,16 @@ const BookingPage = () => {
                   <p className="text-center text-xs text-gray-500 mt-3">
                     By proceeding, you agree to our Terms of Service
                   </p>
+
+                  {/* DEV MODE SIMULATION BUTTON */}
+                  <Button
+                    onClick={handleSimulatePayment}
+                    disabled={paymentLoading}
+                    variant="outline"
+                    className="w-full mt-4 border-dashed border-gray-400 text-gray-600 hover:bg-gray-50"
+                  >
+                    🛠️ Simulate Successful Payment
+                  </Button>
                 </div>
               </div>
             </div>
