@@ -9,8 +9,14 @@ const BusinessExcellenceSection = () => {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.2 }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          // Once visible, we can stop observing to keep it visible
+          if (entry.target) observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.1 } // Lower threshold for better mobile detection
     );
 
     const section = document.getElementById("business-excellence");

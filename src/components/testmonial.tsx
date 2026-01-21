@@ -142,25 +142,25 @@ const TestimonialsSection = () => {
         {/* Stats */}
         <Card className={`bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 shadow-lg  ${getAnimationClasses(isVisible, 'fadeInUp', 900)}`}>
           <CardContent className="p-8">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-8 text-center">
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>5000+</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>5000+</div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Happy Clients</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>100+</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>100+</div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Cities Covered</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>10K+</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>10K+</div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Registrations Done</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>98%</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>98%</div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Satisfaction Rate</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>&lt;3days</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>&lt;3days</div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Avg Delivery Time</div>
               </div>
             </div>

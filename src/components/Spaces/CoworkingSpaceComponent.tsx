@@ -19,12 +19,10 @@ const DEFAULT_PHOTOS = [
 const CoworkingSpaceComponent = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
   // State for API data
   const [spaceDetails, setSpaceDetails] = useState<CoworkingSpaceItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
-  
   // UI State - Only monthly billing
   const [deskCount, setDeskCount] = useState(1);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -37,10 +35,10 @@ const CoworkingSpaceComponent = () => {
   useEffect(() => {
     const fetchSpaceDetails = async () => {
       if (!id) return;
-      
+
       setLoading(true);
       setError("");
-      
+
       try {
         const data = await getCoworkingSpaceById(id);
         setSpaceDetails(data);
@@ -96,6 +94,7 @@ const CoworkingSpaceComponent = () => {
 
   const handleBookNow = () => {
     if (!spaceDetails) return;
+    if (spaceDetails.availability?.toLowerCase() === 'unavailable') return;
     alert(`Booking Confirmed!\nSpace: ${spaceDetails.name}\nDesks: ${deskCount}\nTotal: ₹${getTotalPrice()}/month`);
   };
 
@@ -120,8 +119,8 @@ const CoworkingSpaceComponent = () => {
         <main className="flex-grow bg-white pt-20 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-500 text-xl mb-4">😕 {error || "Space not found"}</p>
-            <button 
-              onClick={() => navigate(-1)} 
+            <button
+              onClick={() => navigate(-1)}
               className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition"
             >
               Go Back
@@ -143,34 +142,57 @@ const CoworkingSpaceComponent = () => {
       {/* 2. Main Content Area */}
       <main className="flex-grow bg-white pt-20">
         <div className="max-w-7xl mx-auto px-4 py-10 font-poppins text-gray-800">
-          
+
           {/* --- HEADER SECTION --- */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold font-geist">{spaceDetails.name}</h1>
-              {spaceDetails.popular && (
-                <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full">🔥 Popular</span>
-              )}
-            </div>
-            <div className="flex items-center justify-between text-sm text-gray-600">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold text-black">{spaceDetails.rating}</span>
-                  <span className="underline">({spaceDetails.reviews} reviews)</span>
+          <div className="mb-6 md:mb-8">
+            {/* Back Button (Mobile) */}
+            <button
+              onClick={() => navigate(-1)}
+              className="md:hidden flex items-center gap-2 text-sm text-gray-500 mb-4 hover:text-black transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Spaces
+            </button>
+
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="text-2xl md:text-3xl font-bold font-geist leading-tight">{spaceDetails.name}</h1>
+                  {spaceDetails.popular && (
+                    <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap">🔥 Popular</span>
+                  )}
                 </div>
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  <span>{spaceDetails.address}</span>
+
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md">
+                    <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                    <span className="font-semibold text-black">{spaceDetails.rating}</span>
+                    <span className="text-gray-400">({spaceDetails.reviews} reviews)</span>
+                  </div>
+
+                  <span className="hidden sm:inline text-gray-300">•</span>
+
+                  <div className="flex items-center gap-1.5 align-middle">
+                    <MapPin className="w-4 h-4 flex-shrink-0 text-gray-500" />
+                    <span>{spaceDetails.address}</span>
+                  </div>
+
+                  {spaceDetails.type && (
+                    <>
+                      <span className="hidden sm:inline text-gray-300">•</span>
+                      <span className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full">
+                        {spaceDetails.type}
+                      </span>
+                    </>
+                  )}
                 </div>
-                {spaceDetails.type && (
-                  <span className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full">
-                    {spaceDetails.type}
-                  </span>
-                )}
               </div>
-              {/* Back Button */}
-              <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-black transition">
+
+              {/* Back Button (Desktop) */}
+              <button
+                onClick={() => navigate(-1)}
+                className="hidden md:flex items-center gap-2 text-sm text-gray-500 hover:text-black transition whitespace-nowrap"
+              >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Spaces
               </button>
@@ -180,35 +202,35 @@ const CoworkingSpaceComponent = () => {
           {/* --- PHOTO GRID --- */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[400px] mb-8 rounded-2xl overflow-hidden">
             <div className="md:col-span-2 h-full">
-              <img 
-                src={photos[0]} 
-                alt="Main Space" 
-                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+              <img
+                src={photos[0]}
+                alt="Main Space"
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                 onClick={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}
               />
             </div>
             <div className="md:col-span-1 grid grid-rows-2 gap-2 h-full">
-              <img 
-                src={photos[1]} 
-                alt="Detail 1" 
-                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+              <img
+                src={photos[1]}
+                alt="Detail 1"
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                 onClick={() => { setGalleryInitialIndex(1); setIsGalleryOpen(true); }}
               />
-              <img 
-                src={photos[2]} 
-                alt="Detail 2" 
-                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+              <img
+                src={photos[2]}
+                alt="Detail 2"
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                 onClick={() => { setGalleryInitialIndex(2); setIsGalleryOpen(true); }}
               />
             </div>
             <div className="md:col-span-1 h-full relative">
-              <img 
-                src={photos[3]} 
-                alt="Detail 3" 
-                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer" 
+              <img
+                src={photos[3]}
+                alt="Detail 3"
+                className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                 onClick={() => { setGalleryInitialIndex(3); setIsGalleryOpen(true); }}
               />
-              <button 
+              <button
                 onClick={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}
                 className="absolute bottom-4 right-4 bg-white hover:bg-gray-100 px-4 py-2 rounded-lg shadow-md text-sm font-semibold transition-colors"
               >
@@ -219,16 +241,18 @@ const CoworkingSpaceComponent = () => {
 
           {/* --- MAIN CONTENT LAYOUT --- */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            
             {/* LEFT COLUMN: Info */}
             <div className="lg:col-span-2">
               <div className="border-b pb-8 mb-8">
                 <h2 className="text-xl font-semibold mb-4 font-geist">About this coworking space</h2>
                 <p className="text-gray-600 leading-relaxed">
-                  {spaceDetails.name} is a modern coworking space located in {spaceDetails.area}, {spaceDetails.city}. 
+                  {spaceDetails.name} is a modern coworking space located in {spaceDetails.area}, {spaceDetails.city}.
                   Perfect for freelancers, startups, and remote workers looking for a productive workspace with all essential amenities.
                   {spaceDetails.availability && (
-                    <span className="block mt-2 text-green-600 font-medium">✓ {spaceDetails.availability}</span>
+                    <span className={`block mt-2 font-medium ${spaceDetails.availability === 'Unavailable' ? 'text-red-500' : 'text-green-600'
+                      }`}>
+                      {spaceDetails.availability === 'Unavailable' ? '✕ Unavailable' : `✓ ${spaceDetails.availability}`}
+                    </span>
                   )}
                 </p>
               </div>
@@ -248,11 +272,11 @@ const CoworkingSpaceComponent = () => {
               <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-4 font-geist">Where you'll be</h2>
                 <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden relative">
-                  <iframe 
-                    width="100%" 
-                    height="100%" 
-                    frameBorder="0" 
-                    style={{border:0}}
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    style={{ border: 0 }}
                     src={`https://maps.google.com/maps?q=${encodeURIComponent(spaceDetails.address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                     allowFullScreen
                     title="Space Location"
@@ -295,7 +319,7 @@ const CoworkingSpaceComponent = () => {
                       <span className="font-semibold">Number of Desks</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <button 
+                      <button
                         onClick={() => setDeskCount(Math.max(1, deskCount - 1))}
                         className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition disabled:opacity-50"
                         disabled={deskCount <= 1}
@@ -303,7 +327,7 @@ const CoworkingSpaceComponent = () => {
                         -
                       </button>
                       <span className="font-bold text-lg w-8 text-center">{deskCount}</span>
-                      <button 
+                      <button
                         onClick={() => setDeskCount(deskCount + 1)}
                         className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition"
                       >
@@ -315,7 +339,7 @@ const CoworkingSpaceComponent = () => {
 
                 {/* Date Picker */}
                 <div className="relative mb-6">
-                  <div 
+                  <div
                     onClick={() => setShowCalendar(!showCalendar)}
                     className="border rounded-lg p-3 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition"
                   >
@@ -330,7 +354,7 @@ const CoworkingSpaceComponent = () => {
                   {showCalendar && (
                     <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-56 bg-white border rounded-lg shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
                       <div className="flex items-center justify-between mb-2">
-                        <button 
+                        <button
                           onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
                           className="p-0.5 hover:bg-gray-100 rounded-full transition"
                         >
@@ -339,7 +363,7 @@ const CoworkingSpaceComponent = () => {
                         <h3 className="font-bold text-xs">
                           {currentMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                         </h3>
-                        <button 
+                        <button
                           onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
                           className="p-0.5 hover:bg-gray-100 rounded-full transition"
                         >
@@ -370,12 +394,11 @@ const CoworkingSpaceComponent = () => {
                             days.push(
                               <button
                                 key={day}
-                                onClick={() => { if (!isPast) { setSelectedDate(date); setShowCalendar(false); }}}
+                                onClick={() => { if (!isPast) { setSelectedDate(date); setShowCalendar(false); } }}
                                 disabled={isPast}
-                                className={`aspect-square flex items-center justify-center text-[11px] rounded transition ${
-                                  isSelected ? 'bg-[#FFD43B] text-black font-bold shadow-sm' : 
+                                className={`aspect-square flex items-center justify-center text-[11px] rounded transition ${isSelected ? 'bg-[#FFD43B] text-black font-bold shadow-sm' :
                                   isPast ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100 font-medium'
-                                }`}
+                                  }`}
                               >
                                 {day}
                               </button>
@@ -400,11 +423,15 @@ const CoworkingSpaceComponent = () => {
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={handleBookNow}
-                  className="w-full bg-[#FFD43B] hover:bg-[#eec635] text-black py-3 rounded-lg font-bold text-lg transition"
+                  disabled={spaceDetails.availability?.toLowerCase() === 'unavailable'}
+                  className={`w-full py-3 rounded-lg font-bold text-lg transition ${spaceDetails.availability?.toLowerCase() === 'unavailable'
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-[#FFD43B] hover:bg-[#eec635] text-black'
+                    }`}
                 >
-                  Book Now
+                  {spaceDetails.availability?.toLowerCase() === 'unavailable' ? 'Unavailable' : 'Book Now'}
                 </button>
                 <p className="text-center text-xs text-gray-400 mt-4">You won't be charged yet</p>
               </div>
@@ -416,7 +443,6 @@ const CoworkingSpaceComponent = () => {
 
       {/* 3. Footer at the bottom */}
       <Footer />
-      
       {/* Image Gallery Modal */}
       <ImageGalleryModal
         isOpen={isGalleryOpen}

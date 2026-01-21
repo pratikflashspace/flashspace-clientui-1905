@@ -1,6 +1,8 @@
 import React, { useState, useRef, MouseEvent, useEffect } from 'react';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText, UserCheck, Award, Briefcase, Quote, Search, MapPin, Clock, Building2, X, ChevronRight, Check, GraduationCap, User } from "lucide-react";
 
 // ===============================================
 // Icon Components
@@ -47,6 +49,10 @@ const styleBlock = `
   0% { transform: translateY(0) translateX(0) scale(1); opacity: .9; }
   50% { transform: translateY(-18px) translateX(6px) scale(1.03); opacity: .7; }
   100% { transform: translateY(0) translateX(0) scale(1); opacity: .9; }
+}
+
+.animate-floatUp {
+  animation: floatUp 6s ease-in-out infinite;
 }
 
 /* subtle slow rotation for background overlay */
@@ -108,83 +114,83 @@ const styleBlock = `
 // ===============================================
 // Hero Component
 // ===============================================
+// ===============================================
+// Hero Component
+// ===============================================
 const Hero: React.FC = () => {
-  const bgRef = useRef<HTMLDivElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const bg = bgRef.current;
-    if (!container || !bg) return;
-
-    const handleMove = (e: MouseEvent | globalThis.MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-      const translateX = x * 14;
-      const translateY = y * 10;
-      bg.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(1.03)`;
-    };
-
-    const handleLeave = () => {
-      if (bg) bg.style.transform = `translate3d(0, 0, 0) scale(1.03)`;
-    };
-
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseleave', handleLeave);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('mouseleave', handleLeave);
-    };
-  }, []);
-
   return (
-    <section className="relative text-white overflow-hidden min-h-screen pt-20 md:pt-24 flex items-center justify-center">
+    <section className="relative w-full min-h-screen pt-20 flex items-center bg-gradient-to-br from-[#FFFBEB] via-white to-[#F0F9FF] dark:from-[#0a0a0a] dark:via-[#111] dark:to-[#1a1a1a] overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-yellow-300/10 rounded-full blur-3xl filter -translate-y-1/2 translate-x-1/2 opacity-70 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-blue-500/5 rounded-full blur-3xl filter translate-y-1/2 -translate-x-1/2 opacity-70 pointer-events-none" />
+
+      {/* Grid Pattern Overlay (Optional for tech feel) */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
+
+      {/* Inject Styles */}
       <style>{styleBlock}</style>
-      <div className="absolute top-0 left-0 w-full h-15 cvnmd:h-15 bg-white dark:bg-black z-10" />
-      <div className="absolute inset-0 -z-0">
-        <div
-          ref={bgRef}
-          className="absolute inset-0 w-full h-full origin-center transition-transform duration-500 ease-out"
-          style={{
-            backgroundImage: `url("https://images.unsplash.com/photo-1564069114553-7215e1ff1890?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1332")`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            filter: 'brightness(0.9) saturate(0.95)',
-            transform: 'scale(1.03)',
-          }}
-        />
-        <div className="absolute inset-0 pointer-events-none" style={{ mixBlendMode: 'overlay', animation: 'slowRotate 120s linear infinite' }}>
-          <div className="absolute -left-40 -top-36 w-[36rem] h-[36rem] bg-yellow-300/12 rounded-full blur-3xl filter" />
-          <div className="absolute -right-40 -bottom-44 w-[28rem] h-[28rem] bg-pink-300/10 rounded-full blur-3xl filter" />
-        </div>
-      </div>
-      <div ref={containerRef} className="relative container mx-auto px-4 sm:px-6 lg:px-8 text-center pt-24 pb-16 md:pt-32 md:pb-20">
-        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute w-44 h-44 rounded-full bg-yellow-400/12 blur-3xl" style={{ left: '6%', top: '10%', animation: 'floatUp 8s ease-in-out infinite' }} />
-          <div className="absolute w-32 h-32 rounded-full bg-white/6 blur-2xl" style={{ right: '8%', top: '18%', animation: 'floatUp 7s ease-in-out .4s infinite' }} />
-          <div className="absolute w-24 h-24 rounded-full bg-yellow-400/10 blur-2xl" style={{ left: '50%', top: '6%', transform: 'translateX(-50%)', animation: 'floatUp 10s ease-in-out .8s infinite' }} />
-        </div>
-        <a href="#" className="inline-flex items-center bg-black/20 text-yellow-300 rounded-full px-4 py-1.5 text-sm font-semibold border border-yellow-500/50 hover:bg-black/30 transition-colors mb-4">
-          <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2 animate-pulse"></span>
-          Join Our Growing Network
-        </a>
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight hero-glow">
-          Build the Future with <br />
-          <span className="text-yellow-400">FlashSpace</span>
-        </h1>
-        <p className="mt-6 text-lg md:text-xl text-slate-300 max-w-3xl mx-auto">
-          Join India's fastest-growing workspace network and unlock limitless revenue opportunities
-        </p>
-        <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
-          <a href="#" className="bg-yellow-400 text-black font-semibold px-8 py-3 rounded-full text-lg hover:bg-yellow-500 hover:shadow-lg hover:scale-105 transition-all duration-300 ease-in-out w-full sm:w-auto btn-glow" role="button">
-            Become a Employee  &rarr;
-          </a>
-          <a href="#" className="bg-white/10 border border-white/20 text-white font-semibold px-8 py-3 rounded-full text-lg hover:bg-white/20 transition-colors w-full sm:w-auto">
-            Explore Benefits
-          </a>
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+
+          {/* Left Content */}
+          <div className="flex-1 text-center lg:text-left pt-10 lg:pt-0">
+            <div className="inline-flex items-center bg-yellow-400/10 text-yellow-600 dark:text-yellow-400 rounded-full px-4 py-1.5 text-sm font-semibold border border-yellow-400/20 mb-6 backdrop-blur-sm">
+              <span className="w-2 h-2 bg-yellow-500 rounded-full mr-2 animate-pulse"></span>
+              Join Our Growing Network
+            </div>
+
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-slate-900 dark:text-white mb-6">
+              Build the Future with <br />
+              <span className="text-yellow-400 relative inline-block">
+                FlashSpace
+                {/* Underline svg */}
+                <svg className="absolute w-full h-3 -bottom-2 left-0 text-yellow-300 opacity-60" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.7501 2.49994 132.5 -3.50004 198 4.99997" stroke="currentColor" strokeWidth="3" /></svg>
+              </span>
+            </h1>
+
+            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              Join India's fastest-growing workspace network and unlock limitless revenue opportunities. Work where innovation meets community.
+            </p>
+
+            <div className="flex flex-col sm:flex-row justify-center lg:justify-start items-center gap-4">
+              <a href="#" className="bg-yellow-400 text-black font-bold px-8 py-3.5 rounded-full text-lg hover:bg-yellow-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto flex items-center justify-center gap-2">
+                View Openings <ArrowTrendingUpIcon className="w-5 h-5" />
+              </a>
+              <a href="#" className="px-8 py-3.5 rounded-full text-lg font-semibold text-slate-700 dark:text-white border border-slate-300 dark:border-white/20 hover:bg-slate-50 dark:hover:bg-white/10 transition-all w-full sm:w-auto">
+                Life at FlashSpace
+              </a>
+            </div>
+          </div>
+
+          {/* Right Image */}
+          <div className="flex-1 relative w-full max-w-lg lg:max-w-none">
+            <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white/50 dark:border-white/10 rotate-1 hover:rotate-0 transition-all duration-500">
+              <img
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200"
+                alt="FlashSpace Team"
+                className="w-full h-auto object-cover transform scale-105 hover:scale-110 transition-transform duration-700 block"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+            </div>
+
+            {/* Floating Stats Card - Bottom Left */}
+            <div className="absolute -bottom-8 -left-8 md:-left-12 bg-white dark:bg-[#1a1a1a] p-4 pr-8 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 dark:border-white/5 flex items-center gap-4 animate-floatUp hidden md:flex">
+              <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-full text-yellow-600 dark:text-yellow-400">
+                <UsersIcon className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Family</p>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">500+ <span className="text-sm font-normal text-slate-500">Members</span></p>
+              </div>
+            </div>
+
+            {/* Floating Badge - Top Right */}
+            <div className="absolute -top-6 -right-6 bg-white dark:bg-[#1a1a1a] p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-white/5 hidden md:block animate-floatUp" style={{ animationDelay: '1s' }}>
+              <span className="text-4xl">🚀</span>
+            </div>
+
+          </div>
         </div>
       </div>
     </section>
@@ -269,7 +275,7 @@ const Stats: React.FC = () => {
   ];
 
   return (
-    <section className="bg-[#0a0a0a] relative py-20">
+    <section className="relative py-20 bg-gradient-to-b from-white to-slate-50 dark:from-[#0a0a0a] dark:to-[#111] transition-colors duration-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
           {stats.map((stat, index) => (
@@ -284,48 +290,63 @@ const Stats: React.FC = () => {
 // ===============================================
 // WhyPartner Component
 // ===============================================
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => (
-  <div className="relative bg-slate-50/80 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-6 transition-all duration-300 border border-slate-200/50 dark:border-white/10 hover:border-flash-yellow hover:shadow-xl hover:shadow-yellow-500/20 hover:-translate-y-2">
-    <div className="card-sheen" />
-    <div className="bg-yellow-100 text-flash-yellow rounded-xl p-3 inline-block mb-4">
-      {icon}
-    </div>
-    <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">{title}</h3>
-    <p className="text-slate-600 dark:text-gray-300">{description}</p>
-  </div>
-);
-
 const WhyPartner: React.FC = () => {
   const features = [
-    { icon: <ArrowTrendingUpIcon className="w-7 h-7" />, title: 'Career Growth', description: 'We invest in your professional development with continuous learning opportunities and clear paths for advancement.' },
-    { icon: <BanknotesIcon className="w-7 h-7" />, title: 'Competitive Compensation', description: 'We offer a competitive salary package, comprehensive benefits, and performance-based bonuses.' },
-    { icon: <LifebuoyIcon className="w-7 h-7" />, title: 'Supportive Culture', description: 'Join a collaborative and inclusive team where your ideas are valued and your well-being is a priority.' },
-    { icon: <ChartBarIcon className="w-7 h-7" />, title: 'Impactful Work', description: 'Contribute to innovative projects that are shaping the future of workspaces and see your impact in real-time.' },
-    { icon: <UserGroupIcon className="w-7 h-7" />, title: 'Collaborative Team', description: 'Work alongside talented and passionate individuals in a dynamic, team-oriented environment.' },
-    { icon: <BoltIcon className="w-7 h-7" />, title: 'Innovative Environment', description: 'Thrive in a fast-paced setting where you can challenge the status quo and drive meaningful change.' },
+    { icon: ArrowTrendingUpIcon, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-500/10", title: 'Career Growth', description: 'We invest in your professional development with continuous learning opportunities and clear paths for advancement.' },
+    { icon: BanknotesIcon, color: "text-green-600 dark:text-green-400", bg: "bg-green-50 dark:bg-green-500/10", title: 'Competitive Compensation', description: 'We offer a competitive salary package, comprehensive benefits, and performance-based bonuses.' },
+    { icon: LifebuoyIcon, color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-50 dark:bg-purple-500/10", title: 'Supportive Culture', description: 'Join a collaborative and inclusive team where your ideas are valued and your well-being is a priority.' },
+    { icon: ChartBarIcon, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-500/10", title: 'Impactful Work', description: 'Contribute to innovative projects that are shaping the future of workspaces and see your impact in real-time.' },
+    { icon: UserGroupIcon, color: "text-pink-600 dark:text-pink-400", bg: "bg-pink-50 dark:bg-pink-500/10", title: 'Collaborative Team', description: 'Work alongside talented and passionate individuals in a dynamic, team-oriented environment.' },
+    { icon: BoltIcon, color: "text-yellow-600 dark:text-yellow-400", bg: "bg-yellow-50 dark:bg-yellow-500/10", title: 'Innovative Environment', description: 'Thrive in a fast-paced setting where you can challenge the status quo and drive meaningful change.' },
   ];
 
   return (
-    <section className="relative overflow-hidden py-16 md:py-24 bg-white dark:bg-[#0a0a0a]">
-      <div className="absolute -top-48 -right-48 w-[40rem] h-[40rem] bg-yellow-300/20 rounded-full blur-3xl filter" aria-hidden="true"></div>
-      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">
+    <section className="relative overflow-hidden py-24 bg-slate-50 dark:bg-[#050505] transition-colors duration-300">
+      {/* Decorative Blobs */}
+      <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-yellow-400/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[40rem] h-[40rem] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 z-10">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white"
+          >
             Why Careers with <span className="text-yellow-400">FlashSpace?</span>
-          </h2>
-          <p className="mt-4 text-lg text-slate-600 dark:text-gray-300">
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mt-6 text-xl text-slate-600 dark:text-slate-400"
+          >
             Join a team that's redefining the future of work. We're looking for passionate individuals to grow with us.
-          </p>
+          </motion.p>
         </div>
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} />
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="group relative bg-white dark:bg-[#111] rounded-[2rem] p-8 shadow-lg hover:shadow-2xl hover:shadow-yellow-400/10 transition-all duration-300 hover:-translate-y-2 border border-slate-100 dark:border-white/5 overflow-hidden"
+            >
+              {/* Top Border Gradient */}
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              <div className={`mb-6 ${feature.color} group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
+                <feature.icon className="w-12 h-12 drop-shadow-md" />
+              </div>
+
+              <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-yellow-500 transition-colors">{feature.title}</h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-lg">{feature.description}</p>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -337,39 +358,72 @@ const WhyPartner: React.FC = () => {
 // HowItWorks Component
 // ===============================================
 const howItWorksSteps = [
-  { emoji: "📝", title: "Submit Your Job Application", description: "Fill out our simple application form with your details and resume to get started.", step: "01" },
-  { emoji: "🤝", title: "Get Verification & Interview", description: "Our HR team will review your application and schedule an interview if you're a good fit.", step: "02" },
-  { emoji: "🎉", title: "Got Offer Letter", description: "If successful, you'll receive an offer letter detailing your role, compensation, and benefits.", step: "03" },
-  { emoji: "💼", title: "Join FlashSpace", description: "Welcome aboard! Begin your journey with us and start making an impact from day one.", step: "04" },
+  { icon: FileText, title: "Submit Application", description: "Fill out our simple application form with your details and resume.", step: "01" },
+  { icon: UserCheck, title: "Verification & Interview", description: "Our HR team reviews your profile and schedules a discussion.", step: "02" },
+  { icon: Award, title: "Receive Offer", description: "Get a competitive offer letter detailing your role and benefits.", step: "03" },
+  { icon: Briefcase, title: "Join FlashSpace", description: "Welcome to the team! Start your journey and make an impact.", step: "04" },
 ];
 
 const HowItWorks: React.FC = () => {
   return (
-    <section className="py-16 md:py-24 bg-slate-100/70 dark:bg-black/50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-800 dark:text-white">
+    <section className="py-24 bg-slate-50 dark:bg-[#080808] relative overflow-hidden">
+      {/* Background Line */}
+      <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent hidden lg:block" />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-20">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-5xl font-bold mb-4 text-slate-900 dark:text-white"
+          >
             How to work in <span className="text-yellow-400">FlashSpace</span>
-          </h2>
-          <p className="text-lg text-slate-600 dark:text-gray-300 max-w-3xl mx-auto">
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-lg text-slate-600 dark:text-gray-300 max-w-2xl mx-auto"
+          >
             Joining FlashSpace is simple. Follow these four easy steps to start your career with us.
-          </p>
+          </motion.p>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 max-w-7xl mx-auto relative">
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {howItWorksSteps.map((step, index) => (
-            <div key={step.title} className="relative">
-              {index < howItWorksSteps.length - 1 && (
-                <div className="hidden lg:block absolute top-16 left-1/2 w-full h-0.5 bg-yellow-300/70 -z-0" style={{ transform: 'translateX(1.5rem)' }} />
-              )}
-              <div className="bg-white dark:bg-[#1f1f1f] p-8 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-slate-200 dark:border-white/10 h-full relative z-10 preserve-3d">
-                <div className="text-6xl font-bold text-flash-yellow/20 mb-4">{step.step}</div>
-                <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/40 rounded-xl flex items-center justify-center mb-5">
-                  <span className="text-4xl" role="img" aria-label={step.title}>{step.emoji}</span>
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.15 }}
+              className="relative group"
+            >
+              <div className="bg-white dark:bg-[#151515] p-8 rounded-[2rem] shadow-xl border border-slate-100 dark:border-white/5 hover:border-yellow-400 transition-all duration-300 h-full flex flex-col items-center text-center relative overflow-hidden group-hover:-translate-y-2">
+
+                {/* Large Watermark Number */}
+                <span className="absolute -right-4 -top-6 text-[8rem] font-bold text-slate-100 dark:text-white/10 pointer-events-none transition-colors group-hover:text-yellow-400/10">
+                  {step.step}
+                </span>
+
+                {/* Icon Container */}
+                <div className="w-20 h-20 rounded-2xl bg-yellow-400/10 text-yellow-500 mb-6 flex items-center justify-center group-hover:scale-110 group-hover:bg-yellow-400 group-hover:text-black transition-all duration-300 shadow-sm relative z-10">
+                  <step.icon className="w-10 h-10" strokeWidth={1.5} />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-slate-800 dark:text-white">{step.title}</h3>
-                <p className="text-slate-600 dark:text-gray-300 leading-relaxed">{step.description}</p>
+
+                <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white relative z-10">{step.title}</h3>
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm relative z-10 font-medium">
+                  {step.description}
+                </p>
+
+                {/* Process Indicator (Mobile only) */}
+                <div className="lg:hidden absolute bottom-4 w-12 h-1 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden">
+                  <div className="h-full bg-yellow-400 w-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+                </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -380,50 +434,110 @@ const HowItWorks: React.FC = () => {
 // ===============================================
 // SuccessStories Component
 // ===============================================
+// ===============================================
+// SuccessStories Component
+// ===============================================
 interface Testimonial {
   quote: string;
   name: string;
   role: string;
   location: string;
-  revenue: string;
+  initials: string;
 }
-
-const QuoteIcon = () => (
-  <svg width="60" height="46" viewBox="0 0 60 46" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute top-6 right-6 text-slate-200/80">
-    <path d="M59.25 23.375C59.25 34.625 51.5 45.125 38 45.125C24.5 45.125 14.25 34.875 14.25 22.875C14.25 10.875 25.25 0.875 38.75 0.875C42.25 0.875 45.5 1.625 48.25 3.125L44.75 10.375C43 9.875 41 9.625 38.75 9.625C30.25 9.625 23.5 15.625 23.5 23.125C23.5 30.625 29.5 36.375 37.25 36.375C44.75 36.375 50.5 30.375 50.5 22.875L50.5 18.125H38.75V9.125H59.25V23.375ZM20.5 23.375C20.5 34.625 12.75 45.125 -0.75 45.125C-14.25 45.125 -24.5 34.875 -24.5 22.875C-24.5 10.875 -13.5 0.875 0 0.875C3.5 0.875 6.75 1.625 9.5 3.125L6 10.375C4.25 9.875 2.25 9.625 0 9.625C-8.5 9.625 -15.25 15.625 -15.25 23.125C-15.25 30.625 -9.25 36.375 -1.5 36.375C6 36.375 11.75 30.375 11.75 22.875L11.75 18.125H-0.75V9.125H20.5V23.375Z" fill="currentColor" />
-  </svg>
-);
-
-const TestimonialCard: React.FC<Testimonial> = ({ quote, name, role, location, revenue }) => (
-  <div className="bg-slate-50/80 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-8 pt-10 border border-slate-200/50 dark:border-white/10 relative transition-all duration-300 hover:border-flash-yellow hover:shadow-xl hover:shadow-yellow-500/20 hover:-translate-y-2">
-    <div className="absolute top-0 -mt-4 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400 text-sm font-semibold px-3 py-1.5 rounded-full">{revenue}</div>
-    <QuoteIcon />
-    <p className="relative z-10 text-slate-600 dark:text-gray-300 mb-6">"{quote}"</p>
-    <div>
-      <p className="font-semibold text-slate-900 dark:text-white">{name}</p>
-      <p className="text-sm text-slate-500 dark:text-gray-400">{role}, {location}</p>
-    </div>
-  </div>
-);
 
 const SuccessStories: React.FC = () => {
   const testimonials: Testimonial[] = [
-    { quote: "Joining FlashSpace as a junior developer was a career-defining move. The mentorship is incredible.", name: "Rajesh Kumar", role: "Software Engineer", location: "Mumbai", revenue: "₹5L+/Year" },
-    { quote: "The work culture at FlashSpace is truly supportive and collaborative. My ideas are always heard.", name: "Priya Sharma", role: "Marketing Manager", location: "Bangalore", revenue: "₹8L+/Year" },
-    { quote: "I've had the opportunity to lead projects that are genuinely shaping the future of work.", name: "Amit Patel", role: "Product Lead", location: "Delhi", revenue: "₹12L+/Year" },
+    {
+      quote: "Joining FlashSpace as a junior developer was a career-defining move. The mentorship is incredible and the growth opportunities are limitless.",
+      name: "Rajesh Kumar",
+      role: "Senior Software Engineer",
+      location: "Mumbai HQ",
+      initials: "RK"
+    },
+    {
+      quote: "The work culture at FlashSpace is truly supportive. My ideas are always heard, and I've been given the freedom to lead impactful projects.",
+      name: "Priya Sharma",
+      role: "Head of Marketing",
+      location: "Bangalore Hub",
+      initials: "PS"
+    },
+    {
+      quote: "I've witnessed the company grow from a startup to a nationwide network. Being part of this journey has been the most rewarding experience of my life.",
+      name: "Amit Patel",
+      role: "VP of Operations",
+      location: "Delhi NCR",
+      initials: "AP"
+    },
   ];
 
   return (
-    <section className="relative overflow-hidden py-16 md:py-24 bg-white dark:bg-[#0a0a0a]">
-      <div className="absolute -bottom-48 -right-48 w-[40rem] h-[40rem] bg-yellow-300/20 rounded-full blur-3xl filter" aria-hidden="true"></div>
-      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">Success <span className="text-yellow-400">Stories</span></h2>
-          <p className="mt-4 text-lg text-slate-600 dark:text-gray-300">Read stories from our team members about their growth, experiences, and journey at FlashSpace.</p>
+    <section className="relative overflow-hidden py-24 bg-white dark:bg-[#0a0a0a]">
+      {/* Background Decoration */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-yellow-400/5 rounded-full blur-[80px]" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px]" />
+      </div>
+
+      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 z-10">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white"
+          >
+            Success <span className="text-yellow-400">Stories</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mt-6 text-xl text-slate-600 dark:text-slate-400"
+          >
+            Hear from our team members about their growth, experiences, and journey at FlashSpace.
+          </motion.p>
         </div>
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <TestimonialCard key={index} {...testimonial} />
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.15 }}
+              className="group relative bg-slate-50 dark:bg-[#111] rounded-[2rem] p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-yellow-400/10 border border-slate-100 dark:border-white/5"
+            >
+              {/* Quote Icon */}
+              <div className="absolute top-8 right-8 text-yellow-400/20 group-hover:text-yellow-400/40 transition-colors">
+                <Quote size={48} strokeWidth={1} fill="currentColor" />
+              </div>
+
+              {/* Initials Avatar */}
+              <div className="relative mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl font-bold text-white">{testimonial.initials}</span>
+                </div>
+              </div>
+
+              {/* Content */}
+              <p className="relative z-10 text-slate-600 dark:text-slate-300 mb-6 leading-relaxed italic">
+                "{testimonial.quote}"
+              </p>
+
+              <div>
+                <h4 className="font-bold text-lg text-slate-900 dark:text-white group-hover:text-yellow-500 transition-colors">
+                  {testimonial.name}
+                </h4>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-500">
+                  {testimonial.role}
+                </p>
+                <p className="text-xs text-slate-400 dark:text-slate-600 mt-1">
+                  📍 {testimonial.location}
+                </p>
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -462,17 +576,21 @@ const jobs: Job[] = [
 // =========================
 // OPEN POSITIONS COMPONENT
 // =========================
+// =========================
+// OPEN POSITIONS COMPONENT
+// =========================
 const OpenPositions: React.FC = () => {
   const [search, setSearch] = useState("");
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [showApply, setShowApply] = useState(false);
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form State for Validation
+  // Form State
   const [formData, setFormData] = useState({
-    fullName: '', dob: '', gender: '', contact: '', email: '', currentAddress: '', permanentAddress: '', nationality: '',
-    degree: '', major: '', institute: '', location: '', startDate: '', completionDate: '', status: '', cgpa: '',
-    jobTitle: '', company: '', expStartDate: '', expEndDate: '', responsibilities: '', skills: ''
+    fullName: '', email: '', phone: '', portfolio: '', linkedin: '',
+    currentRole: '', currentCompany: '', experienceYears: '', noticePeriod: '',
+    primarySkills: '', secondarySkills: '', coverLetter: '', resume: null
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -485,62 +603,27 @@ const OpenPositions: React.FC = () => {
     setShowApply(false);
     setStep(1);
     setFormData({
-      fullName: '', dob: '', gender: '', contact: '', email: '', currentAddress: '', permanentAddress: '', nationality: '',
-      degree: '', major: '', institute: '', location: '', startDate: '', completionDate: '', status: '', cgpa: '',
-      jobTitle: '', company: '', expStartDate: '', expEndDate: '', responsibilities: '', skills: ''
+      fullName: '', email: '', phone: '', portfolio: '', linkedin: '',
+      currentRole: '', currentCompany: '', experienceYears: '', noticePeriod: '',
+      primarySkills: '', secondarySkills: '', coverLetter: '', resume: null
     });
   };
 
-  // Validation
-  const validateStep = (currentStep: number) => {
-    let missingFields = [];
-    if (currentStep === 1) {
-      if (!formData.fullName) missingFields.push("Full Name");
-      if (!formData.dob) missingFields.push("Date of Birth");
-      if (!formData.gender) missingFields.push("Gender");
-      if (!formData.contact) missingFields.push("Contact Number");
-      if (!formData.email) missingFields.push("Email");
-      if (!formData.currentAddress) missingFields.push("Current Address");
-      if (!formData.permanentAddress) missingFields.push("Permanent Address");
-      if (!formData.nationality) missingFields.push("Nationality");
-    } else if (currentStep === 2) {
-      if (!formData.degree) missingFields.push("Degree");
-      if (!formData.major) missingFields.push("Major");
-      if (!formData.institute) missingFields.push("Institute Name");
-      if (!formData.location) missingFields.push("Institute Location");
-      if (!formData.status) missingFields.push("Current Status");
-      if (!formData.cgpa) missingFields.push("Percentage/CGPA");
-    } else if (currentStep === 3) {
-      if (!formData.jobTitle) missingFields.push("Job Title");
-      if (!formData.company) missingFields.push("Company Name");
-      if (!formData.responsibilities) missingFields.push("Responsibilities");
-      if (!formData.skills) missingFields.push("Skills");
-    }
-
-    if (missingFields.length > 0) {
-      alert(`Please fill the following required fields:\n\n- ${missingFields.join("\n- ")}`);
-      return false;
-    }
-    return true;
-  };
-
-  const handleNextStep = () => {
-    if (validateStep(step)) setStep(step + 1);
-  };
+  const handleNextStep = () => setStep(prev => prev + 1);
+  const handlePrevStep = () => setStep(prev => prev - 1);
 
   const handleSubmitApp = () => {
-    if (validateStep(step)) {
-      alert("Application Submitted Successfully!");
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      alert("Application Submitted Successfully! Good luck.");
       closeAll();
-    }
+    }, 2000);
   };
 
   useEffect(() => {
-    if (selectedJob || showApply) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    if (selectedJob || showApply) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = 'unset';
     return () => { document.body.style.overflow = 'unset'; };
   }, [selectedJob, showApply]);
 
@@ -549,241 +632,242 @@ const OpenPositions: React.FC = () => {
   );
 
   return (
-    <section className="relative overflow-hidden py-20 bg-slate-100/70 dark:bg-black/50">
-      <div className="container mx-auto px-4">
+    <section className="relative overflow-hidden py-20 bg-slate-50 dark:bg-[#050505]">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
-        <div className="text-center max-w-3xl mx-auto mb-10">
+        <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">Open <span className="text-yellow-400">Positions</span></h2>
-          <p className="mt-4 text-lg text-slate-600 dark:text-gray-300">Search and apply for roles at FlashSpace.</p>
+          <p className="mt-4 text-lg text-slate-600 dark:text-gray-300">Find your dream role and help us build the future of workspaces.</p>
         </div>
 
-        {/* SEARCH BAR SECTION */}
-        <div className="max-w-7xl mx-auto mb-12">
-          <label className="block text-lg font-semibold text-slate-700 dark:text-slate-300 mb-3 ml-2">Search Jobs</label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-              <SearchIcon className="text-slate-400 text-xl" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search by Job Title, Department, or Location..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 rounded-2xl border border-slate-300 dark:border-white/20 bg-white dark:bg-black/50 focus:ring-4 focus:ring-yellow-400/30 focus:border-yellow-400 shadow-sm text-slate-700 dark:text-white text-lg transition-all"
-            />
+        {/* SEARCH BAR */}
+        <div className="max-w-4xl mx-auto mb-16 relative">
+          <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+            <Search className="text-slate-400 w-6 h-6" />
           </div>
+          <input
+            type="text"
+            placeholder="Search by role, department, or location..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-16 pr-6 py-5 rounded-full border-2 border-slate-200 dark:border-white/10 bg-white dark:bg-[#111] focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 shadow-xl text-slate-700 dark:text-white text-lg transition-all"
+          />
         </div>
 
-        {/* WIDER JOB CARD CONTAINER (max-w-7xl) */}
-        <div className="space-y-6 mx-auto max-w-7xl">
+        {/* JOBS GRID */}
+        <div className="space-y-6 max-w-5xl mx-auto">
           {filteredJobs.map((job) => (
-            <div
+            <motion.div
+              layout
               key={job.id}
               onClick={() => setSelectedJob(job)}
-              className="relative group w-full p-8 bg-white dark:bg-[#1f1f1f] border border-slate-200 dark:border-white/10 border-b-4 border-b-slate-200 dark:border-b-white/10 rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1 hover:border-b-yellow-400 dark:hover:border-b-yellow-400 transition-all duration-300 cursor-pointer overflow-hidden"
+              className="group relative bg-white dark:bg-[#111] rounded-[2rem] p-8 border border-slate-100 dark:border-white/5 hover:border-yellow-400 dark:hover:border-yellow-400 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer overflow-hidden"
             >
-              {/* Hover Background Gradient Reveal */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-yellow-50/40 dark:to-yellow-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6 justify-between relative z-10">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                      {job.department}
+                    </span>
+                    {job.type === 'Internship' && (
+                      <span className="px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-300">Internship</span>
+                    )}
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white group-hover:text-yellow-500 transition-colors mb-2">
+                    {job.title}
+                  </h3>
+                  <div className="flex flex-wrap gap-4 text-sm text-slate-500 dark:text-slate-400 font-medium">
+                    <span className="flex items-center gap-1.5"><MapPin size={16} /> {job.location}</span>
+                    <span className="flex items-center gap-1.5"><Clock size={16} /> {job.type}</span>
+                    <span className="flex items-center gap-1.5"><Building2 size={16} /> On-site</span>
+                  </div>
+                </div>
 
-              {/* Job ID - Moved down, Bold, Uppercase, Black Text */}
-              <span className="absolute top-8 right-10 font-bold text-black dark:text-white text-xs tracking-wider uppercase">
-                Job ID: {job.id}
-              </span>
-
-              <h3 className="text-2xl font-bold text-slate-800 dark:text-white group-hover:text-black dark:group-hover:text-white transition-colors">{job.title}</h3>
-
-              {/* Badges */}
-              <div className="mt-4 flex flex-wrap gap-3 text-sm font-bold">
-                <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
-                  <BuildingOfficeIcon className="w-4 h-4" /> {job.department}
-                </span>
-                <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 shadow-sm">
-                  <ClockIcon className="w-4 h-4" /> {job.type}
-                </span>
-                <span className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
-                  <MapPinIcon className="w-4 h-4" /> {job.location}
-                </span>
+                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center group-hover:bg-yellow-400 group-hover:text-black transition-colors flex-shrink-0">
+                  <ChevronRight size={24} />
+                </div>
               </div>
-
-              <p className="mt-4 text-slate-600 text-lg leading-relaxed">{job.description}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
 
-        {filteredJobs.length === 0 && <p className="text-center text-slate-500 mt-6">No jobs match your search.</p>}
+        {filteredJobs.length === 0 && <p className="text-center text-slate-500 text-xl py-20">No matching jobs found.</p>}
       </div>
 
-      {/* FULL SCREEN JOB DETAILS */}
-      {selectedJob && !showApply && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex justify-center items-start pt-10 overflow-y-auto custom-scrollbar">
-          <div className="bg-white dark:bg-[#1f1f1f] w-full max-w-3xl rounded-2xl p-8 relative mt-10 mb-10 shadow-2xl transition-colors duration-300">
-            <button onClick={closeAll} className="absolute top-4 right-4 text-3xl text-slate-500 hover:text-black dark:hover:text-white">&times;</button>
-            <h1 className="text-3xl font-bold mb-1 text-slate-900 dark:text-white">{selectedJob.title}</h1>
-            <p className="text-sm text-slate-500 dark:text-gray-400 mb-4 font-bold">JOB ID: {selectedJob.id}</p>
-            <div className="flex flex-wrap gap-2 mb-6">
-              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-gray-200 text-sm font-medium border border-slate-200 dark:border-white/10">{selectedJob.department}</span>
-              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-gray-200 text-sm font-medium border border-slate-200 dark:border-white/10">{selectedJob.type}</span>
-              <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-gray-200 text-sm font-medium border border-slate-200 dark:border-white/10">{selectedJob.location}</span>
-            </div>
-            <div className="space-y-8">
-              <div><h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Job Description</h3><p className="text-slate-700 dark:text-gray-300">{selectedJob.description}</p></div>
-              <div><h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Requirements</h3><ul className="list-disc pl-5 text-slate-700 dark:text-gray-300 space-y-1"><li>Strong communication & teamwork skills</li><li>Ability to work in a fast-paced environment</li><li>Role-specific technical skills</li></ul></div>
-              <div><h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">Qualifications</h3><ul className="list-disc pl-5 text-slate-700 dark:text-gray-300 space-y-1"><li>Bachelor's degree or relevant experience</li><li>Strong problem-solving ability</li></ul></div>
-            </div>
-            <button onClick={() => setShowApply(true)} className="mt-10 bg-yellow-400 text-black font-semibold px-8 py-3 rounded-full hover:bg-yellow-500 hover:shadow-lg hover:scale-105 transition-all">Apply Now →</button>
-          </div>
-        </div>
-      )}
+      {/* JOB DETAILS MODAL */}
+      <AnimatePresence>
+        {selectedJob && !showApply && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex justify-center items-center p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-[#111] w-full max-w-3xl rounded-[2.5rem] p-8 md:p-12 relative shadow-2xl overflow-hidden"
+            >
+              <button onClick={closeAll} className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-red-500 hover:text-white transition-colors">
+                <X size={24} />
+              </button>
 
-      {/* FULL SCREEN APPLY FORM */}
-      {showApply && (
-        <div className="fixed inset-0 z-[999] bg-white dark:bg-[#0a0a0a] overflow-y-scroll custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
-          <div className="max-w-4xl mx-auto px-6 py-10 min-h-screen">
-            <button onClick={closeAll} className="text-3xl text-slate-600 dark:text-gray-300 absolute top-6 right-8 hover:text-black dark:hover:text-white transition">&times;</button>
-            <h2 className="text-4xl font-bold mb-2 text-slate-800 dark:text-white">Apply for <span className="text-yellow-400">{selectedJob?.title}</span></h2>
-            <p className="text-slate-500 dark:text-gray-400 mb-10 font-bold">JOB ID: {selectedJob?.id}</p>
-
-            <div className="flex gap-4 mb-10">
-              <div className={`flex-1 py-3 text-center rounded-xl font-semibold transition-all ${step === 1 ? "bg-yellow-300 shadow-md scale-105" : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-gray-400"}`}>Personal Details</div>
-              <div className={`flex-1 py-3 text-center rounded-xl font-semibold transition-all ${step === 2 ? "bg-yellow-300 shadow-md scale-105" : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-gray-400"}`}>Qualification</div>
-              <div className={`flex-1 py-3 text-center rounded-xl font-semibold transition-all ${step === 3 ? "bg-yellow-300 shadow-md scale-105" : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-gray-400"}`}>Experience</div>
-            </div>
-
-            {/* STEP 1 */}
-            {step === 1 && (
-              <div className="space-y-6 animate-fade-in-fast">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Full Name <span className="text-red-500">*</span></label>
-                  <input name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Enter your full name" />
-                </div>
-                <div className="flex gap-4">
-                  <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Date of Birth <span className="text-red-500">*</span></label>
-                    <input type="date" name="dob" value={formData.dob} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white dark:fill-white" />
-                  </div>
-                  <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Gender <span className="text-red-500">*</span></label>
-                    <select name="gender" value={formData.gender} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white">
-                      <option value="">Select Gender</option><option>Male</option><option>Female</option><option>Other</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Contact Number <span className="text-red-500">*</span></label>
-                  <input name="contact" value={formData.contact} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Enter phone number" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Email Address <span className="text-red-500">*</span></label>
-                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Enter email address" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Current Address <span className="text-red-500">*</span></label>
-                  <textarea name="currentAddress" value={formData.currentAddress} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Full address with city, state, pin code"></textarea>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Permanent Address <span className="text-red-500">*</span></label>
-                  <textarea name="permanentAddress" value={formData.permanentAddress} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="If same as current address, type SAME"></textarea>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Nationality <span className="text-red-500">*</span></label>
-                  <input name="nationality" value={formData.nationality} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Indian / Other" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Photo (Optional)</label>
-                  <input type="file" className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" />
-                </div>
-                <button onClick={handleNextStep} className="w-full bg-yellow-400 py-3 rounded-xl font-semibold hover:bg-yellow-500 hover:shadow-lg transition-all">Next →</button>
-              </div>
-            )}
-
-            {/* STEP 2 */}
-            {step === 2 && (
-              <div className="space-y-6 animate-fade-in-fast">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Degree / Qualification <span className="text-red-500">*</span></label>
-                  <input name="degree" value={formData.degree} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="B.Tech / BCA / B.Sc / Diploma" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Major / Field of Study <span className="text-red-500">*</span></label>
-                  <input name="major" value={formData.major} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Computer Science, IT, Marketing, etc." />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">University / Institute Name <span className="text-red-500">*</span></label>
-                  <input name="institute" value={formData.institute} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Enter institute name" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Institute Location <span className="text-red-500">*</span></label>
-                  <input name="location" value={formData.location} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="City, State, Country" />
-                </div>
-                <div className="flex gap-4">
-                  <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Start Date</label>
-                    <input type="month" name="startDate" value={formData.startDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white dark:fill-white" />
-                  </div>
-                  <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Completion Date</label>
-                    <input type="month" name="completionDate" value={formData.completionDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white dark:fill-white" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Current Status <span className="text-red-500">*</span></label>
-                  <select name="status" value={formData.status} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white">
-                    <option value="">Select Status</option><option>Completed</option><option>Pursuing</option><option>Dropped</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Percentage / CGPA <span className="text-red-500">*</span></label>
-                  <input name="cgpa" value={formData.cgpa} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="8.2 CGPA / 85%" />
-                </div>
-                <div className="flex justify-between">
-                  <button onClick={() => setStep(1)} className="px-6 py-2 bg-slate-200 dark:bg-white/10 dark:text-white rounded-xl hover:bg-slate-300 dark:hover:bg-white/20 transition">← Back</button>
-                  <button onClick={handleNextStep} className="px-6 py-2 bg-yellow-400 rounded-xl hover:bg-yellow-500 hover:shadow-lg transition">Next →</button>
+              <div className="mb-8">
+                <span className="text-yellow-500 font-bold tracking-widest text-sm uppercase mb-2 block">Job ID: {selectedJob.id}</span>
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">{selectedJob.title}</h2>
+                <div className="flex flex-wrap gap-3">
+                  <span className="px-4 py-1.5 rounded-full border border-slate-200 dark:border-white/20 text-slate-600 dark:text-slate-300 text-sm font-medium">{selectedJob.department}</span>
+                  <span className="px-4 py-1.5 rounded-full border border-slate-200 dark:border-white/20 text-slate-600 dark:text-slate-300 text-sm font-medium">{selectedJob.location}</span>
+                  <span className="px-4 py-1.5 rounded-full border border-slate-200 dark:border-white/20 text-slate-600 dark:text-slate-300 text-sm font-medium">{selectedJob.type}</span>
                 </div>
               </div>
-            )}
 
-            {/* STEP 3 */}
-            {step === 3 && (
-              <div className="space-y-6 animate-fade-in-fast">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Job Title <span className="text-red-500">*</span></label>
-                  <input name="jobTitle" value={formData.jobTitle} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Data Analyst Intern, Developer, etc." />
+              <div className="space-y-8 mb-10 text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-h-[40vh] overflow-y-auto pr-4 custom-scrollbar">
+                <div>
+                  <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-3">About the Role</h4>
+                  <p>{selectedJob.description}</p>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Company / Organization Name <span className="text-red-500">*</span></label>
-                  <input name="company" value={formData.company} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Enter company name" />
-                </div>
-                <div className="flex gap-4">
-                  <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Start Date</label>
-                    <input type="month" name="expStartDate" value={formData.expStartDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white dark:fill-white" />
-                  </div>
-                  <div className="space-y-2 w-full">
-                    <label className="text-sm font-medium text-slate-700 dark:text-gray-300">End Date / Present</label>
-                    <input type="month" name="expEndDate" value={formData.expEndDate} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white dark:fill-white" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Responsibilities <span className="text-red-500">*</span></label>
-                  <textarea name="responsibilities" value={formData.responsibilities} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Describe your tasks and achievements"></textarea>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-gray-300">Skills Used <span className="text-red-500">*</span></label>
-                  <input name="skills" value={formData.skills} onChange={handleInputChange} className="w-full p-3 border border-slate-300 dark:border-white/20 rounded-xl focus:ring-2 focus:ring-yellow-400 outline-none bg-white dark:bg-[#1a1a1a] dark:text-white" placeholder="Python, SQL, Power BI, Excel, Communication..." />
-                </div>
-                <div className="flex justify-between">
-                  <button onClick={() => setStep(2)} className="px-6 py-2 bg-slate-200 dark:bg-white/10 dark:text-white rounded-xl hover:bg-slate-300 dark:hover:bg-white/20 transition">← Back</button>
-                  <button onClick={handleSubmitApp} className="px-6 py-2 bg-yellow-400 rounded-xl hover:bg-yellow-500 hover:shadow-lg transition">Submit Application</button>
+                <div>
+                  <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-3">Key Responsibilities</h4>
+                  <ul className="list-disc pl-5 space-y-2">
+                    <li>Design and implement scalable solutions.</li>
+                    <li>Collaborate with cross-functional teams to define and design new features.</li>
+                    <li>Continuously discover, evaluate, and implement new technologies.</li>
+                  </ul>
                 </div>
               </div>
-            )}
 
-          </div>
-        </div>
-      )}
+              <div className="pt-6 border-t border-slate-100 dark:border-white/10 flex justify-end">
+                <button onClick={() => setShowApply(true)} className="bg-yellow-400 text-black font-bold px-10 py-4 rounded-full text-lg hover:bg-yellow-500 shadow-lg hover:shadow-yellow-400/30 hover:-translate-y-1 transition-all w-full md:w-auto">
+                  Apply for this Role
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* APPLICATION FORM MODAL */}
+      <AnimatePresence>
+        {showApply && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/90 backdrop-blur-md z-[101] flex justify-center items-center p-0 md:p-6 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }}
+              className="bg-white dark:bg-[#0a0a0a] w-full max-w-4xl rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col h-[95vh] md:h-auto max-h-[90vh]"
+            >
+              {/* Header */}
+              <div className="bg-slate-50 dark:bg-[#111] p-8 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Apply for {selectedJob?.title}</h2>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Step {step} of 3</p>
+                </div>
+                <button onClick={closeAll} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-white transition-colors"><X /></button>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full bg-slate-100 dark:bg-white/5 h-1.5">
+                <div className="h-full bg-yellow-400 transition-all duration-500 ease-out" style={{ width: `${(step / 3) * 100}%` }} />
+              </div>
+
+              {/* Form Content */}
+              <div className="p-8 md:p-12 overflow-y-auto custom-scrollbar flex-1">
+                {step === 1 && (
+                  <div className="space-y-6 animate-fade-in-fast">
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><User className="text-yellow-400" /> Personal Information</h3>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Full Name</label>
+                        <input name="fullName" value={formData.fullName} onChange={handleInputChange} className="w-full p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151515] dark:text-white focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="John Doe" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Email Address</label>
+                        <input name="email" value={formData.email} onChange={handleInputChange} className="w-full p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151515] dark:text-white focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="john@example.com" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Phone Number</label>
+                        <input name="phone" value={formData.phone} onChange={handleInputChange} className="w-full p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151515] dark:text-white focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="+91 98765 43210" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Portfolio URL (Optional)</label>
+                        <input name="portfolio" value={formData.portfolio} onChange={handleInputChange} className="w-full p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151515] dark:text-white focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="https://portfolio.com" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {step === 2 && (
+                  <div className="space-y-6 animate-fade-in-fast">
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><Briefcase className="text-yellow-400" /> Experience Details</h3>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Current Job Title</label>
+                        <input name="currentRole" value={formData.currentRole} onChange={handleInputChange} className="w-full p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151515] dark:text-white focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Ex: Senior Developer" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Current Company</label>
+                        <input name="currentCompany" value={formData.currentCompany} onChange={handleInputChange} className="w-full p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151515] dark:text-white focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Ex: Acme Corp" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Years of Experience</label>
+                        <input name="experienceYears" value={formData.experienceYears} onChange={handleInputChange} className="w-full p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151515] dark:text-white focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Ex: 4 Years" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Notice Period</label>
+                        <select name="noticePeriod" value={formData.noticePeriod} onChange={handleInputChange} className="w-full p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151515] dark:text-white focus:ring-2 focus:ring-yellow-400 outline-none">
+                          <option value="">Select Notice Period</option>
+                          <option>Immediate Joiner</option>
+                          <option>15 Days</option>
+                          <option>30 Days</option>
+                          <option>60 Days</option>
+                          <option>90 Days</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {step === 3 && (
+                  <div className="space-y-6 animate-fade-in-fast">
+                    <h3 className="text-xl font-bold flex items-center gap-2 text-slate-900 dark:text-white"><GraduationCap className="text-yellow-400" /> Skills & Finalize</h3>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Primary Skills (Comma separated)</label>
+                        <input name="primarySkills" value={formData.primarySkills} onChange={handleInputChange} className="w-full p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151515] dark:text-white focus:ring-2 focus:ring-yellow-400 outline-none" placeholder="Ex: React, Node.js, AWS" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Why are you a good fit?</label>
+                        <textarea name="coverLetter" value={formData.coverLetter} onChange={handleInputChange} className="w-full p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#151515] dark:text-white focus:ring-2 focus:ring-yellow-400 outline-none h-32" placeholder="Tell us briefly why you want to join FlashSpace..."></textarea>
+                      </div>
+                      <div className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800 text-sm text-blue-800 dark:text-blue-300">
+                        ℹ️ Note: By submitting this application, you agree to our privacy policy and terms of service.
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer Buttons */}
+              <div className="p-8 border-t border-slate-100 dark:border-white/5 flex justify-between bg-slate-50 dark:bg-[#111]">
+                {step > 1 ? (
+                  <button onClick={handlePrevStep} className="px-8 py-3 rounded-xl font-semibold bg-white dark:bg-white/10 hover:bg-slate-100 dark:hover:bg-white/20 text-slate-700 dark:text-white border border-slate-200 dark:border-transparent transition-all">Back</button>
+                ) : <div />}
+
+                {step < 3 ? (
+                  <button onClick={handleNextStep} className="px-8 py-3 rounded-xl font-bold bg-slate-900 dark:bg-white text-white dark:text-black hover:opacity-90 transition-all flex items-center gap-2">Next <ChevronRight size={18} /></button>
+                ) : (
+                  <button onClick={handleSubmitApp} disabled={isSubmitting} className="px-10 py-3 rounded-xl font-bold bg-yellow-400 text-black hover:bg-yellow-500 shadow-lg hover:shadow-yellow-400/30 transition-all flex items-center gap-2">
+                    {isSubmitting ? 'Submitting...' : 'Submit School Application'} <Check size={18} />
+                  </button>
+                )}
+              </div>
+
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
-}
+};
 
 // ===============================================
 // ContactForm Component

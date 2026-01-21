@@ -14,7 +14,8 @@ import {
   createPaymentOrder,
   openRazorpayCheckout,
   verifyPayment,
-  reportPaymentFailure
+  reportPaymentFailure,
+  simulatePayment
 } from '@/services/payment.service';
 
 const BookingPage = () => {
@@ -32,6 +33,7 @@ const BookingPage = () => {
   const [spaceDetails, setSpaceDetails] = useState<VirtualOfficeItem | null>(null);
   const [selectedPlanDetails, setSelectedPlanDetails] = useState<PlanDetails | null>(null);
   const [selectedTenure, setSelectedTenure] = useState<1 | 2 | 3>(2); // Default to 2 years
+  const [isDevMode, setIsDevMode] = useState(import.meta.env.DEV); // Auto-detect dev mode
 
   // Scroll to top on load
   useEffect(() => {
@@ -244,16 +246,23 @@ const BookingPage = () => {
   };
 
   const handleSimulatePayment = async () => {
+    // Check if user is authenticated
     if (!isAuthenticated || !user) {
-      toast({ title: "Login Required", description: "Please login first", variant: "destructive" });
+      toast({
+        title: "Login Required",
+        description: "Please login to continue with your booking",
+        variant: "destructive",
+      });
       navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}`);
       return;
     }
+
     if (!spaceDetails || !selectedPlanDetails) return;
 
     try {
       setPaymentLoading(true);
-      // Create order
+
+      // Create order on backend
       const orderData = await createPaymentOrder({
         userId: user.id,
         userEmail: user.email,
@@ -271,18 +280,29 @@ const BookingPage = () => {
         paymentType: "virtual_office",
       });
 
-      // Verify immediately (Simulated)
-      await verifyPayment({
-        razorpay_order_id: orderData.orderId,
-        razorpay_payment_id: "pay_simulated_" + Date.now(),
-        razorpay_signature: "simulated_signature",
-        devMode: true,
+      toast({
+        title: "Simulating Payment...",
+        description: "Creating mock payment for testing",
       });
 
-      toast({ title: "Simulation Successful", description: "Payment simulated in DEV mode" });
-      navigate(`/payment/success?orderId=${orderData.orderId}`);
+      // Simulate payment success
+      const result = await simulatePayment(orderData.orderId);
+
+      toast({
+        title: "Payment Simulated! 🎉",
+        description: "Mock booking has been created successfully",
+      });
+
+      // Navigate to success page
+      navigate(`/payment/success?orderId=${orderData.orderId}&paymentId=${result.paymentId}`);
+
     } catch (error: any) {
-      toast({ title: "Simulation Failed", description: error.message, variant: "destructive" });
+      console.error("Payment simulation error:", error);
+      toast({
+        title: "Simulation Failed",
+        description: error.message || "Failed to simulate payment. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setPaymentLoading(false);
     }
@@ -317,8 +337,8 @@ const BookingPage = () => {
                     key={option.years}
                     onClick={() => setSelectedTenure(option.years as 1 | 2 | 3)}
                     className={`relative border-2 rounded-xl p-5 cursor-pointer transition-all duration-300 ${selectedTenure === option.years
-                        ? 'border-yellow-400 bg-yellow-50 shadow-lg scale-[1.02]'
-                        : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+                      ? 'border-yellow-400 bg-yellow-50 shadow-lg scale-[1.02]'
+                      : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
                       }`}
                   >
                     {/* Popular Badge */}
@@ -330,8 +350,8 @@ const BookingPage = () => {
 
                     {/* Selection Indicator */}
                     <div className={`absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedTenure === option.years
-                        ? 'border-yellow-500 bg-yellow-400'
-                        : 'border-gray-300 bg-white'
+                      ? 'border-yellow-500 bg-yellow-400'
+                      : 'border-gray-300 bg-white'
                       }`}>
                       {selectedTenure === option.years && <Check className="w-3 h-3 text-black" />}
                     </div>
@@ -458,19 +478,28 @@ const BookingPage = () => {
                     )}
                   </Button>
 
+                  {/* Dev Mode: Simulate Payment Button */}
+                  {isDevMode && (
+                    <Button
+                      onClick={handleSimulatePayment}
+                      disabled={paymentLoading}
+                      variant="outline"
+                      className="w-full mt-3 border-2 border-blue-400 text-blue-600 hover:bg-blue-50 font-semibold py-3 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                      {paymentLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Simulating...
+                        </span>
+                      ) : (
+                        "🧪 Simulate Payment (Dev)"
+                      )}
+                    </Button>
+                  )}
+
                   <p className="text-center text-xs text-gray-500 mt-3">
                     By proceeding, you agree to our Terms of Service
                   </p>
-
-                  {/* DEV MODE SIMULATION BUTTON */}
-                  <Button
-                    onClick={handleSimulatePayment}
-                    disabled={paymentLoading}
-                    variant="outline"
-                    className="w-full mt-4 border-dashed border-gray-400 text-gray-600 hover:bg-gray-50"
-                  >
-                    🛠️ Simulate Successful Payment
-                  </Button>
                 </div>
               </div>
             </div>

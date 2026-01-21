@@ -1,25 +1,68 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { Building, MapPin, Mail, Phone, FileText, CheckCircle, Star, Users, Award, ChevronDown, Search, ArrowRight, Sparkles, TrendingUp, Shield, Clock, Zap, Target, Package, HeadphonesIcon, Briefcase, Home, Check, X, Globe2 } from "lucide-react";
+import { Building, MapPin, Mail, Phone, FileText, CheckCircle, Star, Users, Award, ChevronDown, Search, ArrowRight, Sparkles, Monitor, Settings, Download, Package, Target, Briefcase, Zap, Globe2, PhoneCall, Shield, Check, X, Headphones, Clock, Wallet, Trophy, Rocket, Scale } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { useState } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const VirtualOffice = () => {
+  const navigate = useNavigate();
   const [selectedCity, setSelectedCity] = useState("Delhi");
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
-  const cities = [
-    "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
-    "Kolkata", "Pune", "Ahmedabad", "Jaipur", "Surat",
-    "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Noida"
+  // Refs for interactive background
+  const bgRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const bg = bgRef.current;
+    if (!container || !bg) return;
+
+    const handleMove = (e: MouseEvent | globalThis.MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+      const translateX = x * 14;
+      const translateY = y * 10;
+      bg.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(1.03)`;
+    };
+
+    const handleLeave = () => {
+      if (bg) bg.style.transform = `translate3d(0, 0, 0) scale(1.03)`;
+    };
+
+    container.addEventListener('mousemove', handleMove);
+    container.addEventListener('mouseleave', handleLeave);
+
+    return () => {
+      container.removeEventListener('mousemove', handleMove);
+      container.removeEventListener('mouseleave', handleLeave);
+    };
+  }, []);
+
+  // City data with famous landmark images
+  const cityData = [
+    { name: "Ahmedabad", image: "https://images.unsplash.com/photo-1569596082827-c5c81c9e3898?w=400&q=80", landmark: "Sabarmati Ashram" },
+    { name: "Bangalore", image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=400&q=80", landmark: "Tech Hub" },
+    { name: "Chennai", image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400&q=80", landmark: "Marina Beach" },
+    { name: "Delhi", image: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&q=80", landmark: "India Gate" },
+    { name: "Dharamshala", image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&q=80", landmark: "Himalayas" },
+    { name: "Gurgaon", image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&q=80", landmark: "Cyber City" },
+    { name: "Hyderabad", image: "https://images.unsplash.com/photo-1572638001012-c342e59c4d56?w=400&q=80", landmark: "Charminar" },
+    { name: "Jaipur", image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=400&q=80", landmark: "Hawa Mahal" },
+    { name: "Jammu", image: "https://images.unsplash.com/photo-1623070573483-65a6c3e79c98?w=400&q=80", landmark: "Vaishno Devi" },
   ];
+
+  // Handle search navigation
+  const handleSearch = () => {
+    navigate(`/services/virtual-office?city=${encodeURIComponent(selectedCity)}&service=virtual-office`);
+  };
 
   const features = [
     {
@@ -118,32 +161,32 @@ const VirtualOffice = () => {
 
   const whyChooseFlashSpace = [
     {
-      emoji: "💼",
+      icon: Wallet,
       title: "Save Up to 90%",
       description: "Eliminate expensive office rent, utilities, and maintenance costs while maintaining professional presence"
     },
     {
-      emoji: "📈",
+      icon: Scale,
       title: "Instant Flexibility",
       description: "Scale up or down instantly. Work from anywhere while your business address stays permanent"
     },
     {
-      emoji: "🏆",
+      icon: Trophy,
       title: "Professional Credibility",
       description: "Impress clients with premium business addresses in prime locations across India"
     },
     {
-      emoji: "⏱️",
+      icon: Clock,
       title: "Setup in 24 Hours",
       description: "Get your virtual office ready within 24 hours. No lengthy paperwork or waiting periods"
     },
     {
-      emoji: "📝",
+      icon: FileText,
       title: "GST Registration",
       description: "Complete support for GST registration and business compliance with expert guidance"
     },
     {
-      emoji: "🤝",
+      icon: Headphones,
       title: "Expert Support",
       description: "Dedicated account manager and 24/7 customer support for all your business needs"
     }
@@ -315,237 +358,338 @@ const VirtualOffice = () => {
     visible: { opacity: 1, y: 0 }
   };
 
+
   return (
     <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
       {/* Header Component */}
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative h-[85vh] overflow-hidden mt-16">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&q=80"
-            alt="Virtual Office Space"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#172A3A]/95 via-[#172A3A]/80 to-[#EDB003]/20"></div>
+      {/* Hero Section (MindTrip Style - Floating Cluster) */}
+      <section ref={containerRef} className="relative min-h-[90vh] flex items-center bg-slate-50 dark:bg-[#0B1120] transition-colors duration-300 z-30">
 
-          {/* Animated Gradient Orbs */}
-          <div className="absolute top-20 left-20 w-96 h-96 bg-[#EDB003]/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#172A3A]/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
+        {/* Clean Background with subtle gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-amber-50 dark:from-[#0B1120] dark:via-[#111] dark:to-[#1a1a1a]" />
 
-        <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
-          <motion.div
-            className="max-w-3xl text-white"
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
-            transition={{ duration: 0.8 }}
-          >
+        <div className="container mx-auto px-4 relative z-10 w-full h-full pt-20 pb-10">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+            {/* LEFT COLUMN: Content */}
             <motion.div
-              className="inline-flex items-center gap-2 bg-[#EDB003]/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 mt-4 border border-[#EDB003]/30"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+              initial="hidden"
+              animate="visible"
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="text-left relative z-20"
             >
-              <Sparkles className="w-4 h-4 text-[#EDB003]" />
-              <span className="text-sm font-semibold text-[#EDB003]">Premium Virtual Office Solutions</span>
-            </motion.div>
+              <motion.div
+                className="inline-flex items-center gap-2 bg-white dark:bg-white/5 border border-amber-200 dark:border-white/10 px-4 py-2 rounded-full mb-8 shadow-sm"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Sparkles className="w-4 h-4 text-[#EDB003]" />
+                <span className="text-sm font-bold tracking-wide text-slate-800 dark:text-white">Premium Virtual Offices</span>
+              </motion.div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight break-words" style={{ fontFamily: 'Poppins' }}>
-              Your Business
-              <br />
-              <span className="text-[#EDB003]">Without Boundaries</span>
-            </h1>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1] text-slate-900 dark:text-white tracking-tight">
+                Start your <br />
+                business <span className="text-[#EDB003]">instantly.</span>
+              </h1>
 
-            <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed">
-              Establish your professional presence with a prestigious business address,
-              GST registration support, and premium amenities - all without physical office costs
-            </p>
+              <p className="text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-lg leading-relaxed">
+                Get a prestigious address, GST registration, and mail handling solutions without the overhead of a physical office.
+              </p>
 
-            {/* Hero Search Bar */}
-            <motion.div
-              className="bg-white dark:bg-[#1f1f1f] rounded-2xl p-2 shadow-2xl max-w-2xl transition-colors duration-300"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <div className="flex items-center gap-2">
-                <div className="flex-1">
-                  <Popover open={isLocationOpen} onOpenChange={setIsLocationOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        role="combobox"
-                        className="w-full justify-between h-16 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-black/20 rounded-xl"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-[#EDB003]/10 rounded-lg flex items-center justify-center">
-                            <MapPin className="w-6 h-6 text-[#EDB003]" />
-                          </div>
-                          <div className="text-left">
-                            <div className="text-xs text-gray-500 font-medium">Location</div>
-                            <div className="text-base font-semibold">{selectedCity || "Select City"}</div>
-                          </div>
+              {/* Search Container (Relative Parent) */}
+              <div className="relative max-w-md w-full">
+
+                {/* Compact Search Bar */}
+                <div className="bg-white dark:bg-white/5 p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 w-full relative z-20">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setIsLocationOpen(!isLocationOpen)}
+                      className="flex-1 justify-between h-12 px-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl text-slate-700 dark:text-white"
+                    >
+                      <span className="truncate mr-2">{selectedCity || "Select City"}</span>
+                      <ChevronDown className="w-4 h-4 opacity-50" />
+                    </Button>
+                    <Button onClick={handleSearch} className="bg-[#EDB003] hover:bg-[#d69f03] text-black font-bold h-12 px-6 rounded-xl">
+                      Search
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Horizontal City Selector Overlay (Anchored to Parent) */}
+                <AnimatePresence>
+                  {isLocationOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
+                      animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
+                      transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                      className="absolute bottom-full left-0 mb-3 z-30 w-full bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-2xl rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-white/20 ring-1 ring-black/5 overflow-hidden"
+                    >
+                      {/* Decorative Top Gradient Line */}
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#EDB003] to-transparent opacity-50" />
+                      <div className="p-5">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-bold text-lg dark:text-white flex items-center gap-2">
+                            <MapPin className="w-5 h-5 text-[#EDB003]" /> Select Location
+                          </h3>
+                          <button onClick={() => setIsLocationOpen(false)} className="p-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors">
+                            <X className="w-5 h-5 text-slate-400" />
+                          </button>
                         </div>
-                        <ChevronDown className="ml-2 h-5 w-5 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 bg-white dark:bg-[#1f1f1f] shadow-xl border-2 border-gray-100 dark:border-white/10">
-                      <Command className="bg-white dark:bg-[#1f1f1f]">
-                        <CommandInput placeholder="Search city..." className="bg-white dark:bg-[#1f1f1f] dark:text-white" />
-                        <CommandList className="bg-white dark:bg-[#1f1f1f]">
-                          <CommandEmpty className="dark:text-white">No city found.</CommandEmpty>
-                          <CommandGroup>
-                            {cities.map((city) => (
-                              <CommandItem
-                                key={city}
-                                value={city}
-                                onSelect={() => {
-                                  setSelectedCity(city);
-                                  setIsLocationOpen(false);
-                                }}
-                                className="dark:text-white dark:aria-selected:bg-white/10"
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    selectedCity === city ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {city}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <Button className="bg-gradient-to-r from-[#EDB003] to-[#f5c242] hover:from-[#d69f03] hover:to-[#EDB003] text-white h-16 px-10 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                  <Search className="w-5 h-5 mr-2" />
-                  Find Spaces
-                </Button>
+                        <div className="flex flex-wrap gap-2 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
+                          {cityData.map(c => (
+                            <button
+                              key={c.name}
+                              onClick={() => { setSelectedCity(c.name); setIsLocationOpen(false); }}
+                              className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 border ${selectedCity === c.name
+                                ? 'bg-[#EDB003] text-black border-[#EDB003] shadow-md shadow-[#EDB003]/20'
+                                : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-100 dark:hover:bg-white/10 hover:scale-[1.02]'
+                                }`}
+                            >
+                              {c.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="flex items-center gap-6 mt-10 text-sm font-medium text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#EDB003]" /> <span>GST Compliant</span></div>
+                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#EDB003]" /> <span>Cancel Anytime</span></div>
               </div>
             </motion.div>
 
-            {/* Trust Indicators */}
-            <motion.div
-              className="flex items-center gap-8 mt-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#EDB003] to-[#f5c242] border-2 border-white"></div>
-                  ))}
+            {/* RIGHT COLUMN: Floating Cluster */}
+            <div className="relative h-[600px] w-full hidden lg:block perspective-1000">
+              {/* Center Image (Main) */}
+              <motion.div
+                animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
+              >
+                <div className="w-64 h-80 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=500&q=80" alt="Office" className="w-full h-full object-cover" />
                 </div>
-                <div className="text-sm">
-                  <div className="font-bold">5000+ Clients</div>
-                  <div className="text-gray-300 text-xs">Trust FlashSpace</div>
-                </div>
-              </div>
+              </motion.div>
 
-              <div className="flex items-center gap-2">
-                <div className="flex gap-0.5">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star key={i} className="w-4 h-4 fill-[#EDB003] text-[#EDB003]" />
-                  ))}
+              {/* Center Gap Image (Teamwork) - Moved to fill gap without overlap */}
+              <motion.div
+                animate={{ y: [0, -25, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 0.8 }}
+                className="absolute top-[50%] left-[22%] transform -translate-x-1/2 -translate-y-1/2 z-10"
+              >
+                <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&q=80" alt="Teamwork" className="w-full h-full object-cover" />
                 </div>
-                <div className="text-sm">
-                  <div className="font-bold">4.9/5 Rating</div>
-                  <div className="text-gray-300 text-xs">From 500+ Reviews</div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
+              </motion.div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-        >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-            <div className="w-1.5 h-3 bg-white rounded-full"></div>
+              {/* Upper Center Filler Image (New) */}
+              <motion.div
+                animate={{ y: [0, -18, 0] }} transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 0.2 }}
+                className="absolute top-[28%] left-[45%] transform -translate-x-1/2 -translate-y-1/2 z-0"
+              >
+                <div className="w-36 h-36 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1600508774634-4e11d34730e2?w=400&q=80" alt="Cafe Coworking" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* Floating Image 1 (Top Right) - Square */}
+              <motion.div
+                animate={{ y: [0, -20, 0] }} transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 }}
+                className="absolute top-[5%] right-[5%] z-10"
+              >
+                <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1604328698692-f76ea9498e76?w=400&q=80" alt="Meeting" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* Floating Image 2 (Bottom Left) - Landscape */}
+              <motion.div
+                animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut", delay: 2 }}
+                className="absolute bottom-[20%] left-[0%] z-20"
+              >
+                <div className="w-48 h-32 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=400&q=80" alt="Bangalore" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* Floating Image 3 (Top Left) - New */}
+              <motion.div
+                animate={{ y: [0, -18, 0] }} transition={{ repeat: Infinity, duration: 7.5, ease: "easeInOut", delay: 0.5 }}
+                className="absolute top-[12%] left-[5%] z-10"
+              >
+                <div className="w-32 h-40 rounded-[2rem] overflow-hidden shadow-lg border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400&q=80" alt="Discussion" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* Floating Image 4 (Bottom Right) - New */}
+              <motion.div
+                animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6.5, ease: "easeInOut", delay: 1.5 }}
+                className="absolute bottom-[10%] right-[10%] z-20"
+              >
+                <div className="w-44 h-44 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=400&q=80" alt="Building" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* Floating Image 5 (Small Accent) - New */}
+              <motion.div
+                animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 2.5 }}
+                className="absolute top-[40%] right-[-5%] z-0"
+              >
+                <div className="w-24 h-24 rounded-[1.5rem] overflow-hidden shadow-md border-4 border-white dark:border-[#333] opacity-80">
+                  <img src="https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=200&q=80" alt="Abstract" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* Pill 1: GST */}
+              <motion.div
+                animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.5 }}
+                className="absolute top-[35%] left-[-5%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+              >
+                <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-sm">📝</div>
+                <span className="font-bold text-slate-800 dark:text-white text-xs">GST Ready</span>
+              </motion.div>
+
+              {/* Pill 2: Location */}
+              <motion.div
+                animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut", delay: 1.5 }}
+                className="absolute bottom-[28%] right-[-2%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+              >
+                <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-sm">📍</div>
+                <span className="font-bold text-slate-800 dark:text-white text-xs">Prime Locations</span>
+              </motion.div>
+
+              {/* Pill 3: Support */}
+              <motion.div
+                animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 3 }}
+                className="absolute top-[5%] left-[30%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+              >
+                <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-sm">📞</div>
+                <span className="font-bold text-slate-800 dark:text-white text-xs">24/7 Support</span>
+              </motion.div>
+
+              {/* Pill 4: Business Address - New */}
+              <motion.div
+                animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 6.2, ease: "easeInOut", delay: 2.2 }}
+                className="absolute bottom-[5%] left-[40%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+              >
+                <div className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-sm">🏢</div>
+                <span className="font-bold text-slate-800 dark:text-white text-xs">Business Address</span>
+              </motion.div>
+
+              {/* Decorative Circle */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#EDB003]/5 rounded-full blur-3xl -z-10" />
+            </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-12 bg-gradient-to-r from-[#EDB003] to-[#f5c242] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      {/* Stats Section (Redesigned - Clean & Premium) */}
+      <section className="py-10 border-y border-slate-100 dark:border-white/10 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-md relative z-20">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-100 dark:divide-white/5">
             {stats.map((stat, index) => (
               <motion.div
                 key={index}
-                className="text-center"
+                className="text-center px-4 group cursor-default"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <stat.icon className="w-8 h-8 text-white mx-auto mb-3" />
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2" >
+                <div className="mb-3 inline-flex p-3 rounded-2xl bg-[#EDB003]/10 text-[#EDB003] group-hover:scale-110 transition-transform duration-300">
+                  <stat.icon className="w-6 h-6" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-1">
                   {stat.number}
                 </div>
-                <div className="text-white/90 font-medium">{stat.label}</div>
+                <div className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                  {stat.label}
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* What is Virtual Office Section */}
-      <section className="py-20 bg-gradient-to-br from-[#EDB003]/5 via-white to-[#172A3A]/5 dark:via-black dark:to-black transition-colors duration-300">
-        <div className="container mx-auto px-4">
+      {/* What is Virtual Office Section - Premium Redesign */}
+      <section className="py-24 relative overflow-hidden bg-slate-50 dark:bg-[#0f172a]">
+        {/* Background Decoration */}
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-center mb-20"
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
           >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Understanding Virtual Office
+            <span className="inline-block px-5 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-bold mb-6 tracking-wide border border-[#EDB003]/20">
+              MODERN BUSINESS SOLUTION
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-[#172A3A] dark:text-white" >
-              What is a <span className="text-[#EDB003]">Virtual Office?</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-slate-900 dark:text-white tracking-tight">
+              What is a <span className="relative inline-block text-[#EDB003]">
+                Virtual Office?
+                <svg className="absolute w-full h-3 -bottom-1 left-0 text-[#EDB003] opacity-40" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.8077 4.00844 57.0722 2.05308 97.4608 2.00085C138.694 1.94753 171.758 4.79326 198.001 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
+              </span>
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              A virtual office gives your business a professional identity without the cost of physical office space.
-              Get a prestigious business address, mail handling, GST support, and meeting room access - all without renting an actual office!
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed font-light">
+              Run your business from anywhere while maintaining a <span className="font-semibold text-slate-900 dark:text-white">prestigious corporate presence</span>. No physical office required.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 max-w-7xl mx-auto pt-10">
             {whatIsVirtualOffice.map((item, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.15, duration: 0.6, ease: "easeOut" }}
                 viewport={{ once: true }}
+                className="group flex flex-col items-center text-center relative"
               >
-                <Card className="border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 h-full bg-white dark:bg-[#1f1f1f] dark:border-white/10 dark:hover:border-[#EDB003] shadow-lg hover:shadow-xl group">
-                  <CardContent className="p-6 text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                      <item.icon className="w-8 h-8 text-white" />
+                {/* Main Icon Bubble */}
+                <div className="relative mb-8">
+                  {/* Glow Background */}
+                  <div className="absolute inset-0 bg-[#EDB003] rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-500 scale-150"></div>
+
+                  {/* Icon Container */}
+                  <div className="w-24 h-24 bg-white dark:bg-[#1E293B] rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] flex items-center justify-center transform group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300 border border-slate-100 dark:border-white/10 relative z-10">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white bg-gradient-to-br ${index === 0 ? 'from-[#EDB003] to-[#f5c242]' :
+                      index === 1 ? 'from-[#EDB003] to-[#f5c242]' :
+                        index === 2 ? 'from-[#EDB003] to-[#f5c242]' :
+                          'from-[#EDB003] to-[#f5c242]'
+                      } shadow-lg`}>
+                      <item.icon className="w-6 h-6 text-black" />
                     </div>
-                    <h3 className="text-xl font-bold mb-3 text-[#172A3A] dark:text-white">
-                      {item.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                      {item.description}
-                    </p>
-                  </CardContent>
-                </Card>
+                  </div>
+
+                  {/* Floating Badge (Optional decorative element) */}
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-white dark:bg-[#0f172a] rounded-full flex items-center justify-center border border-slate-100 dark:border-white/10 shadow-sm z-20 opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100">
+                    <div className="w-2 h-2 rounded-full bg-[#EDB003]"></div>
+                  </div>
+                </div>
+
+                {/* Text Content - Floating with no card background */}
+                <div className="relative z-10 px-2">
+                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-[#EDB003] transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm md:text-base">
+                    {item.description}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -553,63 +697,80 @@ const VirtualOffice = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
+      {/* How It Works Section - Premium Process Timeline */}
+      <section className="py-24 bg-white dark:bg-[#0a0a0a] transition-colors duration-300 relative overflow-hidden">
+        {/* Decorative background blobs */}
+        <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-[#EDB003]/5 rounded-full blur-3xl -translate-y-1/2 -z-10 pointer-events-none" />
+
         <div className="container mx-auto px-4">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-center mb-20"
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Simple Process
+            <span className="inline-block px-5 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-bold mb-6 border border-[#EDB003]/20 tracking-wider">
+              SIMPLE 5-STEP PROCESS
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A]" >
-              How It <span className="text-[#EDB003]">Works</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-slate-900 dark:text-white tracking-tight" >
+              How It <span className="text-[#EDB003] relative">
+                Works
+                <svg className="absolute w-full h-3 -bottom-2 left-0 text-[#EDB003] opacity-40" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.8077 4.00844 57.0722 2.05308 97.4608 2.00085C138.694 1.94753 171.758 4.79326 198.001 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
+              </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Get your virtual office up and running in just 5 simple steps
+            <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-light leading-relaxed">
+              Launch your business presence in minutes with our streamlined fully digital process.
             </p>
           </motion.div>
 
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 relative">
+          <div className="max-w-[90rem] mx-auto relative">
+            {/* Connecting Line (Desktop) */}
+            <div className="hidden lg:block absolute top-[3.5rem] left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent z-0"></div>
+            {/* Dashed Progress Line (Decoration) */}
+            <div className="hidden lg:block absolute top-[3.5rem] left-[10%] right-[10%] h-0.5 border-t-2 border-dashed border-[#EDB003]/30 z-0"></div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 relative z-10">
               {howItWorksSteps.map((step, index) => (
                 <motion.div
                   key={index}
-                  className="relative"
+                  className="relative group flex flex-col items-center text-center"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.2 }}
+                  transition={{ delay: index * 0.15, duration: 0.5 }}
                   viewport={{ once: true }}
                 >
-                  <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-white dark:bg-[#1f1f1f] h-full">
-                    <CardContent className="p-8 text-center relative">
-                      {/* Step Number Circle */}
-                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                        <div className="w-16 h-16 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-full flex items-center justify-center shadow-xl border-4 border-white dark:border-[#1f1f1f]">
-                          <span className="text-2xl font-bold text-white" >
-                            {step.number}
-                          </span>
-                        </div>
-                      </div>
+                  {/* Step Number Node */}
+                  <div className="w-28 h-28 mb-8 relative flex items-center justify-center transition-transform duration-300 group-hover:-translate-y-2">
+                    {/* Glow */}
+                    <div className="absolute inset-0 bg-[#EDB003] rounded-full blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+                    {/* Outer Ring */}
+                    <div className="absolute inset-0 bg-white dark:bg-[#0a0a0a] rounded-full border-4 border-slate-50 dark:border-[#1f1f1f] shadow-xl group-hover:border-[#EDB003]/30 transition-colors duration-300"></div>
 
-                      <div className="mt-8">
-                        <div className="w-16 h-16 bg-[#172A3A]/5 dark:bg-white/5 rounded-xl flex items-center justify-center mx-auto mb-6">
-                          <step.icon className="w-8 h-8 text-[#172A3A] dark:text-white" />
-                        </div>
+                    {/* Inner Circle with Number */}
+                    <div className="absolute inset-2 bg-slate-50 dark:bg-[#111] rounded-full flex items-center justify-center border border-slate-100 dark:border-white/5">
+                      <span className="text-4xl font-black text-slate-200 dark:text-white/10 group-hover:text-[#EDB003] transition-colors duration-300 absolute transform -translate-y-1">0{step.number}</span>
+                      <step.icon className="w-8 h-8 text-slate-800 dark:text-white relative z-10 group-hover:scale-110 transition-transform duration-300" />
+                    </div>
 
-                        <h3 className="text-2xl font-bold mb-4 text-[#172A3A] dark:text-white">
-                          {step.title}
-                        </h3>
+                    {/* Connection Dot (Small) */}
+                    <div className="absolute -bottom-2 w-4 h-4 rounded-full bg-[#EDB003] border-4 border-white dark:border-[#0a0a0a] shadow-sm z-20"></div>
+                  </div>
 
-                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                          {step.description}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {/* Content */}
+                  <div className="px-2">
+                    <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-[#EDB003] transition-colors">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
+
+                  {/* Mobile Connector (Vertical) */}
+                  {index !== howItWorksSteps.length - 1 && (
+                    <div className="lg:hidden absolute bottom-[-3rem] left-1/2 w-0.5 h-12 bg-gradient-to-b from-slate-200 dark:from-white/10 to-transparent transform -translate-x-1/2"></div>
+                  )}
                 </motion.div>
               ))}
             </div>
@@ -618,53 +779,71 @@ const VirtualOffice = () => {
       </section>
 
       {/* Why Choose FlashSpace Section */}
-      <section className="py-20 bg-gradient-to-br from-[#172A3A] via-[#172A3A] to-[#2a4a5a] relative overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#EDB003] rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#EDB003] rounded-full blur-3xl animate-pulse delay-1000"></div>
+      {/* Why Choose FlashSpace Section - Premium Dark Crystal Design */}
+      <section className="py-24 bg-slate-50 dark:bg-[#0f172a] relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}>
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-center mb-20"
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/20 text-[#EDB003] rounded-full text-sm font-semibold mb-4 border border-[#EDB003]/30">
-              Why FlashSpace
+            <span className="inline-block px-5 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-bold mb-6 border border-[#EDB003]/20 tracking-wider shadow-[0_0_15px_-5px_rgba(237,176,3,0.3)]">
+              WHY CHOOSE US
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white" >
-              Why Choose <span className="text-[#EDB003]">FlashSpace</span> Virtual Office?
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-slate-900 dark:text-white tracking-tight" >
+              Why Choose <span className="text-[#EDB003] relative inline-block">FlashSpace?
+                <svg className="absolute w-full h-3 -bottom-1 left-0 text-[#EDB003] opacity-40" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.8077 4.00844 57.0722 2.05308 97.4608 2.00085C138.694 1.94753 171.758 4.79326 198.001 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
+              </span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Join thousands of successful businesses who trust FlashSpace for their virtual office needs
+            <p className="text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
+              Join thousands of successful businesses who trust FlashSpace for their virtual office needs.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 max-w-7xl mx-auto">
             {whyChooseFlashSpace.map((benefit, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
+                className="group flex flex-col items-center text-center relative"
               >
-                <Card className="border-2 border-white/10 hover:border-[#EDB003]/50 transition-all duration-300 bg-white/5 backdrop-blur-sm hover:bg-white/10 h-full group">
-                  <CardContent className="p-6">
-                    <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                      {benefit.emoji}
+                {/* Floating Icon Bubble */}
+                <div className="relative mb-6">
+                  {/* Glow */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 scale-125"></div>
+
+                  {/* Main Container */}
+                  <div className="w-24 h-24 bg-white dark:bg-[#1E293B] rounded-[2rem] shadow-[0_15px_30px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.5)] flex items-center justify-center transform group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300 border-2 border-slate-50 dark:border-white/5 relative z-10">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md bg-gradient-to-br ${index === 0 ? "from-[#EDB003] to-[#FFD700]" : // Wallet (Gold)
+                        index === 1 ? "from-blue-500 to-cyan-400" :   // Scale (Blue)
+                          index === 2 ? "from-emerald-500 to-teal-400" : // Trophy (Green)
+                            index === 3 ? "from-purple-500 to-indigo-400" : // Clock (Purple)
+                              index === 4 ? "from-rose-500 to-orange-400" :   // File (Rose)
+                                "from-slate-700 to-slate-500" // Headphones (Dark)
+                      }`}>
+                      <benefit.icon className="w-6 h-6" />
                     </div>
-                    <h3 className="text-xl font-bold mb-3 text-white">
-                      {benefit.title}
-                    </h3>
-                    <p className="text-gray-300 leading-relaxed">
-                      {benefit.description}
-                    </p>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+
+                {/* Text Content */}
+                <div className="relative z-10 px-4">
+                  <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-[#EDB003] transition-colors">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                    {benefit.description}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -748,7 +927,7 @@ const VirtualOffice = () => {
               <div className="infinite-scroll">
                 {/* First set of logos */}
                 <div className="flex items-center justify-around min-w-full gap-16 px-8">
-                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
+                  <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-white/90 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
                     <img src="/Logo/flipkart.png" alt="Flipkart" className="w-full h-full object-contain" />
                   </div>
                   <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
@@ -824,15 +1003,15 @@ const VirtualOffice = () => {
                 viewport={{ once: true }}
               >
                 <Card
-                  className={`border-2 transition-all duration-300 cursor-pointer ${openFaqIndex === index
+                  className={`border-2 transition-all duration-300 cursor-pointer bg-white dark:bg-[#1f1f1f] ${openFaqIndex === index
                     ? 'border-[#EDB003] shadow-lg'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
                     }`}
                   onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-4">
-                      <h3 className="text-lg font-bold text-[#172A3A]">
+                      <h3 className="text-lg font-bold text-[#172A3A] dark:text-gray-100">
                         {faq.question}
                       </h3>
                       <ChevronDown
@@ -849,7 +1028,7 @@ const VirtualOffice = () => {
                         transition={{ duration: 0.3 }}
                         className="mt-4 pt-4 border-t border-gray-200"
                       >
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                           {faq.answer}
                         </p>
                       </motion.div>
@@ -868,7 +1047,7 @@ const VirtualOffice = () => {
           >
             <p className="text-gray-600 mb-4">Still have questions?</p>
             <Button className="bg-[#EDB003] hover:bg-[#d69f03] text-white px-8 py-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-              <HeadphonesIcon className="w-5 h-5 mr-2" />
+              <Headphones className="w-5 h-5 mr-2" />
               Talk to Our Team
             </Button>
           </motion.div>

@@ -148,6 +148,19 @@ export interface SupportTicket {
   createdAt: string;
 }
 
+export interface CreditsResponse {
+  balance: number;
+  totalEarned: number;
+  history: Array<{
+    amount: number;
+    source: string;
+    description?: string;
+    createdAt: string;
+  }>;
+  rewardThreshold: number;
+  canRedeem: boolean;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message?: string;
@@ -417,6 +430,32 @@ class UserDashboardService {
       return {
         success: false,
         message: error.response?.data?.message || 'Failed to send reply',
+      };
+    }
+  }
+
+  // ========== CREDITS ==========
+
+  async getCredits(): Promise<ApiResponse<CreditsResponse>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<CreditsResponse>>(API_ENDPOINTS.USER.CREDITS);
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to fetch credits',
+      };
+    }
+  }
+
+  async redeemReward(data: any): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(API_ENDPOINTS.USER.REDEEM_REWARD, data);
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to redeem reward',
       };
     }
   }

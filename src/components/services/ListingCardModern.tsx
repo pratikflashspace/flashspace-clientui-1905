@@ -1,9 +1,9 @@
 import { memo, useState } from 'react';
 import { MapPin, Star, Heart, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
-import { VirtualOfficeItem, CoworkingSpaceItem } from '@/types/services';
+import { VirtualOfficeItem, CoworkingSpaceItem, MeetingRoomItem } from '@/types/services';
 
 // Union type that works with all service types
-export type ListingItem = VirtualOfficeItem | CoworkingSpaceItem | {
+export type ListingItem = VirtualOfficeItem | CoworkingSpaceItem | MeetingRoomItem | {
   _id: string;
   name: string;
   address: string;
@@ -53,8 +53,8 @@ const ListingCardModern = memo<ListingCardModernProps>(
     const [isHovered, setIsHovered] = useState(false);
 
     // Use item image as first, then placeholders
-    const images = item.image 
-      ? [item.image, ...PLACEHOLDER_IMAGES.slice(1)] 
+    const images = item.image
+      ? [item.image, ...PLACEHOLDER_IMAGES.slice(1)]
       : PLACEHOLDER_IMAGES;
 
     const handlePrevImage = (e: React.MouseEvent) => {
@@ -86,7 +86,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
     };
 
     return (
-      <div 
+      <div
         className="group cursor-pointer"
         onClick={handleCardClick}
         onMouseEnter={() => setIsHovered(true)}
@@ -127,11 +127,10 @@ const ListingCardModern = memo<ListingCardModernProps>(
           <div className="absolute top-3 right-3 flex items-center gap-2">
             <button
               onClick={handleFavoriteClick}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
-                isFavorite 
-                  ? 'bg-white text-red-500' 
-                  : 'bg-white/80 hover:bg-white text-gray-600 hover:text-red-500'
-              }`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${isFavorite
+                ? 'bg-white text-red-500'
+                : 'bg-white/80 hover:bg-white text-gray-600 hover:text-red-500'
+                }`}
             >
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
             </button>
@@ -171,11 +170,10 @@ const ListingCardModern = memo<ListingCardModernProps>(
                     e.stopPropagation();
                     setCurrentImageIndex(index);
                   }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
-                    index === currentImageIndex 
-                      ? 'bg-white w-2.5' 
-                      : 'bg-white/60 hover:bg-white/80'
-                  }`}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${index === currentImageIndex
+                    ? 'bg-white w-2.5'
+                    : 'bg-white/60 hover:bg-white/80'
+                    }`}
                 />
               ))}
             </div>
@@ -220,25 +218,45 @@ const ListingCardModern = memo<ListingCardModernProps>(
             {'gstPlanPrice' in item && item.gstPlanPrice && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">GST Plan</span>
-                <span className="text-sm font-semibold text-gray-900">{item.gstPlanPrice}</span>
+                <div className="text-right">
+                  <span className="text-sm font-semibold text-gray-900 block">{item.gstPlanPrice}</span>
+                  {item.gstPlanPriceYearly && (
+                    <span className="text-xs text-gray-500 block">₹{item.gstPlanPriceYearly}/yr</span>
+                  )}
+                </div>
               </div>
             )}
             {'mailingPlanPrice' in item && item.mailingPlanPrice && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Mailing Plan</span>
-                <span className="text-sm font-semibold text-gray-900">{item.mailingPlanPrice}</span>
+                <div className="text-right">
+                  <span className="text-sm font-semibold text-gray-900 block">{item.mailingPlanPrice}</span>
+                  {item.mailingPlanPriceYearly && (
+                    <span className="text-xs text-gray-500 block">₹{item.mailingPlanPriceYearly}/yr</span>
+                  )}
+                </div>
               </div>
             )}
             {'brPlanPrice' in item && item.brPlanPrice && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Business Reg</span>
-                <span className="text-sm font-semibold text-gray-900">{item.brPlanPrice}</span>
+                <div className="text-right">
+                  <span className="text-sm font-semibold text-gray-900 block">{item.brPlanPrice}</span>
+                  {item.brPlanPriceYearly && (
+                    <span className="text-xs text-gray-500 block">₹{item.brPlanPriceYearly}/yr</span>
+                  )}
+                </div>
               </div>
             )}
             {!('gstPlanPrice' in item) && (
-              <span className="text-lg font-bold text-gray-900">
-                {item.price}
-              </span>
+              <div className="text-right">
+                <span className="text-lg font-bold text-gray-900 block">
+                  {item.price}
+                </span>
+                {'priceYearly' in item && item.priceYearly && (
+                  <span className="text-xs text-gray-500 block">₹{item.priceYearly}/yr</span>
+                )}
+              </div>
             )}
           </div>
 
@@ -250,7 +268,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
           {/* Get Best Price Button */}
           <button
             onClick={handleCardClick}
-            className="w-full py-2.5 bg-gray-900 hover:bg-[#EDB003] text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-md hover:text-gray-900"
+            className="w-full py-3 bg-gray-900 hover:bg-[#EDB003] text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-md hover:text-gray-900"
           >
             Get Best Price
           </button>

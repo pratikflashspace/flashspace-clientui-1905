@@ -3,79 +3,7 @@
 @tailwind utilities;
 
 /* Import Google Fonts - Poppins (all weights) and Inter */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap');
-
-/* Geist Font - Map to Inter since Geist isn't available on free CDNs */
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/Geist/Geist-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/Geist/Geist-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/Geist/Geist-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/Geist/Geist-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-display: swap;
-}
-
-/* Poppins Font (from uploaded fonts) */
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins/Poppins-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins/Poppins-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'c4b700';
-  src: url('/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
-    url('/fonts/c4b700dcb2187787-s.p.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'new-one';
-  src: url('./assets//fonts/e4af272ccee01ff0-s.p.woff2') format('woff2');
-}
+/* Fonts are loaded via index.html (Outfit) */
 
 /* Removed Locomotive Scroll overrides */
 
@@ -224,8 +152,8 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    /* Primary site font: Poppins (with Geist fallback) */
-    font-family: 'Poppins', 'Geist', 'Georgia', 'serif';
+    /* Primary site font: Outfit */
+    font-family: 'Outfit', sans-serif;
     background: hsl(var(--background));
     color: hsl(var(--foreground));
     min-height: 100vh;

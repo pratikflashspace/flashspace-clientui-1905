@@ -1,4 +1,4 @@
-import { Building, MapPin, Phone, Users, ChevronDown, Grid3X3, List, Wifi, Coffee, Calendar, Star, CheckCircle } from "lucide-react";
+import { Building, MapPin, Phone, Users, ChevronDown, ChevronLeft, Grid3X3, List, Wifi, Coffee, Calendar, Star, CheckCircle, Presentation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
@@ -166,6 +166,12 @@ const CoworkingSpace = () => {
       description: "Meeting rooms & services"
     },
     {
+      label: "Meeting Rooms",
+      href: "/services/meeting-rooms",
+      icon: Presentation,
+      description: "Book meeting rooms hourly"
+    },
+    {
       label: "Event Spaces",
       href: "/services/event-spaces",
       icon: MapPin,
@@ -289,6 +295,15 @@ const CoworkingSpace = () => {
             data-lenis-prevent
           >
             <div className="px-4 sm:px-6 py-4 sm:py-6">
+              {/* Mobile Back Button */}
+              <button
+                onClick={() => navigate('/')}
+                className="md:hidden flex items-center gap-2 text-sm text-gray-500 mb-4 hover:text-black transition"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Back
+              </button>
+
               {/* Breadcrumb */}
               <div className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
                 <span>Home</span>
@@ -366,55 +381,55 @@ const CoworkingSpace = () => {
             </div>
           </div> */}
 
-          {/* Results Header */}
-          <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            <p className="text-xs sm:text-sm text-gray-600">
-              Showing <span className="font-semibold text-gray-900">{coworkingSpaces.length} result(s)</span> for coworking space in {selectedCity}
-            </p>
-            
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-              <Button 
-                variant={viewMode === "list" ? "default" : "ghost"} 
-                size="sm" 
-                onClick={() => setViewMode("list")}
-                className="flex items-center gap-1 text-xs sm:text-sm h-8"
-              >
-                <List className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">List</span>
-              </Button>
-              <Button 
-                variant={viewMode === "grid" ? "default" : "ghost"} 
-                size="sm" 
-                onClick={() => setViewMode("grid")}
-                className="flex items-center gap-1 text-xs sm:text-sm h-8"
-              >
-                <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Grid</span>
-              </Button>
-            </div>
-          </div>
+              {/* Results Header */}
+              <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  Showing <span className="font-semibold text-gray-900">{coworkingSpaces.length} result(s)</span> for coworking space in {selectedCity}
+                </p>
 
-          {/* Coworking Space Listings - Using Optimized ListingCard Component */}
-          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            {loading ? (
-              <SkeletonCardGrid count={6} />
-            ) : error ? (
-              <div className="col-span-full text-center py-8 sm:py-12">
-                <p className="text-sm sm:text-base text-red-600">{error}</p>
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className="flex items-center gap-1 text-xs sm:text-sm h-8"
+                  >
+                    <List className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">List</span>
+                  </Button>
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className="flex items-center gap-1 text-xs sm:text-sm h-8"
+                  >
+                    <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">Grid</span>
+                  </Button>
+                </div>
               </div>
-            ) : coworkingSpaces.length === 0 ? (
-              <div className="col-span-full text-center py-8 sm:py-12">
-                <p className="text-sm sm:text-base text-gray-600">No coworking spaces found for {selectedCity}</p>
+
+              {/* Coworking Space Listings - Using Optimized ListingCard Component */}
+              <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                {loading ? (
+                  <SkeletonCardGrid count={6} />
+                ) : error ? (
+                  <div className="col-span-full text-center py-8 sm:py-12">
+                    <p className="text-sm sm:text-base text-red-600">{error}</p>
+                  </div>
+                ) : coworkingSpaces.length === 0 ? (
+                  <div className="col-span-full text-center py-8 sm:py-12">
+                    <p className="text-sm sm:text-base text-gray-600">No coworking spaces found for {selectedCity}</p>
+                  </div>
+                ) : coworkingSpaces.map((space, index) => (
+                  <ListingCardModern
+                    key={space._id}
+                    item={space}
+                    index={index}
+                    onClick={() => navigate(`/coworking-space/${space._id}`)}
+                  />
+                ))}
               </div>
-            ) : coworkingSpaces.map((space, index) => (
-              <ListingCardModern
-                key={space._id}
-                item={space}
-                index={index}
-                onClick={() => navigate(`/coworking-space/${space._id}`)}
-              />
-            ))}
-          </div>
 
               {/* What is Coworking Space Section */}
               {/* <div className={`bg-gradient-to-br from-[#172A3A] to-[#172A3A]/90 rounded-2xl p-8 mb-8 relative z-30 transition-opacity duration-300 overflow-hidden ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>

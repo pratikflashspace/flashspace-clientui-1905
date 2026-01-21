@@ -11,7 +11,40 @@ import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+import { useRef, useEffect } from "react";
+
 const BusinessSetup = () => {
+  // Refs for interactive background
+  const bgRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const bg = bgRef.current;
+    if (!container || !bg) return;
+
+    const handleMove = (e: MouseEvent | globalThis.MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+      const translateX = x * 14;
+      const translateY = y * 10;
+      bg.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(1.03)`;
+    };
+
+    const handleLeave = () => {
+      if (bg) bg.style.transform = `translate3d(0, 0, 0) scale(1.03)`;
+    };
+
+    container.addEventListener('mousemove', handleMove);
+    container.addEventListener('mouseleave', handleLeave);
+
+    return () => {
+      container.removeEventListener('mousemove', handleMove);
+      container.removeEventListener('mouseleave', handleLeave);
+    };
+  }, []);
   const [selectedCity, setSelectedCity] = useState("Delhi");
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
@@ -229,348 +262,433 @@ const BusinessSetup = () => {
       {/* Header */}
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative h-[85vh] overflow-hidden mt-16">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1920&q=80"
-            alt="Business Setup Services"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#172A3A]/95 via-[#172A3A]/80 to-[#EDB003]/20"></div>
+      {/* Hero Section (MindTrip Style - Floating Cluster) */}
+      <section ref={containerRef} className="relative min-h-[90vh] flex items-center bg-slate-50 dark:bg-[#0B1120] transition-colors duration-300 z-30 pt-20 overflow-hidden">
 
-          {/* Animated Gradient Orbs */}
-          <div className="absolute top-20 left-20 w-96 h-96 bg-[#EDB003]/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#172A3A]/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
+        {/* Clean Background with subtle gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-amber-50 dark:from-[#0B1120] dark:via-[#111] dark:to-[#1a1a1a]" />
 
-        <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
-          <motion.div
-            className="max-w-3xl text-white"
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
-            transition={{ duration: 0.8 }}
-          >
+        {/* Animated Gradient Orbs (Subtle) */}
+        <div className="absolute top-20 left-20 w-[500px] h-[500px] bg-[#EDB003]/5 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px] animate-pulse delay-1000" />
+
+        <div className="container mx-auto px-4 relative z-10 w-full">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+            {/* LEFT COLUMN: Content */}
             <motion.div
-              className="inline-flex items-center gap-2 bg-[#EDB003]/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-[#EDB003]/30"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+              initial="hidden"
+              animate="visible"
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="text-left relative z-20"
             >
-              <Sparkles className="w-4 h-4 text-[#EDB003]" />
-              <span className="text-sm font-semibold text-[#EDB003]">Complete Business Setup Solutions</span>
-            </motion.div>
+              <motion.div
+                className="inline-flex items-center gap-2 bg-white dark:bg-white/5 border border-amber-200 dark:border-white/10 px-4 py-2 rounded-full mb-8 shadow-sm"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Sparkles className="w-4 h-4 text-[#EDB003]" />
+                <span className="text-sm font-bold tracking-wide text-slate-800 dark:text-white">Complete Business Setup Solutions</span>
+              </motion.div>
 
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight" style={{ fontFamily: 'Poppins' }}>
-              Business Setup
-              <br />
-              <span className="text-[#EDB003]">Made Simple</span>
-            </h1>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1] text-slate-900 dark:text-white tracking-tight">
+                Business Setup <br />
+                <span className="text-[#EDB003]">Made Simple.</span>
+              </h1>
 
-            <p className="text-xl md:text-2xl mb-8 text-gray-200 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
-              Complete end-to-end support for company registration, GST filing, licenses, and legal compliance - launch your business in 7-10 days
-            </p>
+              <p className="text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-lg leading-relaxed">
+                Complete end-to-end support for company registration, GST filing, licenses, and legal compliance - launch your business in 7-10 days.
+              </p>
 
-            {/* Hero Search Bar */}
-            <motion.div
-              className="bg-white dark:bg-[#1f1f1f] rounded-2xl p-2 shadow-2xl max-w-2xl"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <div className="flex items-center gap-2">
-                <div className="flex-1">
-                  <Popover open={isLocationOpen} onOpenChange={setIsLocationOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        role="combobox"
-                        className="w-full justify-between h-16 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-black/20 rounded-xl"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-[#EDB003]/10 rounded-lg flex items-center justify-center">
-                            <MapPin className="w-6 h-6 text-[#EDB003]" />
-                          </div>
-                          <div className="text-left">
-                            <div className="text-xs text-gray-500 font-medium">Location</div>
-                            <div className="text-base font-semibold">{selectedCity || "Select City"}</div>
-                          </div>
-                        </div>
-                        <ChevronDown className="ml-2 h-5 w-5 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[300px] p-0 bg-white dark:bg-[#1f1f1f] shadow-xl border-2 border-gray-100 dark:border-white/10">
-                      <Command className="bg-white dark:bg-[#1f1f1f]">
-                        <CommandInput placeholder="Search city..." className="bg-white dark:bg-[#1f1f1f] dark:text-white" />
-                        <CommandList className="bg-white dark:bg-[#1f1f1f]">
-                          <CommandEmpty className="dark:text-white">No city found.</CommandEmpty>
-                          <CommandGroup>
-                            {cities.map((city) => (
-                              <CommandItem
-                                key={city}
-                                value={city}
-                                onSelect={() => {
-                                  setSelectedCity(city);
-                                  setIsLocationOpen(false);
-                                }}
-                                className="dark:text-white dark:aria-selected:bg-white/10"
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    selectedCity === city ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {city}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+              {/* Search Container (Relative Parent) */}
+              <div className="relative max-w-md w-full">
+
+                {/* Compact Search Bar */}
+                <div className="bg-white dark:bg-white/5 p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 w-full relative z-20">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setIsLocationOpen(!isLocationOpen)}
+                      className="flex-1 justify-between h-12 px-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl text-slate-700 dark:text-white"
+                    >
+                      <span className="truncate mr-2">{selectedCity || "Select City"}</span>
+                      <ChevronDown className="w-4 h-4 opacity-50" />
+                    </Button>
+                    <Button className="bg-[#EDB003] hover:bg-[#d69f03] text-black font-bold h-12 px-6 rounded-xl">
+                      Get Started
+                    </Button>
+                  </div>
                 </div>
-                <Button className="bg-gradient-to-r from-[#EDB003] to-[#f5c242] hover:from-[#d69f03] hover:to-[#EDB003] text-white h-16 px-10 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                  <Search className="w-5 h-5 mr-2" />
-                  Get Started
-                </Button>
+
+                {/* Horizontal City Selector Overlay (Anchored to Parent) */}
+                {isLocationOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
+                    animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
+                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                    className="absolute bottom-full left-0 mb-3 z-30 w-full bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-2xl rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-white/20 ring-1 ring-black/5 overflow-hidden"
+                  >
+                    {/* Decorative Top Gradient Line */}
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#EDB003] to-transparent opacity-50" />
+                    <div className="p-5">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-bold text-lg dark:text-white flex items-center gap-2">
+                          <MapPin className="w-5 h-5 text-[#EDB003]" /> Select Location
+                        </h3>
+                        <button onClick={() => setIsLocationOpen(false)} className="p-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors">
+                          <Check className="w-5 h-5 text-slate-400" />
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
+                        {cities.map(c => (
+                          <button
+                            key={c}
+                            onClick={() => { setSelectedCity(c); setIsLocationOpen(false); }}
+                            className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 border ${selectedCity === c
+                              ? 'bg-[#EDB003] text-black border-[#EDB003] shadow-md shadow-[#EDB003]/20'
+                              : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-100 dark:hover:bg-white/10 hover:scale-[1.02]'
+                              }`}
+                          >
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-6 mt-10 text-sm font-medium text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#EDB003]" /> <span>Free Consultation</span></div>
+                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#EDB003]" /> <span>100% Online Process</span></div>
               </div>
             </motion.div>
 
-            {/* Trust Indicators */}
-            <motion.div
-              className="flex items-center gap-8 mt-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#EDB003] to-[#f5c242] border-2 border-white"></div>
-                  ))}
+            {/* RIGHT COLUMN: Floating Cluster */}
+            <div className="relative h-[600px] w-full hidden lg:block perspective-1000">
+              {/* Center Image (Main - Signing/Contract) */}
+              <motion.div
+                animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
+              >
+                <div className="w-64 h-80 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80" alt="Signing Contract" className="w-full h-full object-cover" />
                 </div>
-                <div className="text-sm">
-                  <div className="font-bold">5000+ Companies</div>
-                  <div className="text-gray-300 text-xs">Registered Successfully</div>
-                </div>
-              </div>
+              </motion.div>
 
-              <div className="flex items-center gap-2">
-                <div className="flex gap-0.5">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star key={i} className="w-4 h-4 fill-[#EDB003] text-[#EDB003]" />
-                  ))}
+              {/* Center Gap Image (Handshake) */}
+              <motion.div
+                animate={{ y: [0, -25, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 0.8 }}
+                className="absolute top-[50%] left-[22%] transform -translate-x-1/2 -translate-y-1/2 z-10"
+              >
+                <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=400&q=80" alt="Success Deal" className="w-full h-full object-cover" />
                 </div>
-                <div className="text-sm">
-                  <div className="font-bold">4.9/5 Rating</div>
-                  <div className="text-gray-300 text-xs">From 500+ Reviews</div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
+              </motion.div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-        >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-            <div className="w-1.5 h-3 bg-white rounded-full"></div>
+              {/* Upper Center Filler Image (Legal/Scales) */}
+              <motion.div
+                animate={{ y: [0, -18, 0] }} transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 0.2 }}
+                className="absolute top-[28%] left-[45%] transform -translate-x-1/2 -translate-y-1/2 z-0"
+              >
+                <div className="w-36 h-36 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80" alt="Legal Compliance" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* Floating Image 1 (Top Right - Office) */}
+              <motion.div
+                animate={{ y: [0, -20, 0] }} transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 }}
+                className="absolute top-[5%] right-[5%] z-10"
+              >
+                <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=400&q=80" alt="Corporate Office" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* Floating Image 2 (Bottom Left - Finance) */}
+              <motion.div
+                animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut", delay: 2 }}
+                className="absolute bottom-[20%] left-[0%] z-20"
+              >
+                <div className="w-48 h-32 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=400&q=80" alt="Financial Growth" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* Floating Image 3 (Top Left - Meeting) */}
+              <motion.div
+                animate={{ y: [0, -18, 0] }} transition={{ repeat: Infinity, duration: 7.5, ease: "easeInOut", delay: 0.5 }}
+                className="absolute top-[12%] left-[5%] z-10"
+              >
+                <div className="w-32 h-40 rounded-[2rem] overflow-hidden shadow-lg border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=400&q=80" alt="Consultation" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* Floating Image 4 (Bottom Right - Stamp/Work) */}
+              <motion.div
+                animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6.5, ease: "easeInOut", delay: 1.5 }}
+                className="absolute bottom-[10%] right-[10%] z-20"
+              >
+                <div className="w-44 h-44 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                  <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=400&q=80" alt="Team Work" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+
+              {/* Pill 1 */}
+              <motion.div
+                animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.5 }}
+                className="absolute top-[35%] left-[-5%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+              >
+                <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-sm">⚡</div>
+                <span className="font-bold text-slate-800 dark:text-white text-xs">Fast Setup</span>
+              </motion.div>
+
+              {/* Pill 2 */}
+              <motion.div
+                animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut", delay: 1.5 }}
+                className="absolute bottom-[28%] right-[-2%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+              >
+                <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-sm">🛡️</div>
+                <span className="font-bold text-slate-800 dark:text-white text-xs">Legal Proof</span>
+              </motion.div>
+
+              {/* Pill 3 */}
+              <motion.div
+                animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 3 }}
+                className="absolute top-[5%] left-[30%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+              >
+                <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-sm">👨‍💼</div>
+                <span className="font-bold text-slate-800 dark:text-white text-xs">Expert CAs</span>
+              </motion.div>
+
+              {/* Pill 4 */}
+              <motion.div
+                animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 6.2, ease: "easeInOut", delay: 2.2 }}
+                className="absolute bottom-[5%] left-[40%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+              >
+                <div className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-sm">🌐</div>
+                <span className="font-bold text-slate-800 dark:text-white text-xs">100% Online</span>
+              </motion.div>
+
+              {/* Decorative Circle */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#EDB003]/5 rounded-full blur-3xl -z-10" />
+            </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-12 bg-gradient-to-r from-[#EDB003] to-[#f5c242] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      {/* Stats Section (Redesigned - Clean & Premium) */}
+      <section className="py-10 border-y border-slate-100 dark:border-white/10 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-md relative z-20">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-100 dark:divide-white/5">
             {stats.map((stat, index) => (
               <motion.div
                 key={index}
-                className="text-center"
+                className="text-center group"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <stat.icon className="w-8 h-8 text-white mx-auto mb-3" />
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2" style={{ fontFamily: 'Poppins' }}>
+                <div className="mb-2 flex justify-center">
+                  <div className="w-12 h-12 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-center group-hover:bg-[#EDB003]/10 transition-colors duration-300">
+                    <stat.icon className="w-6 h-6 text-slate-400 dark:text-slate-500 group-hover:text-[#EDB003] transition-colors" />
+                  </div>
+                </div>
+                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>
                   {stat.number}
                 </div>
-                <div className="text-white/90 font-medium">{stat.label}</div>
+                <div className="text-slate-500 dark:text-slate-400 text-sm font-medium tracking-wide">{stat.label}</div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* What is Business Setup Section */}
-      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
-        <div className="container mx-auto px-4">
+      {/* What is Business Setup Section - Floating MindTrip Style */}
+      <section className="py-24 bg-slate-50 dark:bg-[#0f172a] transition-colors duration-300 relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-center mb-20"
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Our Services
+            <span className="inline-block px-5 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-bold mb-6 border border-[#EDB003]/20 tracking-wider">
+              OUR SERVICES
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
-              What is <span className="text-[#EDB003]">Business Setup</span>?
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-slate-900 dark:text-white tracking-tight" >
+              What is <span className="text-[#EDB003]">Business Setup?</span>
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
-              FlashSpace Business Setup provides comprehensive end-to-end support for legally establishing your business in India. From company registration to compliance management, we handle everything so you can focus on growing your venture.
+            <p className="text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
+              FlashSpace Business Setup provides comprehensive end-to-end support for legally establishing your business in India.
+              From company registration to compliance management, we handle everything.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
             {whatIsBusinessSetupCards.map((card, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
+                className="group flex flex-col items-center text-center relative"
               >
-                <Card className="border-2 border-gray-100 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] transition-all duration-500 group hover:shadow-xl h-full bg-white dark:bg-[#1f1f1f]">
-                  <CardContent className="p-8">
-                    <div className="w-16 h-16 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                      <card.icon className="w-8 h-8 text-white" />
+                {/* Floating Icon Bubble */}
+                <div className="relative mb-6">
+                  {/* Glow */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 scale-125"></div>
+
+                  {/* Main Container */}
+                  <div className="w-24 h-24 bg-white dark:bg-[#1E293B] rounded-[2rem] shadow-[0_15px_30px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.5)] flex items-center justify-center transform group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300 border-2 border-slate-50 dark:border-white/5 relative z-10">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md bg-gradient-to-br ${index === 0 ? "from-[#EDB003] to-[#FFD700]" : // Company Reg (Gold)
+                      index === 1 ? "from-emerald-500 to-teal-400" : // GST (Green)
+                        index === 2 ? "from-blue-500 to-cyan-400" :   // Licenses (Blue)
+                          "from-purple-500 to-indigo-400" // Worldwide (Purple)
+                      }`}>
+                      <card.icon className="w-6 h-6" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
-                      {card.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
-                      {card.description}
-                    </p>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+
+                {/* Text Content */}
+                <div className="relative z-10 px-4">
+                  <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-[#EDB003] transition-colors">
+                    {card.title}
+                  </h3>
+                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                    {card.description}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
-        <div className="container mx-auto px-4">
+      {/* How It Works - Connected Process Timeline */}
+      <section className="py-24 bg-white dark:bg-[#0a0a0a] transition-colors duration-300 overflow-hidden relative">
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent"></div>
+        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent"></div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-center mb-24"
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Simple Process
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 mb-6 uppercase tracking-wider">
+              <div className="w-2 h-2 rounded-full bg-[#EDB003]"></div> Simple Process
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900 dark:text-white">
               How It <span className="text-[#EDB003]">Works</span>
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
-              Launch your business in three simple steps with FlashSpace
+            <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-light">
+              Launch your business in three simple steps with FlashSpace. We handle the complexity so you don't have to.
             </p>
           </motion.div>
 
-          <div className="max-w-5xl mx-auto">
-            {howItWorksSteps.map((step, index) => (
-              <motion.div
-                key={index}
-                className="relative flex items-start gap-8 mb-12 last:mb-0"
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.2 }}
-                viewport={{ once: true }}
-              >
-                {/* Step Number Circle */}
-                <div className="flex-shrink-0 relative">
-                  <div className="w-24 h-24 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-full flex items-center justify-center shadow-xl">
-                    <span className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins' }}>
-                      {step.number}
-                    </span>
-                  </div>
-                  {/* Connector Line */}
-                  {index < howItWorksSteps.length - 1 && (
-                    <div className="absolute top-24 left-1/2 transform -translate-x-1/2 w-1 h-12 bg-gradient-to-b from-[#EDB003] to-transparent"></div>
-                  )}
-                </div>
+          <div className="relative max-w-6xl mx-auto">
+            {/* Connecting Line (Desktop) */}
+            <div className="hidden md:block absolute top-12 left-[10%] right-[10%] h-0.5 border-t-2 border-dashed border-slate-200 dark:border-slate-800 md:z-0"></div>
 
-                {/* Step Content */}
-                <div className="flex-1 bg-white dark:bg-[#1f1f1f] rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border-2 border-gray-100 dark:border-white/10 hover:border-[#EDB003]">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#EDB003]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <step.icon className="w-6 h-6 text-[#EDB003]" />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative z-10">
+              {howItWorksSteps.map((step, index) => (
+                <motion.div
+                  key={index}
+                  className="relative flex flex-col items-center text-center group"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.15, duration: 0.5 }}
+                  viewport={{ once: true }}
+                >
+                  {/* Number Bubble - Glossy Effect */}
+                  <div className="w-24 h-24 mb-8 relative cursor-pointer">
+                    <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-full shadow-lg group-hover:shadow-[#EDB003]/20 transition-all duration-300 border-4 border-white dark:border-[#0a0a0a] z-10 flex items-center justify-center group-hover:-translate-y-2">
+                      <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-slate-800 to-slate-600 dark:from-white dark:to-slate-400 group-hover:from-[#EDB003] group-hover:to-amber-500 transition-all duration-300">
+                        {step.number}
+                      </span>
                     </div>
-                    <div>
-                      <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
-                        {step.title}
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg" style={{ fontFamily: 'Geist, sans-serif' }}>
-                        {step.description}
-                      </p>
+                    {/* Floating Small Icon */}
+                    <div className="absolute -top-2 -right-2 w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center shadow-md z-20 group-hover:scale-110 transition-transform duration-300">
+                      <step.icon className="w-5 h-5 text-black" />
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 group-hover:text-[#EDB003] transition-colors">{step.title}</h3>
+                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm">{step.description}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Why Choose FlashSpace Section */}
-      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
-        <div className="container mx-auto px-4">
+      {/* Why Choose FlashSpace - Floating MindTrip Style */}
+      <section className="py-24 bg-slate-50 dark:bg-[#0f172a] relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-center mb-20"
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Why Choose Us
+            <span className="inline-block px-5 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-bold mb-6 border border-[#EDB003]/20 tracking-wider">
+              WHY CHOOSE US
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
-              Why Choose <span className="text-[#EDB003]">FlashSpace</span> Business Setup
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-slate-900 dark:text-white tracking-tight">
+              Why Choose <span className="text-[#EDB003]">FlashSpace?</span>
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
-              Trusted by 5000+ entrepreneurs for comprehensive business registration and compliance solutions
+            <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-light leading-relaxed">
+              We combine legal expertise with technology to provide the fastest, most reliable business setup experience in India.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 max-w-7xl mx-auto">
             {whyChooseReasons.map((reason, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
+                className="group relative"
               >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
-                  <CardContent className="p-8 relative">
-                    {/* Background Gradient */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${reason.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
+                <div className="bg-white dark:bg-[#1E293B] rounded-[2.5rem] p-8 h-full shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 dark:border-white/5 relative z-10 group-hover:-translate-y-2">
+                  {/* Floating Icon */}
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 text-white shadow-lg bg-gradient-to-br ${index % 2 === 0 ? "from-[#EDB003] to-[#f5c242]" : "from-slate-800 to-slate-600 dark:from-slate-700 dark:to-slate-900"
+                    } group-hover:scale-110 transition-transform duration-500`}>
+                    <reason.icon className="w-8 h-8" />
+                  </div>
 
-                    <div className={`w-16 h-16 bg-gradient-to-br ${reason.gradient} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <reason.icon className="w-8 h-8 text-white" />
-                    </div>
+                  <h3 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white group-hover:text-[#EDB003] transition-colors">
+                    {reason.title}
+                  </h3>
+                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium text-lg">
+                    {reason.description}
+                  </p>
+                </div>
 
-                    <h3 className="text-2xl font-bold mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300">
-                      {reason.title}
-                    </h3>
-
-                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed" style={{ fontFamily: 'Geist, sans-serif' }}>
-                      {reason.description}
-                    </p>
-                  </CardContent>
-                </Card>
+                {/* Decorative Blob */}
+                <div className={`absolute -inset-1 rounded-[2.5rem] bg-gradient-to-r ${index % 2 === 0 ? "from-[#EDB003]/20 via-[#f5c242]/20 to-transparent" : "from-slate-400/20 via-slate-500/20 to-transparent"
+                  } blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10`} />
               </motion.div>
             ))}
           </div>

@@ -18,8 +18,10 @@ export interface PricingStructure {
 /**
  * Parses a price string (e.g. "₹1,000" or "1000") into a number.
  */
-export const parsePrice = (priceStr: string | undefined): number => {
-  if (!priceStr) return 0;
+export const parsePrice = (priceStr: string | number | undefined): number => {
+  if (priceStr === undefined || priceStr === null) return 0;
+  if (typeof priceStr === 'number') return priceStr;
+
   const match = priceStr.toString().match(/[\d,]+/);
   return match ? parseInt(match[0].replace(/,/g, ''), 10) : 0;
 };
@@ -35,27 +37,36 @@ export const getVirtualOfficePricing = (spaceDetails: VirtualOfficeItem | null):
   const mailingPrice = parsePrice(spaceDetails.mailingPlanPrice || spaceDetails.price);
   const brPrice = parsePrice(spaceDetails.brPlanPrice || spaceDetails.price);
 
+  const gstPriceYearly = parsePrice(spaceDetails.gstPlanPriceYearly);
+  const mailingPriceYearly = parsePrice(spaceDetails.mailingPlanPriceYearly);
+  const brPriceYearly = parsePrice(spaceDetails.brPlanPriceYearly);
+
+  // Helper to prioritize explicit yearly price but fallback to calculation
+  const resolveYearly = (monthly: number, yearlyExplicit: number) => {
+    return yearlyExplicit > 0 ? yearlyExplicit : monthly * 12;
+  };
+
   return {
-    gst: { 
+    gst: {
       key: "gst",
-      name: "GST Plan", 
+      name: "GST Plan",
       monthlyPrice: gstPrice,
-      yearlyPrice: gstPrice * 12, 
-      features: ["Virtual Address", "GST Registration", "Mail Handling"] 
+      yearlyPrice: resolveYearly(gstPrice, gstPriceYearly),
+      features: ["Virtual Address", "GST Registration", "Mail Handling"]
     },
-    mailing: { 
+    mailing: {
       key: "mailing",
-      name: "Mailing Plan", 
+      name: "Mailing Plan",
       monthlyPrice: mailingPrice,
-      yearlyPrice: mailingPrice * 12, 
-      features: ["Mail Handling", "Courier Receipt"] 
+      yearlyPrice: resolveYearly(mailingPrice, mailingPriceYearly),
+      features: ["Mail Handling", "Courier Receipt"]
     },
-    br: { 
+    br: {
       key: "br",
-      name: "BR Plan", 
+      name: "BR Plan",
       monthlyPrice: brPrice,
-      yearlyPrice: brPrice * 12, 
-      features: ["Business Registration", "Lounge Access", "Meeting Rooms"] 
+      yearlyPrice: resolveYearly(brPrice, brPriceYearly),
+      features: ["Business Registration", "Lounge Access", "Meeting Rooms"]
     },
   };
 };

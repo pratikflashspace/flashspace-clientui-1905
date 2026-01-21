@@ -15,14 +15,19 @@ export const AdminRoute: React.FC = () => {
     }
 
     // Check if user is authenticated and has admin role
+    console.log('AdminRoute Check:', { isAuthenticated, user, role: user?.role });
+
     if (!isAuthenticated || !user) {
+        console.warn('AdminRoute: Not authenticated or no user');
         return <Navigate to="/login" replace />;
     }
 
     if (user.role !== 'admin') {
+        console.warn('AdminRoute: Role mismatch', { expected: 'admin', actual: user.role });
         // If authenticated but not admin, redirect to user dashboard
         return <Navigate to="/dashboard" replace />;
     }
 
+    console.log('AdminRoute: Access granted');
     return <Outlet />;
 };

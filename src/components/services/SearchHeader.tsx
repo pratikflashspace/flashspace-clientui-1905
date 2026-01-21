@@ -49,11 +49,11 @@ const SearchHeader = memo<SearchHeaderProps>(({
   return (
     <div
       className={`bg-white dark:bg-zinc-900 rounded-lg border p-4 mb-4 relative transition-all duration-300 ${isSearchFocused
-          ? 'border-primary shadow-2xl shadow-primary/20 bg-white dark:bg-zinc-900'
-          : 'border-gray-200 dark:border-white/10 shadow-sm'
+        ? 'border-primary shadow-2xl shadow-primary/20 bg-white dark:bg-zinc-900'
+        : 'border-gray-200 dark:border-white/10 shadow-sm'
         }`}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
         {/* Search Label */}
         <div
           className={`flex items-center gap-2 text-sm font-medium transition-colors duration-300 ${isSearchFocused ? 'text-primary' : 'text-gray-700 dark:text-gray-300'
@@ -67,7 +67,7 @@ const SearchHeader = memo<SearchHeaderProps>(({
         </div>
 
         {/* Search Form */}
-        <form onSubmit={onSearchSubmit} className="relative flex-1 max-w-md">
+        <form onSubmit={onSearchSubmit} className="relative flex-1 w-full md:max-w-md">
           <div className="relative">
             <Input
               type="text"
@@ -77,8 +77,8 @@ const SearchHeader = memo<SearchHeaderProps>(({
               onBlur={onSearchBlur}
               placeholder="Search for a city..."
               className={`pr-10 transition-all duration-300 dark:bg-zinc-800 dark:text-white ${isSearchFocused
-                  ? 'border-primary ring-2 ring-primary/20 focus:ring-primary/30'
-                  : 'border-gray-300 dark:border-zinc-700 focus:ring-2 focus:ring-primary focus:border-transparent'
+                ? 'border-primary ring-2 ring-primary/20 focus:ring-primary/30'
+                : 'border-gray-300 dark:border-zinc-700 focus:ring-2 focus:ring-primary focus:border-transparent'
                 }`}
             />
             <Button
@@ -117,7 +117,7 @@ const SearchHeader = memo<SearchHeaderProps>(({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="text-sm text-gray-700 dark:text-gray-300 hover:text-primary transition-colors duration-300 font-medium flex items-center gap-2 border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+              className="text-sm text-gray-700 dark:text-gray-300 hover:text-primary transition-colors duration-300 font-medium flex items-center justify-between md:justify-start gap-2 border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700 w-full md:w-auto"
             >
               {currentService}
               <ChevronDown className="w-4 h-4" />

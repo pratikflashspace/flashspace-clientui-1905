@@ -6,6 +6,7 @@ interface ResizableMapLayoutProps {
   children: ReactNode; // Listing content
   mapContent: ReactNode; // Map content
   defaultListingWidth?: number; // Percentage (e.g., 50 for 50%)
+  showFloatingButton?: boolean; // Control visibility of mobile floating button
 }
 
 /**
@@ -20,6 +21,7 @@ const ResizableMapLayout = memo<ResizableMapLayoutProps>(({
   children,
   mapContent,
   defaultListingWidth = 50,
+  showFloatingButton = true,
 }) => {
   const [listingWidth, setListingWidth] = useState(defaultListingWidth);
   const [isMapExpanded, setIsMapExpanded] = useState(false);
@@ -104,6 +106,10 @@ const ResizableMapLayout = memo<ResizableMapLayoutProps>(({
     setIsMapExpanded(false);
   }, [defaultListingWidth]);
 
+  // Modal Handlers - Defined at top level to avoid conditional hook calls
+  const handleOpenModal = useCallback(() => setShowMapModal(true), []);
+  const handleCloseModal = useCallback(() => setShowMapModal(false), []);
+
   // Memoize calculated width to prevent unnecessary recalculations
   const mapWidth = 100 - listingWidth;
 
@@ -113,7 +119,7 @@ const ResizableMapLayout = memo<ResizableMapLayoutProps>(({
       <div className="hidden lg:flex w-full h-full overflow-hidden relative">
         {/* Listings Panel */}
         <div
-          style={{ 
+          style={{
             width: `${listingWidth}%`,
             height: '100%',
             maxHeight: '100%',
@@ -142,7 +148,7 @@ const ResizableMapLayout = memo<ResizableMapLayoutProps>(({
 
         {/* Map Panel */}
         <div
-          style={{ 
+          style={{
             width: `${mapWidth}%`,
             height: '100%',
             maxHeight: '100%',
@@ -191,22 +197,43 @@ const ResizableMapLayout = memo<ResizableMapLayoutProps>(({
         {children}
 
         {/* Floating Map Button */}
-        <Button
-          onClick={useCallback(() => setShowMapModal(true), [])}
-          className="fixed bottom-6 right-6 z-50 bg-[#172A3A] text-white rounded-full p-4 shadow-2xl hover:bg-[#172A3A]/90 transition-all duration-300 flex items-center gap-2 font-medium"
-        >
-          <MapIcon className="w-5 h-5" />
-          <span className="text-sm">View Map</span>
-        </Button>
+        {/* Floating Mini Map Widget (Mobile) - Only show when modal is closed and enabled */}
+        {!showMapModal && showFloatingButton && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpenModal();
+            }}
+            className="fixed bottom-4 right-4 z-[100] w-36 h-36 bg-gray-100 rounded-2xl shadow-2xl border-4 border-white overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300 animate-in slide-in-from-bottom-10 fade-in select-none"
+            role="button"
+            aria-label="Expand Map"
+          >
+            {/* Transparent Interaction Blocker - Sits ON TOP of map to capture clicks */}
+            <div className="absolute inset-0 z-20 bg-transparent" />
+
+            {/* Map Preview */}
+            <div className="w-full h-full opacity-90 relative z-0">
+              {mapContent}
+            </div>
+
+            {/* Visual Overlay & Label */}
+            <div className="absolute inset-0 z-30 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end items-center pb-3 pointer-events-none">
+              <div className="bg-white/95 text-black text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 transform translate-y-0.5">
+                <Maximize2 className="w-3 h-3" />
+                <span>Expand Map</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Map Modal */}
         {showMapModal && (
-          <div className="fixed inset-0 z-[9999] bg-white overflow-hidden">
+          <div className="fixed inset-0 z-[9999] bg-white flex flex-col animate-in slide-in-from-bottom-5 fade-in duration-300">
             {/* Modal Header */}
-            <div className="absolute top-0 left-0 right-0 z-[10000] bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
+            <div className="flex-none z-[10000] bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm h-[60px]">
               <h3 className="text-lg font-semibold text-gray-900">Map View</h3>
               <Button
-                onClick={useCallback(() => setShowMapModal(false), [])}
+                onClick={handleCloseModal}
                 variant="ghost"
                 size="sm"
                 className="p-2 hover:bg-gray-100 rounded-full h-auto"
@@ -216,16 +243,19 @@ const ResizableMapLayout = memo<ResizableMapLayoutProps>(({
               </Button>
             </div>
 
-            {/* Map Content */}
-            <div className="w-full h-full pt-[60px] pb-[80px]">
-              {mapContent}
+            {/* Map Content - Flex 1 to fill remaining space */}
+            <div className="flex-1 relative w-full overflow-hidden bg-gray-50">
+              {/* Ensure map content takes full height of this flex child */}
+              <div className="absolute inset-0">
+                {mapContent}
+              </div>
             </div>
 
-            {/* Close Button at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 z-[10000] p-4 bg-gradient-to-t from-white via-white to-transparent pointer-events-none">
+            {/* Close Button Footer */}
+            <div className="flex-none z-[10000] p-4 bg-white border-t border-gray-100 h-[80px] flex items-center justify-center">
               <Button
-                onClick={useCallback(() => setShowMapModal(false), [])}
-                className="w-full bg-[#172A3A] text-white hover:bg-[#172A3A]/90 pointer-events-auto"
+                onClick={handleCloseModal}
+                className="w-full bg-[#172A3A] text-white hover:bg-[#172A3A]/90 h-12 text-base font-semibold rounded-xl"
               >
                 Close Map
               </Button>

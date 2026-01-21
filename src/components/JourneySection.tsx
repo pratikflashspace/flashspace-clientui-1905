@@ -206,77 +206,50 @@ const JourneySection = () => {
           </div>
 
           {/* Mobile Layout */}
-          <div className="md:hidden space-y-8 mb-12">
+          <div className="md:hidden space-y-0 text-left">
             {journeySteps.map((step, index) => (
-              <div key={index} className="flex items-center gap-6 relative">
-                <div className="w-20 h-20 rounded-full border-3 border-gray-200 dark:border-white/10 bg-white dark:bg-[#1f1f1f] flex flex-col items-center justify-center flex-shrink-0 shadow-md">
-                  <div className="mb-1 text-[#172A3A] dark:text-white">
-                    {step.icon}
-                  </div>
-                  <span className="text-[#EDB003] font-bold text-xs">
-                    {step.step}
-                  </span>
-                </div>
-                <div className="text-[#172A3A] dark:text-white font-semibold text-lg">
-                  {step.title}
-                </div>
-
-                {/* Mobile Curved Arrow */}
+              <div key={index} className="flex gap-6 relative pb-12 last:pb-0">
+                {/* Mobile Straight Connector Line - Positioned absolute relative to the row to span full height */}
                 {index < journeySteps.length - 1 && (
-                  <div className="absolute left-10 top-full w-8 h-16 transform translate-y-2">
-                    <svg
-                      width="32"
-                      height="64"
-                      viewBox="0 0 32 64"
-                      className="absolute inset-0"
-                    >
-                      {/* Base curved path */}
-                      <path
-                        d="M 16 0 Q 8 20, 16 32 T 16 64"
-                        stroke="#E5E7EB"
-                        strokeWidth="2"
-                        fill="none"
-                        strokeLinecap="round"
-                      />
-
-                      {/* Animated curved path */}
-                      <path
-                        d="M 16 0 Q 8 20, 16 32 T 16 64"
-                        stroke="url(#mobileArrowGradient)"
-                        strokeWidth="2"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeDasharray="80"
-                        strokeDashoffset="0"
-                        className="animate-pulse"
-                      />
-
-                      {/* Arrow Head */}
-                      <polygon
-                        points="12,56 16,64 20,56 16,60"
-                        fill="#EDB003"
-                        className="animate-pulse"
-                      />
-
-                      {/* Gradient Definition */}
-                      <defs>
-                        <linearGradient id="mobileArrowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stopColor="#172A3A" />
-                          <stop offset="100%" stopColor="#EDB003" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
+                  <div className="absolute left-10 top-20 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700 -ml-[1px]">
+                    {/* Animated overlay */}
+                    <div
+                      className="absolute top-0 left-0 w-full bg-[#EDB003] transition-all duration-1000"
+                      style={{
+                        height: isVisible ? '100%' : '0%',
+                        opacity: isVisible ? 1 : 0
+                      }}
+                    ></div>
                   </div>
                 )}
+
+                {/* Step Circle Container */}
+                <div className="flex flex-col items-center flex-shrink-0 w-20 relative z-10">
+                  <div className="w-20 h-20 rounded-full border-3 border-gray-200 dark:border-white/10 bg-white dark:bg-[#1f1f1f] flex flex-col items-center justify-center shadow-md bg-white">
+                    <div className="mb-1 text-[#172A3A] dark:text-white">
+                      {step.icon}
+                    </div>
+                    <span className="text-[#EDB003] font-bold text-xs">
+                      {step.step}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Text Content */}
+                <div className="flex items-center pt-2">
+                  <div className="text-[#172A3A] dark:text-white font-semibold text-xl">
+                    {step.title}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
 
           {/* CTA Button */}
-          <div className="text-center">
+          <div className="text-center mt-8">
             <Button
               className={`
-                bg-[#EDB003] hover:bg-[#172A3A] text-white px-12 py-4 rounded-lg font-bold text-lg
+                bg-[#EDB003] hover:bg-[#172A3A] text-white w-full sm:w-auto px-8 py-6 rounded-xl font-bold text-lg
                 transform hover:scale-105 transition-all duration-300
                 shadow-lg hover:shadow-xl animate-fade-in
               `}

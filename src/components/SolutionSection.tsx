@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import Splash3dButton from "@/components/ui/3d-splash-button";
+
 import { Link } from "react-router-dom";
 import {
   Building,
@@ -10,7 +10,9 @@ import {
   Users,
   Briefcase,
   ChevronRight,
-  Zap
+  Zap,
+  Check,
+  ArrowRight
 } from "lucide-react";
 import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-animation";
 import { motion } from "framer-motion";
@@ -57,7 +59,9 @@ const SolutionsSection = () => {
       title: "Virtual Office",
       description: "Professional business address with mail handling and call forwarding services",
       features: ["Prime Location Address", "GST Registration Support", "Mail Forwarding", "Call Management"],
-      path: "/Solutions/virtual-office"
+      path: "/Solutions/virtual-office",
+      gradient: "from-[#EFAD1A] to-[#F59E0B]", // Gold
+      iconColor: "text-white"
     },
     {
       icon: (isHovered: boolean) => (
@@ -96,7 +100,9 @@ const SolutionsSection = () => {
       title: "Coworking Space",
       description: "Flexible workspace options with networking opportunities and premium amenities",
       features: ["Flexible Workspace", "Networking Events", "Premium Amenities", "24/7 Access"],
-      path: "/Solutions/coworking-space"
+      path: "/Solutions/coworking-space",
+      gradient: "from-[#EFAD1A] to-[#F59E0B]", // Gold
+      iconColor: "text-white"
     },
     {
       icon: (isHovered: boolean) => (
@@ -134,7 +140,9 @@ const SolutionsSection = () => {
       title: "On Demand",
       description: "On-demand meeting spaces and services with video conferencing facilities",
       features: ["Meeting Rooms", "Video Conferencing", "Presentation Tools", "Flexible Booking"],
-      path: "/Solutions/on-demand"
+      path: "/Solutions/on-demand",
+      gradient: "from-[#EFAD1A] to-[#F59E0B]", // Gold
+      iconColor: "text-white"
     },
     {
       icon: (isHovered: boolean) => (
@@ -172,136 +180,93 @@ const SolutionsSection = () => {
       title: "Business Setup",
       description: "Complete business setup solutions including legal documentation and compliance support",
       features: ["Legal Documentation", "Business Registration", "Compliance Support", "Tax Advisory"],
-      path: "/Solutions/business-setup"
+      path: "/Solutions/business-setup",
+      gradient: "from-[#EFAD1A] to-[#F59E0B]", // Gold
+      iconColor: "text-white"
     },
   ];
 
   return (
-    <section id="solutions" className="py-20 px-4 bg-[#ffffff] dark:bg-[#0a0a0a] relative overflow-hidden transition-colors duration-300">
-      {/* Removed gradient & decorative blobs for pure white background */}
-
-      <div className="container mx-auto relative z-10">
+    <section id="solutions" className="py-24 px-4 bg-slate-50 dark:bg-[#0B1120] relative overflow-hidden transition-colors duration-300">
+      <div className="container mx-auto relative z-10 max-w-7xl">
         {/* Section Header */}
-        <div className="text-center mb-20">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-6 font-header ${getAnimationClasses(isVisible, 'fadeInUp', 0)}`} style={{ fontFamily: 'Poppins' }}>
-            Complete Business Ecosystem
-            <br />
-            <span className="text-[#EDB003]">at Your Fingertips</span>
+        <div className="text-center mb-20 animate-fade-in-up">
+          <p className="text-sm font-medium tracking-widest text-slate-500 uppercase mb-4 font-grotesk">
+            OUR SOLUTIONS
+          </p>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-slate-900 dark:text-white font-grotesk tracking-tight leading-tight">
+            Complete Business Ecosystem <br />
+            <span className="text-[#EFAD1A]">at Your Fingertips</span>
           </h2>
-          <p className={`text-xl text-muted-foreground dark:text-gray-400 max-w-4xl mx-auto leading-relaxed font-content font-geist ${getAnimationClasses(isVisible, 'fadeInUp', 200)}`}>
-            Transform your business operations with our comprehensive suite of virtual office solutions
-            designed to scale with your ambitions.
+          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-grotesk font-normal">
+            Transform your business operations with our comprehensive suite of virtual office solutions designed to scale with your ambitions.
           </p>
         </div>
 
         {/* Solutions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
           {solutions.map((solution, index) => (
             <Link
               key={index}
               to={solution.path}
-              className="block"
+              className="block group"
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              <Card
+              <div
                 className={`
-                  bg-gradient-to-br from-white via-white to-gray-50 border border-gray-200
-                  dark:from-[#171717] dark:via-[#171717] dark:to-[#1a1a1a] dark:border-white/10
-                  hover:border-[#EDB003] dark:hover:border-[#EDB003] hover:shadow-2xl shadow-lg
-                  group cursor-pointer transition-all duration-500 hover:-translate-y-2
-                  relative overflow-hidden rounded-2xl h-full
-                  ${getAnimationClasses(isVisible, 'fadeInUp', index * 150)}
+                  h-full bg-white dark:bg-[#1E293B] rounded-[2rem] p-8
+                  border border-slate-100 dark:border-white/5
+                  shadow-xl hover:shadow-2xl hover:shadow-slate-200/50 dark:hover:shadow-none
+                  transition-all duration-300 transform hover:-translate-y-2
+                  flex flex-col relative overflow-hidden
                 `}
               >
-                {/* Animated Background Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#EDB003]/0 via-[#EDB003]/0 to-[#EDB003]/0 group-hover:from-[#EDB003]/5 group-hover:via-[#EDB003]/3 group-hover:to-transparent transition-all duration-700"></div>
+                {/* Gradient Glow */}
+                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${solution.gradient} opacity-10 rounded-bl-[4rem] -mr-8 -mt-8 transition-opacity group-hover:opacity-20`}></div>
 
-                {/* Decorative Elements */}
-                <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-[#EDB003]/10 to-transparent rounded-full blur-2xl group-hover:from-[#EDB003]/20 transition-all duration-500"></div>
-                <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-tr from-[#172A3A]/5 to-transparent rounded-full blur-2xl group-hover:from-[#172A3A]/10 transition-all duration-500"></div>
+                {/* Icon Bubble */}
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${solution.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <solution.icon className={`w-8 h-8 ${solution.iconColor} dark:text-white`} />
+                </div>
 
-                <CardContent className="p-6 relative z-10 flex flex-col h-full">
-                  {/* Icon Section */}
-                  <motion.div
-                    className="mb-5 flex justify-center"
-                    animate={hoveredIndex === index ? { scale: 1.1 } : { scale: 1 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                  >
-                    <motion.div
-                      className="w-20 h-20 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:shadow-[#EDB003]/30 transition-all duration-500 relative"
-                      animate={hoveredIndex === index ? {
-                        rotate: [0, -5, 5, -5, 0],
-                        scale: 1.05
-                      } : {
-                        rotate: 0,
-                        scale: 1
-                      }}
-                      transition={{
-                        rotate: { duration: 0.6 },
-                        scale: { duration: 0.3 }
-                      }}
-                    >
-                      {/* Glow effect on hover */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-2xl blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
-                      <span className="relative z-10">
-                        {solution.icon(hoveredIndex === index)}
-                      </span>
-                    </motion.div>
-                  </motion.div>
+                {/* Content */}
+                <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-[#EFAD1A] transition-colors font-grotesk">
+                  {solution.title}
+                </h3>
+                <p className="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed font-medium">
+                  {solution.description}
+                </p>
 
-                  {/* Title */}
-                  <h3 className="text-xl font-bold text-center mb-3 text-[#172A3A] dark:text-white group-hover:text-[#EDB003] transition-colors duration-300 font-header" style={{ fontFamily: 'Poppins' }}>
-                    {solution.title}
-                  </h3>
+                {/* Features List */}
+                <div className="space-y-3 mt-auto mb-8">
+                  {solution.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-start gap-3 text-sm font-semibold text-slate-600 dark:text-slate-300">
+                      <div className={`mt-0.5 w-4 h-4 rounded-full bg-gradient-to-br ${solution.gradient} flex items-center justify-center flex-shrink-0`}>
+                        <Check className="w-2.5 h-2.5 text-white" />
+                      </div>
+                      {feature}
+                    </div>
+                  ))}
+                </div>
 
-                  {/* Description */}
-                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-5 leading-relaxed font-content min-h-[40px]">
-                    {solution.description}
-                  </p>
-
-                  {/* Features List - Compact */}
-                  <div className="space-y-2 mb-5 flex-grow">
-                    {solution.features.map((feature, featureIndex) => (
-                      <motion.div
-                        key={featureIndex}
-                        className="flex items-center gap-2.5 text-xs"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: hoveredIndex === index ? featureIndex * 0.05 : 0 }}
-                      >
-                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#EDB003]/20 to-[#EDB003]/10 flex items-center justify-center flex-shrink-0 group-hover:from-[#EDB003]/30 group-hover:to-[#EDB003]/20 transition-all duration-300">
-                          <div className="w-1.5 h-1.5 bg-[#EDB003] rounded-full"></div>
-                        </div>
-                        <span className="text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white font-medium transition-colors duration-300">{feature}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* CTA Button - More Prominent */}
-                  <Button
-                    className="w-full bg-[#172A3A] hover:bg-[#EDB003] text-white transition-all duration-300 py-5 font-semibold text-sm rounded-xl shadow-md hover:shadow-lg group/btn relative overflow-hidden"
-                  >
-                    {/* Button Shine Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-700"></div>
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      Explore Now
-                      <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
-                    </span>
-                  </Button>
-                </CardContent>
-              </Card>
+                {/* Arrow Button */}
+                <div className="flex items-center text-sm font-bold text-slate-900 dark:text-white group-hover:text-[#EFAD1A] transition-colors mt-auto">
+                  Explore Now <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
             </Link>
           ))}
         </div>
 
         {/* Bottom CTA */}
         <div className="text-center">
-          <Splash3dButton
-            className={`bg-[#EDB003] hover:bg-[#172A3A] text-white px-8 py-3 font-semibold text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-lg font-[Poppins] ${getAnimationClasses(isVisible, 'fadeInUp', 600)}`}
-          >
-            View All Solutions
-          </Splash3dButton>
+          <Link to="/services/virtual-office">
+            <button className="px-10 py-4 bg-black dark:bg-white text-white dark:text-black rounded-full font-bold text-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-all active:scale-95 shadow-xl flex items-center mx-auto gap-3">
+              View All Solutions
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </Link>
         </div>
       </div>
     </section>

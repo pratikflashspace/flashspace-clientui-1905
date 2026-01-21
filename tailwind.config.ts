@@ -54,10 +54,11 @@ export default {
         },
       },
       fontFamily: {
-        // Use Geist for headings and Poppins for body text (both provided via local fonts)
-        header: ['Geist', 'Poppins', 'sans-serif'],
-        content: ['Poppins', 'Geist', 'Georgia', 'serif'],
-        sans: ['Poppins', 'Geist', 'Georgia', 'serif'],
+        // Use Outfit for everything
+        header: ['Outfit', 'sans-serif'],
+        content: ['Outfit', 'sans-serif'],
+        sans: ['Outfit', 'sans-serif'],
+        grotesk: ['Space Grotesk', 'sans-serif'],
         mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       borderRadius: {
@@ -87,11 +88,11 @@ export default {
           "50%": { transform: "translateY(-20px)" }
         },
         "pulse-glow": {
-          "0%, 100%": { 
+          "0%, 100%": {
             boxShadow: "0 0 0 0 hsl(var(--primary-glow) / 0.7)",
             transform: "translate(-50%, -50%) scale(1)"
           },
-          "50%": { 
+          "50%": {
             boxShadow: "0 0 0 20px hsl(var(--primary-glow) / 0)",
             transform: "translate(-50%, -50%) scale(1.1)"
           }

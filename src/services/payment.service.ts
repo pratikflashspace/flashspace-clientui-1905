@@ -79,7 +79,9 @@ export const createPaymentOrder = async (payload: CreateOrderPayload): Promise<C
     throw new Error(response.data.message || "Failed to create order");
   } catch (error: any) {
     console.error("Error creating payment order:", error);
-    throw new Error(error.response?.data?.message || error.message || "Failed to create order");
+    // Propagate specific error message if available
+    const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || "Failed to create order";
+    throw new Error(errorMessage);
   }
 };
 
@@ -121,6 +123,28 @@ export const reportPaymentFailure = async (orderId: string, errorCode: string, e
     );
   } catch (error) {
     console.error("Error reporting payment failure:", error);
+  }
+};
+
+/**
+ * Simulate payment success (Development Only)
+ */
+export const simulatePayment = async (orderId: string): Promise<PaymentVerificationResponse> => {
+  try {
+    const response = await axios.post<APIResponse<PaymentVerificationResponse>>(
+      `${API.domain}/api/payment/simulate-success`,
+      { orderId },
+      { withCredentials: true }
+    );
+
+    if (response.data.success) {
+      return response.data.data;
+    }
+
+    throw new Error(response.data.message || "Payment simulation failed");
+  } catch (error: any) {
+    console.error("Error simulating payment:", error);
+    throw new Error(error.response?.data?.message || error.message || "Payment simulation failed");
   }
 };
 
@@ -206,7 +230,6 @@ export interface RazorpayCheckoutOptions {
 
 export const openRazorpayCheckout = async (options: RazorpayCheckoutOptions): Promise<void> => {
   const scriptLoaded = await loadRazorpayScript();
-  
   if (!scriptLoaded) {
     throw new Error("Failed to load Razorpay SDK. Please check your internet connection.");
   }
@@ -248,7 +271,7 @@ export const openRazorpayCheckout = async (options: RazorpayCheckoutOptions): Pr
   };
 
   const razorpay = new (window as any).Razorpay(razorpayOptions);
-  
+
   razorpay.on("payment.failed", function (response: any) {
     options.onFailure({
       code: response.error.code,

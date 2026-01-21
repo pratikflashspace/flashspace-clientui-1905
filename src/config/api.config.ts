@@ -25,7 +25,7 @@ export const API_ENDPOINTS = {
     GOOGLE: '/api/auth/google',
     GOOGLE_CALLBACK: '/api/auth/google/callback',
   },
-  
+
   // Contact Form
   CONTACT: {
     CREATE: '/api/contactForm/createContactForm',
@@ -34,7 +34,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/api/contactForm/updateContactForm/${id}`,
     DELETE: (id: string) => `/api/contactForm/deleteContactForm/${id}`,
   },
-  
+
   // Space Provider
   SPACE_PROVIDER: {
     CREATE: '/api/spaceProvider/createSpaceProvider',
@@ -43,7 +43,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/api/spaceProvider/updateSpaceProvider/${id}`,
     DELETE: (id: string) => `/api/spaceProvider/deleteSpaceProvider/${id}`,
   },
-  
+
   // Virtual Office
   VIRTUAL_OFFICE: {
     CREATE: '/api/virtualOffice/create',
@@ -53,7 +53,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/api/virtualOffice/update/${id}`,
     DELETE: (id: string) => `/api/virtualOffice/delete/${id}`,
   },
-  
+
   // Coworking Space
   COWORKING_SPACE: {
     CREATE: '/api/coworkingSpace/create',
@@ -82,5 +82,8 @@ export const API_ENDPOINTS = {
     TICKETS: '/api/user/support/tickets',
     TICKET_BY_ID: (id: string) => `/api/user/support/tickets/${id}`,
     TICKET_REPLY: (id: string) => `/api/user/support/tickets/${id}/reply`,
+    // Credits
+    CREDITS: '/api/user/credits',
+    REDEEM_REWARD: '/api/user/credits/redeem',
   },
 };

@@ -12,7 +12,11 @@ import {
   Settings as SettingsIcon,
   MoreHorizontal,
   LayoutDashboard,
-  LogOut
+  LogOut,
+  Building,
+  MapPin,
+  Zap,
+  ChevronDown
 } from "lucide-react";
 
 import { smoothScrollTo } from "@/lib/lenis";
@@ -21,6 +25,7 @@ import { useAuth } from "@/contexts/AuthContext";
 interface SidebarMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenLogin: () => void;
 }
 
 const MENU_WIDTH_OPEN = 300;
@@ -99,14 +104,25 @@ const UpdatesPopup = ({
 // ------------------------------------------------
 // SidebarMenu component
 // ------------------------------------------------
-const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
+// ... (imports need to include ChevronDown, I will handle that in a separate edit or same if I can match the import line, but let's do the logic first. Wait, I must add ChevronDown to imports first or it will fail. I'll take a safer approach and do the content replacement first, but I need to make sure I don't break the file. Actually, I can replace the import block too.)
+
+// Let's replace the component logic.
+
+const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
   const [showUpdates, setShowUpdates] = useState(false);
+  const [isWorkspacesOpen, setIsWorkspacesOpen] = useState(false);
+
+  const solutions = [
+    { label: "Virtual Office", href: "/services/virtual-office", icon: Building },
+    { label: "Coworking Space", href: "/services/coworking-space", icon: Briefcase },
+    { label: "On Demand", href: "/services/on-demand", icon: Zap },
+    { label: "Event Spaces", href: "/services/event-spaces", icon: MapPin },
+  ];
 
   const primaryTop = [
     { label: "Start Chatting", href: "/start-chatting", icon: MessageCircle },
-    { label: "Get WorkSpace", href: "/services/virtual-office", icon: Briefcase },
     { label: "Business Setup", href: "/Solutions/business-setup", icon: FileText }
   ];
 
@@ -226,24 +242,62 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
 
         {/* Menu items */}
         <div className="overflow-y-auto h-full pb-32 flex flex-col">
-          <div className="p-5 space-y-8 text-sm tracking-wide flex-1">
+          <div className="p-5 space-y-2 text-sm tracking-wide flex-1">
             <nav className="space-y-2">
-              {[...primaryTop, { divider: true }, ...middle, { divider: true }, ...footer].map(
-                (item: any, idx) =>
-                  item.divider ? (
-                    <div key={idx} className="h-px bg-neutral-300 my-3" />
-                  ) : (
-                    <button
-                      key={item.label}
-                      onClick={() => handleNavigation(item.href, item.label)}
-                      className={`group flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
-                        } py-2 px-2 text-[13px] font-medium text-black dark:text-white hover:text-yellow-600 dark:hover:text-[#EDB003] rounded hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 font-poppins`}
-                    >
-                      <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-yellow-600 dark:group-hover:text-[#EDB003] transition-colors duration-300" />
-                      {!iconOnly && <span>{item.label}</span>}
-                    </button>
-                  )
-              )}
+              {/* Primary Top Items */}
+              {primaryTop.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => handleNavigation(item.href, item.label)}
+                  className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
+                    } py-2 px-2 text-[13px] font-medium text-black dark:text-white hover:text-yellow-600 dark:hover:text-[#EDB003] rounded hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 font-poppins`}
+                >
+                  <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-yellow-600 dark:group-hover:text-[#EDB003] transition-colors duration-300" />
+                  {!iconOnly && <span>{item.label}</span>}
+                </button>
+              ))}
+
+              <div className="h-px bg-neutral-300 my-3" />
+
+              {/* Get Workspaces Link */}
+              <button
+                onClick={() => handleNavigation("/services/virtual-office", "Get Workspaces")}
+                className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
+                  } py-2 px-2 text-[13px] font-medium text-black dark:text-white hover:text-yellow-600 dark:hover:text-[#EDB003] rounded hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 font-poppins`}
+              >
+                <Building className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-yellow-600 dark:group-hover:text-[#EDB003] transition-colors duration-300" />
+                {!iconOnly && <span>Get Workspaces</span>}
+              </button>
+
+              <div className="h-px bg-neutral-300 my-3" />
+
+              {/* Middle Items */}
+              {middle.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => handleNavigation(item.href, item.label)}
+                  className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
+                    } py-2 px-2 text-[13px] font-medium text-black dark:text-white hover:text-yellow-600 dark:hover:text-[#EDB003] rounded hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 font-poppins`}
+                >
+                  <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-yellow-600 dark:group-hover:text-[#EDB003] transition-colors duration-300" />
+                  {!iconOnly && <span>{item.label}</span>}
+                </button>
+              ))}
+
+              <div className="h-px bg-neutral-300 my-3" />
+
+              {/* Footer Items */}
+              {footer.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => handleNavigation(item.href, item.label)}
+                  className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
+                    } py-2 px-2 text-[13px] font-medium text-black dark:text-white hover:text-yellow-600 dark:hover:text-[#EDB003] rounded hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 font-poppins`}
+                >
+                  <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-yellow-600 dark:group-hover:text-[#EDB003] transition-colors duration-300" />
+                  {!iconOnly && <span>{item.label}</span>}
+                </button>
+              ))}
             </nav>
 
             {/* Footer */}
@@ -315,7 +369,10 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarMenuProps) => {
                       </button>
 
                       <button
-                        onClick={() => handleNavigation("/login")}
+                        onClick={() => {
+                          onOpenLogin();
+                          closeBoth();
+                        }}
                         className="w-full rounded-md border border-neutral-600 dark:border-white/30 text-black dark:text-white py-2 text-sm hover:bg-yellow-400 hover:text-black dark:hover:bg-[#EDB003] dark:hover:text-black active:scale-[0.98] transition font-poppins font-semibold"
                       >
                         Log in

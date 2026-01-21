@@ -1,5 +1,5 @@
 // DayOfficePage.tsx
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Plug, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -171,6 +171,38 @@ const DayOfficePage: React.FC = () => {
   const [selectedOffice, setSelectedOffice] = useState<any | null>(null);
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(0);
 
+  // Refs for interactive background
+  const bgRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const bg = bgRef.current;
+    if (!container || !bg) return;
+
+    const handleMove = (e: MouseEvent | globalThis.MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+      const translateX = x * 14;
+      const translateY = y * 10;
+      bg.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(1.03)`;
+    };
+
+    const handleLeave = () => {
+      if (bg) bg.style.transform = `translate3d(0, 0, 0) scale(1.03)`;
+    };
+
+    container.addEventListener('mousemove', handleMove);
+    container.addEventListener('mouseleave', handleLeave);
+
+    return () => {
+      container.removeEventListener('mousemove', handleMove);
+      container.removeEventListener('mouseleave', handleLeave);
+    };
+  }, []);
+
   // onHeroChange supports both native events and CurvedSelect value calls
   function onHeroChange(e: any) {
     // if we get a direct value (CurvedSelect might pass a value), we normalize
@@ -220,14 +252,25 @@ const DayOfficePage: React.FC = () => {
       <Header />
 
       {/* ==================== HERO (same layout & form structure as Meeting Rooms) ==================== */}
-      <section className="relative w-full h-screen overflow-hidden">
+      <section ref={containerRef} className="relative w-full h-screen overflow-hidden">
         {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-center bg-cover"
-          style={{ backgroundImage: "url(https://images.unsplash.com/photo-1556761175-4b46a572b786?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)" }}
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0">
+          <div
+            ref={bgRef}
+            className="absolute inset-0 w-full h-full"
+            style={{
+              transition: 'transform 0.5s ease-out',
+              transform: 'scale(1.03)'
+            }}
+          >
+            <img
+              src="https://images.unsplash.com/photo-1556761175-4b46a572b786?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              alt="Day Office"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="absolute inset-0 bg-black/50"></div>
+        </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 h-full flex flex-col lg:flex-row gap-12 items-center justify-center lg:justify-between pt-20 lg:pt-0">
 

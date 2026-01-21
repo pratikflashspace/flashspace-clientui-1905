@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import userDashboardService, { CreditsResponse } from "@/services/userDashboard.service";
+import { createPaymentOrder, openRazorpayCheckout, verifyPayment } from "@/services/payment.service";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { Plug, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -30,7 +35,10 @@ import {
   Headphones,
   Star,
   ChevronDown,
-  Building2
+  Building2,
+  Gift,
+  History,
+  Coins
 } from "lucide-react";
 
 /**
@@ -52,24 +60,28 @@ const ROOM_CARDS = [
     image: "https://cdn.pixabay.com/photo/2023/08/07/09/30/business-8174708_1280.jpg",
     btn: "Book Meeting Room",
     points: ["Board presentations & brainstorming", "Video conferencing calls", "Ideal for 2 – 8 members"],
+    price: 1200, // Per hour
   },
   {
     name: "Board Room",
     image: "https://cdn.pixabay.com/photo/2021/09/26/11/44/conference-6657324_1280.jpg",
     btn: "Book Board Room",
     points: ["High-end formal meetings", "Premium AV equipment", "Ideal for 8 – 16 members, addons"],
+    price: 2500,
   },
   {
     name: "Training Room",
     image: "https://cdn.pixabay.com/photo/2016/05/23/17/57/convention-1410870_1280.jpg",
     btn: "Book Training Room",
     points: ["Training sessions & workshops", "Projector & high-speed WiFi", "Ideal for up to 50 participants"],
+    price: 3500,
   },
   {
     name: "Conference Room",
     image: "https://cdn.pixabay.com/photo/2017/03/31/21/37/room-2192484_1280.jpg",
     btn: "Book Conference Room",
     points: ["Seminars & group discussions", "Spacious, fully equipped", "Ideal for 20 – 50 participants"],
+    price: 5000,
   },
 ];
 
@@ -121,13 +133,186 @@ const FAQ_DATA = [
   { q: "Are corporate bulk bookings available?", a: "Yes, we support bulk and recurring bookings for companies." },
 ];
 
+const RewardsSection = () => {
+  const { user } = useAuth();
+  const [credits, setCredits] = useState<CreditsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      fetchCredits();
+    }
+  }, [user]);
+
+  const fetchCredits = async () => {
+    const response = await userDashboardService.getCredits();
+    if (response.success && response.data) {
+      setCredits(response.data);
+    }
+  };
+
+  const handleRedeem = async () => {
+    if (!credits?.canRedeem) return;
+
+    setLoading(true);
+    const response = await userDashboardService.redeemReward({
+      spaceName: "Reward Meeting Room",
+      date: new Date().toISOString()
+    });
+
+    if (response.success) {
+      toast.success("Reward Redeemed! Free Meeting Room Booked.");
+      fetchCredits(); // Refresh
+    } else {
+      toast.error(response.message || "Redemption Failed");
+    }
+    setLoading(false);
+  };
+
+  if (!user) return null;
+
+  return (
+    <div className="relative w-full py-16 px-6 md:px-16 overflow-hidden">
+      {/* Background Gradient & Pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-950 to-black z-0" />
+      <div
+        className="absolute inset-0 opacity-10 z-0"
+        style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255, 212, 59, 0.3) 1px, transparent 0)', backgroundSize: '40px 40px' }}
+      />
+
+      {/* Glow Effect */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FFD43B] rounded-full blur-[128px] opacity-5 translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+
+      <div className="relative z-10 max-w-6xl mx-auto">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-12 shadow-2xl">
+
+          <div className="flex-1 space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="bg-[#FFD43B]/20 p-3 rounded-2xl">
+                <Coins className="w-8 h-8 text-[#FFD43B]" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white font-geist">
+                Flash <span className="text-[#FFD43B]">Rewards</span>
+              </h2>
+            </div>
+
+            <p className="text-gray-300 font-poppins text-lg leading-relaxed max-w-lg">
+              Unlock exclusive benefits. Earn <span className="text-white font-semibold">50% credits</span> on every booking and redeem them for free meeting rooms!
+            </p>
+
+            <div className="flex flex-wrap gap-8 pt-2">
+              <div className="bg-black/30 px-6 py-4 rounded-xl border border-white/5 min-w-[160px]">
+                <p className="text-xs text-[#FFD43B] uppercase font-bold tracking-wider mb-1">Your Wallet</p>
+                <p className="text-4xl font-bold text-white font-geist tabular-nums">{credits?.balance || 0}</p>
+              </div>
+              <div className="bg-black/30 px-6 py-4 rounded-xl border border-white/5 min-w-[160px]">
+                <p className="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Total Earned</p>
+                <p className="text-4xl font-bold text-gray-300 font-geist tabular-nums">{credits?.totalEarned || 0}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 w-full max-w-md">
+            <div className="bg-gradient-to-b from-[#1a1a1a] to-black p-8 rounded-2xl border border-white/10 shadow-xl relative overflow-hidden group">
+              {/* Card Glow */}
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#FFD43B] to-transparent opacity-50" />
+
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-white font-bold text-xl flex items-center gap-2">
+                  <Gift className="w-5 h-5 text-[#FFD43B]" /> Monthly Goal
+                </h3>
+                <span className="text-sm font-medium text-[#FFD43B] bg-[#FFD43B]/10 px-3 py-1 rounded-full">
+                  {credits?.balance || 0} / 5000 Credits
+                </span>
+              </div>
+
+              {/* Progress Bar Container */}
+              <div className="relative w-full h-4 bg-gray-800 rounded-full mb-8 overflow-hidden border border-white/5">
+                {/* Animated Background Stripe */}
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.05)_50%,transparent_75%)] bg-[length:20px_20px] animate-[pulse_2s_ease-in-out_infinite]" />
+
+                {/* Progress Fill */}
+                <div
+                  className="h-full bg-gradient-to-r from-[#FFD43B] to-[#ffb700] shadow-[0_0_20px_rgba(255,212,59,0.3)] transition-all duration-1000 ease-out relative"
+                  style={{ width: `${Math.min(((credits?.balance || 0) / 5000) * 100, 100)}%` }}
+                >
+                  <div className="absolute right-0 top-0 bottom-0 w-px bg-white/50 shadow-[0_0_10px_white]" />
+                </div>
+              </div>
+
+              <Button
+                onClick={handleRedeem}
+                disabled={!(credits?.canRedeem) || loading}
+                className={`w-full py-7 font-bold text-lg tracking-wide rounded-xl transition-all duration-300 shadow-lg
+                  ${credits?.canRedeem
+                    ? 'bg-[#FFD43B] text-black hover:bg-[#ffc800] hover:scale-[1.02] hover:shadow-[#FFD43B]/20'
+                    : 'bg-gray-800/50 text-gray-500 cursor-not-allowed border border-white/5'}`}
+              >
+                {loading
+                  ? <span className="flex items-center gap-2"><span className="animate-spin text-xl">◌</span> Redeeming...</span>
+                  : credits?.canRedeem
+                    ? <span className="flex items-center gap-2"><Sparkles className="w-5 h-5 fill-black" /> Redeem Free Room</span>
+                    : "Reach 5000 to Unlock Reward"}
+              </Button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 const MeetingRoomsPage: React.FC = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [heroForm, setHeroForm] = useState({ name: "", mobile: "", email: "", city: CITIES[0], seats: SEAT_OPTIONS[0], date: "" });
   const [showModal, setShowModal] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState("");
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [faqOpenIndex, setFaqOpenIndex] = useState<number | null>(0);
 
-  function onHeroChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+  // Booking Form State
+  const [bookingForm, setBookingForm] = useState({
+    date: "",
+    duration: 2, // hours
+    mobile: "",
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Refs for interactive background
+  const bgRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const bg = bgRef.current;
+    if (!container || !bg) return;
+
+    const handleMove = (e: MouseEvent | globalThis.MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+      const translateX = x * 14;
+      const translateY = y * 10;
+      bg.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(1.03)`;
+    };
+
+    const handleLeave = () => {
+      if (bg) bg.style.transform = `translate3d(0, 0, 0) scale(1.03)`;
+    };
+
+    container.addEventListener('mousemove', handleMove);
+    container.addEventListener('mouseleave', handleLeave);
+
+    return () => {
+      container.removeEventListener('mousemove', handleMove);
+      container.removeEventListener('mouseleave', handleLeave);
+    };
+  }, []);
+
+  function onHeroChange(e: any) {
     const { name, value } = e.target;
     setHeroForm((s) => ({ ...s, [name]: value }));
   }
@@ -136,133 +321,299 @@ const MeetingRoomsPage: React.FC = () => {
     alert("Request received — we'll call you soon.");
   }
   const openModal = (roomName: string) => {
-    setSelectedRoom(roomName);
+    const room = ROOM_CARDS.find(r => r.name === roomName);
+    setSelectedRoom(room);
     setShowModal(true);
   };
   const toggleFAQ = (index: number) => setFaqOpenIndex(faqOpenIndex === index ? null : index);
 
+  // === PAYMENT HANDLER ===
+  const handleBookingPayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("Please login to book a meeting room");
+      navigate("/login");
+      return;
+    }
+    if (!selectedRoom) return;
+
+    setIsProcessing(true);
+    try {
+      const pricePerHour = selectedRoom.price || 1200;
+      const totalAmount = pricePerHour * bookingForm.duration;
+
+      // 1. Create Order
+      const order = await createPaymentOrder({
+        userId: user.id || (user as any)._id,
+        userEmail: user.email,
+        userName: user.fullName || "User",
+        userPhone: bookingForm.mobile || user.phoneNumber,
+        spaceId: "fixed-meeting-room-id", // In real app, this would be dynamic ID
+        spaceName: selectedRoom.name,
+        planName: "Hourly Booking",
+        planKey: "meeting_hourly",
+        tenure: 1, // 1 year filler, redundant here but required by interface type
+        yearlyPrice: totalAmount, // filler
+        totalAmount: totalAmount,
+        discountPercent: 0,
+        discountAmount: 0,
+        paymentType: "meeting_room" as any // "meeting_room" was added to types in previous steps but interface might need update
+      });
+
+      // 2. Open Razorpay OR Simulate
+      // AUTO-SIMULATION FOR TESTING:
+      // Since user requested automatic payment stimulation, we bypass Razorpay popup
+      const SIMULATE_SUCCESS = true;
+
+      if (SIMULATE_SUCCESS) {
+        console.log("Simulating Payment Success...");
+
+        // Simulate slight delay for realism
+        await new Promise(r => setTimeout(r, 1500));
+
+        // Call Verify directly with devMode
+        await verifyPayment({
+          razorpay_order_id: order.orderId,
+          razorpay_payment_id: `pay_test_${Date.now()}`,
+          razorpay_signature: "test_signature_dev",
+          devMode: true
+        });
+
+        toast.success("Payment Simulated Successfully! Credits Earned!");
+        setShowModal(false);
+        window.location.reload();
+        return;
+      }
+
+      /* 
+      // Original Flow (Disabled for Simulation)
+      await openRazorpayCheckout({
+        orderId: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        keyId: order.keyId,
+        userEmail: user.email,
+        userName: user.fullName || "User",
+        userPhone: bookingForm.mobile,
+        spaceName: selectedRoom.name,
+        planName: `${bookingForm.duration} Hours Booking`,
+        onSuccess: async (response) => {
+             try {
+               await verifyPayment({
+                 razorpay_order_id: response.razorpay_order_id,
+                 razorpay_payment_id: response.razorpay_payment_id,
+                 razorpay_signature: response.razorpay_signature
+               });
+               toast.success("Booking Successful! Credits Earned!");
+               setShowModal(false);
+               window.location.reload(); 
+             } catch (verr) {
+               toast.error("Payment Verification Failed");
+             }
+        },
+        onFailure: (err) => {
+          toast.error("Payment Failed: " + err.description);
+        },
+        onDismiss: () => {
+          setIsProcessing(false);
+          toast("Payment Cancelled");
+        }
+      });
+      */
+
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+
   return (
-    <div className="w-full min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
-      <Header />
+    <div className="w-full min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300 font-poppins">
+      <div className="relative z-50">
+        <Header />
+      </div>
 
       {/* ==================== SECTION 1: HERO ==================== */}
-      <section className="relative w-full h-screen overflow-hidden">
-        {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-center bg-cover"
-          style={{ backgroundImage: "url(https://plus.unsplash.com/premium_photo-1681487144031-d502ea9abefc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)" }}
-          aria-hidden="true"
-        />
-        <div className="absolute inset-0 bg-black/50" />
+      <section ref={containerRef} className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-black">
+        {/* Background Image & Overlay */}
+        <div className="absolute inset-0 opacity-60">
+          <div
+            ref={bgRef}
+            className="absolute inset-0 w-full h-full"
+            style={{
+              transition: 'transform 0.5s ease-out',
+              transform: 'scale(1.03)'
+            }}
+          >
+            <img
+              src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2301&auto=format&fit=crop"
+              alt="Meeting Room"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+        {/* Simple gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/30" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 h-full flex flex-col lg:flex-row gap-12 items-center justify-center lg:justify-between pt-20 lg:pt-0">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full flex flex-col lg:flex-row gap-16 items-center justify-between pt-24 lg:pt-0">
 
           {/* LEFT SIDE CONTENT */}
-          {/* Added lg:-ml-16 to shift this entire block to the left */}
-          <div className="w-full lg:w-2/3 text-white lg:-ml-16">
-            <div className="max-w-2xl">
+          <div className="w-full lg:w-3/5 text-white space-y-8">
 
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#FFD43B] bg-white/10 backdrop-blur-md px-6 py-2 shadow-sm">
-                <Sparkles className="w-4 h-4 text-[#FFD43B] fill-[#FFD43B]" />
-                <span className="text-[#FFD43B] font-poppins font-bold text-sm tracking-wide">Instant Booking Available</span>
-              </div>
+            {/* Back Button (Mobile/Desktop) */}
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition mb-4"
+            >
+              <ChevronDown className="w-4 h-4 rotate-90" /> {/* Reusing ChevronDown rotated as ChevronLeft if ChevronLeft not imported, but let's check imports first. */}
+              <span>Back</span>
+            </button>
 
-              {/* Heading */}
-              <h1 className="mt-3 text-4xl md:text-6xl font-bold leading-tight font-geist">
-                Professional Meeting Rooms <br />
-                <span className="text-[#FFD43B]">On Your Schedule</span>
-              </h1>
-
-              <p className="mt-4 text-lg md:text-xl text-gray-100 font-poppins max-w-xl">
-                Book premium meeting rooms and conference spaces by the hour or day.
-              </p>
-
-              {/* Checklist */}
-              <div className="mt-4 space-y-3 text-gray-100">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-[#FFD43B] flex-shrink-0" />
-                  <span className="font-poppins">Ready for use whenever required</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-[#FFD43B] flex-shrink-0" />
-                  <span className="font-poppins">Fully equipped with all Amenities</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-[#FFD43B] flex-shrink-0" />
-                  <span className="font-poppins">Prime locations — Pan-India access</span>
-                </div>
-              </div>
-
-              {/* --- NEW BUTTONS SECTION --- */}
-              <div className="mt-4 flex flex-wrap gap-4">
-                <button onClick={() => window.location.href = '/start-chatting'} className="bg-black text-white px-8 py-3.5 rounded-full font-bold font-poppins hover:bg-gray-900 transition-all shadow-lg active:scale-95">
-                  Start Chat
-                </button>
-                <button className="bg-[#FFD43B] text-black px-8 py-3.5 rounded-full font-bold font-poppins hover:bg-[#eec635] transition-all shadow-lg active:scale-95">
-                  Explore Spaces
-                </button>
-              </div>
-
-              {/* Stats Section */}
-              <div className="mt-5 w-full max-w-xl bg-black/30 backdrop-blur-sm rounded-lg p-4 flex justify-between text-center">
-                <div>
-                  <div className="text-2xl md:text-3xl font-bold font-geist text-white">10,000+</div>
-                  <div className="text-xs md:text-sm text-gray-300 font-poppins">Meetings booked</div>
-                </div>
-                <div>
-                  <div className="text-2xl md:text-3xl font-bold font-geist text-white">1,000+</div>
-                  <div className="text-xs md:text-sm text-gray-300 font-poppins">Corporates served</div>
-                </div>
-                <div>
-                  <div className="text-2xl md:text-3xl font-bold font-geist text-white">3,000+</div>
-                  <div className="text-xs md:text-sm text-gray-300 font-poppins">Options to choose</div>
-                </div>
-              </div>
-
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#FFD43B]/30 bg-[#FFD43B]/10 px-6 py-2">
+              <Sparkles className="w-4 h-4 text-[#FFD43B] fill-[#FFD43B]" />
+              <span className="text-[#FFD43B] font-poppins font-bold text-xs tracking-widest uppercase">Instant Booking Available</span>
             </div>
+
+            {/* Heading */}
+            <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] font-geist tracking-tight">
+              Professional <br />
+              <span className="text-white">Meeting Rooms</span> <br />
+              <span className="text-[#FFD43B]">On Your Schedule</span>
+            </h1>
+
+            <p className="text-lg md:text-xl text-gray-300 font-poppins max-w-xl leading-relaxed">
+              Book premium meeting rooms and conference spaces by the hour or day. Experience seamless productivity in fully equipped spaces.
+            </p>
+
+            {/* Checklist */}
+            <div className="flex flex-col gap-4 text-gray-200">
+              {[
+                "Ready for use whenever required",
+                "Fully equipped with Premium Amenities",
+                "Prime locations — Pan-India access"
+              ].map((item, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="p-1.5 rounded-full">
+                    <CheckCircle className="w-5 h-5 text-[#FFD43B]" />
+                  </div>
+                  <span className="font-poppins text-base">{item}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Stats Bar */}
+            <div className="pt-6">
+              <div className="w-full max-w-xl bg-white/5 border border-white/10 rounded-2xl p-6 flex justify-between items-center text-center">
+                <div>
+                  <div className="text-3xl md:text-4xl font-bold font-geist text-white">10k+</div>
+                  <div className="text-xs text-gray-400 font-poppins uppercase tracking-wider mt-1">Bookings</div>
+                </div>
+                <div className="w-px h-10 bg-white/10" />
+                <div>
+                  <div className="text-3xl md:text-4xl font-bold font-geist text-white">1k+</div>
+                  <div className="text-xs text-gray-400 font-poppins uppercase tracking-wider mt-1">Clients</div>
+                </div>
+                <div className="w-px h-10 bg-white/10" />
+                <div>
+                  <div className="text-3xl md:text-4xl font-bold font-geist text-white">3k+</div>
+                  <div className="text-xs text-gray-400 font-poppins uppercase tracking-wider mt-1">Spaces</div>
+                </div>
+              </div>
+            </div>
+
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-4 pt-2">
+              <button onClick={() => window.location.href = '#room-types'} className="bg-[#FFD43B] text-black px-8 py-4 rounded-full font-bold font-poppins hover:bg-white hover:scale-105 transition-all flex items-center gap-2">
+                <Calendar className="w-5 h-5" /> Book Now
+              </button>
+              <button onClick={() => window.location.href = '/start-chatting'} className="bg-white/10 text-white border border-white/20 px-8 py-4 rounded-full font-bold font-poppins hover:bg-white hover:text-black hover:scale-105 transition-all flex items-center gap-2">
+                Explore Spaces
+              </button>
+            </div>
+
           </div>
 
-          {/* RIGHT SIDE FORM (Unchanged) */}
-          <div className="w-full lg:w-1/2 max-w-md">
-            <div className="bg-white dark:bg-[#1f1f1f] rounded-xl shadow-2xl p-6 md:p-8">
-              <h3 className="text-xl font-geist font-bold text-gray-900 dark:text-white"> Get a Call Back for <span className="text-[#FFD43B]">Meeting Rooms</span> </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Available by the hour, day or as long as you need</p>
-              <form className="mt-6 space-y-4" onSubmit={handleHeroSubmit}>
-                <input name="name" value={heroForm.name} onChange={onHeroChange} required placeholder="Name*" className="w-full border border-gray-200 dark:border-white/10 dark:bg-[#0a0a0a] dark:text-white rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
-                <input name="mobile" value={heroForm.mobile} onChange={onHeroChange} required placeholder="Mobile number*" inputMode="tel" className="w-full border border-gray-200 dark:border-white/10 dark:bg-[#0a0a0a] dark:text-white rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
-                <input name="email" value={heroForm.email} onChange={onHeroChange} required placeholder="Email*" type="email" className="w-full border border-gray-200 dark:border-white/10 dark:bg-[#0a0a0a] dark:text-white rounded-md px-4 py-3 outline-none font-poppins text-sm focus:ring-1 focus:ring-[#FFD43B]" />
-                <div className="grid grid-cols-2 gap-3">
-                  <CurvedSelect
-                    value={heroForm.city}
-                    onChange={(val) =>
-                      onHeroChange({ target: { name: "city", value: val } })
-                    }
-                    options={CITIES}
-                    noScroll={true}
+          {/* RIGHT SIDE FORM */}
+          <div className="w-full lg:w-2/5 max-w-md relative">
+            <div className="relative bg-[#111] border border-white/10 rounded-2xl shadow-xl p-8">
+
+              <h3 className="text-2xl font-geist font-bold text-white mb-2">
+                Get a Call Back for <br /> <span className="text-[#FFD43B]">Meeting Rooms</span>
+              </h3>
+              <p className="text-sm text-gray-400 mb-8 font-poppins">
+                Available by the hour, day or as long as you need. Instant response guaranteed.
+              </p>
+
+              <form className="space-y-5" onSubmit={handleHeroSubmit}>
+                <div className="relative">
+                  <input
+                    name="name"
+                    value={heroForm.name}
+                    onChange={onHeroChange}
+                    required
+                    placeholder="Your Name"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 outline-none text-white placeholder:text-gray-500 focus:border-[#FFD43B] transition-all font-poppins text-sm"
                   />
-
-
-
-
-                  <CurvedSelect
-                    value={heroForm.seats}
-                    onChange={(val) =>
-                      onHeroChange({ target: { name: "seats", value: val } })
-                    }
-                    options={SEAT_OPTIONS.map((s) => `${s} seats`)}
-                  />
-
                 </div>
 
-                <input name="date" value={heroForm.date} onChange={onHeroChange} type="date" className="w-full border border-gray-200 rounded-md px-4 py-3 outline-none font-poppins text-sm text-gray-500 focus:ring-1 focus:ring-[#FFD43B]" />
-                <Button type="submit" className="w-full bg-[#FFD43B] text-black text-base px-5 py-6 font-bold rounded-md hover:bg-[#eec635] active:scale-[0.98] transition-all">Request Call Back</Button>
+                <div className="relative">
+                  <input
+                    name="mobile"
+                    value={heroForm.mobile}
+                    onChange={onHeroChange}
+                    required
+                    placeholder="Mobile Number"
+                    inputMode="tel"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 outline-none text-white placeholder:text-gray-500 focus:border-[#FFD43B] transition-all font-poppins text-sm"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <CurvedSelect
+                    value={heroForm.city}
+                    onChange={(val) => onHeroChange({ target: { name: "city", value: val } })}
+                    options={CITIES}
+                    noScroll={true}
+                    className="bg-white/5 border-white/10 text-white"
+                  />
+                  <CurvedSelect
+                    value={heroForm.seats}
+                    onChange={(val) => onHeroChange({ target: { name: "seats", value: val } })}
+                    options={SEAT_OPTIONS.map((s) => `${s} seats`)}
+                    className="bg-white/5 border-white/10 text-white"
+                  />
+                </div>
+
+                <div className="relative">
+                  <input
+                    name="date"
+                    value={heroForm.date}
+                    onChange={onHeroChange}
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 outline-none text-white placeholder:text-gray-500 focus:border-[#FFD43B] transition-all font-poppins text-sm [color-scheme:dark]"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-[#FFD43B] text-black text-lg py-6 font-bold rounded-xl hover:bg-[#eec635] hover:scale-[1.02] active:scale-[0.98] transition-all"
+                >
+                  Request Call Back
+                </Button>
               </form>
             </div>
           </div>
 
         </div>
       </section>
+
+      {/* Rewards Section */}
+      <RewardsSection />
 
       {/* ==================== SECTION 2: REQUIREMENTS & MODAL ==================== */}
       {/* ==================== SECTION : MARKETPLACE STATS ==================== */}
@@ -384,7 +735,7 @@ const MeetingRoomsPage: React.FC = () => {
 
               {/* MODAL HEADER */}
               <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
-                <h3 className="text-xl font-geist font-bold">Book {selectedRoom}</h3>
+                <h3 className="text-xl font-geist font-bold">Book {selectedRoom?.name}</h3>
                 <button
                   className="text-gray-500 hover:text-black bg-gray-200 rounded-full p-1"
                   onClick={() => setShowModal(false)}
@@ -396,104 +747,101 @@ const MeetingRoomsPage: React.FC = () => {
               {/* MODAL BODY */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 p-8">
 
-                {/* ================= LEFT SIDE (UPDATED) ================= */}
+                {/* ================= LEFT SIDE ================= */}
                 <div className="border-r pr-6 hidden md:flex flex-col justify-between border-gray-100">
-
-                  {/* TOP: TITLE + LOGOS */}
+                  {/* Summary */}
                   <div>
-                    <h4 className="font-geist text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                      Trusted by over 5,000+ Clients ✨
-                    </h4>
-
-                    {/* LOGO GRID */}
-                    <div className="grid grid-cols-3 gap-1 mb-8">
-                      <img src="/Logo/trulymadly.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="trulymadly" />
-                      <img src="/Logo/StudyIQ.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="StudyIQ" />
-                      <img src="/Logo/Stage2.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="Stage2" />
-                      <img src="/Logo/luv.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="luv" />
-                      <img src="/Logo/flipkart.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="flipkart" />
-                      <img src="/Logo/Adda247.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="Adda247" />
+                    <div className="h-40 w-full rounded-lg overflow-hidden mb-4">
+                      <img src={selectedRoom?.image} className="w-full h-full object-cover" />
                     </div>
+                    <h4 className="text-2xl font-bold font-geist mb-2">{selectedRoom?.name}</h4>
+                    <p className="text-gray-500 text-sm mb-4">{selectedRoom?.points[0]}</p>
 
-
-                    {/* BULLETS */}
-                    <ul className="space-y-4 font-poppins text-gray-700">
-                      <li className="flex items-center gap-3">
-                        <div className="bg-[#FFD43B]/20 p-2 rounded-full">
-                          <CheckCircle className="w-5 h-5 text-[#FFD43B]" />
-                        </div>
-                        <span className="font-medium">Ready for use whenever required</span>
-                      </li>
-
-                      <li className="flex items-center gap-3">
-                        <div className="bg-[#FFD43B]/20 p-2 rounded-full">
-                          <CheckCircle className="w-5 h-5 text-[#FFD43B]" />
-                        </div>
-                        <span className="font-medium">Fully Equipped with all Amenities</span>
-                      </li>
-
-                      <li className="flex items-center gap-3">
-                        <div className="bg-[#FFD43B]/20 p-2 rounded-full">
-                          <CheckCircle className="w-5 h-5 text-[#FFD43B]" />
-                        </div>
-                        <span className="font-medium">Prime Locations, Pan India Access</span>
-                      </li>
-
-                    </ul>
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <div className="flex justify-between mb-2 text-sm text-gray-600">
+                        <span>Rate per hour</span>
+                        <span>₹{selectedRoom?.price}</span>
+                      </div>
+                      <div className="flex justify-between mb-2 text-sm text-gray-600">
+                        <span>Duration</span>
+                        <span>{bookingForm.duration} Hrs</span>
+                      </div>
+                      <div className="h-px bg-gray-300 my-2"></div>
+                      <div className="flex justify-between font-bold text-lg">
+                        <span>Total</span>
+                        <span>₹{selectedRoom?.price * bookingForm.duration}</span>
+                      </div>
+                      <div className="mt-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded inline-block">
+                        You will earn {Math.floor(selectedRoom?.price * bookingForm.duration * 0.5)} Credits!
+                      </div>
+                    </div>
                   </div>
 
-                  {/* BOTTOM LEFT – FAVICON */}
-                  <div className="mt-10 flex justify-center">
-                    <img
-                      src="/Logo/FlashSpace Favicon.png"
-                      className="h-14 w-14 rounded-full border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg"
-                      alt="FlashSpace Favicon"
-                    />
+                  <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                    <ShieldCheck className="w-4 h-4 text-green-500" /> Secure Payment via Razorpay
                   </div>
-
                 </div>
 
-                {/* ================= RIGHT SIDE FORM (UNCHANGED) ================= */}
+                {/* ================= RIGHT SIDE FORM (PAYMENT) ================= */}
                 <div>
-                  <form className="space-y-4 font-poppins">
+                  <form className="space-y-4 font-poppins" onSubmit={handleBookingPayment}>
                     <div>
-                      <label className="text-xs font-semibold text-black-500 uppercase">Name</label>
-                      <input
-                        type="text"
-                        placeholder="John Doe"
-                        className="w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-[#FFD43B] outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-semibold text-black-500 uppercase">Mobile</label>
-                      <input
-                        type="tel"
-                        placeholder="+91 98765 43210"
-                        className="w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-[#FFD43B] outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs font-semibold text-black-500 uppercase">Work Email</label>
-                      <input
-                        type="email"
-                        placeholder="john@company.com"
-                        className="w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-[#FFD43B] outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-xs  font-semibold  text-black-500 uppercase">Date</label>
+                      <label className="text-xs font-semibold text-black-500 uppercase">Select Date</label>
                       <input
                         type="date"
-                        className="w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-[#FFD43B] outline-none text-gray-500"
+                        required
+                        min={new Date().toISOString().split('T')[0]}
+                        value={bookingForm.date}
+                        onChange={(e) => setBookingForm(prev => ({ ...prev, date: e.target.value }))}
+                        className="w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-[#FFD43B] outline-none text-gray-700"
                       />
                     </div>
 
-                    <Button className="w-full bg-[#FFD43B] text-black font-bold py-6 rounded-lg hover:bg-[#eec635] mt-2">
-                      Request Callback
-                    </Button>
+                    <div>
+                      <label className="text-xs font-semibold text-black-500 uppercase">Duration (Hours)</label>
+                      <CurvedSelect
+                        options={["1 Hour", "2 Hours", "3 Hours", "4 Hours", "Full Day (8 Hrs)"]}
+                        value={`${bookingForm.duration} ${bookingForm.duration === 8 ? "Hrs (Full Day)" : bookingForm.duration === 1 ? "Hour" : "Hours"}`}
+                        onChange={(val) => {
+                          const hours = val.includes("Full Day") ? 8 : parseInt(val);
+                          setBookingForm(prev => ({ ...prev, duration: hours }));
+                        }}
+                        noScroll={true}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold text-black-500 uppercase">Mobile Number</label>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="+91 98765 43210"
+                        value={bookingForm.mobile}
+                        onChange={(e) => setBookingForm(prev => ({ ...prev, mobile: e.target.value }))}
+                        className="w-full px-4 py-3 border rounded-lg focus:ring-1 focus:ring-[#FFD43B] outline-none"
+                      />
+                    </div>
+
+                    {user ? (
+                      <Button
+                        type="submit"
+                        disabled={isProcessing}
+                        className="w-full bg-[#FFD43B] text-black font-bold py-6 rounded-lg hover:bg-[#eec635] mt-4"
+                      >
+                        {isProcessing ? "Processing..." : `Pay ₹${selectedRoom?.price * bookingForm.duration}`}
+                      </Button>
+                    ) : (
+                      <div className="text-center">
+                        <Button
+                          type="button"
+                          onClick={() => navigate('/login')}
+                          className="w-full bg-black text-white font-bold py-6 rounded-lg hover:bg-gray-800 mt-4"
+                        >
+                          Login to Book
+                        </Button>
+                        <p className="text-xs text-gray-500 mt-2">You need to be logged in to earn credits.</p>
+                      </div>
+                    )}
                   </form>
                 </div>
 

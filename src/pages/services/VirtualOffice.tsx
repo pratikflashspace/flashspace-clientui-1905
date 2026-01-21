@@ -1,4 +1,4 @@
-import { Building, MapPin, Phone, Users, ChevronDown, Grid3X3, List, Search } from "lucide-react";
+import { Building, MapPin, Phone, Users, ChevronDown, ChevronLeft, Grid3X3, List, Search, Presentation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
@@ -109,7 +109,7 @@ const VirtualOffice = () => {
     setSearchCity(cityName);
     setSelectedCity(cityName);
     setShowSuggestions(false);
-    
+
     // Update URL with new city
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set('city', cityName);
@@ -156,16 +156,22 @@ const VirtualOffice = () => {
       description: "Professional business address solutions"
     },
     {
-      label: "Coworking Space", 
+      label: "Coworking Space",
       href: "/services/coworking-space",
       icon: Users,
       description: "Flexible workspace solutions"
     },
     {
       label: "On Demand",
-      href: "/services/on-demand", 
+      href: "/services/on-demand",
       icon: Phone,
       description: "Meeting rooms & services"
+    },
+    {
+      label: "Meeting Rooms",
+      href: "/services/meeting-rooms",
+      icon: Presentation,
+      description: "Book meeting rooms hourly"
     },
     {
       label: "Event Spaces",
@@ -263,44 +269,53 @@ const VirtualOffice = () => {
           }
         >
           {/* Listings Content */}
-          <div 
+          <div
             ref={scrollContainerRef}
             className="w-full h-full overflow-y-auto"
             data-lenis-prevent
           >
             <div className="px-4 sm:px-6 py-4 sm:py-6">
-            {/* Breadcrumb */}
-            <div className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-              <span>Home</span>
-              <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
-              <span>Virtual Office</span>
-              <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
-              <span className="text-gray-900 font-medium truncate">{selectedCity}</span>
-            </div>
+              {/* Mobile Back Button */}
+              <button
+                onClick={() => navigate('/')}
+                className="md:hidden flex items-center gap-2 text-sm text-gray-500 mb-4 hover:text-black transition"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Back
+              </button>
 
-            {/* Page Title */}
-            <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-              Virtual Office Space In {selectedCity}
-            </h1>
-          
-          {/* City Search Section - Using Optimized SearchHeader Component */}
-          <SearchHeader
-            searchCity={searchCity}
-            onSearchChange={handleSearchChange}
-            onCitySelect={handleCitySearch}
-            onSearchSubmit={handleSearchSubmit}
-            onSearchFocus={handleSearchFocus}
-            onSearchBlur={handleSearchBlur}
-            isSearchFocused={isSearchFocused}
-            showSuggestions={showSuggestions}
-            filteredCities={filteredCities}
-            currentService="Virtual Office"
-            businessSolutions={businessSolutions}
-            onServiceNavigation={handleNavigation}
-          />
+              {/* Breadcrumb */}
+              <div className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                <span>Home</span>
+                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
+                <span>Virtual Office</span>
+                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
+                <span className="text-gray-900 font-medium truncate">{selectedCity}</span>
+              </div>
 
-          {/* Filters Row */}
-          {/* <div className={`bg-white rounded-lg border border-gray-200 p-4 mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+              {/* Page Title */}
+              <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                Virtual Office Space In {selectedCity}
+              </h1>
+
+              {/* City Search Section - Using Optimized SearchHeader Component */}
+              <SearchHeader
+                searchCity={searchCity}
+                onSearchChange={handleSearchChange}
+                onCitySelect={handleCitySearch}
+                onSearchSubmit={handleSearchSubmit}
+                onSearchFocus={handleSearchFocus}
+                onSearchBlur={handleSearchBlur}
+                isSearchFocused={isSearchFocused}
+                showSuggestions={showSuggestions}
+                filteredCities={filteredCities}
+                currentService="Virtual Office"
+                businessSolutions={businessSolutions}
+                onServiceNavigation={handleNavigation}
+              />
+
+              {/* Filters Row */}
+              {/* <div className={`bg-white rounded-lg border border-gray-200 p-4 mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
                 <Filter className="w-4 h-4" />
@@ -346,55 +361,55 @@ const VirtualOffice = () => {
             </div>
           </div> */}
 
-            {/* Results Header */}
-            <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-              <p className="text-sm text-gray-600">
-                Showing <span className="font-semibold text-gray-900">{virtualOffices.length} result(s)</span> for virtual office space in {selectedCity}
-              </p>
-              
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant={viewMode === "list" ? "default" : "ghost"} 
-                  size="sm" 
-                  onClick={() => setViewMode("list")}
-                  className="flex items-center gap-1 text-xs sm:text-sm h-8"
-                >
-                  <List className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">List</span>
-                </Button>
-                <Button 
-                  variant={viewMode === "grid" ? "default" : "ghost"} 
-                  size="sm" 
-                  onClick={() => setViewMode("grid")}
-                  className="flex items-center gap-1 text-xs sm:text-sm h-8"
-                >
-                  <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Grid</span>
-                </Button>
-              </div>
-            </div>
+              {/* Results Header */}
+              <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                <p className="text-sm text-gray-600">
+                  Showing <span className="font-semibold text-gray-900">{virtualOffices.length} result(s)</span> for virtual office space in {selectedCity}
+                </p>
 
-            {/* Office Cards Grid - Modern MindTrip Style Cards */}
-            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-              {loading ? (
-                <SkeletonCardGrid count={6} />
-              ) : error ? (
-                <div className="col-span-full text-center py-8 sm:py-12">
-                  <p className="text-sm sm:text-base text-red-600">{error}</p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className="flex items-center gap-1 text-xs sm:text-sm h-8"
+                  >
+                    <List className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">List</span>
+                  </Button>
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className="flex items-center gap-1 text-xs sm:text-sm h-8"
+                  >
+                    <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">Grid</span>
+                  </Button>
                 </div>
-              ) : virtualOffices.length === 0 ? (
-                <div className="col-span-full text-center py-8 sm:py-12">
-                  <p className="text-sm sm:text-base text-gray-600">No virtual offices found for {selectedCity}</p>
-                </div>
-              ) : virtualOffices.map((office) => (
-                <ListingCardModern
-                  key={office._id}
-                  item={office}
-                  onGetBestPrice={() => handleGetBestPrice(office._id)}
-                  onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
-                />
-              ))}
-            </div>
+              </div>
+
+              {/* Office Cards Grid - Modern MindTrip Style Cards */}
+              <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                {loading ? (
+                  <SkeletonCardGrid count={6} />
+                ) : error ? (
+                  <div className="col-span-full text-center py-8 sm:py-12">
+                    <p className="text-sm sm:text-base text-red-600">{error}</p>
+                  </div>
+                ) : virtualOffices.length === 0 ? (
+                  <div className="col-span-full text-center py-8 sm:py-12">
+                    <p className="text-sm sm:text-base text-gray-600">No virtual offices found for {selectedCity}</p>
+                  </div>
+                ) : virtualOffices.map((office) => (
+                  <ListingCardModern
+                    key={office._id}
+                    item={office}
+                    onGetBestPrice={() => handleGetBestPrice(office._id)}
+                    onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
+                  />
+                ))}
+              </div>
 
             </div>
           </div>

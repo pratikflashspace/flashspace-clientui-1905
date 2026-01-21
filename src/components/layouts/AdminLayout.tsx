@@ -19,6 +19,7 @@ export default function AdminLayout() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     const handleLogout = async () => {
         await logout();
@@ -79,6 +80,63 @@ export default function AdminLayout() {
                 </div>
             </aside>
 
+            {/* Mobile Sidebar Overlay */}
+            {isMobileOpen && (
+                <div className="fixed inset-0 z-50 md:hidden">
+                    {/* Backdrop */}
+                    <div
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+                        onClick={() => setIsMobileOpen(false)}
+                    />
+
+                    {/* Sidebar Panel */}
+                    <aside className="fixed inset-y-0 left-0 w-64 bg-black text-white flex flex-col shadow-2xl animate-in slide-in-from-left duration-300">
+                        {/* Header */}
+                        <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
+                            <div className="flex items-center gap-2 text-xl font-bold font-[Poppins]">
+                                <span className="text-yellow-400 text-3xl">.</span>
+                                <span>FlashSpace</span>
+                            </div>
+                            <button onClick={() => setIsMobileOpen(false)} className="p-1 hover:bg-white/10 rounded-md transition-colors">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        {/* Nav Links */}
+                        <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
+                            {navItems.map((item) => (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    onClick={() => setIsMobileOpen(false)}
+                                    end={item.path === '/admin'}
+                                    className={({ isActive }) =>
+                                        `flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${isActive
+                                            ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
+                                            : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                        }`
+                                    }
+                                >
+                                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                                    <span className="font-medium">{item.label}</span>
+                                </NavLink>
+                            ))}
+                        </nav>
+
+                        {/* Logout */}
+                        <div className="p-4 border-t border-white/10">
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-3 px-3 py-3 w-full rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
+                            >
+                                <LogOut className="w-5 h-5" />
+                                <span className="font-medium">Logout</span>
+                            </button>
+                        </div>
+                    </aside>
+                </div>
+            )}
+
             {/* Main Content */}
             <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'
                 }`}>
@@ -91,7 +149,10 @@ export default function AdminLayout() {
                         >
                             <Menu className="w-5 h-5" />
                         </button>
-                        <button className="md:hidden p-2 hover:bg-gray-100 rounded-lg text-gray-600">
+                        <button
+                            className="md:hidden p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                            onClick={() => setIsMobileOpen(true)}
+                        >
                             <Menu className="w-5 h-5" />
                         </button>
 

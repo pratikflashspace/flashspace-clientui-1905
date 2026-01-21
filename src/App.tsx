@@ -13,6 +13,7 @@ import ListYourSpace from "./pages/ListYourSpace";
 import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 import VirtualOffice from "./pages/services/VirtualOffice";
+import MeetingRooms from "./pages/services/MeetingRooms";
 import CoworkingSpace from "./pages/services/CoworkingSpace";
 import OnDemand from "./pages/services/OnDemand";
 import EventSpaces from "./pages/services/EventSpaces";
@@ -44,14 +45,21 @@ import Blog, { SinglePostPage } from "./pages/Blog";
 
 // --- Client Dashboard Pages ---
 import ClientDashboard from "./components/ClientDashboard";
+import ScrollToTop from "./components/ScrollToTop";
 
 //-----------spaces---------
 import SpaceComponent from './components/Spaces/SpaceComponent';
+import MeetingRoomSpaceComponent from './components/Spaces/MeetingRoomSpaceComponent';
 import CoworkingSpaceComponent from './components/Spaces/CoworkingSpaceComponent';
 import BookingPage from './pages/BookingPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentFailedPage from './pages/PaymentFailedPage';
 import AdminDashboard from "./pages/admin/Dashboard";
+import UserManagement from "./pages/admin/UserManagement";
+import KYCRequests from "./pages/admin/KYCRequests";
+import SpaceManagement from "./pages/admin/SpaceManagement";
+import AdminBookings from "./pages/admin/AdminBookings";
+import AdminSettings from "./pages/admin/Settings";
 import { AdminRoute } from "./components/auth/AdminRoute";
 import AdminLayout from "./components/layouts/AdminLayout";
 
@@ -66,6 +74,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <DarkModeProvider>
+            <ScrollToTop />
             {/* <MouseFollower/> */}
             <Routes>
               {/* Public Routes */}
@@ -80,6 +89,7 @@ const App = () => (
               <Route path="/Solutions/coworking-space" element={<CoworkingSpaceSolution />} />
               <Route path="/Solutions/on-demand" element={<OnDemandSolution />} />
               <Route path="/Solutions/business-setup" element={<BusinessSetupSolution />} />
+              <Route path="/services/meeting-rooms" element={<MeetingRooms />} />
               <Route path="/Solutions/meetingsroom" element={<MeetingsRoom />} />
               <Route path="/Solutions/day-office" element={<Dayoffice />} />
               <Route path="/Solutions/eventspace" element={<EventSpacePage />} />
@@ -87,6 +97,7 @@ const App = () => (
               {/* Spaces*/}
               <Route path="/space/:id" element={<SpaceComponent />} />
               <Route path="/coworking-space/:id" element={<CoworkingSpaceComponent />} />
+              <Route path="/meeting-room/:id" element={<MeetingRoomSpaceComponent />} />
               <Route path="/booking/:id" element={<BookingPage />} />
 
               {/* Payment Routes */}
@@ -119,6 +130,11 @@ const App = () => (
               <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
+                  <Route path="users" element={<UserManagement />} />
+                  <Route path="kyc-requests" element={<KYCRequests />} />
+                  <Route path="spaces" element={<SpaceManagement />} />
+                  <Route path="bookings" element={<AdminBookings />} />
+                  <Route path="settings" element={<AdminSettings />} />
                   <Route path="*" element={<AdminDashboard />} />
                 </Route>
               </Route>

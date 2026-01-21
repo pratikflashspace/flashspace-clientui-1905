@@ -151,20 +151,20 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               <img
                 src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
                 alt="FlashSpace Logo"
-                className="h-8 w-auto"
+                className="h-8 w-auto dark:invert"
               />
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center justify-center space-x-8 mx-8 flex-1">
-              {/* === All Solutions Dropdown === */}
+              {/* === Get Workspaces Dropdown === */}
               <div ref={solutionsRef} className="relative">
                 <button
-                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors relative ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-black dark:hover:text-gray-700"}`}
+                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors relative ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-gray-100 dark:hover:text-white"}`}
                   onClick={() => setIsSolutionsOpen((prev) => !prev)}
                 >
                   <span className="relative">
-                    All Solutions
+                    Get Workspaces
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#EFAD1A] transition-all duration-300 group-hover:w-full"></span>
                   </span>
                   <ChevronDown
@@ -184,12 +184,12 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                   }}
                 >
                   <div className="p-4 grid grid-cols-2 gap-4">
-                    <div className="border rounded-lg p-4 bg-white/50">
+                    <div className="border border-gray-200 dark:border-white/10 rounded-lg p-4 bg-white/50 dark:bg-white/5">
                       <div className="flex items-center gap-2 mb-1 cursor-pointer" onClick={() => { handleNavigation("/Solutions/on-demand"); setIsSolutionsOpen(false); }}>
                         <Zap className="w-4 h-4 text-primary" />
-                        <h4 className="text-sm font-semibold hover:text-primary transition-colors">On-Demand</h4>
+                        <h4 className="text-sm font-semibold hover:text-primary transition-colors dark:text-gray-100">On-Demand</h4>
                       </div>
-                      <p className="text-xs text-gray-500 mb-3">Book by the hour or day</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Book by the hour or day</p>
                       {[
                         { label: "Meeting Rooms", type: "meeting-room", href: "/Solutions/meetingsroom" },
                         { label: "Event Space", type: "training-room", href: "/Solutions/eventspace" },
@@ -197,7 +197,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                       ].map((item) => (
                         <button
                           key={item.type}
-                          className="flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-gray-100"
+                          className="flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-200 transition-colors"
                           onClick={() => {
                             handleNavigation(item.href);
                             setIsSolutionsOpen(false);
@@ -232,7 +232,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                       ].map(({ icon: Icon, title, desc, href }) => (
                         <div
                           key={title}
-                          className="flex items-start gap-3 p-4 rounded-lg border hover:bg-gray-50 cursor-pointer"
+                          className="flex items-start gap-3 p-4 rounded-lg border dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
                           onClick={() => {
                             handleNavigation(href);
                             setIsSolutionsOpen(false);
@@ -240,8 +240,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                         >
                           <Icon className="w-5 h-5 text-primary mt-0.5" />
                           <div>
-                            <h5 className="text-sm font-semibold">{title}</h5>
-                            <p className="text-xs text-gray-500 mt-1">{desc}</p>
+                            <h5 className="text-sm font-semibold dark:text-gray-100">{title}</h5>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{desc}</p>
                           </div>
                         </div>
                       ))}
@@ -253,7 +253,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               {/* Partner with Us */}
               <button
                 onClick={() => handleNavigation("/partner")}
-                className={`group relative px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-black dark:hover:text-gray-700"}`}
+                className={`group relative px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-gray-100 dark:hover:text-white"}`}
               >
                 <span className="relative">
                   Partner with Us
@@ -264,7 +264,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
               {/* === More Dropdown === */}
               <div ref={moreRef} className="relative">
                 <button
-                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors relative ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-black dark:hover:text-gray-700"}`}
+                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:text-black transition-colors relative ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-gray-100 dark:hover:text-white"}`}
                   onClick={() => setIsMoreOpen((prev) => !prev)}
                 >
                   <span className="relative">
@@ -285,7 +285,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                     ].map((item) => (
                       <li key={item.label}>
                         <button
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-200 transition-colors"
                           onClick={() => {
                             handleNavigation(item.href);
                             setIsMoreOpen(false);
@@ -324,7 +324,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                     {countries.map((country) => (
                       <li key={country.code}>
                         <button
-                          className={`flex items-center w-full px-3 py-2 text-left hover:bg-gray-100 gap-2 text-sm`}
+                          className={`flex items-center w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-800 gap-2 text-sm dark:text-gray-200 transition-colors`}
                           onClick={() => {
                             setSelectedCountry(country);
                             setCountryDropdownOpen(false);
@@ -471,7 +471,11 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
           </div>
 
           {/* Sidebar Menu */}
-          <SidebarMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+          <SidebarMenu
+            isOpen={isMenuOpen}
+            onClose={() => setIsMenuOpen(false)}
+            onOpenLogin={() => setIsLoginOpen(true)}
+          />
         </div>
       </header>
 
