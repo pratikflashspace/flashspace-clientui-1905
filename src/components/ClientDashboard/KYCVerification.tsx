@@ -10,6 +10,7 @@ import {
   AlertCircle,
   FileText,
   User,
+  Users,
   Building2,
   Eye,
   ChevronRight,
@@ -19,13 +20,17 @@ import {
   Save,
   X,
   Trash2,
+  Video as FileVideo,
+  Camera,
+  StopCircle,
+  Play,
 } from "lucide-react";
 import { API_CONFIG } from "@/config/api.config";
 
 
 // Types
 type DocumentStatus = "uploaded" | "pending" | "approved" | "rejected";
-type VerificationStep = "type" | "personal" | "business" | "documents" | "review";
+type VerificationStep = "type" | "personal" | "business" | "video" | "documents" | "review";
 type KYCType = "individual" | "business";
 
 export default function KYCVerification() {
@@ -42,6 +47,7 @@ export default function KYCVerification() {
   // Multi-Level State
   const [profiles, setProfiles] = useState<KYCData[]>([]);
   const [individualProfile, setIndividualProfile] = useState<KYCData | null>(null);
+  const [partnerProfiles, setPartnerProfiles] = useState<KYCData[]>([]);
   const [businessProfiles, setBusinessProfiles] = useState<KYCData[]>([]);
 
   const [loading, setLoading] = useState(true);
@@ -51,6 +57,16 @@ export default function KYCVerification() {
   const [uploadingDocType, setUploadingDocType] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [isPartnerMode, setIsPartnerMode] = useState(false);
+  const [personalForm, setPersonalForm] = useState({
+    phone: "",
+    dateOfBirth: "",
+    aadhaar: "",
+    pan: "",
+    fullName: "",
+  });
+  const [uploadAccept, setUploadAccept] = useState(".pdf,.jpg,.jpeg,.png");
+
   const [businessForm, setBusinessForm] = useState({
     profileName: "",
     companyName: "",
@@ -59,6 +75,7 @@ export default function KYCVerification() {
     cinNumber: "",
     registeredAddress: "",
     industry: "",
+    partners: [] as string[],
   });
   const [previewDoc, setPreviewDoc] = useState<{ url: string; type: string; mimeType: string } | null>(null);
 
@@ -72,6 +89,7 @@ export default function KYCVerification() {
           // Specific profile loaded
           const data = response.data as KYCData;
           setKycData(data);
+
           setBusinessForm({
             profileName: data.profileName || "",
             companyName: data.businessInfo?.companyName || "",
@@ -80,7 +98,18 @@ export default function KYCVerification() {
             cinNumber: data.businessInfo?.cinNumber || "",
             registeredAddress: data.businessInfo?.registeredAddress || "",
             industry: data.businessInfo?.industry || "",
+            partners: data.businessInfo?.partners || [],
           });
+
+          // Pre-fill personal form if exist
+          setPersonalForm({
+            phone: data.personalInfo?.phone || user?.phoneNumber || "",
+            dateOfBirth: data.personalInfo?.dateOfBirth ? new Date(data.personalInfo.dateOfBirth).toISOString().split('T')[0] : "",
+            aadhaar: data.personalInfo?.aadhaarLast4 || "",  // This maps to aadhaarNumber essentially
+            pan: data.personalInfo?.panNumber || "",
+            fullName: data.personalInfo?.fullName || "",
+          });
+
           if (data.kycType) {
             setKycType(data.kycType as KYCType);
           }
@@ -90,10 +119,13 @@ export default function KYCVerification() {
           setProfiles(profilesList);
 
           // Separate profiles
-          const indProfile = profilesList.find((p: KYCData) => p.kycType === 'individual') || null;
+          const indProfiles = profilesList.filter((p: KYCData) => p.kycType === 'individual');
+          const mainIndProfile = indProfiles.length > 0 ? indProfiles[0] : null;
+          const partners = indProfiles.length > 1 ? indProfiles.slice(1) : [];
           const bizProfiles = profilesList.filter((p: KYCData) => p.kycType === 'business');
 
-          setIndividualProfile(indProfile);
+          setIndividualProfile(mainIndProfile);
+          setPartnerProfiles(partners);
           setBusinessProfiles(bizProfiles);
         }
       }
@@ -131,7 +163,14 @@ export default function KYCVerification() {
       const response = await userDashboardService.updateBusinessInfo({
         ...businessForm,
         profileId: (profileId === "new" ? undefined : profileId) || undefined,
-        kycType: kycType
+        kycType: kycType,
+        // Added personal info fields
+        personalPhone: personalForm.phone,
+        personalDob: personalForm.dateOfBirth,
+        personalAadhaar: personalForm.aadhaar,
+        personalPan: personalForm.pan,
+        personalFullName: personalForm.fullName,
+        partners: businessForm.partners, // Include selected partners
       });
       if (response.success && response.data) {
         setEditMode(false);
@@ -174,15 +213,21 @@ export default function KYCVerification() {
   };
 
   const handleUploadDocument = async (docType: string, file: File) => {
-    if (!profileId || profileId === "new") return;
+    if (!profileId || profileId === "new") {
+      alert("Please save your profile information first before uploading documents.");
+      return;
+    }
     setUploading(docType);
     try {
       const response = await userDashboardService.uploadKYCDocument(docType, file, profileId);
       if (response.success) {
         fetchKYC();
+      } else {
+        alert(response.message || "Failed to upload document");
       }
     } catch (err) {
-      console.error("Failed to upload document");
+      console.error("Failed to upload document", err);
+      alert("An error occurred while uploading the document. Please try again.");
     } finally {
       setUploading(null);
       setUploadingDocType(null);
@@ -198,8 +243,13 @@ export default function KYCVerification() {
 
   const triggerFileUpload = (docType: string) => {
     setUploadingDocType(docType);
-    fileInputRef.current?.click();
+    const accept = docType === "video_kyc" ? ".mp4,.webm,.mov" : ".pdf,.jpg,.jpeg,.png";
+    setUploadAccept(accept);
+    setTimeout(() => fileInputRef.current?.click(), 0);
   };
+
+  // Video KYC Handlers removed - using triggerFileUpload instead
+
 
   const getStatusConfig = (status: DocumentStatus) => {
     switch (status) {
@@ -234,35 +284,46 @@ export default function KYCVerification() {
   const steps = [
     { id: "personal", label: "Personal Info", icon: User },
     ...(kycType === "business" ? [{ id: "business", label: "Business Info", icon: Building2 }] : []),
+    { id: "video", label: "Video KYC", icon: FileVideo },
     { id: "documents", label: "Documents", icon: FileText },
     { id: "review", label: "Review", icon: Shield },
   ];
 
   const getCompletionPercentage = () => {
     if (!kycData) return 0;
-    let completed = 0;
-    let total = kycType === 'business' ? 4 : 3;
+    const isBusiness = kycType === 'business';
+    let progress = 0;
 
-    if (kycData.personalInfo?.fullName) completed++;
-    if (kycType === 'business' && kycData.businessInfo?.companyName) completed++;
+    if (isBusiness) {
+      if (kycData.personalInfo?.fullName) progress += 25;
+      if (kycData.businessInfo?.companyName) progress += 25;
+      const uploadedDocsCount = kycData.documents?.length || 0;
+      const requiredDocsCount = 5; // pan, gst, coi, address, video
+      progress += Math.min(40, Math.round((uploadedDocsCount / requiredDocsCount) * 40));
+      if (kycData.overallStatus === "approved") progress += 10;
+    } else {
+      if (kycData.personalInfo?.fullName && kycData.personalInfo?.aadhaarNumber && kycData.personalInfo?.panNumber) progress += 30;
+      const uploadedDocsCount = kycData.documents?.length || 0;
+      const requiredDocsCount = 3; // pan, aadhaar, video
+      progress += Math.min(50, Math.round((uploadedDocsCount / requiredDocsCount) * 50));
+      if (kycData.overallStatus === "approved") progress += 20;
+    }
 
-    const verifiedDocs = kycData.documents?.filter(d => d.status === "approved").length || 0;
-    if (verifiedDocs > 0) completed++;
-
-    if (kycData.overallStatus === "approved") completed++;
-    return Math.round((completed / total) * 100);
+    return Math.min(progress, 100);
   };
 
   const requiredDocTypes = kycType === "individual"
     ? [
       { type: "pan_card", name: "PAN Card", description: "Individual PAN Card", required: true },
       { type: "aadhaar", name: "Aadhaar Card", description: "Aadhaar Card (Front & Back)", required: true },
+      { type: "video_kyc", name: "Video KYC", description: "Live Video Verification", required: true },
     ]
     : [
       { type: "pan_card", name: "PAN Card", description: "Company PAN Card", required: true },
       { type: "gst_certificate", name: "GST Certificate", description: "GST Registration Certificate", required: true },
       { type: "coi", name: "Certificate of Incorporation", description: "Company incorporation certificate", required: false },
       { type: "address_proof", name: "Address Proof", description: "Utility bill or rent agreement", required: true },
+      { type: "video_kyc", name: "Video KYC", description: "Business Representative Video", required: true },
     ];
 
   if (loading) {
@@ -315,7 +376,7 @@ export default function KYCVerification() {
         ref={fileInputRef}
         type="file"
         className="hidden"
-        accept=".pdf,.jpg,.jpeg,.png"
+        accept={uploadAccept}
         onChange={handleFileSelect}
       />
 
@@ -412,7 +473,7 @@ export default function KYCVerification() {
                       // Reset form
                       setBusinessForm({
                         profileName: user?.fullName ? `${user.fullName} (Personal)` : "My Personal Profile",
-                        companyName: "", companyType: "", gstNumber: "", cinNumber: "", registeredAddress: "", industry: ""
+                        companyName: "", companyType: "", gstNumber: "", cinNumber: "", registeredAddress: "", industry: "", partners: []
                       });
                     }}
                     className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 shadow-sm whitespace-nowrap"
@@ -423,10 +484,76 @@ export default function KYCVerification() {
               )}
             </div>
 
-            {/* Section 2: Business Profiles */}
+            {/* Section 2: Partner Profiles */}
+            <div className={`space-y-4 transition-opacity duration-300 ${!individualProfile || individualProfile.overallStatus !== 'approved' ? 'opacity-50 grayscale-[0.5] pointer-events-none' : ''}`}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between border-b pb-2 gap-2">
+                <h2 className="text-lg font-semibold text-gray-900">2. Partner Profiles</h2>
+                <div className="bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                  <Info className="w-3 h-3" />
+                  <span>Adding a company with partners? Add them here first!</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {partnerProfiles.map((p) => {
+                  const status = getOverallStatusConfig(p.overallStatus);
+                  return (
+                    <div key={p._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="p-2 bg-gray-50 rounded-lg">
+                          <Users className="w-6 h-6 text-gray-600" />
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full text-white ${status.bg}`}>
+                          {status.text}
+                        </span>
+                      </div>
+                      <h3 className="font-semibold text-gray-900 truncate mb-1">{p.profileName}</h3>
+                      <p className="text-xs text-gray-500 mb-4 uppercase tracking-wide">Partner</p>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setProfileId(p._id!);
+                            setSearchParams(params => { params.set("profileId", p._id!); return params; });
+                            setIsPartnerMode(true);
+                          }}
+                          className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200"
+                        >
+                          Details
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <button
+                  onClick={() => {
+                    setProfileId("new");
+                    setKycType("individual");
+                    setActiveStep("personal");
+                    setIsPartnerMode(true);
+                    setBusinessForm({
+                      profileName: "", companyName: "", companyType: "", gstNumber: "", cinNumber: "", registeredAddress: "", industry: "", partners: []
+                    });
+                    setPersonalForm({
+                      phone: "", dateOfBirth: "", aadhaar: "", pan: "", fullName: ""
+                    });
+                  }}
+                  disabled={!individualProfile || individualProfile.overallStatus !== 'approved'}
+                  className="bg-white rounded-xl shadow-sm border-2 border-dashed border-gray-200 p-5 flex flex-col items-center justify-center text-gray-400 hover:border-yellow-400 hover:text-yellow-600 transition-all group min-h-[160px] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-400"
+                >
+                  <div className="p-3 bg-gray-50 rounded-full group-hover:bg-yellow-50 mb-3 transition-colors">
+                    <Users className="w-6 h-6" />
+                  </div>
+                  <span className="font-medium">Add Partner Profile</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Section 3: Business Profiles */}
             <div className={`space-y-4 transition-opacity duration-300 ${!individualProfile || individualProfile.overallStatus !== 'approved' ? 'opacity-50 grayscale-[0.5] pointer-events-none' : ''}`}>
               <div className="flex items-center justify-between border-b pb-2">
-                <h2 className="text-lg font-semibold text-gray-900">2. Business Profiles</h2>
+                <h2 className="text-lg font-semibold text-gray-900">3. Business Profiles</h2>
                 {(!individualProfile || individualProfile.overallStatus !== 'approved') && (
                   <span className="text-xs font-medium text-red-500 bg-red-50 px-2 py-1 rounded">Locked until Personal Verification is Approved</span>
                 )}
@@ -479,7 +606,7 @@ export default function KYCVerification() {
                     setKycType("business");
                     setActiveStep("business");
                     setBusinessForm({
-                      profileName: "", companyName: "", companyType: "", gstNumber: "", cinNumber: "", registeredAddress: "", industry: ""
+                      profileName: "", companyName: "", companyType: "", gstNumber: "", cinNumber: "", registeredAddress: "", industry: "", partners: []
                     });
                   }}
                   disabled={!individualProfile || individualProfile.overallStatus !== 'approved'}
@@ -489,6 +616,67 @@ export default function KYCVerification() {
                     <Building2 className="w-6 h-6" />
                   </div>
                   <span className="font-medium">Add Business Profile</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Section 3: Partner Profiles */}
+            <div className={`space-y-4 transition-opacity duration-300 ${!individualProfile || individualProfile.overallStatus !== 'approved' ? 'opacity-50 grayscale-[0.5] pointer-events-none' : ''}`}>
+              <div className="flex items-center justify-between border-b pb-2">
+                <h2 className="text-lg font-semibold text-gray-900">3. Partner Profiles</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {partnerProfiles.map((p) => {
+                  const status = getOverallStatusConfig(p.overallStatus);
+                  return (
+                    <div key={p._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="p-2 bg-gray-50 rounded-lg">
+                          <Users className="w-6 h-6 text-gray-600" />
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full text-white ${status.bg}`}>
+                          {status.text}
+                        </span>
+                      </div>
+                      <h3 className="font-semibold text-gray-900 truncate mb-1">{p.profileName}</h3>
+                      <p className="text-xs text-gray-500 mb-4 uppercase tracking-wide">Partner</p>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setProfileId(p._id!);
+                            setSearchParams(params => { params.set("profileId", p._id!); return params; });
+                          }}
+                          className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200"
+                        >
+                          Details
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <button
+                  onClick={() => {
+                    setProfileId("new");
+                    setKycType("individual");
+                    setActiveStep("personal");
+                    setIsPartnerMode(true);
+                    setBusinessForm({
+                      profileName: "", companyName: "", companyType: "", gstNumber: "", cinNumber: "", registeredAddress: "", industry: "", partners: []
+                    });
+                    setPersonalForm({
+                      phone: "", dateOfBirth: "", aadhaar: "", pan: "", fullName: ""
+                    });
+                  }}
+                  disabled={!individualProfile || individualProfile.overallStatus !== 'approved'}
+                  className="bg-white rounded-xl shadow-sm border-2 border-dashed border-gray-200 p-5 flex flex-col items-center justify-center text-gray-400 hover:border-yellow-400 hover:text-yellow-600 transition-all group min-h-[160px] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-400"
+                >
+                  <div className="p-3 bg-gray-50 rounded-full group-hover:bg-yellow-50 mb-3 transition-colors">
+                    <Users className="w-6 h-6" />
+                  </div>
+                  <span className="font-medium">Add Partner Profile</span>
                 </button>
               </div>
             </div>
@@ -522,7 +710,8 @@ export default function KYCVerification() {
               </div>
             )}
 
-            {(profileId === "new" || editMode) && (
+            {/* Profile Name Input (Hide for Partner Mode) */}
+            {(profileId === "new" || editMode) && !isPartnerMode && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex-1">
@@ -572,309 +761,456 @@ export default function KYCVerification() {
               </div>
             )}
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              {profileId === "new" ? (
-                <div className="space-y-6 text-center py-8">
-                  <div className="max-w-md mx-auto space-y-4">
-                    <h2 className="text-xl font-bold font-[Poppins]">Start New Verification</h2>
-                    <p className="text-gray-500">Provide a name for this profile and select the type to begin.</p>
-                    <button
-                      onClick={handleSaveBusinessInfo}
-                      disabled={saving || !businessForm.profileName}
-                      className="w-full py-3 bg-yellow-400 text-black rounded-lg font-bold hover:bg-yellow-500 transition-colors disabled:opacity-50"
-                    >
-                      {saving ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Begin Verification"}
-                    </button>
-                  </div>
+            {(profileId === "new" && !isPartnerMode) ? (
+              <div className="space-y-6 text-center py-8">
+                <div className="max-w-md mx-auto space-y-4">
+                  <h2 className="text-xl font-bold font-[Poppins]">Start New Verification</h2>
+                  <p className="text-gray-500">Provide a name for this profile and select the type to begin.</p>
+                  <button
+                    onClick={handleSaveBusinessInfo}
+                    disabled={saving || !businessForm.profileName}
+                    className="w-full py-3 bg-yellow-400 text-black rounded-lg font-bold hover:bg-yellow-500 transition-colors disabled:opacity-50"
+                  >
+                    {saving ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Begin Verification"}
+                  </button>
                 </div>
-              ) : (
-                <>
-                  {activeStep === "personal" && (
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                          <User className="w-5 h-5 text-yellow-500" /> Personal Information
-                        </h2>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">Full Name</label>
-                          <p className="text-gray-900 font-medium">{user?.fullName || kycData?.personalInfo?.fullName || "-"}</p>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">Email</label>
-                          <p className="text-gray-900">{user?.email || kycData?.personalInfo?.email || "-"}</p>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">Phone Number</label>
-                          <p className="text-gray-900">{user?.phoneNumber || kycData?.personalInfo?.phone || "-"}</p>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">Date of Birth</label>
-                          <p className="text-gray-900">{kycData?.personalInfo?.dateOfBirth ? new Date(kycData.personalInfo!.dateOfBirth).toLocaleDateString("en-IN") : "-"}</p>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">Aadhaar Number</label>
-                          <p className="text-gray-900 font-mono">{kycData?.personalInfo?.aadhaarLast4 ? `XXXX XXXX ${kycData.personalInfo.aadhaarLast4}` : "-"}</p>
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">PAN Number</label>
-                          <p className="text-gray-900 font-mono">{kycData?.personalInfo?.panNumber || "-"}</p>
-                        </div>
-                      </div>
-                      <div className="mt-6 flex justify-end">
-                        <button
-                          onClick={async () => {
-                            await handleSaveBusinessInfo();
-                            setActiveStep(kycType === 'business' ? 'business' : 'documents');
-                          }}
-                          disabled={saving}
-                          className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2 disabled:opacity-50"
-                        >
-                          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm & Continue"}
-                          {!saving && <ChevronRight className="w-4 h-4" />}
-                        </button>
-                      </div>
-                    </div>
-                  )}
+              </div>
+            ) : null}
 
-                  {activeStep === "business" && (
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                          <Building2 className="w-5 h-5 text-yellow-500" /> Business Information
-                        </h2>
-                        {!editMode ? (
-                          <button onClick={() => setEditMode(true)} className="text-sm text-yellow-600 hover:text-yellow-700 font-medium">Edit</button>
+            {/* Display Forms if Profile ID is set OR (Profile ID is New AND Is Partner Mode) */}
+            {(profileId !== "new" || isPartnerMode) && (
+              <>
+                {activeStep === "personal" && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
+                        <User className="w-5 h-5 text-yellow-500" /> Personal Information
+                      </h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">Full Name</label>
+                        {isPartnerMode || (profileId !== "new" && kycData?.kycType === 'individual' && kycData?.profileName !== user?.fullName && kycData?.personalInfo?.fullName !== user?.fullName) ? (
+                          <input
+                            type="text"
+                            placeholder="Partner Full Name"
+                            value={personalForm.fullName}
+                            onChange={(e) => setPersonalForm({ ...personalForm, fullName: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          />
                         ) : (
-                          <button onClick={() => setEditMode(false)} className="text-sm text-gray-500 hover:text-gray-700 font-medium">Cancel</button>
+                          <p className="text-gray-900 font-medium">{user?.fullName || kycData?.personalInfo?.fullName || "-"}</p>
                         )}
                       </div>
-
-                      {editMode ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm text-gray-500 mb-1">Company Name</label>
-                            <input
-                              type="text"
-                              value={businessForm.companyName}
-                              onChange={(e) => setBusinessForm({ ...businessForm, companyName: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm text-gray-500 mb-1">Company Type</label>
-                            <select
-                              value={businessForm.companyType}
-                              onChange={(e) => setBusinessForm({ ...businessForm, companyType: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            >
-                              <option value="">Select Type</option>
-                              <option value="Sole Proprietorship">Sole Proprietorship</option>
-                              <option value="Partnership">Partnership</option>
-                              <option value="LLP">LLP</option>
-                              <option value="Private Limited">Private Limited</option>
-                              <option value="Public Limited">Public Limited</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-sm text-gray-500 mb-1">GST Number</label>
-                            <input
-                              type="text"
-                              value={businessForm.gstNumber}
-                              onChange={(e) => setBusinessForm({ ...businessForm, gstNumber: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm text-gray-500 mb-1">CIN Number</label>
-                            <input
-                              type="text"
-                              value={businessForm.cinNumber}
-                              onChange={(e) => setBusinessForm({ ...businessForm, cinNumber: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            />
-                          </div>
-                          <div className="md:col-span-2">
-                            <label className="block text-sm text-gray-500 mb-1">Business Address</label>
-                            <textarea
-                              value={businessForm.registeredAddress}
-                              onChange={(e) => setBusinessForm({ ...businessForm, registeredAddress: e.target.value })}
-                              rows={2}
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm text-gray-500 mb-1">Industry</label>
-                            <input
-                              type="text"
-                              value={businessForm.industry}
-                              onChange={(e) => setBusinessForm({ ...businessForm, industry: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            />
-                          </div>
-                          <div className="md:col-span-2 flex justify-end">
-                            <button
-                              onClick={async () => {
-                                await handleSaveBusinessInfo();
-                                setActiveStep('documents');
-                              }}
-                              disabled={saving}
-                              className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2 disabled:opacity-50"
-                            >
-                              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                              Save & Continue
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-6">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                              <label className="block text-sm text-gray-500 mb-1">Company Name</label>
-                              <p className="text-gray-900 font-medium">{kycData?.businessInfo?.companyName || "-"}</p>
-                            </div>
-                            <div>
-                              <label className="block text-sm text-gray-500 mb-1">Company Type</label>
-                              <p className="text-gray-900">{kycData?.businessInfo?.companyType || "-"}</p>
-                            </div>
-                            <div>
-                              <label className="block text-sm text-gray-500 mb-1">GST Number</label>
-                              <p className="text-gray-900 font-mono">{kycData?.businessInfo?.gstNumber || "-"}</p>
-                            </div>
-                            <div>
-                              <label className="block text-sm text-gray-500 mb-1">CIN Number</label>
-                              <p className="text-gray-900 font-mono">{kycData?.businessInfo?.cinNumber || "-"}</p>
-                            </div>
-                            <div className="md:col-span-2">
-                              <label className="block text-sm text-gray-500 mb-1">Business Address</label>
-                              <p className="text-gray-900">{kycData?.businessInfo?.registeredAddress || "-"}</p>
-                            </div>
-                            <div>
-                              <label className="block text-sm text-gray-500 mb-1">Industry</label>
-                              <p className="text-gray-900">{kycData?.businessInfo?.industry || "-"}</p>
-                            </div>
-                          </div>
-                          <div className="flex justify-end">
-                            <button
-                              onClick={() => setActiveStep('documents')}
-                              className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2"
-                            >
-                              Continue to Documents <ChevronRight className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {activeStep === "documents" && (
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-yellow-500" /> Required Documents
-                        </h2>
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">Email</label>
+                        <p className="text-gray-900">{user?.email || kycData?.personalInfo?.email || "-"}</p>
                       </div>
-                      <div className="space-y-4">
-                        {requiredDocTypes.map((docType) => {
-                          const uploadedDoc = kycData?.documents?.find(d => d.type === docType.type);
-                          const status = uploadedDoc?.status || "pending";
-                          const statusConfig = getStatusConfig(status as DocumentStatus);
-                          const isUploading = uploading === docType.type;
-                          return (
-                            <div key={docType.type} className={`p-4 border rounded-xl transition-colors ${status === "rejected" ? "border-red-200 bg-red-50" : "border-gray-200 hover:border-yellow-300"}`}>
-                              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="font-medium text-gray-900">{docType.name}</h3>
-                                    {docType.required && (<span className="text-xs text-red-500">*Required</span>)}
-                                    {uploadedDoc && (
-                                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
-                                        <statusConfig.icon className="w-3 h-3" />
-                                        {statusConfig.label}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="text-sm text-gray-500">{docType.description}</p>
-                                  {uploadedDoc?.name && (
-                                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                                      <FileText className="w-3 h-3" /> {uploadedDoc.name} - Uploaded on {new Date(uploadedDoc.uploadedAt || "").toLocaleDateString("en-IN")}
-                                    </p>
-                                  )}
-                                  {uploadedDoc?.rejectionReason && (
-                                    <p className="text-sm text-red-600 mt-2 flex items-start gap-1">
-                                      <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                                      {uploadedDoc.rejectionReason}
-                                    </p>
-                                  )}
-                                </div>
-                                <div className="flex gap-2">
-                                  {uploadedDoc?.fileUrl && (
-                                    <button
-                                      onClick={() => setPreviewDoc({ url: uploadedDoc.fileUrl!, type: docType.type, mimeType: uploadedDoc.name?.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/*' })}
-                                      className="flex items-center gap-1.5 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
-                                    >
-                                      <Eye className="w-4 h-4" /> View
-                                    </button>
-                                  )}
-                                  {status !== "approved" && (
-                                    <>
-                                      <button onClick={() => triggerFileUpload(docType.type)} disabled={isUploading || !!deleting} className={`flex items-center gap-1.5 px-3 py-2 ${uploadedDoc ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-yellow-400 text-black hover:bg-yellow-500"} rounded-lg text-sm font-medium transition-colors disabled:opacity-50`}>
-                                        {isUploading ? (<Loader2 className="w-4 h-4 animate-spin" />) : (uploadedDoc ? <RefreshCw className="w-4 h-4" /> : <Upload className="w-4 h-4" />)}
-                                        {uploadedDoc ? "Replace" : "Upload"}
-                                      </button>
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">Phone Number</label>
+                        <input
+                          type="tel"
+                          placeholder="Enter 10-digit number"
+                          value={personalForm.phone}
+                          onChange={(e) => setPersonalForm({ ...personalForm, phone: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">Date of Birth</label>
+                        <input
+                          type="date"
+                          value={personalForm.dateOfBirth}
+                          onChange={(e) => setPersonalForm({ ...personalForm, dateOfBirth: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">Aadhaar Number</label>
+                        <input
+                          type="text"
+                          placeholder="12-digit Aadhaar Number"
+                          value={personalForm.aadhaar}
+                          onChange={(e) => setPersonalForm({ ...personalForm, aadhaar: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">PAN Number</label>
+                        <input
+                          type="text"
+                          placeholder="10-character PAN"
+                          value={personalForm.pan}
+                          onChange={(e) => setPersonalForm({ ...personalForm, pan: e.target.value.toUpperCase() })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 uppercase"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-6 flex justify-end">
+                      <button
+                        onClick={async () => {
+                          await handleSaveBusinessInfo();
+                          setActiveStep(kycType === 'business' ? 'business' : 'documents');
+                        }}
+                        disabled={saving}
+                        className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2 disabled:opacity-50"
+                      >
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm & Continue"}
+                        {!saving && <ChevronRight className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                )}
 
-                                      {uploadedDoc && (
-                                        <button
-                                          onClick={() => handleDeleteDocument(docType.type)}
-                                          disabled={deleting === docType.type || isUploading}
-                                          className="flex items-center justify-center px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 border border-red-100"
-                                          title="Delete Document"
-                                        >
-                                          {deleting === docType.type ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                                        </button>
-                                      )}
-                                    </>
-                                  )}
+                {activeStep === "business" && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
+                        <Building2 className="w-5 h-5 text-yellow-500" /> Business Information
+                      </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="md:col-span-2">
+                        <label className="block text-sm text-gray-500 mb-1">Company Name</label>
+                        <input
+                          type="text"
+                          placeholder="Registered Company Name"
+                          value={businessForm.companyName}
+                          onChange={(e) => setBusinessForm({ ...businessForm, companyName: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">Company Type</label>
+                        <select
+                          value={businessForm.companyType}
+                          onChange={(e) => setBusinessForm({ ...businessForm, companyType: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white"
+                        >
+                          <option value="">Select Type</option>
+                          <option value="Private Limited">Private Limited</option>
+                          <option value="LLP">LLP</option>
+                          <option value="Partnership">Partnership</option>
+                          <option value="Proprietorship">Proprietorship</option>
+                          <option value="Public Limited">Public Limited</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">Industry</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Technology, Retail"
+                          value={businessForm.industry}
+                          onChange={(e) => setBusinessForm({ ...businessForm, industry: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">GST Number</label>
+                        <input
+                          type="text"
+                          placeholder="15-digit GSTIN"
+                          value={businessForm.gstNumber}
+                          onChange={(e) => setBusinessForm({ ...businessForm, gstNumber: e.target.value.toUpperCase() })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 uppercase"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">CIN / Registration No.</label>
+                        <input
+                          type="text"
+                          placeholder="Corporate Identity Number"
+                          value={businessForm.cinNumber}
+                          onChange={(e) => setBusinessForm({ ...businessForm, cinNumber: e.target.value.toUpperCase() })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 uppercase"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm text-gray-500 mb-1">Registered Address</label>
+                        <textarea
+                          rows={3}
+                          placeholder="Full business address"
+                          value={businessForm.registeredAddress}
+                          onChange={(e) => setBusinessForm({ ...businessForm, registeredAddress: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"
+                        />
+                      </div>
+                    </div>
+
+
+                    {/* Company Partners Section */}
+                    <div className="border-t border-gray-100 pt-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-medium text-gray-900 flex items-center gap-2">
+                          <Users className="w-4 h-4 text-gray-500" /> Company Partners
+                        </h3>
+                      </div>
+
+                      <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                        <p className="text-sm text-gray-500 mb-2">Select verified partners to link to this company:</p>
+                        {[individualProfile, ...partnerProfiles].filter(p => p && p.overallStatus === 'approved').length === 0 && (
+                          <p className="text-sm text-red-400 italic">No verified partners found. Please complete personal verification for yourself and any partners first.</p>
+                        )}
+
+                        {[individualProfile, ...partnerProfiles].filter(p => p && p.overallStatus === 'approved').map(p => (
+                          <label key={p!._id} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
+                            <input
+                              type="checkbox"
+                              checked={businessForm.partners.includes(p!._id!)}
+                              onChange={(e) => {
+                                const newPartners = e.target.checked
+                                  ? [...businessForm.partners, p!._id!]
+                                  : businessForm.partners.filter(id => id !== p!._id);
+                                setBusinessForm({ ...businessForm, partners: newPartners });
+                              }}
+                              className="w-5 h-5 text-yellow-500 rounded focus:ring-yellow-400"
+                            />
+                            <div>
+                              <p className="font-medium text-gray-900">{p!.profileName}</p>
+                              <p className="text-xs text-gray-500">{p!.personalInfo?.fullName || "Partner"}</p>
+                            </div>
+                            <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3" /> Verified
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                      <button
+                        onClick={async () => {
+                          await handleSaveBusinessInfo();
+                          setActiveStep('video');
+                        }}
+                        disabled={saving}
+                        className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2 disabled:opacity-50"
+                      >
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save & Continue"}
+                        {!saving && <ChevronRight className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {activeStep === "video" && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
+                        <FileVideo className="w-5 h-5 text-yellow-500" /> Video KYC
+                      </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {/* Instructions */}
+                      <div className="space-y-6">
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+                          <h3 className="font-semibold text-yellow-900 mb-2 flex items-center gap-2">
+                            <Info className="w-4 h-4" /> Instructions
+                          </h3>
+                          <ul className="text-sm text-yellow-800 space-y-2 list-disc pl-4">
+                            <li>Hold your original <strong>PAN Card</strong> clearly in front of the camera.</li>
+                            <li>State your name and PAN number clearly.</li>
+                            <li>Rotate your face slightly left and right.</li>
+                            <li>Ensure you are in a well-lit area with no background noise.</li>
+                            <li>Maximum file size: <strong>50MB</strong>.</li>
+                          </ul>
+                        </div>
+
+                        <div className="border border-gray-200 rounded-xl p-4">
+                          <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">Example Video</h4>
+                          <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center relative overflow-hidden group">
+                            <FileVideo className="w-12 h-12 text-gray-300" />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/5">
+                              <span className="text-xs font-medium text-gray-500 italic">Example Video Placeholder</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Upload Interface */}
+                      <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50 hover:bg-gray-50 hover:border-yellow-400 transition-all group">
+                        {(() => {
+                          const videoDoc = kycData?.documents?.find(d => d.type === "video_kyc");
+                          const isUploading = uploading === "video_kyc";
+
+                          if (videoDoc) {
+                            return (
+                              <div className="text-center space-y-4">
+                                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                                  <CheckCircle2 className="w-8 h-8 text-green-600" />
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-gray-900">Video Uploaded</h3>
+                                  <p className="text-sm text-gray-500 mt-1">{videoDoc.name}</p>
+                                </div>
+                                <div className="flex gap-2 justify-center">
+                                  <button
+                                    onClick={() => setPreviewDoc({ url: videoDoc.fileUrl!, type: "video_kyc", mimeType: "video/mp4" })}
+                                    className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-2"
+                                  >
+                                    <Eye className="w-4 h-4" /> View
+                                  </button>
+                                  <button
+                                    onClick={() => triggerFileUpload("video_kyc")}
+                                    className="px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-500 flex items-center gap-2"
+                                  >
+                                    <RefreshCw className="w-4 h-4" /> Replace
+                                  </button>
                                 </div>
                               </div>
+                            );
+                          }
+
+                          return (
+                            <div className="text-center space-y-4">
+                              <div className="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                                <Upload className="w-10 h-10 text-yellow-600" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-gray-900">Upload Verification Video</h3>
+                                <p className="text-sm text-gray-500 mt-1">Select a clear video following the instructions</p>
+                              </div>
+                              <button
+                                onClick={() => triggerFileUpload("video_kyc")}
+                                disabled={isUploading}
+                                className="px-6 py-2.5 bg-yellow-400 text-black rounded-xl font-bold hover:bg-yellow-500 transition-all shadow-md flex items-center gap-2 mx-auto disabled:opacity-50"
+                              >
+                                {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-4 h-4" />}
+                                {isUploading ? "Uploading..." : "Select Video File"}
+                              </button>
+                              <p className="text-xs text-gray-400">Supported formats: MP4, WEBM, MOV (Max 50MB)</p>
                             </div>
                           );
-                        })}
-                      </div>
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <p className="text-sm text-gray-600"><strong>Accepted formats:</strong> PDF, JPG, PNG (Max 5MB per file)</p>
-                      </div>
-
-                      <div className="mt-6 flex justify-end">
-                        <button
-                          onClick={() => setActiveStep('review')}
-                          className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2"
-                        >
-                          Proceed to Review <ChevronRight className="w-4 h-4" />
-                        </button>
+                        })()}
                       </div>
                     </div>
-                  )}
 
-                  {activeStep === "review" && (
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                          <Shield className="w-5 h-5 text-yellow-500" /> Review & Submit
-                        </h2>
-                      </div>
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                        <p className="text-sm text-yellow-800">Please review all your information before submitting. Once submitted, changes may require re-verification.</p>
-                      </div>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <User className="w-5 h-5 text-gray-400" />
-                            <span className="font-medium text-gray-900">Personal Information</span>
+                    <div className="pt-6 border-t border-gray-100 flex justify-end">
+                      <button
+                        onClick={() => setActiveStep('documents')}
+                        className="px-8 py-3 bg-yellow-400 text-black rounded-xl font-bold hover:bg-yellow-500 transition-all flex items-center gap-2 shadow-md"
+                      >
+                        Continue to Documents <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {activeStep === "documents" && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-yellow-500" /> Required Documents
+                      </h2>
+                    </div>
+                    <div className="space-y-4">
+                      {requiredDocTypes.map((docType) => {
+                        const uploadedDoc = kycData?.documents?.find(d => d.type === docType.type);
+                        const status = uploadedDoc?.status || "pending";
+                        const statusConfig = getStatusConfig(status as DocumentStatus);
+                        const isUploading = uploading === docType.type;
+                        return (
+                          <div key={docType.type} className={`p-4 border rounded-xl transition-colors ${status === "rejected" ? "border-red-200 bg-red-50" : "border-gray-200 hover:border-yellow-300"}`}>
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h3 className="font-medium text-gray-900">{docType.name}</h3>
+                                  {docType.required && (<span className="text-xs text-red-500">*Required</span>)}
+                                  {uploadedDoc && (
+                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
+                                      <statusConfig.icon className="w-3 h-3" />
+                                      {statusConfig.label}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-sm text-gray-500">{docType.description}</p>
+                                {uploadedDoc?.name && (
+                                  <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                                    <FileText className="w-3 h-3" /> {uploadedDoc.name} - Uploaded on {new Date(uploadedDoc.uploadedAt || "").toLocaleDateString("en-IN")}
+                                  </p>
+                                )}
+                                {uploadedDoc?.rejectionReason && (
+                                  <p className="text-sm text-red-600 mt-2 flex items-start gap-1">
+                                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                                    {uploadedDoc.rejectionReason}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="flex gap-2">
+                                {uploadedDoc?.fileUrl && (
+                                  <button
+                                    onClick={() => setPreviewDoc({ url: uploadedDoc.fileUrl!, type: docType.type, mimeType: uploadedDoc.name?.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/*' })}
+                                    className="flex items-center gap-1.5 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                                  >
+                                    <Eye className="w-4 h-4" /> View
+                                  </button>
+                                )}
+                                {status !== "approved" && (
+                                  <>
+                                    <button onClick={() => triggerFileUpload(docType.type)} disabled={isUploading || !!deleting} className={`flex items-center gap-1.5 px-3 py-2 ${uploadedDoc ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-yellow-400 text-black hover:bg-yellow-500"} rounded-lg text-sm font-medium transition-colors disabled:opacity-50`}>
+                                      {isUploading ? (<Loader2 className="w-4 h-4 animate-spin" />) : (uploadedDoc ? <RefreshCw className="w-4 h-4" /> : <Upload className="w-4 h-4" />)}
+                                      {uploadedDoc ? "Replace" : "Upload"}
+                                    </button>
+
+                                    {uploadedDoc && (
+                                      <button
+                                        onClick={() => handleDeleteDocument(docType.type)}
+                                        disabled={deleting === docType.type || isUploading}
+                                        className="flex items-center justify-center px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 border border-red-100"
+                                        title="Delete Document"
+                                      >
+                                        {deleting === docType.type ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                      </button>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          {kycData?.personalInfo?.fullName ? (<CheckCircle2 className="w-5 h-5 text-green-500" />) : (<Clock className="w-5 h-5 text-yellow-500" />)}
+                        );
+                      })}
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-sm text-gray-600"><strong>Accepted formats:</strong> PDF, JPG, PNG (Max 5MB per file)</p>
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                      <button
+                        onClick={() => setActiveStep('review')}
+                        className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2"
+                      >
+                        Proceed to Review <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {activeStep === "review" && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
+                        <Shield className="w-5 h-5 text-yellow-500" /> Review & Submit
+                      </h2>
+                    </div>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                      <p className="text-sm text-yellow-800">Please review all your information before submitting. Once submitted, changes may require re-verification.</p>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <User className="w-5 h-5 text-gray-400" />
+                          <span className="font-medium text-gray-900">Personal Information</span>
                         </div>
+                        {(kycData?.personalInfo?.fullName && kycData?.personalInfo?.phone && kycData?.personalInfo?.aadhaarNumber) ? (<CheckCircle2 className="w-5 h-5 text-green-500" />) : (<Clock className="w-5 h-5 text-yellow-500" />)}
+                      </div>
+
+                      {kycType === 'business' && (
                         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                           <div className="flex items-center gap-3">
                             <Building2 className="w-5 h-5 text-gray-400" />
@@ -882,48 +1218,56 @@ export default function KYCVerification() {
                           </div>
                           {kycData?.businessInfo?.companyName ? (<CheckCircle2 className="w-5 h-5 text-green-500" />) : (<Clock className="w-5 h-5 text-yellow-500" />)}
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <FileText className="w-5 h-5 text-gray-400" />
-                            <span className="font-medium text-gray-900">Documents ({kycData?.documents?.filter(d => d.status === "approved" || d.status === "pending").length || 0}/{requiredDocTypes.length} uploaded)</span>
-                          </div>
-                          {(kycData?.documents?.length || 0) >= requiredDocTypes.filter(d => d.required).length ? (<CheckCircle2 className="w-5 h-5 text-green-500" />) : (<Clock className="w-5 h-5 text-yellow-500" />)}
-                        </div>
-                      </div>
-                      <div className="pt-4 border-t border-gray-100">
-                        <label className="flex items-start gap-3">
-                          <input type="checkbox" className="mt-1 w-4 h-4 text-yellow-500 rounded focus:ring-yellow-400" />
-                          <span className="text-sm text-gray-600">I confirm that all the information provided is accurate and I agree to FlashSpace <a href="/terms" className="text-yellow-600 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-yellow-600 hover:underline">Privacy Policy</a>.</span>
-                        </label>
-                      </div>
-
-                      {linkBookingId && kycData?.overallStatus === "approved" && (
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
-                          <p className="text-sm text-green-800 font-medium flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4" /> This profile is verified! Click "Use for Booking" to activate your space.
-                          </p>
-                        </div>
                       )}
+                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <FileVideo className="w-5 h-5 text-gray-400" />
+                          <span className="font-medium text-gray-900">Video KYC</span>
+                        </div>
+                        {kycData?.documents?.find(d => d.type === "video_kyc") ? (<CheckCircle2 className="w-5 h-5 text-green-500" />) : (<Clock className="w-5 h-5 text-yellow-500" />)}
+                      </div>
 
-                      <button
-                        onClick={linkBookingId && kycData?.overallStatus === "approved" ? () => handleLinkBooking(profileId!) : undefined}
-                        disabled={(!linkBookingId && (kycData?.overallStatus === "approved" || kycData?.overallStatus === "pending"))}
-                        className="w-full py-3 bg-yellow-400 text-black rounded-xl font-semibold hover:bg-yellow-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {linkBookingId && kycData?.overallStatus === "approved"
-                          ? "Use for Booking"
-                          : kycData?.overallStatus === "approved"
-                            ? "Already Verified"
-                            : kycData?.overallStatus === "pending"
-                              ? "Under Review"
-                              : "Submit for Verification"}
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
+                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <FileText className="w-5 h-5 text-gray-400" />
+                          <span className="font-medium text-gray-900">Documents ({kycData?.documents?.filter(d => d.type !== "video_kyc" && (d.status === "approved" || d.status === "pending")).length || 0}/{requiredDocTypes.length - 1} uploaded)</span>
+                        </div>
+                        {kycData?.documents?.filter(d => d.type !== "video_kyc").length >= requiredDocTypes.filter(d => d.required && d.type !== "video_kyc").length ? (<CheckCircle2 className="w-5 h-5 text-green-500" />) : (<Clock className="w-5 h-5 text-yellow-500" />)}
+                      </div>
                     </div>
-                  )}
-                </>
-              )}
-            </div>
+                    <div className="pt-4 border-t border-gray-100">
+                      <label className="flex items-start gap-3">
+                        <input type="checkbox" className="mt-1 w-4 h-4 text-yellow-500 rounded focus:ring-yellow-400" />
+                        <span className="text-sm text-gray-600">I confirm that all the information provided is accurate and I agree to FlashSpace <a href="/terms" className="text-yellow-600 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-yellow-600 hover:underline">Privacy Policy</a>.</span>
+                      </label>
+                    </div>
+
+                    {linkBookingId && kycData?.overallStatus === "approved" && (
+                      <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
+                        <p className="text-sm text-green-800 font-medium flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4" /> This profile is verified! Click "Use for Booking" to activate your space.
+                        </p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={linkBookingId && kycData?.overallStatus === "approved" ? () => handleLinkBooking(profileId!) : undefined}
+                      disabled={(!linkBookingId && (kycData?.overallStatus === "approved" || kycData?.overallStatus === "pending"))}
+                      className="w-full py-3 bg-yellow-400 text-black rounded-xl font-semibold hover:bg-yellow-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {linkBookingId && kycData?.overallStatus === "approved"
+                        ? "Use for Booking"
+                        : kycData?.overallStatus === "approved"
+                          ? "Already Verified"
+                          : kycData?.overallStatus === "pending"
+                            ? "Under Review"
+                            : "Submit for Verification"}
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )
         }
