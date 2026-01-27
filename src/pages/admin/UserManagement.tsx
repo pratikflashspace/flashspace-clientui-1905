@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { adminService } from '@/services/admin.service';
-import { Search, Shield, MoreVertical, Users, UserCheck, UserPlus, Download, Filter, Trash2, RotateCcw } from 'lucide-react';
+import { Search, Shield, MoreVertical, Users, UserCheck, UserPlus, Download, Filter, Trash2, RotateCcw, X, Plus } from 'lucide-react';
 import { toast } from "sonner";
 
 interface User {
@@ -18,6 +18,16 @@ export default function UserManagement() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('all');
     const [viewMode, setViewMode] = useState<'active' | 'deleted'>('active');
+
+    // Add User Modal State
+    const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [newUser, setNewUser] = useState({
+        fullName: '',
+        email: '',
+        password: '',
+        role: 'user'
+    });
 
     useEffect(() => {
         fetchUsers();
@@ -64,6 +74,27 @@ export default function UserManagement() {
         }
     };
 
+    const handleAddUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        try {
+            const response = await adminService.createUser(newUser);
+            if (response.success) {
+                toast.success("User created successfully");
+                setIsAddUserModalOpen(false);
+                setNewUser({ fullName: '', email: '', password: '', role: 'user' });
+                fetchUsers();
+            } else {
+                toast.error(response.message || "Failed to create user");
+            }
+        } catch (error) {
+            toast.error("An error occurred while creating user");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     const filteredUsers = users.filter(user => {
         const matchesSearch = user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -103,6 +134,22 @@ export default function UserManagement() {
         return gradients[index];
     };
 
+    const getRoleBadge = (role: string) => {
+        switch (role) {
+            case 'admin':
+                return { label: 'Admin', className: 'bg-purple-50 text-purple-700 border-purple-200', icon: <Shield className="w-3 h-3" /> };
+            case 'partner':
+                return { label: 'Partner', className: 'bg-orange-50 text-orange-700 border-orange-200', icon: <Users className="w-3 h-3" /> };
+            case 'space_manager':
+                return { label: 'Space Manager', className: 'bg-indigo-50 text-indigo-700 border-indigo-200', icon: <Shield className="w-3 h-3" /> };
+            case 'sales':
+                return { label: 'Sales Team', className: 'bg-green-50 text-green-700 border-green-200', icon: <Users className="w-3 h-3" /> };
+            case 'user':
+            default:
+                return { label: 'Client', className: 'bg-blue-50 text-blue-700 border-blue-200', icon: null };
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -120,6 +167,13 @@ export default function UserManagement() {
                     <p className="text-gray-500 mt-2 text-lg">Oversee, manage, and analyze user base.</p>
                 </div>
                 <div className="flex gap-3">
+                    <button
+                        onClick={() => setIsAddUserModalOpen(true)}
+                        className="px-5 py-2.5 bg-black text-white border border-transparent rounded-xl hover:bg-gray-800 transition-all shadow-sm hover:shadow flex items-center gap-2 font-medium"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Add User
+                    </button>
                     <button className="px-5 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all shadow-sm hover:shadow flex items-center gap-2 font-medium">
                         <Download className="w-4 h-4" />
                         Export
@@ -214,6 +268,9 @@ export default function UserManagement() {
                                 <option value="unverified">Unverified</option>
                                 <option value="admin">Admins</option>
                                 <option value="user">Clients</option>
+                                <option value="partner">Partners</option>
+                                <option value="space_manager">Space Managers</option>
+                                <option value="sales">Sales Team</option>
                             </select>
                         </div>
                     </div>
@@ -232,73 +289,73 @@ export default function UserManagement() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {filteredUsers.map((user) => (
-                                <tr key={user.id} className={`group hover:bg-gray-50 transition-colors duration-200 ${viewMode === 'deleted' ? 'opacity-70 grayscale-[0.3]' : ''}`}>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${getRandomGradient(user.fullName)} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
-                                                {getInitials(user.fullName)}
+                            {filteredUsers.map((user) => {
+                                const roleBadge = getRoleBadge(user.role);
+                                return (
+                                    <tr key={user.id} className={`group hover:bg-gray-50 transition-colors duration-200 ${viewMode === 'deleted' ? 'opacity-70 grayscale-[0.3]' : ''}`}>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${getRandomGradient(user.fullName)} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
+                                                    {getInitials(user.fullName)}
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-gray-900">{user.fullName}</p>
+                                                    <p className="text-sm text-gray-500">{user.email}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="font-semibold text-gray-900">{user.fullName}</p>
-                                                <p className="text-sm text-gray-500">{user.email}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${user.role === 'admin'
-                                            ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                            : 'bg-blue-50 text-blue-700 border-blue-200'
-                                            }`}>
-                                            {user.role === 'admin' && <Shield className="w-3 h-3" />}
-                                            {user.role === 'user' ? 'Client' : 'Admin'}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        {viewMode === 'deleted' ? (
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2 h-2 rounded-full bg-red-500" />
-                                                <span className="text-sm font-medium text-red-600">Deleted</span>
-                                            </div>
-                                        ) : user.isEmailVerified ? (
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                                <span className="text-sm font-medium text-gray-700">Verified</span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                                                <span className="text-sm font-medium text-gray-700">Pending</span>
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className="text-sm text-gray-600 font-medium">
-                                            {new Date(user.createdAt).toLocaleDateString(undefined, {
-                                                year: 'numeric',
-                                                month: 'short',
-                                                day: 'numeric'
-                                            })}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-2 text-right">
-                                            {user.role !== 'admin' && (
-                                                <button
-                                                    onClick={() => handleDeleteUser(user)}
-                                                    className={`p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100 ${viewMode === 'deleted'
-                                                        ? 'text-blue-600 hover:bg-blue-50 bg-blue-50/50'
-                                                        : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
-                                                        }`}
-                                                    title={viewMode === 'deleted' ? "Restore User" : "Move to Trash"}
-                                                >
-                                                    {viewMode === 'deleted' ? <RotateCcw className="w-5 h-5" /> : <Trash2 className="w-5 h-5" />}
-                                                </button>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${roleBadge.className}`}>
+                                                {roleBadge.icon}
+                                                {roleBadge.label}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {viewMode === 'deleted' ? (
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-2 h-2 rounded-full bg-red-500" />
+                                                    <span className="text-sm font-medium text-red-600">Deleted</span>
+                                                </div>
+                                            ) : user.isEmailVerified ? (
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                                    <span className="text-sm font-medium text-gray-700">Verified</span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                                                    <span className="text-sm font-medium text-gray-700">Pending</span>
+                                                </div>
                                             )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="text-sm text-gray-600 font-medium">
+                                                {new Date(user.createdAt).toLocaleDateString(undefined, {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric'
+                                                })}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex items-center justify-end gap-2 text-right">
+                                                {user.role !== 'admin' && (
+                                                    <button
+                                                        onClick={() => handleDeleteUser(user)}
+                                                        className={`p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100 ${viewMode === 'deleted'
+                                                            ? 'text-blue-600 hover:bg-blue-50 bg-blue-50/50'
+                                                            : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+                                                            }`}
+                                                        title={viewMode === 'deleted' ? "Restore User" : "Move to Trash"}
+                                                    >
+                                                        {viewMode === 'deleted' ? <RotateCcw className="w-5 h-5" /> : <Trash2 className="w-5 h-5" />}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
 
                             {filteredUsers.length === 0 && (
                                 <tr>
@@ -321,6 +378,97 @@ export default function UserManagement() {
                     </table>
                 </div>
             </div>
+
+            {/* Add User Modal */}
+            {isAddUserModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <h2 className="text-xl font-bold text-gray-900">Add New User</h2>
+                            <button
+                                onClick={() => setIsAddUserModalOpen(false)}
+                                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleAddUser} className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={newUser.fullName}
+                                    onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black/5 focus:border-gray-900 outline-none transition-all"
+                                    placeholder="John Doe"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={newUser.email}
+                                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black/5 focus:border-gray-900 outline-none transition-all"
+                                    placeholder="john@example.com"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={newUser.password}
+                                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black/5 focus:border-gray-900 outline-none transition-all"
+                                    placeholder="••••••••"
+                                    minLength={8}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                                <select
+                                    value={newUser.role}
+                                    onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black/5 focus:border-gray-900 outline-none transition-all bg-white"
+                                >
+                                    <option value="user">Client (User)</option>
+                                    <option value="partner">Partner</option>
+                                    <option value="space_manager">Space Manager</option>
+                                    <option value="sales">Sales Team</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+
+                            <div className="pt-4 flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddUserModalOpen(false)}
+                                    className="flex-1 px-4 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 font-medium transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="flex-1 px-4 py-2.5 bg-black text-white rounded-xl hover:bg-gray-800 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        'Create User'
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

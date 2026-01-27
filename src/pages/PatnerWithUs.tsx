@@ -215,126 +215,198 @@ const PartnerWithUs = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black overflow-hidden transition-colors duration-300">
-      <Header forceWhiteBackground={true} />
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
+      <Header />
 
-      {/* Hero Section with Background Image */}
-      <section className="relative pt-32 pb-24 px-4 overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80"
-            alt="Partnership Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-amber-900/50"></div>
-        </div>
+      {/* Hero Section (Clean 2-Column Layout) */}
+      <section className="relative min-h-[90vh] flex items-center bg-slate-50 dark:bg-[#0B1120] overflow-hidden">
+        {/* Background Gradients */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-amber-50/30 to-white dark:from-[#0B1120] dark:via-[#111] dark:to-[#1a1a1a]" />
 
-        {/* Animated floating elements */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-          {[...Array(20)].map((_, i) => (
+        {/* Decorative Blob */}
+        <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-[#EFAD1A]/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="container mx-auto px-4 relative z-10 w-full pt-20 pb-10">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+            {/* LEFT COLUMN: Text Content */}
             <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-yellow-400 rounded-full"
-              initial={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * 600,
-                opacity: 0
-              }}
-              animate={{
-                y: [null, Math.random() * -100],
-                opacity: [0, 0.6, 0],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 4,
-                repeat: Infinity,
-                delay: Math.random() * 5,
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="container mx-auto max-w-7xl relative z-20">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="inline-block mb-6"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-left relative z-20"
             >
-              <span className="px-6 py-2 bg-yellow-400/20 border border-yellow-400/50 rounded-full text-yellow-400 font-semibold text-sm backdrop-blur-sm">
-                🤝 Join Our Growing Network
-              </span>
+              <div className="inline-flex items-center gap-2 bg-white dark:bg-white/5 border border-amber-200 dark:border-white/10 px-4 py-2 rounded-full mb-8 shadow-sm">
+                <Handshake className="w-4 h-4 text-[#EFAD1A]" />
+                <span className="text-sm font-bold tracking-wide text-slate-800 dark:text-white">Join Our Network</span>
+              </div>
+
+              <h1 className="font-grotesk text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1] text-slate-900 dark:text-white tracking-tight">
+                Partner with <br />
+                <span className="text-[#EFAD1A]">FlashSpace</span>
+              </h1>
+
+              <p className="text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-lg leading-relaxed font-medium">
+                Monetize your commercial real estate and unlock consistent revenue streams by joining India's fastest-growing workspace network.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="px-8 py-6 bg-[#EFAD1A] hover:bg-[#d69f03] text-slate-900 text-lg rounded-full font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                >
+                  Become a Partner
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button
+                  onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })}
+                  variant="outline"
+                  className="px-8 py-6 border-2 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 text-lg rounded-full font-bold transition-all duration-300"
+                >
+                  Explore Benefits
+                </Button>
+              </div>
             </motion.div>
 
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight" style={{ fontFamily: 'Poppins' }}>
-              Partner with{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-600">
-                FlashSpace
-              </span>
-            </h1>
+            {/* RIGHT COLUMN: Floating Cluster */}
+            {/* RIGHT COLUMN: Complex Floating Cluster */}
+            <div className="relative h-[650px] w-full hidden lg:block perspective-1000">
 
-            <p className="text-xl md:text-2xl text-gray-200 mb-10 max-w-3xl mx-auto leading-relaxed" style={{ fontFamily: 'Geist' }}>
-              Join India's fastest-growing workspace network and unlock limitless revenue opportunities
-            </p>
+              {/* 1. Top Left - Tall w/ Brick Wall */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: [0, -15, 0] }} transition={{ opacity: { delay: 0.2 }, y: { repeat: Infinity, duration: 6, ease: "easeInOut" } }}
+                className="absolute top-[0%] left-[5%] z-20"
+              >
+                <div className="w-44 h-64 rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222]">
+                  <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=500&q=80" alt="Meeting" className="w-full h-full object-cover" />
+                </div>
+                {/* Pill: Verified */}
+                <div className="absolute -bottom-4 -left-8 bg-white dark:bg-[#222] px-4 py-2 rounded-full shadow-xl flex items-center gap-2 z-30 animate-bounce-slow">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                    <Shield className="w-4 h-4" />
+                  </div>
+                  <span className="font-bold text-slate-800 dark:text-white text-xs">Verified Partner</span>
+                </div>
+              </motion.div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
-                className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black px-10 py-7 text-lg rounded-full font-bold shadow-2xl hover:shadow-yellow-500/50 transition-all duration-300 hover:scale-105"
-                style={{ fontFamily: 'Poppins' }}
+              {/* 2. Top Right - Bright Office */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: [0, -10, 0] }} transition={{ opacity: { delay: 0.4 }, y: { repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 } }}
+                className="absolute top-[5%] right-[5%] z-10"
               >
-                Become a Partner
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button
-                className="bg-white text-black hover:bg-[#EDB003] hover:text-white px-10 py-7 text-lg rounded-full font-semibold transition-all duration-300 hover:scale-105"
-                style={{ fontFamily: 'Poppins' }}
-                onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })}
+                <div className="w-56 h-56 rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222]">
+                  <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80" alt="Office" className="w-full h-full object-cover" />
+                </div>
+                {/* Pill: Support */}
+                <div className="absolute top-8 -left-20 bg-white dark:bg-[#222] px-4 py-2 rounded-full shadow-xl flex items-center gap-2 z-30">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <span className="font-bold text-slate-800 dark:text-white text-xs">24/7 Support</span>
+                </div>
+              </motion.div>
+
+              {/* 3. Center - Industrial */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1, y: [0, -18, 0] }} transition={{ opacity: { delay: 0.6 }, scale: { delay: 0.6 }, y: { repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 0.5 } }}
+                className="absolute top-[28%] left-[32%] z-30"
               >
-                Explore Benefits
-              </Button>
+                <div className="w-48 h-48 rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222]">
+                  <img src="https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?w=500&q=80" alt="Coworking" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* 4. Center Right - Laptop Small */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0, y: [0, -12, 0] }} transition={{ opacity: { delay: 0.8 }, x: { delay: 0.8 }, y: { repeat: Infinity, duration: 6.5, ease: "easeInOut", delay: 1.5 } }}
+                className="absolute top-[45%] right-[2%] z-20"
+              >
+                <div className="w-32 h-32 rounded-[1.5rem] overflow-hidden shadow-xl border-[5px] border-white dark:border-[#222]">
+                  <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&q=80" alt="Laptop" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* 5. Bottom Left - Wide City */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0, y: [0, -20, 0] }} transition={{ opacity: { delay: 1.0 }, x: { delay: 1.0 }, y: { repeat: Infinity, duration: 8, ease: "easeInOut", delay: 2 } }}
+                className="absolute bottom-[20%] left-[-5%] z-20"
+              >
+                <div className="w-64 h-36 rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222]">
+                  <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80" alt="City" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* 6. Middle Left - People */}
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1, y: [0, -14, 0] }} transition={{ opacity: { delay: 1.2 }, y: { repeat: Infinity, duration: 7.5, ease: "easeInOut", delay: 0.8 } }}
+                className="absolute bottom-[28%] left-[25%] z-10"
+              >
+                <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-lg border-[5px] border-white dark:border-[#222]">
+                  <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500&q=80" alt="Team" className="w-full h-full object-cover" />
+                </div>
+              </motion.div>
+
+              {/* 7. Bottom Right - Large Tall Lounge */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: [0, -16, 0] }} transition={{ opacity: { delay: 1.4 }, y: { repeat: Infinity, duration: 9, ease: "easeInOut", delay: 0.2 } }}
+                className="absolute -bottom-[5%] right-[8%] z-40"
+              >
+                <div className="w-60 h-80 rounded-[3rem] overflow-hidden shadow-2xl border-[8px] border-white dark:border-[#222]">
+                  <img src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600&q=80" alt="Lounge" className="w-full h-full object-cover" />
+                </div>
+                {/* Pill: Prime Locations */}
+                <div className="absolute top-12 -right-12 bg-white dark:bg-[#222] px-5 py-3 rounded-full shadow-xl flex items-center gap-2 z-50">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <span className="font-bold text-slate-800 dark:text-white text-sm">High Occupancy</span>
+                </div>
+                {/* Pill: Business Address */}
+                <div className="absolute bottom-8 -left-10 bg-white dark:bg-[#222] px-5 py-3 rounded-full shadow-xl flex items-center gap-3 z-50">
+                  <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                    <Building2 className="w-4 h-4" />
+                  </div>
+                  <span className="font-bold text-slate-800 dark:text-white text-sm">Premium Brand</span>
+                </div>
+              </motion.div>
+
             </div>
-          </motion.div>
+          </div>
+        </div>
+      </section>
 
-          {/* Stats Section with Glass Morphism */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
+      {/* Stats Section (Clean) */}
+      <section className="py-10 border-y border-slate-100 dark:border-white/10 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-md relative z-20">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-100 dark:divide-white/5">
             {stats.map((stat, index) => (
               <motion.div
                 key={index}
+                className="text-center px-4 group cursor-default"
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + index * 0.1 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
               >
-                <Card className="bg-white/10 backdrop-blur-md border-2 border-white/20 hover:border-yellow-400/50 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group">
-                  <CardContent className="p-6 text-center">
-                    <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full mb-4 group-hover:scale-110 transition-transform">
-                      <stat.icon className="w-7 h-7 text-white" />
-                    </div>
-                    <h3 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Poppins' }}>{stat.number}</h3>
-                    <p className="text-gray-200 text-sm font-medium" style={{ fontFamily: 'Geist' }}>{stat.label}</p>
-                  </CardContent>
-                </Card>
+                <div className="mb-3 inline-flex p-3 rounded-2xl bg-[#EFAD1A]/10 text-[#EFAD1A] group-hover:scale-110 transition-transform duration-300">
+                  <stat.icon className="w-6 h-6" />
+                </div>
+                <div className="text-3xl md:font-grotesk text-4xl font-bold text-slate-900 dark:text-white mb-1">
+                  {stat.number}
+                </div>
+                <div className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                  {stat.label}
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Partnership Types Section with Images */}
-      <section className="py-24 px-4 bg-gradient-to-br from-gray-50 via-white to-amber-50/30 dark:from-gray-900 dark:via-black dark:to-[#1a1a1a] relative transition-colors duration-300">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.1) 1px, transparent 0)`,
-            backgroundSize: '40px 40px'
-          }}></div>
-        </div>
+      {/* Partnership Types Section */}
+      <section className="py-24 px-4 bg-white dark:bg-[#0a0a0a] relative transition-colors duration-300">
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
+          backgroundSize: '40px 40px'
+        }}></div>
 
         <div className="container mx-auto max-w-7xl relative z-10">
           <motion.div
@@ -343,10 +415,10 @@ const PartnerWithUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="font-grotesk text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4">
               Partnership <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">Opportunities</span>
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Choose the partnership model that aligns with your business vision
             </p>
           </motion.div>
@@ -360,7 +432,7 @@ const PartnerWithUs = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="group hover:shadow-2xl transition-all duration-500 border-2 hover:border-yellow-400 overflow-hidden h-full bg-white dark:bg-[#1a1a1a] dark:border-white/10">
+                <Card className="group hover:shadow-2xl transition-all duration-500 border border-slate-200 hover:border-[#EFAD1A] overflow-hidden h-full bg-white dark:bg-[#1f1f1f] dark:border-white/10">
                   {/* Image Section */}
                   <div className="relative h-56 overflow-hidden">
                     <img
@@ -368,27 +440,26 @@ const PartnerWithUs = () => {
                       alt={type.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className={`absolute inset-0 bg-gradient-to-t ${type.color} group-hover:opacity-80 transition-opacity`}></div>
-                    <div className="absolute top-4 right-4 p-4 bg-white/90 backdrop-blur-sm rounded-full shadow-lg">
-                      <type.icon className="w-8 h-8 text-yellow-600" />
-                    </div>
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all"></div>
                   </div>
 
                   <CardContent className="p-8 relative">
-                    <h3 className="text-2xl font-bold text-black dark:text-white mb-3 group-hover:text-yellow-600 transition-colors" style={{ fontFamily: 'Poppins' }}>
+                    <div className="absolute -top-10 right-8 p-4 bg-white dark:bg-[#1f1f1f] rounded-2xl shadow-lg border border-slate-100 dark:border-white/10 group-hover:scale-110 transition-transform">
+                      <type.icon className="w-8 h-8 text-[#EFAD1A]" />
+                    </div>
+
+                    <h3 className="font-grotesk text-2xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-[#EFAD1A] transition-colors">
                       {type.title}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed" style={{ fontFamily: 'Geist' }}>
+                    <p className="text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
                       {type.description}
                     </p>
 
-                    <div className="space-y-3 mb-6">
+                    <div className="space-y-3 mb-8">
                       {type.benefits.map((benefit, idx) => (
                         <div key={idx} className="flex items-center gap-3">
-                          <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                            <CheckCircle2 className="w-4 h-4 text-green-600" />
-                          </div>
-                          <span className="text-gray-700 dark:text-gray-300" style={{ fontFamily: 'Geist' }}>{benefit}</span>
+                          <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                          <span className="text-slate-600 dark:text-slate-300 text-sm font-medium">{benefit}</span>
                         </div>
                       ))}
                     </div>
@@ -398,8 +469,7 @@ const PartnerWithUs = () => {
                         handleInputChange('partnershipType', type.title);
                         document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="w-full bg-gradient-to-r from-black to-gray-800 hover:from-yellow-500 hover:to-amber-600 text-white rounded-full py-6 group-hover:shadow-xl transition-all duration-300"
-                      style={{ fontFamily: 'Poppins' }}
+                      className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-[#EFAD1A] dark:hover:bg-[#EFAD1A] rounded-xl py-6 font-bold shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       Get Started
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -412,11 +482,10 @@ const PartnerWithUs = () => {
         </div>
       </section>
 
-      {/* Benefits Section with Enhanced Visuals */}
-      <section id="benefits" className="py-24 px-4 bg-white dark:bg-black relative overflow-hidden transition-colors duration-300">
-        {/* Decorative Background */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl"></div>
+      {/* Benefits Section */}
+      <section id="benefits" className="py-24 px-4 bg-slate-50 dark:bg-[#0f172a] relative overflow-hidden transition-colors duration-300">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#EFAD1A]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
 
         <div className="container mx-auto max-w-7xl relative z-10">
           <motion.div
@@ -425,10 +494,10 @@ const PartnerWithUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="font-grotesk text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4">
               Why Partner with <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">Us?</span>
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Experience the FlashSpace advantage and accelerate your business growth
             </p>
           </motion.div>
@@ -447,10 +516,10 @@ const PartnerWithUs = () => {
                 <div className={`inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br ${benefit.gradient} rounded-2xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg`}>
                   <benefit.icon className="w-12 h-12 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-black dark:text-white mb-3 group-hover:text-yellow-600 transition-colors" style={{ fontFamily: 'Poppins' }}>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-yellow-600 transition-colors">
                   {benefit.title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed" style={{ fontFamily: 'Geist' }}>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   {benefit.description}
                 </p>
               </motion.div>
@@ -460,22 +529,7 @@ const PartnerWithUs = () => {
       </section>
 
       {/* Success Stories / Testimonials */}
-      <section className="py-24 px-4 bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0">
-          {[...Array(15)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-yellow-400 rounded-full animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 3}s`,
-              }}
-            />
-          ))}
-        </div>
+      <section className="py-24 px-4 bg-white dark:bg-[#0a0a0a] relative overflow-hidden">
 
         <div className="container mx-auto max-w-7xl relative z-10">
           <motion.div
@@ -484,10 +538,10 @@ const PartnerWithUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-4" style={{ fontFamily: 'Poppins' }}>
-              Success <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500">Stories</span>
+            <h2 className="font-grotesk text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4">
+              Success <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EFAD1A] to-amber-500">Stories</span>
             </h2>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
+            <p className="text-lg text-slate-600 dark:text-gray-300 max-w-2xl mx-auto">
               Hear from our partners who are thriving with FlashSpace
             </p>
           </motion.div>
@@ -501,7 +555,7 @@ const PartnerWithUs = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.15 }}
               >
-                <Card className="bg-white/10 backdrop-blur-md border-2 border-white/20 hover:border-yellow-400/50 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 h-full">
+                <Card className="bg-slate-50 dark:bg-[#1f1f1f] border border-slate-100 dark:border-white/10 hover:border-[#EFAD1A] transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full">
                   <CardContent className="p-8">
                     {/* Rating Stars */}
                     <div className="flex gap-1 mb-4">
@@ -511,20 +565,20 @@ const PartnerWithUs = () => {
                     </div>
 
                     {/* Quote */}
-                    <p className="text-gray-200 mb-6 italic leading-relaxed" style={{ fontFamily: 'Geist' }}>
+                    <p className="text-slate-600 dark:text-gray-300 mb-6 italic leading-relaxed">
                       "{story.quote}"
                     </p>
 
                     {/* Author */}
-                    <div className="flex items-center gap-4 pt-4 border-t border-white/20">
+                    <div className="flex items-center gap-4 pt-4 border-t border-slate-200 dark:border-white/10">
                       <img
                         src={story.image}
                         alt={story.name}
-                        className="w-14 h-14 rounded-full border-2 border-yellow-400"
+                        className="w-14 h-14 rounded-full border-2 border-[#EFAD1A]"
                       />
                       <div>
-                        <h4 className="font-bold text-white" style={{ fontFamily: 'Poppins' }}>{story.name}</h4>
-                        <p className="text-sm text-gray-400" style={{ fontFamily: 'Geist' }}>{story.role}</p>
+                        <h4 className="font-bold text-slate-900 dark:text-white">{story.name}</h4>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{story.role}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -544,10 +598,10 @@ const PartnerWithUs = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="font-grotesk text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4">
               Partnership <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">Process</span>
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Your journey to becoming a FlashSpace partner in 5 simple steps
             </p>
           </motion.div>
@@ -568,15 +622,15 @@ const PartnerWithUs = () => {
                     <div className={`${step.color} w-20 h-20 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform duration-300 relative z-10`}>
                       <step.icon className="w-10 h-10 text-white" />
                     </div>
-                    <div className="absolute -top-3 -right-3 bg-white border-4 border-yellow-400 rounded-full w-10 h-10 flex items-center justify-center font-bold text-black z-20">
+                    <div className="absolute -top-3 -right-3 bg-white border-4 border-yellow-400 rounded-full w-10 h-10 flex items-center justify-center font-bold text-slate-900 z-20">
                       {step.step}
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-bold text-black dark:text-white mb-2" style={{ fontFamily: 'Poppins' }}>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
                     {step.title}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400" style={{ fontFamily: 'Geist' }}>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     {step.description}
                   </p>
                 </motion.div>
@@ -597,15 +651,15 @@ const PartnerWithUs = () => {
             viewport={{ once: true }}
           >
             <h2
-              className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4"
-              style={{ fontFamily: "Poppins" }}
+              className="font-grotesk text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4"
+
             >
               Let's Build{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">
                 Together
               </span>
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400" style={{ fontFamily: "Geist" }}>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
               Fill out the form below and our partnership team will reach out to you
               within 24 hours
             </p>
@@ -740,8 +794,8 @@ const PartnerWithUs = () => {
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black px-12 py-7 text-lg rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{ fontFamily: "Poppins" }}
+                      className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-slate-900 px-12 py-7 text-lg rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+
                     >
                       {isSubmitting ? (
                         <>
@@ -810,7 +864,7 @@ const PartnerWithUs = () => {
                   <p className="text-sm text-gray-600 font-medium">
                     {contact.label}
                   </p>
-                  <p className="font-bold text-black text-sm md:text-base whitespace-nowrap">
+                  <p className="font-bold text-slate-900 text-sm md:text-base whitespace-nowrap">
                     {contact.value}
                   </p>
                 </div>
@@ -839,16 +893,16 @@ const PartnerWithUs = () => {
             viewport={{ once: true }}
           >
             <HeartHandshake className="w-20 h-20 text-yellow-400 mx-auto mb-6" />
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="font-grotesk text-4xl md:text-6xl font-bold text-white mb-6">
               Ready to Grow Together?
             </h2>
-            <p className="text-xl text-gray-200 mb-10 max-w-2xl mx-auto" style={{ fontFamily: 'Geist' }}>
+            <p className="text-xl text-gray-200 mb-10 max-w-2xl mx-auto">
               Join hundreds of successful partners who are transforming the workspace industry with FlashSpace
             </p>
             <Button
               onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black px-12 py-7 text-lg rounded-full font-bold shadow-2xl hover:shadow-yellow-500/50 hover:scale-110 transition-all duration-300"
-              style={{ fontFamily: 'Poppins' }}
+              className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-slate-900 px-12 py-7 text-lg rounded-full font-bold shadow-2xl hover:shadow-yellow-500/50 hover:scale-110 transition-all duration-300"
+
             >
               Start Your Partnership Journey
               <Rocket className="ml-2 h-5 w-5" />

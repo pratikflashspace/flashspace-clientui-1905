@@ -187,7 +187,7 @@ const SolutionsSection = () => {
   ];
 
   return (
-    <section id="solutions" className="py-24 px-4 bg-slate-50 dark:bg-[#0B1120] relative overflow-hidden transition-colors duration-300">
+    <section id="solutions" className="py-24 px-4 bg-transparent dark:bg-[#0B1120] relative overflow-hidden transition-colors duration-300">
       <div className="container mx-auto relative z-10 max-w-7xl">
         {/* Section Header */}
         <div className="text-center mb-20 animate-fade-in-up">

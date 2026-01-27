@@ -5,7 +5,7 @@ import {
   Building2,
   Briefcase,
   MapPin,
-  Calendar,
+  Calendar as CalendarIcon,
   Clock,
   Download,
   Eye,
@@ -22,6 +22,16 @@ import {
   ToggleRight,
   ShieldCheck,
 } from "lucide-react";
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { Calendar } from "@/components/ui/calender";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // Type definitions
 type BookingType = "virtual_office" | "coworking_space";
@@ -38,6 +48,7 @@ const MyBookings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [togglingAutoRenew, setTogglingAutoRenew] = useState<string | null>(null);
+  const [date, setDate] = useState<DateRange | undefined>();
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -103,7 +114,14 @@ const MyBookings: React.FC = () => {
       b.spaceSnapshot?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       b.bookingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       b.spaceSnapshot?.city?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchSearch;
+
+    // Filter by Date Range (Start Date)
+    const matchDate = !date?.from || (
+      new Date(b.startDate || "").getTime() >= date.from.getTime() &&
+      (!date.to || new Date(b.startDate || "").getTime() <= date.to.getTime())
+    );
+
+    return matchSearch && matchDate;
   });
 
   const formatCurrency = (amount: number) => {
@@ -259,6 +277,54 @@ const MyBookings: React.FC = () => {
               />
             </div>
 
+            {/* Date Range Picker */}
+            <div className="relative">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="date"
+                    variant={"outline"}
+                    className={cn(
+                      "w-[260px] justify-start text-left font-normal border-gray-200 hover:bg-gray-50",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date?.from ? (
+                      date.to ? (
+                        <>
+                          {format(date.from, "LLL dd, y")} -{" "}
+                          {format(date.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(date.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-white" align="end">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={setDate}
+                    numberOfMonths={2}
+                  />
+                </PopoverContent>
+              </Popover>
+              {date && (
+                <button
+                  onClick={() => setDate(undefined)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full"
+                >
+                  <X className="w-3 h-3 text-gray-400" />
+                </button>
+              )}
+            </div>
+
             {/* Status Filter */}
             <div className="relative">
               <button
@@ -355,7 +421,7 @@ const MyBookings: React.FC = () => {
 
                           <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-3">
                             <span className="flex items-center gap-1">
-                              <Calendar className="w-4 h-4 text-gray-400" />
+                              <CalendarIcon className="w-4 h-4 text-gray-400" />
                               {formatDate(booking.startDate || "")} - {formatDate(booking.endDate || "")}
                             </span>
                             <span className="font-medium">Plan: {booking.plan.name}</span>

@@ -8,9 +8,9 @@ interface GoogleLoginButtonProps {
   onError?: () => void;
 }
 
-export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ 
-  onSuccess, 
-  onError 
+export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
+  onSuccess,
+  onError
 }) => {
   const { googleLogin, isLoading } = useAuth();
   const { toast } = useToast();
@@ -22,7 +22,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
       }
 
       await googleLogin(credentialResponse.credential);
-      
+
       toast({
         title: 'Success',
         description: 'Successfully signed in with Google',
@@ -31,7 +31,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
       onSuccess?.();
     } catch (error: any) {
       console.error('Google login error:', error);
-      
+
       toast({
         title: 'Login Failed',
         description: error.message || 'Failed to sign in with Google',
@@ -44,7 +44,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
 
   const handleGoogleError = () => {
     console.error('Google Login Failed');
-    
+
     toast({
       title: 'Login Failed',
       description: 'Failed to sign in with Google. Please try again.',
@@ -83,7 +83,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
           border-radius: 12px !important;
           border: 1.5px solid #e2e8f0 !important;
           box-shadow: none !important;
-          font-family: 'Poppins', sans-serif !important;
+          font-family: 'Inter', sans-serif !important;
           transition: all 0.2s ease !important;
         }
         
@@ -105,7 +105,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
           font-size: 16px !important;
           font-weight: 500 !important;
           color: #172A3A !important;
-          font-family: 'Poppins', sans-serif !important;
+          font-family: 'Inter', sans-serif !important;
         }
         
         /* Center content */

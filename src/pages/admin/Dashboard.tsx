@@ -15,28 +15,65 @@ import {
     AlertCircle,
     DollarSign
 } from 'lucide-react';
+import { ClippedAreaChart } from '@/components/ui/clipped-area-chart';
 
 export default function AdminDashboard() {
     const navigate = useNavigate();
     const [stats, setStats] = useState<AdminDashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const [revenueData, setRevenueData] = useState<{ month: string; revenue: number }[]>([]);
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchData = async () => {
             try {
-                const response = await adminService.getDashboardStats();
-                if (response.success && response.data) {
-                    setStats(response.data);
+                const [statsResponse, bookingsResponse] = await Promise.all([
+                    adminService.getDashboardStats(),
+                    adminService.getAllBookings()
+                ]);
+
+                if (statsResponse.success && statsResponse.data) {
+                    setStats(statsResponse.data);
+                }
+
+                if (bookingsResponse.success && bookingsResponse.data && bookingsResponse.data.bookings) {
+                    processRevenueData(bookingsResponse.data.bookings);
                 }
             } catch (error) {
-                console.error('Failed to fetch admin stats', error);
+                console.error('Failed to fetch admin data', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchStats();
+        fetchData();
     }, []);
+
+    const processRevenueData = (bookings: any[]) => {
+        // Group revenue by month for the current year (or last 12 months)
+        const monthMap = new Map<string, number>();
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        // Initialize all months with 0
+        months.forEach(m => monthMap.set(m, 0));
+
+        bookings.forEach(booking => {
+            if (booking.createdAt && booking.plan?.price) {
+                const date = new Date(booking.createdAt);
+                if (!isNaN(date.getTime())) {
+                    const monthName = months[date.getMonth()];
+                    const currentRevenue = monthMap.get(monthName) || 0;
+                    monthMap.set(monthName, currentRevenue + Number(booking.plan.price));
+                }
+            }
+        });
+
+        const data = months.map(month => ({
+            month,
+            revenue: monthMap.get(month) || 0
+        }));
+
+        setRevenueData(data);
+    };
 
     if (loading) {
         return (
@@ -151,83 +188,90 @@ export default function AdminDashboard() {
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Recent Activity - Takes 2 columns */}
-                <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
-                    <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <Activity className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <h3 className="text-lg font-bold text-gray-900">Recent Activity</h3>
-                            </div>
-                            <button className="text-sm text-blue-600 font-semibold hover:text-blue-700 transition-colors">
-                                View All →
-                            </button>
-                        </div>
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Revenue Chart */}
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden p-4">
+                        <ClippedAreaChart data={revenueData} />
                     </div>
 
-                    <div className="p-6">
-                        <div className="relative">
-                            {/* Vertical Line */}
-                            <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-gray-100 hidden sm:block"></div>
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
+                        <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                        <Activity className="w-5 h-5 text-blue-600" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-gray-900">Recent Activity</h3>
+                                </div>
+                                <button className="text-sm text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                                    View All →
+                                </button>
+                            </div>
+                        </div>
 
-                            <div className="space-y-6">
-                                {stats?.recentActivity && stats.recentActivity.length > 0 ? (
-                                    stats.recentActivity.map((activity, index) => (
-                                        <motion.div
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: index * 0.1 }}
-                                            key={activity.id}
-                                            className="relative flex gap-4 group"
-                                        >
-                                            {/* Icon/Timeline Dot */}
-                                            <div className={`relative z-10 w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm border-2 border-white transition-all duration-300 group-hover:scale-110 group-hover:shadow-md ${activity.type === 'user' ? 'bg-indigo-50 text-indigo-600' :
-                                                activity.type === 'payment' ? 'bg-emerald-50 text-emerald-600' :
-                                                    activity.type === 'kyc' ? 'bg-amber-50 text-amber-600' :
-                                                        'bg-gray-50 text-gray-600'
-                                                }`}>
-                                                {activity.type === 'user' ? <Users className="w-5 h-5" /> :
-                                                    activity.type === 'payment' ? <CreditCard className="w-5 h-5" /> :
-                                                        activity.type === 'kyc' ? <CheckCircle className="w-5 h-5" /> :
-                                                            <Activity className="w-5 h-5" />}
-                                            </div>
+                        <div className="p-6">
+                            <div className="relative">
+                                {/* Vertical Line */}
+                                <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-gray-100 hidden sm:block"></div>
 
-                                            {/* Content Card */}
-                                            <div className="flex-1 bg-gray-50/50 rounded-2xl p-4 hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 group-hover:shadow-sm">
-                                                <div className="flex justify-between items-start gap-4">
-                                                    <div>
-                                                        <h4 className={`font-semibold text-sm mb-1 ${activity.type === 'user' ? 'text-indigo-900' :
-                                                            activity.type === 'payment' ? 'text-emerald-900' :
-                                                                activity.type === 'kyc' ? 'text-amber-900' :
-                                                                    'text-gray-900'
-                                                            }`}>
-                                                            {activity.type === 'user' ? 'New User Registration' :
-                                                                activity.type === 'payment' ? 'Payment Received' :
-                                                                    activity.type === 'kyc' ? 'KYC Verification' :
-                                                                        'System Activity'}
-                                                        </h4>
-                                                        <p className="text-gray-600 text-sm leading-relaxed">
-                                                            {activity.message}
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-500 bg-white rounded-full shadow-sm border border-gray-100">
-                                                        <Clock className="w-3 h-3" />
-                                                        {activity.time}
+                                <div className="space-y-6">
+                                    {stats?.recentActivity && stats.recentActivity.length > 0 ? (
+                                        stats.recentActivity.map((activity, index) => (
+                                            <motion.div
+                                                initial={{ opacity: 0, x: -20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: index * 0.1 }}
+                                                key={activity.id}
+                                                className="relative flex gap-4 group"
+                                            >
+                                                {/* Icon/Timeline Dot */}
+                                                <div className={`relative z-10 w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm border-2 border-white transition-all duration-300 group-hover:scale-110 group-hover:shadow-md ${activity.type === 'user' ? 'bg-indigo-50 text-indigo-600' :
+                                                    activity.type === 'payment' ? 'bg-emerald-50 text-emerald-600' :
+                                                        activity.type === 'kyc' ? 'bg-amber-50 text-amber-600' :
+                                                            'bg-gray-50 text-gray-600'
+                                                    }`}>
+                                                    {activity.type === 'user' ? <Users className="w-5 h-5" /> :
+                                                        activity.type === 'payment' ? <CreditCard className="w-5 h-5" /> :
+                                                            activity.type === 'kyc' ? <CheckCircle className="w-5 h-5" /> :
+                                                                <Activity className="w-5 h-5" />}
+                                                </div>
+
+                                                {/* Content Card */}
+                                                <div className="flex-1 bg-gray-50/50 rounded-2xl p-4 hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 group-hover:shadow-sm">
+                                                    <div className="flex justify-between items-start gap-4">
+                                                        <div>
+                                                            <h4 className={`font-semibold text-sm mb-1 ${activity.type === 'user' ? 'text-indigo-900' :
+                                                                activity.type === 'payment' ? 'text-emerald-900' :
+                                                                    activity.type === 'kyc' ? 'text-amber-900' :
+                                                                        'text-gray-900'
+                                                                }`}>
+                                                                {activity.type === 'user' ? 'New User Registration' :
+                                                                    activity.type === 'payment' ? 'Payment Received' :
+                                                                        activity.type === 'kyc' ? 'KYC Verification' :
+                                                                            'System Activity'}
+                                                            </h4>
+                                                            <p className="text-gray-600 text-sm leading-relaxed">
+                                                                {activity.message}
+                                                            </p>
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-500 bg-white rounded-full shadow-sm border border-gray-100">
+                                                            <Clock className="w-3 h-3" />
+                                                            {activity.time}
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </motion.div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-12">
+                                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                                                <Activity className="w-6 h-6 text-gray-400" />
                                             </div>
-                                        </motion.div>
-                                    ))
-                                ) : (
-                                    <div className="text-center py-12">
-                                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
-                                            <Activity className="w-6 h-6 text-gray-400" />
+                                            <h3 className="text-gray-900 font-medium mb-1">No recent activity</h3>
+                                            <p className="text-gray-500 text-sm">New events will appear here</p>
                                         </div>
-                                        <h3 className="text-gray-900 font-medium mb-1">No recent activity</h3>
-                                        <p className="text-gray-500 text-sm">New events will appear here</p>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

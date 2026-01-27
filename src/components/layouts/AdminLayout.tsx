@@ -26,14 +26,17 @@ export default function AdminLayout() {
         navigate('/login');
     };
 
-    const navItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
-        { icon: Users, label: 'User Management', path: '/admin/users' },
-        { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests' },
-        { icon: Building2, label: 'Space Management', path: '/admin/spaces' },
-        { icon: CreditCard, label: 'Bookings & Payments', path: '/admin/bookings' },
-        { icon: Settings, label: 'Settings', path: '/admin/settings' },
+    const allNavItems = [
+        { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['admin', 'partner', 'space_manager', 'sales'] },
+        { icon: Users, label: 'User Management', path: '/admin/users', roles: ['admin'] },
+        { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['admin', 'partner', 'space_manager'] },
+        // Partner can manage their own spaces, Admin all. Space Manager operates but typically doesn't "Manage listing details" deeply, but let's allow read access or limited edit.
+        { icon: Building2, label: 'Space Management', path: '/admin/spaces', roles: ['admin', 'partner', 'space_manager'] },
+        { icon: CreditCard, label: 'Bookings & Payments', path: '/admin/bookings', roles: ['admin', 'partner', 'space_manager', 'sales'] },
+        { icon: Settings, label: 'Settings', path: '/admin/settings', roles: ['admin', 'partner'] },
     ];
+
+    const navItems = allNavItems.filter(item => user?.role && item.roles.includes(user.role));
 
     return (
         <div className="min-h-screen bg-gray-50 flex">

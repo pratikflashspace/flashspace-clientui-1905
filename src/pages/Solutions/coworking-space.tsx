@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { DraggableCardContainer, DraggableCardBody } from "@/components/ui/draggable-card";
 
 const CoworkingSpace = () => {
   const navigate = useNavigate();
@@ -376,6 +377,46 @@ const CoworkingSpace = () => {
     visible: { opacity: 1, y: 0 }
   };
 
+  const draggableImages = [
+    {
+      image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500&q=80",
+      className: "absolute top-[0%] left-[5%] z-20 w-44 h-64 rounded-[2rem]",
+      alt: "Coworking Vibe"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80",
+      className: "absolute top-[5%] right-[5%] z-10 w-56 h-56 rounded-[2.5rem]",
+      alt: "Team Collaboration"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=500&q=80",
+      className: "absolute top-[28%] left-[32%] z-30 w-48 h-48 rounded-[2rem]",
+      alt: "Meeting"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&q=80",
+      className: "absolute top-[45%] right-[2%] z-20 w-32 h-32 rounded-[1.5rem]",
+      alt: "Laptop"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80",
+      className: "absolute bottom-[20%] left-[-5%] z-20 w-64 h-36 rounded-[2rem]",
+      alt: "City"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500&q=80",
+      className: "absolute bottom-[28%] left-[25%] z-10 w-40 h-40 rounded-[2rem]",
+      alt: "Team"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80",
+      className: "absolute -bottom-[5%] right-[8%] z-40 w-60 h-80 rounded-[3rem]",
+      alt: "High Five"
+    }
+  ];
+
+
+
   return (
     <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
       {/* Header */}
@@ -393,7 +434,7 @@ const CoworkingSpace = () => {
         <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px] animate-pulse delay-1000" />
 
         <div className="container mx-auto px-4 relative z-10 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
             {/* LEFT COLUMN: Content */}
             <motion.div
@@ -401,7 +442,7 @@ const CoworkingSpace = () => {
               animate="visible"
               variants={fadeInUp}
               transition={{ duration: 0.8 }}
-              className="text-left relative z-20"
+              className="text-center lg:text-left relative z-20 mx-auto max-w-3xl lg:max-w-none"
             >
               <motion.div
                 className="inline-flex items-center gap-2 bg-white dark:bg-white/5 border border-amber-200 dark:border-white/10 px-4 py-2 rounded-full mb-8 shadow-sm"
@@ -423,7 +464,7 @@ const CoworkingSpace = () => {
               </p>
 
               {/* Search Container (Relative Parent) */}
-              <div className="relative max-w-md w-full">
+              <div className="relative max-w-md w-full mx-auto lg:mx-0">
 
                 {/* Compact Search Bar */}
                 <div className="bg-white dark:bg-white/5 p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 w-full relative z-20">
@@ -483,123 +524,27 @@ const CoworkingSpace = () => {
                 </AnimatePresence>
               </div>
 
-              <div className="flex items-center gap-6 mt-10 text-sm font-medium text-slate-500 dark:text-slate-400">
+              <div className="flex items-center justify-center lg:justify-start gap-6 mt-10 text-sm font-medium text-slate-500 dark:text-slate-400">
                 <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#EDB003]" /> <span>High-Speed Wifi</span></div>
                 <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#EDB003]" /> <span>Community Events</span></div>
               </div>
             </motion.div>
 
-            {/* RIGHT COLUMN: Floating Cluster */}
-            <div className="relative h-[600px] w-full hidden lg:block perspective-1000">
-              {/* Center Image (Main - Vibrant Open Space) */}
-              <motion.div
-                animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
-              >
-                <div className="w-64 h-80 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80" alt="Vibrant Coworking Space" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Center Gap Image (Collaboration) */}
-              <motion.div
-                animate={{ y: [0, -25, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 0.8 }}
-                className="absolute top-[50%] left-[22%] transform -translate-x-1/2 -translate-y-1/2 z-10"
-              >
-                <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=400&q=80" alt="Team Collaboration" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Upper Center Filler Image (Coffee/Casual) */}
-              <motion.div
-                animate={{ y: [0, -18, 0] }} transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 0.2 }}
-                className="absolute top-[28%] left-[45%] transform -translate-x-1/2 -translate-y-1/2 z-0"
-              >
-                <div className="w-36 h-36 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=400&q=80" alt="Office Coffee" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Floating Image 1 (Top Right - Meeting) */}
-              <motion.div
-                animate={{ y: [0, -20, 0] }} transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 }}
-                className="absolute top-[5%] right-[5%] z-10"
-              >
-                <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=400&q=80" alt="Meeting Room" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Floating Image 2 (Bottom Left - Focus) */}
-              <motion.div
-                animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut", delay: 2 }}
-                className="absolute bottom-[20%] left-[0%] z-20"
-              >
-                <div className="w-48 h-32 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=400&q=80" alt="Focused Work" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Floating Image 3 (Top Left - Interior) */}
-              <motion.div
-                animate={{ y: [0, -18, 0] }} transition={{ repeat: Infinity, duration: 7.5, ease: "easeInOut", delay: 0.5 }}
-                className="absolute top-[12%] left-[5%] z-10"
-              >
-                <div className="w-32 h-40 rounded-[2rem] overflow-hidden shadow-lg border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=400&q=80" alt="Modern Interior" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Floating Image 4 (Bottom Right - Lounge) */}
-              <motion.div
-                animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6.5, ease: "easeInOut", delay: 1.5 }}
-                className="absolute bottom-[10%] right-[10%] z-20"
-              >
-                <div className="w-44 h-44 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1604328698692-f76ea9498e76?auto=format&fit=crop&w=400&q=80" alt="Office Lounge" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-
-              {/* Pill 1: Wifi */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.5 }}
-                className="absolute top-[35%] left-[-5%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
-              >
-                <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-sm">📶</div>
-                <span className="font-bold text-slate-800 dark:text-white text-xs">Fast Wifi</span>
-              </motion.div>
-
-              {/* Pill 2: Location */}
-              <motion.div
-                animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut", delay: 1.5 }}
-                className="absolute bottom-[28%] right-[-2%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
-              >
-                <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-sm">📍</div>
-                <span className="font-bold text-slate-800 dark:text-white text-xs">Prime Spots</span>
-              </motion.div>
-
-              {/* Pill 3: Support */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 3 }}
-                className="absolute top-[5%] left-[30%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
-              >
-                <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-sm">☕</div>
-                <span className="font-bold text-slate-800 dark:text-white text-xs">Premium Coffee</span>
-              </motion.div>
-
-              {/* Pill 4: Community */}
-              <motion.div
-                animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 6.2, ease: "easeInOut", delay: 2.2 }}
-                className="absolute bottom-[5%] left-[40%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
-              >
-                <div className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-sm">🤝</div>
-                <span className="font-bold text-slate-800 dark:text-white text-xs">Community</span>
-              </motion.div>
-
-              {/* Decorative Circle */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#EDB003]/5 rounded-full blur-3xl -z-10" />
+            {/* RIGHT COLUMN: Draggable Cards Cluster */}
+            <div className="hidden lg:block h-[650px] w-full">
+              <DraggableCardContainer className="perspective-1000">
+                {draggableImages.map((item, index) => (
+                  <DraggableCardBody key={index} className={item.className}>
+                    <div className="w-full h-full overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222] rounded-[inherit] hover:shadow-xl transition-shadow duration-300">
+                      <img
+                        src={item.image}
+                        alt={item.alt}
+                        className="w-full h-full object-cover pointer-events-none"
+                      />
+                    </div>
+                  </DraggableCardBody>
+                ))}
+              </DraggableCardContainer>
             </div>
           </div>
         </div>

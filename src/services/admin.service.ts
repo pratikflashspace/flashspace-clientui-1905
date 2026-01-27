@@ -93,6 +93,19 @@ class AdminService {
         return response.data;
     }
 
+    async createUser(userData: any) {
+        try {
+            const response = await axiosInstance.post<ApiResponse<any>>('/api/admin/users', userData);
+            return response.data;
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error?.response?.data?.message || error?.message || 'Failed to create user',
+                error: error?.response?.data?.error || error?.message
+            };
+        }
+    }
+
     async deleteUser(id: string, restore: boolean = false) {
         try {
             const response = await axiosInstance.delete<ApiResponse<any>>(`/api/admin/users/${id}?restore=${restore}`);
