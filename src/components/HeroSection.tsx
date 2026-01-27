@@ -151,7 +151,7 @@ const HeroSection = () => {
               animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.5 }}
               className="absolute top-[35%] left-[-2%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
             >
-              <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-sm">🤖</div>
+              <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-sm"></div>
               <span className="font-bold text-slate-800 dark:text-white text-xs">AI Powered</span>
             </motion.div>
 
@@ -160,7 +160,7 @@ const HeroSection = () => {
               animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut", delay: 1.5 }}
               className="absolute bottom-[28%] right-[-5%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
             >
-              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-sm">⚡</div>
+              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-sm"></div>
               <span className="font-bold text-slate-800 dark:text-white text-xs">Smart Access</span>
             </motion.div>
 
@@ -169,7 +169,7 @@ const HeroSection = () => {
               animate={{ y: [0, -9, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 2.5 }}
               className="absolute top-[10%] right-[30%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
             >
-              <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-sm">🌍</div>
+              <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-sm"></div>
               <span className="font-bold text-slate-800 dark:text-white text-xs">Global Network</span>
             </motion.div>
 

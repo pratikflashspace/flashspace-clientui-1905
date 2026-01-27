@@ -85,6 +85,7 @@ export interface KYCData {
     status?: any;
     dateOfBirth?: string;
     aadhaarLast4?: string;
+    aadhaarNumber?: string;
     panNumber?: string;
   };
   businessInfo?: {
@@ -96,6 +97,7 @@ export interface KYCData {
     registeredAddress?: string;
     industry?: string;
     verified?: boolean;
+    partners?: string[]; // IDs of linked individual profiles
   };
   documents?: Array<{
     type: string;
@@ -260,6 +262,13 @@ class UserDashboardService {
     cinNumber?: string;
     registeredAddress?: string;
     industry?: string;
+    partners?: string[];
+    // Personal Info Fields
+    personalPhone?: string;
+    personalDob?: string;
+    personalAadhaar?: string;
+    personalPan?: string;
+    personalFullName?: string;
   }): Promise<ApiResponse<KYCData>> {
     try {
       const response = await axiosInstance.put<ApiResponse<KYCData>>(API_ENDPOINTS.USER.KYC_BUSINESS_INFO, data);
@@ -330,7 +339,7 @@ class UserDashboardService {
   async linkBookingToProfile(bookingId: string, profileId: string): Promise<ApiResponse<any>> {
     try {
       const response = await axiosInstance.post<ApiResponse<any>>(
-        `/user/bookings/${bookingId}/link-profile`,
+        `/api/user/bookings/${bookingId}/link-profile`,
         { profileId }
       );
       return response.data;
