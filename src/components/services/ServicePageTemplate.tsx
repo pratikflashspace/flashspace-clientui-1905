@@ -26,7 +26,7 @@ import { cityCenters } from "@/components/Map/locationData.example";
 import Header from "@/components/Header";
 import MapSection from "@/components/services/MapSection";
 import SearchHeader from "@/components/services/SearchHeader";
-import ListingCard from "@/components/services/ListingCard";
+// import ListingCard from "@/components/services/ListingCard";
 import {
   City,
   BusinessSolution,
@@ -34,6 +34,7 @@ import {
   SortBy,
   VirtualOfficeItem // Or use CoworkingSpaceItem, EventSpaceItem based on your service
 } from "@/types/services";
+import ListingCardModern from "./ListingCardModern";
 
 // Type alias for better code readability
 type ListingItem = VirtualOfficeItem; // Update based on your service type
@@ -212,10 +213,21 @@ const ServicePageTemplate = () => {
   // Resolve map center by selected city (fallback to Delhi)
   const resolvedCenter = useMemo(() => {
     const cityKeyFromState = selectedCity.trim().toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
-    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
-    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
+    if (["ahmedabad", "amdavad"].includes(cityKeyFromState)) return cityCenters.ahmedabad;
     if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
+    if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
+    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
+    if (["dharamshala", "dharamsala"].includes(cityKeyFromState)) return cityCenters.dharamshala;
+    if (["gurgaon", "gurugram"].includes(cityKeyFromState)) return cityCenters.gurgaon;
+    if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
+    if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
+    if (["jammu"].includes(cityKeyFromState)) return cityCenters.jammu;
+    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
     if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
+    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
+    if (["lucknow"].includes(cityKeyFromState)) return cityCenters.lucknow;
+    if (["surat"].includes(cityKeyFromState)) return cityCenters.surat;
+    if (["noida"].includes(cityKeyFromState)) return cityCenters.noida;
     return cityCenters.delhi;
   }, [selectedCity]);
 
@@ -238,7 +250,7 @@ const ServicePageTemplate = () => {
   }, [items, resolvedCenter]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-black transition-colors duration-300">
       {/* Header */}
       <div className="flex-shrink-0">
         <Header />
@@ -254,16 +266,16 @@ const ServicePageTemplate = () => {
         >
           <div className="px-6 py-6">
             {/* Breadcrumb */}
-            <div className={`flex items-center gap-2 text-sm text-gray-600 mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <div className={`flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               <span>Home</span>
               <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
               <span>Your Service</span> {/* TODO: Update this */}
               <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
-              <span className="text-gray-900 font-medium">{selectedCity}</span>
+              <span className="text-gray-900 dark:text-white font-medium">{selectedCity}</span>
             </div>
 
             {/* Page Title */}
-            <h1 className={`text-3xl font-bold text-gray-900 mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <h1 className={`text-3xl font-bold text-gray-900 dark:text-white mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               Your Service In {selectedCity} {/* TODO: Update this */}
             </h1>
 
@@ -286,8 +298,8 @@ const ServicePageTemplate = () => {
             {/* Results Header */}
             <div className={`flex items-center justify-between mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               <div className="flex items-center gap-4">
-                <p className="text-gray-600">
-                  Showing <span className="font-semibold text-gray-900">{items.length} result(s)</span> for your service in {selectedCity}
+                <p className="text-gray-600 dark:text-gray-400">
+                  Showing <span className="font-semibold text-gray-900 dark:text-white">{items.length} result(s)</span> for your service in {selectedCity}
                 </p>
               </div>
 
@@ -317,18 +329,18 @@ const ServicePageTemplate = () => {
             <div className={`grid grid-cols-2 gap-4 mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
               {loading ? (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-gray-600">Loading...</p>
+                  <p className="text-gray-600 dark:text-gray-400">Loading...</p>
                 </div>
               ) : error ? (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-red-600">{error}</p>
+                  <p className="text-red-600 dark:text-red-400">{error}</p>
                 </div>
               ) : items.length === 0 ? (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-gray-600">No items found for {selectedCity}</p>
+                  <p className="text-gray-600 dark:text-gray-400">No items found for {selectedCity}</p>
                 </div>
               ) : items.map((item) => (
-                <ListingCard
+                <ListingCardModern
                   key={item._id}
                   item={item}
                   onGetBestPrice={(itemId) => console.log('Get best price for:', itemId)}

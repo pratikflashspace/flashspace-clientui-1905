@@ -13,6 +13,7 @@ import ListYourSpace from "./pages/ListYourSpace";
 import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 import VirtualOffice from "./pages/services/VirtualOffice";
+import MeetingRooms from "./pages/services/MeetingRooms";
 import CoworkingSpace from "./pages/services/CoworkingSpace";
 import OnDemand from "./pages/services/OnDemand";
 import EventSpaces from "./pages/services/EventSpaces";
@@ -44,20 +45,29 @@ import Blog, { SinglePostPage } from "./pages/Blog";
 
 // --- Client Dashboard Pages ---
 import ClientDashboard from "./components/ClientDashboard";
-import Dashboard from "./components/ClientDashboard/Dashboard";
-import MyBookings from "./components/ClientDashboard/MyBookings";
-import Billing from "./components/ClientDashboard/Billing";
-import KYCVerification from "./components/ClientDashboard/KYCVerification";
-import Support from "./components/ClientDashboard/Support";
-import Logout from "./components/ClientDashboard/Logout";
-import Profile from "./components/ClientDashboard/Profile";
+import ScrollToTop from "./components/ScrollToTop";
 
 //-----------spaces---------
 import SpaceComponent from './components/Spaces/SpaceComponent';
-
-// --- end dashboard imports ---
-
-import Viewdetails from "./components/ClientDashboard/Viewdetails";
+import MeetingRoomSpaceComponent from './components/Spaces/MeetingRoomSpaceComponent';
+import CoworkingSpaceComponent from './components/Spaces/CoworkingSpaceComponent';
+import BookingPage from './pages/BookingPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentFailedPage from './pages/PaymentFailedPage';
+import AdminDashboard from "./pages/admin/Dashboard";
+import UserManagement from "./pages/admin/UserManagement";
+import KYCRequests from "./pages/admin/KYCRequests";
+import SpaceManagement from "./pages/admin/SpaceManagement";
+import AdminBookings from "./pages/admin/AdminBookings";
+import AdminSettings from "./pages/admin/Settings";
+import LearningHub from "./pages/admin/learning-hub/LearningHub";
+import Clients from "./pages/admin/Clients";
+import ClientDetails from "./pages/admin/ClientDetails";
+import { AdminRoute } from "./components/auth/AdminRoute";
+import AdminLayout from "./components/layouts/AdminLayout";
+import SalesAnalytics from "./pages/admin/SalesAnalytics";
+import LeadManagement from "./pages/admin/LeadManagement";
+import TicketSystem from "./pages/admin/TicketSystem";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -70,6 +80,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <DarkModeProvider>
+            <ScrollToTop />
             {/* <MouseFollower/> */}
             <Routes>
               {/* Public Routes */}
@@ -84,13 +95,20 @@ const App = () => (
               <Route path="/Solutions/coworking-space" element={<CoworkingSpaceSolution />} />
               <Route path="/Solutions/on-demand" element={<OnDemandSolution />} />
               <Route path="/Solutions/business-setup" element={<BusinessSetupSolution />} />
+              <Route path="/services/meeting-rooms" element={<MeetingRooms />} />
               <Route path="/Solutions/meetingsroom" element={<MeetingsRoom />} />
               <Route path="/Solutions/day-office" element={<Dayoffice />} />
               <Route path="/Solutions/eventspace" element={<EventSpacePage />} />
 
               {/* Spaces*/}
               <Route path="/space/:id" element={<SpaceComponent />} />
+              <Route path="/coworking-space/:id" element={<CoworkingSpaceComponent />} />
+              <Route path="/meeting-room/:id" element={<MeetingRoomSpaceComponent />} />
+              <Route path="/booking/:id" element={<BookingPage />} />
 
+              {/* Payment Routes */}
+              <Route path="/payment/success" element={<PaymentSuccessPage />} />
+              <Route path="/payment/failed" element={<PaymentFailedPage />} />
 
               <Route path="/city-listing" element={<CityListing />} />
               <Route path="/career" element={<Career />} />
@@ -99,8 +117,8 @@ const App = () => (
               <Route path="/blog/:id" element={<SinglePostPage />} />
 
               {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Index openLogin={true} />} />
+              <Route path="/signup" element={<Index openSignup={true} />} />
               <Route path="/verify-otp" element={<VerifyOTP />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
 
@@ -111,20 +129,33 @@ const App = () => (
                 <Route path="/settings" element={<Settings />} />
 
                 {/* Client Dashboard Routes - Protected */}
-                <Route path="/dashboard" element={<ClientDashboard />} />
-                <Route path="/dashboard/overview" element={<Dashboard />} />
-                <Route path="/dashboard/my-bookings" element={<MyBookings />} />
-                <Route path="/dashboard/billing" element={<Billing />} />
-                <Route path="/dashboard/kyc-verification" element={<KYCVerification />} />
-                <Route path="/dashboard/support" element={<Support />} />
-                <Route path="/dashboard/profile" element={<Profile />} />
-                <Route path="/dashboard/logout" element={<Logout />} />
+                <Route path="/dashboard/*" element={<ClientDashboard />} />
+              </Route>
+
+              {/* Admin Routes - Protected (RBAC) */}
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="users" element={<UserManagement />} />
+                  <Route path="kyc-requests" element={<KYCRequests />} />
+                  <Route path="spaces" element={<SpaceManagement />} />
+                  <Route path="bookings" element={<AdminBookings />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                  <Route path="clients" element={<Clients />} />
+                  <Route path="clients/:id" element={<ClientDetails />} />
+                  <Route path="learning-hub" element={<LearningHub />} />
+                  <Route path="sales-analytics" element={<SalesAnalytics />} />
+                  <Route path="tickets" element={<TicketSystem />} />
+                  <Route path="leads" element={<LeadManagement />} />
+                  <Route path="*" element={<AdminDashboard />} />
+                </Route>
               </Route>
 
               <Route path="/list-your-space" element={<ListYourSpace />} />
               <Route path="/partner" element={<PartnerWithUs />} />
               <Route path="/coming-soon" element={<ComingSoon />} />
               <Route path="/start-chatting" element={<StartChatting />} />
+
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

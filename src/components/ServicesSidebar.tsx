@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 
 const ServicesSidebar = () => {
   const location = useLocation();
-  
+
   const services = [
     {
       icon: <Building className="w-5 h-5" />,
@@ -34,7 +34,7 @@ const ServicesSidebar = () => {
   ];
 
   return (
-    <div className="w-80 bg-white/95 backdrop-blur-sm border-r border-gray-200 min-h-screen p-6">
+    <div className="hidden lg:block w-80 bg-white/95 backdrop-blur-sm border-r border-gray-200 min-h-screen p-6">
       <div className="mb-8">
         <h2 className="text-xl font-bold text-gray-900 mb-2">Business Solutions</h2>
         <p className="text-gray-600 text-sm">Complete ecosystem for your business needs</p>
@@ -43,7 +43,7 @@ const ServicesSidebar = () => {
       <div className="space-y-3">
         {services.map((service, index) => {
           const isActive = location.pathname === service.path;
-          
+
           return (
             <Link
               key={index}
@@ -52,8 +52,8 @@ const ServicesSidebar = () => {
             >
               <Card className={`
                 p-4 cursor-pointer transition-all duration-300 border hover:shadow-md
-                ${isActive 
-                  ? 'bg-accent/20 border-accent/30 shadow-md' 
+                ${isActive
+                  ? 'bg-accent/20 border-accent/30 shadow-md'
                   : 'bg-white/50 border-gray-200 hover:bg-gray-50/80'
                 }
               `}>
@@ -61,8 +61,8 @@ const ServicesSidebar = () => {
                   <div className="flex items-center gap-3">
                     <div className={`
                       p-2 rounded-lg transition-colors duration-300
-                      ${isActive 
-                        ? 'bg-accent/30 text-accent' 
+                      ${isActive
+                        ? 'bg-accent/30 text-accent'
                         : 'bg-gray-100 text-gray-600'
                       }
                     `}>
@@ -82,8 +82,8 @@ const ServicesSidebar = () => {
                   </div>
                   <ChevronRight className={`
                     w-4 h-4 transition-all duration-300
-                    ${isActive 
-                      ? 'text-accent translate-x-1' 
+                    ${isActive
+                      ? 'text-accent translate-x-1'
                       : 'text-gray-400 group-hover:translate-x-1'
                     }
                   `} />

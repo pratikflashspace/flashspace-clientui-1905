@@ -1,484 +1,196 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { MapPin, Search, ChevronDown, Check, ArrowRight } from "lucide-react";
+import { MapPin, Search, ChevronDown, Check, ArrowRight, Video } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import VideoBackground from "./VideoBackground";
 import { cn } from "@/lib/utils";
-import ModernFlairButton from "./ui/ModernFlairButton";
-
+import { motion } from "framer-motion";
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const [selectedCity, setSelectedCity] = useState("Delhi"); // Default Delhi selected
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedService, setSelectedService] = useState("Virtual Spaces");
-  const [isLocationOpen, setIsLocationOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isSolutionOpen, setIsSolutionOpen] = useState(false);
-
-  const cities = [
-    "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
-    "Kolkata", "Pune", "Ahmedabad", "Jaipur", "Surat",
-    "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane"
-  ];
-
-  const services = [
-    "Virtual Spaces",
-    "Coworking Spaces",
-    "On Demand",
-    "Business Setup"
-  ];
-
-  // Location recommendations based on selected city
-  const getLocationRecommendations = (city: string, query: string) => {
-    if (!city) return [];
-
-    const recommendations = {
-      mumbai: ["Bandra Kurla Complex", "Lower Parel", "Andheri East", "Powai", "Goregaon", "Malad"],
-      delhi: ["Connaught Place", "Gurgaon", "Noida", "Lajpat Nagar", "Karol Bagh", "Dwarka"],
-      bangalore: ["Koramangala", "Indiranagar", "Whitefield", "Electronic City", "HSR Layout", "Jayanagar"],
-      hyderabad: ["Hitech City", "Gachibowli", "Banjara Hills", "Jubilee Hills", "Kondapur", "Madhapur"],
-      chennai: ["T. Nagar", "Anna Nagar", "Velachery", "OMR", "Guindy", "Adyar"],
-      kolkata: ["Salt Lake", "Park Street", "Esplanade", "New Town", "Ballygunge", "Howrah"],
-      pune: ["Koregaon Park", "Viman Nagar", "Baner", "Wakad", "Kharadi", "Hinjewadi"],
-      ahmedabad: ["SG Highway", "Prahlad Nagar", "Satellite", "Vastrapur", "Bopal", "Maninagar"],
-      jaipur: ["Malviya Nagar", "C-Scheme", "Vaishali Nagar", "Mansarovar", "Jagatpura", "Tonk Road"],
-      surat: ["Adajan", "Vesu", "Pal", "Athwa", "Rander", "Udhna"]
-    };
-
-    const cityKey = city.toLowerCase().replace(/\s+/g, '');
-    const cityRecommendations = recommendations[cityKey] || [];
-
-    if (!query) return cityRecommendations;
-
-    return cityRecommendations.filter(location =>
-      location.toLowerCase().includes(query.toLowerCase())
-    );
-  };
-
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const handleSearch = () => {
-    // Only city is mandatory now
-    if (!selectedCity) {
-      alert("Please select a city");
-      return;
-    }
-
-    // Simplified routing based on service selection
-    let route = "/city-listing"; // Default to city listings
-
-    if (selectedService) {
-      const serviceRoutes = {
-        "virtual spaces": "/services/virtual-office",
-        "coworking spaces": "/services/coworking-space",
-        "on demand": "/services/on-demand",
-        "business setup": "/services/virtual-office" // Using virtual office for now
-      };
-
-      const serviceKey = selectedService.toLowerCase();
-      route = serviceRoutes[serviceKey] || "/city-listing";
-    }
-
-    // Add query parameters for filtering
-    const params = new URLSearchParams();
-    params.set('city', selectedCity.toLowerCase().replace(/\s+/g, '-')); // Convert "New Delhi" to "new-delhi"
-    if (searchQuery) params.set('location', searchQuery);
-    if (selectedService) params.set('service', selectedService);
-
-    // Navigate using React Router
-    const url = `${route}?${params.toString()}`;
-    console.log('Navigating to:', url); // Debug log
-    navigate(url);
-  };
 
   return (
-    <section className="min-h-screen flex items-center justify-center pt-16 pb-12 px-4 relative overflow-hidden">
-      {/* Dynamic Video Background - Only for Hero Section */}
-      {/* <VideoBackground /> */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <img
-          src="/Logo/neww1.png"   // your high-quality image
-          alt="Virtual office workspace background"
-          className="w-full h-full object-cover"
-          loading="eager"
-        />
-      </div>
+    <section className="relative min-h-screen flex items-center bg-slate-50 dark:bg-[#0B1120] transition-colors duration-300 overflow-hidden pt-20 pb-20">
+
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-amber-50 dark:from-[#0B1120] dark:via-[#111] dark:to-[#1a1a1a]" />
+
+      {/* Static Gradient Orbs (Optimized for Performance - No Animation) */}
+      <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-[#EFAD1A]/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
 
 
 
-      {/* Darker overlay for text readability */}
-      {/* <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-black/40 to-slate-800/50 backdrop-blur-sm z-10"></div> */}
+      <div className="container mx-auto px-4 relative z-10 w-full">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-      <div className="container mx-auto text-left relative z-20 pl-24 md:pl-16 lg:pl-8">
-        <div className="max-w-4xl mb-8 relative">
-
-          {/* Eyebrow / Context line */}
-          <p
-            className="mb-4 text-sm uppercase tracking-widest text-gray-600 animate-fade-in"
-            style={{ fontFamily: "Geist" }}
+          {/* LEFT COLUMN: Content */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-left relative z-20"
           >
-            AI-Enabled Coworking & Virtual Offices
-          </p>
+            {/* Eyebrow */}
+            <p className="text-sm font-medium tracking-widest text-slate-500 uppercase mb-4 font-grotesk">
+              AI-Enabled Coworking & Virtual Offices
+            </p>
 
-          {/* Headline */}
-          <h1
-            className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight text-black animate-fade-in"
-            style={{ fontFamily: "Geist" }}
-          >
-            India’s First <span className="text-[#EFAD1A]">AI-Powered</span><br />
-            Workspaces
-          </h1>
+            {/* Headline */}
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl xl:text-7xl font-extrabold mb-6 leading-[1.1] text-slate-900 dark:text-white font-grotesk tracking-tight">
+              <span className="whitespace-nowrap">India’s First <span className="text-[#EFAD1A]">AI-Powered</span></span> <br />
+              Workspaces
+            </h1>
 
-          {/* Subheading */}
-          <p
-            className="mt-6 text-lg md:text-xl text-black leading-relaxed max-w-2xl animate-fade-in"
-            style={{
-              animationDelay: "200ms",
-              fontFamily: "Geist",
-            }}
-          >
-            Flexible workspaces and virtual offices with built-in compliance,
-            security, and smart workspace management.
-          </p>
+            {/* Subheading */}
+            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-2xl leading-relaxed font-grotesk font-medium">
+              Flexible workspaces and virtual offices with built-in compliance, security, and smart workspace management.
+            </p>
 
-          {/* CTA Buttons */}
-          <div
-            className="mt-10 flex flex-col sm:flex-row gap-4 animate-fade-in"
-            style={{ animationDelay: "300ms" }}
-          >
-            {/* Primary CTA */}
-            <ModernFlairButton
-              onClick={() => navigate("/start-chatting")}
-              className="group px-8 py-4 bg-[#0a0a0a] text-white rounded-full transition-all duration-300 transform hover:scale-[1.02] hover:shadow-[0_0_30px_-5px_rgba(239,173,26,0.3)] border border-white/5 active:scale-95 overflow-hidden"
-              flairColor="rgba(239, 173, 26, 0.3)"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-[#EFAD1A]/0 via-[#EFAD1A]/10 to-[#EFAD1A]/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700 ease-in-out"></div>
-              <span className="relative flex items-center gap-3 font-medium tracking-wide" style={{ fontFamily: "Geist" }}>
-                Start Chatting
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EFAD1A] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#EFAD1A]"></span>
-                </span>
-              </span>
-            </ModernFlairButton>
-
-            {/* Secondary CTA */}
-            <ModernFlairButton
-              onClick={() => navigate("/services/virtual-office")}
-              className="group px-8 py-4 bg-white/80 backdrop-blur-md border border-white/50 text-black rounded-full transition-all duration-300 hover:bg-white hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
-              flairColor="rgba(0, 0, 0, 0.1)"
-            >
-              <span className="flex items-center gap-2 font-medium" style={{ fontFamily: "Geist" }}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-5 h-5 text-gray-600 group-hover:text-[#EFAD1A] transition-colors duration-300"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m22 8-6 4 6 4V8Z" />
-                  <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
-                </svg>
-                Explore Workspaces
-                <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#EFAD1A]" />
-              </span>
-            </ModernFlairButton>
-          </div>
-
-          {/* Trust Signals */}
-          <div className="mt-8 flex flex-wrap gap-6 text-sm text-black">
-            <span>✔ AI Compliance</span>
-            <span>✔ Prime Locations</span>
-            <span>✔ Enterprise-Ready</span>
-          </div>
-
-
-
-          {/* 
-          Search Component - Enhanced Version - COMMENTED OUT
-          <div className="bg-white rounded-full shadow-2xl max-w-4xl mx-auto p-2 animate-fade-in" style={{ animationDelay: '400ms' }}>
-            <div className="flex flex-col md:flex-row gap-2">
-              City Selection
-              <div className="flex-1 flex items-center px-4 py-3">
-                <MapPin className="w-5 h-5 mr-3 text-gray-500" />
-                <Popover open={isLocationOpen} onOpenChange={setIsLocationOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      role="combobox"
-                      aria-expanded={isLocationOpen}
-                      className="justify-between p-0 h-auto font-normal border-0 bg-transparent hover:bg-transparent cursor-pointer"
-                    >
-                      {selectedCity || "Select City"}
-                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <div className="bg-white border border-primary/20 shadow-lg rounded-lg">
-                      <Command>
-                        <CommandInput placeholder="Search city..." />
-                        <CommandList>
-                          <CommandEmpty>No city found.</CommandEmpty>
-                          <CommandGroup>
-                            {cities.map((city) => (
-                              <CommandItem
-                                key={city}
-                                value={city}
-                                onSelect={(currentValue) => {
-                                  setSelectedCity(currentValue === selectedCity ? "" : city);
-                                  setIsLocationOpen(false);
-                                  setSearchQuery(""); Reset search when city changes
-                                }}
-                                className="cursor-pointer"
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    selectedCity === city ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {city}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              Divider
-              <div className="hidden md:block w-px bg-gray-200 my-3"></div>
-
-              Location Search within City
-              <div className="flex-1 flex items-center px-4 py-3 relative">
-                <Search className="w-5 h-5 mr-3 text-gray-500" />
-                <div className="w-full relative">
-                  <input
-                    type="text"
-                    placeholder={selectedCity ? `Search in ${selectedCity}...` : "Select city first"}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      if (selectedCity && e.target.value.length > 0) {
-                        setIsSearchOpen(true);
-                      } else {
-                        setIsSearchOpen(false);
-                      }
-                    }}
-                    onFocus={() => {
-                      if (selectedCity) {
-                        setIsSearchOpen(true);
-                      }
-                    }}
-                    onBlur={() => {
-                      setTimeout(() => setIsSearchOpen(false), 200);
-                    }}
-                    disabled={!selectedCity}
-                    className="w-full bg-transparent border-0 outline-none text-gray-700 placeholder:text-gray-500 text-base"
-                    style={{ all: 'unset', width: '100%', color: '#374151' }}
-                  />
-                  
-                  Recommendations Dropdown
-                  {isSearchOpen && selectedCity && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
-                      {getLocationRecommendations(selectedCity, searchQuery).length > 0 ? (
-                        <>
-                          <div className="px-3 py-2 text-xs font-medium text-gray-500 border-b">
-                            Popular Areas in {selectedCity}
-                          </div>
-                          {getLocationRecommendations(selectedCity, searchQuery).map((location) => (
-                            <div
-                              key={location}
-                              className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
-                              onMouseDown={(e) => {
-                                e.preventDefault(); Prevent blur
-                                setSearchQuery(location);
-                                setIsSearchOpen(false);
-                              }}
-                            >
-                              <MapPin className="mr-2 h-4 w-4 text-gray-400" />
-                              <span className="text-sm">{location}</span>
-                            </div>
-                          ))}
-                        </>
-                      ) : searchQuery.length > 0 ? (
-                        <div className="px-3 py-2 text-sm text-gray-500">
-                          No locations found for "{searchQuery}"
-                        </div>
-                      ) : (
-                        <div className="px-3 py-2 text-sm text-gray-500">
-                          Start typing to search locations
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              Divider
-              <div className="hidden md:block w-px bg-gray-200 my-3"></div>
-
-              Solution Selection
-              <div className="flex-1 flex items-center px-4 py-3">
-                <Search className="w-5 h-5 mr-3 text-gray-500" />
-                <Popover open={isSolutionOpen} onOpenChange={setIsSolutionOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      role="combobox"
-                      aria-expanded={isSolutionOpen}
-                      className="justify-between p-0 h-auto font-normal border-0 bg-transparent hover:bg-transparent cursor-pointer"
-                    >
-                      {selectedService || "Select Solution"}
-                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <div className="bg-white border border-primary/20 shadow-lg rounded-lg">
-                      <Command>
-                        <CommandInput placeholder="Search solution..." />
-                        <CommandList>
-                          <CommandEmpty>No solution found.</CommandEmpty>
-                          <CommandGroup>
-                            {services.map((service) => (
-                              <CommandItem
-                                key={service}
-                                value={service}
-                                onSelect={(currentValue) => {
-                                  setSelectedService(currentValue === selectedService ? "" : service);
-                                  setIsSolutionOpen(false);
-                                }}
-                                className="cursor-pointer"
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    selectedService === service ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {service}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              Search Button
-              <Button 
-                onClick={handleSearch}
-                disabled={!selectedCity} Only city is required
-                className="bg-black hover:bg-gray-800 text-white rounded-full px-12 py-6 h-auto font-medium disabled:opacity-50"
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-10">
+              <button
+                onClick={() => navigate("/start-chatting")}
+                className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-full font-medium flex items-center justify-center gap-3 hover:bg-gray-900 dark:hover:bg-gray-100 transition-all active:scale-95 shadow-lg"
               >
-                Search
-              </Button>
+                Start Chatting
+                <span className="w-3 h-3 bg-[#EFAD1A] rounded-full"></span>
+              </button>
 
-              <RippleButton 
-               text="Search"
-               background="#000000"
-               textColor="white"
-               hoverTextColor="black"
-               hoverFlairColor="#EFAD1A"
-               buttonHeight="60px"
-               onClick={handleSearch}
-              />
-              
+              <button
+                onClick={() => navigate("/services/virtual-office")}
+                className="group px-8 py-4 bg-white dark:bg-white/10 text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 rounded-full font-medium flex items-center justify-center gap-3 hover:bg-slate-50 dark:hover:bg-white/20 transition-all active:scale-95 shadow-sm"
+              >
+                <Video className="w-5 h-5 text-slate-400 group-hover:text-slate-600" />
+                Explore Workspaces
+              </button>
             </div>
-          </div>
-          END OF COMMENTED SEARCH COMPONENT 
-          */}
-        </div>
 
-        {/* Golden Dots Animation - Minimal */}
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-yellow-400 rounded-full animate-float opacity-40"
-              style={{
-                left: `${10 + (Math.random() * 80)}%`,
-                top: `${10 + (Math.random() * 80)}%`,
-                animationDelay: `${Math.random() * 12}s`,
-                animationDuration: `${10 + Math.random() * 8}s`,
-              }}
-            />
-          ))}
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={`large-${i}`}
-              className="absolute w-2 h-2 bg-yellow-400/60 rounded-full animate-float opacity-30"
-              style={{
-                left: `${15 + (Math.random() * 70)}%`,
-                top: `${15 + (Math.random() * 70)}%`,
-                animationDelay: `${Math.random() * 15}s`,
-                animationDuration: `${12 + Math.random() * 10}s`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
+            {/* Trust Signals */}
+            <div className="flex flex-wrap gap-x-8 gap-y-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
+              <div className="flex items-center gap-2">✓ AI Compliance</div>
+              <div className="flex items-center gap-2">✓ Prime Locations</div>
+              <div className="flex items-center gap-2">✓ Enterprise-Ready</div>
+            </div>
+          </motion.div>
 
-      {/* Scroll More Button */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 animate-fade-in" style={{ animationDelay: '600ms' }}>
-        <button
-          onClick={() => {
-            window.scrollTo({
-              top: window.innerHeight,
-              behavior: 'smooth'
-            });
-          }}
-          className="group flex flex-col items-center gap-2 text-black dark:text-white hover:text-yellow-600 transition-all duration-300 transform hover:scale-110"
-        >
-          <div className="flex flex-col items-center">
-            <span className="text-sm font-medium mb-2 opacity-80 group-hover:opacity-100 transition-opacity">
-              Scroll More
-            </span>
-            <div className="relative">
-              {/* Animated Circle */}
-              <div className="w-12 h-12 border-2 border-black/30 dark:border-white/30 rounded-full group-hover:border-yellow-600/60 transition-colors duration-300 flex items-center justify-center">
-                {/* Animated Arrow */}
-                <svg
-                  className="w-6 h-6 transition-all duration-300 group-hover:animate-pulse"
-                  style={{
-                    animation: 'gentle-bounce 2.5s ease-in-out infinite'
-                  }}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                  />
-                </svg>
+          {/* RIGHT COLUMN: Floating Cluster */}
+          <div className="relative h-[600px] w-full hidden lg:block perspective-1000 lg:translate-x-4">
+            {/* Center Image (Main - Tech Office) */}
+            <motion.div
+              animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
+            >
+              <div className="w-72 h-96 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#333]">
+                <img src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80" alt="AI Workspace" className="w-full h-full object-cover" />
               </div>
-              {/* Ripple Effect */}
-              <div className="absolute inset-0 w-12 h-12 border border-yellow-400/20 rounded-full animate-ping opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            </div>
+            </motion.div>
+
+            {/* Center Gap Image (People) */}
+            <motion.div
+              animate={{ y: [0, -25, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 0.8 }}
+              className="absolute top-[50%] left-[15%] transform -translate-x-1/2 -translate-y-1/2 z-10"
+            >
+              <div className="w-44 h-44 rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#333]">
+                <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=500&q=80" alt="Team Work" className="w-full h-full object-cover" />
+              </div>
+            </motion.div>
+
+            {/* Upper Center Filler Image (Abstract/Tech) */}
+            <motion.div
+              animate={{ y: [0, -18, 0] }} transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 0.2 }}
+              className="absolute top-[25%] left-[45%] transform -translate-x-1/2 -translate-y-1/2 z-0"
+            >
+              <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=500&q=80" alt="Tech" className="w-full h-full object-cover" />
+              </div>
+            </motion.div>
+
+            {/* Floating Image 1 (Top Right - Meeting) */}
+            <motion.div
+              animate={{ y: [0, -20, 0] }} transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 }}
+              className="absolute top-[5%] right-[5%] z-10"
+            >
+              <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                <img src="https://images.unsplash.com/photo-1577412647305-991150c7d163?auto=format&fit=crop&w=500&q=80" alt="Meeting" className="w-full h-full object-cover" />
+              </div>
+            </motion.div>
+
+            {/* Floating Image 2 (Bottom Left - Focus) */}
+            <motion.div
+              animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut", delay: 2 }}
+              className="absolute bottom-[15%] left-[5%] z-20"
+            >
+              <div className="w-48 h-32 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=500&q=80" alt="Focus" className="w-full h-full object-cover" />
+              </div>
+            </motion.div>
+
+            {/* Floating Image 3 (Top Left - Interior) */}
+            <motion.div
+              animate={{ y: [0, -18, 0] }} transition={{ repeat: Infinity, duration: 7.5, ease: "easeInOut", delay: 0.5 }}
+              className="absolute top-[10%] left-[8%] z-10"
+            >
+              <div className="w-32 h-40 rounded-[2rem] overflow-hidden shadow-lg border-4 border-white dark:border-[#333]">
+                <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=500&q=80" alt="Modern" className="w-full h-full object-cover" />
+              </div>
+            </motion.div>
+
+            {/* Floating Image 4 (Bottom Right - Lounge) */}
+            <motion.div
+              animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6.5, ease: "easeInOut", delay: 1.5 }}
+              className="absolute bottom-[10%] right-[12%] z-20"
+            >
+              <div className="w-44 h-44 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
+                <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=500&q=80" alt="Lounge" className="w-full h-full object-cover" />
+              </div>
+            </motion.div>
+
+
+            {/* Feature Pill 1 */}
+            <motion.div
+              animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.5 }}
+              className="absolute top-[35%] left-[-2%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+            >
+              <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-sm"></div>
+              <span className="font-bold text-slate-800 dark:text-white text-xs">AI Powered</span>
+            </motion.div>
+
+            {/* Feature Pill 2 */}
+            <motion.div
+              animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut", delay: 1.5 }}
+              className="absolute bottom-[28%] right-[-5%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+            >
+              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-sm"></div>
+              <span className="font-bold text-slate-800 dark:text-white text-xs">Smart Access</span>
+            </motion.div>
+
+            {/* Feature Pill 3 */}
+            <motion.div
+              animate={{ y: [0, -9, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 2.5 }}
+              className="absolute top-[10%] right-[30%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
+            >
+              <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-sm"></div>
+              <span className="font-bold text-slate-800 dark:text-white text-xs">Global Network</span>
+            </motion.div>
+
+            {/* Decorative Circle */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#EFAD1A]/5 rounded-full blur-3xl -z-10" />
           </div>
-        </button>
+        </div>
       </div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        animate={{ y: [0, 10, 0] }}
+        transition={{ repeat: Infinity, duration: 2 }}
+      >
+        <div className="w-6 h-10 border-2 border-slate-300 dark:border-slate-700 rounded-full flex items-start justify-center p-2 opacity-50 hover:opacity-100 transition-opacity cursor-pointer"
+          onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+        >
+          <div className="w-1.5 h-3 bg-slate-400 dark:bg-slate-500 rounded-full"></div>
+        </div>
+      </motion.div>
     </section>
   );
 };

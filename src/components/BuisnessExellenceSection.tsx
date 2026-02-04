@@ -2,6 +2,44 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { CheckCircle, TrendingUp, Users, Zap, MapPin, Shield, Building2, ArrowRight } from "lucide-react";
 import { BarPatternChart } from "@/components/ui/bar-pattern-chart";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+
+const Card3D = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
+  const mouseY = useSpring(y, { stiffness: 150, damping: 15 });
+
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], ["7deg", "-7deg"]);
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-7deg", "7deg"]);
+
+  const handleMouseMove = ({ currentTarget, clientX, clientY }: React.MouseEvent) => {
+    const { left, top, width, height } = currentTarget.getBoundingClientRect();
+    x.set((clientX - left) / width - 0.5);
+    y.set((clientY - top) / height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      className={`relative active:scale-95 transition-transform duration-200 ease-out ${className}`}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 const BusinessExcellenceSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -9,8 +47,14 @@ const BusinessExcellenceSection = () => {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { threshold: 0.2 }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          // Once visible, we can stop observing to keep it visible
+          if (entry.target) observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.1 } // Lower threshold for better mobile detection
     );
 
     const section = document.getElementById("business-excellence");
@@ -24,34 +68,34 @@ const BusinessExcellenceSection = () => {
       icon: TrendingUp,
       title: "Instant Setup",
       description: "Get your business address activated in less than 24 hours with our streamlined onboarding process.",
-      bgColor: "bg-blue-50",
+      bgColor: "bg-blue-50 dark:bg-blue-900/10",
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop&auto=format"
     },
     {
       icon: MapPin,
       title: "Prime Locations",
       description: "Establish your presence in India's most prestigious business districts across 100+ cities.",
-      bgColor: "bg-purple-50",
+      bgColor: "bg-purple-50 dark:bg-purple-900/10",
       image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop&auto=format"
     },
     {
       icon: Shield,
       title: "Reliable Compliance ",
       description: "GST ready addresses with full legal documentation and compliance support included.",
-      bgColor: "bg-emerald-50",
+      bgColor: "bg-emerald-50 dark:bg-emerald-900/10",
       image: "https://plus.unsplash.com/premium_photo-1664475876634-246925214655?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8c2lnbmF0dXJlJTVDfGVufDB8fDB8fHww"
     },
     {
       icon: Users,
       title: "98% Satisfaction",
       description: "Join thousands of happy businesses who trust FlashSpace for their virtual office needs.",
-      bgColor: "bg-[#EDB003]/10",
+      bgColor: "bg-[#EDB003]/10 dark:bg-[#EDB003]/5",
       image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400&h=300&fit=crop&auto=format"
     }
   ];
 
   return (
-    <section id="business-excellence" className="py-20 px-4 relative overflow-hidden bg-[#ffffff] dark:bg-[#0a0a0a] transition-colors duration-300">
+    <section id="business-excellence" className="py-20 px-4 relative overflow-hidden bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300">
       <div className="container mx-auto relative z-10 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-16">
@@ -72,7 +116,7 @@ const BusinessExcellenceSection = () => {
                 key={index}
                 className={`
                   group relative overflow-hidden cursor-pointer
-                  ${reason.bgColor} dark:bg-opacity-10 dark:bg-white/5 border-0 rounded-3xl
+                  ${reason.bgColor} border-0 rounded-3xl
                   transition-all duration-500
                   hover:shadow-xl hover:-translate-y-1
                   ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}
@@ -158,162 +202,164 @@ const BusinessExcellenceSection = () => {
               <BarPatternChart />
             </div>
 
-            {/* Right: Beautiful Pie Chart & Stats */}
-            <div className="space-y-8">
+            {/* Right: Beautiful Pie Chart & Stats - 3D Enabled */}
+            <div className="space-y-8 perspective-1000">
               {/* Pie Chart Visualization */}
-              <div className="bg-gradient-to-br from-[#EDB003]/5 via-white to-[#EDB003]/10 dark:from-[#EDB003]/10 dark:via-[#1a1a1a] dark:to-[#EDB003]/5 p-8 rounded-3xl border-2 border-[#EDB003]/20 shadow-lg">
-                <h4 className="text-lg font-semibold text-[#172A3A] dark:text-white mb-6 text-center" style={{ fontFamily: 'Poppins' }}>
-                  Service Distribution
-                </h4>
+              <Card3D className="bg-gradient-to-br from-[#EDB003]/5 via-white to-[#EDB003]/10 dark:from-[#EDB003]/10 dark:via-[#1a1a1a] dark:to-[#EDB003]/5 p-8 rounded-3xl border-2 border-[#EDB003]/20 shadow-lg">
+                <div style={{ transform: "translateZ(20px)" }}>
+                  <h4 className="text-lg font-semibold text-[#172A3A] dark:text-white mb-6 text-center" style={{ fontFamily: 'Poppins' }}>
+                    Service Distribution
+                  </h4>
 
-                {/* Pie Chart (CSS-based) */}
-                <div className="flex items-center justify-center mb-8">
-                  <div className="relative w-48 h-48">
-                    {/* Pie Chart Circle */}
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                      {/* Virtual Office - 35% */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="#EDB003"
-                        strokeWidth="20"
-                        strokeDasharray="87.96 251.2"
-                        strokeDashoffset="0"
-                        className="transition-all duration-500 hover:stroke-[#EDB003]/80"
-                      />
-                      {/* Coworking - 30% */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="#EDB003"
-                        strokeWidth="20"
-                        strokeDasharray="75.36 251.2"
-                        strokeDashoffset="-87.96"
-                        opacity="0.75"
-                        className="transition-all duration-500 hover:opacity-90"
-                      />
-                      {/* On Demand - 25% */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="#EDB003"
-                        strokeWidth="20"
-                        strokeDasharray="62.8 251.2"
-                        strokeDashoffset="-163.32"
-                        opacity="0.5"
-                        className="transition-all duration-500 hover:opacity-70"
-                      />
-                      {/* Business Setup - 10% */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="#EDB003"
-                        strokeWidth="20"
-                        strokeDasharray="25.12 251.2"
-                        strokeDashoffset="-226.12"
-                        opacity="0.25"
-                        className="transition-all duration-500 hover:opacity-40"
-                      />
-                    </svg>
+                  {/* Pie Chart (CSS-based) */}
+                  <div className="flex items-center justify-center mb-8">
+                    <div className="relative w-48 h-48" style={{ transformStyle: "preserve-3d" }}>
+                      {/* Pie Chart Circle */}
+                      <svg className="w-full h-full transform -rotate-90 text-[#EDB003]" viewBox="0 0 100 100" style={{ transform: "translateZ(30px)" }}>
+                        {/* Virtual Office - 35% */}
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="20"
+                          strokeDasharray="87.96 251.2"
+                          strokeDashoffset="0"
+                          className="transition-all duration-500 hover:stroke-[#EDB003]/80 drop-shadow-xl"
+                        />
+                        {/* Coworking - 30% */}
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="20"
+                          strokeDasharray="75.36 251.2"
+                          strokeDashoffset="-87.96"
+                          opacity="0.75"
+                          className="transition-all duration-500 hover:opacity-90"
+                        />
+                        {/* On Demand - 25% */}
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="20"
+                          strokeDasharray="62.8 251.2"
+                          strokeDashoffset="-163.32"
+                          opacity="0.5"
+                          className="transition-all duration-500 hover:opacity-70"
+                        />
+                        {/* Business Setup - 10% */}
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="20"
+                          strokeDasharray="25.12 251.2"
+                          strokeDashoffset="-226.12"
+                          opacity="0.25"
+                          className="transition-all duration-500 hover:opacity-40"
+                        />
+                      </svg>
 
-                    {/* Center Label */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <div className="text-3xl font-bold text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>100%</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">Coverage</div>
+                      {/* Center Label */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ transform: "translateZ(50px)" }}>
+                        <div className="text-3xl font-bold text-[#172A3A] dark:text-white drop-shadow-md" style={{ fontFamily: 'Poppins' }}>100%</div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">Coverage</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Legend */}
+                  <div className="space-y-3" style={{ transform: "translateZ(10px)" }}>
+                    <div className="flex items-center justify-between p-3 bg-white/80 dark:bg-[#1f1f1f]/80 rounded-lg hover:shadow-md transition-shadow duration-300 backdrop-blur-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 rounded-full bg-[#EDB003]"></div>
+                        <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">Virtual Office</span>
+                      </div>
+                      <span className="text-sm font-bold text-[#EDB003]">35%</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white/80 dark:bg-[#1f1f1f]/80 rounded-lg hover:shadow-md transition-shadow duration-300 backdrop-blur-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 rounded-full bg-[#EDB003] opacity-75"></div>
+                        <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">Coworking Space</span>
+                      </div>
+                      <span className="text-sm font-bold text-[#EDB003]">30%</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white/80 dark:bg-[#1f1f1f]/80 rounded-lg hover:shadow-md transition-shadow duration-300 backdrop-blur-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 rounded-full bg-[#EDB003] opacity-50"></div>
+                        <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">On Demand</span>
+                      </div>
+                      <span className="text-sm font-bold text-[#EDB003]">25%</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white/80 dark:bg-[#1f1f1f]/80 rounded-lg hover:shadow-md transition-shadow duration-300 backdrop-blur-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 rounded-full bg-[#EDB003] opacity-25"></div>
+                        <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">Business Setup</span>
+                      </div>
+                      <span className="text-sm font-bold text-[#EDB003]">10%</span>
                     </div>
                   </div>
                 </div>
-
-                {/* Legend */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1f1f1f] rounded-lg hover:shadow-md transition-shadow duration-300">
-                    <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded-full bg-[#EDB003]"></div>
-                      <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">Virtual Office</span>
-                    </div>
-                    <span className="text-sm font-bold text-[#EDB003]">35%</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1f1f1f] rounded-lg hover:shadow-md transition-shadow duration-300">
-                    <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded-full bg-[#EDB003] opacity-75"></div>
-                      <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">Coworking Space</span>
-                    </div>
-                    <span className="text-sm font-bold text-[#EDB003]">30%</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1f1f1f] rounded-lg hover:shadow-md transition-shadow duration-300">
-                    <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded-full bg-[#EDB003] opacity-50"></div>
-                      <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">On Demand</span>
-                    </div>
-                    <span className="text-sm font-bold text-[#EDB003]">25%</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-white dark:bg-[#1f1f1f] rounded-lg hover:shadow-md transition-shadow duration-300">
-                    <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded-full bg-[#EDB003] opacity-25"></div>
-                      <span className="text-sm font-medium text-[#172A3A] dark:text-gray-200">Business Setup</span>
-                    </div>
-                    <span className="text-sm font-bold text-[#EDB003]">10%</span>
-                  </div>
-                </div>
-              </div>
+              </Card3D>
 
               {/* Key Stats Cards - Compact with Background Images */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 perspective-1000">
                 {/* Workspaces Card */}
-                <div className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
-                  <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+                <Card3D className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
+                  <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300" style={{ transform: "translateZ(10px)" }}>
                     <MapPin className="w-full h-full text-[#EDB003]" />
                   </div>
-                  <div className="relative z-10">
+                  <div className="relative z-10" style={{ transform: "translateZ(20px)" }}>
                     <MapPin className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
                     <div className="text-2xl font-bold text-[#172A3A] dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>100+</div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">Workspaces</div>
                   </div>
-                </div>
+                </Card3D>
 
                 {/* Locations Card */}
-                <div className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
-                  <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+                <Card3D className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
+                  <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300" style={{ transform: "translateZ(10px)" }}>
                     <Users className="w-full h-full text-[#EDB003]" />
                   </div>
-                  <div className="relative z-10">
+                  <div className="relative z-10" style={{ transform: "translateZ(20px)" }}>
                     <Users className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
                     <div className="text-2xl font-bold text-[#172A3A] dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>48+</div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">Locations</div>
                   </div>
-                </div>
+                </Card3D>
 
                 {/* Satisfaction Card */}
-                <div className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
-                  <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+                <Card3D className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
+                  <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300" style={{ transform: "translateZ(10px)" }}>
                     <CheckCircle className="w-full h-full text-[#EDB003]" />
                   </div>
-                  <div className="relative z-10">
+                  <div className="relative z-10" style={{ transform: "translateZ(20px)" }}>
                     <CheckCircle className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
                     <div className="text-2xl font-bold text-[#172A3A] dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>98%</div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">Satisfaction</div>
                   </div>
-                </div>
+                </Card3D>
 
                 {/* Response Time Card */}
-                <div className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
-                  <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300">
+                <Card3D className="relative overflow-hidden bg-white dark:bg-[#1f1f1f] p-4 rounded-xl border-2 border-[#EDB003]/20 hover:border-[#EDB003] transition-all duration-300 hover:shadow-lg group">
+                  <div className="absolute top-0 right-0 w-20 h-20 opacity-10 group-hover:opacity-20 transition-opacity duration-300" style={{ transform: "translateZ(10px)" }}>
                     <Zap className="w-full h-full text-[#EDB003]" />
                   </div>
-                  <div className="relative z-10">
+                  <div className="relative z-10" style={{ transform: "translateZ(20px)" }}>
                     <Zap className="w-7 h-7 text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" />
                     <div className="text-2xl font-bold text-[#172A3A] dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>&lt;3days</div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">Avg Documentation</div>
                   </div>
-                </div>
+                </Card3D>
               </div>
 
               {/* Explore Workspaces Section */}

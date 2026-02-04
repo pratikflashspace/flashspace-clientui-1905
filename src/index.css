@@ -2,88 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Google Fonts - Poppins (all weights) and Inter */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap');
-
-/* Geist Font - Map to Inter since Geist isn't available on free CDNs */
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/Geist/Geist-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/Geist/Geist-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/Geist/Geist-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Geist';
-  src: url('/fonts/Geist/Geist-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-display: swap;
-}
-
-/* Poppins Font (from uploaded fonts) */
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins/Poppins-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins/Poppins-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  src: url('/fonts/Poppins/Poppins-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'c4b700';
-  src: url('/fonts/c4b700dcb2187787-s.p.woff2') format('woff2'),
-    url('/fonts/c4b700dcb2187787-s.p.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'new-one';
-  src: url('./assets//fonts/e4af272ccee01ff0-s.p.woff2') format('woff2');
-}
-
-/* Removed Locomotive Scroll overrides */
-
 /* VirtuHub Connect Design System - FlashSpace Branding */
 
 @layer base {
   :root {
     /* Core Brand Colors - Light Theme */
+    font-family: 'Inter', sans-serif;
     --background: 0 0% 100%;
     --foreground: 210 40% 5%;
 
@@ -96,10 +20,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 40% 5%;
 
-    /* Brand Primary - Blue */
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 91% 70%;
+    /* Brand Primary - FlashSpace Yellow (was Blue) */
+    --primary: 45 96% 47%;
+    --primary-foreground: 210 40% 5%;
+    --primary-glow: 45 96% 57%;
 
     /* Brand Accent - FlashSpace Yellow */
     --accent: 48 100% 67%;
@@ -117,7 +41,7 @@
     /* Interactive Elements */
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 217 91% 60%;
+    --ring: 45 96% 47%;
 
     /* Destructive */
     --destructive: 0 84.2% 60.2%;
@@ -160,7 +84,7 @@
 
     --sidebar-border: 220 13% 91%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 45 96% 47%;
 
     --d-bg: 0 0% 100%;
 
@@ -183,8 +107,8 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 45 96% 47%;
+    --primary-foreground: 210 40% 5%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -192,8 +116,8 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 48 100% 67%;
+    --accent-foreground: 210 40% 5%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -208,7 +132,7 @@
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 45 96% 47%;
     --d-bg: 0 0% 10%;
     --d-muted: 0 0% 20%;
     --d-fg: 0 0% 100%;
@@ -224,8 +148,8 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    /* Primary site font: Poppins (with Geist fallback) */
-    font-family: 'Poppins', 'Geist', 'Georgia', 'serif';
+    /* Primary site font: Inter */
+    font-family: 'Inter', sans-serif;
     background: hsl(var(--background));
     color: hsl(var(--foreground));
     min-height: 100vh;

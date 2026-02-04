@@ -1,523 +1,545 @@
 import React, { useState } from "react";
-import { CheckCircle, FileText, ArrowLeft, Upload } from "lucide-react";
+import {
+  CheckCircle2,
+  FileText,
+  ArrowLeft,
+  Upload,
+  Download,
+  Building2,
+  Calendar,
+  Clock,
+  User,
+  Phone,
+  Mail,
+  MapPin,
+  Eye,
+  Edit3,
+  ChevronRight,
+  AlertCircle,
+  Shield,
+  Briefcase,
+} from "lucide-react";
+
+interface Partner {
+  id: number;
+  name: string;
+  designation: string;
+  citizen: string;
+  signatory: boolean;
+  documents: { name: string; status: "verified" | "pending" | "rejected" }[];
+}
 
 const ViewDetails: React.FC = () => {
   const [activeTab, setActiveTab] = useState("subscription");
   const [showHistory, setShowHistory] = useState(false);
   const [showReviewPanel, setShowReviewPanel] = useState(false);
 
-  const [partners, setPartners] = useState([
-    { id: 1, name: "ANSHU PRASAD", citizen: "Yes", signatory: "Yes", idProof: "Aadhaar + PAN" },
-    { id: 2, name: "JACK", citizen: "Yes", signatory: "No", idProof: "Aadhaar" },
-  ]);
+  const partners: Partner[] = [
+    {
+      id: 1,
+      name: "Anshu Prasad",
+      designation: "Director",
+      citizen: "Yes",
+      signatory: true,
+      documents: [
+        { name: "PAN Card", status: "verified" },
+        { name: "Aadhaar Card", status: "verified" },
+      ],
+    },
+    {
+      id: 2,
+      name: "Rajesh Kumar",
+      designation: "Director",
+      citizen: "Yes",
+      signatory: false,
+      documents: [
+        { name: "PAN Card", status: "verified" },
+        { name: "Aadhaar Card", status: "pending" },
+      ],
+    },
+  ];
 
-  const handlePartnerChange = (id: number, field: keyof typeof partners[0], value: string) => {
-    setPartners((prev) => prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)));
-  };
-
-  const handleUpload = (id: number) => {
-    // dummy upload handler — replace with real upload logic
-    alert(`Upload document for Partner ID: ${id}`);
-  };
-
-  // Mock data (replace with real booking details)
-  const userData = {
-    userName: "ANSHU PRASAD",
-    companyName: "TALENODE-ANALYTICS CONSULTANCY PRIVATE LIMITED",
-    phone: "9899223359",
+  // Mock booking data
+  const bookingData = {
+    id: "VO-2025-00142",
+    type: "Virtual Office",
+    status: "active",
+    userName: "Anshu Prasad",
+    companyName: "Talenode Analytics Consultancy Private Limited",
+    phone: "+91 98992 23359",
     email: "anshuabrol@live.com",
-    address: "47B Pocket A11 Surya Apartments Kalkaji Extension, New Delhi 110019",
-    workspaceName: "Stirring Minds",
-    city: "Delhi",
-    plan: "New Company Registration Plan",
-    tenure: "Yearly",
-    paymentDate: "20 May, 2025",
-    activationDate: "19 Jun, 2025",
-    expiryDate: "19 Jun, 2026",
-    daysLeft: "221 DAYS",
+    gstin: "07AADCT1234F1Z5",
+    cin: "U78300DL2024PTC432593",
+    address: "47B Pocket A11, Surya Apartments, Kalkaji Extension, New Delhi - 110019",
+    workspace: {
+      name: "Stirring Minds",
+      address: "1st Floor, B-26, Sector 3, Noida, UP - 201301",
+      city: "Delhi NCR",
+    },
+    plan: {
+      name: "Virtual Office Premium",
+      tenure: "Yearly",
+      price: 18000,
+      gstIncluded: true,
+    },
+    dates: {
+      payment: "20 May, 2025",
+      activation: "19 Jun, 2025",
+      expiry: "19 Jun, 2026",
+      daysLeft: 221,
+    },
+    features: ["GST Registration Address", "Mail Handling", "Business Address Proof", "NOC for Registration"],
   };
 
   const steps = [
-    { title: "KYC Verification", status: "Approved", date: "23 May, 2025", by: "Ramit (WORKSPACE)" },
-    { title: "Agreement Signature", status: "Approved", date: "23 May, 2025", by: "Ramit (WORKSPACE)" },
-    { title: "Documents Processing", status: "Shared", date: "23 May, 2025", by: "(WORKSPACE)" },
-    { title: "Active", status: "Active", date: "23 May, 2025", by: "(WORKSPACE)" },
-    { title: "Expired", status: "Pending", date: "-", by: "" },
+    { title: "KYC Submitted", status: "completed", date: "20 May, 2025", by: "Client" },
+    { title: "KYC Verified", status: "completed", date: "23 May, 2025", by: "Workspace" },
+    { title: "Agreement Signed", status: "completed", date: "23 May, 2025", by: "Both Parties" },
+    { title: "Subscription Active", status: "current", date: "19 Jun, 2025", by: "" },
+    { title: "Renewal Due", status: "upcoming", date: "19 Jun, 2026", by: "" },
   ];
 
+  const documents = [
+    {
+      id: 1,
+      name: "Virtual Office NOC",
+      type: "user_specific",
+      status: "ready",
+      lastUpdated: "23 May, 2025",
+      description: "No Objection Certificate for GST/Company Registration",
+    },
+    {
+      id: 2,
+      name: "Client Agreement",
+      type: "user_specific",
+      status: "ready",
+      lastUpdated: "23 May, 2025",
+      description: "Signed agreement between client and workspace",
+    },
+    {
+      id: 3,
+      name: "Utility Bill",
+      type: "user_specific",
+      status: "ready",
+      lastUpdated: "01 Jan, 2025",
+      description: "Electricity bill for address proof",
+    },
+    {
+      id: 4,
+      name: "Rent Agreement",
+      type: "user_specific",
+      status: "ready",
+      lastUpdated: "19 Jun, 2025",
+      description: "Registered rent agreement for premises",
+    },
+  ];
+
+  const subscriptionHistory = [
+    { id: 1, plan: "Virtual Office Premium", start: "19 Jun, 2024", end: "19 Jun, 2025", status: "completed", amount: 18000 },
+    { id: 2, plan: "Virtual Office Basic", start: "20 Jun, 2023", end: "20 Jun, 2024", status: "completed", amount: 12000 },
+  ];
+
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(amount);
+
+  const getStepIcon = (status: string, idx: number) => {
+    if (status === "completed") return <CheckCircle2 className="w-5 h-5" />;
+    if (status === "current") return <Clock className="w-5 h-5" />;
+    return <span className="text-sm font-bold">{idx + 1}</span>;
+  };
+
   return (
-    <div className="min-h-screen bg-white py-8 px-4 sm:px-6 md:px-8 font-[Poppins] text-gray-900">
-      {/* HEADER */}
-      <div className="max-w-6xl mx-auto border-b pb-5 mb-8">
-        <div className="flex flex-wrap justify-between items-center gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">{userData.userName}</h1>
-            <p className="text-sm text-gray-600 mt-1">{userData.userName} Virtual Office details</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-sm font-semibold">ACTIVE</span>
-            <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-lg text-sm font-semibold">RENEWAL</span>
-          </div>
-        </div>
-      </div>
-
-      {/* SUBSCRIPTION STATUS */}
-      <div className="max-w-6xl mx-auto mb-12 relative">
-        <h2 className="text-lg font-semibold mb-6">Subscription Status</h2>
-
-        <div className="relative flex justify-between items-center">
-          {/* black connecting line (placed behind steps, not overlapping) */}
-          <div className="absolute top-[18px] left-0 w-full h-[2px] bg-black z-0 rounded" />
-
-          {steps.map((step, idx) => {
-            const isActive = ["Approved", "Active", "Shared"].includes(step.status);
-            return (
-              <div key={idx} className="relative z-10 flex-1 flex flex-col items-center min-w-[70px]">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 border-black ${
-                    isActive ? "bg-green-500 text-white" : "bg-gray-300 text-gray-600"
-                  }`}
-                >
-                  <CheckCircle size={16} />
-                </div>
-                <p className="text-xs sm:text-sm font-medium mt-2 text-center">{step.title}</p>
-                <p className={`text-xs ${isActive ? "text-green-600" : "text-gray-500"}`}>
-                  {step.status.toUpperCase()} {step.date !== "-" && `on ${step.date}`}
-                </p>
-                <p className="text-xs text-gray-500">{step.by}</p>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 bg-yellow-100 rounded-xl flex items-center justify-center">
+                <Building2 className="w-7 h-7 text-yellow-600" />
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* TABS */}
-      <div className="max-w-6xl mx-auto border-b mb-6">
-        <div className="flex gap-6 text-sm font-semibold">
-          <button
-            onClick={() => setActiveTab("subscription")}
-            className={`pb-3 ${activeTab === "subscription" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-700"}`}>
-            Subscription Details
-          </button>
-          <button
-            onClick={() => setActiveTab("kyc")}
-            className={`pb-3 ${activeTab === "kyc" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-700"}`}>
-            KYC & Agreement Details
-          </button>
-          <button
-            onClick={() => setActiveTab("documents")}
-            className={`pb-3 ${activeTab === "documents" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-700"}`}>
-            Documents
-          </button>
-        </div>
-      </div>
-
-      {/* CONTENTS */}
-      <div className="max-w-6xl mx-auto">
-        {/* ---------- Subscription Details (keep everything) ---------- */}
-        {activeTab === "subscription" && (
-          <div>
-            <div className="text-sm text-gray-600 mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-              <p>The current subscription is a renewal. Please refer to the subscription history for all previous documents.</p>
-              <button
-                className="text-blue-600 font-semibold hover:underline"
-                onClick={() => setShowHistory((s) => !s)}
-              >
-                View Subscription History →
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-xl md:text-2xl font-bold font-[Poppins] text-gray-900">
+                    {bookingData.workspace.name}
+                  </h1>
+                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold uppercase">
+                    Active
+                  </span>
+                </div>
+                <p className="text-gray-500 text-sm mt-1">{bookingData.type}  {bookingData.id}</p>
+                <p className="text-gray-600 text-sm mt-1 flex items-center gap-1">
+                  <MapPin className="w-4 h-4" />
+                  {bookingData.workspace.address}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Expires in</p>
+                <p className="text-2xl font-bold text-yellow-500">{bookingData.dates.daysLeft} days</p>
+              </div>
+              <button className="px-4 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors">
+                Renew Now
               </button>
             </div>
+          </div>
+        </div>
 
+        {/* Subscription Timeline */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">Subscription Timeline</h2>
+          <div className="relative">
+            <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200 rounded"></div>
+            <div className="relative flex justify-between">
+              {steps.map((step, idx) => {
+                const isCompleted = step.status === "completed";
+                const isCurrent = step.status === "current";
+                return (
+                  <div key={idx} className="flex flex-col items-center relative z-10" style={{ flex: 1 }}>
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+                        isCompleted
+                          ? "bg-green-500 border-green-500 text-white"
+                          : isCurrent
+                          ? "bg-yellow-400 border-yellow-400 text-black"
+                          : "bg-white border-gray-300 text-gray-400"
+                      }`}
+                    >
+                      {getStepIcon(step.status, idx)}
+                    </div>
+                    <p className="text-xs font-medium text-center mt-3 text-gray-900">{step.title}</p>
+                    <p className={`text-xs text-center ${isCompleted ? "text-green-600" : isCurrent ? "text-yellow-600" : "text-gray-400"}`}>
+                      {step.date}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-1">
+          <div className="flex gap-1">
+            {[
+              { id: "subscription", label: "Subscription", icon: Calendar },
+              { id: "kyc", label: "KYC & Agreement", icon: Shield },
+              { id: "documents", label: "Documents", icon: FileText },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => { setActiveTab(tab.id); setShowReviewPanel(false); }}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === tab.id ? "bg-yellow-400 text-black" : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Subscription Tab */}
+        {activeTab === "subscription" && (
+          <div className="space-y-6">
             {/* Client Details */}
-            <div className="bg-white rounded-lg border p-6 mb-8 shadow-sm overflow-x-auto">
-              <h3 className="text-lg font-semibold mb-4 border-b pb-2">Client Details</h3>
-              <table className="w-full text-sm">
-                <tbody>
-                  <tr className="bg-gray-50">
-                    <td className="border p-2 font-semibold w-1/3">User Name</td>
-                    <td className="border p-2">{userData.userName}</td>
-                  </tr>
-                  <tr>
-                    <td className="border p-2 font-semibold">Company Name</td>
-                    <td className="border p-2">{userData.companyName}</td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="border p-2 font-semibold">Phone No.</td>
-                    <td className="border p-2">{userData.phone}</td>
-                  </tr>
-                  <tr>
-                    <td className="border p-2 font-semibold">Email</td>
-                    <td className="border p-2">{userData.email}</td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="border p-2 font-semibold">Shipping Address</td>
-                    <td className="border p-2">{userData.address}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            {/* Subscription Details */}
-            <div className="bg-white rounded-lg border p-6 shadow-sm overflow-x-auto mb-8">
-              <h3 className="text-lg font-semibold mb-4 border-b pb-2">Subscription Details</h3>
-              <table className="w-full text-sm">
-                <tbody>
-                  <tr className="bg-gray-50">
-                    <td className="border p-2 font-semibold w-1/3">Workspace Name</td>
-                    <td className="border p-2">{userData.workspaceName}</td>
-                  </tr>
-                  <tr>
-                    <td className="border p-2 font-semibold">City</td>
-                    <td className="border p-2">{userData.city}</td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="border p-2 font-semibold">Plan</td>
-                    <td className="border p-2">{userData.plan}</td>
-                  </tr>
-                  <tr>
-                    <td className="border p-2 font-semibold">Tenure</td>
-                    <td className="border p-2">{userData.tenure}</td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="border p-2 font-semibold">Payment Date</td>
-                    <td className="border p-2">{userData.paymentDate}</td>
-                  </tr>
-                  <tr>
-                    <td className="border p-2 font-semibold">Activation Date</td>
-                    <td className="border p-2">{userData.activationDate}</td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="border p-2 font-semibold">Expiry Date</td>
-                    <td className="border p-2">
-                      {userData.expiryDate}{" "}
-                      <span className="ml-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">{userData.daysLeft}</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            {/* Dummy Subscription History */}
-            {showHistory && (
-              <div className="bg-white rounded-lg border p-6 shadow-sm mb-8">
-                <h3 className="text-lg font-semibold mb-4 border-b pb-2">Subscription History (Dummy Data)</h3>
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="p-2 border">S.No.</th>
-                      <th className="p-2 border">Plan</th>
-                      <th className="p-2 border">Start Date</th>
-                      <th className="p-2 border">End Date</th>
-                      <th className="p-2 border">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border p-2 text-center">1</td>
-                      <td className="border p-2">Virtual Office Renewal</td>
-                      <td className="border p-2">19 Jun, 2024</td>
-                      <td className="border p-2">19 Jun, 2025</td>
-                      <td className="border p-2 text-green-600 font-semibold">Completed</td>
-                    </tr>
-                    <tr>
-                      <td className="border p-2 text-center">2</td>
-                      <td className="border p-2">Company Registration Plan</td>
-                      <td className="border p-2">20 Jun, 2023</td>
-                      <td className="border p-2">20 Jun, 2024</td>
-                      <td className="border p-2 text-green-600 font-semibold">Completed</td>
-                    </tr>
-                  </tbody>
-                </table>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <User className="w-5 h-5 text-yellow-500" /> Client Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <User className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <p className="text-xs text-gray-500">Name</p>
+                      <p className="font-medium text-gray-900">{bookingData.userName}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Building2 className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <p className="text-xs text-gray-500">Company</p>
+                      <p className="font-medium text-gray-900">{bookingData.companyName}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Briefcase className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <p className="text-xs text-gray-500">CIN</p>
+                      <p className="font-medium text-gray-900">{bookingData.cin}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Phone className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <p className="text-xs text-gray-500">Phone</p>
+                      <p className="font-medium text-gray-900">{bookingData.phone}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Mail className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <p className="text-xs text-gray-500">Email</p>
+                      <p className="font-medium text-gray-900">{bookingData.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <FileText className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <p className="text-xs text-gray-500">GSTIN</p>
+                      <p className="font-medium text-gray-900">{bookingData.gstin}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Plan Details */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-yellow-500" /> Plan Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="p-4 bg-gray-50 rounded-lg text-center">
+                  <p className="text-xs text-gray-500">Plan</p>
+                  <p className="font-semibold text-gray-900">{bookingData.plan.name}</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg text-center">
+                  <p className="text-xs text-gray-500">Tenure</p>
+                  <p className="font-semibold text-gray-900">{bookingData.plan.tenure}</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg text-center">
+                  <p className="text-xs text-gray-500">Amount Paid</p>
+                  <p className="font-semibold text-green-600">{formatCurrency(bookingData.plan.price)}</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg text-center">
+                  <p className="text-xs text-gray-500">Active Since</p>
+                  <p className="font-semibold text-gray-900">{bookingData.dates.activation}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-3">Plan Features:</p>
+                <div className="flex flex-wrap gap-2">
+                  {bookingData.features.map((feature, idx) => (
+                    <span key={idx} className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-sm flex items-center gap-1">
+                      <CheckCircle2 className="w-4 h-4" />
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Subscription History */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Subscription History</h3>
+                <button
+                  onClick={() => setShowHistory(!showHistory)}
+                  className="text-yellow-600 text-sm font-medium hover:text-yellow-700 flex items-center gap-1"
+                >
+                  {showHistory ? "Hide History" : "View History"} <ChevronRight className={`w-4 h-4 transition-transform ${showHistory ? "rotate-90" : ""}`} />
+                </button>
+              </div>
+              {showHistory && (
+                <div className="space-y-3">
+                  {subscriptionHistory.map((sub) => (
+                    <div key={sub.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-gray-900">{sub.plan}</p>
+                        <p className="text-sm text-gray-500">{sub.start} - {sub.end}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-gray-900">{formatCurrency(sub.amount)}</p>
+                        <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Completed</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* ---------- KYC & AGREEMENT DETAILS (with Review) ---------- */}
+        {/* KYC Tab */}
         {activeTab === "kyc" && (
-          <>
+          <div className="space-y-6">
             {!showReviewPanel ? (
-              <div className="bg-white rounded-lg border p-6 shadow-sm">
-                <h3 className="text-lg font-semibold mb-3">KYC Details</h3>
-                <p className="text-sm text-gray-600 mb-4">Verification and approval status for your company’s KYC documents.</p>
+              <>
+                {/* KYC Status */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-yellow-500" /> KYC Verification
+                    </h3>
+                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Verified</span>
+                  </div>
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-green-800">KYC verification completed successfully</p>
+                      <p className="text-sm text-green-700">Verified on 23 May, 2025 by Workspace Admin</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowReviewPanel(true)}
+                    className="mt-4 text-yellow-600 font-medium hover:text-yellow-700 flex items-center gap-1"
+                  >
+                    View KYC Details <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
 
-                <table className="w-full text-sm border mb-6">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="p-2 border">S.No.</th>
-                      <th className="p-2 border">Verification Details</th>
-                      <th className="p-2 border">Received On</th>
-                      <th className="p-2 border">Approval Status</th>
-                      <th className="p-2 border">Approved/Rejected On</th>
-                      <th className="p-2 border">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border p-2 text-center">1</td>
-                      <td className="border p-2">Company & Director Details</td>
-                      <td className="border p-2">23 May, 2025</td>
-                      <td className="border p-2 text-green-600 font-semibold">Approved</td>
-                      <td className="border p-2">23 May, 2025</td>
-                      <td className="border p-2 text-blue-600 font-semibold cursor-pointer hover:underline" onClick={() => setShowReviewPanel(true)}>Review</td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                <h3 className="text-lg font-semibold mt-8 mb-3">Renewal Client Agreement</h3>
-                <table className="w-full text-sm border">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="p-2 border">S.No.</th>
-                      <th className="p-2 border">Document</th>
-                      <th className="p-2 border">Received On</th>
-                      <th className="p-2 border">Approval Status</th>
-                      <th className="p-2 border">Approved/Rejected On</th>
-                      <th className="p-2 border">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border p-2 text-center">1</td>
-                      <td className="border p-2">Client Agreement</td>
-                      <td className="border p-2">20 May, 2025</td>
-                      <td className="border p-2 text-green-600 font-semibold">Approved</td>
-                      <td className="border p-2">23 May, 2025</td>
-                      <td className="border p-2 text-blue-600 font-semibold cursor-pointer hover:underline">View Agreement</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                {/* Agreement */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-yellow-500" /> Client Agreement
+                  </h3>
+                  <div className="p-4 border border-gray-200 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                        <FileText className="w-6 h-6 text-red-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">Virtual Office Agreement</p>
+                        <p className="text-sm text-gray-500">Signed on 23 May, 2025  PDF, 245 KB</p>
+                      </div>
+                    </div>
+                    <button className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                      <Download className="w-4 h-4" /> Download
+                    </button>
+                  </div>
+                </div>
+              </>
             ) : (
-              /* REVIEW PANEL */
-              <div className="bg-white rounded-lg border p-6 shadow-sm">
-                <button onClick={() => setShowReviewPanel(false)} className="flex items-center gap-2 text-blue-600 mb-6 hover:underline">
-                  <ArrowLeft size={18} /> Back
+              /* KYC Review Panel */
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <button
+                  onClick={() => setShowReviewPanel(false)}
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+                >
+                  <ArrowLeft className="w-5 h-5" /> Back to KYC Overview
                 </button>
 
-                <h2 className="text-xl font-semibold mb-4">Review KYC details for {userData.companyName}</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">KYC Details Review</h2>
 
                 {/* Company Details */}
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-3">Company Details</h3>
-                  <table className="w-full text-sm border">
-                    <tbody>
-                      <tr>
-                        <td className="border p-2 font-semibold w-1/3">Legal Company Name</td>
-                        <td className="border p-2">{userData.companyName}</td>
-                      </tr>
-                      <tr>
-                        <td className="border p-2 font-semibold">Company CIN</td>
-                        <td className="border p-2">U78300DL2024PTC432593</td>
-                      </tr>
-                      <tr>
-                        <td className="border p-2 font-semibold">Firm Type</td>
-                        <td className="border p-2">INDIAN COMPANY</td>
-                      </tr>
-                      <tr>
-                        <td className="border p-2 font-semibold">Company Incorporated</td>
-                        <td className="border p-2">Yes</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div className="mb-6">
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Company Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {[
+                      { label: "Legal Name", value: bookingData.companyName },
+                      { label: "CIN", value: bookingData.cin },
+                      { label: "GSTIN", value: bookingData.gstin },
+                      { label: "Company Type", value: "Private Limited" },
+                    ].map((item, idx) => (
+                      <div key={idx} className="p-3 bg-gray-50 rounded-lg">
+                        <p className="text-xs text-gray-500">{item.label}</p>
+                        <p className="font-medium text-gray-900">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Company Documents */}
-                <div className="mb-8 overflow-x-auto">
-                  <h3 className="text-lg font-semibold mb-3">Company Documents</h3>
-                  <table className="w-full text-sm border">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="p-2 border">S.No.</th>
-                        <th className="p-2 border">Document Name</th>
-                        <th className="p-2 border">Document</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td colSpan={3} className="p-6 text-center text-gray-400">📂 No data available</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                {/* Directors */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Directors / Partners</h3>
+                  <div className="space-y-3">
+                    {partners.map((partner) => (
+                      <div key={partner.id} className="p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                              <User className="w-5 h-5 text-gray-500" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{partner.name}</p>
+                              <p className="text-sm text-gray-500">{partner.designation}</p>
+                            </div>
+                          </div>
+                          {partner.signatory && (
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">Authorized Signatory</span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {partner.documents.map((doc, idx) => (
+                            <span
+                              key={idx}
+                              className={`px-3 py-1 rounded-full text-xs flex items-center gap-1 ${
+                                doc.status === "verified"
+                                  ? "bg-green-100 text-green-700"
+                                  : doc.status === "pending"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {doc.status === "verified" ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+                              {doc.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-
-                {/* Directors / Partners — viewable with text buttons for View & Upload */}
-<div className="overflow-x-auto">
-  <h3 className="text-lg font-semibold mb-3">Directors / Partners</h3>
-  <table className="w-full text-sm border">
-    <thead className="bg-gray-100">
-      <tr>
-        <th className="p-2 border">S.No.</th>
-        <th className="p-2 border">Partner</th>
-        <th className="p-2 border">Indian Citizen</th>
-        <th className="p-2 border">Signatory</th>
-        <th className="p-2 border">Identity Proof</th>
-        <th className="p-2 border">View Doc</th>
-        <th className="p-2 border">Upload Doc</th>
-      </tr>
-    </thead>
-    <tbody>
-      {partners.map((p, i) => (
-        <tr key={p.id}>
-          <td className="border p-2 text-center">{i + 1}.</td>
-          <td className="border p-2">{p.name}</td>
-          <td className="border p-2 text-center">{p.citizen}</td>
-          <td className="border p-2 text-center">{p.signatory}</td>
-          <td className="border p-2">{p.idProof}</td>
-          <td className="border p-2 text-center">
-            <button
-              onClick={() => alert(`Viewing document for ${p.name}`)}
-              className="text-blue-600 hover:underline font-medium"
-            >
-              View Doc
-            </button>
-          </td>
-          <td className="border p-2 text-center">
-            <button
-              onClick={() => alert(`Upload document for ${p.name}`)}
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Upload Doc
-            </button>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-
-  {/* Edit Details link (plain text) */}
-  <div className="flex justify-end mt-3">
-    <button
-      onClick={() => alert("Edit Partner Details (coming soon)")}
-      className="text-blue-600 hover:underline font-medium"
-    >
-      Edit Details
-    </button>
-  </div>
-</div>
-
               </div>
             )}
-          </>
+          </div>
         )}
 
-       {/* DOCUMENTS SECTION */}
-{activeTab === "documents" && (
-  <div className="bg-white rounded-lg border p-6 shadow-sm text-sm">
-    <h3 className="text-lg font-semibold mb-5 flex items-center gap-2">
-      Documents to be shared with the client
-      <span className="text-gray-500 text-base cursor-pointer">ℹ️</span>
-    </h3>
+        {/* Documents Tab */}
+        {activeTab === "documents" && (
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-yellow-500" /> Available Documents
+              </h3>
+              <p className="text-sm text-gray-500 mb-6">
+                Download the documents required for GST registration, bank account opening, and other official purposes.
+              </p>
 
-    <div className="overflow-x-auto">
-      <table className="w-full border text-sm">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-2 border text-left w-[60px]">S.No.</th>
-            <th className="p-2 border text-left">Document Name</th>
-            <th className="p-2 border text-left">Document Type</th>
-            <th className="p-2 border text-left">Document Status</th>
-            <th className="p-2 border text-left">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* Row 1 */}
-          <tr>
-            <td className="border p-2 text-center">1.</td>
-            <td className="border p-2">Coworking Client NOC</td>
-            <td className="border p-2">User specific</td>
-            <td className="border p-2">
-              <button className="text-blue-600 font-semibold hover:underline">
-                View
-              </button>
-            </td>
-            <td className="border p-2">
-              <div>
-                <button className="text-blue-600 font-semibold hover:underline flex items-center gap-1">
-                  <span>✏️</span> Update Document
-                </button>
-                <p className="text-xs text-gray-500 mt-1">
-                  Auto-generated using client details. Re-upload in case of any error.
-                </p>
+              <div className="space-y-3">
+                {documents.map((doc) => (
+                  <div key={doc.id} className="p-4 border border-gray-200 rounded-lg hover:border-yellow-300 transition-colors">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-5 h-5 text-yellow-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{doc.name}</p>
+                          <p className="text-sm text-gray-500">{doc.description}</p>
+                          <p className="text-xs text-gray-400 mt-1">Last updated: {doc.lastUpdated}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2 text-sm">
+                          <Eye className="w-4 h-4" /> View
+                        </button>
+                        <button className="px-4 py-2 bg-yellow-400 text-black rounded-lg hover:bg-yellow-500 flex items-center gap-2 text-sm font-medium">
+                          <Download className="w-4 h-4" /> Download
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </td>
-          </tr>
+            </div>
 
-          {/* Row 2 */}
-          <tr>
-            <td className="border p-2 text-center">2.</td>
-            <td className="border p-2">Coworking Client Agreement</td>
-            <td className="border p-2">User specific</td>
-            <td className="border p-2">
-              <div>
-                <button className="text-blue-600 font-semibold hover:underline">
-                  View
-                </button>
-                <p className="text-xs text-gray-500 mt-1">Last Updated: 23 May 2025</p>
+            {/* Info Note */}
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-blue-800">
+                <p className="font-medium mb-1">Important Note</p>
+                <p>These documents are valid for GST registration, company incorporation address proof, and bank account opening. For any custom requirements, please contact support.</p>
               </div>
-            </td>
-            <td className="border p-2">
-              <div>
-                <button className="text-blue-600 font-semibold hover:underline flex items-center gap-1">
-                  <span>✏️</span> Update Document
-                </button>
-                <p className="text-xs text-gray-500 mt-1">
-                  Agreement signed by you & the client.
-                </p>
-              </div>
-            </td>
-          </tr>
-
-          {/* Row 3 */}
-          <tr>
-            <td className="border p-2 text-center">3.</td>
-            <td className="border p-2">Company Registration Guide</td>
-            <td className="border p-2">Common for all</td>
-            <td className="border p-2">
-              <button className="text-blue-600 font-semibold hover:underline">
-                View
-              </button>
-            </td>
-            <td className="border p-2">
-              <div>
-                <p className="text-gray-600 font-medium">No action required</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Monthly updated through workspaces settings.
-                </p>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    {/* FOOTER NOTES */}
-    <div className="mt-6 space-y-2 text-sm">
-      <div className="flex items-start gap-2">
-        <span className="text-gray-600">ℹ️</span>
-        <p className="text-gray-700">
-          Documents have been shared with the client. The virtual office subscription is active.
-        </p>
-      </div>
-      <div className="flex items-start gap-2">
-        <span className="text-gray-600">ℹ️</span>
-        <p className="text-gray-700">
-          The current subscription is a renewal. Please refer to the subscription history for all previous documents.
-        </p>
-      </div>
-    </div>
-
-    {/* SUBSCRIPTION HISTORY LINK */}
-    <div className="flex justify-end mt-4">
-      <button
-        onClick={() => alert("Opening Subscription History (dummy)")}
-        className="text-blue-600 font-semibold hover:underline flex items-center gap-1"
-      >
-        View Subscription History →
-      </button>
-    </div>
-  </div>
-)}
-
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

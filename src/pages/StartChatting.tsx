@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { getLenis } from '@/lib/lenis.ts';
+import { useDarkMode } from '@/contexts/DarkModeContext';
 import { useNavigate } from 'react-router-dom';
 import {
   Send, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
-  Settings, MoreHorizontal, X // [NEW] Added X icon
+  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon // [NEW] Added Sun, Moon
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
 import Splash3dButton from '@/components/ui/3d-splash-button';
@@ -15,6 +16,134 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import MapSection, { MapMarker } from '@/components/services/MapSection';
+import ResizableMapLayout from '@/components/services/ResizableMapLayout';
+import { getVirtualOfficesByCity } from '@/services/virtualOffice.service';
+import { getCoworkingSpacesByCity } from '@/services/coworkingSpace.service';
+import { cityCenters } from '@/components/Map/locationData.example';
+import { LoginModal } from '@/components/auth/LoginModal'; // [NEW]
+import { SignupModal } from '@/components/auth/SignupModal'; // [NEW]
+
+// [NEW] Custom Text Formatter to handle bold text, URLs, Images, and PDFs
+const formatMessage = (text: string) => {
+  if (!text) return null;
+
+  // URL regex pattern
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+  // Split by bold markers first
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+
+  return parts.map((part, index) => {
+    // Handle Bold
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+
+    // Handle URLs within text parts
+    if (urlRegex.test(part)) {
+      const subParts = part.split(urlRegex);
+      return (
+        <span key={index}>
+          {subParts.map((subPart, subIndex) => {
+            if (urlRegex.test(subPart)) {
+              // Check if URL is an image
+              const isImage = /\.(jpeg|jpg|gif|png|webp|bmp|svg)($|\?)/i.test(subPart) || subPart.includes('images.unsplash.com');
+
+              // Check if URL is a PDF
+              const isPdf = /\.pdf($|\?)/i.test(subPart);
+
+              if (isImage) {
+                return (
+                  <div key={subIndex} className="block mt-3 mb-2">
+                    <img
+                      src={subPart}
+                      alt="Attached content"
+                      className="rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 max-w-full sm:max-w-[280px] hover:scale-[1.02] transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  </div>
+                );
+              }
+
+              if (isPdf) {
+                return (
+                  <a
+                    key={subIndex}
+                    href={subPart}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 my-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hover:shadow-md transition-all group no-underline max-w-sm"
+                  >
+                    <div className="w-10 h-10 bg-red-100 dark:bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-red-500 dark:text-red-400" />
+                    </div>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <div className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate pr-2">Document.pdf</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">Click to preview</div>
+                    </div>
+                  </a>
+                );
+              }
+
+              // Default Link styling
+              return (
+                <a
+                  key={subIndex}
+                  href={subPart}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-500 break-all"
+                >
+                  {subPart}
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              );
+            }
+            return subPart;
+          })}
+        </span>
+      );
+    }
+
+    return <span key={index}>{part}</span>;
+  });
+};
+
+// [NEW] Typewriter Effect Component
+const TypewriterEffect = ({ text, onComplete }: { text: string; onComplete?: () => void }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const speed = 5; // ms per char
+
+  useEffect(() => {
+    setDisplayedText('');
+    let i = 0;
+    const timer = setInterval(() => {
+      // Handle the case where text might be empty or undefined gracefully
+      if (!text) {
+        clearInterval(timer);
+        if (onComplete) onComplete();
+        return;
+      }
+
+      if (i < text.length) {
+        setDisplayedText((prev) => prev + text.charAt(i));
+        i++;
+      } else {
+        clearInterval(timer);
+        if (onComplete) onComplete();
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text]);
+
+  return (
+    <div className="text-[16px] leading-[1.8] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium text-gray-800 font-sans">
+      {formatMessage(displayedText)}
+    </div>
+  );
+};
 
 // TypeScript Interfaces
 interface QuickAction {
@@ -43,6 +172,7 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  isTyping?: boolean; // [NEW] Flag to trigger typing effect
 }
 
 // n8n Webhook Configuration
@@ -83,7 +213,7 @@ const UpdatesPopup = ({
         width: UPDATES_WIDTH,
         height: "100vh",
         // [MODIFIED] Lower Z-index than sidebar (Sidebar is z-[60])
-        zIndex: 50, 
+        zIndex: 50,
         // [MODIFIED] Slide logic: 0 is visible, -100% hides it to the left (under sidebar)
         transform: open ? "translateX(0)" : "translateX(-100%)",
         // [MODIFIED] Add opacity for smoother fade
@@ -92,68 +222,45 @@ const UpdatesPopup = ({
         pointerEvents: open ? "auto" : "none",
         transition: "transform 0.4s cubic-bezier(.25,.8,.25,1), opacity 0.3s ease-in-out",
         // [MODIFIED] Shadow to give depth when sliding out
-        boxShadow: "10px 0 30px rgba(0,0,0,0.1)" 
+        boxShadow: "10px 0 30px rgba(0,0,0,0.1)"
       }}
     >
       <div
-        style={{
-          background: "#fff",
-          borderTopLeftRadius: "0px",
-          borderBottomLeftRadius: "0px",
-          borderTopRightRadius: "22px",
-          borderBottomRightRadius: "22px",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-          padding: "28px 32px 32px 32px",
-          width: "100%",
-          height: "100%",
-          overflowY: "auto",
-          display: "flex",
-          flexDirection: "column",
-          position: "relative"
-        }}
+        className="bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 rounded-r-[22px] shadow-[0_8px_32px_rgba(0,0,0,0.15)] p-7 w-full h-full overflow-y-auto flex flex-col relative"
       >
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <h2
-            style={{
-              fontSize: "1.5rem",
-              fontWeight: "bold",
-              marginBottom: 18,
-              color: "#222",
-              marginTop: 10,
-              letterSpacing: "0.5px"
-            }}
-          >
-            Update & <span style={{ color: "#FFCC00" }}>Notification</span>
+        <div className="flex justify-between items-center gap-3">
+          <h2 className="text-2xl font-bold mb-[18px] text-gray-900 dark:text-white mt-2.5 tracking-wide">
+            Update & <span className="text-[#FFCC00]">Notification</span>
           </h2>
           <button
             onClick={onCloseBoth}
             aria-label="Close updates"
-            style={{ background: "transparent", border: "none", cursor: "pointer", padding: 8 }}
+            className="bg-transparent border-none cursor-pointer p-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
           >
-            <X style={{ width: 18, height: 18 }} />
+            <X className="w-[18px] h-[18px]" />
           </button>
         </div>
 
         {/* Updates Content */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.3rem" }}>
-          <div style={{ background: "#f6f7ff", borderRadius: "14px", padding: "18px" }}>
-            <strong>Site Launched!</strong>
-            <p style={{ margin: "10px 0 0 0", color: "#506" }}>
+        <div className="flex flex-col gap-[1.3rem]">
+          <div className="bg-[#f6f7ff] dark:bg-indigo-950/30 rounded-[14px] p-[18px]">
+            <strong className="text-gray-900 dark:text-gray-100">Site Launched!</strong>
+            <p className="m-[10px_0_0_0] text-[#506] dark:text-indigo-300">
               We have deployed the first AI-enabled business workspace platform. 🎉
             </p>
           </div>
 
-          <div style={{ background: "#f0fff6", borderRadius: "14px", padding: "18px" }}>
-            <strong>New Feature: Flash Tribe</strong>
-            <p style={{ margin: "10px 0 0 0", color: "#265" }}>
+          <div className="bg-[#f0fff6] dark:bg-green-950/30 rounded-[14px] p-[18px]">
+            <strong className="text-gray-900 dark:text-gray-100">New Feature: Flash Tribe</strong>
+            <p className="m-[10px_0_0_0] text-[#265] dark:text-emerald-300">
               Now connect with fellow workspace members and grow your professional network.
             </p>
           </div>
 
-          <div style={{ background: "#fff8f0", borderRadius: "14px", padding: "18px" }}>
-            <strong>Maintenance Notice</strong>
-            <p style={{ margin: "10px 0 0 0", color: "#a64" }}>
+          <div className="bg-[#fff8f0] dark:bg-orange-950/30 rounded-[14px] p-[18px]">
+            <strong className="text-gray-900 dark:text-gray-100">Maintenance Notice</strong>
+            <p className="m-[10px_0_0_0] text-[#a64] dark:text-orange-300">
               There’s scheduled maintenance on Nov 3rd, 2AM to 3AM IST.
             </p>
           </div>
@@ -170,6 +277,7 @@ const UpdatesPopup = ({
 
 const StartChatting = () => {
   const navigate = useNavigate();
+  const { darkMode, toggleDarkMode } = useDarkMode();
   const [message, setMessage] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showUpdates, setShowUpdates] = useState(false); // [NEW] State for the popup
@@ -183,7 +291,128 @@ const StartChatting = () => {
   const [isLoading, setIsLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  const [selectedCity] = useState('Delhi');
+  // [NEW] Map Integration State
+  const [showMap, setShowMap] = useState(false);
+  const [mapMarkers, setMapMarkers] = useState<MapMarker[]>([]);
+  const [selectedCity, setSelectedCity] = useState("Bangalore");
+
+  // Initialize mapCenter as object { lat, lng }
+  const defaultCenter = cityCenters["Bangalore"] || [12.9716, 77.5946];
+  const [mapCenter, setMapCenter] = useState({ lat: defaultCenter[0], lng: defaultCenter[1] });
+
+  const [mapZoom, setMapZoom] = useState(11);
+  const [isLoginOpen, setIsLoginOpen] = useState(false); // [NEW]
+  const [isSignupOpen, setIsSignupOpen] = useState(false); // [NEW]
+  const [isMapLoading, setIsMapLoading] = useState(false);
+  const [mapTitle, setMapTitle] = useState('Popular Spaces');
+
+  // Helper: Generate random coordinates if missing (reuse from services pages)
+  const generateRandomCoordinates = (center: { lat: number; lng: number }, index: number) => {
+    const seed = index + 1;
+    const latOffset = ((seed * 17) % 50) / 1000 - 0.025;
+    const lngOffset = ((seed * 23) % 50) / 1000 - 0.025;
+    return {
+      lat: center.lat + latOffset,
+      lng: center.lng + lngOffset
+    };
+  };
+
+  // Helper: Detect City and Service from text
+  const detectIntents = (text: string) => {
+    const textLower = text.toLowerCase();
+
+    // Extended City Parsing with Aliases
+    const cityMap: Record<string, { key: string; name: string; aliases: string[] }> = {
+      ahmedabad: { key: 'ahmedabad', name: 'Ahmedabad', aliases: ['ahmedabad', 'amdavad'] },
+      bangalore: { key: 'bangalore', name: 'Bangalore', aliases: ['bangalore', 'bengaluru', 'banglore'] },
+      chennai: { key: 'chennai', name: 'Chennai', aliases: ['chennai', 'madras'] },
+      delhi: { key: 'delhi', name: 'Delhi', aliases: ['delhi', 'new delhi', 'dilli', 'ncr'] },
+      dharamshala: { key: 'dharamshala', name: 'Dharamshala', aliases: ['dharamshala', 'dharamsala'] },
+      gurgaon: { key: 'gurgaon', name: 'Gurgaon', aliases: ['gurgaon', 'gurugram'] },
+      hyderabad: { key: 'hyderabad', name: 'Hyderabad', aliases: ['hyderabad', 'hyd'] },
+      jaipur: { key: 'jaipur', name: 'Jaipur', aliases: ['jaipur'] },
+      jammu: { key: 'jammu', name: 'Jammu', aliases: ['jammu'] },
+      noida: { key: 'delhi', name: 'Noida', aliases: ['noida'] }, // Fallback to Delhi for map center if needed
+    };
+
+    let foundCityKey: string | undefined;
+    let foundCityName: string | undefined;
+
+    // Search for city aliases in text
+    for (const [_, data] of Object.entries(cityMap)) {
+      if (data.aliases.some(alias => textLower.includes(alias))) {
+        foundCityKey = data.key;
+        foundCityName = data.name;
+        break;
+      }
+    }
+
+    // Check for service type
+    const services = [
+      { type: 'virtual', keys: ['virtual', 'address', 'mail', 'gst', 'registration'] },
+      { type: 'coworking', keys: ['coworking', 'desk', 'office', 'space', 'workspace', 'seat', 'cabin'] },
+    ];
+
+    const foundService = services.find(s => s.keys.some(k => textLower.includes(k)));
+
+    return {
+      cityKey: foundCityKey, // e.g., 'delhi'
+      cityName: foundCityName, // e.g., 'Delhi'
+      serviceType: foundService?.type // 'virtual' | 'coworking'
+    };
+  };
+
+  // Helper: Fetch and Update Map
+  const updateMapForQuery = async (text: string) => {
+    const { cityKey, cityName, serviceType } = detectIntents(text);
+
+    if (cityKey && cityName && (serviceType || text.toLowerCase().includes('space'))) {
+      const type = serviceType || 'coworking'; // Default to coworking if ambiguous but city present
+      setIsMapLoading(true);
+      setMapTitle(`${type === 'virtual' ? 'Virtual Offices' : 'Coworking Spaces'} in ${cityName}`);
+
+      try {
+        let markers: MapMarker[] = [];
+        const center = (cityCenters as any)[cityKey] || cityCenters.delhi;
+        setMapCenter(center);
+
+        if (type === 'virtual') {
+          const items = await getVirtualOfficesByCity(cityName); // Service expects capitalized name typically or handles it
+          markers = items.map((item, index) => ({
+            position: item.coordinates || generateRandomCoordinates(center, index),
+            title: item.name,
+            address: item.address,
+            price: item.price,
+            rating: item.rating,
+            reviews: item.reviews,
+            image: item.image,
+            features: item.features,
+          }));
+        } else {
+          const items = await getCoworkingSpacesByCity(cityName);
+          markers = items.map((item, index) => ({
+            position: item.coordinates || generateRandomCoordinates(center, index),
+            title: item.name,
+            address: item.address,
+            price: item.price,
+            rating: item.rating,
+            reviews: item.reviews,
+            image: item.image,
+            features: item.features,
+          }));
+        }
+
+        if (markers.length > 0) {
+          setMapMarkers(markers);
+          setShowMap(true);
+        }
+      } catch (error) {
+        console.error("Failed to update map for query:", error);
+      } finally {
+        setIsMapLoading(false);
+      }
+    }
+  };
 
   const popularSpaces: PopularSpace[] = [
     { name: 'Connaught Place Hub', location: 'CP, New Delhi', type: 'Premium', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80&fit=crop&crop=entropy&auto=format' },
@@ -278,6 +507,61 @@ const StartChatting = () => {
     };
   }, []);
 
+  // [NEW] Function to handle typing completion
+  const handleTypingComplete = (id: string) => {
+    setChatMessages(prev => prev.map(msg =>
+      msg.id === id ? { ...msg, isTyping: false } : msg
+    ));
+  };
+
+  // [NEW] Voice to Text State
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  // [NEW] Handle Voice Input
+  const toggleVoiceInput = () => {
+    if (isListening) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        setIsListening(false);
+      }
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Your browser does not support voice input. Please try Chrome or Edge.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setMessage((prev) => (prev ? prev + ' ' + transcript : transcript));
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error', event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
+
   const handleSendMessage = async () => {
     if (!message.trim() || isLoading) return;
 
@@ -308,16 +592,19 @@ const StartChatting = () => {
         })
       });
 
+      // [NEW] Trigger map update based on user message (optimistic update)
+      updateMapForQuery(userMessage.content);
+
       if (!response.ok) {
         throw new Error('Failed to get response from chatbot');
       }
 
       const data = await response.json();
       console.log('n8n response:', data); // Debug log
-      
+
       // Try multiple possible response formats from n8n
       let aiResponseText = '';
-      
+
       if (Array.isArray(data)) {
         // If response is an array, get first item
         const firstItem = data[0];
@@ -328,27 +615,29 @@ const StartChatting = () => {
       } else {
         aiResponseText = String(data);
       }
-      
+
       // Add AI response to chat
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: aiResponseText || 'I apologize, but I encountered an error. Please try again.',
-        timestamp: new Date()
+        timestamp: new Date(),
+        isTyping: true // [NEW] Start typing effect
       };
 
       setChatMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message to n8n:', error);
-      
+
       // Add error message
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: 'I apologize, but I\'m having trouble connecting right now. Please try again in a moment.',
-        timestamp: new Date()
+        timestamp: new Date(),
+        isTyping: true
       };
-      
+
       setChatMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -391,39 +680,61 @@ const StartChatting = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1120] dark:text-gray-100 flex flex-col overflow-x-hidden font-grotesk">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 lg:left-20">
+      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50 lg:left-20">
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 -ml-2 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+            >
+              <MenuIcon className="w-6 h-6" />
+            </button>
+            {/* Mobile Back Button */}
+            <button
+              onClick={() => navigate(-1)}
+              className="lg:hidden p-2 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
             {/* Main Text Logo */}
             <img
               src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
               alt="FlashSpace Logo"
-              className="h-7 w-auto cursor-pointer"
+              className="h-7 w-auto cursor-pointer dark:invert"
               onClick={() => handleNavigation('/')}
             />
           </div>
           <div className="flex items-center gap-3">
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors mr-2"
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+
             {/* IND Button */}
-            <div className="hidden sm:flex items-center px-3 py-1.5 rounded-md border transition-colors duration-300 border-gray-300 text-black">
+            <div className="hidden sm:flex items-center px-3 py-1.5 rounded-md border transition-colors duration-300 border-gray-300 dark:border-gray-700 text-black dark:text-white">
               <span className="text-sm font-md">IND</span>
             </div>
 
             {/* Get in Touch Button */}
             <Splash3dButton
               onClick={() => handleNavigation('/get-in-touch')}
-              className="hidden sm:inline-flex relative px-6 py-2.5 text-base rounded-lg font-bold bg-black text-white border border-black shadow-[0_2px_8px_0_rgba(0,0,0,0.10)] hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.13)] active:translate-y-1 transition-all duration-150 before:content-[''] before:absolute before:inset-0 before:rounded-lg before:pointer-events-none"
+              className="hidden sm:inline-flex relative px-6 py-2.5 text-base rounded-lg font-bold bg-black dark:bg-gray-800 text-white dark:text-white border border-black dark:border-gray-700 shadow-[0_2px_8px_0_rgba(0,0,0,0.10)] hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.13)] active:translate-y-1 transition-all duration-150 before:content-[''] before:absolute before:inset-0 before:rounded-lg before:pointer-events-none"
             >
               Get in Touch
             </Splash3dButton>
 
             {/* Log in Button */}
             <Button
-              onClick={() => handleNavigation('/login')}
+              onClick={() => setIsLoginOpen(true)}
               variant="outline"
-              className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 text-black hover:bg-gray-50"
-              style={{ fontFamily: 'Poppins' }}
+              className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 dark:border-gray-700 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
             >
               Log in
             </Button>
@@ -460,10 +771,8 @@ const StartChatting = () => {
       {/* [MODIFIED] Increased z-index to z-[60] so it sits ON TOP of the Updates Popup (z-50) */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-screen w-20 bg-white border-r border-gray-200 shadow-sm z-[60] flex flex-col overflow-hidden lg:translate-x-0 transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-        style={{ fontFamily: 'Geist, Poppins, sans-serif' }}
+        className={`fixed top-0 left-0 h-screen w-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden lg:translate-x-0 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {/* Logo Section */}
         <div className="h-16 flex items-center justify-center flex-shrink-0">
@@ -491,10 +800,10 @@ const StartChatting = () => {
                         setIsSidebarOpen(false);
                       }
                     }}
-                    className="w-full flex items-center justify-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 group"
+                    className="w-full flex items-center justify-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg transition-all duration-200 group"
                     title={item.label}
                   >
-                    <Icon className="w-6 h-6 text-gray-700 group-hover:text-black group-hover:fill-[#EDB003] group-hover:scale-125 transition-all duration-200" strokeWidth={2} />
+                    <Icon className="w-6 h-6 text-gray-700 dark:text-gray-200 group-hover:text-black dark:group-hover:text-white group-hover:fill-[#EDB003] group-hover:scale-125 transition-all duration-200" strokeWidth={2} />
                   </button>
                 </li>
               );
@@ -505,10 +814,10 @@ const StartChatting = () => {
               <Popover>
                 <PopoverTrigger asChild>
                   <button
-                    className="w-full flex items-center justify-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 group"
+                    className="w-full flex items-center justify-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg transition-all duration-200 group"
                     title="More"
                   >
-                    <MoreHorizontal className="w-6 h-6 text-gray-700 group-hover:text-black group-hover:fill-[#EDB003] group-hover:scale-125 transition-all duration-200" strokeWidth={2} />
+                    <MoreHorizontal className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-black dark:group-hover:text-white group-hover:fill-[#EDB003] group-hover:scale-125 transition-all duration-200" strokeWidth={2} />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-48" side="right" align="start" sideOffset={10}>
@@ -539,11 +848,11 @@ const StartChatting = () => {
         </nav>
 
         {/* Bottom Section - Profile & Footer */}
-        <div className="border-t border-gray-100 p-4 flex-shrink-0 space-y-3">
+        <div className="border-t border-gray-100 dark:border-gray-800 p-4 flex-shrink-0 space-y-3">
           {/* Profile Button */}
           <button
             onClick={() => handleNavigation('/about')}
-            className="w-full flex items-center justify-center py-3 hover:bg-gray-50 rounded-lg transition-all duration-200"
+            className="w-full flex items-center justify-center py-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
             title="Profile"
           >
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#EDB003] to-[#f5c242] flex items-center justify-center text-white font-semibold">
@@ -559,274 +868,373 @@ const StartChatting = () => {
       </div>
 
       {/* Main Content - Adjusted for sidebar */}
-      <div className="flex-1 lg:ml-20 pt-16 flex flex-col lg:flex-row">
-        <div className="flex flex-col lg:flex-row w-full h-[calc(100vh-4rem)]">
-
-          {/* Left Panel - Chat Interface - 60-65% - Scrollable Chat Area */}
-          <div className="w-full lg:w-[60%] xl:w-[65%] h-full flex flex-col bg-white border-r border-gray-200">
-
-            {/* Chat Content */}
-            <div 
-              ref={chatContainerRef}
-              className="flex-1 p-4 sm:p-6 bg-white chat-container overflow-y-auto"
-              style={{
-                height: '100%'
-              }}
-              tabIndex={0}
-              role="region"
-              aria-label="Chat messages"
-              data-lenis-prevent
-              data-lenis-prevent-wheel
-              data-lenis-prevent-touch
-            >
-              {chatMessages.length === 0 ? (
-                // Empty State
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <div className="relative mb-6">
-                    <div className="w-20 h-20 bg-[#EDB003] rounded-xl flex items-center justify-center shadow-sm">
-                      <Building2 className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
-
-                  <h2 className="text-xl font-bold text-gray-900 mb-3">
-                    Need WorkSpace / Business Setup?
-                  </h2>
-                  <p className="text-gray-600 text-sm mb-6 max-w-lg leading-relaxed">
-                    Hey! I'm here to assist you with end-to-end workspace and compliance requirements. Let's get started!
-                  </p>
-
-                  {/* Large Prompt Suggestions */}
-                  <div className="w-full max-w-2xl grid grid-cols-2 gap-3 mb-6">
-                    <button 
-                      onClick={() => handleQuickAction('Find coworking spaces in Delhi NCR region')}
-                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
-                    >
-                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">Find coworking spaces</div>
-                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">in Delhi NCR region</div>
-                    </button>
-                    <button 
-                      onClick={() => handleQuickAction('Help me with GST Registration complete registration process')}
-                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
-                    >
-                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">GST Registration</div>
-                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">Complete registration process</div>
-                    </button>
-                    <button 
-                      onClick={() => handleQuickAction('Compare workspace plans and find the best deal')}
-                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
-                    >
-                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">Compare workspace plans</div>
-                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">Find the best deal</div>
-                    </button>
-                    <button 
-                      onClick={() => handleQuickAction('Check business compliance requirements')}
-                      className="p-4 bg-gray-50 border border-gray-200 hover:border-[#EDB003] hover:bg-[#EDB003] hover:text-white rounded-lg text-left transition-all group"
-                    >
-                      <div className="text-sm font-semibold text-gray-900 group-hover:text-white">Business compliance</div>
-                      <div className="text-xs text-gray-500 group-hover:text-white/90 mt-1">Check requirements</div>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                // Chat Messages
-                <div className="space-y-4 max-w-4xl mx-auto">
-                  {chatMessages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                          msg.role === 'user'
-                            ? 'bg-[#EDB003] text-white'
-                            : 'bg-gray-100 text-gray-900'
-                        }`}
-                      >
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                        <p className={`text-xs mt-1 ${
-                          msg.role === 'user' ? 'text-white/70' : 'text-gray-500'
-                        }`}>
-                          {new Date(msg.timestamp).toLocaleTimeString('en-US', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {/* Loading indicator */}
-                  {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-gray-100 rounded-2xl px-4 py-3">
-                        <div className="flex gap-2">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Chat Input */}
-            <div className="p-4 border-t border-gray-200 bg-white">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Ask anything..."
-                  className="w-full px-14 py-4 bg-gray-50 border border-gray-300 rounded-xl outline-none text-gray-900 placeholder-gray-400 focus:border-[#EDB003] focus:bg-white transition-all"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                />
-                <button className="absolute left-4 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                  <Plus className="w-5 h-5 text-gray-500" />
-                </button>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2">
-                  <button className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                    <Mic className="w-5 h-5 text-gray-500" />
-                  </button>
-                  <button
-                    onClick={handleSendMessage}
-                    className="p-2.5 bg-[#EDB003] hover:bg-[#d99f03] rounded-lg transition-all"
+      <div className="flex-1 lg:ml-20 pt-16 flex flex-col lg:flex-row shadow-2xl z-40 relative">
+        <div className="w-full h-[calc(100dvh-4rem)] bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col">
+          <ResizableMapLayout
+            defaultListingWidth={65}
+            showFloatingButton={showMap}
+            mapContent={
+              /* Right Panel - Sidebar - Scrollable Vertically */
+              <div
+                className={`w-full h-full bg-white dark:bg-[#0F172A] flex flex-col relative transition-all duration-300 ${showMap ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden p-6 scrollbar-yellow'
+                  }`}
+                style={{
+                  WebkitOverflowScrolling: 'touch',
+                  overscrollBehavior: 'contain',
+                  touchAction: 'pan-y'
+                }}
+                data-lenis-prevent
+                data-lenis-prevent-wheel
+                data-lenis-prevent-touch
+              >
+                {showMap ? (
+                  // Full Height Map View (Mindtrip Style)
+                  <div
+                    className="w-full h-full relative flex flex-col bg-white dark:bg-gray-900"
+                    style={{
+                      animation: 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) both'
+                    }}
                   >
-                    <Send className="w-5 h-5 text-white" />
-                  </button>
-                </div>
-              </div>
-              <p className="text-xs text-gray-400 text-center mt-3">
-                FlashSpace Chat Agent can make mistakes. Check important info.
-              </p>
-            </div>
-          </div>
-
-          {/* Right Panel - Sidebar - 35-40% - Scrollable Vertically */}
-          <div
-            className="w-full lg:w-[40%] xl:w-[35%] h-full bg-gray-50 overflow-y-auto overflow-x-hidden p-6 scrollbar-yellow"
-            style={{
-              WebkitOverflowScrolling: 'touch',
-              overscrollBehavior: 'contain',
-              touchAction: 'pan-y'
-            }}
-            data-lenis-prevent
-            data-lenis-prevent-wheel
-            data-lenis-prevent-touch
-          >
-            <div className="space-y-6 max-w-xl mx-auto min-h-full">
-
-              {/* Popular Spaces Section */}
-              <div className="bg-white rounded-2xl p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[#EDB003]" />
-                    <h3 className="text-base font-bold text-gray-900" >Popular Spaces in {selectedCity}</h3>
-                  </div>
-                  <button className="text-xs font-medium text-[#EDB003] hover:text-[#d69f03] flex items-center gap-1 transition-colors">
-                    View Map
-                    <ExternalLink className="w-3 h-3" />
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {popularSpaces.map((space, index) => (
-                    <div
-                      key={index}
-                      className="bg-white border border-gray-200 hover:border-[#EDB003] rounded-xl overflow-hidden cursor-pointer transition-all group hover:shadow-md hover:scale-[1.02] duration-200"
-                    >
-                      <div className="h-32 relative overflow-hidden bg-gray-100">
-                        {space.image && (
-                          <img
-                            src={space.image}
-                            alt={space.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                        <div className="absolute top-2 right-2">
-                          <span className="inline-block text-[10px] px-2 py-1 bg-white/90 backdrop-blur-sm text-gray-900 rounded-md font-semibold">
-                            {space.type}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-3">
-                        <div className="text-sm font-bold text-gray-900 mb-1 line-clamp-1" >{space.name}</div>
-                        <div className="text-xs text-gray-600 line-clamp-1 flex items-center gap-1" >
-                          <MapPin className="w-3 h-3 text-gray-400" />
-                          {space.location}
-                        </div>
+                    <style>{`
+                      @keyframes slideInRight {
+                        0% { opacity: 0; transform: translateX(50px); }
+                        100% { opacity: 1; transform: translateX(0); }
+                      }
+                    `}</style>
+                    <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+                      <button
+                        onClick={() => setShowMap(false)}
+                        className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md text-gray-800 dark:text-gray-100 px-3 py-2 rounded-lg shadow-sm hover:shadow-md border border-gray-200 dark:border-gray-700 text-sm font-medium flex items-center gap-2 transition-all"
+                      >
+                        <ArrowRight className="w-4 h-4 rotate-180" />
+                        <span>Back</span>
+                      </button>
+                      <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md px-3 py-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        {mapTitle}
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Get Started Section */}
-              <div className="bg-gradient-to-br from-[#FFF9E6] to-[#FFFAED] rounded-2xl p-5 shadow-sm border border-[#FFD43B]/20">
-                <h3 className="text-base font-bold text-gray-900 mb-4" >Get Started</h3>
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className="w-10 h-10 bg-[#EDB003]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-5 h-5 text-[#EDB003]" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-gray-900 mb-1" >Find Your Perfect Workspace</h4>
-                      <p className="text-xs text-gray-600 leading-relaxed" >
-                        Take our quick quiz to discover workspaces tailored to your needs.
-                      </p>
-                    </div>
-                  </div>
-                  <button className="w-full bg-[#EDB003] hover:bg-[#d69f03] text-white text-sm font-semibold py-2.5 px-4 rounded-lg transition-all flex items-center justify-center gap-2 group">
-                    Take Workspace Quiz
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Get Inspired Section */}
-              <div className="bg-white rounded-2xl p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base font-bold text-gray-900" >Get Inspired</h3>
-                  <button className="text-xs font-medium text-[#EDB003] hover:text-[#d69f03] transition-colors">
-                    See all
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {inspirationCards.map((card, index) => (
-                    <div
-                      key={index}
-                      className="flex gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl cursor-pointer transition-all group border border-transparent hover:border-gray-200"
-                    >
-                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200">
-                        <img
-                          src={card.image}
-                          alt={card.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    <div className="flex-1 w-full h-full">
+                      {isMapLoading ? (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#EDB003]"></div>
+                        </div>
+                      ) : (
+                        <MapSection
+                          center={mapCenter}
+                          markers={mapMarkers}
+                          zoom={11}
+                          height="100%"
                         />
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6 max-w-xl mx-auto min-h-full">
+                    {/* Popular Spaces Section */}
+                    <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 shadow-lg border border-slate-100 dark:border-white/5">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-[#EDB003]" />
+                          <h3 className="text-base font-bold text-gray-900 dark:text-white" >Popular Spaces in {selectedCity}</h3>
+                        </div>
+                        <button className="text-xs font-medium text-[#EDB003] hover:text-[#d69f03] flex items-center gap-1 transition-colors">
+                          View Map
+                          <ExternalLink className="w-3 h-3" />
+                        </button>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-[#EDB003] transition-colors" >
-                          {card.title}
-                        </h4>
-                        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed" >
-                          {card.description}
-                        </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {popularSpaces.map((space, index) => (
+                          <div
+                            key={index}
+                            className="bg-white dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800 hover:border-[#EFAD1A]/50 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 group hover:shadow-xl hover:shadow-[#EFAD1A]/5 hover:-translate-y-1"
+                          >
+                            <div className="h-32 relative overflow-hidden">
+                              {space.image && (
+                                <img
+                                  src={space.image}
+                                  alt={space.name}
+                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                                />
+                              )}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                              <div className="absolute top-2 right-2">
+                                <span className="inline-block text-[10px] px-2.5 py-1 bg-white/20 backdrop-blur-md text-white border border-white/20 rounded-full font-bold tracking-wide">
+                                  {space.type}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="p-4 relative">
+                              <div className="absolute -top-3 right-3 w-8 h-8 rounded-full bg-[#EFAD1A] flex items-center justify-center text-white shadow-lg scale-0 group-hover:scale-100 transition-transform duration-300">
+                                <ArrowRight className="w-4 h-4 -rotate-45" />
+                              </div>
+                              <div className="text-sm font-bold text-slate-900 dark:text-white mb-1 line-clamp-1 group-hover:text-[#EFAD1A] transition-colors">{space.name}</div>
+                              <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 flex items-center gap-1.5">
+                                <MapPin className="w-3 h-3 text-slate-400" />
+                                {space.location}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
-                </div>
+
+                    {/* Get Started Section - Premium Card */}
+                    <div className="relative overflow-hidden rounded-2xl p-6 group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#EFAD1A] to-[#F59E0B] opacity-10 dark:opacity-20 group-hover:opacity-15 transition-opacity"></div>
+                      <div className="absolute inset-0 border border-[#EFAD1A]/20 rounded-2xl"></div>
+
+                      {/* Decorative blobs */}
+                      <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#EFAD1A]/20 rounded-full blur-2xl"></div>
+                      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#EFAD1A]/10 rounded-full blur-2xl"></div>
+
+                      <div className="relative z-10">
+                        <div className="flex items-start justify-between mb-4">
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-white font-grotesk">Find Your Perfect <br /> Workspace</h3>
+                          <div className="w-12 h-12 rounded-2xl bg-white dark:bg-[#0F172A] shadow-lg flex items-center justify-center text-[#EFAD1A] rotate-3 group-hover:rotate-12 transition-transform duration-300">
+                            <Sparkles className="w-6 h-6" />
+                          </div>
+                        </div>
+
+                        <p className="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed font-medium">
+                          Take our AI-powered quiz to discover workspaces tailored to your specific needs in seconds.
+                        </p>
+
+                        <button className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold py-3.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 group/btn">
+                          Take Workspace Quiz
+                          <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Get Inspired Section */}
+                    <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 shadow-lg border border-slate-100 dark:border-white/5">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white" >Get Inspired</h3>
+                        <button className="text-xs font-medium text-[#EDB003] hover:text-[#d69f03] transition-colors">
+                          See all
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        {inspirationCards.map((card, index) => (
+                          <div
+                            key={index}
+                            className="flex gap-4 p-4 bg-white dark:bg-[#0F172A] hover:bg-slate-50 dark:hover:bg-[#1E293B] rounded-2xl cursor-pointer transition-all duration-300 group border border-slate-100 dark:border-slate-800 hover:border-[#EFAD1A]/30 hover:shadow-md"
+                          >
+                            <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 relative">
+                              <img
+                                src={card.image}
+                                alt={card.title}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0 flex flex-col justify-center">
+                              <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5 line-clamp-1 group-hover:text-[#EFAD1A] transition-colors font-grotesk" >
+                                {card.title}
+                              </h4>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium" >
+                                {card.description}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+              </div>
+            }
+          >
+            {/* Left Panel - Chat Interface - 60-65% - Scrollable Chat Area */}
+            <div className="w-full h-full flex flex-col bg-slate-50 dark:bg-[#0B1120] relative border-r border-slate-200 dark:border-slate-800">
+
+              {/* Chat Content */}
+              <div
+                ref={chatContainerRef}
+                className="flex-1 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth"
+                style={{
+                  height: '100%'
+                }}
+                tabIndex={0}
+                role="region"
+                aria-label="Chat messages"
+                data-lenis-prevent
+                data-lenis-prevent-wheel
+                data-lenis-prevent-touch
+              >
+                {chatMessages.length === 0 ? (
+                  // Empty State
+                  <div className="flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto">
+                    <div className="relative mb-8 group">
+                      <div className="absolute inset-0 bg-[#EFAD1A]/30 rounded-full blur-3xl group-hover:blur-3xl transition-all duration-500 opacity-50"></div>
+                      <div className="w-24 h-24 bg-white dark:bg-[#1E293B] rounded-[2rem] flex items-center justify-center shadow-2xl border border-white/50 dark:border-white/10 relative z-10 group-hover:-translate-y-2 transition-transform duration-500">
+                        <Building2 className="w-10 h-10 text-[#EFAD1A]" />
+                      </div>
+                    </div>
+
+                    <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight font-grotesk">
+                      How can we help your business?
+                    </h2>
+                    <p className="text-slate-500 dark:text-slate-400 mb-12 max-w-lg text-lg leading-relaxed font-normal">
+                      Ask about coworking spaces, virtual offices, compliance, or compare plans instantly.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4">
+                      {/* Suggestions buttons */}
+                      <button
+                        onClick={() => handleQuickAction('Find coworking spaces in Delhi NCR region')}
+                        className="text-left p-6 bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-xl hover:bg-white dark:hover:bg-[#1E293B] shadow-sm hover:shadow-xl hover:shadow-[#EFAD1A]/10 border border-slate-200 dark:border-white/5 hover:border-[#EFAD1A]/50 rounded-[1.5rem] transition-all duration-300 group"
+                      >
+                        <div className="text-base font-bold text-slate-800 dark:text-white group-hover:text-[#EFAD1A] transition-colors mb-1 font-grotesk">Find coworking spaces</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400 font-medium group-hover:text-slate-600 dark:group-hover:text-slate-300">in Delhi NCR region</div>
+                      </button>
+                      <button
+                        onClick={() => handleQuickAction('Help me with GST Registration complete registration process')}
+                        className="text-left p-6 bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-xl hover:bg-white dark:hover:bg-[#1E293B] shadow-sm hover:shadow-xl hover:shadow-[#EFAD1A]/10 border border-slate-200 dark:border-white/5 hover:border-[#EFAD1A]/50 rounded-[1.5rem] transition-all duration-300 group"
+                      >
+                        <div className="text-base font-bold text-slate-800 dark:text-white group-hover:text-[#EFAD1A] transition-colors mb-1 font-grotesk">GST Registration</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400 font-medium group-hover:text-slate-600 dark:group-hover:text-slate-300">Complete registration</div>
+                      </button>
+                      <button
+                        onClick={() => handleQuickAction('Compare workspace plans and find the best deal')}
+                        className="text-left p-6 bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-xl hover:bg-white dark:hover:bg-[#1E293B] shadow-sm hover:shadow-xl hover:shadow-[#EFAD1A]/10 border border-slate-200 dark:border-white/5 hover:border-[#EFAD1A]/50 rounded-[1.5rem] transition-all duration-300 group"
+                      >
+                        <div className="text-base font-bold text-slate-800 dark:text-white group-hover:text-[#EFAD1A] transition-colors mb-1 font-grotesk">Compare plans</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400 font-medium group-hover:text-slate-600 dark:group-hover:text-slate-300">Find the best deal</div>
+                      </button>
+                      <button
+                        onClick={() => handleQuickAction('Check business compliance requirements')}
+                        className="text-left p-6 bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-xl hover:bg-white dark:hover:bg-[#1E293B] shadow-sm hover:shadow-xl hover:shadow-[#EFAD1A]/10 border border-slate-200 dark:border-white/5 hover:border-[#EFAD1A]/50 rounded-[1.5rem] transition-all duration-300 group"
+                      >
+                        <div className="text-base font-bold text-slate-800 dark:text-white group-hover:text-[#EFAD1A] transition-colors mb-1 font-grotesk">Business compliance</div>
+                        <div className="text-sm text-slate-500 dark:text-slate-400 font-medium group-hover:text-slate-600 dark:group-hover:text-slate-300">Check requirements</div>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Chat Messages
+                  <div className="space-y-6 max-w-5xl mx-auto pb-4 w-full">
+                    {chatMessages.map((msg) => (
+                      <div
+                        key={msg.id}
+                        className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                      >
+                        {/* Avatar */}
+                        <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${msg.role === 'user'
+                          ? 'bg-gradient-to-br from-[#EDB003] to-[#F59E0B] border-[#EDB003] text-white'
+                          : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-[#EDB003]'
+                          }`}>
+                          {msg.role === 'user' ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
+                        </div>
+
+                        {/* Message Bubble */}
+                        <div
+                          className={`max-w-[85%] sm:max-w-[85%] px-6 py-4 shadow-sm ${msg.role === 'user'
+                            ? 'bg-gradient-to-br from-[#EDB003] to-[#f59e0b] text-white rounded-2xl rounded-tr-sm'
+                            : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-sm'
+                            }`}
+                        >
+                          {msg.role === 'assistant' && msg.isTyping ? (
+                            <TypewriterEffect
+                              text={msg.content}
+                              onComplete={() => handleTypingComplete(msg.id)}
+                            />
+                          ) : (
+                            <div className={`text-[16px] leading-[1.8] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium font-sans ${msg.role === 'user' ? 'text-white' : 'text-gray-800 dark:text-gray-100'
+                              }`}>
+                              {formatMessage(msg.content)}
+                            </div>
+                          )}
+                          <p className={`text-[10px] mt-2 font-medium tracking-wide opacity-80 ${msg.role === 'user' ? 'text-white' : 'text-gray-400'
+                            }`}>
+                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Loading Indicator */}
+                    {isLoading && (
+                      <div className="flex gap-4">
+                        <div className="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center text-[#EDB003] shadow-sm flex-shrink-0">
+                          <Building2 className="w-5 h-5" />
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-6 py-4 shadow-sm flex items-center gap-2">
+                          <span className="w-2 h-2 bg-[#EDB003] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                          <span className="w-2 h-2 bg-[#EDB003] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                          <span className="w-2 h-2 bg-[#EDB003] rounded-full animate-bounce"></span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
+              {/* Chat Input Floating Card */}
+              <div className="p-4 sm:p-6 bg-transparent pt-20 relative z-20">
+                <div className="max-w-4xl mx-auto relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#EFAD1A]/20 to-amber-400/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                  <div className="relative bg-white dark:bg-[#1E293B] shadow-2xl shadow-slate-200/50 dark:shadow-black/50 rounded-[1.25rem] border border-slate-100 dark:border-white/5 flex items-center p-2 pr-2 gap-2 transition-all group-focus-within:border-[#EFAD1A]/50">
+                    <button className="p-3 text-slate-400 dark:text-slate-400 hover:text-[#EFAD1A] hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors">
+                      <Plus className="w-5 h-5" />
+                    </button>
+                    <input
+                      type="text"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      placeholder="Type a message..."
+                      className="flex-1 bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 placeholder-gray-400 text-[16px] font-medium h-full py-2 min-w-0"
+                    />
+                    <button
+                      onClick={toggleVoiceInput}
+                      className={`p-3 rounded-xl transition-all ${isListening
+                        ? 'text-red-500 bg-red-50 hover:bg-red-100 animate-pulse'
+                        : 'text-gray-400 dark:text-gray-300 hover:text-[#EDB003] hover:bg-yellow-50 dark:hover:bg-gray-800'
+                        }`}
+                      title={isListening ? "Stop listening" : "Start voice input"}
+                    >
+                      <Mic className={`w-5 h-5 ${isListening ? 'fill-current' : ''}`} />
+                    </button>
+                    <button
+                      onClick={handleSendMessage}
+                      className="p-3 bg-black dark:bg-white text-white dark:text-black rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none"
+                      disabled={!message.trim() || isLoading}
+                    >
+                      <Send className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-center text-gray-400 mt-3 font-medium">
+                    FlashSpace AI can make mistakes. Please verify important details.
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
+          </ResizableMapLayout>
         </div>
       </div>
+      {/* Auth Modals */}
+      <LoginModal
+        isOpen={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
+        onSignupClick={() => {
+          setIsLoginOpen(false);
+          setIsSignupOpen(true);
+        }}
+      />
+      <SignupModal
+        isOpen={isSignupOpen}
+        onClose={() => setIsSignupOpen(false)}
+        onLoginClick={() => {
+          setIsSignupOpen(false);
+          setIsLoginOpen(true);
+        }}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-animation";
+import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
 
 const TestimonialsSection = () => {
   const isVisible = useScrollAnimation('testimonials');
@@ -43,7 +44,7 @@ const TestimonialsSection = () => {
   ];
 
   return (
-    <section id="testimonials" className="py-20 px-4 relative overflow-hidden bg-[#ffffff] dark:bg-[#0a0a0a] transition-colors duration-300">
+    <section id="testimonials" className="py-20 px-4 relative bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300">
 
       <div className="container mx-auto relative z-10">
         {/* Section Header */}
@@ -73,7 +74,7 @@ const TestimonialsSection = () => {
                   key={index}
                   className="flex-shrink-0 mx-4 flex items-center justify-center w-52 h-32"
                 >
-                  <div className={`${company.needsInvert ? 'bg-[#172A3A]' : 'bg-white'} border-2 border-gray-200 p-6 w-full h-full flex items-center justify-center hover:shadow-xl transition-all duration-300 rounded-xl group hover:border-[#EDB003] relative overflow-hidden`}>
+                  <div className={`${company.needsInvert ? 'bg-[#172A3A]' : 'bg-white'} border-2 border-gray-200 dark:border-white/10 p-6 w-full h-full flex items-center justify-center hover:shadow-xl transition-all duration-300 rounded-xl group hover:border-[#EDB003] relative overflow-hidden`}>
                     <img
                       src={company.logo}
                       alt={company.name}
@@ -97,7 +98,7 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Client Testimonials */}
-        <div className="text-center mb-8 mt-16">
+        <div className="text-center mb-0 mt-16">
           <h3 className={`text-3xl md:text-4xl font-bold mb-4 text-[#172A3A] dark:text-white ${getAnimationClasses(isVisible, 'fadeInUp', 400)}`} style={{ fontFamily: 'Poppins' }}>
             Great People <span className="text-[#EDB003]">Trust Us</span>
           </h3>
@@ -106,61 +107,38 @@ const TestimonialsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {testimonials.map((testimonial, index) => (
-            <Card
-              key={index}
-              className={`bg-white dark:bg-[#1f1f1f] shadow-md hover:shadow-xl hover:scale-105 border-2 border-gray-200 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] transition-all duration-500 ${getAnimationClasses(isVisible, 'fadeInUp', 600 + index * 100)}`}
-            >
-              <CardContent className="p-6">
-                {/* Quote */}
-                <div className="text-6xl text-[#EDB003]/20 mb-4 font-serif">"</div>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4 font-content">
-                  {testimonial.text}
-                </p>
-
-                {/* Author Info */}
-                <div className="border-t border-gray-200 dark:border-white/10 pt-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#172A3A]/15 to-[#EDB003]/15 rounded-full flex items-center justify-center">
-                      <span className="text-[#172A3A] dark:text-white font-bold text-lg">
-                        {testimonial.author.split(' ').map(name => name[0]).join('')}
-                      </span>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-[#172A3A] dark:text-white font-content">{testimonial.author}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 font-content">{testimonial.position}</div>
-                      <div className="text-sm text-[#EDB003] font-content">{testimonial.company}</div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div className={getAnimationClasses(isVisible, 'fadeInUp', 600)}>
+          <AnimatedTestimonials testimonials={testimonials.map(t => ({
+            quote: t.text,
+            name: t.author,
+            designation: `${t.position}, ${t.company}`,
+            // Using placeholder images as original data didn't have images
+            src: `https://ui-avatars.com/api/?name=${encodeURIComponent(t.author)}&background=random&size=200`
+          }))} />
         </div>
 
         {/* Stats */}
         <Card className={`bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 shadow-lg  ${getAnimationClasses(isVisible, 'fadeInUp', 900)}`}>
           <CardContent className="p-8">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-8 text-center">
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>5000+</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>5000+</div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Happy Clients</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>100+</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>100+</div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Cities Covered</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>10K+</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>10K+</div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Registrations Done</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>98%</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>98%</div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Satisfaction Rate</div>
               </div>
               <div className="group">
-                <div className="text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>&lt;3days</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300" style={{ fontFamily: 'Poppins' }}>&lt;3days</div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">Avg Delivery Time</div>
               </div>
             </div>

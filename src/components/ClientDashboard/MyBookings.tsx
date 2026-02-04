@@ -1,421 +1,635 @@
-
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import userDashboardService, { Booking } from "@/services/userDashboard.service";
 import {
-  Briefcase,
   Building2,
-  Rocket,
-  Wrench,
+  Briefcase,
   MapPin,
+  Calendar as CalendarIcon,
   Clock,
-  CheckCircle2,
-  CreditCard,
-  Truck,
-  Loader2,
-  Info,
+  Download,
+  Eye,
   Filter,
+  Search,
+  ChevronDown,
+  FileText,
+  CheckCircle2,
+  AlertCircle,
+  RefreshCw,
+  X,
+  Loader2,
+  ToggleLeft,
+  ToggleRight,
+  ShieldCheck,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // ✅ for routing
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { Calendar } from "@/components/ui/calender";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+// Type definitions
+type BookingType = "virtual_office" | "coworking_space";
+type BookingStatus = "active" | "expired" | "pending" | "pending_kyc" | "cancelled" | "pending_payment";
 
 const MyBookings: React.FC = () => {
-   const navigate = useNavigate(); // ✅ initialize navigation
-  const services = [
-    { id: "onDemand", title: "On-Demand Services", desc: "Instant workspace solutions and hourly meeting rooms.", icon: Wrench },
-    { id: "virtualOffice", title: "Virtual Office", desc: "Premium business address and mail handling.", icon: Building2 },
-    { id: "coworking", title: "Coworking Spaces", desc: "Collaborative spaces to work, connect, and grow.", icon: Briefcase },
-    { id: "businessSetup", title: "Business Setup", desc: "Start your venture with legal, GST & registration support.", icon: Rocket },
-  ];
-
-  // bookings (dates stored in ISO-like YYYY-MM-DD for exact date filtering)
-  const allBookings = [
-    {
-      id: "BKD-1001",
-      service: "onDemand",
-      workspace: "Meeting Room - Delhi",
-      date: "2025-11-10",
-      time: "10:00 AM - 1:00 PM",
-      city: "Delhi",
-      company: "Talenode Analytics Pvt Ltd",
-      location: "Delhi NCR Workspace Hub",
-      status: "Completed",
-      payment: "Paid",
-      delivery: "Delivered",
-      nextStep: "Closed",
-      kyc: "Verified",
-    },
-    {
-      id: "BKD-1002",
-      service: "virtualOffice",
-      workspace: "Virtual Office - Mumbai",
-      date: "2025-11-09",
-      time: "Full-time access",
-      city: "Mumbai",
-      company: "Volmio Systems LLP",
-      location: "Mumbai Business Park",
-      status: "In Progress",
-      payment: "Paid",
-      delivery: "Documents Pending",
-      nextStep: "Verification Underway",
-      kyc: "Verified",
-    },
-    {
-      id: "BKD-1003",
-      service: "coworking",
-      workspace: "Coworking Space - Bangalore",
-      date: "2025-11-12",
-      time: "09:00 AM - 06:00 PM",
-      city: "Bangalore",
-      company: "NextSpace Solutions",
-      location: "Bangalore Tech Hub",
-      status: "Payment Pending",
-      payment: "Pending",
-      delivery: "Not Started",
-      nextStep: "Awaiting Payment Confirmation",
-      kyc: "Not Verified",
-    },
-    {
-      id: "BKD-1004",
-      service: "businessSetup",
-      workspace: "Company Registration - Patna",
-      date: "2025-11-05",
-      time: "N/A",
-      city: "Patna",
-      company: "StartupHub Pvt Ltd",
-      location: "Remote (Patna HQ)",
-      status: "Delivery in Progress",
-      payment: "Paid",
-      delivery: "Ongoing",
-      nextStep: "Final Document Dispatch",
-      kyc: "Verified",
-    },
-    {
-      id: "BKD-1005",
-      service: "coworking",
-      workspace: "Team Cabin - Pune",
-      date: "2025-11-15",
-      time: "08:00 AM - 08:00 PM",
-      city: "Pune",
-      company: "Techify Hub",
-      location: "Pune Business Bay",
-      status: "Completed",
-      payment: "Paid",
-      delivery: "Completed",
-      nextStep: "Closed",
-      kyc: "Verified",
-    },
-    {
-      id: "BKD-1006",
-      service: "virtualOffice",
-      workspace: "Virtual Office - Chennai",
-      date: "2025-11-20",
-      time: "Full-time access",
-      city: "Chennai",
-      company: "SmartDesk Co.",
-      location: "Chennai Corporate Plaza",
-      status: "In Progress",
-      payment: "Pending",
-      delivery: "Documents Processing",
-      nextStep: "KYC Verification",
-      kyc: "Not Verified",
-    },
-  ];
-
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<"all" | BookingType>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | BookingStatus>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [togglingAutoRenew, setTogglingAutoRenew] = useState<string | null>(null);
+  const [date, setDate] = useState<DateRange | undefined>();
 
-  // all filter fields kept
-  const [filters, setFilters] = useState({
-    userId: "",
-    bookingId: "",
-    email: "",
-    phone: "",
-    company: "",
-    status: "",
-    subStatus: "",
-    kyc: "",
-    city: "",
-    workspace: "",
-    date: "",
-  });
-
-  const topCities = ["Delhi", "Mumbai", "Bangalore", "Hyderabad", "Chennai", "Pune", "Kolkata", "Ahmedabad", "Jaipur", "Lucknow"];
-  const workspaces = ["Stirring Minds - Delhi", "Virtual Office - Mumbai", "Coworking Space - Bangalore", "Company Registration - Patna", "Team Cabin - Pune"];
-
-  const subStatusOptions: Record<string, string[]> = {
-    Active: ["Payment Verified", "Auto-Renew On", "KYC Verified"],
-    "Pending Activation": ["Awaiting Payment", "Awaiting KYC", "Admin Approval Pending"],
-    Suspended: ["Payment Failed", "Verification Failed", "Account Under Review"],
-    Cancelled: ["User Cancelled", "Admin Cancelled", "Non-Renewal"],
-    Expired: ["Not Renewed", "Plan Expired", "Renewal Grace Period Over"],
-    Trial: ["Trial Ongoing", "Trial Expiring Soon"],
-    "Renewal Due": ["Payment Pending", "Renewal Reminder Sent"],
+  const fetchBookings = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await userDashboardService.getBookings({
+        type: activeTab === "all" ? undefined : activeTab,
+        status: statusFilter === "all" ? undefined : statusFilter,
+      });
+      if (response.success && response.data) {
+        setBookings(response.data);
+      } else {
+        setError(response.message || "Failed to load bookings");
+      }
+    } catch (err) {
+      setError("Failed to load bookings");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleChange = (key: string, value: string) => setFilters({ ...filters, [key]: value });
+  useEffect(() => {
+    fetchBookings();
+  }, [activeTab, statusFilter]);
 
-  const resetFilters = () =>
-    setFilters({
-      userId: "",
-      bookingId: "",
-      email: "",
-      phone: "",
-      company: "",
-      status: "",
-      subStatus: "",
-      kyc: "",
-      city: "",
-      workspace: "",
-      date: "",
-    });
+  const handleToggleAutoRenew = async (bookingId: string, currentValue: boolean) => {
+    setTogglingAutoRenew(bookingId);
+    try {
+      const response = await userDashboardService.toggleAutoRenew(bookingId, !currentValue);
+      if (response.success) {
+        setBookings((prev) =>
+          prev.map((b) =>
+            b._id === bookingId ? { ...b, autoRenew: !currentValue } : b
+          )
+        );
+        if (selectedBooking?._id === bookingId) {
+          setSelectedBooking({ ...selectedBooking, autoRenew: !currentValue });
+        }
+      }
+    } catch (err) {
+      console.error("Failed to toggle auto-renew");
+    } finally {
+      setTogglingAutoRenew(null);
+    }
+  };
 
-  // filter logic (keeps all filter fields)
-  const filteredBookings = allBookings.filter((b) => {
-    const matchService = selectedService ? b.service === selectedService : true;
-    const matchStatus = filters.status ? b.status === filters.status : true;
-    const matchSubStatus = filters.subStatus ? (subStatusOptions[filters.status] || []).includes(filters.subStatus) : true;
-    const matchCity = filters.city ? b.city === filters.city : true;
-    const matchKyc = filters.kyc ? b.kyc === filters.kyc : true;
-    const matchCompany = filters.company ? b.company.toLowerCase().includes(filters.company.toLowerCase()) : true;
-    const matchWorkspace = filters.workspace ? b.workspace.includes(filters.workspace) : true;
-    const matchBookingId = filters.bookingId ? b.id.includes(filters.bookingId) : true;
-    const matchDate = filters.date ? b.date === filters.date : true;
-    // userId, email, phone are kept for UI but not matched (placeholder) — you can map them to booking fields if available
-    return matchService && matchStatus && matchSubStatus && matchCity && matchKyc && matchCompany && matchWorkspace && matchBookingId && matchDate;
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (selectedBooking) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [selectedBooking]);
+
+  // Filter bookings client-side for search
+  const filteredBookings = bookings.filter((b) => {
+    const matchSearch =
+      searchQuery === "" ||
+      b.spaceSnapshot?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.bookingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.spaceSnapshot?.city?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Filter by Date Range (Start Date)
+    const matchDate = !date?.from || (
+      new Date(b.startDate || "").getTime() >= date.from.getTime() &&
+      (!date.to || new Date(b.startDate || "").getTime() <= date.to.getTime())
+    );
+
+    return matchSearch && matchDate;
   });
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case "active":
+        return { bg: "bg-green-100", text: "text-green-700", icon: CheckCircle2, label: "Active" };
+      case "expired":
+        return { bg: "bg-gray-100", text: "text-gray-600", icon: Clock, label: "Expired" };
+      case "pending":
+      case "pending_payment":
+        return { bg: "bg-yellow-100", text: "text-yellow-700", icon: AlertCircle, label: "Payment Pending" };
+      case "pending_kyc":
+        return { bg: "bg-yellow-100", text: "text-yellow-700", icon: AlertCircle, label: "Pending KYC" };
+      case "cancelled":
+        return { bg: "bg-red-100", text: "text-red-700", icon: X, label: "Cancelled" };
+      default:
+        return { bg: "bg-gray-100", text: "text-gray-600", icon: Clock, label: status };
+    }
+  };
+
+  const calculateDaysRemaining = (endDate: string) => {
+    const end = new Date(endDate);
+    const today = new Date();
+    const diffTime = end.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  // Stats
+  const stats = {
+    total: bookings.length,
+    active: bookings.filter((b) => b.status === "active").length,
+    virtualOffice: bookings.filter((b) => b.type === "virtual_office").length,
+    coworking: bookings.filter((b) => b.type === "coworking_space").length,
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 text-yellow-500 animate-spin mx-auto mb-4" />
+          <p className="text-gray-500">Loading bookings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <p className="text-gray-700 font-medium mb-2">{error}</p>
+          <button
+            onClick={fetchBookings}
+            className="px-4 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2 mx-auto"
+          >
+            <RefreshCw className="w-4 h-4" /> Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-yellow-50 py-10 px-6 font-[Geist]">
-      {/* HEADER */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-[Poppins] font-bold text-slate-900">
-          My <span className="text-yellow-400">Bookings</span>
-        </h1>
-        <p className="text-slate-600 mt-3 max-w-2xl mx-auto text-base">
-          Select a service below to view, filter, and manage your workspace bookings.
-        </p>
-      </div>
-
-      {/* SERVICE CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-16">
-        {services.map((service) => {
-          const Icon = service.icon;
-          const isSelected = selectedService === service.id;
-          return (
-            <div
-              key={service.id}
-              onClick={() => setSelectedService(service.id)}
-              className={`cursor-pointer p-6 rounded-2xl border flex flex-col justify-between transition-all duration-300 ${
-                isSelected
-                  ? "bg-yellow-400 text-black border-yellow-500 shadow-lg"
-                  : "bg-white border-slate-200 shadow-md hover:shadow-lg"
-              }`}
-            >
-              <div>
-                <Icon className={`w-8 h-8 mb-4 ${isSelected ? "text-black" : "text-yellow-400"}`} />
-                <h3 className="text-xl font-semibold font-[Poppins] mb-2">{service.title}</h3>
-                <p className={`text-sm ${isSelected ? "text-slate-800" : "text-slate-600"}`}>{service.desc}</p>
-              </div>
-              <div className="mt-5 text-right text-sm font-medium">{isSelected ? "Selected ✓" : "View →"}</div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* BOOKINGS SECTION */}
-      {selectedService && (
-        <div className="max-w-7xl mx-auto transition-all duration-500">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-[Poppins] font-bold text-slate-900 flex items-center gap-2">
-              {services.find((s) => s.id === selectedService)?.title} <span className="text-yellow-400">Bookings</span>
-            </h2>
-
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 bg-yellow-400 text-black font-semibold px-4 py-2 rounded-lg hover:bg-yellow-500 transition"
-            >
-              <Filter className="w-5 h-5" /> Filters
-            </button>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold font-[Poppins] text-gray-900">
+              My <span className="text-yellow-500">Bookings</span>
+            </h1>
+            <p className="text-gray-500 mt-1">Manage your virtual offices and coworking spaces</p>
           </div>
+          <a
+            href="/services/virtual-office"
+            className="inline-flex items-center gap-2 bg-yellow-400 text-black px-5 py-2.5 rounded-lg font-medium hover:bg-yellow-500 transition-colors"
+          >
+            <Building2 className="w-4 h-4" />
+            Book New Space
+          </a>
+        </div>
 
-          {/* FILTER PANEL */}
-          {showFilters && (
-            <div className="bg-white shadow-md rounded-2xl p-6 mb-8 border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-[Poppins]">
-              <input type="text" placeholder="User ID" value={filters.userId} onChange={(e) => handleChange("userId", e.target.value)} className="border border-slate-300 rounded-lg p-2" />
-              <input type="text" placeholder="Booking ID" value={filters.bookingId} onChange={(e) => handleChange("bookingId", e.target.value)} className="border border-slate-300 rounded-lg p-2" />
-              <input type="email" placeholder="Email" value={filters.email} onChange={(e) => handleChange("email", e.target.value)} className="border border-slate-300 rounded-lg p-2" />
-              <input type="text" placeholder="Phone No." value={filters.phone} onChange={(e) => handleChange("phone", e.target.value)} className="border border-slate-300 rounded-lg p-2" />
-              <input type="text" placeholder="Company" value={filters.company} onChange={(e) => handleChange("company", e.target.value)} className="border border-slate-300 rounded-lg p-2" />
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+            <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+            <p className="text-sm text-gray-500">Total Bookings</p>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+            <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+            <p className="text-sm text-gray-500">Active</p>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+            <p className="text-2xl font-bold text-yellow-600">{stats.virtualOffice}</p>
+            <p className="text-sm text-gray-500">Virtual Offices</p>
+          </div>
+          <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+            <p className="text-2xl font-bold text-blue-600">{stats.coworking}</p>
+            <p className="text-sm text-gray-500">Coworking</p>
+          </div>
+        </div>
 
-              <select value={filters.status} onChange={(e) => { handleChange("status", e.target.value); handleChange("subStatus", ""); }} className="border border-slate-300 rounded-lg p-2 font-[Poppins]">
-                <option value="">Subscription Status</option>
-                <option>Active</option>
-                <option>Expired</option>
-                <option>Pending Activation</option>
-                <option>Suspended</option>
-                <option>Cancelled</option>
-                <option>Trial</option>
-                <option>Renewal Due</option>
-                <option>Completed</option>
-              </select>
-
-              <select value={filters.subStatus} onChange={(e) => handleChange("subStatus", e.target.value)} className="border border-slate-300 rounded-lg p-2 font-[Poppins]">
-                <option value="">Subscription Sub Status</option>
-                {filters.status &&
-                  subStatusOptions[filters.status]?.map((sub) => (
-                    <option key={sub}>{sub}</option>
-                  ))}
-              </select>
-
-              <select value={filters.kyc} onChange={(e) => handleChange("kyc", e.target.value)} className="border border-slate-300 rounded-lg p-2 font-[Poppins]">
-                <option value="">KYC Type</option>
-                <option>Verified</option>
-                <option>Not Verified</option>
-              </select>
-
-              <input type="date" value={filters.date} onChange={(e) => handleChange("date", e.target.value)} className="border border-slate-300 rounded-lg p-2" />
-
-              <select value={filters.city} onChange={(e) => handleChange("city", e.target.value)} className="border border-slate-300 rounded-lg p-2 font-[Poppins]">
-                <option value="">Cities</option>
-                {topCities.map((city) => (
-                  <option key={city}>{city}</option>
-                ))}
-              </select>
-
-              <select value={filters.workspace} onChange={(e) => handleChange("workspace", e.target.value)} className="border border-slate-300 rounded-lg p-2 font-[Poppins]">
-                <option value="">Workspaces</option>
-                {workspaces.map((space) => (
-                  <option key={space}>{space}</option>
-                ))}
-              </select>
-
-              <div className="flex gap-2 col-span-full mt-2">
-                <button onClick={() => setFilters({ ...filters })} className="bg-yellow-400 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500">Apply Filters</button>
-                <button onClick={resetFilters} className="border border-slate-300 px-4 py-2 rounded-lg font-semibold hover:bg-slate-100">Reset</button>
-              </div>
-            </div>
-          )}
-
-          {/* BOOKINGS CARD LIST */}
-          
-
-{filteredBookings.length > 0 ? (
-  <div className="space-y-5">
-    {filteredBookings.map((b) => {
-      let borderColor = "border-slate-300";
-      if (b.status === "Completed") borderColor = "border-green-500";
-      else if (b.status === "In Progress") borderColor = "border-yellow-500";
-      else if (b.status === "Payment Pending") borderColor = "border-orange-500";
-      else if (b.status === "Delivery in Progress") borderColor = "border-blue-500";
-
-      return (
-        <div
-          key={b.id}
-          className={`bg-white p-6 rounded-2xl shadow-md border-l-4 ${borderColor} w-full hover:shadow-lg transition-all duration-300`}
-        >
-          {/* GRID: Left top, middle center, right top-aligned */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start relative">
-            
-            {/* LEFT SIDE - Top aligned */}
-            <div className="flex flex-col justify-start">
-              <h3 className="text-lg font-[Poppins] font-semibold">{b.workspace}</h3>
-              <p className="text-sm text-slate-600 font-[Geist] flex items-center mt-1">
-                <Clock className="w-4 h-4 mr-1 text-yellow-400" /> {b.date} • {b.time}
-              </p>
-              <p className="text-sm text-slate-600 font-[Geist] flex items-center mt-1">
-                <MapPin className="w-4 h-4 mr-1 text-yellow-400" /> {b.location}
-              </p>
+        {/* Filters Bar */}
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Service Type Tabs */}
+            <div className="flex gap-2">
+              {[
+                { id: "all", label: "All", icon: null },
+                { id: "virtual_office", label: "Virtual Office", icon: Building2 },
+                { id: "coworking_space", label: "Coworking", icon: Briefcase },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
+                    ? "bg-yellow-400 text-black"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                >
+                  {tab.icon && <tab.icon className="w-4 h-4" />}
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
-            {/* MIDDLE - aligned center */}
-            <div className="flex flex-col justify-center">
-              <p className="text-sm text-slate-700">
-                <span className="font-[Poppins] font-semibold">Company:</span> {b.company}
-              </p>
-              <p className="text-sm text-slate-700 mt-1">
-                <span className="font-[Poppins] font-semibold">City:</span> {b.city}
-              </p>
-              <p className="text-sm text-slate-700 mt-1">
-                <span className="font-[Poppins] font-semibold">KYC:</span> {b.kyc}
-              </p>
-              <p className="text-sm text-slate-700 mt-1">
-                <span className="font-[Poppins] font-semibold">Booking ID:</span> {b.id}
-              </p>
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by name, ID, or city..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+              />
             </div>
 
-            {/* RIGHT SIDE - top aligned with left, with View Details on top-right */}
-            <div className="flex flex-col justify-start items-end text-right relative">
-              {/* View Details */}
-              <button
-                onClick={() => navigate(`/client/viewdetails/${b.id}`)} // ✅ navigation added
-                className="absolute -top-4 right-0 text-sm font-[Poppins] font-semibold text-blue-600 hover:underline"
-              >
-                View Details
-              </button>
-
-              {/* Right section data - top aligned same as left */}
-              <div className="mt-0">
-                <p className="text-sm text-slate-700">
-                  <span className="font-[Poppins] font-semibold">Payment:</span> {b.payment}
-                </p>
-                <p className="text-sm text-slate-700 mt-1">
-                  <span className="font-[Poppins] font-semibold">Delivery:</span> {b.delivery}
-                </p>
-                <p className="text-sm text-slate-700 mt-1">
-                  <span className="font-[Poppins] font-semibold">Next Step:</span> {b.nextStep}
-                </p>
-                <p className="text-sm mt-2">
-                  <span
-                    className="inline-block px-3 py-1 rounded-full text-xs font-semibold"
-                    style={{
-                      background:
-                        b.status === "Completed"
-                          ? "#ecfdf5"
-                          : b.status === "In Progress"
-                          ? "#fffbeb"
-                          : b.status === "Payment Pending"
-                          ? "#fff7ed"
-                          : "#eff6ff",
-                      color:
-                        b.status === "Completed"
-                          ? "#065f46"
-                          : b.status === "In Progress"
-                          ? "#92400e"
-                          : b.status === "Payment Pending"
-                          ? "#9a3412"
-                          : "#1e40af",
-                    }}
+            {/* Date Range Picker */}
+            <div className="relative">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="date"
+                    variant={"outline"}
+                    className={cn(
+                      "w-[260px] justify-start text-left font-normal border-gray-200 hover:bg-gray-50",
+                      !date && "text-muted-foreground"
+                    )}
                   >
-                    {b.status}
-                  </span>
-                </p>
-              </div>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date?.from ? (
+                      date.to ? (
+                        <>
+                          {format(date.from, "LLL dd, y")} -{" "}
+                          {format(date.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(date.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-white" align="end">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={setDate}
+                    numberOfMonths={2}
+                  />
+                </PopoverContent>
+              </Popover>
+              {date && (
+                <button
+                  onClick={() => setDate(undefined)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full"
+                >
+                  <X className="w-3 h-3 text-gray-400" />
+                </button>
+              )}
+            </div>
+
+            {/* Status Filter */}
+            <div className="relative">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Filter className="w-4 h-4" />
+                Status
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {showFilters && (
+                <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[150px]">
+                  {["all", "active", "pending", "expired", "cancelled"].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => {
+                        setStatusFilter(status as typeof statusFilter);
+                        setShowFilters(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${statusFilter === status ? "bg-yellow-50 text-yellow-700" : ""
+                        }`}
+                    >
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
-      );
-    })}
-  </div>
-) : (
-  <p className="text-center text-slate-600 font-[Geist] py-8">
-    No bookings found matching filters.
-  </p>
-)}
 
+        {/* Bookings List */}
+        {filteredBookings.length === 0 ? (
+          <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-100">
+            <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No bookings found</h3>
+            <p className="text-gray-500 mb-6">
+              {searchQuery ? "Try adjusting your search or filters" : "Book your first workspace to get started"}
+            </p>
+            <a
+              href="/services/virtual-office"
+              className="inline-flex items-center gap-2 bg-yellow-400 text-black px-6 py-2.5 rounded-lg font-medium hover:bg-yellow-500 transition-colors"
+            >
+              Browse Spaces
+            </a>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredBookings.map((booking) => {
+              const statusConfig = getStatusConfig(booking.status);
+              const daysRemaining = calculateDaysRemaining(booking.endDate || "");
+              const isExpiring = booking.status === "active" && daysRemaining <= 30;
 
-        </div>
-      )}
+              return (
+                <div
+                  key={booking._id}
+                  className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <div className="flex flex-col md:flex-row">
+                    {/* Image */}
+                    <div className="md:w-48 h-32 md:h-auto relative">
+                      <img
+                        src={booking.spaceSnapshot?.images?.[0] || booking.spaceSnapshot?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"}
+                        alt={booking.spaceSnapshot?.name || "Space"}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-3 left-3">
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium ${booking.type === "virtual_office"
+                            ? "bg-yellow-400 text-black"
+                            : "bg-blue-500 text-white"
+                            }`}
+                        >
+                          {booking.type === "virtual_office" ? "Virtual Office" : "Coworking"}
+                        </span>
+                      </div>
+                    </div>
 
-      {/* FONT IMPORTS */}
-      <style jsx global>{`
-        @font-face {
-          font-family: "Poppins";
-          src: url("/fonts/Poppins-Regular.ttf") format("truetype");
-        }
-        @font-face {
-          font-family: "Geist";
-          src: url("/fonts/Geist-Regular.ttf") format("truetype");
-        }
-      `}</style>
+                    {/* Content */}
+                    <div className="flex-1 p-5">
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        {/* Left Info */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-semibold text-gray-900">{booking.spaceSnapshot?.name}</h3>
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
+                              <statusConfig.icon className="w-3 h-3" />
+                              {statusConfig.label}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-500 flex items-center gap-1 mb-2">
+                            <MapPin className="w-3.5 h-3.5" /> {booking.spaceSnapshot?.address}, {booking.spaceSnapshot?.city}
+                          </p>
+
+                          <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-3">
+                            <span className="flex items-center gap-1">
+                              <CalendarIcon className="w-4 h-4 text-gray-400" />
+                              {formatDate(booking.startDate || "")} - {formatDate(booking.endDate || "")}
+                            </span>
+                            <span className="font-medium">Plan: {booking.plan.name}</span>
+                            <span className="font-semibold text-gray-900">{formatCurrency(booking.plan.price)}/{booking.plan.tenure} {booking.plan.tenureUnit}</span>
+                          </div>
+
+                          {/* Features Pills */}
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            {booking.plan.gstIncluded && (
+                              <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full">GST Included</span>
+                            )}
+                            {booking.autoRenew && (
+                              <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">Auto Renew</span>
+                            )}
+                            {isExpiring && (
+                              <span className="px-2 py-1 bg-orange-50 text-orange-700 text-xs rounded-full flex items-center gap-1">
+                                <RefreshCw className="w-3 h-3" /> Renews in {daysRemaining} days
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Right Actions */}
+                        <div className="flex flex-row md:flex-col gap-2 md:items-end">
+                          <button
+                            onClick={() => setSelectedBooking(booking)}
+                            className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                          >
+                            <Eye className="w-4 h-4" /> View Details
+                          </button>
+                          {booking.status === "pending_kyc" && (
+                            <button
+                              onClick={() => navigate(`/dashboard/kyc-verification?linkBookingId=${booking._id}`)}
+                              className="flex items-center gap-1.5 px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors"
+                            >
+                              <ShieldCheck className="w-4 h-4" /> Verify Now
+                            </button>
+                          )}
+                          {booking.documents && booking.documents.length > 0 && (
+                            <button className="flex items-center gap-1.5 px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors">
+                              <Download className="w-4 h-4" /> Documents
+                            </button>
+                          )}
+                          {booking.status === "active" && (
+                            <button
+                              onClick={() => handleToggleAutoRenew(booking._id, booking.autoRenew)}
+                              disabled={togglingAutoRenew === booking._id}
+                              className="flex items-center gap-1.5 px-4 py-2 border border-yellow-400 text-yellow-600 rounded-lg text-sm font-medium hover:bg-yellow-50 transition-colors disabled:opacity-50"
+                            >
+                              {togglingAutoRenew === booking._id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : booking.autoRenew ? (
+                                <ToggleRight className="w-4 h-4" />
+                              ) : (
+                                <ToggleLeft className="w-4 h-4" />
+                              )}
+                              {booking.autoRenew ? "Auto Renew On" : "Auto Renew Off"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Booking Detail Modal */}
+        {selectedBooking && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+              <div className="relative">
+                <img
+                  src={selectedBooking.spaceSnapshot?.images?.[0] || selectedBooking.spaceSnapshot?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"}
+                  alt={selectedBooking.spaceSnapshot?.name}
+                  className="w-full h-48 object-cover"
+                />
+                <button
+                  onClick={() => setSelectedBooking(null)}
+                  className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-4 left-4">
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${selectedBooking.type === "virtual_office"
+                      ? "bg-yellow-400 text-black"
+                      : "bg-blue-500 text-white"
+                      }`}
+                  >
+                    {selectedBooking.type === "virtual_office" ? "Virtual Office" : "Coworking"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">{selectedBooking.spaceSnapshot?.name}</h2>
+                    <p className="text-gray-500 flex items-center gap-1 mt-1">
+                      <MapPin className="w-4 h-4" /> {selectedBooking.spaceSnapshot?.address}
+                    </p>
+                  </div>
+                  <span
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${getStatusConfig(selectedBooking.status).bg
+                      } ${getStatusConfig(selectedBooking.status).text}`}
+                  >
+                    {getStatusConfig(selectedBooking.status).label}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">Booking ID</p>
+                    <p className="text-sm font-semibold">{selectedBooking.bookingNumber}</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">Plan</p>
+                    <p className="text-sm font-semibold">{selectedBooking.plan.name}</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">Start Date</p>
+                    <p className="text-sm font-semibold">{formatDate(selectedBooking.startDate || "")}</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">End Date</p>
+                    <p className="text-sm font-semibold">{formatDate(selectedBooking.endDate || "")}</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">Amount</p>
+                    <p className="text-sm font-semibold">{formatCurrency(selectedBooking.plan.price)}/{selectedBooking.plan.tenure} {selectedBooking.plan.tenureUnit}</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-xs text-gray-500">City</p>
+                    <p className="text-sm font-semibold">{selectedBooking.spaceSnapshot?.city}</p>
+                  </div>
+                </div>
+
+                {/* Documents */}
+                {selectedBooking.documents && selectedBooking.documents.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-gray-900 mb-3">Documents</h3>
+                    <div className="space-y-2">
+                      {selectedBooking.documents.map((doc, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        >
+                          <div className="flex items-center gap-3">
+                            <FileText className="w-5 h-5 text-gray-400" />
+                            <span className="text-sm font-medium">{doc.name}</span>
+                          </div>
+                          <a
+                            href={doc.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-yellow-600 hover:text-yellow-700 font-medium text-sm"
+                          >
+                            Download
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Auto Renew Toggle */}
+                {selectedBooking.status === "active" && (
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-gray-900">Auto Renew</p>
+                      <p className="text-sm text-gray-500">Automatically renew before expiry</p>
+                    </div>
+                    <button
+                      onClick={() => handleToggleAutoRenew(selectedBooking._id, selectedBooking.autoRenew)}
+                      disabled={togglingAutoRenew === selectedBooking._id}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedBooking.autoRenew
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 text-gray-600"
+                        }`}
+                    >
+                      {togglingAutoRenew === selectedBooking._id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : selectedBooking.autoRenew ? (
+                        "Enabled"
+                      ) : (
+                        "Disabled"
+                      )}
+                    </button>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setSelectedBooking(null)}
+                    className="flex-1 border border-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

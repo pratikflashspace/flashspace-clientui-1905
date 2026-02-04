@@ -93,7 +93,7 @@ const ContactSection = () => {
   ];
 
   return (
-    <section id="contact" className="py-20 px-4 relative overflow-hidden bg-[#ffffff] dark:bg-[#0a0a0a] transition-colors duration-300">
+    <section id="contact" className="py-20 px-4 relative overflow-hidden bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300">
 
       <div className="container mx-auto relative z-10">
         {/* Section Header */}
@@ -237,11 +237,11 @@ const ContactSection = () => {
           {contactInfo.map((info, index) => (
             <Card
               key={index}
-              className={`relative overflow-hidden border-2 border-gray-200 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] transition-all duration-300 cursor-pointer group shadow-sm hover:shadow-lg ${getAnimationClasses(isVisible, 'fadeInUp', 800 + index * 100)}`}
+              className={`relative overflow-hidden border-2 border-gray-200 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] transition-all duration-300 cursor-pointer group shadow-sm hover:shadow-lg bg-white dark:bg-[#1f1f1f] ${getAnimationClasses(isVisible, 'fadeInUp', 800 + index * 100)}`}
               onClick={() => window.open(info.href, '_blank')}
             >
               {/* Transparent Gradient Overlay Background */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${info.bgColor}`}></div>
+              <div className={`absolute inset-0 bg-gradient-to-br ${info.bgColor} dark:opacity-10`}></div>
 
               <CardContent className="relative p-6 sm:p-8 text-center min-h-[280px] flex flex-col justify-between">
                 {/* Icon Container */}
@@ -252,8 +252,8 @@ const ContactSection = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-[#172A3A] mb-3 text-lg sm:text-xl">{info.title}</h3>
-                  <p className="text-gray-700 mb-4 font-medium text-sm sm:text-base">{info.content}</p>
+                  <h3 className="font-bold text-[#172A3A] dark:text-white mb-3 text-lg sm:text-xl">{info.title}</h3>
+                  <p className="text-gray-700 dark:text-gray-300 mb-4 font-medium text-sm sm:text-base">{info.content}</p>
                 </div>
 
                 <Button

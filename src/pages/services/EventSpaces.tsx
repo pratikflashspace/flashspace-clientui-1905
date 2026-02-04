@@ -14,7 +14,7 @@ import { cityCenters } from "@/components/Map/locationData.example";
 import Header from "@/components/Header";
 import MapSection from "@/components/services/MapSection";
 import SearchHeader from "@/components/services/SearchHeader";
-import ListingCard from "@/components/services/ListingCard";
+import ListingCardModern from "@/components/services/ListingCardModern";
 import ResizableMapLayout from "@/components/services/ResizableMapLayout";
 import {
   City,
@@ -282,6 +282,12 @@ const EventSpaces = () => {
     if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
     if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
     if (["jammu"].includes(cityKeyFromState)) return cityCenters.jammu;
+    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
+    if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
+    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
+    if (["lucknow"].includes(cityKeyFromState)) return cityCenters.lucknow;
+    if (["surat"].includes(cityKeyFromState)) return cityCenters.surat;
+    if (["noida"].includes(cityKeyFromState)) return cityCenters.noida;
     return cityCenters.delhi;
   }, [selectedCity]);
 
@@ -305,7 +311,7 @@ const EventSpaces = () => {
   }, [typedEventSpaces, resolvedCenter]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-white">
       {/* Header */}
       <div className="flex-shrink-0">
         <Header />
@@ -484,17 +490,9 @@ const EventSpaces = () => {
 
           {/* Results Header */}
           <div className={`flex items-center justify-between mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-            <div className="flex items-center gap-4">
-              <p className="text-gray-600">
-                Showing <span className="font-semibold text-gray-900">{citySpaces.length} result(s)</span> for event spaces in {selectedCity}
-              </p>
-              <Button variant="ghost" size="sm" className="text-primary text-sm">
-                📍 Compare Venues
-              </Button>
-              <Button variant="ghost" size="sm" className="text-primary text-sm">
-                💡 Find the ideal venue for you
-              </Button>
-            </div>
+            <p className="text-gray-600">
+              Showing <span className="font-semibold text-gray-900">{citySpaces.length} result(s)</span> for event spaces in {selectedCity}
+            </p>
             
             <div className="flex items-center gap-2">
               <Button 
@@ -519,106 +517,44 @@ const EventSpaces = () => {
           </div>
 
           {/* Event Space Listings */}
-          <div className={`grid gap-4 mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'} ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
-            {citySpaces.map((space) => {
-              let imageSrc = "";
-              switch (space.name) {
-                case "Grand Imperial Hall": imageSrc = "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80&fit=crop&auto=format"; break;
-                case "Tech Summit Center": imageSrc = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80&fit=crop&auto=format"; break;
-                case "Heritage Banquet": imageSrc = "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&q=80&fit=crop&auto=format"; break;
-                case "Modern Event Space": imageSrc = "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80&fit=crop&auto=format"; break;
-                case "BKC Grand Ballroom": imageSrc = "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80&fit=crop&auto=format"; break;
-                case "Worli Convention Hall": imageSrc = "https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=800&q=80&fit=crop&auto=format"; break;
-                case "Andheri Event Center": imageSrc = "https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=800&q=80&fit=crop&auto=format"; break;
-                case "Tech Valley Auditorium": imageSrc = "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80&fit=crop&auto=format"; break;
-                case "Whitefield Conference": imageSrc = "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800&q=80&fit=crop&auto=format"; break;
-                case "HSR Event Plaza": imageSrc = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80&fit=crop&auto=format"; break;
-                case "Hinjewadi IT Convention": imageSrc = "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&q=80&fit=crop&auto=format"; break;
-                case "Koregaon Premium Hall": imageSrc = "https://images.unsplash.com/photo-1569012871812-f38ee64cd54c?w=800&q=80&fit=crop&auto=format"; break;
-                default: imageSrc = "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80&fit=crop&auto=format";
-              }
+          <div className={`grid gap-4 mb-8 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'} ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
+            {citySpaces.map((space, index) => {
+              const imageMap: Record<string, string> = {
+                "Grand Imperial Hall": "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80&fit=crop&auto=format",
+                "Tech Summit Center": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80&fit=crop&auto=format",
+                "Heritage Banquet": "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&q=80&fit=crop&auto=format",
+                "Modern Event Space": "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80&fit=crop&auto=format",
+                "BKC Grand Ballroom": "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80&fit=crop&auto=format",
+                "Worli Convention Hall": "https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=800&q=80&fit=crop&auto=format",
+                "Andheri Event Center": "https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=800&q=80&fit=crop&auto=format",
+                "Tech Valley Auditorium": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80&fit=crop&auto=format",
+                "Whitefield Conference": "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800&q=80&fit=crop&auto=format",
+                "HSR Event Plaza": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80&fit=crop&auto=format",
+                "Hinjewadi IT Convention": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&q=80&fit=crop&auto=format",
+                "Koregaon Premium Hall": "https://images.unsplash.com/photo-1569012871812-f38ee64cd54c?w=800&q=80&fit=crop&auto=format"
+              };
+              const imageSrc = imageMap[space.name] || "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80&fit=crop&auto=format";
+              
+              // Transform to ListingCardModern format
+              const transformedSpace = {
+                _id: space.id,
+                name: space.name,
+                address: space.address,
+                area: space.area,
+                price: space.price,
+                rating: space.rating,
+                reviews: space.reviews,
+                features: space.features,
+                image: imageSrc
+              };
               
               return (
-                <Card key={space.id} className="bg-white shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 rounded-lg overflow-hidden group">
-                  <div className="relative">
-                    <img src={imageSrc} alt={space.name} className="w-full h-48 object-cover" />
-                    
-                    {/* Badges */}
-                    <div className="absolute top-3 left-3 flex gap-2">
-                      {space.popular && (
-                        <span className="bg-[#EDB003] text-white text-xs px-2 py-1 rounded font-medium">
-                          🔥 Popular
-                        </span>
-                      )}
-                      <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded font-medium">
-                        {space.type}
-                      </span>
-                    </div>
-                    
-                    <div className="absolute top-3 right-3 bg-green-600 text-white px-2 py-1 rounded flex items-center gap-1 text-xs font-medium">
-                      <Star className="w-3 h-3 fill-current" />
-                      {space.rating}
-                    </div>
-
-                    {/* Capacity */}
-                    <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium text-gray-700">
-                      Capacity: {space.capacity}
-                    </div>
-                  </div>
-                  
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="font-semibold text-lg text-gray-900 mb-1 group-hover:text-primary transition-colors">
-                          {space.name}
-                        </h3>
-                        <div className="flex items-center gap-1 text-gray-600 text-sm mb-2">
-                          <MapPin className="w-4 h-4 flex-shrink-0" />
-                          <span>{space.address}</span>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-500">
-                        ♡
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="font-medium">{space.rating}</span>
-                        <span className="text-gray-500">({space.reviews} Reviews)</span>
-                      </div>
-                    </div>
-
-                    <div className="mb-3">
-                      <p className="text-xs text-gray-600 mb-1">Starting price (negotiable)</p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-gray-900">{space.price}</span>
-                        <span className="text-sm text-gray-500 line-through">{space.originalPrice}</span>
-                      </div>
-                      <p className="text-xs text-gray-600">/ day</p>
-                    </div>
-
-                    <div className="mb-4">
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {space.features.slice(0, 3).map((feature, idx) => (
-                          <span key={idx} className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-200">
-                            {feature}
-                          </span>
-                        ))}
-                        {space.features.length > 3 && (
-                          <span className="text-xs text-gray-500">+{space.features.length - 3} more</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button className="flex-1 bg-primary hover:bg-primary/90 text-white">
-                        Get best price
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ListingCardModern
+                  key={space.id}
+                  item={transformedSpace}
+                  index={index}
+                  onClick={() => navigate(`/event-spaces/${space.id}`)}
+                />
               );
             })}
           </div>

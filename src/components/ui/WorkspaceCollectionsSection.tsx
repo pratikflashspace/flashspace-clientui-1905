@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Monitor, Users, Building2, ArrowRight } from "lucide-react";
+import { Monitor, Users, Building2, ArrowRight, Presentation } from "lucide-react";
 
 const WorkspaceCollectionsSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -45,16 +45,16 @@ const WorkspaceCollectionsSection = () => {
       accentColor: "bg-purple-600"
     },
     {
-      icon: Building2,
-      title: "Private Offices",
-      description: "Fully furnished private offices for teams of all sizes. Your own space with premium amenities included.",
+      icon: Presentation,
+      title: "Meeting Rooms",
+      description: "On-demand meeting rooms and conference halls equipped with premium AV and video conferencing tools.",
       images: [
-        "https://images.unsplash.com/photo-1497366672149-e5e4b4d34eb3?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=400&h=300&fit=crop",
-        "https://images.unsplash.com/photo-1497366858526-0766cadbe8fa?w=400&h=300&fit=crop"
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1517502884422-41e157d2ed22?w=400&h=300&fit=crop",
+        "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400&h=300&fit=crop"
       ],
-      bgColor: "bg-emerald-50",
-      accentColor: "bg-emerald-600"
+      bgColor: "bg-amber-50",
+      accentColor: "bg-amber-600"
     }
   ];
 
@@ -97,26 +97,26 @@ const WorkspaceCollectionsSection = () => {
                 <div className="relative h-64 overflow-hidden">
                   {/* Main large image */}
                   <div className="absolute top-4 left-4 right-20 h-40 rounded-2xl overflow-hidden shadow-xl transform -rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                    <img 
-                      src={collection.images[0]} 
+                    <img
+                      src={collection.images[0]}
                       alt={collection.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  
+
                   {/* Small top right image */}
                   <div className="absolute top-4 right-4 w-24 h-24 rounded-xl overflow-hidden shadow-lg transform rotate-6 group-hover:rotate-3 transition-transform duration-500">
-                    <img 
-                      src={collection.images[1]} 
+                    <img
+                      src={collection.images[1]}
                       alt={collection.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  
+
                   {/* Small bottom right image */}
                   <div className="absolute top-32 right-4 w-28 h-28 rounded-xl overflow-hidden shadow-lg transform rotate-12 group-hover:rotate-6 transition-transform duration-500">
-                    <img 
-                      src={collection.images[2]} 
+                    <img
+                      src={collection.images[2]}
                       alt={collection.title}
                       className="w-full h-full object-cover"
                     />

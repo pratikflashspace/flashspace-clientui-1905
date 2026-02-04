@@ -21,8 +21,12 @@ export interface VirtualOfficeItem {
   price: string;
   originalPrice: string;
   gstPlanPrice: string;
+  gstPlanPriceYearly?: string;
   mailingPlanPrice: string;
+  mailingPlanPriceYearly?: string;
   brPlanPrice: string;
+  brPlanPriceYearly?: string;
+  priceYearly?: string;
   rating: number;
   reviews: number;
   features: string[];
@@ -57,7 +61,7 @@ export interface EventSpaceItem {
   reviews: number;
   type: string;
   capacity: string;
-  features: string[];           
+  features: string[];
   area: string;
   availability: string;
   popular: boolean;
@@ -80,10 +84,8 @@ export interface CoworkingSpaceItem {
   city: string;
   area: string;
   price: string;
+  priceYearly?: string;
   originalPrice: string;
-  gstPlanPrice: string;
-  mailingPlanPrice: string;
-  brPlanPrice: string;
   rating: number;
   reviews: number;
   type: string;
@@ -104,6 +106,37 @@ export interface CoworkingSpaceItem {
 
 export type CoworkingSpaceCityKey = 'delhi' | 'mumbai' | 'bangalore' | 'pune';
 export type CoworkingSpacesByCity = Record<CoworkingSpaceCityKey, CoworkingSpaceItem[]>;
+
+// Meeting Room specific types
+export interface MeetingRoomItem {
+  _id: string;
+  name: string;
+  address: string;
+  city: string;
+  area: string;
+  price: string; // e.g., "₹1,000/hour"
+  originalPrice?: string;
+  rating: number;
+  reviews: number;
+  type: string; // e.g. "Meeting Room", "Conference Room", "Cabin"
+  features: string[];
+  availability: string;
+  popular: boolean;
+  image?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  capacity?: string;
+  isDeleted?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+}
+
+export type MeetingRoomCityKey = 'delhi' | 'mumbai' | 'bangalore' | 'pune' | 'ahmedabad' | 'chandigarh';
+export type MeetingRoomsByCity = Record<MeetingRoomCityKey, MeetingRoomItem[]>;
 
 // Business Setup specific types
 export interface BusinessSetupFeature {
