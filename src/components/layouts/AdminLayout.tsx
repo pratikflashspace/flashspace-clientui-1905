@@ -12,7 +12,14 @@ import {
     Menu,
     X,
     Bell,
-    Search
+    Search,
+    BookOpen,
+    Briefcase,
+    ChevronLeft,
+    Home,
+    LineChart,
+    Target,
+    Ticket
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -28,9 +35,13 @@ export default function AdminLayout() {
 
     const allNavItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['admin', 'partner', 'space_manager', 'sales'] },
+        { icon: LineChart, label: 'Sales Analytics', path: '/admin/sales-analytics', roles: ['admin', 'sales', 'partner'] },
+        { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['admin', 'sales'] },
+        { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['admin', 'sales'] },
+        { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['admin', 'sales'] },
+        { icon: Briefcase, label: 'Clients', path: '/admin/clients', roles: ['admin', 'sales'] },
         { icon: Users, label: 'User Management', path: '/admin/users', roles: ['admin'] },
         { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['admin', 'partner', 'space_manager'] },
-        // Partner can manage their own spaces, Admin all. Space Manager operates but typically doesn't "Manage listing details" deeply, but let's allow read access or limited edit.
         { icon: Building2, label: 'Space Management', path: '/admin/spaces', roles: ['admin', 'partner', 'space_manager'] },
         { icon: CreditCard, label: 'Bookings & Payments', path: '/admin/bookings', roles: ['admin', 'partner', 'space_manager', 'sales'] },
         { icon: Settings, label: 'Settings', path: '/admin/settings', roles: ['admin', 'partner'] },
@@ -39,47 +50,81 @@ export default function AdminLayout() {
     const navItems = allNavItems.filter(item => user?.role && item.roles.includes(user.role));
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-[#FDFDFD] flex font-sans text-gray-900">
             {/* Sidebar - Desktop */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 bg-black text-white transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'
-                    } hidden md:flex flex-col`}
+                className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 transition-all duration-300 ${isSidebarOpen ? 'w-72' : 'w-20'
+                    } hidden md:flex flex-col shadow-sm`}
             >
-                <div className="h-16 flex items-center px-6 border-b border-white/10">
-                    <div className="flex items-center gap-2 text-xl font-bold font-[Poppins]">
-                        <span className="text-yellow-400 text-3xl">.</span>
-                        {isSidebarOpen && <span>FlashSpace</span>}
+                {/* Sidebar Header */}
+                <div className="h-auto py-8 px-6 flex flex-col items-start gap-1">
+                    <div className="flex items-center gap-2 text-xl font-bold tracking-tight text-teal-900 font-sans mb-2">
+                        {isSidebarOpen ? (
+                            <span className="text-2xl font-extrabold tracking-tighter text-teal-950">
+                                flashspace
+                            </span>
+                        ) : (
+                            <span className="text-2xl font-extrabold text-teal-600">f.</span>
+                        )}
                     </div>
+                    {isSidebarOpen && (
+                        <>
+                            <h2 className="text-sm font-bold text-gray-900">FlashSpace Admin</h2>
+                            <p className="text-xs text-gray-500 font-medium">Complete platform management</p>
+                        </>
+                    )}
                 </div>
 
-                <nav className="flex-1 py-6 px-3 space-y-1">
+                {/* Navigation */}
+                <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
                     {navItems.map((item) => (
                         <NavLink
                             key={item.path}
                             to={item.path}
                             end={item.path === '/admin'}
                             className={({ isActive }) =>
-                                `flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${isActive
-                                    ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
-                                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                                    ? 'bg-teal-600 text-white shadow-md shadow-teal-200'
+                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium'
                                 }`
                             }
                         >
-                            <item.icon className="w-5 h-5 flex-shrink-0" />
-                            {isSidebarOpen && <span className="font-medium whitespace-nowrap">{item.label}</span>}
+                            <item.icon className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                                // Active styles handled by parent class
+                                ''
+                                }`} />
+                            {isSidebarOpen && <span className="whitespace-nowrap font-medium text-sm">{item.label}</span>}
                         </NavLink>
                     ))}
                 </nav>
 
-                <div className="p-4 border-t border-white/10">
+                {/* Bottom Actions */}
+                <div className="p-4 mt-auto border-t border-gray-100 space-y-2">
                     <button
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                        className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-gray-500 hover:bg-gray-50 transition-colors ${!isSidebarOpen ? 'justify-center' : ''}`}
+                    >
+                        <ChevronLeft className={`w-5 h-5 transition-transform ${!isSidebarOpen ? 'rotate-180' : ''}`} />
+                        {isSidebarOpen && <span className="font-medium text-sm">Collapse</span>}
+                    </button>
+
+                    <button
+                        onClick={() => navigate('/')}
+                        className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-gray-500 hover:bg-gray-50 transition-colors ${!isSidebarOpen ? 'justify-center' : ''}`}
+                    >
+                        <Home className="w-5 h-5" />
+                        {isSidebarOpen && <span className="font-medium text-sm">Back to Home</span>}
+                    </button>
+
+                    {/* Logout - Hidden in collapsed or moved? Keeping it accessible. */}
+                    {/* <button
                         onClick={handleLogout}
-                        className={`flex items-center gap-3 px-3 py-3 w-full rounded-lg text-red-400 hover:bg-red-500/10 transition-colors ${!isSidebarOpen ? 'justify-center' : ''
+                        className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-red-500 hover:bg-red-50 transition-colors ${!isSidebarOpen ? 'justify-center' : ''
                             }`}
                     >
                         <LogOut className="w-5 h-5" />
-                        {isSidebarOpen && <span className="font-medium">Logout</span>}
-                    </button>
+                        {isSidebarOpen && <span className="font-medium text-sm">Logout</span>}
+                    </button> */}
                 </div>
             </aside>
 
@@ -88,25 +133,26 @@ export default function AdminLayout() {
                 <div className="fixed inset-0 z-50 md:hidden">
                     {/* Backdrop */}
                     <div
-                        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+                        className="fixed inset-0 bg-teal-900/20 backdrop-blur-sm"
                         onClick={() => setIsMobileOpen(false)}
                     />
 
                     {/* Sidebar Panel */}
-                    <aside className="fixed inset-y-0 left-0 w-64 bg-black text-white flex flex-col shadow-2xl animate-in slide-in-from-left duration-300">
+                    <aside className="fixed inset-y-0 left-0 w-72 bg-white text-gray-900 flex flex-col shadow-2xl animate-in slide-in-from-left duration-300">
                         {/* Header */}
-                        <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
-                            <div className="flex items-center gap-2 text-xl font-bold font-[Poppins]">
-                                <span className="text-yellow-400 text-3xl">.</span>
-                                <span>FlashSpace</span>
-                            </div>
-                            <button onClick={() => setIsMobileOpen(false)} className="p-1 hover:bg-white/10 rounded-md transition-colors">
-                                <X className="w-6 h-6" />
+                        <div className="py-8 px-6 flex flex-col items-start gap-1 border-b border-gray-100">
+                            <span className="text-2xl font-extrabold tracking-tighter text-teal-950">
+                                flashspace
+                            </span>
+                            <h2 className="text-sm font-bold text-gray-900 mt-2">FlashSpace Admin</h2>
+                            <p className="text-xs text-gray-500 font-medium">Complete platform management</p>
+                            <button onClick={() => setIsMobileOpen(false)} className="absolute top-6 right-6 p-2 hover:bg-gray-50 rounded-full transition-colors text-gray-400">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
 
                         {/* Nav Links */}
-                        <nav className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
+                        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
                             {navItems.map((item) => (
                                 <NavLink
                                     key={item.path}
@@ -114,26 +160,33 @@ export default function AdminLayout() {
                                     onClick={() => setIsMobileOpen(false)}
                                     end={item.path === '/admin'}
                                     className={({ isActive }) =>
-                                        `flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${isActive
-                                            ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
-                                            : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                        `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${isActive
+                                            ? 'bg-teal-600 text-white shadow-md shadow-teal-200'
+                                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium'
                                         }`
                                     }
                                 >
                                     <item.icon className="w-5 h-5 flex-shrink-0" />
-                                    <span className="font-medium">{item.label}</span>
+                                    <span className="font-medium text-sm">{item.label}</span>
                                 </NavLink>
                             ))}
                         </nav>
 
-                        {/* Logout */}
-                        <div className="p-4 border-t border-white/10">
+                        {/* Bottom */}
+                        <div className="p-4 border-t border-gray-100 space-y-2">
+                            <button
+                                onClick={() => navigate('/')}
+                                className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-gray-500 hover:bg-gray-50 transition-colors"
+                            >
+                                <Home className="w-5 h-5" />
+                                <span className="font-medium text-sm">Back to Home</span>
+                            </button>
                             <button
                                 onClick={handleLogout}
-                                className="flex items-center gap-3 px-3 py-3 w-full rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
+                                className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-500 hover:bg-red-50 transition-colors"
                             >
                                 <LogOut className="w-5 h-5" />
-                                <span className="font-medium">Logout</span>
+                                <span className="font-medium text-sm">Logout</span>
                             </button>
                         </div>
                     </aside>
@@ -141,58 +194,46 @@ export default function AdminLayout() {
             )}
 
             {/* Main Content */}
-            <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'
+            <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isSidebarOpen ? 'md:ml-72' : 'md:ml-20'
                 }`}>
-                {/* Topbar */}
-                <header className="h-16 bg-white border-b border-gray-200 sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between">
+                {/* Topbar - Simplified to match clean style */}
+                <header className="h-20 bg-transparent flex items-center justify-between px-8 md:px-12 pt-6">
                     <div className="flex items-center gap-4">
                         <button
-                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 hidden md:block"
-                        >
-                            <Menu className="w-5 h-5" />
-                        </button>
-                        <button
-                            className="md:hidden p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                            className="md:hidden p-2 hover:bg-gray-100 rounded-lg text-gray-500"
                             onClick={() => setIsMobileOpen(true)}
                         >
-                            <Menu className="w-5 h-5" />
+                            <Menu className="w-6 h-6" />
                         </button>
+                        {/* Breadcrumbs or Title could go here, but Dashboard usually handles its own header */}
+                    </div>
 
-                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-6">
+                        {/* Search Bar - Optional, based on ref it might be cleaner without or minimal */}
+                        {/*  <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200 shadow-sm focus-within:ring-2 focus-within:ring-teal-100 transition-all w-64">
                             <Search className="w-4 h-4 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search..."
-                                className="bg-transparent border-none focus:outline-none text-sm w-48"
+                                className="bg-transparent border-none focus:outline-none text-sm w-full text-gray-600 placeholder:text-gray-400"
                             />
-                        </div>
-                    </div>
+                        </div> */}
 
-                    <div className="flex items-center gap-4">
-                        <button className="relative p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors">
+                        {/* Profile/Notifs */}
+                        {/*  <button className="relative p-2 hover:bg-white rounded-full text-gray-400 hover:text-gray-600 transition-colors">
                             <Bell className="w-5 h-5" />
-                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                        </button>
+                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                        </button> */}
 
-                        <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
-                            <div className="text-right hidden md:block">
-                                <p className="text-sm font-semibold text-gray-900">{user?.fullName}</p>
-                                <p className="text-xs text-gray-500 uppercase">{user?.role}</p>
-                            </div>
-                            <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
-                                {user?.profilePicture ? (
-                                    <img src={user.profilePicture} alt={user.fullName} className="w-full h-full object-cover" />
-                                ) : (
-                                    <span className="font-bold text-yellow-600">{user?.fullName?.charAt(0)}</span>
-                                )}
-                            </div>
-                        </div>
+                        {/* Minimal Profile */}
+                        {/* <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold shadow-md cursor-pointer hover:scale-105 transition-transform">
+                             {user?.fullName?.charAt(0) || 'U'}
+                        </div> */}
                     </div>
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+                <main className="flex-1 px-8 md:px-12 py-6">
                     <div className="max-w-7xl mx-auto">
                         <Outlet />
                     </div>

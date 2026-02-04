@@ -227,7 +227,7 @@ const SolutionsSection = () => {
 
                 {/* Icon Bubble */}
                 <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${solution.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  <solution.icon className={`w-8 h-8 ${solution.iconColor} dark:text-white`} />
+
                 </div>
 
                 {/* Content */}

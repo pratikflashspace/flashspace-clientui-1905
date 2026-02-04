@@ -60,8 +60,14 @@ import KYCRequests from "./pages/admin/KYCRequests";
 import SpaceManagement from "./pages/admin/SpaceManagement";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminSettings from "./pages/admin/Settings";
+import LearningHub from "./pages/admin/learning-hub/LearningHub";
+import Clients from "./pages/admin/Clients";
+import ClientDetails from "./pages/admin/ClientDetails";
 import { AdminRoute } from "./components/auth/AdminRoute";
 import AdminLayout from "./components/layouts/AdminLayout";
+import SalesAnalytics from "./pages/admin/SalesAnalytics";
+import LeadManagement from "./pages/admin/LeadManagement";
+import TicketSystem from "./pages/admin/TicketSystem";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -135,6 +141,12 @@ const App = () => (
                   <Route path="spaces" element={<SpaceManagement />} />
                   <Route path="bookings" element={<AdminBookings />} />
                   <Route path="settings" element={<AdminSettings />} />
+                  <Route path="clients" element={<Clients />} />
+                  <Route path="clients/:id" element={<ClientDetails />} />
+                  <Route path="learning-hub" element={<LearningHub />} />
+                  <Route path="sales-analytics" element={<SalesAnalytics />} />
+                  <Route path="tickets" element={<TicketSystem />} />
+                  <Route path="leads" element={<LeadManagement />} />
                   <Route path="*" element={<AdminDashboard />} />
                 </Route>
               </Route>
