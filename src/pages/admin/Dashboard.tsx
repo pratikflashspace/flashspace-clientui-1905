@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { adminService, AdminDashboardStats } from '@/services/admin.service';
 import {
     Users,
-    CreditCard,
-    Building2,
     TrendingUp,
-    Activity,
     ArrowUpRight,
     ArrowDownRight,
-    Clock,
+    Ticket,
+    BarChart3,
+    Sparkles,
+    LineChart,
+    Target,
+    Lightbulb,
+    Bot,
+    MessageCircle,
+    Trophy,
+    Link,
+    LayoutDashboard,
+    Headset,
+    CreditCard,
+    FileCheck,
     CheckCircle,
-    AlertCircle,
-    DollarSign
+    Scale,
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -22,304 +30,405 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchData = async () => {
             try {
-                const response = await adminService.getDashboardStats();
-                if (response.success && response.data) {
-                    setStats(response.data);
+                const [statsResponse] = await Promise.all([
+                    adminService.getDashboardStats(),
+                ]);
+
+                if (statsResponse.success && statsResponse.data) {
+                    setStats(statsResponse.data);
                 }
             } catch (error) {
-                console.error('Failed to fetch admin stats', error);
+                console.error('Failed to fetch admin data', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchStats();
+        fetchData();
     }, []);
 
     if (loading) {
         return (
-            <div className="animate-pulse space-y-8">
-                <div className="h-12 w-64 bg-gray-200 rounded"></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="p-8 space-y-8 animate-pulse bg-transparent min-h-screen">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-40 bg-gray-200 rounded-2xl"></div>
+                        <div key={i} className="h-40 bg-gray-100 rounded-[24px]"></div>
                     ))}
                 </div>
-                <div className="h-96 bg-gray-200 rounded-2xl"></div>
             </div>
         );
     }
 
-    const statCards = [
+    const kpiCards = [
         {
-            title: 'Total Users',
-            value: stats?.totalUsers.toLocaleString() || '0',
+            title: "Total Bookings",
+            value: stats?.totalBookings?.toLocaleString() || "2,847",
+            change: "18% from last month",
+            trend: "up",
+            icon: BarChart3,
+            iconClass: "text-emerald-600 bg-emerald-50"
+        },
+        {
+            title: "Active Clients",
+            value: stats?.totalUsers?.toLocaleString() || "1,234",
+            change: "12% from last month",
+            trend: "up",
             icon: Users,
-            gradient: 'from-blue-500 to-cyan-500',
-            change: '+12.5%',
-            isPositive: true,
-            navPath: '/admin/users',
+            iconClass: "text-teal-600 bg-teal-50"
         },
         {
-            title: 'Total Revenue',
-            value: `₹${(stats?.totalRevenue || 0).toLocaleString()}`,
-            icon: DollarSign,
-            gradient: 'from-emerald-500 to-teal-500',
-            change: '+23.1%',
-            isPositive: true,
-            navPath: '/admin/bookings',
-        },
-        {
-            title: 'Active Bookings',
-            value: stats?.totalBookings.toLocaleString() || '0',
+            title: "Monthly Revenue",
+            value: stats?.totalRevenue ? `₹${stats.totalRevenue.toLocaleString()}` : "₹48.5L",
+            change: "23% from last month",
+            trend: "up",
             icon: TrendingUp,
-            gradient: 'from-purple-500 to-pink-500',
-            change: '+8.2%',
-            isPositive: true,
-            navPath: '/admin/bookings',
+            iconClass: "text-emerald-600 bg-emerald-50"
         },
         {
-            title: 'Active Listings',
-            value: stats?.activeListings.toLocaleString() || '0',
-            icon: Building2,
-            gradient: 'from-orange-500 to-amber-500',
-            change: '+5.4%',
-            isPositive: true,
-            navPath: '/admin/spaces',
+            title: "Open Tickets",
+            value: "47",
+            change: "8% from last month",
+            trend: "down",
+            icon: Ticket,
+            iconClass: "text-teal-600 bg-teal-50"
+        }
+    ];
+
+    const aiTools = [
+        {
+            title: "Sales Forecasting",
+            desc: "AI-based analysis and forecasting of sales based on web portal activity",
+            icon: LineChart
         },
+        {
+            title: "Lead Scoring",
+            desc: "AI-enabled lead scoring with sales probability prediction",
+            icon: Target
+        },
+        {
+            title: "Client Suggestions",
+            desc: "AI forecasting and suggestions on which clients to focus on",
+            icon: Lightbulb
+        },
+        {
+            title: "Inhouse AI Agent",
+            desc: "Ask anything about clients, get improvement suggestions and more",
+            icon: Bot
+        }
     ];
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="min-h-screen bg-transparent space-y-10 font-sans animate-in fade-in duration-500 pb-12">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-4xl font-bold text-gray-900 tracking-tight font-[Poppins]">
-                        Dashboard Overview
-                    </h1>
-                    <p className="text-gray-500 mt-2 text-lg">
-                        Welcome back! Here's what's happening with your business today.
-                    </p>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-xl border border-green-200">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span className="text-sm font-medium">All Systems Operational</span>
-                </div>
+            <div>
+                <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                    Admin <span className="text-teal-500 italic">Portal</span>
+                </h1>
+                <p className="text-gray-500 mt-2 text-base font-light">
+                    Complete control over sales, support, and finance operations
+                </p>
             </div>
 
-            {/* Stats Grid */}
+            {/* KPI Cards Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {statCards.map((stat, index) => (
+                {kpiCards.map((card, idx) => (
                     <div
-                        key={index}
-                        onClick={() => navigate(stat.navPath)}
-                        className="group relative bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer hover:scale-105"
+                        key={idx}
+                        className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 relative group"
                     >
-                        {/* Gradient Background */}
-                        <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
-
-                        <div className="relative p-6">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.gradient} shadow-lg`}>
-                                    <stat.icon className="w-6 h-6 text-white" />
-                                </div>
-                                <div className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold ${stat.isPositive
-                                    ? 'bg-green-50 text-green-700'
-                                    : 'bg-red-50 text-red-700'
-                                    }`}>
-                                    {stat.isPositive ? (
-                                        <ArrowUpRight className="w-3 h-3" />
-                                    ) : (
-                                        <ArrowDownRight className="w-3 h-3" />
-                                    )}
-                                    {stat.change}
-                                </div>
+                        <div className="flex justify-between items-start mb-6">
+                            <span className="text-gray-500 font-medium text-base">{card.title}</span>
+                            <div className={`p-2.5 rounded-xl ${card.iconClass} bg-opacity-60`}>
+                                <card.icon className="w-5 h-5" />
                             </div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">{stat.title}</p>
-                            <h3 className="text-3xl font-bold text-gray-900">{stat.value}</h3>
-                            <div className="mt-3 flex items-center gap-1 text-xs text-gray-400 group-hover:text-gray-600 transition-colors">
-                                <span>View details</span>
-                                <ArrowUpRight className="w-3 h-3" />
+                        </div>
+                        <div className="space-y-3">
+                            <h3 className="text-4xl font-extrabold text-gray-900 tracking-tight">{card.value}</h3>
+                            <div className={`flex items-center gap-2 text-sm font-bold ${card.trend === 'up' ? 'text-emerald-500' : 'text-red-500'
+                                }`}>
+                                {card.trend === 'up' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                                <span>{card.change}</span>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Recent Activity - Takes 2 columns */}
-                <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-lg overflow-hidden">
-                    <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <Activity className="w-5 h-5 text-blue-600" />
+            <div className="space-y-12">
+                {/* Sales Team Section */}
+                <div className="space-y-8">
+                    {/* Header */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Sales Team</h2>
+                        <p className="text-gray-500 text-sm font-light mt-1">Tools and insights for the sales team</p>
+                    </div>
+
+                    {/* AI Tools Subsection */}
+                    <div className="space-y-6">
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">AI-Powered Sales Tools</h3>
+                            <p className="text-gray-500 text-sm font-light">Leverage AI for better sales outcomes</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {aiTools.map((tool, idx) => (
+                                <div
+                                    key={idx}
+                                    className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[160px]"
+                                >
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex-1">
+                                            <h4 className="font-bold text-gray-900 mb-1 text-base">{tool.title}</h4>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-full border border-gray-100">
+                                            <Sparkles className="w-3 h-3 text-gray-400" />
+                                            <span className="text-[10px] font-bold text-gray-500 tracking-wider">AI</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-auto">
+                                        <p className="text-gray-500 text-xs leading-relaxed font-light">
+                                            {tool.desc}
+                                        </p>
+                                    </div>
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900">Recent Activity</h3>
-                            </div>
-                            <button className="text-sm text-blue-600 font-semibold hover:text-blue-700 transition-colors">
-                                View All →
-                            </button>
+                            ))}
                         </div>
                     </div>
 
-                    <div className="p-6">
-                        <div className="relative">
-                            {/* Vertical Line */}
-                            <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-gray-100 hidden sm:block"></div>
+                    {/* Sales Management Subsection */}
+                    <div className="space-y-6">
+                        <div className="space-y-2"></div>
 
-                            <div className="space-y-6">
-                                {stats?.recentActivity && stats.recentActivity.length > 0 ? (
-                                    stats.recentActivity.map((activity, index) => (
-                                        <motion.div
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: index * 0.1 }}
-                                            key={activity.id}
-                                            className="relative flex gap-4 group"
-                                        >
-                                            {/* Icon/Timeline Dot */}
-                                            <div className={`relative z-10 w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm border-2 border-white transition-all duration-300 group-hover:scale-110 group-hover:shadow-md ${activity.type === 'user' ? 'bg-indigo-50 text-indigo-600' :
-                                                activity.type === 'payment' ? 'bg-emerald-50 text-emerald-600' :
-                                                    activity.type === 'kyc' ? 'bg-amber-50 text-amber-600' :
-                                                        'bg-gray-50 text-gray-600'
-                                                }`}>
-                                                {activity.type === 'user' ? <Users className="w-5 h-5" /> :
-                                                    activity.type === 'payment' ? <CreditCard className="w-5 h-5" /> :
-                                                        activity.type === 'kyc' ? <CheckCircle className="w-5 h-5" /> :
-                                                            <Activity className="w-5 h-5" />}
-                                            </div>
-
-                                            {/* Content Card */}
-                                            <div className="flex-1 bg-gray-50/50 rounded-2xl p-4 hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 group-hover:shadow-sm">
-                                                <div className="flex justify-between items-start gap-4">
-                                                    <div>
-                                                        <h4 className={`font-semibold text-sm mb-1 ${activity.type === 'user' ? 'text-indigo-900' :
-                                                            activity.type === 'payment' ? 'text-emerald-900' :
-                                                                activity.type === 'kyc' ? 'text-amber-900' :
-                                                                    'text-gray-900'
-                                                            }`}>
-                                                            {activity.type === 'user' ? 'New User Registration' :
-                                                                activity.type === 'payment' ? 'Payment Received' :
-                                                                    activity.type === 'kyc' ? 'KYC Verification' :
-                                                                        'System Activity'}
-                                                        </h4>
-                                                        <p className="text-gray-600 text-sm leading-relaxed">
-                                                            {activity.message}
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-500 bg-white rounded-full shadow-sm border border-gray-100">
-                                                        <Clock className="w-3 h-3" />
-                                                        {activity.time}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ))
-                                ) : (
-                                    <div className="text-center py-12">
-                                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
-                                            <Activity className="w-6 h-6 text-gray-400" />
-                                        </div>
-                                        <h3 className="text-gray-900 font-medium mb-1">No recent activity</h3>
-                                        <p className="text-gray-500 text-sm">New events will appear here</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[
+                                {
+                                    title: "Client Information Panel",
+                                    desc: "View all client information including their activity on flashspace ecosystem",
+                                    icon: Users
+                                },
+                                {
+                                    title: "CRM Integration",
+                                    desc: "Manage leads with email and WhatsApp marketing workflows integrated",
+                                    icon: Link
+                                },
+                                {
+                                    title: "Coupon Generator",
+                                    desc: "Create discount vouchers for payment portal to help close deals",
+                                    icon: Ticket
+                                },
+                                {
+                                    title: "WhatsApp Access",
+                                    desc: "Tap into client chats coming into the website via WhatsApp API",
+                                    icon: MessageCircle
+                                },
+                                {
+                                    title: "Booking Dashboard",
+                                    desc: "View total bookings by categories, packages, and sales amounts",
+                                    icon: LayoutDashboard
+                                },
+                                {
+                                    title: "Leaderboard",
+                                    desc: "Track KPIs, targets, and achievements with team rankings",
+                                    icon: Trophy
+                                }
+                            ].map((item, idx) => (
+                                <div key={idx} className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 cursor-pointer group flex items-center gap-6">
+                                    <div className="p-3 bg-teal-50 rounded-2xl text-teal-600">
+                                        <item.icon className="w-6 h-6" />
                                     </div>
-                                )}
-                            </div>
+                                    <div>
+                                        <h4 className="font-bold text-gray-900 mb-1 text-base">{item.title}</h4>
+                                        <p className="text-gray-500 text-xs leading-relaxed font-light">
+                                            {item.desc}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
 
-                {/* Quick Actions */}
-                <div className="space-y-6">
-                    {/* Quick Actions Card */}
-                    <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl shadow-2xl p-6 text-white overflow-hidden relative">
-                        {/* Decorative elements */}
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-yellow-400 rounded-full blur-3xl opacity-10"></div>
-                        <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-400 rounded-full blur-3xl opacity-10"></div>
+                {/* Support Team Section */}
+                <div className="space-y-8">
+                    {/* Header */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Support Team</h2>
+                        <p className="text-gray-500 text-sm font-light mt-1">Tools for client support and satisfaction</p>
+                    </div>
 
-                        <div className="relative">
-                            <h3 className="font-bold text-xl mb-6 flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></div>
-                                Quick Actions
-                            </h3>
-                            <div className="space-y-3">
-                                <button
-                                    onClick={() => navigate('/admin/kyc-requests')}
-                                    className="w-full group py-3.5 px-4 bg-white/10 hover:bg-white/20 rounded-xl text-left transition-all flex items-center gap-3 border border-white/10 hover:border-white/20 hover:scale-105 duration-200"
-                                >
-                                    <div className="p-2 bg-yellow-400/20 rounded-lg group-hover:bg-yellow-400/30 transition-colors">
-                                        <CheckCircle className="w-5 h-5 text-yellow-400" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <span className="font-semibold">Verify New Users</span>
-                                        <p className="text-xs text-gray-400 mt-0.5">Review pending KYC</p>
-                                    </div>
-                                    <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
-                                </button>
+                    {/* AI Support Tools Subsection */}
+                    <div className="space-y-6">
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">AI Support Tools</h3>
+                            <p className="text-gray-500 text-sm font-light">AI-powered support assistance</p>
+                        </div>
 
-                                <button
-                                    onClick={() => navigate('/admin/spaces')}
-                                    className="w-full group py-3.5 px-4 bg-white/10 hover:bg-white/20 rounded-xl text-left transition-all flex items-center gap-3 border border-white/10 hover:border-white/20 hover:scale-105 duration-200"
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {[
+                                {
+                                    title: "AI Support Agent",
+                                    desc: "Access all client data - agreements, renewals, visits, and more",
+                                },
+                                {
+                                    title: "Auto Translation",
+                                    desc: "Translate any language used by clients for support team understanding",
+                                },
+                                {
+                                    title: "Satisfaction Dashboard",
+                                    desc: "AI based metrics on client satisfaction, pending cases, and more",
+                                },
+                                {
+                                    title: "Performance Suggestions",
+                                    desc: "AI board showing best performers' strategies and improvement tips",
+                                }
+                            ].map((tool, idx) => (
+                                <div
+                                    key={idx}
+                                    className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[160px]"
                                 >
-                                    <div className="p-2 bg-blue-400/20 rounded-lg group-hover:bg-blue-400/30 transition-colors">
-                                        <Building2 className="w-5 h-5 text-blue-400" />
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="flex-1">
+                                            <h4 className="font-bold text-gray-900 mb-1 text-base">{tool.title}</h4>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-full border border-gray-100">
+                                            <Sparkles className="w-3 h-3 text-gray-400" />
+                                            <span className="text-[10px] font-bold text-gray-500 tracking-wider">AI</span>
+                                        </div>
                                     </div>
-                                    <div className="flex-1">
-                                        <span className="font-semibold">Manage Spaces</span>
-                                        <p className="text-xs text-gray-400 mt-0.5">Add or edit listings</p>
-                                    </div>
-                                    <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
-                                </button>
 
-                                <button
-                                    onClick={() => navigate('/admin/bookings')}
-                                    className="w-full group py-3.5 px-4 bg-white/10 hover:bg-white/20 rounded-xl text-left transition-all flex items-center gap-3 border border-white/10 hover:border-white/20 hover:scale-105 duration-200"
-                                >
-                                    <div className="p-2 bg-green-400/20 rounded-lg group-hover:bg-green-400/30 transition-colors">
-                                        <CreditCard className="w-5 h-5 text-green-400" />
+                                    <div className="mt-auto">
+                                        <p className="text-gray-500 text-xs leading-relaxed font-light">
+                                            {tool.desc}
+                                        </p>
                                     </div>
-                                    <div className="flex-1">
-                                        <span className="font-semibold">Review Payments</span>
-                                        <p className="text-xs text-gray-400 mt-0.5">Check transactions</p>
-                                    </div>
-                                    <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
-                                </button>
-                            </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
-                    {/* System Status Card */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6">
-                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <AlertCircle className="w-5 h-5 text-blue-600" />
-                            System Status
-                        </h3>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-600">Database</span>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                                    <span className="text-sm font-medium text-green-600">Healthy</span>
+                    {/* Support Operations Subsection */}
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[
+                                {
+                                    title: "Ticket Management",
+                                    desc: "Auto-assign tickets with due dates, follow-ups, and escalation alerts",
+                                    icon: Ticket
+                                },
+                                {
+                                    title: "Chat Takeover",
+                                    desc: "Take over support chats and view all active and past tickets",
+                                    icon: MessageCircle
+                                },
+                                {
+                                    title: "Client Portal",
+                                    desc: "Detailed access to all client accounts and their history",
+                                    icon: Users
+                                },
+                                {
+                                    title: "Learning Hub",
+                                    desc: "Training videos, articles, and documents for day-to-day tasks",
+                                    icon: Lightbulb
+                                },
+                                {
+                                    title: "Support Leaderboard",
+                                    desc: "Track team performance and highlight best performers",
+                                    icon: Trophy
+                                }
+                            ].map((item, idx) => (
+                                <div key={idx} className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 cursor-pointer group flex items-center gap-6">
+                                    <div className="p-3 bg-teal-50 rounded-2xl text-teal-600">
+                                        <item.icon className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-gray-900 mb-1 text-base">{item.title}</h4>
+                                        <p className="text-gray-500 text-xs leading-relaxed font-light">
+                                            {item.desc}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-600">API Server</span>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                                    <span className="text-sm font-medium text-green-600">Online</span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Finance & Accounts Section */}
+                <div className="space-y-8">
+                    {/* Header */}
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Finance & Accounts</h2>
+                        <p className="text-gray-500 text-sm font-light mt-1">Financial management and reporting</p>
+                    </div>
+
+                    {/* Financial Management Subsection */}
+                    <div className="space-y-6">
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-900 mb-1">Financial Management</h3>
+                            <p className="text-gray-500 text-sm font-light">Complete financial control and reporting</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[
+                                {
+                                    title: "Revenue Dashboard",
+                                    desc: "Track payments received, receivable, payable, and more data",
+                                    icon: BarChart3,
+                                    isAi: false
+                                },
+                                {
+                                    title: "Receivable/Payable",
+                                    desc: "Filter by space, city to get detailed payment information",
+                                    icon: CreditCard,
+                                    isAi: false
+                                },
+                                {
+                                    title: "Invoice Management",
+                                    desc: "View and approve/reject invoices from clients and space partners",
+                                    icon: FileCheck,
+                                    isAi: false
+                                },
+                                {
+                                    title: "Cleared Invoices",
+                                    desc: "Track all cleared invoices with payment details",
+                                    icon: CheckCircle,
+                                    isAi: false
+                                },
+                                {
+                                    title: "Balance Sheet",
+                                    desc: "Overall, space specific, region specific, and date range reports",
+                                    icon: Scale,
+                                    isAi: false
+                                },
+                                {
+                                    title: "AI Assistant",
+                                    desc: "Custom AI agent to answer questions about any client",
+                                    icon: Bot,
+                                    isAi: true
+                                }
+                            ].map((item, idx) => (
+                                <div key={idx} className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 cursor-pointer group flex items-center gap-6 relative overflow-hidden">
+                                    <div className="p-3 bg-teal-50 rounded-2xl text-teal-600 flex-shrink-0">
+                                        <item.icon className="w-6 h-6" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-start">
+                                            <h4 className="font-bold text-gray-900 mb-1 text-base">{item.title}</h4>
+                                            {item.isAi && (
+                                                <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100 absolute top-6 right-6">
+                                                    <Sparkles className="w-2.5 h-2.5 text-gray-400" />
+                                                    <span className="text-[9px] font-bold text-gray-500 tracking-wider">AI</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <p className="text-gray-500 text-xs leading-relaxed font-light pr-2">
+                                            {item.desc}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-600">Payment Gateway</span>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                                    <span className="text-sm font-medium text-green-600">Active</span>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </div>

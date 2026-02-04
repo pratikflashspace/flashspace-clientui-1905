@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-animation";
+import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
 
 const TestimonialsSection = () => {
   const isVisible = useScrollAnimation('testimonials');
@@ -43,7 +44,7 @@ const TestimonialsSection = () => {
   ];
 
   return (
-    <section id="testimonials" className="py-20 px-4 relative overflow-hidden bg-[#ffffff] dark:bg-[#0a0a0a] transition-colors duration-300">
+    <section id="testimonials" className="py-20 px-4 relative bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300">
 
       <div className="container mx-auto relative z-10">
         {/* Section Header */}
@@ -97,7 +98,7 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Client Testimonials */}
-        <div className="text-center mb-8 mt-16">
+        <div className="text-center mb-0 mt-16">
           <h3 className={`text-3xl md:text-4xl font-bold mb-4 text-[#172A3A] dark:text-white ${getAnimationClasses(isVisible, 'fadeInUp', 400)}`} style={{ fontFamily: 'Poppins' }}>
             Great People <span className="text-[#EDB003]">Trust Us</span>
           </h3>
@@ -106,37 +107,14 @@ const TestimonialsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {testimonials.map((testimonial, index) => (
-            <Card
-              key={index}
-              className={`bg-white dark:bg-[#1f1f1f] shadow-md hover:shadow-xl hover:scale-105 border-2 border-gray-200 dark:border-white/10 hover:border-[#EDB003] dark:hover:border-[#EDB003] transition-all duration-500 ${getAnimationClasses(isVisible, 'fadeInUp', 600 + index * 100)}`}
-            >
-              <CardContent className="p-6">
-                {/* Quote */}
-                <div className="text-6xl text-[#EDB003]/20 mb-4 font-serif">"</div>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4 font-content">
-                  {testimonial.text}
-                </p>
-
-                {/* Author Info */}
-                <div className="border-t border-gray-200 dark:border-white/10 pt-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#172A3A]/15 to-[#EDB003]/15 rounded-full flex items-center justify-center">
-                      <span className="text-[#172A3A] dark:text-white font-bold text-lg">
-                        {testimonial.author.split(' ').map(name => name[0]).join('')}
-                      </span>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-[#172A3A] dark:text-white font-content">{testimonial.author}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 font-content">{testimonial.position}</div>
-                      <div className="text-sm text-[#EDB003] font-content">{testimonial.company}</div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div className={getAnimationClasses(isVisible, 'fadeInUp', 600)}>
+          <AnimatedTestimonials testimonials={testimonials.map(t => ({
+            quote: t.text,
+            name: t.author,
+            designation: `${t.position}, ${t.company}`,
+            // Using placeholder images as original data didn't have images
+            src: `https://ui-avatars.com/api/?name=${encodeURIComponent(t.author)}&background=random&size=200`
+          }))} />
         </div>
 
         {/* Stats */}

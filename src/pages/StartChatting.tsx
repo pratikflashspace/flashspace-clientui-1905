@@ -735,7 +735,6 @@ const StartChatting = () => {
               onClick={() => setIsLoginOpen(true)}
               variant="outline"
               className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 dark:border-gray-700 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
-              style={{ fontFamily: 'Poppins' }}
             >
               Log in
             </Button>
@@ -774,7 +773,6 @@ const StartChatting = () => {
         ref={sidebarRef}
         className={`fixed top-0 left-0 h-screen w-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden lg:translate-x-0 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
-        style={{ fontFamily: 'Geist, Poppins, sans-serif' }}
       >
         {/* Logo Section */}
         <div className="h-16 flex items-center justify-center flex-shrink-0">

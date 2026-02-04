@@ -2,16 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Google Fonts - Poppins (all weights) and Inter */
-/* Fonts are loaded via index.html (Outfit) */
-
-/* Removed Locomotive Scroll overrides */
-
 /* VirtuHub Connect Design System - FlashSpace Branding */
 
 @layer base {
   :root {
     /* Core Brand Colors - Light Theme */
+    font-family: 'Inter', sans-serif;
     --background: 0 0% 100%;
     --foreground: 210 40% 5%;
 
@@ -152,8 +148,8 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    /* Primary site font: Outfit */
-    font-family: 'Outfit', sans-serif;
+    /* Primary site font: Inter */
+    font-family: 'Inter', sans-serif;
     background: hsl(var(--background));
     color: hsl(var(--foreground));
     min-height: 100vh;
