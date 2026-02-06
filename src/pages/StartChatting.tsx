@@ -2,11 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { getLenis } from '@/lib/lenis.ts';
 import { useDarkMode } from '@/contexts/DarkModeContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { cn } from "@/lib/utils";
 import {
   Send, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
-  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon // [NEW] Added Sun, Moon
+  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon,
+  LayoutDashboard, LogOut, User as UserIcon, ChevronDown
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
 import Splash3dButton from '@/components/ui/3d-splash-button';
@@ -277,10 +280,12 @@ const UpdatesPopup = ({
 
 const StartChatting = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [message, setMessage] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showUpdates, setShowUpdates] = useState(false); // [NEW] State for the popup
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // [NEW] User menu state
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: '',
@@ -565,6 +570,17 @@ const StartChatting = () => {
   const handleSendMessage = async () => {
     if (!message.trim() || isLoading) return;
 
+    // [NEW] Guest Chat Limit Check
+    if (!isAuthenticated) {
+      const currentCount = parseInt(localStorage.getItem('guest_chat_count') || '0');
+      if (currentCount >= 3) {
+        setIsLoginOpen(true);
+        // Optional: clear message to avoid confusion or keep it? Keeping it allows them to send after login
+        return;
+      }
+      localStorage.setItem('guest_chat_count', (currentCount + 1).toString());
+    }
+
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -730,15 +746,106 @@ const StartChatting = () => {
               Get in Touch
             </Splash3dButton>
 
-            {/* Log in Button */}
-            <Button
-              onClick={() => setIsLoginOpen(true)}
-              variant="outline"
-              className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 dark:border-gray-700 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
-              style={{ fontFamily: 'Poppins' }}
-            >
-              Log in
-            </Button>
+            {/* Log in Button or User Profile */}
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 border border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-500/10"
+                >
+                  {/* User Avatar */}
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                    {user?.fullName?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  {/* User Name */}
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200 max-w-[120px] truncate hidden sm:block">
+                    {user?.fullName || 'User'}
+                  </span>
+                  {/* Dropdown Icon */}
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform duration-200",
+                      isUserMenuOpen && "rotate-180"
+                    )}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    {/* User Info Header */}
+                    <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        {user?.fullName}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          handleNavigation("/dashboard");
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        <span className="font-medium">Dashboard</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          handleNavigation("/dashboard/profile");
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                      >
+                        <UserIcon className="h-4 w-4" />
+                        <span className="font-medium">My Profile</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          handleNavigation("/settings");
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                      >
+                        <Settings className="h-4 w-4" />
+                        <span className="font-medium">Settings</span>
+                      </button>
+                    </div>
+
+                    {/* Logout Section */}
+                    <div className="border-t border-gray-100 dark:border-gray-800 pt-1">
+                      <button
+                        onClick={async () => {
+                          await logout();
+                          setIsUserMenuOpen(false);
+                          handleNavigation("/");
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-150"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span className="font-medium">Logout</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Button
+                onClick={() => setIsLoginOpen(true)}
+                variant="outline"
+                className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 dark:border-gray-700 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
+                style={{ fontFamily: 'Poppins' }}
+              >
+                Log in
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -1228,6 +1335,7 @@ const StartChatting = () => {
           setIsLoginOpen(false);
           setIsSignupOpen(true);
         }}
+        onLoginSuccess={() => setIsLoginOpen(false)}
       />
       <SignupModal
         isOpen={isSignupOpen}
