@@ -58,7 +58,7 @@ const JourneySection = () => {
   ];
 
   return (
-    <section id="journey" className="py-20 px-4 bg-[#ffffff] dark:bg-[#0a0a0a] overflow-hidden relative transition-colors duration-300">
+    <section id="journey" className="py-20 px-4 bg-transparent dark:bg-[#0a0a0a] overflow-hidden relative transition-colors duration-300">
       {/* Background Elements - Removed for clean white background */}
 
       <div className="container mx-auto relative z-10">

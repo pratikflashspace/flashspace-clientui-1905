@@ -54,11 +54,11 @@ export default {
         },
       },
       fontFamily: {
-        // Use Outfit for everything
-        header: ['Outfit', 'sans-serif'],
-        content: ['Outfit', 'sans-serif'],
-        sans: ['Outfit', 'sans-serif'],
-        grotesk: ['Space Grotesk', 'sans-serif'],
+        // Use Inter for everything
+        header: ['Inter', 'sans-serif'],
+        content: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
+        grotesk: ['Inter', 'sans-serif'],
         mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       borderRadius: {

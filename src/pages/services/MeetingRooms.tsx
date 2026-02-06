@@ -1,4 +1,5 @@
 import { Building, MapPin, Phone, Users, ChevronDown, Grid3X3, List, Presentation } from "lucide-react";
+import MeetingRoomHero from "@/components/services/MeetingRoomHero";
 import { Button } from "@/components/ui/button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
@@ -243,38 +244,21 @@ const MeetingRooms = () => {
                         className="w-full h-full overflow-y-auto"
                         data-lenis-prevent
                     >
+
+
+                        {/* Replaced Header with New Hero Section */}
+                        <MeetingRoomHero
+                            currentCity={selectedCity}
+                            onCitySearch={handleCitySearch}
+                        />
+
                         <div className="px-4 sm:px-6 py-4 sm:py-6">
-                            <div className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-                                <span>Home</span>
-                                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
-                                <span>Meeting Rooms</span>
-                                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
-                                <span className="text-gray-900 font-medium truncate">{selectedCity}</span>
-                            </div>
-
-                            <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
-                                Meeting Rooms In {selectedCity}
-                            </h1>
-
-                            <SearchHeader
-                                searchCity={searchCity}
-                                onSearchChange={handleSearchChange}
-                                onCitySelect={handleCitySearch}
-                                onSearchSubmit={handleSearchSubmit}
-                                onSearchFocus={handleSearchFocus}
-                                onSearchBlur={handleSearchBlur}
-                                isSearchFocused={isSearchFocused}
-                                showSuggestions={showSuggestions}
-                                filteredCities={filteredCities}
-                                currentService="Meeting Rooms"
-                                businessSolutions={businessSolutions}
-                                onServiceNavigation={handleNavigation}
-                            />
-
-                            <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                            {/* Result Count & Filters */}
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
                                 <p className="text-sm text-gray-600">
                                     Showing <span className="font-semibold text-gray-900">{meetingRooms.length} result(s)</span> for meeting rooms in {selectedCity}
                                 </p>
+
 
                                 <div className="flex items-center gap-2">
                                     <Button

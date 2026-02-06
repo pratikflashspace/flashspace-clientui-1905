@@ -1,4 +1,5 @@
 import axiosInstance from '@/lib/axios';
+import { Client, ClientActivity, ClientOrder, ClientQuery, ClientNote } from '@/types/client.types';
 
 export interface AdminDashboardStats {
     totalUsers: number;
@@ -93,6 +94,19 @@ class AdminService {
         return response.data;
     }
 
+    async createUser(userData: any) {
+        try {
+            const response = await axiosInstance.post<ApiResponse<any>>('/api/admin/users', userData);
+            return response.data;
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error?.response?.data?.message || error?.message || 'Failed to create user',
+                error: error?.response?.data?.error || error?.message
+            };
+        }
+    }
+
     async deleteUser(id: string, restore: boolean = false) {
         try {
             const response = await axiosInstance.delete<ApiResponse<any>>(`/api/admin/users/${id}?restore=${restore}`);
@@ -101,6 +115,22 @@ class AdminService {
         } catch (error: any) {
             console.error('deleteUser error:', error);
             // Return error in expected format
+            return {
+                success: false,
+                message: error?.response?.data?.message || error?.message || 'Failed to update user',
+                error: error?.response?.data?.error || error?.message
+            };
+        }
+    }
+
+    async updateUser(id: string, data: any) {
+        try {
+            console.log(`[AdminService] Sending PUT request to: /api/admin/users/${id}`, data);
+            const response = await axiosInstance.put<ApiResponse<any>>(`/api/admin/users/${id}`, data);
+            return response.data;
+        } catch (error: any) {
+            console.error(`[AdminService] Update failed for /api/admin/users/${id}`, error);
+            console.error('[AdminService] Error details:', error.response?.data);
             return {
                 success: false,
                 message: error?.response?.data?.message || error?.message || 'Failed to update user',
@@ -120,6 +150,42 @@ class AdminService {
             : '/api/coworkingSpace/create';
 
         const response = await axiosInstance.post<ApiResponse<any>>(endpoint, data);
+        return response.data;
+    }
+
+    // Client Management
+    async getClients(params?: any) {
+        const response = await axiosInstance.get<ApiResponse<Client[]>>('/api/admin/clients', { params });
+        return response.data;
+    }
+
+    async getClientDetails(clientId: string) {
+        const response = await axiosInstance.get<ApiResponse<Client>>(`/api/admin/clients/${clientId}`);
+        return response.data;
+    }
+
+    async getClientActivity(clientId: string) {
+        const response = await axiosInstance.get<ApiResponse<ClientActivity[]>>(`/api/admin/clients/${clientId}/activity`);
+        return response.data;
+    }
+
+    async getClientOrders(clientId: string) {
+        const response = await axiosInstance.get<ApiResponse<ClientOrder[]>>(`/api/admin/clients/${clientId}/orders`);
+        return response.data;
+    }
+
+    async getClientQueries(clientId: string) {
+        const response = await axiosInstance.get<ApiResponse<ClientQuery[]>>(`/api/admin/clients/${clientId}/queries`);
+        return response.data;
+    }
+
+    async getClientNotes(clientId: string) {
+        const response = await axiosInstance.get<ApiResponse<ClientNote[]>>(`/api/admin/clients/${clientId}/notes`);
+        return response.data;
+    }
+
+    async addClientNote(clientId: string, note: { content: string }) {
+        const response = await axiosInstance.post<ApiResponse<ClientNote>>(`/api/admin/clients/${clientId}/notes`, note);
         return response.data;
     }
 }

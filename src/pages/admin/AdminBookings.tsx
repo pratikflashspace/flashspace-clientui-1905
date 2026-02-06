@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { adminService } from '@/services/admin.service';
-import { Search, Calendar, User, Building2, CreditCard, DollarSign, Clock, Filter, TrendingUp, Package } from 'lucide-react';
+import { Search, Calendar as CalendarIcon, User, Building2, CreditCard, DollarSign, Clock, Filter, TrendingUp, Package, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { Calendar } from "@/components/ui/calender";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface Booking {
     bookingNumber: string;
@@ -30,6 +40,7 @@ export default function AdminBookings() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
+    const [date, setDate] = useState<DateRange | undefined>();
 
     useEffect(() => {
         fetchBookings();
@@ -58,7 +69,16 @@ export default function AdminBookings() {
 
         const matchesFilter = filterStatus === 'all' || booking.status === filterStatus;
 
-        return matchesSearch && matchesFilter;
+        // Filter by Date Range (Created At)
+        let matchDate = true;
+        if (date?.from) {
+            const bookingTime = new Date(booking.createdAt).getTime();
+            const fromTime = new Date(date.from).setHours(0, 0, 0, 0);
+            const toTime = (date.to ? new Date(date.to) : new Date(date.from)).setHours(23, 59, 59, 999);
+            matchDate = bookingTime >= fromTime && bookingTime <= toTime;
+        }
+
+        return matchesSearch && matchesFilter && matchDate;
     });
 
     // Calculate stats
@@ -151,7 +171,67 @@ export default function AdminBookings() {
                         />
                     </div>
 
+
+
                     <div className="flex items-center gap-3 w-full sm:w-auto">
+                        {/* Date Range Picker */}
+                        <div className="relative">
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        id="date"
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-[240px] justify-start text-left font-normal border-none bg-gray-50 text-gray-700 hover:bg-gray-100",
+                                            !date && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {date?.from ? (
+                                            date.to ? (
+                                                <>
+                                                    {format(date.from, "LLL dd, y")} -{" "}
+                                                    {format(date.to, "LLL dd, y")}
+                                                </>
+                                            ) : (
+                                                format(date.from, "LLL dd, y")
+                                            )
+                                        ) : (
+                                            <span>Pick a date</span>
+                                        )}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0 bg-white" align="end" side="bottom" avoidCollisions={false}>
+                                    <Calendar
+                                        initialFocus
+                                        mode="range"
+                                        defaultMonth={date?.from}
+                                        selected={date}
+                                        onSelect={setDate}
+                                        numberOfMonths={1}
+                                        captionLayout="dropdown-buttons"
+                                        fromYear={2020}
+                                        toYear={2030}
+                                        classNames={{
+                                            caption_label: "hidden",
+                                            caption_dropdowns: "flex justify-center gap-1",
+                                            dropdown: "flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+                                            dropdown_month: "w-[120px]",
+                                            dropdown_year: "w-[100px]",
+                                            dropdown_icon: "opacity-50 ml-auto"
+                                        }}
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                            {date && (
+                                <button
+                                    onClick={() => setDate(undefined)}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full transition-colors"
+                                >
+                                    <X className="w-3 h-3 text-gray-400" />
+                                </button>
+                            )}
+                        </div>
                         <div className="relative">
                             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                             <select
@@ -254,6 +334,6 @@ export default function AdminBookings() {
                     </table>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
