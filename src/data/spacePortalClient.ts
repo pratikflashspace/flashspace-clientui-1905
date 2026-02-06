@@ -1,0 +1,43 @@
+import type { Client } from "@/types/spaceClient";
+
+export const CLIENTS: Client[] = [
+  {
+    id: "CL-1001",
+    name: "Rohit Sharma",
+    company: "Alpha Tech",
+    phone: "+91 98765 43210",
+    email: "rohit@alphatech.com",
+    status: "ACTIVE",
+    plan: "Premium",
+    space: "FlashSpace - Gurgaon",
+    bookings: 4,
+    pendingPayments: false,
+    createdAt: "2026-01-14",
+  },
+  {
+    id: "CL-1002",
+    name: "Neha Verma",
+    company: "Verto Media",
+    phone: "+91 99999 11111",
+    email: "neha@vertomedia.com",
+    status: "PENDING",
+    plan: "Standard",
+    space: "FlashSpace - Delhi",
+    bookings: 1,
+    pendingPayments: true,
+    createdAt: "2026-01-22",
+  },
+  {
+    id: "CL-1003",
+    name: "Aman Singh",
+    company: "BuildPro",
+    phone: "+91 88888 22222",
+    email: "aman@buildpro.com",
+    status: "ACTIVE",
+    plan: "Basic",
+    space: "FlashSpace - Noida",
+    bookings: 2,
+    pendingPayments: false,
+    createdAt: "2026-01-30",
+  },
+];

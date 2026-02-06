@@ -68,6 +68,7 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
+import Dashboard from "./pages/spacePortal/Dashboard";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -84,6 +85,8 @@ const App = () => (
             {/* <MouseFollower/> */}
             <Routes>
               {/* Public Routes */}
+      
+                <Route path="/spaceportal" element={<Dashboard/>} />
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
               <Route path="/services/virtual-office" element={<VirtualOffice />} />
