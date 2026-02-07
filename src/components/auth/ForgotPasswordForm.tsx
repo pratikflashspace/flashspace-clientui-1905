@@ -93,8 +93,8 @@ export const ForgotPasswordForm = () => {
         {/* Back to Login Button */}
         <div className="pt-2">
           <Link to="/login">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full py-6 rounded-xl border-2 border-slate-200 hover:border-[#4DA1FF] hover:bg-[#4DA1FF]/5 transition-all duration-300 font-semibold text-[#172A3A]"
               style={{ fontFamily: 'Poppins' }}
             >
@@ -140,9 +140,9 @@ export const ForgotPasswordForm = () => {
       </div>
 
       {/* Submit Button */}
-      <Button 
-        type="submit" 
-        className="w-full bg-gradient-to-r from-[#4DA1FF] to-[#3B82F6] hover:from-[#4DA1FF]/90 hover:to-[#3B82F6]/90 text-white font-bold py-6 rounded-xl shadow-lg shadow-[#4DA1FF]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#4DA1FF]/40 hover:-translate-y-0.5 text-base" 
+      <Button
+        type="submit"
+        className="w-full bg-gradient-to-r from-[#4DA1FF] to-[#3B82F6] hover:from-[#4DA1FF]/90 hover:to-[#3B82F6]/90 text-white font-bold py-6 rounded-xl shadow-lg shadow-[#4DA1FF]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#4DA1FF]/40 hover:-translate-y-0.5 text-base"
         style={{ fontFamily: 'Poppins' }}
         disabled={isLoading}
       >
@@ -161,8 +161,8 @@ export const ForgotPasswordForm = () => {
 
       {/* Back to Login Link */}
       <div className="text-center pt-2">
-        <Link 
-          to="/login" 
+        <Link
+          to="/login"
           className="text-sm text-slate-600 hover:text-[#4DA1FF] font-semibold inline-flex items-center gap-2 transition-colors duration-200"
           style={{ fontFamily: 'Poppins' }}
         >
