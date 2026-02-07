@@ -69,9 +69,10 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
+
+import SpacePortalClients from "@/pages/spacePortal/Clients";
+import SpacePortalClientDetails from "@/pages/spacePortal/ClientsDetails";
 import Dashboard from "./pages/spacePortal/Dashboard";
-import { CLIENTS } from "./data/spacePortal/clients";
-import Enquiries from "./pages/spacePortal/ClientEnquiries";
 import Invoices from "./pages/spacePortal/Invoices";
 import Calendar from "./pages/spacePortal/Calendar";
 import Spaces from "./pages/spacePortal/Spaces";
@@ -202,7 +203,8 @@ const App = () => (
                 <Route index element={<Dashboard />} />
                 <Route path="dashboard" element={<Dashboard />} />
 
-                <Route path="clients" element={<Clients />} />
+                <Route path="clients" element={<SpacePortalClients />} />
+                <Route path="clients/:clientId" element={<SpacePortalClientDetails />} />
                 <Route path="client-enquiries" element={<ClientEnquiries />} />
                 <Route path="invoices-payments" element={<Invoices />} />
                 <Route path="booking-calendar" element={<Calendar />} />

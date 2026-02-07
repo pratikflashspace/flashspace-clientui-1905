@@ -2,14 +2,18 @@ import { useMemo, useState } from "react";
 import { CLIENTS } from "@/data/spacePortal/clients";
 import type { Client } from "@/types/spacePortal/client";
 import { MapPin, Eye, MessageSquare, MoreVertical, Filter } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Clients() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  console.log("🔍 CLIENTS imported:", CLIENTS);
+  console.log("🔍 CLIENTS length:", CLIENTS.length);
+
 
   const filteredClients = useMemo(() => {
-    return CLIENTS.filter((client) => {
+    const result = CLIENTS.filter((client) => {
       const q = query.toLowerCase();
-
       return (
         client.companyName.toLowerCase().includes(q) ||
         client.contactName.toLowerCase().includes(q) ||
@@ -17,7 +21,10 @@ export default function Clients() {
         client.space.toLowerCase().includes(q)
       );
     });
+    console.log("🔍 Filtered clients:", result.length);
+    return result;
   }, [query]);
+  console.log("🔍 Rendering with clients:", filteredClients.length);
 
   return (
     <div className="flex-1">
@@ -26,7 +33,9 @@ export default function Clients() {
         <h1 className="text-3xl font-bold text-slate-900">
           My <span className="text-[#3FA69E]">Clients</span>
         </h1>
-        <p className="mt-2 text-slate-500">Manage all your client relationships</p>
+        <p className="mt-2 text-slate-500">
+          Manage all your client relationships
+        </p>
       </div>
 
       {/* Search + Filter */}
@@ -63,7 +72,11 @@ export default function Clients() {
 
           <tbody>
             {filteredClients.map((client) => (
-              <ClientRow key={client.id} client={client} />
+              <ClientRow
+                key={client.id}
+                client={client}
+                onView={() => navigate(`/spaceportal/clients/${client.id}`)}
+              />
             ))}
           </tbody>
         </table>
@@ -76,13 +89,21 @@ export default function Clients() {
   );
 }
 
-function ClientRow({ client }: { client: Client }) {
-  const initials = client.companyName
-    .split(" ")
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
+function ClientRow({
+  client,
+  onView,
+}: {
+  client: Client;
+  onView: () => void;
+}) {
+  const initials = useMemo(() => {
+    return client.companyName
+      .split(" ")
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase();
+  }, [client.companyName]);
 
   return (
     <tr className="border-t border-slate-100 hover:bg-slate-50">
@@ -152,14 +173,23 @@ function ClientRow({ client }: { client: Client }) {
       {/* Actions */}
       <td className="px-6 py-5">
         <div className="flex items-center justify-center gap-4 text-slate-500">
-          <button className="hover:text-slate-900">
+          <button onClick={onView} className="hover:text-slate-900" aria-label="Quick preview" type="button">
             <Eye size={18} />
           </button>
-          <button className="hover:text-slate-900">
+
+          <button className="hover:text-slate-900" aria-label="Send message" type="button">
             <MessageSquare size={18} />
           </button>
-          <button className="hover:text-slate-900">
+
+          <button className="hover:text-slate-900" aria-label="More options" type="button">
             <MoreVertical size={18} />
+          </button>
+
+          <button
+            onClick={onView}
+            className="rounded-lg bg-[#3FA69E] px-4 py-2 text-xs font-semibold text-white hover:opacity-90" type="button"
+          >
+            View
           </button>
         </div>
       </td>
