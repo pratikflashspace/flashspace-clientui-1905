@@ -8,7 +8,7 @@ import {
   Send, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
-  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon,
+  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, Lock,
   LayoutDashboard, LogOut, User as UserIcon, ChevronDown
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
@@ -307,6 +307,7 @@ const StartChatting = () => {
 
   const [mapZoom, setMapZoom] = useState(11);
   const [isLoginOpen, setIsLoginOpen] = useState(false); // [NEW]
+  const [isLimitPopupOpen, setIsLimitPopupOpen] = useState(false); // [NEW] Limit Reached Popup
   const [isSignupOpen, setIsSignupOpen] = useState(false); // [NEW]
   const [isMapLoading, setIsMapLoading] = useState(false);
   const [mapTitle, setMapTitle] = useState('Popular Spaces');
@@ -574,7 +575,7 @@ const StartChatting = () => {
     if (!isAuthenticated) {
       const currentCount = parseInt(localStorage.getItem('guest_chat_count') || '0');
       if (currentCount >= 3) {
-        setIsLoginOpen(true);
+        setIsLimitPopupOpen(true);
         // Optional: clear message to avoid confusion or keep it? Keeping it allows them to send after login
         return;
       }
@@ -1327,6 +1328,39 @@ const StartChatting = () => {
           </ResizableMapLayout>
         </div>
       </div>
+      {/* Limit Reached Popup */}
+      {isLimitPopupOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+          <div className="absolute inset-0" onClick={() => setIsLimitPopupOpen(false)} />
+          <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-gray-800 text-center font-grotesk">
+            <button
+              onClick={() => setIsLimitPopupOpen(false)}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="w-16 h-16 bg-yellow-50 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4 text-[#EDB003]">
+              <Lock className="w-7 h-7" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Chat Limit Reached
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">
+              You've reached the free chat limit. <br />
+              Please login to continue chatting with our AI assistant.
+            </p>
+            <button
+              onClick={() => {
+                setIsLimitPopupOpen(false);
+                setIsLoginOpen(true);
+              }}
+              className="w-full py-3 bg-black dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold hover:opacity-90 transition-all transform active:scale-95 shadow-lg shadow-black/20 dark:shadow-white/10"
+            >
+              Log in to Continue
+            </button>
+          </div>
+        </div>
+      )}
       {/* Auth Modals */}
       <LoginModal
         isOpen={isLoginOpen}
