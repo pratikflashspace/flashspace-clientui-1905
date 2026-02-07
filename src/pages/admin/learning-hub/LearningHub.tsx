@@ -40,7 +40,7 @@ const itemVariants = {
 const ProductTraining = () => {
     // Mock data for product training
     const articles = [
-        { id: '1', title: 'Virtual Office Explained', update: '2 days ago', category: 'Virtual Office', color: 'bg-blue-500' },
+        { id: '1', title: 'Virtual Office Explained', category: 'Virtual Office', color: 'bg-blue-500' },
         { id: '2', title: 'Coworking Space Tiers', update: '1 week ago', category: 'Coworking', color: 'bg-cyan-500' },
         { id: '3', title: 'Meeting Room Booking Process', update: '3 weeks ago', category: 'Meeting Rooms', color: 'bg-emerald-500' },
         { id: '4', title: 'Pricing Plans Overview', update: '1 month ago', category: 'General', color: 'bg-indigo-500' },
