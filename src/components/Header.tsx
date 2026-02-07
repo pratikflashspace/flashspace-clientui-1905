@@ -160,7 +160,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                             <div ref={solutionsRef} className="relative">
                                 <button
                                     className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-gray-100 dark:hover:text-white"}`}
-                                    onClick={() => setIsSolutionsOpen((prev) => !prev)}
+                                    onMouseEnter={() => setIsSolutionsOpen(true)}
+                                    onClick={()=>setIsSolutionsOpen(false)}
                                 >
                                     <span className="relative">
                                         Get Workspaces
@@ -262,7 +263,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                             <div ref={moreRef} className="relative">
                                 <button
                                     className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-gray-100 dark:hover:text-white"}`}
-                                    onClick={() => setIsMoreOpen((prev) => !prev)}
+                                    onMouseEnter={() => setIsMoreOpen(true)}
+                                    onClick={()=>setIsMoreOpen(false)}
                                 >
                                     <span className="relative">
                                         More

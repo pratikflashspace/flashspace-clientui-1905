@@ -134,7 +134,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
   const footer = [
     { label: "Updates", href: "/updates", icon: Bell },
     { label: "Settings", href: "/settings", icon: SettingsIcon },
-    { label: "More", href: "#more", icon: MoreHorizontal }
+    // { label: "More", href: "#more", icon: MoreHorizontal }
   ];
 
   useEffect(() => {
@@ -241,7 +241,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
         )}
 
         {/* Menu items */}
-        <div className="overflow-y-auto h-full pb-32 flex flex-col">
+        <div className="overflow-hidden h-full pb-32 flex flex-col ">
           <div className="p-5 space-y-2 text-sm tracking-wide flex-1">
             <nav className="space-y-2">
               {/* Primary Top Items */}
