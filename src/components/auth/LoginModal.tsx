@@ -8,9 +8,10 @@ interface LoginModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSignupClick?: () => void;
+    onLoginSuccess?: () => void;
 }
 
-export const LoginModal = ({ isOpen, onClose, onSignupClick }: LoginModalProps) => {
+export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: LoginModalProps) => {
     useEffect(() => {
         const lenis = getLenis();
         if (isOpen) {
@@ -63,7 +64,7 @@ export const LoginModal = ({ isOpen, onClose, onSignupClick }: LoginModalProps) 
                     </p>
                 </div>
 
-                <LoginForm />
+                <LoginForm onSuccess={onLoginSuccess} />
 
                 <div className="mt-6 text-center">
                     <p className="text-sm text-slate-600">

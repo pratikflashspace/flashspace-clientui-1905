@@ -5,22 +5,30 @@ import { Button } from '@/components/ui/button';
 import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
 import { GoogleLoginButton } from './GoogleLoginButton';
 
-export const LoginForm = () => {
+interface LoginFormProps {
+  onSuccess?: () => void;
+}
+
+export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const navigate = useNavigate();
   const { login, isLoading, isAuthenticated } = useAuth();
 
   useEffect(() => {
     // Only redirect if authenticated and not currently loading
     if (isAuthenticated && !isLoading) {
-      navigate('/dashboard', { replace: true });
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading, navigate, onSuccess]);
 
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -44,7 +52,7 @@ export const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     try {
@@ -136,9 +144,9 @@ export const LoginForm = () => {
       </div>
 
       {/* Submit Button */}
-      <Button 
-        type="submit" 
-        className="w-full bg-[#EDB003] hover:bg-[#d99f03] text-white font-bold py-3.5 rounded-xl shadow-md transition-all duration-200 hover:shadow-lg text-base border-0" 
+      <Button
+        type="submit"
+        className="w-full bg-[#EDB003] hover:bg-[#d99f03] text-white font-bold py-3.5 rounded-xl shadow-md transition-all duration-200 hover:shadow-lg text-base border-0"
         disabled={isLoading}
       >
         {isLoading ? (
@@ -155,19 +163,19 @@ export const LoginForm = () => {
       </Button>
 
       {/* Social Login */}
-<div className="mt-6">
-  <div className="relative">
-    <div className="absolute inset-0 flex items-center">
-      <div className="w-full border-t border-slate-200"></div>
-    </div>
-    <div className="relative flex justify-center text-sm">
-      <span className="px-4 bg-white text-slate-500">or continue with</span>
-    </div>
-  </div>
+      <div className="mt-6">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-slate-200"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-4 bg-white text-slate-500">or continue with</span>
+          </div>
+        </div>
 
-  <div className="mt-6 grid grid-cols-1">
-    {/* Google Only */}
-    {/* <button
+        <div className="mt-6 grid grid-cols-1">
+          {/* Google Only */}
+          {/* <button
       type="button"
       className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors duration-200 text-sm font-medium text-[#172A3A]"
     >
@@ -179,12 +187,12 @@ export const LoginForm = () => {
       </svg>
       Google
     </button> */}
-  </div>
-</div>
-
-        <div className="mt-6 ">
-          <GoogleLoginButton onSuccess={() => navigate('/dashboard')} />
         </div>
+      </div>
+
+      <div className="mt-6 ">
+        <GoogleLoginButton onSuccess={() => navigate('/dashboard')} />
+      </div>
       {/* </div> */}
     </form>
   );
