@@ -8,7 +8,9 @@ import {
   Send, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
-  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History // [NEW] Added History icon
+  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
+  LogOut, Lock, // [NEW] Added icons
+  UserIcon
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
 import Splash3dButton from '@/components/ui/3d-splash-button';
@@ -363,6 +365,7 @@ const StartChatting = () => {
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [message, setMessage] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // [NEW] User menu state
   const [showUpdates, setShowUpdates] = useState(false); // [NEW] State for the popup
   const [showHistory, setShowHistory] = useState(false); // [NEW] State for history sidebar
   const sidebarRef = useRef<HTMLDivElement>(null);
