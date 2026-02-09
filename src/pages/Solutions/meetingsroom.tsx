@@ -526,7 +526,7 @@ const MeetingRoomsPage: React.FC = () => {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-4 pt-2">
+            <div className="flex flex-wrap gap-4 pb-4">
               <button onClick={() => window.location.href = '#room-types'} className="bg-[#FFD43B] text-black px-8 py-4 rounded-full font-bold font-poppins hover:bg-white hover:scale-105 transition-all flex items-center gap-2">
                 <Calendar className="w-5 h-5" /> Book Now
               </button>
@@ -985,7 +985,7 @@ const MeetingRoomsPage: React.FC = () => {
                   {item.name}
                 </h4>
 
-                <p className="text-sm text-gray-700 font-poppins mb-1">
+                <p className="text-sm text-gray-700 dark:text-gray-200 font-poppins mb-1">
                   {item.role}
                 </p>
 
