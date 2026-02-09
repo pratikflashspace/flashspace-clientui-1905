@@ -1,0 +1,48 @@
+import type { Client } from "@/types/spacePortal/client";
+
+export const CLIENTS: Client[] = [
+  {
+    id: "CL-1001",
+    companyName: "Tech Innovations Pvt Ltd",
+    contactName: "Rahul Sharma",
+    plan: "Virtual Office Premium",
+    space: "Mumbai - BKC",
+    startDate: "2024-01-15",
+    endDate: "2025-01-15",
+    status: "ACTIVE",
+    kycStatus: "VERIFIED",
+  },
+  {
+    id: "CL-1002",
+    companyName: "StartupXYZ Solutions",
+    contactName: "Priya Patel",
+    plan: "Team Space",
+    space: "Delhi - CP",
+    startDate: "2023-12-01",
+    endDate: "2024-11-30",
+    status: "ACTIVE",
+    kycStatus: "VERIFIED",
+  },
+  {
+    id: "CL-1003",
+    companyName: "Global Consulting LLC",
+    contactName: "Amit Kumar",
+    plan: "Virtual Office Standard",
+    space: "Bangalore - HSR",
+    startDate: "2024-02-01",
+    endDate: "2025-01-31",
+    status: "ACTIVE",
+    kycStatus: "PENDING",
+  },
+  {
+    id: "CL-1004",
+    companyName: "Design Studio Co",
+    contactName: "Neha Singh",
+    plan: "Hot Desk Monthly",
+    space: "Chennai - Anna Nagar",
+    startDate: "2024-01-10",
+    endDate: "2024-02-10",
+    status: "EXPIRING_SOON",
+    kycStatus: "VERIFIED",
+  },
+];
