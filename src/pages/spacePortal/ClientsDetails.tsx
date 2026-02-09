@@ -128,7 +128,7 @@ export default function ClientDetails() {
             </p>
 
             <div className="mt-6 overflow-x-auto">
-              <table className="w-full border-collapse text-left text-sm">
+              <table className="w-full min-w-[900px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 text-slate-500">
                     <th className="py-3">Booking ID</th>
@@ -187,7 +187,7 @@ export default function ClientDetails() {
             </p>
 
             <div className="mt-6 overflow-x-auto">
-              <table className="w-full border-collapse text-left text-sm">
+              <table className="w-full min-w-[900px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 text-slate-500">
                     <th className="py-3">Invoice #</th>

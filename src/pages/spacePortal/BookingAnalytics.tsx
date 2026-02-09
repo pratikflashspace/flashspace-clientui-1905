@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import StatCard from "@/components/ui/SpacePartner/StatCard";
 import { BOOKING_ANALYTICS } from "@/data/spacePortal/bookingAnalytics";
 
@@ -16,6 +17,9 @@ import {
 export default function BookingAnalytics() {
   const { summary, planDivision, spaceDivision, revenueTrend } =
     BOOKING_ANALYTICS;
+  const [tooltipTrigger, setTooltipTrigger] = useState<"hover" | "click">(
+    "hover"
+  );
 
   const growth =
     ((summary.revenueThisMonth - summary.revenueLastMonth) /
@@ -29,6 +33,22 @@ export default function BookingAnalytics() {
       maximumFractionDigits: 0,
     }).format(value);
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(hover: none), (pointer: coarse)");
+    const updateTrigger = () =>
+      setTooltipTrigger(mq.matches ? "click" : "hover");
+    updateTrigger();
+
+    if (mq.addEventListener) {
+      mq.addEventListener("change", updateTrigger);
+      return () => mq.removeEventListener("change", updateTrigger);
+    }
+
+    mq.addListener(updateTrigger);
+    return () => mq.removeListener(updateTrigger);
+  }, []);
 
   return (
     <div className="flex-1">
@@ -80,24 +100,37 @@ export default function BookingAnalytics() {
       {/* Revenue Chart + Summary */}
       <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Chart */}
-        <div className="xl:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="xl:col-span-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
           <h2 className="text-lg font-bold text-slate-900">Revenue Trend</h2>
           <p className="text-sm text-slate-500">
             Monthly revenue & booking performance.
           </p>
 
-          <div className="mt-6 h-[300px]">
+          <div className="mt-4 h-[240px] sm:mt-6 sm:h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={revenueTrend}>
+              <LineChart
+                data={revenueTrend}
+                margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
+                <XAxis
+                  dataKey="month"
+                  interval="preserveStartEnd"
+                  minTickGap={20}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis tick={{ fontSize: 12 }} width={44} />
+                <Tooltip
+                  trigger={tooltipTrigger}
+                  wrapperStyle={{ outline: "none" }}
+                />
                 <Line
                   type="monotone"
                   dataKey="revenue"
                   stroke="#3FA69E"
                   strokeWidth={3}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 6 }}
                 />
               </LineChart>
             </ResponsiveContainer>

@@ -40,7 +40,7 @@ export default function Dashboard() {
   const inactiveClients = CLIENTS.filter((c) => c.status === "INACTIVE").length;
 
   return (
-    <div className="p-8">
+    <div className="flex-1">
       {/* Heading */}
       <h1 className="text-3xl font-bold text-slate-900">
         Space <span className="text-[#3FA69E]">Dashboard</span>

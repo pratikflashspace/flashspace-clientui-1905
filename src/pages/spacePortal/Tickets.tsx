@@ -82,8 +82,8 @@ export default function Tickets() {
       </div>
 
       {/* Table */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <table className="w-full border-collapse text-left text-sm">
+      <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table className="w-full min-w-[900px] border-collapse text-left text-sm">
           <thead className="bg-slate-50">
             <tr className="text-slate-600">
               <th className="px-6 py-4 font-semibold">Ticket ID</th>

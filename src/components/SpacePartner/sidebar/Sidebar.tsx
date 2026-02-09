@@ -1,4 +1,5 @@
 import React from "react";
+import { X } from "lucide-react";
 import { sidebarConfig } from "./sidebarConfig";
 import { NavLink } from "react-router-dom";
 
@@ -32,26 +33,42 @@ function SidebarItem({ icon, label, to }: SidebarItemProps) {
   );
 }
 
-export default function Sidebar() {
+type SidebarProps = {
+  onClose?: () => void;
+};
+
+export default function Sidebar({ onClose }: SidebarProps) {
   return (
     <aside className="flex h-screen w-72 flex-col border-r border-slate-200 bg-white px-4 py-6">
       {/* Logo */}
-      <div className="mb-6">
-        <h1 className="text-xl font-bold text-slate-900">flashspace</h1>
-        <p className="text-sm text-slate-500">Space Partner Portal</p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900">flashspace</h1>
+          <p className="text-sm text-slate-500">Space Partner Portal</p>
+        </div>
+        {onClose ? (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close sidebar"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 lg:hidden"
+          >
+            <X size={18} />
+          </button>
+        ) : null}
       </div>
 
       {/* Menu */}
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
-  {sidebarConfig.map((item) => (
-    <SidebarItem
-      key={item.path}
-      to={item.path}
-      icon={<item.icon size={18} />}
-      label={item.label}
-    />
-  ))}
-</div>
+        {sidebarConfig.map((item) => (
+          <SidebarItem
+            key={item.path}
+            to={item.path}
+            icon={<item.icon size={18} />}
+            label={item.label}
+          />
+        ))}
+      </div>
 
 
       {/* Bottom */}

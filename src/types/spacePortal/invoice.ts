@@ -10,3 +10,13 @@ export type Invoice = {
   method: string;
   client: string;
 };
+
+export type InvoicesResponse = {
+  summary: {
+    totalInvoices: number;
+    totalAmount: number;
+    paidAmount: number;
+    dueAmount: number;
+  };
+  invoices: Invoice[];
+};
