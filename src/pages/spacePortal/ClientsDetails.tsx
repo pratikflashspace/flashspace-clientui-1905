@@ -1,8 +1,11 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
 import { CLIENT_DETAILS } from "@/data/spacePortal/clientDetail";
+
 import { ArrowLeft, Download, FileText, ShieldCheck, Mail } from "lucide-react";
 import { toast } from "sonner";
+
 import {
   Dialog,
   DialogContent,
@@ -11,17 +14,38 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+/**
+ * ClientDetails Page
+ *
+ * Shows:
+ * - Client overview
+ * - Booking history
+ * - Invoice history
+ * - KYC documents
+ * - Agreement details
+ *
+ * Backend-ready:
+ * - Replace CLIENT_DETAILS with GET /api/clients/:id response.
+ */
 export default function ClientDetails() {
-  const { clientId } = useParams(); // ✅ Changed from 'id' to match route param
+  const { clientId } = useParams(); // must match route param
   const navigate = useNavigate();
+
   const [isDocsOpen, setIsDocsOpen] = useState(false);
 
+  /**
+   * Find client from mock array.
+   * Backend version will directly fetch by clientId.
+   */
   const client = useMemo(() => {
     if (!clientId) return null;
-    // ✅ Find in array instead of accessing as object
-    return CLIENT_DETAILS.find(c => c.id === clientId) || null;
+    return CLIENT_DETAILS.find((c) => c.id === clientId) || null;
   }, [clientId]);
 
+  /**
+   * Opens external file link safely.
+   * Used for agreement PDF and KYC documents.
+   */
   const handleOpenLink = (url: string | undefined, label: string) => {
     if (!url || url === "#") {
       toast.error(`${label} is not available yet.`);
@@ -30,12 +54,17 @@ export default function ClientDetails() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  /**
+   * If client not found show fallback UI.
+   */
   if (!client) {
     return (
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold text-slate-900">Client Not Found</h1>
+
         <p className="text-slate-500">
-          No client exists with ID: <span className="font-semibold">{clientId}</span>
+          No client exists with ID:{" "}
+          <span className="font-semibold">{clientId}</span>
         </p>
 
         <button
@@ -66,37 +95,20 @@ export default function ClientDetails() {
             <h1 className="text-3xl font-bold text-slate-900">
               {client.companyName}
             </h1>
+
             <p className="mt-2 text-slate-500">
               Client ID:{" "}
               <span className="font-semibold text-slate-700">{client.id}</span>
             </p>
 
+            {/* Tags */}
             <div className="mt-4 flex flex-wrap gap-3">
               <span className="rounded-full bg-emerald-50 px-4 py-1 text-xs font-semibold text-[#3FA69E]">
                 Plan: {client.plan}
               </span>
 
-              <span
-                className={`rounded-full px-4 py-1 text-xs font-semibold ${
-                  client.status === "ACTIVE"
-                    ? "bg-emerald-50 text-emerald-700"
-                    : client.status === "EXPIRING_SOON"
-                    ? "bg-amber-50 text-amber-700"
-                    : "bg-rose-50 text-rose-700"
-                }`}
-              >
-                Status: {client.status}
-              </span>
-
-              <span
-                className={`rounded-full px-4 py-1 text-xs font-semibold ${
-                  client.kyc.status === "VERIFIED"
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-amber-50 text-amber-700"
-                }`}
-              >
-                KYC: {client.kyc.status}
-              </span>
+              <ClientStatusBadge status={client.status} />
+              <KycStatusBadge status={client.kyc.status} />
             </div>
           </div>
 
@@ -128,15 +140,13 @@ export default function ClientDetails() {
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* LEFT (Main Info) */}
+        {/* LEFT SIDE */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           {/* Overview */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900">Overview</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Basic client information and plan details.
-            </p>
-
+          <SectionCard
+            title="Overview"
+            description="Basic client information and plan details."
+          >
             <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
               <InfoRow label="Contact Name" value={client.contactName} />
               <InfoRow label="Email" value={client.email} />
@@ -145,17 +155,13 @@ export default function ClientDetails() {
               <InfoRow label="Start Date" value={client.startDate} />
               <InfoRow label="End Date" value={client.endDate} />
             </div>
-          </div>
+          </SectionCard>
 
           {/* Booking History */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900">
-              Booking History
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Recent bookings done by this client.
-            </p>
-
+          <SectionCard
+            title="Booking History"
+            description="Recent bookings done by this client."
+          >
             <div className="mt-6 overflow-x-auto">
               <table className="w-full min-w-[900px] border-collapse text-left text-sm">
                 <thead>
@@ -180,17 +186,7 @@ export default function ClientDetails() {
                       <td className="text-slate-700">{b.date}</td>
                       <td className="text-slate-600">{b.slot}</td>
                       <td>
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                            b.status === "CONFIRMED"
-                              ? "bg-emerald-50 text-emerald-700"
-                              : b.status === "PENDING"
-                              ? "bg-amber-50 text-amber-700"
-                              : "bg-rose-50 text-rose-700"
-                          }`}
-                        >
-                          {b.status}
-                        </span>
+                        <BookingStatusBadge status={b.status} />
                       </td>
                       <td className="text-right font-semibold text-slate-900">
                         ₹{b.amount}
@@ -206,15 +202,13 @@ export default function ClientDetails() {
                 </p>
               )}
             </div>
-          </div>
+          </SectionCard>
 
           {/* Invoice History */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900">Invoices</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Payment history for this client.
-            </p>
-
+          <SectionCard
+            title="Invoices"
+            description="Payment history for this client."
+          >
             <div className="mt-6 overflow-x-auto">
               <table className="w-full min-w-[900px] border-collapse text-left text-sm">
                 <thead>
@@ -237,17 +231,7 @@ export default function ClientDetails() {
                       </td>
                       <td className="text-slate-600">{inv.createdAt}</td>
                       <td>
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                            inv.status === "PAID"
-                              ? "bg-emerald-50 text-emerald-700"
-                              : inv.status === "PENDING"
-                              ? "bg-amber-50 text-amber-700"
-                              : "bg-rose-50 text-rose-700"
-                          }`}
-                        >
-                          {inv.status}
-                        </span>
+                        <InvoiceStatusBadge status={inv.status} />
                       </td>
                       <td className="text-right font-semibold text-slate-900">
                         ₹{inv.amount}
@@ -263,10 +247,10 @@ export default function ClientDetails() {
                 </p>
               )}
             </div>
-          </div>
+          </SectionCard>
         </div>
 
-        {/* RIGHT (KYC + Agreement) */}
+        {/* RIGHT SIDE */}
         <div className="flex flex-col gap-6">
           {/* KYC Card */}
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -276,8 +260,19 @@ export default function ClientDetails() {
             </div>
 
             <div className="mt-6 space-y-4 text-sm">
-              <p className="text-slate-600">Status: <span className="font-semibold text-slate-900">{client.kyc.status}</span></p>
-              <p className="text-slate-600">Documents: <span className="font-semibold text-slate-900">{client.kyc.documents.length} uploaded</span></p>
+              <p className="text-slate-600">
+                Status:{" "}
+                <span className="font-semibold text-slate-900">
+                  {client.kyc.status}
+                </span>
+              </p>
+
+              <p className="text-slate-600">
+                Documents:{" "}
+                <span className="font-semibold text-slate-900">
+                  {client.kyc.documents.length} uploaded
+                </span>
+              </p>
             </div>
 
             <button
@@ -306,8 +301,14 @@ export default function ClientDetails() {
 
             <div className="mt-6 space-y-4 text-sm">
               <InfoRow label="Status" value={client.agreement.status} />
-              <InfoRow label="Signed Date" value={client.agreement.signedAt || "-"} />
-              <InfoRow label="Valid Till" value={client.agreement.validTill || "-"} />
+              <InfoRow
+                label="Signed Date"
+                value={client.agreement.signedAt || "-"}
+              />
+              <InfoRow
+                label="Valid Till"
+                value={client.agreement.validTill || "-"}
+              />
             </div>
 
             <button
@@ -323,6 +324,7 @@ export default function ClientDetails() {
         </div>
       </div>
 
+      {/* Uploaded Docs Dialog */}
       <Dialog open={isDocsOpen} onOpenChange={setIsDocsOpen}>
         <DialogContent className="max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
           <DialogHeader>
@@ -359,6 +361,7 @@ export default function ClientDetails() {
                   >
                     View
                   </button>
+
                   <button
                     type="button"
                     onClick={() =>
@@ -378,6 +381,31 @@ export default function ClientDetails() {
   );
 }
 
+/**
+ * Reusable Section Card
+ * Used for Overview, Booking History, Invoices etc.
+ */
+function SectionCard({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 className="text-lg font-bold text-slate-900">{title}</h2>
+      <p className="mt-1 text-sm text-slate-500">{description}</p>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Info row component
+ */
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col">
@@ -387,4 +415,76 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       </span>
     </div>
   );
+}
+
+/**
+ * Generic Badge Component
+ * Used to remove repeated badge code.
+ */
+function Badge({
+  label,
+  className,
+}: {
+  label: string;
+  className: string;
+}) {
+  return (
+    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${className}`}>
+      {label}
+    </span>
+  );
+}
+
+/**
+ * Client Status Badge
+ */
+function ClientStatusBadge({ status }: { status: string }) {
+  const config =
+    status === "ACTIVE"
+      ? { className: "bg-emerald-50 text-emerald-700", label: `Status: ${status}` }
+      : status === "EXPIRING_SOON"
+      ? { className: "bg-amber-50 text-amber-700", label: `Status: ${status}` }
+      : { className: "bg-rose-50 text-rose-700", label: `Status: ${status}` };
+
+  return <Badge label={config.label} className={config.className} />;
+}
+
+/**
+ * KYC Status Badge
+ */
+function KycStatusBadge({ status }: { status: string }) {
+  const config =
+    status === "VERIFIED"
+      ? { className: "bg-emerald-50 text-emerald-700", label: `KYC: ${status}` }
+      : { className: "bg-amber-50 text-amber-700", label: `KYC: ${status}` };
+
+  return <Badge label={config.label} className={config.className} />;
+}
+
+/**
+ * Booking Status Badge
+ */
+function BookingStatusBadge({ status }: { status: string }) {
+  const config =
+    status === "CONFIRMED"
+      ? { className: "bg-emerald-50 text-emerald-700", label: status }
+      : status === "PENDING"
+      ? { className: "bg-amber-50 text-amber-700", label: status }
+      : { className: "bg-rose-50 text-rose-700", label: status };
+
+  return <Badge label={config.label} className={config.className} />;
+}
+
+/**
+ * Invoice Status Badge
+ */
+function InvoiceStatusBadge({ status }: { status: string }) {
+  const config =
+    status === "PAID"
+      ? { className: "bg-emerald-50 text-emerald-700", label: status }
+      : status === "PENDING"
+      ? { className: "bg-amber-50 text-amber-700", label: status }
+      : { className: "bg-rose-50 text-rose-700", label: status };
+
+  return <Badge label={config.label} className={config.className} />;
 }

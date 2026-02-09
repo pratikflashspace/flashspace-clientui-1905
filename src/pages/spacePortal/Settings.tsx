@@ -1,20 +1,65 @@
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Bell, Mail, ShieldCheck, Smartphone } from "lucide-react";
 
+/**
+ * SpacePortalSettings Page
+ *
+ * Features:
+ * - Notification preferences toggles
+ * - Security overview (static for now)
+ *
+ * Backend-ready:
+ * - Later notifications state should be fetched from backend and saved via API.
+ */
 export default function SpacePortalSettings() {
+  /**
+   * Notification preferences state.
+   * Later this should come from backend.
+   */
   const [notifications, setNotifications] = useState({
     emailUpdates: true,
     bookingAlerts: true,
     smsAlerts: false,
   });
 
+  /**
+   * Toggle any notification preference safely.
+   */
   const toggleNotification = (key: keyof typeof notifications) => {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  /**
+   * Toggle config list to avoid repeated JSX.
+   */
+  const notificationToggles = useMemo(
+    () => [
+      {
+        key: "emailUpdates" as const,
+        label: "Email updates",
+        description: "Weekly performance summaries and system updates.",
+        icon: <Mail size={16} />,
+      },
+      {
+        key: "bookingAlerts" as const,
+        label: "Booking alerts",
+        description: "Instant alerts for new booking requests.",
+        icon: <Bell size={16} />,
+      },
+      {
+        key: "smsAlerts" as const,
+        label: "SMS alerts",
+        description: "Critical updates sent to your phone.",
+        icon: <Smartphone size={16} />,
+      },
+    ],
+    []
+  );
+
   return (
     <div className="flex-1">
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Notification Preferences */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center gap-2">
             <Bell size={18} className="text-slate-500" />
@@ -22,35 +67,26 @@ export default function SpacePortalSettings() {
               Notification Preferences
             </h2>
           </div>
+
           <p className="mt-2 text-sm text-slate-500">
             Choose how you want to receive updates from the portal.
           </p>
 
           <div className="mt-5 space-y-4">
-            <SettingToggle
-              label="Email updates"
-              description="Weekly performance summaries and system updates."
-              icon={<Mail size={16} />}
-              enabled={notifications.emailUpdates}
-              onToggle={() => toggleNotification("emailUpdates")}
-            />
-            <SettingToggle
-              label="Booking alerts"
-              description="Instant alerts for new booking requests."
-              icon={<Bell size={16} />}
-              enabled={notifications.bookingAlerts}
-              onToggle={() => toggleNotification("bookingAlerts")}
-            />
-            <SettingToggle
-              label="SMS alerts"
-              description="Critical updates sent to your phone."
-              icon={<Smartphone size={16} />}
-              enabled={notifications.smsAlerts}
-              onToggle={() => toggleNotification("smsAlerts")}
-            />
+            {notificationToggles.map((toggle) => (
+              <SettingToggle
+                key={toggle.key}
+                label={toggle.label}
+                description={toggle.description}
+                icon={toggle.icon}
+                enabled={notifications[toggle.key]}
+                onToggle={() => toggleNotification(toggle.key)}
+              />
+            ))}
           </div>
         </div>
 
+        {/* Security Overview */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center gap-2">
             <ShieldCheck size={18} className="text-slate-500" />
@@ -58,21 +94,18 @@ export default function SpacePortalSettings() {
               Security Overview
             </h2>
           </div>
+
           <p className="mt-2 text-sm text-slate-500">
             Keep your account protected with strong security habits.
           </p>
 
           <div className="mt-5 space-y-4 text-sm text-slate-600">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <p className="font-semibold text-slate-900">
-                Last password update
-              </p>
-              <p className="text-slate-500">Not available</p>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <p className="font-semibold text-slate-900">2FA status</p>
-              <p className="text-slate-500">Disabled</p>
-            </div>
+            <SecurityInfoCard
+              title="Last password update"
+              value="Not available"
+            />
+
+            <SecurityInfoCard title="2FA status" value="Disabled" />
           </div>
 
           <button
@@ -87,6 +120,18 @@ export default function SpacePortalSettings() {
   );
 }
 
+/**
+ * Reusable security info block card
+ */
+function SecurityInfoCard({ title, value }: { title: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+      <p className="font-semibold text-slate-900">{title}</p>
+      <p className="text-slate-500">{value}</p>
+    </div>
+  );
+}
+
 type SettingToggleProps = {
   label: string;
   description: string;
@@ -95,6 +140,10 @@ type SettingToggleProps = {
   onToggle: () => void;
 };
 
+/**
+ * SettingToggle Component
+ * Used for notification preferences switches.
+ */
 function SettingToggle({
   label,
   description,
@@ -106,11 +155,14 @@ function SettingToggle({
     <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-200 px-4 py-3">
       <div className="flex items-start gap-3">
         <div className="mt-1 text-slate-500">{icon}</div>
+
         <div>
           <p className="text-sm font-semibold text-slate-900">{label}</p>
           <p className="text-xs text-slate-500">{description}</p>
         </div>
       </div>
+
+      {/* Toggle Button */}
       <button
         type="button"
         onClick={onToggle}
