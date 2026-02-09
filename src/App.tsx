@@ -80,6 +80,10 @@ import Spaces from "./pages/spacePortal/Spaces";
 import Tickets from "./pages/spacePortal/Tickets";
 import BookingAnalytics from "./pages/spacePortal/BookingAnalytics";
 import ClientEnquiries from "./pages/spacePortal/ClientEnquiries";
+import SpacePortalProfile from "./pages/spacePortal/Profile";
+import Notifications from "./pages/spacePortal/Notifications";
+import SpacePortalSettings from "./pages/spacePortal/Settings";
+import AddSpace from "./pages/spacePortal/AddSpace";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -207,6 +211,9 @@ const App = () => (
                 <Route path="clients" element={<SpacePortalClients />} />
                 <Route path="clients/:clientId" element={<SpacePortalClientDetails />} />
                 <Route path="client-enquiries" element={<ClientEnquiries />} />
+                <Route path="notifications" element={<Notifications />} />
+                <Route path="profile" element={<SpacePortalProfile />} />
+                <Route path="settings" element={<SpacePortalSettings />} />
                 <Route path="invoices-payments" element={<Invoices />} />
                 <Route path="booking-calendar" element={<Calendar />} />
                 <Route
@@ -214,6 +221,7 @@ const App = () => (
                   element={<BookingAnalytics />}
                 />
                 <Route path="space-management" element={<Spaces />} />
+                <Route path="space-management/add" element={<AddSpace />} />
                 <Route path="tickets" element={<Tickets />} />
               </Route>
 

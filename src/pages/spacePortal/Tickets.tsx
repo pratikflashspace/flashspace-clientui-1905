@@ -1,17 +1,23 @@
 import { useMemo, useState } from "react";
 import { TICKETS } from "@/data/spacePortal/ticket";
-import type { Ticket, TicketPriority, TicketStatus } from "@/types/spacePortal/ticket";
+import type {
+  Ticket,
+  TicketPriority,
+  TicketStatus,
+} from "@/types/spacePortal/ticket";
 
-import { Search, Eye, MoreVertical } from "lucide-react";
+import { Eye, MoreVertical } from "lucide-react";
+import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
+import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
 
 export default function Tickets() {
-  const [query, setQuery] = useState("");
+  const { query } = useSpacePortalSearch();
   const [statusFilter, setStatusFilter] = useState<TicketStatus | "ALL">("ALL");
   const [priorityFilter, setPriorityFilter] = useState<TicketPriority | "ALL">("ALL");
 
   const filteredTickets = useMemo(() => {
     return TICKETS.filter((t) => {
-      const q = query.toLowerCase();
+      const q = query.trim().toLowerCase();
 
       const matchesQuery =
         t.title.toLowerCase().includes(q) ||
@@ -31,54 +37,33 @@ export default function Tickets() {
 
   return (
     <div className="flex-1">
-      {/* Heading */}
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">
-          Ticket <span className="text-[#3FA69E]">System</span>
-        </h1>
-        <p className="mt-2 text-slate-500">
-          Track support requests raised by clients and manage resolutions.
-        </p>
-      </div>
-
       {/* Filters */}
-      <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center">
-        {/* Search */}
-        <div className="flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3">
-          <Search size={18} className="text-slate-400" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tickets..."
-            className="w-full bg-transparent text-sm outline-none"
-          />
-        </div>
-
-        {/* Status Filter */}
-        <select
+      <div className="mt-6 flex flex-nowrap items-center gap-3">
+        <SelectBox
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as any)}
-          className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
-        >
-          <option value="ALL">All Status</option>
-          <option value="OPEN">Open</option>
-          <option value="IN_PROGRESS">In Progress</option>
-          <option value="RESOLVED">Resolved</option>
-          <option value="CLOSED">Closed</option>
-        </select>
+          onChange={(val) => setStatusFilter(val as TicketStatus | "ALL")}
+          options={[
+            { label: "All Status", value: "ALL" },
+            { label: "Open", value: "OPEN" },
+            { label: "In Progress", value: "IN_PROGRESS" },
+            { label: "Resolved", value: "RESOLVED" },
+            { label: "Closed", value: "CLOSED" },
+          ]}
+          triggerClassName="w-36 sm:w-52"
+        />
 
-        {/* Priority Filter */}
-        <select
+        <SelectBox
           value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value as any)}
-          className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
-        >
-          <option value="ALL">All Priority</option>
-          <option value="LOW">Low</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="HIGH">High</option>
-          <option value="URGENT">Urgent</option>
-        </select>
+          onChange={(val) => setPriorityFilter(val as TicketPriority | "ALL")}
+          options={[
+            { label: "All Priority", value: "ALL" },
+            { label: "Low", value: "LOW" },
+            { label: "Medium", value: "MEDIUM" },
+            { label: "High", value: "HIGH" },
+            { label: "Urgent", value: "URGENT" },
+          ]}
+          triggerClassName="w-36 sm:w-52"
+        />
       </div>
 
       {/* Table */}

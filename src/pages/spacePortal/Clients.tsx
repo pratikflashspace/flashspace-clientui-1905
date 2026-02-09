@@ -1,58 +1,86 @@
 import { useMemo, useState } from "react";
 import { CLIENTS } from "@/data/spacePortal/clients";
-import type { Client } from "@/types/spacePortal/client";
+import type { Client, ClientPlan, ClientStatus, KycStatus } from "@/types/spacePortal/client";
 import { MapPin, Eye, MessageSquare, MoreVertical, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
+import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
 
 export default function Clients() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState("");
+  const { query } = useSpacePortalSearch();
+  const [statusFilter, setStatusFilter] = useState<ClientStatus | "ALL">("ALL");
+  const [planFilter, setPlanFilter] = useState<ClientPlan | "ALL">("ALL");
+  const [kycFilter, setKycFilter] = useState<KycStatus | "ALL">("ALL");
   console.log("🔍 CLIENTS imported:", CLIENTS);
   console.log("🔍 CLIENTS length:", CLIENTS.length);
 
 
   const filteredClients = useMemo(() => {
     const result = CLIENTS.filter((client) => {
-      const q = query.toLowerCase();
-      return (
+      const q = query.trim().toLowerCase();
+      const matchesQuery =
         client.companyName.toLowerCase().includes(q) ||
         client.contactName.toLowerCase().includes(q) ||
         client.id.toLowerCase().includes(q) ||
-        client.space.toLowerCase().includes(q)
-      );
+        client.space.toLowerCase().includes(q);
+      const matchesStatus =
+        statusFilter === "ALL" ? true : client.status === statusFilter;
+      const matchesPlan = planFilter === "ALL" ? true : client.plan === planFilter;
+      const matchesKyc = kycFilter === "ALL" ? true : client.kycStatus === kycFilter;
+      return matchesQuery && matchesStatus && matchesPlan && matchesKyc;
     });
     console.log("🔍 Filtered clients:", result.length);
     return result;
-  }, [query]);
+  }, [query, statusFilter, planFilter, kycFilter]);
   console.log("🔍 Rendering with clients:", filteredClients.length);
 
   return (
     <div className="flex-1">
-      {/* Heading */}
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">
-          My <span className="text-[#3FA69E]">Clients</span>
-        </h1>
-        <p className="mt-2 text-slate-500">
-          Manage all your client relationships
-        </p>
-      </div>
-
       {/* Search + Filter */}
-      <div className="mt-6 flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3">
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search clients..."
-            className="w-full bg-transparent text-sm outline-none"
+      <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex items-center gap-2 text-slate-700">
+          <Filter size={18} />
+          <p className="text-sm font-semibold">Filters</p>
+        </div>
+        <p className="mt-1 text-xs text-slate-500">
+          Narrow down clients by status, plan, and KYC.
+        </p>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center">
+          <SelectBox
+            value={statusFilter}
+            onChange={(val) => setStatusFilter(val as ClientStatus | "ALL")}
+            options={[
+              { label: "All Status", value: "ALL" },
+              { label: "Active", value: "ACTIVE" },
+              { label: "Expiring Soon", value: "EXPIRING_SOON" },
+              { label: "Inactive", value: "INACTIVE" },
+            ]}
+          />
+
+          <SelectBox
+            value={planFilter}
+            onChange={(val) => setPlanFilter(val as ClientPlan | "ALL")}
+            options={[
+              { label: "All Plans", value: "ALL" },
+              { label: "Virtual Office Premium", value: "Virtual Office Premium" },
+              { label: "Virtual Office Standard", value: "Virtual Office Standard" },
+              { label: "Team Space", value: "Team Space" },
+              { label: "Hot Desk Monthly", value: "Hot Desk Monthly" },
+            ]}
+          />
+
+          <SelectBox
+            value={kycFilter}
+            onChange={(val) => setKycFilter(val as KycStatus | "ALL")}
+            options={[
+              { label: "All KYC", value: "ALL" },
+              { label: "Verified", value: "VERIFIED" },
+              { label: "Pending", value: "PENDING" },
+            ]}
           />
         </div>
-
-        <button className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-          <Filter size={18} />
-          Filter
-        </button>
       </div>
 
       {/* Table Card */}

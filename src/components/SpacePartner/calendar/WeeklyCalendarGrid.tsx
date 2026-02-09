@@ -1,7 +1,7 @@
 import type { Booking } from "@/types/spacePortal/booking";
 
 type WeeklyCalendarGridProps = {
-  weekDays: string[];
+  weekDates: Date[];
   bookings: Booking[];
 };
 
@@ -20,58 +20,82 @@ const HOURS = [
 ];
 
 export default function WeeklyCalendarGrid({
-  weekDays,
+  weekDates,
   bookings,
 }: WeeklyCalendarGridProps) {
+  const minWidthClass =
+    weekDates.length <= 1 ? "min-w-[420px]" : "min-w-[920px]";
+
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-      {/* Header Row */}
-      <div className="grid grid-cols-8 border-b border-slate-200 bg-slate-50">
-        <div className="p-4 text-sm font-semibold text-slate-500">Time</div>
-
-        {weekDays.map((day) => (
-          <div
-            key={day}
-            className="p-4 text-sm font-semibold text-slate-700 border-l border-slate-200"
-          >
-            {day}
-          </div>
-        ))}
-      </div>
-
-      {/* Time Rows */}
-      <div className="relative">
-        {HOURS.map((hour) => (
-          <div key={hour} className="grid grid-cols-8 border-b border-slate-100">
-            {/* Time column */}
-            <div className="p-4 text-xs font-semibold text-slate-500 bg-white">
-              {hour}
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-x-auto">
+        <div className={minWidthClass}>
+          {/* Header Row */}
+          <div className="grid grid-cols-8 border-b border-slate-200 bg-slate-50">
+            <div className="p-3 text-xs font-semibold text-slate-500 sm:p-4 sm:text-sm">
+              Time
             </div>
 
-            {/* Day columns */}
-            {weekDays.map((day) => (
+            {weekDates.map((date) => {
+              const dayLabel = date.toLocaleDateString("en-US", {
+                weekday: "short",
+              });
+              const dateLabel = date.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              });
+              return (
+                <div
+                  key={date.toISOString()}
+                  className="border-l border-slate-200 p-3 text-xs font-semibold text-slate-700 sm:p-4 sm:text-sm"
+                >
+                  <span className="block">{dayLabel}</span>
+                  <span className="block text-[10px] font-medium text-slate-400 sm:text-xs">
+                    {dateLabel}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Time Rows */}
+          <div className="relative">
+            {HOURS.map((hour) => (
               <div
-                key={day + hour}
-                className="relative border-l border-slate-100 p-4 h-[72px]"
-              />
-            ))}
-          </div>
-        ))}
+                key={hour}
+                className="grid grid-cols-8 border-b border-slate-100"
+              >
+                {/* Time column */}
+                <div className="bg-white p-3 text-xs font-semibold text-slate-500 sm:p-4">
+                  {hour}
+                </div>
 
-        {/* Booking Blocks Overlay */}
-        <div className="absolute inset-0 grid grid-cols-8 pointer-events-none">
-          {/* empty first column */}
-          <div />
-
-          {weekDays.map((day, dayIndex) => (
-            <div key={dayIndex} className="relative">
-              {bookings
-                .filter((b) => formatDay(b.startTime) === day)
-                .map((booking) => (
-                  <BookingBlock key={booking.id} booking={booking} />
+                {/* Day columns */}
+                {weekDates.map((date) => (
+                  <div
+                    key={`${date.toISOString()}-${hour}`}
+                    className="relative h-[72px] border-l border-slate-100 p-3 sm:p-4"
+                  />
                 ))}
+              </div>
+            ))}
+
+            {/* Booking Blocks Overlay */}
+            <div className="pointer-events-none absolute inset-0 grid grid-cols-8">
+              {/* empty first column */}
+              <div />
+
+              {weekDates.map((date, dayIndex) => (
+                <div key={dayIndex} className="relative">
+                  {bookings
+                    .filter((b) => isSameDay(new Date(b.startTime), date))
+                    .map((booking) => (
+                      <BookingBlock key={booking.id} booking={booking} />
+                    ))}
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
@@ -106,9 +130,12 @@ function BookingBlock({ booking }: { booking: Booking }) {
   );
 }
 
-function formatDay(dateString: string) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", { weekday: "short" });
+function isSameDay(a: Date, b: Date) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
 function formatTime(dateString: string) {

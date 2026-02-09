@@ -587,6 +587,16 @@
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
 }
 
+/* Hide scrollbars while keeping scroll functional */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* MapLibre Popup Custom Styling */
 .maplibregl-popup {
   max-width: none !important;

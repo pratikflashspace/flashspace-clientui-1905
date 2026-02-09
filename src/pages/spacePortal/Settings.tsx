@@ -1,0 +1,130 @@
+import { useState, type ReactNode } from "react";
+import { Bell, Mail, ShieldCheck, Smartphone } from "lucide-react";
+
+export default function SpacePortalSettings() {
+  const [notifications, setNotifications] = useState({
+    emailUpdates: true,
+    bookingAlerts: true,
+    smsAlerts: false,
+  });
+
+  const toggleNotification = (key: keyof typeof notifications) => {
+    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  return (
+    <div className="flex-1">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-2">
+            <Bell size={18} className="text-slate-500" />
+            <h2 className="text-lg font-bold text-slate-900">
+              Notification Preferences
+            </h2>
+          </div>
+          <p className="mt-2 text-sm text-slate-500">
+            Choose how you want to receive updates from the portal.
+          </p>
+
+          <div className="mt-5 space-y-4">
+            <SettingToggle
+              label="Email updates"
+              description="Weekly performance summaries and system updates."
+              icon={<Mail size={16} />}
+              enabled={notifications.emailUpdates}
+              onToggle={() => toggleNotification("emailUpdates")}
+            />
+            <SettingToggle
+              label="Booking alerts"
+              description="Instant alerts for new booking requests."
+              icon={<Bell size={16} />}
+              enabled={notifications.bookingAlerts}
+              onToggle={() => toggleNotification("bookingAlerts")}
+            />
+            <SettingToggle
+              label="SMS alerts"
+              description="Critical updates sent to your phone."
+              icon={<Smartphone size={16} />}
+              enabled={notifications.smsAlerts}
+              onToggle={() => toggleNotification("smsAlerts")}
+            />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={18} className="text-slate-500" />
+            <h2 className="text-lg font-bold text-slate-900">
+              Security Overview
+            </h2>
+          </div>
+          <p className="mt-2 text-sm text-slate-500">
+            Keep your account protected with strong security habits.
+          </p>
+
+          <div className="mt-5 space-y-4 text-sm text-slate-600">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <p className="font-semibold text-slate-900">
+                Last password update
+              </p>
+              <p className="text-slate-500">Not available</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <p className="font-semibold text-slate-900">2FA status</p>
+              <p className="text-slate-500">Disabled</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="mt-5 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            Update security settings
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type SettingToggleProps = {
+  label: string;
+  description: string;
+  icon: ReactNode;
+  enabled: boolean;
+  onToggle: () => void;
+};
+
+function SettingToggle({
+  label,
+  description,
+  icon,
+  enabled,
+  onToggle,
+}: SettingToggleProps) {
+  return (
+    <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-200 px-4 py-3">
+      <div className="flex items-start gap-3">
+        <div className="mt-1 text-slate-500">{icon}</div>
+        <div>
+          <p className="text-sm font-semibold text-slate-900">{label}</p>
+          <p className="text-xs text-slate-500">{description}</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`h-6 w-11 rounded-full px-1 transition ${
+          enabled ? "bg-[#3FA69E]" : "bg-slate-200"
+        }`}
+        aria-pressed={enabled}
+      >
+        <span
+          className={`block h-4 w-4 rounded-full bg-white transition ${
+            enabled ? "translate-x-5" : "translate-x-0"
+          }`}
+        />
+      </button>
+    </div>
+  );
+}

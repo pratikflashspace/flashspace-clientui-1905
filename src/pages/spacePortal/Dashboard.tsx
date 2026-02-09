@@ -3,20 +3,20 @@ import { CLIENTS } from "@/data/spacePortal/clients";
 import type { ClientStatus, ClientPlan } from "@/types/spacePortal/client";
 
 import StatCard from "@/components/ui/SpacePartner/StatCard";
-import SearchBar from "@/components/ui/SpacePartner/SearchBar";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
 import Table from "@/components/ui/SpacePartner/Table";
+import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
 
 import { Users, UserX, Clock, CheckCircle2 } from "lucide-react";
 
 export default function Dashboard() {
-  const [query, setQuery] = useState("");
+  const { query } = useSpacePortalSearch();
   const [statusFilter, setStatusFilter] = useState<ClientStatus | "ALL">("ALL");
   const [planFilter, setPlanFilter] = useState<ClientPlan | "ALL">("ALL");
 
   const filteredClients = useMemo(() => {
     return CLIENTS.filter((c) => {
-      const q = query.toLowerCase();
+      const q = query.trim().toLowerCase();
 
       const matchesQuery =
         c.companyName.toLowerCase().includes(q) ||
@@ -41,17 +41,8 @@ export default function Dashboard() {
 
   return (
     <div className="flex-1">
-      {/* Heading */}
-      <h1 className="text-3xl font-bold text-slate-900">
-        Space <span className="text-[#3FA69E]">Dashboard</span>
-      </h1>
-
-      <p className="mt-2 text-slate-500">
-        Complete control over clients, plans, and space performance.
-      </p>
-
       {/* Stats */}
-      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Total Clients"
           value={totalClients}
@@ -92,13 +83,7 @@ export default function Dashboard() {
           Search and filter clients by plan, status, and space.
         </p>
 
-        <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center">
-          <SearchBar
-            value={query}
-            onChange={setQuery}
-            placeholder="Search by ID, company, contact, space..."
-          />
-
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center">
           <SelectBox
             value={statusFilter}
             onChange={(val) => setStatusFilter(val as ClientStatus | "ALL")}

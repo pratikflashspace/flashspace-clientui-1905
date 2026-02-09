@@ -52,18 +52,8 @@ export default function BookingAnalytics() {
 
   return (
     <div className="flex-1">
-      {/* Heading */}
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">
-          Booking <span className="text-[#3FA69E]">Analytics</span>
-        </h1>
-        <p className="mt-2 text-slate-500">
-          Monitor performance across plans, spaces, and revenue trends.
-        </p>
-      </div>
-
       {/* KPI Cards */}
-      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Total Bookings"
           value={summary.totalBookings}

@@ -1,26 +1,29 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SPACES } from "@/data/spacePortal/spaces";
 import type { SpaceStatus } from "@/types/spacePortal/space";
 
 import StatCard from "@/components/ui/SpacePartner/StatCard";
+import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
+import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
 
 import {
   Building2,
   CheckCircle2,
   Wrench,
   XCircle,
-  Search,
   Plus,
 } from "lucide-react";
 
 export default function Spaces() {
-  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const { query } = useSpacePortalSearch();
   const [statusFilter, setStatusFilter] = useState<SpaceStatus | "ALL">("ALL");
   const [cityFilter, setCityFilter] = useState<string | "ALL">("ALL");
 
   const filteredSpaces = useMemo(() => {
     return SPACES.filter((space) => {
-      const q = query.toLowerCase();
+      const q = query.trim().toLowerCase();
 
       const matchesQuery =
         space.name.toLowerCase().includes(q) ||
@@ -48,25 +51,20 @@ export default function Spaces() {
 
   return (
     <div className="flex-1">
-      {/* Heading */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">
-            Space <span className="text-[#3FA69E]">Management</span>
-          </h1>
-          <p className="mt-2 text-slate-500">
-            Manage your coworking spaces, availability, and operational status.
-          </p>
-        </div>
-
-        <button className="flex items-center gap-2 rounded-xl bg-[#3FA69E] px-5 py-3 text-sm font-bold text-white shadow-sm hover:opacity-90">
+      {/* Actions */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          onClick={() => navigate("/spaceportal/space-management/add")}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3FA69E] px-5 py-3 text-sm font-bold text-white shadow-sm hover:opacity-90 sm:w-auto sm:justify-start"
+        >
           <Plus size={18} />
           Add Space
         </button>
       </div>
 
       {/* Stats */}
-      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Total Spaces"
           value={totalSpaces}
@@ -101,43 +99,33 @@ export default function Spaces() {
       </div>
 
       {/* Filters */}
-      <div className="mt-10 flex flex-col gap-4 md:flex-row md:items-center">
-        {/* Search */}
-        <div className="flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3">
-          <Search size={18} className="text-slate-400" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by space name, city, id..."
-            className="w-full bg-transparent text-sm outline-none"
+      <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <p className="text-sm font-semibold text-slate-700">Filters</p>
+        <p className="mt-1 text-xs text-slate-500">
+          Filter spaces by status and city.
+        </p>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center">
+          <SelectBox
+            value={statusFilter}
+            onChange={(val) => setStatusFilter(val as SpaceStatus | "ALL")}
+            options={[
+              { label: "All Status", value: "ALL" },
+              { label: "Active", value: "ACTIVE" },
+              { label: "Maintenance", value: "MAINTENANCE" },
+              { label: "Inactive", value: "INACTIVE" },
+            ]}
+          />
+
+          <SelectBox
+            value={cityFilter}
+            onChange={(val) => setCityFilter(val)}
+            options={[
+              { label: "All Cities", value: "ALL" },
+              ...cities.map((city) => ({ label: city, value: city })),
+            ]}
           />
         </div>
-
-        {/* Status Filter */}
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as any)}
-          className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
-        >
-          <option value="ALL">All Status</option>
-          <option value="ACTIVE">Active</option>
-          <option value="MAINTENANCE">Maintenance</option>
-          <option value="INACTIVE">Inactive</option>
-        </select>
-
-        {/* City Filter */}
-        <select
-          value={cityFilter}
-          onChange={(e) => setCityFilter(e.target.value)}
-          className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
-        >
-          <option value="ALL">All Cities</option>
-          {cities.map((city) => (
-            <option key={city} value={city}>
-              {city}
-            </option>
-          ))}
-        </select>
       </div>
 
       {/* Table */}

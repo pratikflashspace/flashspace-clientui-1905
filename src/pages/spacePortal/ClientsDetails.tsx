@@ -1,17 +1,34 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CLIENT_DETAILS } from "@/data/spacePortal/clientDetail";
-import { ArrowLeft, Download, FileText, ShieldCheck, User } from "lucide-react";
+import { ArrowLeft, Download, FileText, ShieldCheck, Mail } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function ClientDetails() {
   const { clientId } = useParams(); // ✅ Changed from 'id' to match route param
   const navigate = useNavigate();
+  const [isDocsOpen, setIsDocsOpen] = useState(false);
 
   const client = useMemo(() => {
     if (!clientId) return null;
     // ✅ Find in array instead of accessing as object
     return CLIENT_DETAILS.find(c => c.id === clientId) || null;
   }, [clientId]);
+
+  const handleOpenLink = (url: string | undefined, label: string) => {
+    if (!url || url === "#") {
+      toast.error(`${label} is not available yet.`);
+      return;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   if (!client) {
     return (
@@ -85,14 +102,26 @@ export default function ClientDetails() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3 sm:flex-row">
-            <button className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <button
+              type="button"
+              onClick={() =>
+                handleOpenLink(client.agreement.agreementUrl, "Agreement")
+              }
+              className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
               <Download size={16} />
               Download Agreement
             </button>
 
-            <button className="rounded-xl bg-[#3FA69E] px-5 py-3 text-sm font-semibold text-white hover:opacity-90">
+            <a
+              href={`mailto:${client.email}?subject=Flashspace%20Partnership&body=Hi%20${encodeURIComponent(
+                client.contactName
+              )},%0A%0A`}
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#3FA69E] px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
+            >
+              <Mail size={16} />
               Message Client
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -251,7 +280,17 @@ export default function ClientDetails() {
               <p className="text-slate-600">Documents: <span className="font-semibold text-slate-900">{client.kyc.documents.length} uploaded</span></p>
             </div>
 
-            <button className="mt-6 w-full rounded-xl bg-[#3FA69E] px-4 py-3 text-sm font-semibold text-white hover:opacity-90">
+            <button
+              type="button"
+              onClick={() => {
+                if (!client.kyc.documents.length) {
+                  toast.error("No uploaded documents found.");
+                  return;
+                }
+                setIsDocsOpen(true);
+              }}
+              className="mt-6 w-full rounded-xl bg-[#3FA69E] px-4 py-3 text-sm font-semibold text-white hover:opacity-90"
+            >
               View Uploaded Docs
             </button>
           </div>
@@ -271,12 +310,70 @@ export default function ClientDetails() {
               <InfoRow label="Valid Till" value={client.agreement.validTill || "-"} />
             </div>
 
-            <button className="mt-6 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <button
+              type="button"
+              onClick={() =>
+                handleOpenLink(client.agreement.agreementUrl, "Agreement")
+              }
+              className="mt-6 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
               Download PDF
             </button>
           </div>
         </div>
       </div>
+
+      <Dialog open={isDocsOpen} onOpenChange={setIsDocsOpen}>
+        <DialogContent className="max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+          <DialogHeader>
+            <DialogTitle className="text-slate-900">
+              Uploaded Documents
+            </DialogTitle>
+            <DialogDescription className="text-slate-500">
+              Review the client KYC documents.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-4 space-y-3">
+            {client.kyc.documents.map((doc) => (
+              <div
+                key={doc.id}
+                className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {doc.type}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Uploaded: {doc.uploadedAt}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleOpenLink(doc.fileUrl, `${doc.type} document`)
+                    }
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                  >
+                    View
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleOpenLink(doc.fileUrl, `${doc.type} document`)
+                    }
+                    className="rounded-lg bg-[#3FA69E] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+                  >
+                    Download
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
