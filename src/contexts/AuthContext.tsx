@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import toast from 'react-hot-toast';
 import { User, AuthState } from '@/types/auth.types';
 import { authService } from '@/services/auth.service';
-import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
@@ -27,8 +27,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     error: null,
   });
 
-  const { toast } = useToast();
-
   // Check auth status on mount
   useEffect(() => {
     checkAuthStatus();
@@ -38,7 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setState((prev) => ({ ...prev, isLoading: true }));
       const response = await authService.checkAuth();
-      
+
       if (response.success && response.data.isAuthenticated && response.data.user) {
         setState({
           user: response.data.user,
@@ -57,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error: any) {
       // Auth check failed - cookies are invalid or expired
-      
+
       setState({
         user: null,
         isAuthenticated: false,
@@ -70,9 +68,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
-      
+
       const response = await authService.login({ email, password });
-      
+
       if (response.success && response.data?.user) {
         setState({
           user: response.data.user,
@@ -81,10 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: null,
         });
 
-        toast({
-          title: 'Login Successful',
-          description: response.message || 'Welcome back!',
-        });
+        toast.success('Logged in successfully');
       } else {
         const errorMsg = response.message || 'Login failed';
         setState((prev) => ({
@@ -93,11 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: errorMsg,
         }));
 
-        toast({
-          title: 'Login Failed',
-          description: errorMsg,
-          variant: 'destructive',
-        });
+        toast.error(errorMsg);
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Login failed';
@@ -107,20 +98,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: errorMessage,
       }));
 
-      toast({
-        title: 'Login Failed',
-        description: errorMessage,
-        variant: 'destructive',
-      });
+      toast.error(errorMessage);
     }
   };
 
   const signup = async (data: any) => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
-      
+
       const response = await authService.signup(data);
-      
+
       if (response.success) {
         setState((prev) => ({
           ...prev,
@@ -128,10 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: null,
         }));
 
-        toast({
-          title: 'Registration Successful',
-          description: response.message || 'Please check your email for OTP verification.',
-        });
+        toast.success('Signed up successfully');
       } else {
         throw new Error(response.message || 'Signup failed');
       }
@@ -143,12 +127,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: errorMessage,
       }));
 
-      toast({
-        title: 'Registration Failed',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      
+      toast.error(errorMessage);
+
       throw error;
     }
   };
@@ -156,9 +136,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const verifyOTP = async (email: string, otp: string) => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
-      
+
       const response = await authService.verifyOTP({ email, otp });
-      
+
       if (response.success && response.data.user) {
         setState({
           user: response.data.user,
@@ -167,10 +147,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: null,
         });
 
-        toast({
-          title: 'Verification Successful',
-          description: response.message || 'Your email has been verified!',
-        });
+        toast.success('Email verified successfully');
       } else {
         throw new Error(response.message || 'OTP verification failed');
       }
@@ -182,12 +159,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: errorMessage,
       }));
 
-      toast({
-        title: 'Verification Failed',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-      
+      toast.error(errorMessage);
+
       throw error;
     }
   };
@@ -195,7 +168,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await authService.logout();
-      
+
       // Backend clears cookies, just update state
       setState({
         user: null,
@@ -204,10 +177,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: null,
       });
 
-      toast({
-        title: 'Logged Out',
-        description: 'You have been successfully logged out.',
-      });
+      toast.success('Logged out successfully');
     } catch (error: any) {
       // Even if logout fails on server, clear local state
       // Cookies will be invalid anyway
@@ -218,10 +188,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: null,
       });
 
-      toast({
-        title: 'Logged Out',
-        description: 'You have been logged out.',
-      });
+      toast.success('Logged out successfully');
     }
   };
 
@@ -242,9 +209,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const googleLogin = async (idToken: string) => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
-      
+
       const response = await authService.googleLogin(idToken);
-      
+
       if (response.success && response.data?.user) {
         setState({
           user: response.data.user,
@@ -253,10 +220,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: null,
         });
 
-        toast({
-          title: 'Login Successful',
-          description: response.message || 'Welcome!',
-        });
+        toast.success('Logged in successfully');
       } else {
         const errorMsg = response.message || 'Google login failed';
         setState((prev) => ({
@@ -265,11 +229,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: errorMsg,
         }));
 
-        toast({
-          title: 'Login Failed',
-          description: errorMsg,
-          variant: 'destructive',
-        });
+        toast.error(errorMsg);
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Google login failed';
@@ -279,11 +239,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: errorMessage,
       }));
 
-      toast({
-        title: 'Login Failed',
-        description: errorMessage,
-        variant: 'destructive',
-      });
+      toast.error(errorMessage);
     }
   };
 

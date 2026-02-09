@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import userDashboardService, { SupportTicket } from "@/services/userDashboard.service";
+import { SupportTicket, TicketPriority, TicketStatus } from "@/types/services";
+import userDashboardService from "@/services/userDashboard.service";
 import { useAuth } from "@/contexts/AuthContext";
+import toast from "react-hot-toast";
 import {
   MessageCircle,
   Phone,
@@ -108,7 +110,7 @@ export default function Support() {
   const [formData, setFormData] = useState({
     subject: "",
     category: "",
-    priority: "medium" as "low" | "medium" | "high",
+    priority: "medium" as TicketPriority,
     description: "",
   });
   const [submitted, setSubmitted] = useState(false);
@@ -118,10 +120,13 @@ export default function Support() {
     try {
       const response = await userDashboardService.getTickets();
       if (response.success && response.data) {
-        setTickets(response.data);
+        // API returns { tickets: [], total, page, ... } - extract the tickets array
+        const ticketsData = Array.isArray(response.data) ? response.data : response.data.tickets || [];
+        setTickets(ticketsData);
       }
-    } catch (err) {
-      console.error("Failed to fetch tickets");
+    } catch (err: unknown) {
+      console.error("Failed to fetch tickets", err);
+      alert("Failed to load tickets. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -139,11 +144,12 @@ export default function Support() {
     try {
       const response = await userDashboardService.createTicket({
         subject: formData.subject,
-        category: formData.category as any,
+        category: formData.category,
         priority: formData.priority,
-        message: formData.description,
+        description: formData.description,
       });
-      if (response.success) {
+
+      if (response.success && response.data) {
         setSubmitted(true);
         fetchTickets();
         setTimeout(() => {
@@ -151,9 +157,12 @@ export default function Support() {
           setShowNewTicket(false);
           setFormData({ subject: "", category: "", priority: "medium", description: "" });
         }, 3000);
+      } else {
+        alert(response.message || "Failed to create ticket");
       }
-    } catch (err) {
-      console.error("Failed to create ticket");
+    } catch (err: unknown) {
+      console.error("Failed to create ticket", err);
+      alert("Failed to create ticket. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -168,9 +177,13 @@ export default function Support() {
         setSelectedTicket(response.data);
         setReplyMessage("");
         fetchTickets();
+        toast.success("Reply sent!");
+      } else {
+        alert(response.message || "Failed to send reply");
       }
-    } catch (err) {
-      console.error("Failed to reply");
+    } catch (err: unknown) {
+      console.error("Failed to reply", err);
+      alert("Failed to send reply. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -182,17 +195,20 @@ export default function Support() {
       if (response.success && response.data) {
         setSelectedTicket(response.data);
       }
-    } catch (err) {
-      console.error("Failed to load ticket");
+    } catch (err: unknown) {
+      console.error("Failed to load ticket", err);
+      alert("Failed to load ticket details");
     }
   };
 
-  const getStatusConfig = (status: string) => {
+  const getStatusConfig = (status: TicketStatus) => {
     switch (status) {
       case "open":
         return { bg: "bg-blue-100", text: "text-blue-700", label: "Open" };
       case "in_progress":
         return { bg: "bg-yellow-100", text: "text-yellow-700", label: "In Progress" };
+      case "waiting_customer":
+        return { bg: "bg-orange-100", text: "text-orange-700", label: "Waiting for Customer" };
       case "resolved":
         return { bg: "bg-green-100", text: "text-green-700", label: "Resolved" };
       case "closed":
@@ -202,8 +218,9 @@ export default function Support() {
     }
   };
 
-  const getPriorityConfig = (priority: string) => {
+  const getPriorityConfig = (priority: TicketPriority) => {
     switch (priority) {
+      case "urgent":
       case "high":
         return { bg: "bg-red-100", text: "text-red-700" };
       case "medium":
@@ -258,11 +275,10 @@ export default function Support() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? "bg-yellow-400 text-black"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
+                  ? "bg-yellow-400 text-black"
+                  : "text-gray-600 hover:bg-gray-100"
+                  }`}
               >
                 <tab.icon className="w-4 h-4" />
                 <span className="hidden sm:inline">{tab.label}</span>
@@ -334,7 +350,7 @@ export default function Support() {
                 >
                   <ArrowLeft className="w-4 h-4" /> Back to Tickets
                 </button>
-                
+
                 <div className="flex items-start justify-between mb-6">
                   <div>
                     <p className="text-sm font-mono text-gray-500">{selectedTicket.ticketNumber}</p>
@@ -371,7 +387,7 @@ export default function Support() {
                 </div>
 
                 {/* Reply Form */}
-                {selectedTicket.status !== "closed" && (
+                {selectedTicket.status !== "closed" && selectedTicket.status !== "resolved" ? (
                   <div className="border-t border-gray-100 pt-4">
                     <div className="flex gap-3">
                       <textarea
@@ -388,6 +404,20 @@ export default function Support() {
                       >
                         {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                       </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border-t border-gray-100 pt-4">
+                    <div className="bg-green-50 rounded-xl p-4 text-center border border-green-100">
+                      <CheckCircle2 className="w-8 h-8 text-green-500 mx-auto mb-2" />
+                      <p className="text-green-700 font-medium">
+                        This ticket has been {selectedTicket.status === "resolved" ? "resolved" : "closed"}
+                      </p>
+                      <p className="text-sm text-green-600 mt-1">
+                        {selectedTicket.status === "resolved"
+                          ? "Our support team has resolved your query. Thank you for contacting us!"
+                          : "This ticket is now closed. Please create a new ticket if you need further assistance."}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -446,6 +476,21 @@ export default function Support() {
                             </select>
                           </div>
                         </div>
+
+                        <div>
+                          <label className="block text-sm text-gray-600 mb-1">Priority</label>
+                          <select
+                            value={formData.priority}
+                            onChange={(e) => setFormData({ ...formData, priority: e.target.value as TicketPriority })}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          >
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                          </select>
+                        </div>
+
                         <div>
                           <label className="block text-sm text-gray-600 mb-1">Description</label>
                           <textarea
@@ -510,7 +555,7 @@ export default function Support() {
                                 </div>
                                 <p className="font-medium text-gray-900">{ticket.subject}</p>
                                 <p className="text-xs text-gray-400 mt-1">
-                                  Created: {new Date(ticket.createdAt).toLocaleDateString("en-IN")} - Last updated: {new Date(ticket.updatedAt).toLocaleDateString("en-IN")}
+                                  Created: {new Date(ticket.createdAt).toLocaleDateString("en-IN")}
                                 </p>
                               </div>
                               <button

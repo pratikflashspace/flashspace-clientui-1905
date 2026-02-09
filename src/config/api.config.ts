@@ -79,11 +79,22 @@ export const API_ENDPOINTS = {
     INVOICES: '/api/user/invoices',
     INVOICE_BY_ID: (id: string) => `/api/user/invoices/${id}`,
     // Support
-    TICKETS: '/api/user/support/tickets',
-    TICKET_BY_ID: (id: string) => `/api/user/support/tickets/${id}`,
-    TICKET_REPLY: (id: string) => `/api/user/support/tickets/${id}/reply`,
+    TICKETS: '/api/tickets',
+    MY_TICKETS: '/api/tickets/my-tickets',
+    TICKET_BY_ID: (id: string) => `/api/tickets/${id}`,
+    TICKET_REPLY: (id: string) => `/api/tickets/${id}/reply`,
     // Credits
     CREDITS: '/api/user/credits',
     REDEEM_REWARD: '/api/user/credits/redeem',
+  },
+
+  // Admin endpoints
+  ADMIN: {
+    DASHBOARD: '/api/admin/dashboard',
+    USERS: '/api/admin/users',
+    BOOKINGS: '/api/admin/bookings',
+    KYC_PENDING: '/api/admin/kyc/pending',
+    KYC_REVIEW: (id: string) => `/api/admin/kyc/${id}/review`,
+    // Tickets - directly use ticket routes
   },
 };
