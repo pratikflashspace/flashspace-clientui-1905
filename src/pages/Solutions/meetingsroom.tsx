@@ -348,16 +348,16 @@ const MeetingRoomsPage: React.FC = () => {
         userEmail: user.email,
         userName: user.fullName || "User",
         userPhone: bookingForm.mobile || user.phoneNumber,
-        spaceId: "fixed-meeting-room-id", // In real app, this would be dynamic ID
+        spaceId: selectedRoom._id || selectedRoom.id || `meeting_room_${selectedRoom.name.replace(/\s+/g, '_').toLowerCase()}`,
         spaceName: selectedRoom.name,
         planName: "Hourly Booking",
         planKey: "meeting_hourly",
-        tenure: 1, // 1 year filler, redundant here but required by interface type
-        yearlyPrice: totalAmount, // filler
+        tenure: 1,
+        yearlyPrice: totalAmount,
         totalAmount: totalAmount,
         discountPercent: 0,
         discountAmount: 0,
-        paymentType: "meeting_room" as any // "meeting_room" was added to types in previous steps but interface might need update
+        paymentType: "meeting_room"
       });
 
       // 2. Open Razorpay OR Simulate
