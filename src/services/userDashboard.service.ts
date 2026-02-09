@@ -1,178 +1,28 @@
 import axiosInstance from '@/lib/axios';
 import { API_ENDPOINTS } from '@/config/api.config';
-
-// ============ TYPES ============
-
-export interface DashboardData {
-  activeServices: number;
-  pendingInvoices: number;
-  nextBookingDate: string | null;
-  kycStatus: string;
-  recentActivity: Array<{
-    type: string;
-    message: string;
-    date: string;
-  }>;
-  usageBreakdown: {
-    virtualOffice: number;
-    coworkingSpace: number;
-  };
-  monthlyBookings: Array<{
-    month: string;
-    count: number;
-  }>;
-}
-
-export interface SpaceSnapshot {
-  _id?: string;
-  name?: string;
-  address?: string;
-  city?: string;
-  area?: string;
-  image?: string;
-  images?: string[];
-  coordinates?: { lat: number; lng: number };
-}
-
-export interface Booking {
-  _id: string;
-  bookingNumber: string;
-  type: 'virtual_office' | 'coworking_space';
-  status: 'pending_payment' | 'pending_kyc' | 'active' | 'expired' | 'cancelled';
-  spaceId: string;
-  spaceSnapshot?: SpaceSnapshot;
-  plan: {
-    name: string;
-    price: number;
-    originalPrice?: number;
-    discount?: number;
-    tenure: number;
-    tenureUnit?: string;
-    gstIncluded?: boolean;
-  };
-  timeline?: Array<{
-    status: string;
-    date: string;
-    note?: string;
-    by?: string;
-  }>;
-  documents?: Array<{
-    name: string;
-    type: string;
-    url?: string;
-    generatedAt?: string;
-  }>;
-  startDate?: string;
-  endDate?: string;
-  daysRemaining?: number;
-  autoRenew?: boolean;
-  features?: string[];
-  createdAt: string;
-}
-
-export interface KYCData {
-  _id?: string; // Profile ID
-  profileName?: string; // e.g., "TechCorp Pvt Ltd" or "John Doe (Personal)"
-  linkedBookings?: string[]; // Array of booking IDs
-  overallStatus: 'not_started' | 'pending' | 'approved' | 'rejected' | 'resubmit';
-  kycType?: 'individual' | 'business';
-  progress: number;
-  personalInfo?: {
-    fullName?: string;
-    email?: string;
-    phone?: string;
-    verified?: boolean;
-    status?: any;
-    dateOfBirth?: string;
-    aadhaarLast4?: string;
-    aadhaarNumber?: string;
-    panNumber?: string;
-  };
-  businessInfo?: {
-    companyName?: string;
-    companyType?: string;
-    gstNumber?: string;
-    panNumber?: string;
-    cinNumber?: string;
-    registeredAddress?: string;
-    industry?: string;
-    verified?: boolean;
-    partners?: string[]; // IDs of linked individual profiles
-  };
-  documents?: Array<{
-    type: string;
-    name: string;
-    fileUrl?: string;
-    status: 'pending' | 'approved' | 'rejected';
-    rejectionReason?: string;
-    uploadedAt?: string;
-    verifiedAt?: string;
-  }>;
-}
-
-export interface Invoice {
-  _id: string;
-  invoiceNumber: string;
-  bookingNumber?: string;
-  description: string;
-  subtotal: number;
-  taxRate?: number;
-  taxAmount?: number;
-  total: number;
-  status: 'paid' | 'pending' | 'overdue' | 'cancelled';
-  dueDate?: string;
-  paidAt?: string;
-  createdAt: string;
-}
-
-export interface InvoicesResponse {
-  summary: {
-    totalPaid: number;
-    totalPending: number;
-    totalInvoices: number;
-  };
-  invoices: Invoice[];
-}
-
-export interface SupportTicket {
-  _id: string;
-  ticketNumber: string;
-  subject: string;
-  category: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'open' | 'in_progress' | 'waiting_customer' | 'resolved' | 'closed';
-  messages?: Array<{
-    sender: 'user' | 'support';
-    senderName: string;
-    message: string;
-    createdAt: string;
-  }>;
-  createdAt: string;
-}
-
-export interface CreditsResponse {
-  balance: number;
-  totalEarned: number;
-  history: Array<{
-    amount: number;
-    source: string;
-    description?: string;
-    createdAt: string;
-  }>;
-  rewardThreshold: number;
-  canRedeem: boolean;
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  message?: string;
-  data?: T;
-  pagination?: {
-    total: number;
-    page: number;
-    pages: number;
-  };
-}
+import {
+  ApiResponse,
+  DashboardData,
+  Booking,
+  KYCData,
+  InvoicesResponse,
+  Invoice,
+  SupportTicket,
+  CreditsResponse,
+  UploadKYCDocumentResponse,
+  CreateTicketResponse,
+  RewardRedeemData,
+  LinkBookingResponse,
+  BookingType,
+  BookingStatus,
+  TicketPriority,
+  TicketStatus,
+  InvoiceStatus,
+  KYCType,
+  KYCDocument,
+  PersonalInfo,
+  BusinessInfo
+} from '@/types/services';
 
 // ============ SERVICE CLASS ============
 
@@ -183,10 +33,11 @@ class UserDashboardService {
     try {
       const response = await axiosInstance.get<ApiResponse<DashboardData>>(API_ENDPOINTS.USER.DASHBOARD);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch dashboard';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch dashboard',
+        message: errorMessage,
       };
     }
   }
@@ -194,18 +45,19 @@ class UserDashboardService {
   // ========== BOOKINGS ==========
 
   async getBookings(params?: {
-    type?: string;
-    status?: string;
+    type?: BookingType;
+    status?: BookingStatus;
     page?: number;
     limit?: number;
   }): Promise<ApiResponse<Booking[]>> {
     try {
       const response = await axiosInstance.get<ApiResponse<Booking[]>>(API_ENDPOINTS.USER.BOOKINGS, { params });
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch bookings';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch bookings',
+        message: errorMessage,
       };
     }
   }
@@ -214,10 +66,11 @@ class UserDashboardService {
     try {
       const response = await axiosInstance.get<ApiResponse<Booking>>(API_ENDPOINTS.USER.BOOKING_BY_ID(id));
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch booking';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch booking',
+        message: errorMessage,
       };
     }
   }
@@ -226,35 +79,35 @@ class UserDashboardService {
     try {
       const response = await axiosInstance.patch<ApiResponse<void>>(API_ENDPOINTS.USER.BOOKING_AUTO_RENEW(id), { autoRenew });
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update auto-renewal';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to update auto-renewal',
+        message: errorMessage,
       };
     }
   }
 
   // ========== KYC ==========
 
-  // Get KYC status - now returns all profiles or specific profile
   async getKYC(profileId?: string): Promise<ApiResponse<KYCData | KYCData[]>> {
     try {
       const params = profileId ? { profileId } : {};
       const response = await axiosInstance.get<ApiResponse<KYCData | KYCData[]>>(API_ENDPOINTS.USER.KYC, { params });
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch KYC data';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch KYC data',
+        message: errorMessage,
       };
     }
   }
 
-  // Update business info - now works with profiles
   async updateBusinessInfo(data: {
     profileId?: string;
     profileName?: string;
-    kycType?: string;
+    kycType?: KYCType;
     companyName?: string;
     companyType?: string;
     gstNumber?: string;
@@ -263,7 +116,6 @@ class UserDashboardService {
     registeredAddress?: string;
     industry?: string;
     partners?: string[];
-    // Personal Info Fields
     personalPhone?: string;
     personalDob?: string;
     personalAadhaar?: string;
@@ -273,27 +125,27 @@ class UserDashboardService {
     try {
       const response = await axiosInstance.put<ApiResponse<KYCData>>(API_ENDPOINTS.USER.KYC_BUSINESS_INFO, data);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update business info';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to update business info',
+        message: errorMessage,
       };
     }
   }
 
-  // Upload KYC document - now requires profileId
   async uploadKYCDocument(
     documentType: string,
     file: File,
     profileId: string
-  ): Promise<ApiResponse<{ type: string; status: string; uploadedAt: string }>> {
+  ): Promise<ApiResponse<UploadKYCDocumentResponse>> {
     try {
       const formData = new FormData();
       formData.append('documentType', documentType);
       formData.append('profileId', profileId);
       formData.append('file', file);
 
-      const response = await axiosInstance.post<ApiResponse<{ type: string; status: string; uploadedAt: string }>>(
+      const response = await axiosInstance.post<ApiResponse<UploadKYCDocumentResponse>>(
         API_ENDPOINTS.USER.KYC_UPLOAD,
         formData,
         {
@@ -303,15 +155,15 @@ class UserDashboardService {
         }
       );
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload document';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to upload document',
+        message: errorMessage,
       };
     }
   }
 
-  // Delete KYC document
   async deleteKYCDocument(
     documentType: string,
     profileId: string
@@ -327,26 +179,27 @@ class UserDashboardService {
         }
       );
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete document';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to delete document',
+        message: errorMessage,
       };
     }
   }
 
-  // Link booking to profile
-  async linkBookingToProfile(bookingId: string, profileId: string): Promise<ApiResponse<any>> {
+  async linkBookingToProfile(bookingId: string, profileId: string): Promise<ApiResponse<LinkBookingResponse>> {
     try {
-      const response = await axiosInstance.post<ApiResponse<any>>(
+      const response = await axiosInstance.post<ApiResponse<LinkBookingResponse>>(
         `/api/user/bookings/${bookingId}/link-profile`,
         { profileId }
       );
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to link booking';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to link booking',
+        message: errorMessage,
       };
     }
   }
@@ -354,7 +207,7 @@ class UserDashboardService {
   // ========== INVOICES ==========
 
   async getInvoices(params?: {
-    status?: string;
+    status?: InvoiceStatus;
     fromDate?: string;
     toDate?: string;
     page?: number;
@@ -363,10 +216,11 @@ class UserDashboardService {
     try {
       const response = await axiosInstance.get<ApiResponse<InvoicesResponse>>(API_ENDPOINTS.USER.INVOICES, { params });
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch invoices';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch invoices',
+        message: errorMessage,
       };
     }
   }
@@ -375,10 +229,11 @@ class UserDashboardService {
     try {
       const response = await axiosInstance.get<ApiResponse<Invoice>>(API_ENDPOINTS.USER.INVOICE_BY_ID(id));
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch invoice';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch invoice',
+        message: errorMessage,
       };
     }
   }
@@ -386,17 +241,18 @@ class UserDashboardService {
   // ========== SUPPORT TICKETS ==========
 
   async getTickets(params?: {
-    status?: string;
+    status?: TicketStatus;
     page?: number;
     limit?: number;
   }): Promise<ApiResponse<SupportTicket[]>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<SupportTicket[]>>(API_ENDPOINTS.USER.TICKETS, { params });
+      const response = await axiosInstance.get<ApiResponse<SupportTicket[]>>('/api/tickets/my-tickets', { params });
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch tickets';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch tickets',
+        message: errorMessage,
       };
     }
   }
@@ -404,41 +260,44 @@ class UserDashboardService {
   async createTicket(data: {
     subject: string;
     category: string;
-    priority?: string;
+    priority?: TicketPriority;
     description: string;
     bookingId?: string;
-  }): Promise<ApiResponse<{ _id: string; ticketNumber: string; status: string }>> {
+  }): Promise<ApiResponse<CreateTicketResponse>> {
     try {
-      const response = await axiosInstance.post<ApiResponse<{ _id: string; ticketNumber: string; status: string }>>(API_ENDPOINTS.USER.TICKETS, data);
+      const response = await axiosInstance.post<ApiResponse<CreateTicketResponse>>('/api/tickets', data);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create ticket';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to create ticket',
+        message: errorMessage,
       };
     }
   }
 
   async getTicketById(id: string): Promise<ApiResponse<SupportTicket>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<SupportTicket>>(API_ENDPOINTS.USER.TICKET_BY_ID(id));
+      const response = await axiosInstance.get<ApiResponse<SupportTicket>>(`/api/tickets/${id}`);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch ticket';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch ticket',
+        message: errorMessage,
       };
     }
   }
 
-  async replyToTicket(id: string, message: string): Promise<ApiResponse<void>> {
+  async replyToTicket(id: string, message: string): Promise<ApiResponse<SupportTicket>> {
     try {
-      const response = await axiosInstance.post<ApiResponse<void>>(API_ENDPOINTS.USER.TICKET_REPLY(id), { message });
+      const response = await axiosInstance.post<ApiResponse<SupportTicket>>(`/api/tickets/${id}/reply`, { message });
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send reply';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to send reply',
+        message: errorMessage,
       };
     }
   }
@@ -449,22 +308,27 @@ class UserDashboardService {
     try {
       const response = await axiosInstance.get<ApiResponse<CreditsResponse>>(API_ENDPOINTS.USER.CREDITS);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch credits';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to fetch credits',
+        message: errorMessage,
       };
     }
   }
 
-  async redeemReward(data: any): Promise<ApiResponse<any>> {
+  async redeemReward(data: RewardRedeemData): Promise<ApiResponse<{ rewardId: string; amount: number; status: string }>> {
     try {
-      const response = await axiosInstance.post<ApiResponse<any>>(API_ENDPOINTS.USER.REDEEM_REWARD, data);
+      const response = await axiosInstance.post<ApiResponse<{ rewardId: string; amount: number; status: string }>>(
+        API_ENDPOINTS.USER.REDEEM_REWARD,
+        data
+      );
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to redeem reward';
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to redeem reward',
+        message: errorMessage,
       };
     }
   }
