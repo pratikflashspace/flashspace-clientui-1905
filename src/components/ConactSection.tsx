@@ -93,7 +93,7 @@ const ContactSection = () => {
   ];
 
   return (
-    <section id="contact" className="py-20 px-4 relative overflow-hidden bg-[#ffffff] dark:bg-[#0a0a0a] transition-colors duration-300">
+    <section id="contact" className="py-20 px-4 relative overflow-hidden bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300">
 
       <div className="container mx-auto relative z-10">
         {/* Section Header */}

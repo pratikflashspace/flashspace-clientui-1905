@@ -7,7 +7,7 @@ const ImmediateAssistanceSection = () => {
   const isVisible = useScrollAnimation('immediate-assistance');
 
   return (
-    <section id="immediate-assistance" className="py-8 sm:py-12 px-4 bg-[#ffffff] dark:bg-[#0a0a0a] transition-colors duration-300">
+    <section id="immediate-assistance" className="py-8 sm:py-12 px-4 bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300">
       <div className="container mx-auto">
         <div className="max-w-3xl mx-auto">
           <Card className={`relative overflow-hidden border-2 border-yellow-200 shadow-xl hover:shadow-2xl transition-all duration-500 ${getAnimationClasses(isVisible, 'scale', 0)}`}>

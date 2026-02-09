@@ -8,8 +8,7 @@ import {
   Send, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
-  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, Lock,
-  LayoutDashboard, LogOut, User as UserIcon, ChevronDown
+  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History // [NEW] Added History icon
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
 import Splash3dButton from '@/components/ui/3d-splash-button';
@@ -276,7 +275,87 @@ const UpdatesPopup = ({
 // ------------------------------------------------
 // End of UpdatesPopup
 // ------------------------------------------------
+const ChatHistorySidebar = ({
+  open,
+  width,
+  onClose,
+  onSelectChat
+}: {
+  open: boolean;
+  width: number;
+  onClose: () => void;
+  onSelectChat: (chatId: string) => void;
+}) => {
+  // Mock Data for History
+  const historyData = [
+    { id: '1', title: 'Start a Startup in Bangalore', date: 'Today' },
+    { id: '2', title: 'Coworking in Indiranagar', date: 'Yesterday' },
+    { id: '3', title: 'Virtual Office Registration', date: 'Last Week' },
+    { id: '4', title: 'Meeting Room Requirements', date: 'Last Week' },
+  ];
 
+  return createPortal(
+    <div
+      className={`fixed top-0 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col`}
+      style={{
+        left: width, // 80px from left
+        width: '320px', // Fixed width for history
+        transform: open ? 'translateX(0)' : 'translateX(-100%)',
+        // Opacity transition for smoother effect
+        opacity: open ? 1 : 0,
+        pointerEvents: open ? 'auto' : 'none',
+      }}
+    >
+      <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+          <History className="w-5 h-5 text-indigo-500" />
+          History
+        </h2>
+        <button
+          onClick={onClose}
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-500" />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-2">
+        {historyData.map((chat) => (
+          <div
+            key={chat.id}
+            onClick={() => onSelectChat(chat.id)}
+            className="group p-3 mb-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-all border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
+          >
+            <div className="text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
+              {chat.title}
+            </div>
+            <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              {chat.date}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="p-4 border-t border-gray-100 dark:border-gray-800">
+        <Button
+          variant="outline"
+          className="w-full justify-start text-gray-600 dark:text-gray-300"
+          onClick={() => {
+            onSelectChat('new');
+          }}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New Chat
+        </Button>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+// ------------------------------------------------
+// End of UpdatesPopup & ChatHistorySidebar
+// ------------------------------------------------
 
 const StartChatting = () => {
   const navigate = useNavigate();
@@ -285,7 +364,7 @@ const StartChatting = () => {
   const [message, setMessage] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showUpdates, setShowUpdates] = useState(false); // [NEW] State for the popup
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // [NEW] User menu state
+  const [showHistory, setShowHistory] = useState(false); // [NEW] State for history sidebar
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: '',
@@ -457,6 +536,7 @@ const StartChatting = () => {
 
   const sidebarMenuItems: SidebarMenuItem[] = [
     { label: 'Start Chatting', icon: MessageSquare, onClick: () => handleNavigation('/start-chatting') },
+    { label: 'History', icon: History, onClick: () => setShowHistory(prev => !prev) }, // [NEW] History toggle
     { label: 'Get Workspace', icon: Building2, onClick: () => handleNavigation('/solutions/on-demand') },
     { label: 'Business Setup', icon: Briefcase, onClick: () => handleNavigation('/solutions/business-setup') },
     { label: 'Your Bookings', icon: Calendar, onClick: () => handleNavigation('/bookings') },
@@ -468,7 +548,19 @@ const StartChatting = () => {
   // [NEW] Close popup function
   const closeBoth = () => {
     setShowUpdates(false);
+    setShowHistory(false); // Close history as well
     setIsSidebarOpen(false); // Also close mobile sidebar if open
+  };
+
+  // [NEW] Handle history selection
+  const handleHistorySelect = (chatId: string) => {
+    console.log("Selected chat:", chatId);
+    setShowHistory(false); // Slide back inside instantly
+    // Logic to load chat would go here
+    if (chatId === 'new') {
+      setChatMessages([]);
+      // reset other state if needed
+    }
   };
 
   // [NEW] Handle Escape key and body scroll
@@ -477,7 +569,7 @@ const StartChatting = () => {
       if (e.key === "Escape") closeBoth();
     };
     // Only block body scroll if the popup is open
-    if (showUpdates) {
+    if (showUpdates || showHistory) {
       document.addEventListener("keydown", esc);
       document.body.style.overflow = "hidden";
     } else {
@@ -491,7 +583,7 @@ const StartChatting = () => {
       // Always clean up to unset, the other effect for isSidebarOpen will handle it
       document.body.style.overflow = "unset";
     };
-  }, [showUpdates, isSidebarOpen]); // [NEW] Added isSidebarOpen as dependency
+  }, [showUpdates, showHistory, isSidebarOpen]); // [NEW] Added isSidebarOpen as dependency
 
   // Pause Lenis globally while this page is mounted to keep native wheel behavior snappy
   useEffect(() => {
@@ -851,9 +943,9 @@ const StartChatting = () => {
         </div>
       </header>
 
-      {/* [NEW] Transparent Overlay for Updates Popup */}
+      {/* [NEW] Transparent Overlay for Updates/History Popup */}
       {/* This sits below the popup (z-9999) but above the page content */}
-      {showUpdates && (
+      {(showUpdates || showHistory) && (
         <div
           onClick={closeBoth}
           className="fixed inset-0 z-[45]"
@@ -864,8 +956,16 @@ const StartChatting = () => {
       {/* [NEW] Render the Updates Popup */}
       <UpdatesPopup
         open={showUpdates}
-        menuWidth={SIDEBAR_WIDTH_ICON} // [NEW] Pass the 80px width
+        menuWidth={SIDEBAR_WIDTH_ICON}
         onCloseBoth={closeBoth}
+      />
+
+      {/* [NEW] Render Chat History Sidebar */}
+      <ChatHistorySidebar
+        open={showHistory}
+        width={SIDEBAR_WIDTH_ICON}
+        onClose={() => setShowHistory(false)}
+        onSelectChat={handleHistorySelect}
       />
 
       {/* Backdrop Overlay (for mobile sidebar) */}
@@ -882,7 +982,6 @@ const StartChatting = () => {
         ref={sidebarRef}
         className={`fixed top-0 left-0 h-screen w-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden lg:translate-x-0 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
-        style={{ fontFamily: 'Geist, Poppins, sans-serif' }}
       >
         {/* Logo Section */}
         <div className="h-16 flex items-center justify-center flex-shrink-0">

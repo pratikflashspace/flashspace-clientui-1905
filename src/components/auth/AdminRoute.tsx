@@ -22,8 +22,10 @@ export const AdminRoute: React.FC = () => {
         return <Navigate to="/login" replace />;
     }
 
-    if (user.role !== 'admin') {
-        console.warn('AdminRoute: Role mismatch', { expected: 'admin', actual: user.role });
+    const allowedRoles = ['admin', 'partner', 'space_manager', 'sales'];
+    if (!allowedRoles.includes(user.role)) {
+        console.warn('AdminRoute: Role mismatch', { expected: allowedRoles, actual: user.role });
+
         // If authenticated but not admin, redirect to user dashboard
         return <Navigate to="/dashboard" replace />;
     }

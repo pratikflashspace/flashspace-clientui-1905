@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { DraggableCardContainer, DraggableCardBody } from "@/components/ui/draggable-card";
 
 import { useRef, useEffect } from "react";
 
@@ -257,8 +258,48 @@ const BusinessSetup = () => {
     visible: { opacity: 1, y: 0 }
   };
 
+  const draggableImages = [
+    {
+      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500&q=80",
+      className: "absolute top-[0%] left-[5%] z-20 w-44 h-64 rounded-[2rem]",
+      alt: "Property Deal"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80",
+      className: "absolute top-[5%] right-[5%] z-10 w-56 h-56 rounded-[2.5rem]",
+      alt: "Signing Contract"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=500&q=80",
+      className: "absolute top-[28%] left-[32%] z-30 w-48 h-48 rounded-[2rem]",
+      alt: "Legal"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&q=80",
+      className: "absolute top-[45%] right-[2%] z-20 w-32 h-32 rounded-[1.5rem]",
+      alt: "Laptop"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80",
+      className: "absolute bottom-[20%] left-[-5%] z-20 w-64 h-36 rounded-[2rem]",
+      alt: "City"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500&q=80",
+      className: "absolute bottom-[28%] left-[25%] z-10 w-40 h-40 rounded-[2rem]",
+      alt: "Team"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80",
+      className: "absolute -bottom-[5%] right-[8%] z-40 w-60 h-80 rounded-[3rem]",
+      alt: "Handshake"
+    }
+  ];
+
+
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300" style={{ fontFamily: 'Geist, Poppins, sans-serif' }}>
+    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
       {/* Header */}
       <Header />
 
@@ -273,7 +314,7 @@ const BusinessSetup = () => {
         <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px] animate-pulse delay-1000" />
 
         <div className="container mx-auto px-4 relative z-10 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
             {/* LEFT COLUMN: Content */}
             <motion.div
@@ -281,7 +322,7 @@ const BusinessSetup = () => {
               animate="visible"
               variants={fadeInUp}
               transition={{ duration: 0.8 }}
-              className="text-left relative z-20"
+              className="text-center lg:text-left relative z-20 mx-auto max-w-3xl lg:max-w-none"
             >
               <motion.div
                 className="inline-flex items-center gap-2 bg-white dark:bg-white/5 border border-amber-200 dark:border-white/10 px-4 py-2 rounded-full mb-8 shadow-sm"
@@ -303,7 +344,7 @@ const BusinessSetup = () => {
               </p>
 
               {/* Search Container (Relative Parent) */}
-              <div className="relative max-w-md w-full">
+              <div className="relative max-w-md w-full mx-auto lg:mx-0">
 
                 {/* Compact Search Bar */}
                 <div className="bg-white dark:bg-white/5 p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 w-full relative z-20">
@@ -361,123 +402,27 @@ const BusinessSetup = () => {
                 )}
               </div>
 
-              <div className="flex items-center gap-6 mt-10 text-sm font-medium text-slate-500 dark:text-slate-400">
+              <div className="flex items-center justify-center lg:justify-start gap-6 mt-10 text-sm font-medium text-slate-500 dark:text-slate-400">
                 <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#EDB003]" /> <span>Free Consultation</span></div>
                 <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#EDB003]" /> <span>100% Online Process</span></div>
               </div>
             </motion.div>
 
-            {/* RIGHT COLUMN: Floating Cluster */}
-            <div className="relative h-[600px] w-full hidden lg:block perspective-1000">
-              {/* Center Image (Main - Signing/Contract) */}
-              <motion.div
-                animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
-              >
-                <div className="w-64 h-80 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80" alt="Signing Contract" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Center Gap Image (Handshake) */}
-              <motion.div
-                animate={{ y: [0, -25, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 0.8 }}
-                className="absolute top-[50%] left-[22%] transform -translate-x-1/2 -translate-y-1/2 z-10"
-              >
-                <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=400&q=80" alt="Success Deal" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Upper Center Filler Image (Legal/Scales) */}
-              <motion.div
-                animate={{ y: [0, -18, 0] }} transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 0.2 }}
-                className="absolute top-[28%] left-[45%] transform -translate-x-1/2 -translate-y-1/2 z-0"
-              >
-                <div className="w-36 h-36 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=400&q=80" alt="Legal Compliance" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Floating Image 1 (Top Right - Office) */}
-              <motion.div
-                animate={{ y: [0, -20, 0] }} transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 }}
-                className="absolute top-[5%] right-[5%] z-10"
-              >
-                <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=400&q=80" alt="Corporate Office" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Floating Image 2 (Bottom Left - Finance) */}
-              <motion.div
-                animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 8, ease: "easeInOut", delay: 2 }}
-                className="absolute bottom-[20%] left-[0%] z-20"
-              >
-                <div className="w-48 h-32 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=400&q=80" alt="Financial Growth" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Floating Image 3 (Top Left - Meeting) */}
-              <motion.div
-                animate={{ y: [0, -18, 0] }} transition={{ repeat: Infinity, duration: 7.5, ease: "easeInOut", delay: 0.5 }}
-                className="absolute top-[12%] left-[5%] z-10"
-              >
-                <div className="w-32 h-40 rounded-[2rem] overflow-hidden shadow-lg border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=400&q=80" alt="Consultation" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-              {/* Floating Image 4 (Bottom Right - Stamp/Work) */}
-              <motion.div
-                animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6.5, ease: "easeInOut", delay: 1.5 }}
-                className="absolute bottom-[10%] right-[10%] z-20"
-              >
-                <div className="w-44 h-44 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white dark:border-[#333]">
-                  <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=400&q=80" alt="Team Work" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
-
-
-              {/* Pill 1 */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.5 }}
-                className="absolute top-[35%] left-[-5%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
-              >
-                <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-sm">⚡</div>
-                <span className="font-bold text-slate-800 dark:text-white text-xs">Fast Setup</span>
-              </motion.div>
-
-              {/* Pill 2 */}
-              <motion.div
-                animate={{ y: [0, -14, 0] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut", delay: 1.5 }}
-                className="absolute bottom-[28%] right-[-2%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
-              >
-                <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-sm">🛡️</div>
-                <span className="font-bold text-slate-800 dark:text-white text-xs">Legal Proof</span>
-              </motion.div>
-
-              {/* Pill 3 */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 3 }}
-                className="absolute top-[5%] left-[30%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
-              >
-                <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-sm">👨‍💼</div>
-                <span className="font-bold text-slate-800 dark:text-white text-xs">Expert CAs</span>
-              </motion.div>
-
-              {/* Pill 4 */}
-              <motion.div
-                animate={{ y: [0, -12, 0] }} transition={{ repeat: Infinity, duration: 6.2, ease: "easeInOut", delay: 2.2 }}
-                className="absolute bottom-[5%] left-[40%] bg-white dark:bg-[#1f1f1f] px-5 py-2.5 rounded-full shadow-lg flex items-center gap-3 z-30 border border-slate-100 dark:border-white/5"
-              >
-                <div className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-sm">🌐</div>
-                <span className="font-bold text-slate-800 dark:text-white text-xs">100% Online</span>
-              </motion.div>
-
-              {/* Decorative Circle */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#EDB003]/5 rounded-full blur-3xl -z-10" />
+            {/* RIGHT COLUMN: Draggable Cards Cluster */}
+            <div className="hidden lg:block h-[650px] w-full">
+              <DraggableCardContainer className="perspective-1000">
+                {draggableImages.map((item, index) => (
+                  <DraggableCardBody key={index} className={item.className}>
+                    <div className="w-full h-full overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222] rounded-[inherit] hover:shadow-xl transition-shadow duration-300">
+                      <img
+                        src={item.image}
+                        alt={item.alt}
+                        className="w-full h-full object-cover pointer-events-none"
+                      />
+                    </div>
+                  </DraggableCardBody>
+                ))}
+              </DraggableCardContainer>
             </div>
           </div>
         </div>
@@ -501,7 +446,7 @@ const BusinessSetup = () => {
                     <stat.icon className="w-6 h-6 text-slate-400 dark:text-slate-500 group-hover:text-[#EDB003] transition-colors" />
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>
+                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
                   {stat.number}
                 </div>
                 <div className="text-slate-500 dark:text-slate-400 text-sm font-medium tracking-wide">{stat.label}</div>
@@ -707,10 +652,10 @@ const BusinessSetup = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Success Stories
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white">
               What Our <span className="text-[#EDB003]">Clients Say</span>
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Hear from entrepreneurs who successfully launched their businesses with FlashSpace
             </p>
           </motion.div>
@@ -734,7 +679,7 @@ const BusinessSetup = () => {
                     </div>
 
                     {/* Content */}
-                    <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed italic" style={{ fontFamily: 'Geist, sans-serif' }}>
+                    <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed italic">
                       "{testimonial.content}"
                     </p>
 
@@ -771,10 +716,10 @@ const BusinessSetup = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Our Locations
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white">
               <span className="text-[#EDB003]">68+</span> Centers Across <span className="text-[#EDB003]">8</span> Cities
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300" style={{ fontFamily: 'Geist, sans-serif' }}>Register your business from anywhere in India</p>
+            <p className="text-xl text-gray-600 dark:text-gray-300">Register your business from anywhere in India</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -801,7 +746,7 @@ const BusinessSetup = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#EDB003]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform transition-transform duration-500 group-hover:translate-y-0">
-                  <h3 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Poppins' }}>{location.city}</h3>
+                  <h3 className="text-3xl font-bold mb-2">{location.city}</h3>
                   <p className="text-white/90 mb-4 text-lg">{location.description}</p>
 
                   <div className="flex items-center justify-between">
@@ -833,10 +778,10 @@ const BusinessSetup = () => {
             <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
               Have Questions?
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white">
               Frequently Asked <span className="text-[#EDB003]">Questions</span>
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Geist, sans-serif' }}>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Everything you need to know about business registration and setup
             </p>
           </motion.div>
