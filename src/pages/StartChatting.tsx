@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from "@/lib/utils";
 import {
-  Send, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
+  Send, Speech, Volume2, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
   Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
@@ -27,6 +27,7 @@ import { getCoworkingSpacesByCity } from '@/services/coworkingSpace.service';
 import { cityCenters } from '@/components/Map/locationData.example';
 import { LoginModal } from '@/components/auth/LoginModal'; // [NEW]
 import { SignupModal } from '@/components/auth/SignupModal'; // [NEW]
+import { API_CONFIG } from '@/config/api.config'; // [NEW] Import API Config
 
 // [NEW] Custom Text Formatter to handle bold text, URLs, Images, and PDFs
 const formatMessage = (text: string) => {
@@ -662,6 +663,44 @@ const StartChatting = () => {
     recognitionRef.current = recognition;
     recognition.start();
   };
+
+  // [NEW] Speak Function
+  const handleSpeak = (text: string) => {
+    window.speechSynthesis.cancel();
+    
+    // Simple clean up of markdown for better speech
+    const cleanText = text.replace(/\*\*/g, '').replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+    
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    
+    // [UPDATED] Voice Selection for softer, more natural female voice
+    const voices = window.speechSynthesis.getVoices();
+    
+    // Try to find a high-quality female voice
+    const preferredVoice = voices.find(voice => 
+      (voice.name.includes("Google") && voice.name.includes("US English")) || // Chrome specific
+      (voice.name.includes("Microsoft Zira")) || // Windows specific
+      (voice.name.includes("Neural") && voice.name.includes("Female")) || // Smart filters
+      (voice.name.includes("Natural") && voice.name.includes("Female")) 
+    ) || voices.find(voice => voice.name.includes("Female")) || voices.find(v => v.lang.startsWith("en-"));
+
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+    
+    // Tuning for softness
+    utterance.pitch = 1.1; // Slightly higher for lighter tone
+    utterance.rate = 0.95; // Slightly slower for composure
+    
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // [NEW] Cleanup speech on unmount
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
 
   const handleSendMessage = async () => {
     if (!message.trim() || isLoading) return;
@@ -1329,7 +1368,7 @@ const StartChatting = () => {
                     {chatMessages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                        className={`flex gap-4 group ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                       >
                         {/* Avatar */}
                         <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${msg.role === 'user'
@@ -1362,6 +1401,17 @@ const StartChatting = () => {
                             {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
+
+                        {msg.role === 'assistant' && !msg.isTyping && (
+                          <button
+                            onClick={() => handleSpeak(msg.content)}
+                            className="opacity-60 hover:opacity-100 transition-opacity duration-200 p-2 h-fit self-start mt-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-[#EDB003]"
+                            title="Read Aloud"
+                            aria-label="Read message aloud"
+                          >
+                            <Volume2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     ))}
 

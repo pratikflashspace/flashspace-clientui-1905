@@ -27,6 +27,7 @@ import PartnerWithUs from "./pages/PatnerWithUs";
 import MeetingsRoom from "./pages/Solutions/meetingsroom";
 import Dayoffice from "./pages/Solutions/Dayoffice";
 import EventSpacePage from "./pages/Solutions/Eventspace";
+import SpacePortalLayout from "./layouts/SpacePortalLayout";
 
 //Mouse Follower
 import MouseFollower from "./components/MouseFollower";
@@ -48,12 +49,12 @@ import ClientDashboard from "./components/ClientDashboard";
 import ScrollToTop from "./components/ScrollToTop";
 
 //-----------spaces---------
-import SpaceComponent from './components/Spaces/SpaceComponent';
-import MeetingRoomSpaceComponent from './components/Spaces/MeetingRoomSpaceComponent';
-import CoworkingSpaceComponent from './components/Spaces/CoworkingSpaceComponent';
-import BookingPage from './pages/BookingPage';
-import PaymentSuccessPage from './pages/PaymentSuccessPage';
-import PaymentFailedPage from './pages/PaymentFailedPage';
+import SpaceComponent from "./components/Spaces/SpaceComponent";
+import MeetingRoomSpaceComponent from "./components/Spaces/MeetingRoomSpaceComponent";
+import CoworkingSpaceComponent from "./components/Spaces/CoworkingSpaceComponent";
+import BookingPage from "./pages/BookingPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PaymentFailedPage from "./pages/PaymentFailedPage";
 import AdminDashboard from "./pages/admin/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import KYCRequests from "./pages/admin/KYCRequests";
@@ -68,6 +69,15 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
+import Dashboard from "./pages/spacePortal/Dashboard";
+import { CLIENTS } from "./data/spacePortal/clients";
+import Enquiries from "./pages/spacePortal/ClientEnquiries";
+import Invoices from "./pages/spacePortal/Invoices";
+import Calendar from "./pages/spacePortal/Calendar";
+import Spaces from "./pages/spacePortal/Spaces";
+import Tickets from "./pages/spacePortal/Tickets";
+import BookingAnalytics from "./pages/spacePortal/BookingAnalytics";
+import ClientEnquiries from "./pages/spacePortal/ClientEnquiries";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -86,24 +96,60 @@ const App = () => (
               {/* Public Routes */}
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
-              <Route path="/services/virtual-office" element={<VirtualOffice />} />
-              <Route path="/services/coworking-space" element={<CoworkingSpace />} />
+              <Route
+                path="/services/virtual-office"
+                element={<VirtualOffice />}
+              />
+              <Route
+                path="/services/coworking-space"
+                element={<CoworkingSpace />}
+              />
               <Route path="/services/on-demand" element={<OnDemand />} />
               <Route path="/services/event-spaces" element={<EventSpaces />} />
-              <Route path="/services/business-setup" element={<BusinessSetup />} />
-              <Route path="/Solutions/virtual-office" element={<VirtualOfficeSolution />} />
-              <Route path="/Solutions/coworking-space" element={<CoworkingSpaceSolution />} />
-              <Route path="/Solutions/on-demand" element={<OnDemandSolution />} />
-              <Route path="/Solutions/business-setup" element={<BusinessSetupSolution />} />
-              <Route path="/services/meeting-rooms" element={<MeetingRooms />} />
-              <Route path="/Solutions/meetingsroom" element={<MeetingsRoom />} />
+              <Route
+                path="/services/business-setup"
+                element={<BusinessSetup />}
+              />
+              <Route
+                path="/Solutions/virtual-office"
+                element={<VirtualOfficeSolution />}
+              />
+              <Route
+                path="/Solutions/coworking-space"
+                element={<CoworkingSpaceSolution />}
+              />
+              <Route
+                path="/Solutions/on-demand"
+                element={<OnDemandSolution />}
+              />
+              <Route
+                path="/Solutions/business-setup"
+                element={<BusinessSetupSolution />}
+              />
+              <Route
+                path="/services/meeting-rooms"
+                element={<MeetingRooms />}
+              />
+              <Route
+                path="/Solutions/meetingsroom"
+                element={<MeetingsRoom />}
+              />
               <Route path="/Solutions/day-office" element={<Dayoffice />} />
-              <Route path="/Solutions/eventspace" element={<EventSpacePage />} />
+              <Route
+                path="/Solutions/eventspace"
+                element={<EventSpacePage />}
+              />
 
               {/* Spaces*/}
               <Route path="/space/:id" element={<SpaceComponent />} />
-              <Route path="/coworking-space/:id" element={<CoworkingSpaceComponent />} />
-              <Route path="/meeting-room/:id" element={<MeetingRoomSpaceComponent />} />
+              <Route
+                path="/coworking-space/:id"
+                element={<CoworkingSpaceComponent />}
+              />
+              <Route
+                path="/meeting-room/:id"
+                element={<MeetingRoomSpaceComponent />}
+              />
               <Route path="/booking/:id" element={<BookingPage />} />
 
               {/* Payment Routes */}
@@ -149,6 +195,23 @@ const App = () => (
                   <Route path="leads" element={<LeadManagement />} />
                   <Route path="*" element={<AdminDashboard />} />
                 </Route>
+              </Route>
+
+              {/* Space Partner Portal Routes */}
+              <Route path="/spaceportal" element={<SpacePortalLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="dashboard" element={<Dashboard />} />
+
+                <Route path="clients" element={<Clients />} />
+                <Route path="client-enquiries" element={<ClientEnquiries />} />
+                <Route path="invoices-payments" element={<Invoices />} />
+                <Route path="booking-calendar" element={<Calendar />} />
+                <Route
+                  path="booking-analytics"
+                  element={<BookingAnalytics />}
+                />
+                <Route path="space-management" element={<Spaces />} />
+                <Route path="tickets" element={<Tickets />} />
               </Route>
 
               <Route path="/list-your-space" element={<ListYourSpace />} />

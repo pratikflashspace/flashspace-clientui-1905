@@ -10,6 +10,10 @@ import {
   User,
   Building2,
   ChevronRight,
+  Bell,
+  Mail,
+  Users,
+  FileText,
 } from "lucide-react";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,12 +33,17 @@ import Support from "./Support";
 import Logout from "./Logout";
 import Profile from "./Profile";
 import Viewdetails from "./Viewdetails";
+import Notifications from "./Notifications"; // Import the new Notifications component
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, section: "main", path: "/dashboard" },
   { name: "My Bookings", icon: Calendar, section: "main", path: "/dashboard/my-bookings" },
+  { name: "Notifications", icon: Bell, section: "main", path: "/dashboard/notifications" },
   { name: "Billing", icon: CreditCard, section: "main", path: "/dashboard/billing" },
   { name: "KYC Verification", icon: ShieldCheck, section: "main", path: "/dashboard/kyc-verification" },
+  { name: "Mail Records", icon: Mail, section: "main", path: "/dashboard/mail-records" },
+  { name: "Visit Records", icon: Users, section: "main", path: "/dashboard/visit-records" },
+  { name: "Documents", icon: FileText, section: "main", path: "/dashboard/documents" },
   { name: "Support", icon: Headphones, section: "main", path: "/dashboard/support" },
   { name: "Profile", icon: User, section: "account", path: "/dashboard/profile" },
   { name: "Logout", icon: LogOut, section: "account", path: "/dashboard/logout" },
@@ -86,14 +95,22 @@ export default function ClientDashboard() {
       case 1:
         return <MyBookings />;
       case 2:
-        return <Billing />;
+        return <Notifications />; // Notifications page
       case 3:
-        return <KYCVerification />;
+        return <Billing />;
       case 4:
-        return <Support />;
+        return <KYCVerification />;
       case 5:
-        return <Profile />;
+        return <div className="p-8 text-center text-gray-500">Mail Records - Coming Soon</div>;
       case 6:
+        return <div className="p-8 text-center text-gray-500">Visit Records - Coming Soon</div>;
+      case 7:
+        return <div className="p-8 text-center text-gray-500">Documents - Coming Soon</div>;
+      case 8:
+        return <Support />;
+      case 9:
+        return <Profile />;
+      case 10:
         return <Logout />;
       case 100: // Special case for View Details
         return <Viewdetails />;
@@ -116,10 +133,10 @@ export default function ClientDashboard() {
           <div className="mb-8 p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-lg">
-                {user?.name?.charAt(0) || "U"}
+                {user?.fullName?.charAt(0) || "U"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 truncate">{user?.name || "User"}</p>
+                <p className="font-semibold text-gray-900 truncate">{user?.fullName || "User"}</p>
                 <p className="text-sm text-gray-500 truncate">{user?.email || "user@email.com"}</p>
               </div>
             </div>
