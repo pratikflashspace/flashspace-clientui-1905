@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminService } from '@/services/admin.service';
 import { Search, Check, X, FileText, AlertCircle, User, Building2, Eye, Download, Clock, CheckCircle2, XCircle, ExternalLink, Calendar, File } from 'lucide-react';
 import { toast } from "sonner";
+import { API_CONFIG } from '@/config/api.config';
 
 interface KYCDocument {
     type: string;
@@ -48,9 +49,51 @@ export default function KYCRequests() {
     const [showDocumentModal, setShowDocumentModal] = useState(false);
     const [selectedDocument, setSelectedDocument] = useState<KYCDocument | null>(null);
 
+    // Helper to construct full URL from relative path
+    const getFullUrl = (url?: string): string => {
+        if (!url) return '';
+        if (url.startsWith('http')) return url;
+        const baseUrl = API_CONFIG.BASE_URL.endsWith('/') ? API_CONFIG.BASE_URL.slice(0, -1) : API_CONFIG.BASE_URL;
+        const path = url.startsWith('/') ? url : `/${url}`;
+        return `${baseUrl}${path}`;
+    };
+
     useEffect(() => {
         fetchKYCRequests();
     }, []);
+
+    // Close modal on ESC key
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                if (showDocumentModal) {
+                    setShowDocumentModal(false);
+                    setSelectedDocument(null);
+                }
+                if (showRejectModal) {
+                    setShowRejectModal(false);
+                    setRejectionReason('');
+                    setSelectedRequest(null);
+                }
+            }
+        };
+
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [showDocumentModal, showRejectModal]);
+
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        if (showDocumentModal || showRejectModal) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showDocumentModal, showRejectModal]);
 
     const fetchKYCRequests = async () => {
         setLoading(true);
@@ -158,6 +201,11 @@ export default function KYCRequests() {
 
     const isPDFFile = (url?: string) => {
         return getFileExtension(url) === 'pdf';
+    };
+
+    const isVideoFile = (url?: string) => {
+        const ext = getFileExtension(url);
+        return ['mp4', 'webm', 'mov', 'avi', 'mkv'].includes(ext);
     };
 
     if (loading) {
@@ -348,10 +396,18 @@ export default function KYCRequests() {
 
             {/* Document Details Modal */}
             {showDocumentModal && selectedDocument && selectedRequest && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8 animate-in fade-in zoom-in duration-200">
+                <div 
+                    className="fixed inset-0  flex items-center justify-center z-50 p-4 backdrop-blur-sm"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            setShowDocumentModal(false);
+                            setSelectedDocument(null);
+                        }
+                    }}
+                >
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[100vh] flex flex-col animate-in fade-in zoom-in duration-200">
                         {/* Modal Header */}
-                        <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white">
+                        <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white flex-shrink-0">
                             <div className="flex items-start justify-between">
                                 <div>
                                     <h3 className="text-2xl font-bold text-gray-900 mb-1">Document Details</h3>
@@ -362,15 +418,15 @@ export default function KYCRequests() {
                                         setShowDocumentModal(false);
                                         setSelectedDocument(null);
                                     }}
-                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                    className="p-2 hover:bg-white rounded-lg transition-colors"
                                 >
                                     <X className="w-5 h-5 text-gray-500" />
                                 </button>
                             </div>
                         </div>
 
-                        {/* Modal Content */}
-                        <div className="p-6 space-y-6">
+                        {/* Modal Content - Scrollable */}
+                        <div className="p-6 space-y-6 overflow-y-auto flex-1">
                             {/* Document Info */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="bg-gray-50 rounded-xl p-4">
@@ -409,30 +465,67 @@ export default function KYCRequests() {
 
                             {/* Document Preview */}
                             {selectedDocument.fileUrl && (
-                                <div className="bg-gray-50 rounded-xl p-6">
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-4">Document Preview</h4>
+                                <div className="bg-gray-50 rounded-xl p-6 relative">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h4 className="text-sm font-semibold text-gray-700">Document Preview</h4>
+                                        <button
+                                            onClick={() => {
+                                                setShowDocumentModal(false);
+                                                setSelectedDocument(null);
+                                            }}
+                                            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                                            title="Close Preview"
+                                        >
+                                            <X className="w-4 h-4 text-gray-600" />
+                                        </button>
+                                    </div>
                                     {isImageFile(selectedDocument.fileUrl) ? (
                                         <div className="bg-white rounded-lg p-4 border border-gray-200">
                                             <img
-                                                src={selectedDocument.fileUrl}
+                                                src={getFullUrl(selectedDocument.fileUrl)}
                                                 alt={selectedDocument.name}
                                                 className="max-w-full max-h-96 mx-auto rounded-lg shadow-md"
+                                                onError={(e) => {
+                                                    console.error('Image load error:', e);
+                                                    console.error('Image URL:', selectedDocument.fileUrl);
+                                                    console.error('Full URL:', getFullUrl(selectedDocument.fileUrl));
+                                                }}
                                             />
                                         </div>
                                     ) : isPDFFile(selectedDocument.fileUrl) ? (
                                         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                                             <iframe
-                                                src={selectedDocument.fileUrl}
+                                                src={getFullUrl(selectedDocument.fileUrl)}
                                                 className="w-full h-96"
                                                 title={selectedDocument.name}
                                             />
+                                        </div>
+                                    ) : isVideoFile(selectedDocument.fileUrl) ? (
+                                        <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                            <video
+                                                key={getFullUrl(selectedDocument.fileUrl)}
+                                                src={getFullUrl(selectedDocument.fileUrl)}
+                                                controls
+                                                controlsList="nodownload"
+                                                className="max-w-full max-h-96 mx-auto rounded-lg shadow-md"
+                                                onLoadStart={() => console.log('Video loading started')}
+                                                onLoadedMetadata={() => console.log('Video metadata loaded')}
+                                                onCanPlay={() => console.log('Video can play')}
+                                                onError={(e) => {
+                                                    console.error('Video load error:', e);
+                                                    console.error('Video URL:', selectedDocument.fileUrl);
+                                                    console.error('Full URL:', getFullUrl(selectedDocument.fileUrl));
+                                                }}
+                                            >
+                                                Your browser does not support the video tag.
+                                            </video>
                                         </div>
                                     ) : (
                                         <div className="bg-white rounded-lg p-8 border border-gray-200 text-center">
                                             <FileText className="w-16 h-16 text-gray-300 mx-auto mb-3" />
                                             <p className="text-gray-500 mb-4">Preview not available for this file type</p>
                                             <a
-                                                href={selectedDocument.fileUrl}
+                                                href={getFullUrl(selectedDocument.fileUrl)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
@@ -458,11 +551,11 @@ export default function KYCRequests() {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
+                        <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3 flex-shrink-0">
                             {selectedDocument.fileUrl && (
                                 <>
                                     <a
-                                        href={selectedDocument.fileUrl}
+                                        href={getFullUrl(selectedDocument.fileUrl)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-blue-200 text-blue-600 hover:bg-blue-50 transition-colors font-semibold"
@@ -471,7 +564,7 @@ export default function KYCRequests() {
                                         Open in New Tab
                                     </a>
                                     <a
-                                        href={selectedDocument.fileUrl}
+                                        href={getFullUrl(selectedDocument.fileUrl)}
                                         download
                                         className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors font-semibold"
                                     >
@@ -487,16 +580,38 @@ export default function KYCRequests() {
 
             {/* Reject Modal */}
             {showRejectModal && selectedRequest && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div 
+                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            setShowRejectModal(false);
+                            setRejectionReason('');
+                            setSelectedRequest(null);
+                        }
+                    }}
+                >
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                <XCircle className="w-6 h-6 text-red-600" />
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                    <XCircle className="w-6 h-6 text-red-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Reject KYC</h3>
+                                    <p className="text-sm text-gray-500">{selectedRequest.user?.fullName}</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-900">Reject KYC</h3>
-                                <p className="text-sm text-gray-500">{selectedRequest.user?.fullName}</p>
-                            </div>
+                            <button
+                                onClick={() => {
+                                    setShowRejectModal(false);
+                                    setRejectionReason('');
+                                    setSelectedRequest(null);
+                                }}
+                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                title="Close"
+                            >
+                                <X className="w-5 h-5 text-gray-500" />
+                            </button>
                         </div>
 
                         <div className="mb-6">

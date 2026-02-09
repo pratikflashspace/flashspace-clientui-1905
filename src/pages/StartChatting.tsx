@@ -2,11 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { getLenis } from '@/lib/lenis.ts';
 import { useDarkMode } from '@/contexts/DarkModeContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { cn } from "@/lib/utils";
 import {
-  Send, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
+  Send, Speech, Volume2, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
-  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon // [NEW] Added Sun, Moon
+  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
+  LogOut, Lock, // [NEW] Added icons
+  UserIcon
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
 import Splash3dButton from '@/components/ui/3d-splash-button';
@@ -23,6 +27,7 @@ import { getCoworkingSpacesByCity } from '@/services/coworkingSpace.service';
 import { cityCenters } from '@/components/Map/locationData.example';
 import { LoginModal } from '@/components/auth/LoginModal'; // [NEW]
 import { SignupModal } from '@/components/auth/SignupModal'; // [NEW]
+import { API_CONFIG } from '@/config/api.config'; // [NEW] Import API Config
 
 // [NEW] Custom Text Formatter to handle bold text, URLs, Images, and PDFs
 const formatMessage = (text: string) => {
@@ -273,14 +278,97 @@ const UpdatesPopup = ({
 // ------------------------------------------------
 // End of UpdatesPopup
 // ------------------------------------------------
+const ChatHistorySidebar = ({
+  open,
+  width,
+  onClose,
+  onSelectChat
+}: {
+  open: boolean;
+  width: number;
+  onClose: () => void;
+  onSelectChat: (chatId: string) => void;
+}) => {
+  // Mock Data for History
+  const historyData = [
+    { id: '1', title: 'Start a Startup in Bangalore', date: 'Today' },
+    { id: '2', title: 'Coworking in Indiranagar', date: 'Yesterday' },
+    { id: '3', title: 'Virtual Office Registration', date: 'Last Week' },
+    { id: '4', title: 'Meeting Room Requirements', date: 'Last Week' },
+  ];
 
+  return createPortal(
+    <div
+      className={`fixed top-0 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col`}
+      style={{
+        left: width, // 80px from left
+        width: '320px', // Fixed width for history
+        transform: open ? 'translateX(0)' : 'translateX(-100%)',
+        // Opacity transition for smoother effect
+        opacity: open ? 1 : 0,
+        pointerEvents: open ? 'auto' : 'none',
+      }}
+    >
+      <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+          <History className="w-5 h-5 text-indigo-500" />
+          History
+        </h2>
+        <button
+          onClick={onClose}
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-500" />
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-2">
+        {historyData.map((chat) => (
+          <div
+            key={chat.id}
+            onClick={() => onSelectChat(chat.id)}
+            className="group p-3 mb-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-all border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
+          >
+            <div className="text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
+              {chat.title}
+            </div>
+            <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              {chat.date}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="p-4 border-t border-gray-100 dark:border-gray-800">
+        <Button
+          variant="outline"
+          className="w-full justify-start text-gray-600 dark:text-gray-300"
+          onClick={() => {
+            onSelectChat('new');
+          }}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New Chat
+        </Button>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+// ------------------------------------------------
+// End of UpdatesPopup & ChatHistorySidebar
+// ------------------------------------------------
 
 const StartChatting = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [message, setMessage] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // [NEW] User menu state
   const [showUpdates, setShowUpdates] = useState(false); // [NEW] State for the popup
+  const [showHistory, setShowHistory] = useState(false); // [NEW] State for history sidebar
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: '',
@@ -302,6 +390,7 @@ const StartChatting = () => {
 
   const [mapZoom, setMapZoom] = useState(11);
   const [isLoginOpen, setIsLoginOpen] = useState(false); // [NEW]
+  const [isLimitPopupOpen, setIsLimitPopupOpen] = useState(false); // [NEW] Limit Reached Popup
   const [isSignupOpen, setIsSignupOpen] = useState(false); // [NEW]
   const [isMapLoading, setIsMapLoading] = useState(false);
   const [mapTitle, setMapTitle] = useState('Popular Spaces');
@@ -451,6 +540,7 @@ const StartChatting = () => {
 
   const sidebarMenuItems: SidebarMenuItem[] = [
     { label: 'Start Chatting', icon: MessageSquare, onClick: () => handleNavigation('/start-chatting') },
+    { label: 'History', icon: History, onClick: () => setShowHistory(prev => !prev) }, // [NEW] History toggle
     { label: 'Get Workspace', icon: Building2, onClick: () => handleNavigation('/solutions/on-demand') },
     { label: 'Business Setup', icon: Briefcase, onClick: () => handleNavigation('/solutions/business-setup') },
     { label: 'Your Bookings', icon: Calendar, onClick: () => handleNavigation('/bookings') },
@@ -462,7 +552,19 @@ const StartChatting = () => {
   // [NEW] Close popup function
   const closeBoth = () => {
     setShowUpdates(false);
+    setShowHistory(false); // Close history as well
     setIsSidebarOpen(false); // Also close mobile sidebar if open
+  };
+
+  // [NEW] Handle history selection
+  const handleHistorySelect = (chatId: string) => {
+    console.log("Selected chat:", chatId);
+    setShowHistory(false); // Slide back inside instantly
+    // Logic to load chat would go here
+    if (chatId === 'new') {
+      setChatMessages([]);
+      // reset other state if needed
+    }
   };
 
   // [NEW] Handle Escape key and body scroll
@@ -471,7 +573,7 @@ const StartChatting = () => {
       if (e.key === "Escape") closeBoth();
     };
     // Only block body scroll if the popup is open
-    if (showUpdates) {
+    if (showUpdates || showHistory) {
       document.addEventListener("keydown", esc);
       document.body.style.overflow = "hidden";
     } else {
@@ -485,7 +587,7 @@ const StartChatting = () => {
       // Always clean up to unset, the other effect for isSidebarOpen will handle it
       document.body.style.overflow = "unset";
     };
-  }, [showUpdates, isSidebarOpen]); // [NEW] Added isSidebarOpen as dependency
+  }, [showUpdates, showHistory, isSidebarOpen]); // [NEW] Added isSidebarOpen as dependency
 
   // Pause Lenis globally while this page is mounted to keep native wheel behavior snappy
   useEffect(() => {
@@ -562,8 +664,57 @@ const StartChatting = () => {
     recognition.start();
   };
 
+  // [NEW] Speak Function
+  const handleSpeak = (text: string) => {
+    window.speechSynthesis.cancel();
+    
+    // Simple clean up of markdown for better speech
+    const cleanText = text.replace(/\*\*/g, '').replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+    
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    
+    // [UPDATED] Voice Selection for softer, more natural female voice
+    const voices = window.speechSynthesis.getVoices();
+    
+    // Try to find a high-quality female voice
+    const preferredVoice = voices.find(voice => 
+      (voice.name.includes("Google") && voice.name.includes("US English")) || // Chrome specific
+      (voice.name.includes("Microsoft Zira")) || // Windows specific
+      (voice.name.includes("Neural") && voice.name.includes("Female")) || // Smart filters
+      (voice.name.includes("Natural") && voice.name.includes("Female")) 
+    ) || voices.find(voice => voice.name.includes("Female")) || voices.find(v => v.lang.startsWith("en-"));
+
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+    
+    // Tuning for softness
+    utterance.pitch = 1.1; // Slightly higher for lighter tone
+    utterance.rate = 0.95; // Slightly slower for composure
+    
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // [NEW] Cleanup speech on unmount
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
   const handleSendMessage = async () => {
     if (!message.trim() || isLoading) return;
+
+    // [NEW] Guest Chat Limit Check
+    if (!isAuthenticated) {
+      const currentCount = parseInt(localStorage.getItem('guest_chat_count') || '0');
+      if (currentCount >= 3) {
+        setIsLimitPopupOpen(true);
+        // Optional: clear message to avoid confusion or keep it? Keeping it allows them to send after login
+        return;
+      }
+      localStorage.setItem('guest_chat_count', (currentCount + 1).toString());
+    }
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -730,21 +881,113 @@ const StartChatting = () => {
               Get in Touch
             </Splash3dButton>
 
-            {/* Log in Button */}
-            <Button
-              onClick={() => setIsLoginOpen(true)}
-              variant="outline"
-              className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 dark:border-gray-700 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
-            >
-              Log in
-            </Button>
+            {/* Log in Button or User Profile */}
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 border border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-500/10"
+                >
+                  {/* User Avatar */}
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                    {user?.fullName?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  {/* User Name */}
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200 max-w-[120px] truncate hidden sm:block">
+                    {user?.fullName || 'User'}
+                  </span>
+                  {/* Dropdown Icon */}
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform duration-200",
+                      isUserMenuOpen && "rotate-180"
+                    )}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    {/* User Info Header */}
+                    <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        {user?.fullName}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="py-1">
+                      <button
+                        onClick={() => {
+                          handleNavigation("/dashboard");
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        <span className="font-medium">Dashboard</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          handleNavigation("/dashboard/profile");
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                      >
+                        <UserIcon className="h-4 w-4" />
+                        <span className="font-medium">My Profile</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          handleNavigation("/settings");
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                      >
+                        <Settings className="h-4 w-4" />
+                        <span className="font-medium">Settings</span>
+                      </button>
+                    </div>
+
+                    {/* Logout Section */}
+                    <div className="border-t border-gray-100 dark:border-gray-800 pt-1">
+                      <button
+                        onClick={async () => {
+                          await logout();
+                          setIsUserMenuOpen(false);
+                          handleNavigation("/");
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-150"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span className="font-medium">Logout</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Button
+                onClick={() => setIsLoginOpen(true)}
+                variant="outline"
+                className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 dark:border-gray-700 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
+                style={{ fontFamily: 'Poppins' }}
+              >
+                Log in
+              </Button>
+            )}
           </div>
         </div>
       </header>
 
-      {/* [NEW] Transparent Overlay for Updates Popup */}
+      {/* [NEW] Transparent Overlay for Updates/History Popup */}
       {/* This sits below the popup (z-9999) but above the page content */}
-      {showUpdates && (
+      {(showUpdates || showHistory) && (
         <div
           onClick={closeBoth}
           className="fixed inset-0 z-[45]"
@@ -755,8 +998,16 @@ const StartChatting = () => {
       {/* [NEW] Render the Updates Popup */}
       <UpdatesPopup
         open={showUpdates}
-        menuWidth={SIDEBAR_WIDTH_ICON} // [NEW] Pass the 80px width
+        menuWidth={SIDEBAR_WIDTH_ICON}
         onCloseBoth={closeBoth}
+      />
+
+      {/* [NEW] Render Chat History Sidebar */}
+      <ChatHistorySidebar
+        open={showHistory}
+        width={SIDEBAR_WIDTH_ICON}
+        onClose={() => setShowHistory(false)}
+        onSelectChat={handleHistorySelect}
       />
 
       {/* Backdrop Overlay (for mobile sidebar) */}
@@ -1117,7 +1368,7 @@ const StartChatting = () => {
                     {chatMessages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                        className={`flex gap-4 group ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                       >
                         {/* Avatar */}
                         <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${msg.role === 'user'
@@ -1150,6 +1401,17 @@ const StartChatting = () => {
                             {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
+
+                        {msg.role === 'assistant' && !msg.isTyping && (
+                          <button
+                            onClick={() => handleSpeak(msg.content)}
+                            className="opacity-60 hover:opacity-100 transition-opacity duration-200 p-2 h-fit self-start mt-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-[#EDB003]"
+                            title="Read Aloud"
+                            aria-label="Read message aloud"
+                          >
+                            <Volume2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     ))}
 
@@ -1218,6 +1480,39 @@ const StartChatting = () => {
           </ResizableMapLayout>
         </div>
       </div>
+      {/* Limit Reached Popup */}
+      {isLimitPopupOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+          <div className="absolute inset-0" onClick={() => setIsLimitPopupOpen(false)} />
+          <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-gray-800 text-center font-grotesk">
+            <button
+              onClick={() => setIsLimitPopupOpen(false)}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="w-16 h-16 bg-yellow-50 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4 text-[#EDB003]">
+              <Lock className="w-7 h-7" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Chat Limit Reached
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-medium">
+              You've reached the free chat limit. <br />
+              Please login to continue chatting with our AI assistant.
+            </p>
+            <button
+              onClick={() => {
+                setIsLimitPopupOpen(false);
+                setIsLoginOpen(true);
+              }}
+              className="w-full py-3 bg-black dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold hover:opacity-90 transition-all transform active:scale-95 shadow-lg shadow-black/20 dark:shadow-white/10"
+            >
+              Log in to Continue
+            </button>
+          </div>
+        </div>
+      )}
       {/* Auth Modals */}
       <LoginModal
         isOpen={isLoginOpen}
@@ -1226,6 +1521,7 @@ const StartChatting = () => {
           setIsLoginOpen(false);
           setIsSignupOpen(true);
         }}
+        onLoginSuccess={() => setIsLoginOpen(false)}
       />
       <SignupModal
         isOpen={isSignupOpen}

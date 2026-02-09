@@ -134,7 +134,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
   const footer = [
     { label: "Updates", href: "/updates", icon: Bell },
     { label: "Settings", href: "/settings", icon: SettingsIcon },
-    { label: "More", href: "#more", icon: MoreHorizontal }
+    // { label: "More", href: "#more", icon: MoreHorizontal }
   ];
 
   useEffect(() => {
@@ -176,11 +176,11 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
       document.addEventListener("keydown", esc);
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
     }
     return () => {
       document.removeEventListener("keydown", esc);
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
     };
   }, [isOpen, showUpdates]);
 
@@ -212,7 +212,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
 
       {/* Sidebar */}
       <div
-        className="relative z-20 h-full bg-white dark:bg-[#0a0a0a] text-black dark:text-white border-r border-neutral-200 dark:border-white/10 shadow-xl transform transition-transform duration-300 ease-out overflow-hidden font-geist"
+        className="relative z-20 h-full bg-white dark:bg-[#0a0a0a] text-black dark:text-white border-r border-neutral-200 dark:border-white/10 shadow-xl transform transition-transform duration-300 ease-out overflow-hidden font-geist flex flex-col"
         style={{
           width: `${menuWidth}px`,
           minWidth: `${menuWidth}px`,
@@ -241,7 +241,10 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
         )}
 
         {/* Menu items */}
-        <div className="overflow-y-auto h-full pb-32 flex flex-col">
+        <div 
+          className="flex-1 overflow-y-auto pb-32 flex flex-col overscroll-contain touch-pan-y min-h-0"
+          data-lenis-prevent
+        >
           <div className="p-5 space-y-2 text-sm tracking-wide flex-1">
             <nav className="space-y-2">
               {/* Primary Top Items */}
