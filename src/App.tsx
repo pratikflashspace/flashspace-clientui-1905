@@ -71,6 +71,8 @@ import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
 import Dashboard from "./pages/spacePortal/Dashboard";
 
+import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
+
 // --- React Query setup ---
 const queryClient = new QueryClient();
 
@@ -124,6 +126,8 @@ const App = () => (
               {/* Public Routes */}
 
               <Route path="/spaceportal" element={<Dashboard />} />
+              <Route path="/spaceportal/dashboard" element={<Dashboard />} />
+              <Route path="/spaceportal/feedback-nps" element={<SpacePortalFeedbackNPS />} />
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
               <Route path="/services/virtual-office" element={<VirtualOffice />} />
