@@ -1,6 +1,7 @@
 import { memo, useState } from 'react';
-import { MapPin, Star, Heart, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MapPin, Star, Heart, Plus, ChevronLeft, ChevronRight, Phone } from 'lucide-react';
 import { VirtualOfficeItem, CoworkingSpaceItem, MeetingRoomItem } from '@/types/services';
+import MeetingBookingModal from '@/components/ui/MeetingBookingModal';
 
 // Union type that works with all service types
 export type ListingItem = VirtualOfficeItem | CoworkingSpaceItem | MeetingRoomItem | {
@@ -51,6 +52,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFavorite, setIsFavorite] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+    const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
 
     // Use item image as first, then placeholders
     const images = item.image
@@ -265,14 +267,33 @@ const ListingCardModern = memo<ListingCardModernProps>(
             <span className="text-xs text-gray-500 italic">Price negotiable</span>
           </div>
 
-          {/* Get Best Price Button */}
-          <button
-            onClick={handleCardClick}
-            className="w-full py-3 bg-gray-900 hover:bg-[#EDB003] text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-md hover:text-gray-900"
-          >
-            Get Best Price
-          </button>
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleCardClick}
+              className="flex-1 py-3 bg-gray-900 hover:bg-[#EDB003] text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-md hover:text-gray-900"
+            >
+              Get Best Price
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMeetingModalOpen(true);
+              }}
+              className="flex-1 py-3 bg-white border-2 border-gray-900 hover:bg-gray-900 text-gray-900 hover:text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-md flex items-center justify-center gap-1.5"
+            >
+              <Phone className="w-4 h-4" />
+              Contact Sales
+            </button>
+          </div>
         </div>
+
+        {/* Meeting Booking Modal */}
+        <MeetingBookingModal
+          isOpen={isMeetingModalOpen}
+          onClose={() => setIsMeetingModalOpen(false)}
+          item={item}
+        />
       </div>
     );
   },
