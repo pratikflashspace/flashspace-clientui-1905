@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster as HotToaster } from 'react-hot-toast';
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -93,6 +94,42 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <HotToaster
+        position="top-center"
+        toastOptions={{
+          duration: 2500,
+          style: {
+            background: '#ffffff',
+            color: '#1f2937',
+            borderRadius: '16px',
+            padding: '20px 32px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            fontSize: '16px',
+            fontWeight: '500',
+            maxWidth: '400px',
+          },
+          success: {
+            style: {
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+            },
+            iconTheme: {
+              primary: '#10b981',
+              secondary: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#ffffff',
+              border: '1px solid #fecaca',
+            },
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: 'white',
+            },
+          },
+        }}
+      />
       <BrowserRouter>
         <AuthProvider>
           <DarkModeProvider>
@@ -100,6 +137,8 @@ const App = () => (
             {/* <MouseFollower/> */}
             <Routes>
               {/* Public Routes */}
+
+              <Route path="/spaceportal" element={<Dashboard />} />
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
               <Route
