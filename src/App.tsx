@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
@@ -69,15 +69,21 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
+
+// --- Space Partner Portal Pages ---
+import SpacePortalClients from "@/pages/spacePortal/Clients";
+import SpacePortalClientDetails from "@/pages/spacePortal/ClientsDetails";
 import Dashboard from "./pages/spacePortal/Dashboard";
-import { CLIENTS } from "./data/spacePortal/clients";
-import Enquiries from "./pages/spacePortal/ClientEnquiries";
 import Invoices from "./pages/spacePortal/Invoices";
 import Calendar from "./pages/spacePortal/Calendar";
 import Spaces from "./pages/spacePortal/Spaces";
 import Tickets from "./pages/spacePortal/Tickets";
 import BookingAnalytics from "./pages/spacePortal/BookingAnalytics";
 import ClientEnquiries from "./pages/spacePortal/ClientEnquiries";
+import SpacePortalProfile from "./pages/spacePortal/Profile";
+import Notifications from "./pages/spacePortal/Notifications";
+import SpacePortalSettings from "./pages/spacePortal/Settings";
+import AddSpace from "./pages/spacePortal/AddSpace";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -199,11 +205,15 @@ const App = () => (
 
               {/* Space Partner Portal Routes */}
               <Route path="/spaceportal" element={<SpacePortalLayout />}>
-                <Route index element={<Dashboard />} />
+                <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="dashboard" element={<Dashboard />} />
 
-                <Route path="clients" element={<Clients />} />
+                <Route path="clients" element={<SpacePortalClients />} />
+                <Route path="clients/:clientId" element={<SpacePortalClientDetails />} />
                 <Route path="client-enquiries" element={<ClientEnquiries />} />
+                <Route path="notifications" element={<Notifications />} />
+                <Route path="profile" element={<SpacePortalProfile />} />
+                <Route path="settings" element={<SpacePortalSettings />} />
                 <Route path="invoices-payments" element={<Invoices />} />
                 <Route path="booking-calendar" element={<Calendar />} />
                 <Route
@@ -211,6 +221,7 @@ const App = () => (
                   element={<BookingAnalytics />}
                 />
                 <Route path="space-management" element={<Spaces />} />
+                <Route path="space-management/add" element={<AddSpace />} />
                 <Route path="tickets" element={<Tickets />} />
               </Route>
 

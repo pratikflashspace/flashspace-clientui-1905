@@ -225,7 +225,7 @@ const JourneySection = () => {
 
                 {/* Step Circle Container */}
                 <div className="flex flex-col items-center flex-shrink-0 w-20 relative z-10">
-                  <div className="w-20 h-20 rounded-full border-3 border-gray-200 dark:border-white/10 bg-white dark:bg-[#1f1f1f] flex flex-col items-center justify-center shadow-md bg-white">
+                  <div className="w-20 h-20 rounded-full border-3 border-gray-200 dark:border-white/10 bg-white dark:bg-[#1f1f1f] flex flex-col items-center justify-center shadow-md">
                     <div className="mb-1 text-[#172A3A] dark:text-white">
                       {step.icon}
                     </div>
