@@ -230,6 +230,10 @@ export default function SpacePortalLayout() {
           title: "Client Details",
           subtitle: "Review client profile and plan details.",
         },
+        "/spaceportal/feedback-nps": {
+          title: "Feedback",
+          subtitle: "Monitor client satisfaction",
+        },
       }),
       []
     );
@@ -418,9 +422,8 @@ export default function SpacePortalLayout() {
 
           {/* Mobile Sidebar */}
           <div
-            className={`fixed inset-0 z-40 transition-opacity lg:hidden ${
-              isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
-            }`}
+            className={`fixed inset-0 z-40 transition-opacity lg:hidden ${isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
+              }`}
             aria-hidden={!isSidebarOpen}
           >
             <button
@@ -431,9 +434,8 @@ export default function SpacePortalLayout() {
             />
 
             <div
-              className={`absolute inset-y-0 left-0 w-72 transform bg-white shadow-2xl transition-transform ${
-                isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-              }`}
+              className={`absolute inset-y-0 left-0 w-72 transform bg-white shadow-2xl transition-transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
             >
               <Sidebar onClose={() => setIsSidebarOpen(false)} />
             </div>

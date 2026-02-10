@@ -140,9 +140,8 @@ const App = () => (
             <Routes>
               {/* Public Routes */}
 
-              <Route path="/spaceportal" element={<Dashboard />} />
-              <Route path="/spaceportal/dashboard" element={<Dashboard />} />
-              <Route path="/spaceportal/feedback-nps" element={<SpacePortalFeedbackNPS />} />
+
+
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
               <Route
@@ -266,6 +265,7 @@ const App = () => (
                 <Route path="space-management" element={<Spaces />} />
                 <Route path="space-management/add" element={<AddSpace />} />
                 <Route path="tickets" element={<Tickets />} />
+                <Route path="feedback-nps" element={<SpacePortalFeedbackNPS />} />
               </Route>
 
               <Route path="/list-your-space" element={<ListYourSpace />} />
