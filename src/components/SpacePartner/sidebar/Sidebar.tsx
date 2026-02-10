@@ -1,60 +1,160 @@
-import { Link, useLocation } from "react-router-dom";
-import { sidebarConfig } from "./SidebarConfig";
+import React from "react";
+import { X, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { sidebarConfig } from "./sidebarConfig";
+import { NavLink } from "react-router-dom";
 
-function SidebarItem({
-  icon: Icon,
-  label,
-  path,
-  active,
-}: {
-  icon: any;
+type SidebarItemProps = {
+  icon: React.ReactNode;
   label: string;
-  path: string;
-  active: boolean;
-}) {
+  to: string;
+  collapsed?: boolean;
+};
+
+function SidebarItem({ icon, label, to, collapsed }: SidebarItemProps) {
   return (
-    <Link
-      to={path}
-      className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${active
-        ? "bg-[#3FA69E] text-white shadow-sm"
-        : "text-slate-600 hover:bg-slate-100"
-        }`}
+    <NavLink
+      to={to}
+      title={label}
+      aria-label={label}
+      className={({ isActive }) =>
+        `flex w-full items-center rounded-xl text-left text-sm font-semibold transition ${
+          isActive
+            ? "bg-[#3FA69E] text-white shadow-sm"
+            : "text-slate-600 hover:bg-slate-100"
+        } ${collapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"}`
+      }
     >
-      <span className={`${active ? "text-white" : "text-slate-500"}`}>
-        <Icon size={18} />
-      </span>
-      <span>{label}</span>
-    </Link>
+      {({ isActive }) => (
+        <>
+          <span className={`${isActive ? "text-white" : "text-slate-500"}`}>
+            {icon}
+          </span>
+          {collapsed ? null : <span>{label}</span>}
+        </>
+      )}
+    </NavLink>
   );
 }
 
-export default function Sidebar() {
-  const location = useLocation();
+type SidebarProps = {
+  onClose?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+};
 
+export default function Sidebar({
+  onClose,
+  isCollapsed = false,
+  onToggleCollapse,
+}: SidebarProps) {
   return (
-    <aside className="h-screen w-72 border-r border-slate-200 bg-white px-4 py-6">
-      <div className="mb-6">
-        <h1 className="text-xl font-bold text-slate-900">flashspace</h1>
-        <p className="text-sm text-slate-500">Space Admin</p>
-      </div>
+    <aside
+      className={`flex h-screen flex-col overflow-hidden border-r border-slate-200 bg-white py-6 transition-[width,padding] duration-200 ${
+        isCollapsed ? "w-20 px-3" : "w-72 px-4"
+      }`}
+    >
+      {/* Logo */}
+      {isCollapsed ? (
+        <div className="mb-6 flex items-start justify-between gap-2">
+          <NavLink
+            to="/spaceportal/dashboard"
+            className="rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#3FA69E]/30"
+            aria-label="Go to Space Portal dashboard"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-sm font-bold text-white">
+              FS
+            </div>
+          </NavLink>
 
-      <div className="flex flex-col gap-2">
+          {onClose ? (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close sidebar"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 lg:hidden"
+            >
+              <X size={18} />
+            </button>
+          ) : null}
+        </div>
+      ) : (
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <NavLink
+            to="/spaceportal/dashboard"
+            className="rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#3FA69E]/30"
+            aria-label="Go to Space Portal dashboard"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-sm font-bold text-white">
+                FS
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-slate-900">flashspace</h1>
+                <p className="text-sm text-slate-500">Space Partner Portal</p>
+              </div>
+            </div>
+          </NavLink>
+
+          <div className="flex items-center gap-2">
+            {onToggleCollapse ? (
+              <button
+                type="button"
+                onClick={onToggleCollapse}
+                aria-label="Collapse sidebar"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50"
+              >
+                <ChevronLeft size={18} />
+              </button>
+            ) : null}
+
+            {onClose ? (
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close sidebar"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 lg:hidden"
+              >
+                <X size={18} />
+              </button>
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {/* Menu */}
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
         {sidebarConfig.map((item) => (
           <SidebarItem
             key={item.path}
-            icon={item.icon}
+            to={item.path}
+            icon={<item.icon size={18} />}
             label={item.label}
-            path={item.path}
-            active={location.pathname === item.path}
+            collapsed={isCollapsed}
           />
         ))}
       </div>
 
-      <div className="mt-auto pt-10 text-sm text-slate-500">
-        <button className="mt-4 w-full rounded-xl border border-slate-200 px-4 py-3 hover:bg-slate-50">
-          Logout
+      {onToggleCollapse && isCollapsed ? (
+        <button
+          type="button"
+          onClick={onToggleCollapse}
+          aria-label="Expand sidebar"
+          className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50"
+        >
+          <ChevronRight size={18} />
         </button>
-      </div>
+      ) : null}
+
+
+      {/* Bottom */}
+      {isCollapsed ? null : (
+        <div className="mt-auto pt-6 text-sm text-slate-500">
+          <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-semibold hover:bg-slate-50">
+            <LogOut size={16} />
+            <span>Logout</span>
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

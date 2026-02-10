@@ -17,10 +17,12 @@ const Card3D = ({ children, className = "" }: { children: React.ReactNode; class
   const handleMouseMove = ({ currentTarget, clientX, clientY }: React.MouseEvent) => {
     const { left, top, width, height } = currentTarget.getBoundingClientRect();
     x.set((clientX - left) / width - 0.5);
+
     y.set((clientY - top) / height - 0.5);
   };
 
   const handleMouseLeave = () => {
+    
     x.set(0);
     y.set(0);
   };

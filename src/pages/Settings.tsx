@@ -25,6 +25,15 @@ export default function Settings() {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [isLoading, setIsLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setProfileImage(imageUrl);
+    }
+  };
 
   // Password state
   const [passwordForm, setPasswordForm] = useState({
@@ -92,17 +101,18 @@ export default function Settings() {
         <div className="relative flex flex-col md:flex-row gap-6 items-start md:items-end pt-12">
           <div className="relative group">
             <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-100">
-              {user?.profilePicture ? (
-                <img src={user.profilePicture} alt={user.fullName} className="w-full h-full object-cover" />
+              {profileImage || user?.profilePicture ? (
+                <img src={profileImage || user?.profilePicture} alt={user?.fullName} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-900 text-white text-4xl font-bold">
                   {user?.fullName?.charAt(0)}
                 </div>
               )}
             </div>
-            <button className="absolute bottom-2 right-2 p-2 bg-black text-white rounded-full hover:bg-gray-800 transition-colors shadow-lg group-hover:scale-105">
+            <label className="absolute bottom-2 right-2 p-2 bg-black text-white rounded-full hover:bg-gray-800 transition-colors shadow-lg group-hover:scale-105 cursor-pointer">
               <Camera className="w-4 h-4" />
-            </button>
+              <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+            </label>
           </div>
 
           <div className="flex-1 mb-2">

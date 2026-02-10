@@ -14,7 +14,7 @@ type Props<T> = {
 export default function Table<T extends { id: string }>({ data, columns }: Props<T>) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <table className="w-full border-collapse text-left text-sm">
+      <table className="w-full min-w-[900px] border-collapse text-left text-sm">
         <thead className="bg-slate-50">
           <tr className="border-b border-slate-200 text-slate-600">
             {columns.map((col) => (
