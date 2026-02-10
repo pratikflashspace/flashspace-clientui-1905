@@ -86,6 +86,8 @@ import Notifications from "./pages/spacePortal/Notifications";
 import SpacePortalSettings from "./pages/spacePortal/Settings";
 import AddSpace from "./pages/spacePortal/AddSpace";
 
+import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
+
 // --- React Query setup ---
 const queryClient = new QueryClient();
 
@@ -139,6 +141,8 @@ const App = () => (
               {/* Public Routes */}
 
               <Route path="/spaceportal" element={<Dashboard />} />
+              <Route path="/spaceportal/dashboard" element={<Dashboard />} />
+              <Route path="/spaceportal/feedback-nps" element={<SpacePortalFeedbackNPS />} />
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
               <Route

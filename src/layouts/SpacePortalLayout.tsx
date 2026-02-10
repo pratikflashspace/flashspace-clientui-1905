@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import Sidebar from "@/components/SpacePartner/sidebar/Sidebar";
-import Topbar from "@/components/SpacePartner/topbar/Topbar";
+import TopBar from "@/components/SpacePartner/topbar/Topbar";
 import Footer from "@/components/SpacePartner/footer/Footer";
 
 import { SpacePortalSearchProvider } from "@/contexts/SpacePortalSearchContext";
@@ -472,7 +472,7 @@ export default function SpacePortalLayout() {
           <div className="flex min-w-0 flex-1 flex-col">
             {/* Topbar */}
             <div className="px-3 pt-3 sm:px-5 sm:pt-5 lg:px-8">
-              <Topbar
+              <TopBar
                 title={headerConfig.title}
                 subtitle={headerConfig.subtitle}
                 onMenuClick={() => setIsSidebarOpen(true)}
