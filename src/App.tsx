@@ -88,6 +88,8 @@ import SpacePortalSettings from "./pages/spacePortal/Settings";
 import AddSpace from "./pages/spacePortal/AddSpace";
 
 import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
+import ActiveRequests from "./pages/spacePortal/ActiveRequests";
+import { PartnerRoute } from "./components/auth/PartnerRoute";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -248,26 +250,29 @@ const App = () => (
               </Route>
 
               {/* Space Partner Portal Routes */}
-              <Route path="/spaceportal" element={<SpacePortalLayout />}>
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={<Dashboard />} />
+              <Route element={<PartnerRoute />}>
+                <Route path="/spaceportal" element={<SpacePortalLayout />}>
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route path="dashboard" element={<Dashboard />} />
 
-                <Route path="clients" element={<SpacePortalClients />} />
-                <Route path="clients/:clientId" element={<SpacePortalClientDetails />} />
-                <Route path="client-enquiries" element={<ClientEnquiries />} />
-                <Route path="notifications" element={<Notifications />} />
-                <Route path="profile" element={<SpacePortalProfile />} />
-                <Route path="settings" element={<SpacePortalSettings />} />
-                <Route path="invoices-payments" element={<Invoices />} />
-                <Route path="booking-calendar" element={<Calendar />} />
-                <Route
-                  path="booking-analytics"
-                  element={<BookingAnalytics />}
-                />
-                <Route path="space-management" element={<Spaces />} />
-                <Route path="space-management/add" element={<AddSpace />} />
-                <Route path="tickets" element={<Tickets />} />
-                <Route path="feedback-nps" element={<SpacePortalFeedbackNPS />} />
+                  <Route path="clients" element={<SpacePortalClients />} />
+                  <Route path="clients/:clientId" element={<SpacePortalClientDetails />} />
+                  <Route path="client-enquiries" element={<ClientEnquiries />} />
+                  <Route path="notifications" element={<Notifications />} />
+                  <Route path="profile" element={<SpacePortalProfile />} />
+                  <Route path="settings" element={<SpacePortalSettings />} />
+                  <Route path="invoices-payments" element={<Invoices />} />
+                  <Route path="booking-calendar" element={<Calendar />} />
+                  <Route path="active-requests" element={<ActiveRequests />} />
+                  <Route
+                    path="booking-analytics"
+                    element={<BookingAnalytics />}
+                  />
+                  <Route path="space-management" element={<Spaces />} />
+                  <Route path="space-management/add" element={<AddSpace />} />
+                  <Route path="tickets" element={<Tickets />} />
+                  <Route path="feedback-nps" element={<SpacePortalFeedbackNPS />} />
+                </Route>
               </Route>
 
               <Route path="/list-your-space" element={<ListYourSpace />} />
