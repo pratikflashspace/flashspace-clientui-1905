@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             name: "Dashboard",
             icon: LayoutGrid,
             section: "main",
-            path: "/affiliate-portal/dashboard",
+            path: "/affiliate-portal/affiliate-dashboard",
         },
         {
             name: "Booking Management",
@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             name: "Invoices",
             icon: FileText,
             section: "main",
-            path: "/affiliate-portal/invoices",
+            path: "/affiliate-portal/affiliate-invoices",
         },
         {
             name: "Lead Management",

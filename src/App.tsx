@@ -245,11 +245,11 @@ const App = () => (
                   <Route path="/forgot-password" element={<ForgotPassword />} />
               {/* Affiliate Portal Routes */}
               <Route path="/affiliate-portal" element={<AffiliateLayout />}>
-                  <Route index element={<Navigate to="dashboard" replace />} />
-                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route index element={<Navigate to="affiliate-dashboard" replace />} />
+                  <Route path="affiliate-dashboard" element={<Dashboard />} />
                   <Route path="booking-management" element={<BookingManagement />} />
                   <Route path="revenue-dashboard" element={<RevenueDashboard />} />
-                  <Route path="invoices" element={<Invoices />} />
+                  <Route path="affiliate-invoices" element={<Invoices />} />
                   <Route path="payouts" element={<Payouts />} />
                   <Route path="lead-management" element={<LeadManagementAffiliate/>} />
                   <Route path="quotation-generator" element={<QuotationGenerator />} />
