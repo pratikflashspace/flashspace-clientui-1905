@@ -321,7 +321,7 @@ class UserDashboardService {
       const response = await axiosInstance.delete<ApiResponse<void>>(
         API_ENDPOINTS.USER.KYC_UPLOAD,
         {
-          data: {
+          params: {
             documentType,
             profileId,
           },
