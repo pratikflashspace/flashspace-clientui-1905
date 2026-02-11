@@ -75,6 +75,7 @@ export const API_ENDPOINTS = {
     KYC: '/api/user/kyc',
     KYC_BUSINESS_INFO: '/api/user/kyc/business-info',
     KYC_UPLOAD: '/api/user/kyc/upload',
+    KYC_SUBMIT: '/api/user/kyc/submit',
     // Invoices
     INVOICES: '/api/user/invoices',
     INVOICE_BY_ID: (id: string) => `/api/user/invoices/${id}`,

@@ -74,8 +74,9 @@ export interface KYCData {
   _id?: string; // Profile ID
   profileName?: string; // e.g., "TechCorp Pvt Ltd" or "John Doe (Personal)"
   linkedBookings?: string[]; // Array of booking IDs
-  overallStatus: 'not_started' | 'pending' | 'approved' | 'rejected' | 'resubmit';
+  overallStatus: 'not_started' | 'in_progress' | 'pending' | 'approved' | 'rejected' | 'resubmit';
   kycType?: 'individual' | 'business';
+  isPartner?: boolean; // True if this is a partner profile
   progress: number;
   personalInfo?: {
     fullName?: string;
@@ -331,6 +332,22 @@ class UserDashboardService {
       return {
         success: false,
         message: error.response?.data?.message || 'Failed to delete document',
+      };
+    }
+  }
+
+  // Submit KYC for review
+  async submitKYC(profileId: string): Promise<ApiResponse<KYCData>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<KYCData>>(
+        API_ENDPOINTS.USER.KYC_SUBMIT,
+        { profileId }
+      );
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to submit KYC for review',
       };
     }
   }

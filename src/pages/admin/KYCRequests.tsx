@@ -16,6 +16,9 @@ interface KYCDocument {
 
 interface KYCRequest {
     _id: string;
+    profileName?: string;
+    kycType?: 'individual' | 'business';
+    isPartner?: boolean;
     user: {
         _id: string;
         fullName: string;
@@ -267,6 +270,11 @@ export default function KYCRequests() {
                                         <div className="min-w-0 flex-1">
                                             <h3 className="font-bold text-gray-900 truncate">{request.user?.fullName || 'Unknown User'}</h3>
                                             <p className="text-sm text-gray-500 truncate">{request.user?.email || ''}</p>
+                                            {request.profileName && (
+                                                <p className="text-xs text-blue-600 font-medium truncate mt-0.5">
+                                                    {request.isPartner ? '🤝 Partner: ' : request.kycType === 'business' ? '🏢 ' : ''}{request.profileName}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex-shrink-0">
