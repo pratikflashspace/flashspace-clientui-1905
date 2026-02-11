@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
+import TeamManagement from "./pages/spacePortal/teamManagement";
 
 import Index from "./pages/Index";
 import Services from "./pages/Services";
@@ -270,6 +271,7 @@ const App = () => (
                   />
                   <Route path="space-management" element={<Spaces />} />
                   <Route path="space-management/add" element={<AddSpace />} />
+                  <Route path="team-management" element={<TeamManagement />} />
                   <Route path="tickets" element={<Tickets />} />
                   <Route path="feedback-nps" element={<SpacePortalFeedbackNPS />} />
                 </Route>
