@@ -348,16 +348,16 @@ const MeetingRoomsPage: React.FC = () => {
         userEmail: user.email,
         userName: user.fullName || "User",
         userPhone: bookingForm.mobile || user.phoneNumber,
-        spaceId: "fixed-meeting-room-id", // In real app, this would be dynamic ID
+        spaceId: selectedRoom._id || selectedRoom.id || `meeting_room_${selectedRoom.name.replace(/\s+/g, '_').toLowerCase()}`,
         spaceName: selectedRoom.name,
         planName: "Hourly Booking",
         planKey: "meeting_hourly",
-        tenure: 1, // 1 year filler, redundant here but required by interface type
-        yearlyPrice: totalAmount, // filler
+        tenure: 1,
+        yearlyPrice: totalAmount,
         totalAmount: totalAmount,
         discountPercent: 0,
         discountAmount: 0,
-        paymentType: "meeting_room" as any // "meeting_room" was added to types in previous steps but interface might need update
+        paymentType: "meeting_room"
       });
 
       // 2. Open Razorpay OR Simulate
@@ -526,7 +526,7 @@ const MeetingRoomsPage: React.FC = () => {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-4 pt-2">
+            <div className="flex flex-wrap gap-4 pb-4">
               <button onClick={() => window.location.href = '#room-types'} className="bg-[#FFD43B] text-black px-8 py-4 rounded-full font-bold font-poppins hover:bg-white hover:scale-105 transition-all flex items-center gap-2">
                 <Calendar className="w-5 h-5" /> Book Now
               </button>
@@ -985,7 +985,7 @@ const MeetingRoomsPage: React.FC = () => {
                   {item.name}
                 </h4>
 
-                <p className="text-sm text-gray-700 font-poppins mb-1">
+                <p className="text-sm text-gray-700 dark:text-gray-200 font-poppins mb-1">
                   {item.role}
                 </p>
 

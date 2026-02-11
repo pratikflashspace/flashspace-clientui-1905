@@ -172,7 +172,7 @@ class UserDashboardService {
       const response = await axiosInstance.delete<ApiResponse<void>>(
         API_ENDPOINTS.USER.KYC_UPLOAD,
         {
-          data: {
+          params: {
             documentType,
             profileId,
           },
@@ -188,6 +188,23 @@ class UserDashboardService {
     }
   }
 
+  // Submit KYC for review
+  async submitKYC(profileId: string): Promise<ApiResponse<KYCData>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<KYCData>>(
+        API_ENDPOINTS.USER.KYC_SUBMIT,
+        { profileId }
+      );
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to submit KYC for review',
+      };
+    }
+  }
+
+  // Link booking to profile
   async linkBookingToProfile(bookingId: string, profileId: string): Promise<ApiResponse<LinkBookingResponse>> {
     try {
       const response = await axiosInstance.post<ApiResponse<LinkBookingResponse>>(

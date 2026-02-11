@@ -32,7 +32,7 @@ export interface CreateOrderPayload {
   totalAmount: number;
   discountPercent: number;
   discountAmount: number;
-  paymentType?: "virtual_office" | "coworking_space";
+  paymentType?: "virtual_office" | "coworking_space" | "meeting_room";
 }
 
 export interface CreateOrderResponse {
@@ -128,12 +128,18 @@ export const reportPaymentFailure = async (orderId: string, errorCode: string, e
 
 /**
  * Simulate payment success (Development Only)
+ * Uses the existing /verify endpoint with devMode: true
  */
 export const simulatePayment = async (orderId: string): Promise<PaymentVerificationResponse> => {
   try {
     const response = await axios.post<APIResponse<PaymentVerificationResponse>>(
-      `${API.domain}/api/payment/simulate-success`,
-      { orderId },
+      `${API.domain}/api/payment/verify`,
+      {
+        razorpay_order_id: orderId,
+        razorpay_payment_id: `pay_sim_${Date.now()}`,
+        razorpay_signature: "simulated_signature",
+        devMode: true,
+      },
       { withCredentials: true }
     );
 
