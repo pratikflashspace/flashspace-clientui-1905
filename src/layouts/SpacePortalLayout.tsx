@@ -188,6 +188,10 @@ export default function SpacePortalLayout() {
           title: makeTitle("Booking", "Calendar"),
           subtitle: "Plan schedules and manage booking requests.",
         },
+        "/spaceportal/active-requests": {
+          title: makeTitle("Active", "Requests"),
+          subtitle: "Review and manage space booking requests.",
+        },
         "/spaceportal/clients": {
           title: makeTitle("My", "Clients"),
           subtitle: "Manage all your client relationships",

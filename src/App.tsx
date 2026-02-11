@@ -88,6 +88,7 @@ import SpacePortalSettings from "./pages/spacePortal/Settings";
 import AddSpace from "./pages/spacePortal/AddSpace";
 
 import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
+import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 
 // --- React Query setup ---
@@ -262,6 +263,7 @@ const App = () => (
                   <Route path="settings" element={<SpacePortalSettings />} />
                   <Route path="invoices-payments" element={<Invoices />} />
                   <Route path="booking-calendar" element={<Calendar />} />
+                  <Route path="active-requests" element={<ActiveRequests />} />
                   <Route
                     path="booking-analytics"
                     element={<BookingAnalytics />}
