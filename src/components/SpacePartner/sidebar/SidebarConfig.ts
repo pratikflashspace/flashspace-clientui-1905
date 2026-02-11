@@ -5,6 +5,7 @@ import {
   BarChart3,
 
   CalendarDays,
+  FileText,
 
   Users,
 
@@ -51,6 +52,16 @@ export const sidebarConfig = [
     path: "/spaceportal/booking-calendar",
 
     icon: CalendarDays,
+
+  },
+
+  {
+
+    label: "Active Requests",
+
+    path: "/spaceportal/active-requests",
+
+    icon: FileText,
 
   },
 
