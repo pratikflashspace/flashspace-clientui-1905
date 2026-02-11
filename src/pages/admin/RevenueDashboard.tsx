@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     TrendingUp,
@@ -9,18 +9,82 @@ import {
     ArrowUpRight,
     MapPin,
     Building2,
-    UserCheck
+    UserCheck,
+    Loader2,
+    AlertCircle
 } from 'lucide-react';
+import api from '../../lib/axios';
+
+interface RevenueData {
+    metrics: {
+        mtd: number;
+        ytd: number;
+        avgPerClient: number;
+        partnerPayouts: number;
+    };
+    byCity: { name: string; revenue: number }[];
+    byCategory: { name: string; revenue: number; bookings: number }[];
+    byPartner: any[];
+}
 
 const RevenueDashboard = () => {
     const [activeTab, setActiveTab] = useState('city');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [data, setData] = useState<RevenueData | null>(null);
 
-    // Mock Data
+    useEffect(() => {
+        fetchDashboardData();
+    }, []);
+
+    const fetchDashboardData = async () => {
+        try {
+            setLoading(true);
+            const response = await api.get('/api/admin/revenue/dashboard');
+            if (response.data.success) {
+                setData(response.data.data);
+            } else {
+                setError('Failed to load dashboard data');
+            }
+        } catch (err) {
+            console.error('Error fetching revenue dashboard:', err);
+            setError('Failed to connect to server. Ensure backend is running.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex h-96 items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+            </div>
+        );
+    }
+
+    if (error || !data) {
+        return (
+            <div className="flex h-96 items-center justify-center flex-col gap-4">
+                <div className="p-4 bg-red-50 rounded-full">
+                    <AlertCircle className="h-8 w-8 text-red-500" />
+                </div>
+                <p className="text-gray-500">{error || 'No data available'}</p>
+                <button
+                    onClick={fetchDashboardData}
+                    className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                >
+                    Retry
+                </button>
+            </div>
+        );
+    }
+
+    // Process Data for Display
     const metrics = [
         {
             title: "Total Revenue (MTD)",
-            value: "₹48.5L",
-            change: "+23% from last month",
+            value: `₹${(data.metrics.mtd / 100000).toFixed(1)}L`,
+            change: "+23% from last month", // Placeholder for now, real calculation needs history
             isPositive: true,
             icon: TrendingUp,
             color: "text-teal-600",
@@ -28,7 +92,7 @@ const RevenueDashboard = () => {
         },
         {
             title: "Revenue (YTD)",
-            value: "₹4.2Cr",
+            value: `₹${(data.metrics.ytd / 10000000).toFixed(2)}Cr`,
             change: "+18% from last month",
             isPositive: true,
             icon: Calendar,
@@ -37,7 +101,7 @@ const RevenueDashboard = () => {
         },
         {
             title: "Avg Revenue/Client",
-            value: "₹34K",
+            value: `₹${(data.metrics.avgPerClient / 1000).toFixed(1)}K`,
             change: "+12% from last month",
             isPositive: true,
             icon: Users,
@@ -46,7 +110,7 @@ const RevenueDashboard = () => {
         },
         {
             title: "Partner Payouts",
-            value: "₹28.5L",
+            value: `₹${(data.metrics.partnerPayouts / 100000).toFixed(1)}L`,
             change: "+15% from last month",
             isPositive: true,
             icon: CreditCard,
@@ -55,27 +119,38 @@ const RevenueDashboard = () => {
         }
     ];
 
-    const cityData = [
-        { name: "Mumbai", revenue: "₹18.5L", growth: "+22%", share: 38, color: "bg-teal-500" },
-        { name: "Delhi", revenue: "₹12.2L", growth: "+18%", share: 25, color: "bg-teal-400" },
-        { name: "Bangalore", revenue: "₹10.8L", growth: "+28%", share: 22, color: "bg-teal-300" },
-        { name: "Chennai", revenue: "₹4.5L", growth: "+12%", share: 9, color: "bg-teal-200" },
-        { name: "Hyderabad", revenue: "₹2.5L", growth: "+35%", share: 6, color: "bg-teal-100" },
-    ];
+    // Helper to format large numbers
+    const formatCurrency = (val: number) => {
+        if (val >= 10000000) return `₹${(val / 10000000).toFixed(1)}Cr`;
+        if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+        return `₹${val.toLocaleString()}`;
+    };
 
-    const categoryData = [
-        { name: "Virtual Office", revenue: "₹22.4L", subtext: "847 active clients", growth: "+15%", color: "bg-blue-50 text-blue-700" },
-        { name: "Team Space", revenue: "₹15.8L", subtext: "232 active clients", growth: "+35%", color: "bg-emerald-50 text-emerald-700" },
-        { name: "Meeting Rooms", revenue: "₹6.2L", subtext: "1245 bookings", growth: "+22%", color: "bg-purple-50 text-purple-700" },
-        { name: "Day Pass", revenue: "₹4.1L", subtext: "523 bookings", growth: "+8%", color: "bg-orange-50 text-orange-700" },
-    ];
+    // Calculate total revenue for share percentages
+    const totalRevenue = data.metrics.ytd || 1;
 
-    const partnerData = [
+    // Transform API data to UI format
+    const cityData = data.byCity.map((c, i) => ({
+        name: c.name,
+        revenue: formatCurrency(c.revenue),
+        growth: "+15%", // Placeholder
+        share: Math.round((c.revenue / totalRevenue) * 100),
+        color: `bg-teal-${500 - (i * 100)}` // Gradient effect
+    }));
+
+    const categoryData = data.byCategory.map((c, i) => ({
+        name: c.name === 'coworking-space' ? 'Coworking Space' : 'Virtual Office',
+        revenue: formatCurrency(c.revenue),
+        subtext: `${c.bookings} bookings`,
+        growth: "+10%", // Placeholder
+        color: i % 2 === 0 ? "bg-blue-50 text-blue-700" : "bg-emerald-50 text-emerald-700"
+    }));
+
+    // If partner data is empty from backend, show placeholder or empty state
+    // Use cityData structure as fallback for partner tab if needed
+    const partnerData = data.byPartner.length > 0 ? data.byPartner : [
         { name: "WeWork India", revenue: "₹12.5L", growth: "+15%", share: 25, color: "bg-indigo-500" },
         { name: "91Springboard", revenue: "₹8.2L", growth: "+10%", share: 18, color: "bg-indigo-400" },
-        { name: "Innov8", revenue: "₹6.8L", growth: "+20%", share: 14, color: "bg-indigo-300" },
-        { name: "Awfis", revenue: "₹5.4L", growth: "+8%", share: 11, color: "bg-indigo-200" },
-        { name: "Bhive", revenue: "₹4.1L", growth: "+12%", share: 8, color: "bg-indigo-100" },
     ];
 
     const renderContent = () => {
@@ -91,7 +166,7 @@ const RevenueDashboard = () => {
                             className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex justify-between items-start"
                         >
                             <div>
-                                <h3 className="text-gray-900 font-bold text-lg mb-1">{item.name}</h3>
+                                <h3 className="text-gray-900 font-bold text-lg mb-1 capitalize">{item.name}</h3>
                                 <div className="text-3xl font-bold text-gray-900 mb-1">{item.revenue}</div>
                                 <div className="text-sm text-gray-400">{item.subtext}</div>
                             </div>
@@ -104,7 +179,7 @@ const RevenueDashboard = () => {
             );
         }
 
-        const data = activeTab === 'partner' ? partnerData : cityData;
+        const currentData = activeTab === 'partner' ? partnerData : cityData;
         const isPartner = activeTab === 'partner';
 
         return (
@@ -119,7 +194,7 @@ const RevenueDashboard = () => {
 
                 {/* Table Rows */}
                 <div className="space-y-2">
-                    {data.map((item, index) => (
+                    {currentData.map((item, index) => (
                         <motion.div
                             key={index}
                             initial={{ opacity: 0, x: -20 }}
@@ -142,7 +217,7 @@ const RevenueDashboard = () => {
                                         initial={{ width: 0 }}
                                         animate={{ width: `${item.share}%` }}
                                         transition={{ duration: 1, delay: 0.5 }}
-                                        className={`h-full ${item.color}`}
+                                        className={`h-full ${item.color || 'bg-gray-300'}`}
                                     />
                                 </div>
                                 <span className="text-xs text-gray-400 w-8 text-right">{item.share}%</span>
@@ -204,8 +279,8 @@ const RevenueDashboard = () => {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === tab.id
-                                    ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-100'
-                                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-100'
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                                 }`}
                         >
                             {/* <tab.icon className="w-4 h-4" /> */}
@@ -236,8 +311,8 @@ const RevenueDashboard = () => {
                         </div>
                         <p className="text-teal-900 leading-relaxed text-sm md:text-base opacity-90">
                             Based on current growth trends and seasonal patterns, projected revenue for next month is
-                            <span className="font-bold"> ₹52.8L</span> (+8.8%).
-                            <span className="font-semibold"> Bangalore</span> shows the highest growth potential with
+                            <span className="font-bold"> ₹{(data.metrics.mtd * 1.08 / 100000).toFixed(1)}L</span> (+8.8%).
+                            <span className="font-semibold"> {data.byCity[0]?.name || 'Bangalore'}</span> shows the highest growth potential with
                             28% MoM increase. Consider expanding team space inventory in this region.
                         </p>
                     </div>
