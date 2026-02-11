@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Eye, EyeOff, Loader2, User, Mail, Phone, Lock, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Loader2, User, Mail, Phone, Lock, ArrowRight, Building2 } from 'lucide-react';
 import { GoogleLoginButton } from './GoogleLoginButton';
 import { toast } from 'sonner';
 
@@ -20,6 +20,7 @@ export const SignupForm = () => {
     phoneNumber: '',
     password: '',
     confirmPassword: '',
+    role: 'user' as 'user' | 'partner',
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -63,7 +64,10 @@ export const SignupForm = () => {
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
 
     if (!formData.password) newErrors.password = 'Password is required';
-    else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+    else if (!/[A-Z]/.test(formData.password)) newErrors.password = 'Password must contain at least one uppercase letter';
+    else if (!/[a-z]/.test(formData.password)) newErrors.password = 'Password must contain at least one lowercase letter';
+    else if (!/[!@#$%^&*(),.?":{}|<>]/.test(formData.password)) newErrors.password = 'Password must contain at least one special character';
 
     if (!formData.confirmPassword) newErrors.confirmPassword = 'Please confirm your password';
     else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
@@ -94,6 +98,59 @@ export const SignupForm = () => {
 
   return (
     <form onSubmit={(e) => e.preventDefault()} className="space-y-4" style={{ fontFamily: 'Poppins' }}>
+
+      {/* Step 1: Role Selection */}
+      {step === 1 && (
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-[#586A7E]">I want to join as</label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setFormData(prev => ({ ...prev, role: 'user' }))}
+              className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 ${formData.role === 'user'
+                ? 'border-[#4DA1FF] bg-[#4DA1FF]/5 shadow-md'
+                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                }`}
+            >
+              <div className={`p-2.5 rounded-full transition-all duration-200 ${formData.role === 'user' ? 'bg-[#4DA1FF]/10 text-[#4DA1FF]' : 'bg-slate-100 text-slate-400'
+                }`}>
+                <User size={22} />
+              </div>
+              <span className={`text-sm font-semibold transition-colors duration-200 ${formData.role === 'user' ? 'text-[#172A3A]' : 'text-slate-500'
+                }`}>User</span>
+              <span className={`text-xs transition-colors duration-200 ${formData.role === 'user' ? 'text-slate-500' : 'text-slate-400'
+                }`}>Book spaces</span>
+              {formData.role === 'user' && (
+                <div className="absolute top-2 right-2 w-5 h-5 bg-[#4DA1FF] rounded-full flex items-center justify-center">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </div>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData(prev => ({ ...prev, role: 'partner' }))}
+              className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 ${formData.role === 'partner'
+                ? 'border-[#EDB003] bg-[#EDB003]/5 shadow-md'
+                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                }`}
+            >
+              <div className={`p-2.5 rounded-full transition-all duration-200 ${formData.role === 'partner' ? 'bg-[#EDB003]/10 text-[#EDB003]' : 'bg-slate-100 text-slate-400'
+                }`}>
+                <Building2 size={22} />
+              </div>
+              <span className={`text-sm font-semibold transition-colors duration-200 ${formData.role === 'partner' ? 'text-[#172A3A]' : 'text-slate-500'
+                }`}>Space Partner</span>
+              <span className={`text-xs transition-colors duration-200 ${formData.role === 'partner' ? 'text-slate-500' : 'text-slate-400'
+                }`}>List your space</span>
+              {formData.role === 'partner' && (
+                <div className="absolute top-2 right-2 w-5 h-5 bg-[#EDB003] rounded-full flex items-center justify-center">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </div>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Step 1 & 2: Phone Number */}
       {(step === 1 || step === 2) && (

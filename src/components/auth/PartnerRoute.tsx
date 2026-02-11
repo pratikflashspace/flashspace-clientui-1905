@@ -1,9 +1,10 @@
+// components/auth/PartnerRoute.tsx
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
-export const AdminRoute: React.FC = () => {
+export const PartnerRoute: React.FC = () => {
     const { user, isAuthenticated, isLoading } = useAuth();
 
     if (isLoading) {
@@ -14,22 +15,13 @@ export const AdminRoute: React.FC = () => {
         );
     }
 
-    // Check if user is authenticated and has admin role
-    console.log('AdminRoute Check:', { isAuthenticated, user, role: user?.role });
-
     if (!isAuthenticated || !user) {
-        console.warn('AdminRoute: Not authenticated or no user');
         return <Navigate to="/login" replace />;
     }
 
-    const allowedRoles = ['admin', 'partner', 'sales'];
-    if (!allowedRoles.includes(user.role)) {
-        console.warn('AdminRoute: Role mismatch', { expected: allowedRoles, actual: user.role });
-
-        // If authenticated but not admin, redirect to user dashboard
+    if (user.role !== 'partner') {
         return <Navigate to="/dashboard" replace />;
     }
 
-    console.log('AdminRoute: Access granted');
     return <Outlet />;
 };
