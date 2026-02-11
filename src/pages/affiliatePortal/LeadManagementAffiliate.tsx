@@ -83,7 +83,7 @@ const LeadManagementAffiliate = () => {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up">
                 <LeadStatCard
                     label="Total Leads"
                     value={INITIAL_LEADS.length}
@@ -102,7 +102,7 @@ const LeadManagementAffiliate = () => {
             </div>
 
             {/* Main Content Area */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-slide-up">
                 <div className="p-6 space-y-6">
                     {/* Search Bar */}
                     <div className="relative max-w-md">

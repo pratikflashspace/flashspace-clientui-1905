@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom"; // Import Router hooks
 import Sidebar from "@/components/affiliatePortal/Sidebar";
 import { Menu } from "lucide-react";
+import "./portal-animations.css";
 
 const AffiliateLayout = () => {
     const [isMobileOpen, setIsMobileOpen] = useState(false);

@@ -48,7 +48,7 @@ const Support = () => {
         <TabsContent value="chat" className="outline-none">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Chat Interface - Passing state and setter as props */}
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-8 animate-slide-up">
               <SupportChat 
                 messages={chatMessages} 
                 setMessages={setChatMessages} 
@@ -56,7 +56,7 @@ const Support = () => {
             </div>
 
             {/* Sidebar: Only visible in Chat Tab */}
-            <div className="lg:col-span-4 space-y-6 animate-in slide-in-from-right-4 duration-500">
+            <div className="lg:col-span-4 space-y-6 animate-slide-up">
               {/* Contact Us Card */}
               <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
                 <h3 className="font-bold text-gray-800">Contact Us</h3>
@@ -115,22 +115,25 @@ const Support = () => {
         </TabsContent>
 
         {/* --- MY TICKETS TAB --- */}
-        <TabsContent value="chat_tickets" className="outline-none animate-in fade-in duration-300">
+        <TabsContent value="chat_tickets" className="outline-none animate-slide-up">
           <div className="max-w-5xl mx-auto">
             <SupportTickets />
           </div>
         </TabsContent>
 
         {/* --- FAQ TAB --- */}
-        <TabsContent value="faq" className="outline-none animate-in fade-in duration-300">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <TabsContent value="faq" className="outline-none">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-up">
             {[
               { q: "How is my commission calculated?", a: "Your commission is calculated as 10% of the first month's booking value for new clients you refer." },
               { q: "When are payouts processed?", a: "Payouts are processed on the 1st and 15th of every month for all confirmed bookings." },
               { q: "How do I track my referrals?", a: "You can track all your referrals in the Booking Management section with real-time status updates." },
               { q: "Can I get custom marketing materials?", a: "Yes! Visit the Marketing Tools section to request custom branded materials." }
             ].map((item, i) => (
-              <div key={i} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-3 group hover:border-[#5bb09c]/30 transition-all">
+              <div 
+                key={i} 
+                className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-3 group hover:border-[#5bb09c]/30 transition-all"
+              >
                 <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-[#5bb09c] group-hover:bg-teal-50 transition-colors">
                   <HelpCircle className="w-5 h-5" />
                 </div>

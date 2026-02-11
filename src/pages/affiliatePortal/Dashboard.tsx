@@ -137,93 +137,11 @@ const INSIGHT_DATA: Record<InsightType, InsightContent> = {
 
 // --- Sub-Components ---
 
-// 1. Main Insight Card (Clickable)
-const InsightCard = ({
-    title,
-    description,
-    id,
-    onClick,
-}: {
-    title: string;
-    description: string;
-    id: InsightType;
-    onClick: (id: InsightType) => void;
-}) => (
-    <div
-        onClick={() => onClick(id)}
-        className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group relative overflow-hidden"
-    >
-        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Sparkles size={40} className="text-[#5aa39c]" />
-        </div>
-        <div className="flex justify-between items-start mb-4 relative z-10">
-            <h3 className="font-bold text-slate-900 group-hover:text-[#5aa39c] transition-colors text-base">
-                {title}
-            </h3>
-            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 rounded-full text-[10px] font-bold text-gray-600 border border-gray-200 tracking-wide uppercase">
-                <Sparkles size={10} className="text-[#5aa39c] fill-[#5aa39c]" />{" "}
-                AI
-            </span>
-        </div>
-        <p className="text-sm text-gray-500 leading-relaxed relative z-10 pr-4">
-            {description}
-        </p>
-    </div>
-);
+import StatCardDashboard from "@/components/affiliatePortal/StatCardDashboard";
+import InsightCard from "@/components/affiliatePortal/InsightCard";
+import SectionHeader from "@/components/affiliatePortal/SectionHeader";
+import ActionCard from "@/components/affiliatePortal/ActionCard";
 
-// 2. Stat Card (For Top Grid)
-const StatCardDashboard = ({ label, value, trend, icon: Icon, delay }: any) => (
-    <div
-        className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-in-up"
-        style={{ animationDelay: `${delay}ms` }}
-    >
-        <div className="flex justify-between items-start mb-4">
-            <span className="text-gray-500 font-medium text-sm">{label}</span>
-            <div className="p-2 bg-gray-50 rounded-lg text-gray-400">
-                <Icon size={18} />
-            </div>
-        </div>
-        <div className="space-y-1">
-            <h3 className="text-3xl font-bold text-slate-900">{value}</h3>
-            {trend && (
-                <div className="flex items-center gap-1 text-sm font-medium text-green-600">
-                    <TrendingUp size={14} />
-                    <span>{trend}</span>
-                </div>
-            )}
-        </div>
-    </div>
-);
-
-// 3. Section Header
-const SectionHeader = ({ icon: Icon, title, subtitle }: any) => (
-    <div className="flex items-start gap-4 mb-6 pt-8 border-t border-gray-100/50">
-        <div className="p-3 bg-[#eaf4f3] rounded-xl text-[#5aa39c]">
-            <Icon size={24} strokeWidth={2.5} />
-        </div>
-        <div>
-            <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-            <p className="text-sm text-gray-500">{subtitle}</p>
-        </div>
-    </div>
-);
-
-// 4. Standard Action Card (Non-Interactive/Generic)
-const ActionCard = ({ title, description, badge }: any) => (
-    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col justify-between group cursor-default">
-        <div className="flex justify-between items-start mb-3">
-            <h3 className="font-bold text-slate-900 text-sm group-hover:text-[#5aa39c] transition-colors">
-                {title}
-            </h3>
-            {badge && (
-                <span className="px-2 py-0.5 bg-gray-100 rounded text-[10px] font-semibold text-gray-600 border border-gray-200 uppercase tracking-wider">
-                    {badge}
-                </span>
-            )}
-        </div>
-        <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
-    </div>
-);
 
 // --- Main Dashboard Component ---
 
@@ -591,39 +509,6 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Styles for Animations */}
-            <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(15px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes scaleUp {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.4s ease-out forwards;
-        }
-        .animate-fade-in-up {
-          animation: fadeInUp 0.5s ease-out forwards;
-          opacity: 0;
-          animation-fill-mode: forwards;
-        }
-        .animate-scale-up {
-          animation: scaleUp 0.3s ease-out forwards;
-        }
-        .animate-slide-up {
-          animation: slideUp 0.6s ease-out forwards;
-        }
-      `}</style>
         </div>
     );
 };

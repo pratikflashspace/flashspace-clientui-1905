@@ -85,7 +85,7 @@ const MarketingTools = () => {
         </TabsList>
 
         {/* --- REFERRAL LINKS TAB --- */}
-        <TabsContent value="referral" className="space-y-8 outline-none">
+        <TabsContent value="referral" className="space-y-8 outline-none animate-slide-up">
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
             <h3 className="font-bold text-gray-800 text-lg">Your Unique Referral Link</h3>
             <div className="flex flex-col xl:flex-row gap-4">
@@ -202,9 +202,12 @@ const MarketingTools = () => {
 
         {/* --- MARKETING ASSETS TAB --- */}
         <TabsContent value="assets" className="outline-none">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-up">
             {ASSETS_DATA.map((asset, idx) => (
-              <div key={idx} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between group hover:border-[#5bb09c]/30 transition-all">
+              <div 
+                key={idx} 
+                className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between group hover:border-[#5bb09c]/30 transition-all"
+              >
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
                     <div className="p-3 bg-gray-50 rounded-xl text-gray-400 group-hover:text-[#5bb09c] transition-colors">
@@ -232,9 +235,12 @@ const MarketingTools = () => {
         {/* --- QR CODES TAB (REFINED SIZE) --- */}
         <TabsContent value="qr" className="outline-none">
           {/* Increased grid columns from 3 to 4 for smaller cards on desktop */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fade-in-up">
             {QR_CODES_DATA.map((qr, idx) => (
-              <div key={idx} className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center group hover:border-[#5bb09c]/30 transition-all">
+              <div 
+                key={idx} 
+                className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center group hover:border-[#5bb09c]/30 transition-all"
+              >
                 
                 {/* QR Code Container (Reduced padding) */}
                 <div className="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center mb-4 p-6">

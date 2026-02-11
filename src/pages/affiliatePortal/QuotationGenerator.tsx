@@ -58,7 +58,7 @@ const RECENT_QUOTATIONS = [
     },
 ];
 
-const QuatationGenerator = () => {
+const QuotationGenerator = () => {
     return (
         <div className=" mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-700">
             {/* Header Section */}
@@ -75,7 +75,7 @@ const QuatationGenerator = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* LEFT COLUMN: FORM AREA (7/12) */}
-                <div className="lg:col-span-7">
+                <div className="lg:col-span-7 animate-slide-up">
                     <div className="bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-sm space-y-10">
                         <div className="flex items-center gap-3 pb-4 border-b border-gray-50">
                             <div className="p-2 bg-teal-50 rounded-lg text-[#5bb09c]">
@@ -242,7 +242,7 @@ const QuatationGenerator = () => {
                 </div>
 
                 {/* RIGHT COLUMN: SIDEBAR (5/12) */}
-                <div className="lg:col-span-5 space-y-8">
+                <div className="lg:col-span-5 space-y-8 animate-slide-up">
                     {/* Recent Quotations Section */}
                     <div className="bg-transparent space-y-4">
                         <div className="flex justify-between items-center px-1">
@@ -275,4 +275,4 @@ const QuatationGenerator = () => {
     );
 };
 
-export default QuatationGenerator;
+export default QuotationGenerator;

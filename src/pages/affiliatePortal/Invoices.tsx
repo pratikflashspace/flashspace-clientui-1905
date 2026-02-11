@@ -380,7 +380,7 @@ const Invoices = () => {
             )}
 
             {/* --- NORMAL SCREEN CONTENT (Hidden during print via CSS) --- */}
-            <div className="w-full space-y-8 no-print animate-fade-in">
+            <div className="w-full space-y-8 no-print animate-slide-up">
                 {/* Header */}
                 <div>
                     <h1 className="text-3xl text-[#5aa39c] italic font-extrabold tracking-tight">
@@ -572,7 +572,7 @@ const Invoices = () => {
             {selectedInvoice && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in no-print">
                     {/* Modal Container */}
-                    <div className="bg-white w-full max-w-3xl max-h-[85vh] rounded-2xl shadow-2xl flex flex-col animate-slide-up relative overflow-hidden">
+                    <div className="bg-white w-full max-w-3xl max-h-[85vh] rounded-2xl shadow-2xl flex flex-col animate-scale-up relative overflow-hidden">
                         {/* Modal Header (Sticky) */}
                         <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white sticky top-0 z-10">
                             <div className="flex items-center gap-3">
@@ -621,13 +621,6 @@ const Invoices = () => {
 
             {/* --- CSS Animations & Print Styles --- */}
             <style>{`
-        /* Animations */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
-        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
-        .animate-fade-in-up { animation: fadeIn 0.2s ease-out forwards; transform: translateY(5px); }
-
         /* Print Logic */
         .print-only-container { display: none; }
         

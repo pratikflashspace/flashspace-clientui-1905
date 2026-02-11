@@ -108,7 +108,7 @@ import Invoices from "./pages/affiliatePortal/Invoices";
 import Payouts from "./pages/affiliatePortal/Payouts";
 import AffiliateLayout from "./pages/affiliatePortal/AffiliateLayout";
 import LeadManagementAffiliate from "./pages/affiliatePortal/LeadManagementAffiliate";
-import QuatationGenerator from "./pages/affiliatePortal/QuatationGenerator";
+import QuotationGenerator from "./pages/affiliatePortal/QuotationGenerator";
 import MarketingTools from "./pages/affiliatePortal/MarketingTools";
 import LeaderBoard from "./pages/affiliatePortal/LeaderBoard";
 import Support from "./pages/affiliatePortal/Support";
@@ -252,7 +252,7 @@ const App = () => (
                   <Route path="invoices" element={<Invoices />} />
                   <Route path="payouts" element={<Payouts />} />
                   <Route path="lead-management" element={<LeadManagementAffiliate/>} />
-                  <Route path="quotation-generator" element={<QuatationGenerator />} />
+                  <Route path="quotation-generator" element={<QuotationGenerator />} />
                   <Route path="marketing-tools" element={<MarketingTools />} />
                   <Route path="leaderboard" element={<LeaderBoard />} />
                   <Route path="support" element={<Support />} />

@@ -96,7 +96,7 @@ const LeaderBoard = () => {
             </div>
 
             {/* User Position Hero Card */}
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+            <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between animate-scale-up">
                 <div className="flex items-center gap-6">
                     <div className="w-16 h-16 bg-[#5bb09c]/10 text-[#5bb09c] rounded-full flex items-center justify-center text-2xl font-bold">
                         #8
@@ -119,7 +119,7 @@ const LeaderBoard = () => {
             </div>
 
             {/* Leaderboard Tabs */}
-            <Tabs defaultValue="national" className="w-full">
+            <Tabs defaultValue="national" className="w-full animate-slide-up">
                 <TabsList className="bg-gray-100/50 p-1 mb-6">
                     <TabsTrigger value="national">National</TabsTrigger>
                     <TabsTrigger value="regional">Regional (West)</TabsTrigger>
