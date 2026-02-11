@@ -20,7 +20,8 @@ import {
     LineChart,
     Target,
     Ticket,
-    Tag
+    Tag,
+    Banknote
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -37,6 +38,7 @@ export default function AdminLayout() {
     const allNavItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['admin', 'partner', 'space_manager', 'sales'] },
         { icon: LineChart, label: 'Sales Analytics', path: '/admin/sales-analytics', roles: ['admin', 'sales', 'partner'] },
+        { icon: Banknote, label: 'Revenue Dashboard', path: '/admin/revenue-dashboard', roles: ['admin', 'sales'] },
         { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['admin', 'sales'] },
         { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['admin', 'sales'] },
         { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['admin', 'sales'] },
