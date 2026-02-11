@@ -339,8 +339,8 @@ export interface InvoicesResponse {
 
 // ============ TICKET TYPES ============
 
-export type TicketPriority = 'low' | 'medium' | 'high';
-export type TicketStatus = 'open' | 'in_progress' | 'escalated' | 'resolved' | 'closed';
+export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type TicketStatus = 'open' | 'in_progress' | 'escalated' | 'resolved' | 'closed' | 'waiting_customer';
 
 export interface TicketMessage {
   sender: 'user' | 'support' | 'admin';
