@@ -58,6 +58,7 @@ import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentFailedPage from "./pages/PaymentFailedPage";
 import AdminDashboard from "./pages/admin/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
+import Coupons from "./pages/admin/Coupons";
 import KYCRequests from "./pages/admin/KYCRequests";
 import SpaceManagement from "./pages/admin/SpaceManagement";
 import AdminBookings from "./pages/admin/AdminBookings";
@@ -140,9 +141,8 @@ const App = () => (
             <Routes>
               {/* Public Routes */}
 
-              <Route path="/spaceportal" element={<Dashboard />} />
-              <Route path="/spaceportal/dashboard" element={<Dashboard />} />
-              <Route path="/spaceportal/feedback-nps" element={<SpacePortalFeedbackNPS />} />
+
+
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
               <Route
@@ -238,6 +238,7 @@ const App = () => (
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="clients" element={<Clients />} />
                   <Route path="clients/:id" element={<ClientDetails />} />
+                  <Route path="coupons" element={<Coupons />} />
                   <Route path="learning-hub" element={<LearningHub />} />
                   <Route path="sales-analytics" element={<SalesAnalytics />} />
                   <Route path="tickets" element={<TicketSystem />} />
@@ -266,6 +267,7 @@ const App = () => (
                 <Route path="space-management" element={<Spaces />} />
                 <Route path="space-management/add" element={<AddSpace />} />
                 <Route path="tickets" element={<Tickets />} />
+                <Route path="feedback-nps" element={<SpacePortalFeedbackNPS />} />
               </Route>
 
               <Route path="/list-your-space" element={<ListYourSpace />} />

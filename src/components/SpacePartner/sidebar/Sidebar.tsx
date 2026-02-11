@@ -1,6 +1,6 @@
 import React from "react";
 import { X, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
-import { sidebarConfig } from "./sidebarConfig";
+import { sidebarConfig } from "./SidebarConfig";
 import { NavLink } from "react-router-dom";
 
 type SidebarItemProps = {
