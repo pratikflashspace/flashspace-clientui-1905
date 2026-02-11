@@ -101,10 +101,10 @@ import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 // Affiliate Portal
-import Dashboard from "./pages/affiliatePortal/Dashboard";
+import AffiliateDashboard from "./pages/affiliatePortal/Dashboard";
 import BookingManagement from "./pages/affiliatePortal/BookingManagement";
 import RevenueDashboard from "./pages/affiliatePortal/RevenueDashboard";
-import Invoices from "./pages/affiliatePortal/Invoices";
+import AffiliateInvoices from "./pages/affiliatePortal/Invoices";
 import Payouts from "./pages/affiliatePortal/Payouts";
 import AffiliateLayout from "./pages/affiliatePortal/AffiliateLayout";
 import LeadManagementAffiliate from "./pages/affiliatePortal/LeadManagementAffiliate";
@@ -246,10 +246,10 @@ const App = () => (
               {/* Affiliate Portal Routes */}
               <Route path="/affiliate-portal" element={<AffiliateLayout />}>
                   <Route index element={<Navigate to="affiliate-dashboard" replace />} />
-                  <Route path="affiliate-dashboard" element={<Dashboard />} />
+                  <Route path="affiliate-dashboard" element={<AffiliateDashboard />} />
                   <Route path="booking-management" element={<BookingManagement />} />
                   <Route path="revenue-dashboard" element={<RevenueDashboard />} />
-                  <Route path="affiliate-invoices" element={<Invoices />} />
+                  <Route path="affiliate-invoices" element={<AffiliateInvoices />} />
                   <Route path="payouts" element={<Payouts />} />
                   <Route path="lead-management" element={<LeadManagementAffiliate/>} />
                   <Route path="quotation-generator" element={<QuotationGenerator />} />
