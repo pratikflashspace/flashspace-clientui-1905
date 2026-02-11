@@ -100,6 +100,18 @@ import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
 import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
+// Affiliate Portal
+import Dashboard from "./pages/affiliatePortal/Dashboard";
+import BookingManagement from "./pages/affiliatePortal/BookingManagement";
+import RevenueDashboard from "./pages/affiliatePortal/RevenueDashboard";
+import Invoices from "./pages/affiliatePortal/Invoices";
+import Payouts from "./pages/affiliatePortal/Payouts";
+import AffiliateLayout from "./pages/affiliatePortal/AffiliateLayout";
+import LeadManagementAffiliate from "./pages/affiliatePortal/LeadManagementAffiliate";
+import QuatationGenerator from "./pages/affiliatePortal/QuatationGenerator";
+import MarketingTools from "./pages/affiliatePortal/MarketingTools";
+import LeaderBoard from "./pages/affiliatePortal/LeaderBoard";
+import Support from "./pages/affiliatePortal/Support";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -231,6 +243,26 @@ const App = () => (
                   <Route path="/signup" element={<Index openSignup={true} />} />
                   <Route path="/verify-otp" element={<VerifyOTP />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
+              {/* Affiliate Portal Routes */}
+              <Route path="/affiliate-portal" element={<AffiliateLayout />}>
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="booking-management" element={<BookingManagement />} />
+                  <Route path="revenue-dashboard" element={<RevenueDashboard />} />
+                  <Route path="invoices" element={<Invoices />} />
+                  <Route path="payouts" element={<Payouts />} />
+                  <Route path="lead-management" element={<LeadManagementAffiliate/>} />
+                  <Route path="quotation-generator" element={<QuatationGenerator />} />
+                  <Route path="marketing-tools" element={<MarketingTools />} />
+                  <Route path="leaderboard" element={<LeaderBoard />} />
+                  <Route path="support" element={<Support />} />
+              </Route>
+
+
+              <Route path="/list-your-space" element={<ListYourSpace />} />
+              <Route path="/partner" element={<PartnerWithUs />} />
+              <Route path="/coming-soon" element={<ComingSoon />} />
+              <Route path="/start-chatting" element={<StartChatting />} />
 
                   {/* Protected Routes */}
                   <Route element={<ProtectedRoute />}>
