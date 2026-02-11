@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { smoothScrollTo } from "@/lib/lenis";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,7 @@ interface HeaderProps {
 const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = false, openLogin = false, openSignup = false }: HeaderProps): ReactNode => {
     const { darkMode, toggleDarkMode } = useDarkMode();
     const navigate = useNavigate();
+    const location = useLocation(); // Add checks for current route
     const { isAuthenticated, user, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
@@ -62,6 +63,22 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
     const [isContactOpen, setIsContactOpen] = useState(false);
     const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
     const [isSignupOpen, setIsSignupOpen] = useState(openSignup);
+
+    // Ref helpers for closing modals with redirection
+    const closeLogin = () => {
+        setIsLoginOpen(false);
+        if (location.pathname === '/login') {
+            navigate('/');
+        }
+    };
+
+    const closeSignup = () => {
+        setIsSignupOpen(false);
+        if (location.pathname === '/signup') {
+            navigate('/');
+        }
+    };
+
 
     // Sync props to state
     useEffect(() => {
@@ -397,10 +414,29 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                                 <p className="text-xs text-gray-500 truncate">
                                                     {user?.email}
                                                 </p>
+                                                <div className="mt-1.5 flex flex-wrap gap-1">
+                                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${user?.role === 'partner' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}`}>
+                                                        {user?.role}
+                                                    </span>
+                                                </div>
                                             </div>
 
                                             {/* Menu Items */}
                                             <div className="py-1">
+                                                {/* Partner Portal Button */}
+                                                {user?.role === 'partner' && (
+                                                    <button
+                                                        onClick={() => {
+                                                            navigate("/spaceportal");
+                                                            setIsUserMenuOpen(false);
+                                                        }}
+                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-50 hover:text-amber-800 transition-colors duration-150"
+                                                    >
+                                                        <Building2 className="h-4 w-4" />
+                                                        <span className="">Your Space Portal</span>
+                                                    </button>
+                                                )}
+
                                                 <button
                                                     onClick={() => {
                                                         handleNavigation("/dashboard");
@@ -454,7 +490,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 </div>
                             ) : (
                                 <ModernFlairButton
-                                    onClick={() => setIsLoginOpen(true)}
+                                    onClick={() => navigate('/login')}
                                     className="hidden lg:inline-flex group px-6 py-2.5 bg-white text-[#164e4e] text-sm font-bold rounded-full border border-[#164e4e]/20 transition-all duration-300 hover:bg-[#164e4e] hover:text-white hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
                                     flairColor="rgba(255, 255, 255, 0.1)"
                                 >
@@ -467,11 +503,11 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                         </div>
                     </div>
 
-                    {/* Sidebar Menu */}
+                    {/* SidebarMenu */}
                     <SidebarMenu
                         isOpen={isMenuOpen}
                         onClose={() => setIsMenuOpen(false)}
-                        onOpenLogin={() => setIsLoginOpen(true)}
+                        onOpenLogin={() => navigate('/login')}
                     />
                 </div>
             </header>
@@ -590,10 +626,10 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
             )}
 
             {/* === Login Modal === */}
-            <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+            <LoginModal isOpen={isLoginOpen} onClose={closeLogin} />
 
             {/* === Signup Modal === */}
-            <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} />
+            <SignupModal isOpen={isSignupOpen} onClose={closeSignup} />
         </>
     );
 };

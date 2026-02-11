@@ -241,7 +241,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
         )}
 
         {/* Menu items */}
-        <div 
+        <div
           className="flex-1 overflow-y-auto pb-32 flex flex-col overscroll-contain touch-pan-y min-h-0"
           data-lenis-prevent
         >
@@ -324,11 +324,26 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
                           <p className="text-xs text-gray-600 dark:text-gray-400 truncate font-geist">
                             {user?.email || 'user@example.com'}
                           </p>
+                          <div className="mt-1">
+                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${user?.role === 'partner' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'}`}>
+                              {user?.role}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
                       {/* Action Buttons */}
                       <div className="space-y-2">
+                        {user?.role === 'partner' && (
+                          <button
+                            onClick={() => handleNavigation("/spaceportal")}
+                            className="w-full rounded-lg bg-amber-500 text-white font-semibold py-2.5 text-sm hover:bg-amber-600 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm font-poppins"
+                          >
+                            <Building className="w-4 h-4" />
+                            Your Space Portal
+                          </button>
+                        )}
+
                         <button
                           onClick={() => handleNavigation("/dashboard")}
                           className="w-full rounded-lg bg-blue-600 text-white font-semibold py-2.5 text-sm hover:bg-blue-700 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm font-poppins"

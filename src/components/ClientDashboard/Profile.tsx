@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import userDashboardService, { KYCData, Booking } from "@/services/userDashboard.service";
+import { KYCData, Booking } from "@/types/services";
+import userDashboardService from "@/services/userDashboard.service";
 import {
   User,
   Mail,
@@ -68,7 +69,7 @@ const Profile: React.FC = () => {
         if (user) {
           setProfileData(prev => ({
             ...prev,
-            fullName: user.name || "",
+            fullName: user.fullName || "",
             email: user.email || "",
             phone: user.phone || "",
           }));

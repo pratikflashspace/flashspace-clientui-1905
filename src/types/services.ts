@@ -186,3 +186,330 @@ export interface SearchHandlers {
 
 // Navigation handler
 export type NavigationHandler = (href: string) => void;
+
+// ============ USER DASHBOARD TYPES ============
+
+export interface DashboardData {
+  activeServices: number;
+  pendingInvoices: number;
+  nextBookingDate: string | null;
+  kycStatus: string;
+  recentActivity: Array<{
+    type: string;
+    message: string;
+    date: string;
+  }>;
+  usageBreakdown: {
+    virtualOffice: number;
+    coworkingSpace: number;
+  };
+  monthlyBookings: Array<{
+    month: string;
+    count: number;
+  }>;
+}
+
+export interface SpaceSnapshot {
+  _id?: string;
+  name?: string;
+  address?: string;
+  city?: string;
+  area?: string;
+  image?: string;
+  images?: string[];
+  coordinates?: { lat: number; lng: number };
+}
+
+export type BookingType = 'virtual_office' | 'coworking_space';
+export type BookingStatus = 'pending_payment' | 'pending_kyc' | 'active' | 'expired' | 'cancelled';
+
+export interface Booking {
+  _id: string;
+  bookingNumber: string;
+  type: BookingType;
+  status: BookingStatus;
+  spaceId: string;
+  spaceSnapshot?: SpaceSnapshot;
+  plan: {
+    name: string;
+    price: number;
+    originalPrice?: number;
+    discount?: number;
+    tenure: number;
+    tenureUnit?: string;
+    gstIncluded?: boolean;
+  };
+  timeline?: Array<{
+    status: string;
+    date: string;
+    note?: string;
+    by?: string;
+  }>;
+  documents?: Array<{
+    name: string;
+    type: string;
+    url?: string;
+    generatedAt?: string;
+  }>;
+  startDate?: string;
+  endDate?: string;
+  daysRemaining?: number;
+  autoRenew?: boolean;
+  features?: string[];
+  createdAt: string;
+}
+
+export type KYCStatus = 'not_started' | 'pending' | 'approved' | 'rejected' | 'resubmit';
+export type KYCType = 'individual' | 'business';
+export type DocumentStatus = 'pending' | 'approved' | 'rejected';
+
+export interface PersonalInfo {
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  verified?: boolean;
+  status?: string;
+  dateOfBirth?: string;
+  aadhaarLast4?: string;
+  aadhaarNumber?: string;
+  panNumber?: string;
+}
+
+export interface BusinessInfo {
+  companyName?: string;
+  companyType?: string;
+  gstNumber?: string;
+  panNumber?: string;
+  cinNumber?: string;
+  registeredAddress?: string;
+  industry?: string;
+  verified?: boolean;
+  partners?: string[]; // IDs of linked individual profiles
+}
+
+export interface KYCDocument {
+  type: string;
+  name: string;
+  fileUrl?: string;
+  status: DocumentStatus;
+  rejectionReason?: string;
+  uploadedAt?: string;
+  verifiedAt?: string;
+}
+
+export interface KYCData {
+  _id?: string; // Profile ID
+  profileName?: string; // e.g., "TechCorp Pvt Ltd" or "John Doe (Personal)"
+  linkedBookings?: string[]; // Array of booking IDs
+  overallStatus: KYCStatus;
+  kycType?: KYCType;
+  progress: number;
+  personalInfo?: PersonalInfo;
+  businessInfo?: BusinessInfo;
+  documents?: KYCDocument[];
+}
+
+export type InvoiceStatus = 'paid' | 'pending' | 'overdue' | 'cancelled';
+
+export interface Invoice {
+  _id: string;
+  invoiceNumber: string;
+  bookingNumber?: string;
+  description: string;
+  subtotal: number;
+  taxRate?: number;
+  taxAmount?: number;
+  total: number;
+  status: InvoiceStatus;
+  dueDate?: string;
+  paidAt?: string;
+  createdAt: string;
+}
+
+export interface InvoicesSummary {
+  totalPaid: number;
+  totalPending: number;
+  totalInvoices: number;
+}
+
+export interface InvoicesResponse {
+  summary: InvoicesSummary;
+  invoices: Invoice[];
+}
+
+// ============ TICKET TYPES ============
+
+export type TicketPriority = 'low' | 'medium' | 'high';
+export type TicketStatus = 'open' | 'in_progress' | 'escalated' | 'resolved' | 'closed';
+
+export interface TicketMessage {
+  sender: 'user' | 'support' | 'admin';
+  senderName?: string;
+  message: string;
+  attachments?: string[];
+  createdAt: string;
+}
+
+export interface SupportTicket {
+  _id: string;
+  ticketNumber: string;
+  subject: string;
+  description: string;
+  category: string;
+  priority: TicketPriority;
+  status: TicketStatus;
+  user?: {
+    _id: string;
+    fullName: string;
+    email: string;
+    phoneNumber?: string;
+  };
+  assignee?: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
+  messages?: TicketMessage[];
+  createdAt: string;
+  updatedAt?: string;
+  deadline?: string;
+  resolvedAt?: string;
+  closedAt?: string;
+}
+
+export interface CreditHistoryItem {
+  amount: number;
+  source: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface CreditsResponse {
+  balance: number;
+  totalEarned: number;
+  history: CreditHistoryItem[];
+  rewardThreshold: number;
+  canRedeem: boolean;
+}
+
+export interface PaginationInfo {
+  total: number;
+  page: number;
+  pages: number;
+  hasNextPage?: boolean;
+  hasPrevPage?: boolean;
+}
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  message?: string;
+  data?: T;
+  pagination?: PaginationInfo;
+  error?: string;
+}
+
+export interface UploadKYCDocumentResponse {
+  type: string;
+  status: DocumentStatus;
+  uploadedAt: string;
+}
+
+export interface CreateTicketResponse {
+  _id: string;
+  ticketNumber: string;
+  status: TicketStatus;
+}
+
+export interface RewardRedeemData {
+  rewardType: string;
+  amount?: number;
+  contactInfo?: string;
+}
+
+export interface LinkBookingResponse {
+  success: boolean;
+  message: string;
+  profileId: string;
+  bookingId: string;
+}
+
+// ============ ADMIN TICKET TYPES ============
+
+export interface AdminTicketData {
+  _id: string;
+  ticketNumber: string;
+  subject: string;
+  description: string;
+  user: {
+    _id: string;
+    fullName: string;
+    email: string;
+    phoneNumber?: string;
+  };
+  category: string;
+  priority: 'low' | 'medium' | 'high';
+  status: 'open' | 'in_progress' | 'escalated' | 'resolved' | 'closed';
+  assignee?: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  deadline?: string;
+  messages: Array<{
+    sender: 'user' | 'support' | 'admin';
+    message: string;
+    createdAt: string;
+  }>;
+}
+
+export interface TicketStats {
+  open: number;
+  in_progress: number;
+  escalated: number;
+  resolved: number;
+  closed: number;
+  avgResolution?: string;
+  resolvedThisMonth: number;
+  totalTickets: number;
+}
+
+export interface AllTicketsResponse {
+  tickets: AdminTicketData[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+// ============ AUTH TYPES ============
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface AuthUser {
+  _id: string;
+  id: string;
+  email: string;
+  role: 'user' | 'admin' | 'support';
+  fullName?: string;
+}
+
+// ============ NOTIFICATION TYPES ============
+
+export interface Notification {
+  id: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  action?: {
+    label: string;
+    url: string;
+  };
+}

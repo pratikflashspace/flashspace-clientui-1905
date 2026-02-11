@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Shield, Clock, Star, Building2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check, Shield, Clock, Star, Building2, Loader2, Tag, X, Percent } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { getVirtualOfficeById } from '@/services/virtualOffice.service';
 import { VirtualOfficeItem } from '@/types/services';
 import { getVirtualOfficePricing, PlanDetails } from '@/utils/priceUtils';
 import { BookingPageSkeleton } from '@/components/ui/skeleton-loaders';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { validateCoupon, markCouponUsed } from '@/services/coupon.service';
 import {
   createPaymentOrder,
   openRazorpayCheckout,
@@ -35,10 +37,72 @@ const BookingPage = () => {
   const [selectedTenure, setSelectedTenure] = useState<1 | 2 | 3>(2); // Default to 2 years
   const [isDevMode, setIsDevMode] = useState(import.meta.env.DEV); // Auto-detect dev mode
 
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string, discountValue: number } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+
   // Scroll to top on load
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+
+    // Check if user is logged in first
+    if (!isAuthenticated || !user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to apply coupons",
+        variant: "destructive",
+      });
+      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}`);
+      return;
+    }
+
+    setCouponLoading(true);
+    try {
+      const result = await validateCoupon(couponCode);
+      if (result.valid && result.data) {
+        setAppliedCoupon({
+          code: result.data.code,
+          discountValue: result.data.discountValue
+        });
+        toast({
+          title: "Coupon Applied! 🎉",
+          description: `You've saved ${result.data.discountValue}% on your booking!`,
+        });
+      } else {
+        toast({
+          title: "Invalid Coupon",
+          description: result.message || "This coupon code is not valid.",
+          variant: "destructive",
+        });
+        setAppliedCoupon(null);
+      }
+    } catch (error: any) {
+      console.error("Coupon validation error:", error);
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to validate coupon.",
+        variant: "destructive",
+      });
+      setAppliedCoupon(null);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    toast({
+      title: "Coupon Removed",
+      description: "Discount has been removed.",
+    });
+  };
 
   // Fetch Data from Backend
   useEffect(() => {
@@ -144,6 +208,13 @@ const BookingPage = () => {
 
   const selectedOption = tenureOptions.find(t => t.years === selectedTenure)!;
 
+  // Calculate final price with coupon
+  const couponDiscountAmount = appliedCoupon
+    ? Math.round((selectedOption.totalPrice * appliedCoupon.discountValue) / 100)
+    : 0;
+
+  const finalPayableAmount = selectedOption.totalPrice - couponDiscountAmount;
+
   const handleProceedToPayment = async () => {
     // Check if user is authenticated
     if (!isAuthenticated || !user) {
@@ -174,9 +245,9 @@ const BookingPage = () => {
         planKey: planKeyId,
         tenure: selectedTenure,
         yearlyPrice: yearlyPrice,
-        totalAmount: selectedOption.totalPrice,
-        discountPercent: selectedOption.savingsPercent,
-        discountAmount: selectedOption.savings,
+        totalAmount: finalPayableAmount,
+        discountPercent: selectedOption.savingsPercent + (appliedCoupon?.discountValue || 0),
+        discountAmount: selectedOption.savings + couponDiscountAmount,
         paymentType: "virtual_office",
       });
 
@@ -204,6 +275,15 @@ const BookingPage = () => {
               title: "Payment Successful! 🎉",
               description: "Your booking has been confirmed",
             });
+
+            // Mark coupon as used if applicable
+            if (appliedCoupon) {
+              try {
+                await markCouponUsed(appliedCoupon.code);
+              } catch (err) {
+                console.error("Failed to mark coupon used", err);
+              }
+            }
 
             // Navigate to success page
             navigate(`/payment/success?orderId=${response.razorpay_order_id}&paymentId=${response.razorpay_payment_id}`);
@@ -274,9 +354,9 @@ const BookingPage = () => {
         planKey: planKeyId,
         tenure: selectedTenure,
         yearlyPrice: yearlyPrice,
-        totalAmount: selectedOption.totalPrice,
-        discountPercent: selectedOption.savingsPercent,
-        discountAmount: selectedOption.savings,
+        totalAmount: finalPayableAmount,
+        discountPercent: selectedOption.savingsPercent + (appliedCoupon?.discountValue || 0),
+        discountAmount: selectedOption.savings + couponDiscountAmount,
         paymentType: "virtual_office",
       });
 
@@ -292,6 +372,15 @@ const BookingPage = () => {
         title: "Payment Simulated! 🎉",
         description: "Mock booking has been created successfully",
       });
+
+      // Mark coupon as used if applicable (Mock)
+      if (appliedCoupon) {
+        try {
+          await markCouponUsed(appliedCoupon.code);
+        } catch (err) {
+          console.error("Failed to mark coupon used in simulation", err);
+        }
+      }
 
       // Navigate to success page
       navigate(`/payment/success?orderId=${orderData.orderId}&paymentId=${result.paymentId}`);
@@ -447,16 +536,56 @@ const BookingPage = () => {
 
                     {selectedOption.savings > 0 && (
                       <div className="flex justify-between text-green-600">
-                        <span>Discount ({selectedOption.savingsPercent}%)</span>
+                        <span>Tenure Savings ({selectedOption.savingsPercent}%)</span>
                         <span className="font-medium">-₹{selectedOption.savings.toLocaleString()}</span>
                       </div>
                     )}
+
+                    {/* Coupon Section */}
+                    <div className="pt-3 my-3 border-t border-gray-200">
+                      {appliedCoupon ? (
+                        <div className="flex flex-col gap-2 bg-green-50 p-3 rounded-lg border border-green-200">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 font-medium text-green-700">
+                              <Tag className="w-4 h-4" />
+                              <span>{appliedCoupon.code}</span>
+                            </div>
+                            <button onClick={handleRemoveCoupon} className="text-gray-400 hover:text-red-500 transition-colors">
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="flex justify-between text-sm text-green-600">
+                            <span>Coupon Discount ({appliedCoupon.discountValue}%)</span>
+                            <span>-₹{couponDiscountAmount.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <input
+                            placeholder="Have a coupon code?"
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value)}
+                            className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/5 bg-gray-50"
+                          />
+                          <Button
+                            onClick={handleApplyCoupon}
+                            disabled={couponLoading || !couponCode}
+                            className="bg-black text-white hover:bg-gray-800 h-[38px] px-4 text-xs font-semibold rounded-lg"
+                          >
+                            {couponLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : "Apply"}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
 
                     <div className="border-t border-gray-200 pt-3 mt-3">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-900 font-semibold">Total Amount</span>
                         <div className="text-right">
-                          <span className="text-xl font-bold text-gray-900">₹{selectedOption.totalPrice.toLocaleString()}</span>
+                          {appliedCoupon && (
+                            <span className="text-sm text-gray-400 line-through block">₹{selectedOption.totalPrice.toLocaleString()}</span>
+                          )}
+                          <span className="text-xl font-bold text-gray-900">₹{finalPayableAmount.toLocaleString()}</span>
                           <p className="text-xs text-gray-500">for {selectedTenure} year{selectedTenure > 1 ? 's' : ''}</p>
                         </div>
                       </div>

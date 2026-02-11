@@ -1,7 +1,15 @@
+import { useEffect, useMemo, useState } from "react";
+
 import StatCard from "@/components/ui/SpacePartner/StatCard";
 import { BOOKING_ANALYTICS } from "@/data/spacePortal/bookingAnalytics";
 
-import { Users, CalendarCheck, XCircle, Clock, TrendingUp } from "lucide-react";
+import {
+  Users,
+  CalendarCheck,
+  XCircle,
+  Clock,
+  TrendingUp,
+} from "lucide-react";
 
 import {
   LineChart,
@@ -13,15 +21,36 @@ import {
   CartesianGrid,
 } from "recharts";
 
+/**
+ * BookingAnalytics Page
+ * - Shows KPI cards
+ * - Revenue trend chart
+ * - Plan-wise + Space-wise revenue division
+ *
+ * Currently using mock data: BOOKING_ANALYTICS
+ * Later backend integration will replace this with API response.
+ */
 export default function BookingAnalytics() {
+  /**
+   * Extracting mock analytics data.
+   * Later this will come from backend.
+   */
   const { summary, planDivision, spaceDivision, revenueTrend } =
     BOOKING_ANALYTICS;
 
-  const growth =
-    ((summary.revenueThisMonth - summary.revenueLastMonth) /
-      summary.revenueLastMonth) *
-    100;
+  /**
+   * Tooltip trigger changes depending on device type:
+   * - Desktop -> hover
+   * - Mobile -> click
+   */
+  const [tooltipTrigger, setTooltipTrigger] = useState<"hover" | "click">(
+    "hover"
+  );
 
+  /**
+   * Currency formatter (INR)
+   * Keeping it as function for reuse in multiple sections.
+   */
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -30,74 +59,137 @@ export default function BookingAnalytics() {
     }).format(value);
   };
 
+  /**
+   * Growth % calculation
+   * Safety check prevents division by zero.
+   */
+  const growth = useMemo(() => {
+    if (!summary.revenueLastMonth || summary.revenueLastMonth === 0) return 0;
+
+    return (
+      ((summary.revenueThisMonth - summary.revenueLastMonth) /
+        summary.revenueLastMonth) *
+      100
+    );
+  }, [summary.revenueThisMonth, summary.revenueLastMonth]);
+
+  /**
+   * KPI Cards Config
+   * This avoids repeating <StatCard> code manually.
+   */
+  const kpiCards = useMemo(
+    () => [
+      {
+        title: "Total Bookings",
+        value: summary.totalBookings,
+        icon: <CalendarCheck size={22} />,
+        trend: "up" as const,
+        trendLabel: "8%",
+      },
+      {
+        title: "Active Clients",
+        value: summary.activeClients,
+        icon: <Users size={22} />,
+        trend: "up" as const,
+        trendLabel: "5%",
+      },
+      {
+        title: "Cancelled Bookings",
+        value: summary.cancelledBookings,
+        icon: <XCircle size={22} />,
+        trend: "down" as const,
+        trendLabel: "2%",
+      },
+      {
+        title: "Pending Requests",
+        value: summary.pendingRequests,
+        icon: <Clock size={22} />,
+        trend: "up" as const,
+        trendLabel: "3%",
+      },
+    ],
+    [summary]
+  );
+
+  /**
+   * Detect touch devices (mobile/tablet) and change tooltip trigger.
+   */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const mq = window.matchMedia("(hover: none), (pointer: coarse)");
+
+    const updateTrigger = () => {
+      setTooltipTrigger(mq.matches ? "click" : "hover");
+    };
+
+    updateTrigger();
+
+    // Modern browsers
+    if (mq.addEventListener) {
+      mq.addEventListener("change", updateTrigger);
+      return () => mq.removeEventListener("change", updateTrigger);
+    }
+
+    // Old browsers fallback
+    mq.addListener(updateTrigger);
+    return () => mq.removeListener(updateTrigger);
+  }, []);
+
   return (
     <div className="flex-1">
-      {/* Heading */}
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">
-          Booking <span className="text-[#3FA69E]">Analytics</span>
-        </h1>
-        <p className="mt-2 text-slate-500">
-          Monitor performance across plans, spaces, and revenue trends.
-        </p>
-      </div>
-
       {/* KPI Cards */}
-      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          title="Total Bookings"
-          value={summary.totalBookings}
-          icon={<CalendarCheck size={22} />}
-          trend="up"
-          trendLabel="8%"
-        />
-
-        <StatCard
-          title="Active Clients"
-          value={summary.activeClients}
-          icon={<Users size={22} />}
-          trend="up"
-          trendLabel="5%"
-        />
-
-        <StatCard
-          title="Cancelled Bookings"
-          value={summary.cancelledBookings}
-          icon={<XCircle size={22} />}
-          trend="down"
-          trendLabel="2%"
-        />
-
-        <StatCard
-          title="Pending Requests"
-          value={summary.pendingRequests}
-          icon={<Clock size={22} />}
-          trend="up"
-          trendLabel="3%"
-        />
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {kpiCards.map((card) => (
+          <StatCard
+            key={card.title}
+            title={card.title}
+            value={card.value}
+            icon={card.icon}
+            trend={card.trend}
+            trendLabel={card.trendLabel}
+          />
+        ))}
       </div>
 
       {/* Revenue Chart + Summary */}
       <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Chart */}
-        <div className="xl:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="xl:col-span-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
           <h2 className="text-lg font-bold text-slate-900">Revenue Trend</h2>
           <p className="text-sm text-slate-500">
             Monthly revenue & booking performance.
           </p>
 
-          <div className="mt-6 h-[300px]">
+          <div className="mt-4 h-[240px] sm:mt-6 sm:h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={revenueTrend}>
+              <LineChart
+                data={revenueTrend}
+                margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
+
+                <XAxis
+                  dataKey="month"
+                  interval="preserveStartEnd"
+                  minTickGap={20}
+                  tick={{ fontSize: 12 }}
+                />
+
+                <YAxis tick={{ fontSize: 12 }} width={44} />
+
+                <Tooltip
+                  trigger={tooltipTrigger}
+                  wrapperStyle={{ outline: "none" }}
+                />
+
                 <Line
                   type="monotone"
                   dataKey="revenue"
                   stroke="#3FA69E"
                   strokeWidth={3}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 6 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -134,64 +226,78 @@ export default function BookingAnalytics() {
       {/* Plan + Space Division */}
       <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-2">
         {/* Plan Division */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-slate-900">
-            Plan-wise Division
-          </h2>
-          <p className="text-sm text-slate-500">
-            Compare bookings and revenue by plan type.
-          </p>
-
-          <div className="mt-6 space-y-4">
-            {planDivision.map((plan) => (
-              <div
-                key={plan.plan}
-                className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
-              >
-                <div>
-                  <p className="font-semibold text-slate-900">{plan.plan}</p>
-                  <p className="text-xs text-slate-500">
-                    {plan.bookings} bookings
-                  </p>
-                </div>
-
-                <p className="font-bold text-slate-900">
-                  {formatCurrency(plan.revenue)}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <DivisionCard
+          title="Plan-wise Division"
+          description="Compare bookings and revenue by plan type."
+          items={planDivision.map((plan) => ({
+            key: plan.plan,
+            name: plan.plan,
+            bookings: plan.bookings,
+            revenue: plan.revenue,
+          }))}
+          formatCurrency={formatCurrency}
+        />
 
         {/* Space Division */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-bold text-slate-900">
-            Space-wise Division
-          </h2>
-          <p className="text-sm text-slate-500">
-            Performance breakdown by each space location.
-          </p>
+        <DivisionCard
+          title="Space-wise Division"
+          description="Performance breakdown by each space location."
+          items={spaceDivision.map((space) => ({
+            key: space.space,
+            name: space.space,
+            bookings: space.bookings,
+            revenue: space.revenue,
+          }))}
+          formatCurrency={formatCurrency}
+        />
+      </div>
+    </div>
+  );
+}
 
-          <div className="mt-6 space-y-4">
-            {spaceDivision.map((space) => (
-              <div
-                key={space.space}
-                className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
-              >
-                <div>
-                  <p className="font-semibold text-slate-900">{space.space}</p>
-                  <p className="text-xs text-slate-500">
-                    {space.bookings} bookings
-                  </p>
-                </div>
+/**
+ * Reusable component for Plan-wise / Space-wise division
+ * UI remains exactly same (just removes duplicate code).
+ */
+function DivisionCard({
+  title,
+  description,
+  items,
+  formatCurrency,
+}: {
+  title: string;
+  description: string;
+  items: {
+    key: string;
+    name: string;
+    bookings: number;
+    revenue: number;
+  }[];
+  formatCurrency: (value: number) => string;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 className="text-lg font-bold text-slate-900">{title}</h2>
+      <p className="text-sm text-slate-500">{description}</p>
 
-                <p className="font-bold text-slate-900">
-                  {formatCurrency(space.revenue)}
-                </p>
-              </div>
-            ))}
+      <div className="mt-6 space-y-4">
+        {items.map((item) => (
+          <div
+            key={item.key}
+            className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+          >
+            <div>
+              <p className="font-semibold text-slate-900">{item.name}</p>
+              <p className="text-xs text-slate-500">
+                {item.bookings} bookings
+              </p>
+            </div>
+
+            <p className="font-bold text-slate-900">
+              {formatCurrency(item.revenue)}
+            </p>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

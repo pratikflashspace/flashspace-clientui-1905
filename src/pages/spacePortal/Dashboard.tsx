@@ -1,28 +1,76 @@
 import { useMemo, useState } from "react";
+
 import { CLIENTS } from "@/data/spacePortal/clients";
 import type { ClientStatus, ClientPlan } from "@/types/spacePortal/client";
 
 import StatCard from "@/components/ui/SpacePartner/StatCard";
-import SearchBar from "@/components/ui/SpacePartner/SearchBar";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
 import Table from "@/components/ui/SpacePartner/Table";
+import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
 
 import { Users, UserX, Clock, CheckCircle2 } from "lucide-react";
 
+/**
+ * Dashboard Page
+ *
+ * Shows:
+ * - KPI stats (Total, Active, Expiring, Inactive)
+ * - Filters (Status, Plan)
+ * - Clients table overview
+ *
+ * Backend-ready:
+ * - Later CLIENTS will be replaced with API response.
+ * - Query + filters can be passed to backend.
+ */
 export default function Dashboard() {
-  const [query, setQuery] = useState("");
+  const { query } = useSpacePortalSearch();
+
+  // Filters state
   const [statusFilter, setStatusFilter] = useState<ClientStatus | "ALL">("ALL");
   const [planFilter, setPlanFilter] = useState<ClientPlan | "ALL">("ALL");
 
+  /**
+   * Dropdown filter options (keeps JSX clean and avoids duplication)
+   */
+  const statusOptions = useMemo(
+    () => [
+      { label: "All Status", value: "ALL" },
+      { label: "Active", value: "ACTIVE" },
+      { label: "Expiring Soon", value: "EXPIRING_SOON" },
+      { label: "Inactive", value: "INACTIVE" },
+    ],
+    []
+  );
+
+  const planOptions = useMemo(
+    () => [
+      { label: "All Plans", value: "ALL" },
+      { label: "Virtual Office Premium", value: "Virtual Office Premium" },
+      { label: "Virtual Office Standard", value: "Virtual Office Standard" },
+      { label: "Team Space", value: "Team Space" },
+      { label: "Hot Desk Monthly", value: "Hot Desk Monthly" },
+    ],
+    []
+  );
+
+  /**
+   * Normalize query once instead of doing trim().toLowerCase() repeatedly.
+   */
+  const normalizedQuery = useMemo(() => query.trim().toLowerCase(), [query]);
+
+  /**
+   * Filter clients based on:
+   * - Search query
+   * - Status filter
+   * - Plan filter
+   */
   const filteredClients = useMemo(() => {
     return CLIENTS.filter((c) => {
-      const q = query.toLowerCase();
-
       const matchesQuery =
-        c.companyName.toLowerCase().includes(q) ||
-        c.contactName.toLowerCase().includes(q) ||
-        c.id.toLowerCase().includes(q) ||
-        c.space.toLowerCase().includes(q);
+        c.companyName.toLowerCase().includes(normalizedQuery) ||
+        c.contactName.toLowerCase().includes(normalizedQuery) ||
+        c.id.toLowerCase().includes(normalizedQuery) ||
+        c.space.toLowerCase().includes(normalizedQuery);
 
       const matchesStatus =
         statusFilter === "ALL" ? true : c.status === statusFilter;
@@ -31,30 +79,34 @@ export default function Dashboard() {
 
       return matchesQuery && matchesStatus && matchesPlan;
     });
-  }, [query, statusFilter, planFilter]);
+  }, [normalizedQuery, statusFilter, planFilter]);
 
-  // Stats
-  const totalClients = CLIENTS.length;
-  const activeClients = CLIENTS.filter((c) => c.status === "ACTIVE").length;
-  const expiringSoon = CLIENTS.filter((c) => c.status === "EXPIRING_SOON").length;
-  const inactiveClients = CLIENTS.filter((c) => c.status === "INACTIVE").length;
+  /**
+   * Dashboard stats computed once.
+   * This is cleaner + prevents repeated CLIENTS.filter calls.
+   */
+  const stats = useMemo(() => {
+    const total = CLIENTS.length;
+
+    const active = CLIENTS.filter((c) => c.status === "ACTIVE").length;
+    const expiringSoon = CLIENTS.filter((c) => c.status === "EXPIRING_SOON").length;
+    const inactive = CLIENTS.filter((c) => c.status === "INACTIVE").length;
+
+    return {
+      total,
+      active,
+      expiringSoon,
+      inactive,
+    };
+  }, []);
 
   return (
-    <div className="p-8">
-      {/* Heading */}
-      <h1 className="text-3xl font-bold text-slate-900">
-        Space <span className="text-[#3FA69E]">Dashboard</span>
-      </h1>
-
-      <p className="mt-2 text-slate-500">
-        Complete control over clients, plans, and space performance.
-      </p>
-
+    <div className="flex-1">
       {/* Stats */}
-      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Total Clients"
-          value={totalClients}
+          value={stats.total}
           icon={<CheckCircle2 size={22} />}
           trend="up"
           trendLabel="10%"
@@ -62,7 +114,7 @@ export default function Dashboard() {
 
         <StatCard
           title="Active Clients"
-          value={activeClients}
+          value={stats.active}
           icon={<Users size={22} />}
           trend="up"
           trendLabel="6%"
@@ -70,7 +122,7 @@ export default function Dashboard() {
 
         <StatCard
           title="Expiring Soon"
-          value={expiringSoon}
+          value={stats.expiringSoon}
           icon={<Clock size={22} />}
           trend="down"
           trendLabel="3%"
@@ -78,48 +130,32 @@ export default function Dashboard() {
 
         <StatCard
           title="Inactive Clients"
-          value={inactiveClients}
+          value={stats.inactive}
           icon={<UserX size={22} />}
           trend="down"
           trendLabel="2%"
         />
       </div>
 
-      {/* Filters */}
+      {/* Filters + Table */}
       <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-bold text-slate-900">Client Overview</h2>
         <p className="text-sm text-slate-500">
           Search and filter clients by plan, status, and space.
         </p>
 
-        <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center">
-          <SearchBar
-            value={query}
-            onChange={setQuery}
-            placeholder="Search by ID, company, contact, space..."
-          />
-
+        {/* Filters */}
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center">
           <SelectBox
             value={statusFilter}
             onChange={(val) => setStatusFilter(val as ClientStatus | "ALL")}
-            options={[
-              { label: "All Status", value: "ALL" },
-              { label: "Active", value: "ACTIVE" },
-              { label: "Expiring Soon", value: "EXPIRING_SOON" },
-              { label: "Inactive", value: "INACTIVE" },
-            ]}
+            options={statusOptions}
           />
 
           <SelectBox
             value={planFilter}
             onChange={(val) => setPlanFilter(val as ClientPlan | "ALL")}
-            options={[
-              { label: "All Plans", value: "ALL" },
-              { label: "Virtual Office Premium", value: "Virtual Office Premium" },
-              { label: "Virtual Office Standard", value: "Virtual Office Standard" },
-              { label: "Team Space", value: "Team Space" },
-              { label: "Hot Desk Monthly", value: "Hot Desk Monthly" },
-            ]}
+            options={planOptions}
           />
         </div>
 
@@ -136,44 +172,17 @@ export default function Dashboard() {
               {
                 key: "status",
                 header: "Status",
-                render: (client) => (
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      client.status === "ACTIVE"
-                        ? "bg-emerald-50 text-[#3FA69E]"
-                        : client.status === "EXPIRING_SOON"
-                        ? "bg-amber-50 text-amber-700"
-                        : "bg-rose-50 text-rose-700"
-                    }`}
-                  >
-                    {client.status === "ACTIVE"
-                      ? "Active"
-                      : client.status === "EXPIRING_SOON"
-                      ? "Expiring Soon"
-                      : "Inactive"}
-                  </span>
-                ),
+                render: (client) => <StatusPill status={client.status} />,
               },
               {
                 key: "kycStatus",
                 header: "KYC",
-                render: (client) => (
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      client.kycStatus === "VERIFIED"
-                        ? "bg-emerald-50 text-[#3FA69E]"
-                        : "bg-amber-50 text-amber-700"
-                    }`}
-                  >
-                    {client.kycStatus === "VERIFIED"
-                      ? "Verified"
-                      : "Pending"}
-                  </span>
-                ),
+                render: (client) => <KycPill status={client.kycStatus} />,
               },
             ]}
           />
 
+          {/* Empty State */}
           {filteredClients.length === 0 && (
             <p className="mt-6 text-center text-slate-500">
               No clients found.
@@ -182,5 +191,44 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Status pill used in table
+ * Keeps UI same but removes duplicated ternary blocks.
+ */
+function StatusPill({ status }: { status: ClientStatus }) {
+  const config =
+    status === "ACTIVE"
+      ? { label: "Active", className: "bg-emerald-50 text-[#3FA69E]" }
+      : status === "EXPIRING_SOON"
+      ? { label: "Expiring Soon", className: "bg-amber-50 text-amber-700" }
+      : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
+
+  return (
+    <span
+      className={`rounded-full px-3 py-1 text-xs font-semibold ${config.className}`}
+    >
+      {config.label}
+    </span>
+  );
+}
+
+/**
+ * KYC pill used in table
+ */
+function KycPill({ status }: { status: string }) {
+  const config =
+    status === "VERIFIED"
+      ? { label: "Verified", className: "bg-emerald-50 text-[#3FA69E]" }
+      : { label: "Pending", className: "bg-amber-50 text-amber-700" };
+
+  return (
+    <span
+      className={`rounded-full px-3 py-1 text-xs font-semibold ${config.className}`}
+    >
+      {config.label}
+    </span>
   );
 }

@@ -1,7 +1,8 @@
 // Auth Types and Interfaces
 
 export interface User {
-  id: string;
+  _id: string; // CHANGED FROM 'id' TO '_id'
+  id?: string; // Optional for backward compatibility
   email: string;
   fullName: string;
   phoneNumber?: string;
@@ -10,7 +11,7 @@ export interface User {
   profilePicture?: string;
   authProvider?: 'local' | 'google';
   lastLogin?: string;
-  createdAt: string;
+  createdAt?: string; // ADDED: For Profile.tsx
   updatedAt?: string;
 }
 
@@ -25,6 +26,7 @@ export interface SignupRequest {
   confirmPassword: string;
   fullName: string;
   phoneNumber?: string;
+  role?: 'user' | 'partner';
 }
 
 export interface LoginRequest {

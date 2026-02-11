@@ -22,7 +22,7 @@ export const AdminRoute: React.FC = () => {
         return <Navigate to="/login" replace />;
     }
 
-    const allowedRoles = ['admin', 'partner', 'space_manager', 'sales'];
+    const allowedRoles = ['admin', 'partner', 'sales'];
     if (!allowedRoles.includes(user.role)) {
         console.warn('AdminRoute: Role mismatch', { expected: allowedRoles, actual: user.role });
 
