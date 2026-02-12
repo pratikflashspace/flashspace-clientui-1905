@@ -169,6 +169,16 @@ export default function KYCRequests() {
         setShowDocumentModal(true);
     };
 
+    const updateDocumentStatus = (requestId: string, docIndex: number, status: 'approved' | 'rejected') => {
+        setRequests(prev => prev.map(req => {
+            if (req._id !== requestId) return req;
+            const updatedDocs = req.documents.map((doc, idx) =>
+                idx === docIndex ? { ...doc, status } : doc
+            );
+            return { ...req, documents: updatedDocs };
+        }));
+    };
+
     const filteredRequests = requests.filter(request =>
         request.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         request.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -258,8 +268,17 @@ export default function KYCRequests() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredRequests.map((request) => (
-                        <div key={request._id} className="bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+                    {filteredRequests.map((request) => {
+                        const allDocsApproved =
+                            request.documents &&
+                            request.documents.length > 0 &&
+                            request.documents.every((doc) => doc.status === 'approved');
+
+                        return (
+                            <div
+                                key={request._id}
+                                className="bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                            >
                             {/* Header */}
                             <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                                 <div className="flex items-center justify-between mb-4 gap-3">
@@ -305,7 +324,7 @@ export default function KYCRequests() {
                                     <div className="bg-blue-50 rounded-xl p-4">
                                         <div className="flex items-center gap-2 mb-3">
                                             <User className="w-4 h-4 text-blue-600" />
-                                            <h4 className="text-sm font-semibold text-blue-900">Personal Info</h4>
+                                            <h4 className="text-sm font-semibold text-blue-900">Partner's Personal Info</h4>
                                         </div>
                                         <div className="space-y-1 text-sm">
                                             {request.personalInfo.fullName && (
@@ -313,6 +332,9 @@ export default function KYCRequests() {
                                             )}
                                             {request.personalInfo.phone && (
                                                 <p className="text-gray-700"><span className="font-medium">Phone:</span> {request.personalInfo.phone}</p>
+                                            )}
+                                            {request.personalInfo.email && (
+                                                <p className="text-gray-700"><span className="font-medium">Email:</span> {request.personalInfo.email}</p>
                                             )}
                                         </div>
                                     </div>
@@ -344,7 +366,10 @@ export default function KYCRequests() {
                                     {request.documents && request.documents.length > 0 ? (
                                         <div className="space-y-2">
                                             {request.documents.map((doc, idx) => (
-                                                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors group/doc">
+                                                <div
+                                                    key={idx}
+                                                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors group/doc"
+                                                >
                                                     <div className="flex items-center gap-2 flex-1 min-w-0">
                                                         <div className="p-1.5 bg-blue-100 rounded-lg">
                                                             <FileText className="w-4 h-4 text-blue-600" />
@@ -354,13 +379,32 @@ export default function KYCRequests() {
                                                             <p className="text-xs text-gray-500 truncate">{doc.name}</p>
                                                         </div>
                                                     </div>
-                                                    <button
-                                                        onClick={() => openDocumentModal(doc, request)}
-                                                        className="flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-                                                    >
-                                                        <Eye className="w-3 h-3" />
-                                                        Details
-                                                    </button>
+                                                    <div className="flex items-center gap-2">
+                                                        {doc.status && (
+                                                            <span className="px-2 py-0.5 text-[11px] rounded-full bg-gray-100 text-gray-600 capitalize">
+                                                                {doc.status}
+                                                            </span>
+                                                        )}
+                                                        <button
+                                                            onClick={() => openDocumentModal(doc, request)}
+                                                            className="flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                                                        >
+                                                            <Eye className="w-3 h-3" />
+                                                            Details
+                                                        </button>
+                                                        <button
+                                                            onClick={() => updateDocumentStatus(request._id, idx, 'approved')}
+                                                            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            onClick={() => updateDocumentStatus(request._id, idx, 'rejected')}
+                                                            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
@@ -386,7 +430,11 @@ export default function KYCRequests() {
                                     </button>
                                     <button
                                         onClick={() => handleApprove(request)}
-                                        className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-105"
+                                        disabled={!allDocsApproved}
+                                        className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white transition-all text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-105 opacity-0 group-hover:opacity-100 ${
+                                            !allDocsApproved ? 'cursor-not-allowed opacity-60 hover:scale-100 hover:shadow-lg' : 'hover:from-green-700 hover:to-emerald-700'
+                                        }`}
+                                        title={allDocsApproved ? 'Approve KYC' : 'Approve all documents first'}
                                     >
                                         <Check className="w-4 h-4" />
                                         Approve
@@ -398,7 +446,8 @@ export default function KYCRequests() {
                                 </div>
                             </div>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
 

@@ -66,6 +66,7 @@ export default function KYCVerification() {
     aadhaar: "",
     pan: "",
     fullName: "",
+    email: "",
   });
   const [uploadAccept, setUploadAccept] = useState(".pdf,.jpg,.jpeg,.png");
 
@@ -93,11 +94,8 @@ export default function KYCVerification() {
           setKycData(data);
 
           // Detect if this is a partner profile
-          if (data.isPartner || (data.kycType === 'individual' && data.personalInfo?.fullName && data.personalInfo.fullName !== user?.fullName)) {
-            setIsPartnerMode(true);
-          } else {
-            setIsPartnerMode(false);
-          }
+          const isPartnerProfile = data.isPartner || (data.kycType === 'individual' && data.personalInfo?.fullName && data.personalInfo.fullName !== user?.fullName);
+          setIsPartnerMode(!!isPartnerProfile);
 
           setBusinessForm({
             profileName: data.profileName || "",
@@ -117,6 +115,8 @@ export default function KYCVerification() {
             aadhaar: prev.aadhaar || data.personalInfo?.aadhaarNumber || "",  // Keep existing value or use full number
             pan: data.personalInfo?.panNumber || "",
             fullName: data.personalInfo?.fullName || "",
+            // For partners, do not fall back to logged-in user's email
+            email: data.personalInfo?.email || (isPartnerProfile ? "" : (user?.email || "")),
           }));
 
           if (data.kycType) {
@@ -179,6 +179,7 @@ export default function KYCVerification() {
         personalAadhaar: personalForm.aadhaar,
         personalPan: personalForm.pan,
         personalFullName: personalForm.fullName,
+        personalEmail: personalForm.email,
         partners: businessForm.partners, // Include selected partners
       });
       if (response.success && response.data) {
@@ -298,7 +299,7 @@ export default function KYCVerification() {
 
   // Step validation functions
   const isPersonalInfoComplete = () => {
-    if (isPartnerMode && !personalForm.fullName) return false;
+    if (isPartnerMode && (!personalForm.fullName || !personalForm.email)) return false;
     return !!(personalForm.phone && personalForm.dateOfBirth && personalForm.aadhaar && personalForm.pan);
   };
 
@@ -671,7 +672,7 @@ export default function KYCVerification() {
                       profileName: "", companyName: "", companyType: "", gstNumber: "", cinNumber: "", registeredAddress: "", industry: "", partners: []
                     });
                     setPersonalForm({
-                      phone: "", dateOfBirth: "", aadhaar: "", pan: "", fullName: ""
+                      phone: "", dateOfBirth: "", aadhaar: "", pan: "", fullName: "", email: ""
                     });
                   }}
                   disabled={!individualProfile || individualProfile.overallStatus !== 'approved'}
@@ -875,7 +876,7 @@ export default function KYCVerification() {
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                        <User className="w-5 h-5 text-yellow-500" /> Personal Information
+                        <User className="w-5 h-5 text-yellow-500" /> {isPartnerMode ? "Partner Personal Information" : "Personal Information"}
                       </h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -895,8 +896,19 @@ export default function KYCVerification() {
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-500 mb-1">Email</label>
-                        <p className="text-gray-900">{user?.email || kycData?.personalInfo?.email || "-"}</p>
+                        <label className="block text-sm text-gray-500 mb-1">Email <span className="text-red-500">*</span></label>
+                        {isPartnerMode ? (
+                          <input
+                            type="email"
+                            placeholder="Partner Email"
+                            value={personalForm.email}
+                            onChange={(e) => setPersonalForm({ ...personalForm, email: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            required
+                          />
+                        ) : (
+                          <p className="text-gray-900">{user?.email || kycData?.personalInfo?.email || "-"}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm text-gray-500 mb-1">Phone Number <span className="text-red-500">*</span></label>
@@ -964,7 +976,14 @@ export default function KYCVerification() {
                             setActiveStep('video'); // Regular individual goes to video
                           }
                         }}
-                        disabled={saving || !personalForm.phone || !personalForm.dateOfBirth || !personalForm.aadhaar || !personalForm.pan || (isPartnerMode && !personalForm.fullName)}
+                        disabled={
+                          saving ||
+                          !personalForm.phone ||
+                          !personalForm.dateOfBirth ||
+                          !personalForm.aadhaar ||
+                          !personalForm.pan ||
+                          (isPartnerMode && (!personalForm.fullName || !personalForm.email))
+                        }
                         className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2 disabled:opacity-50"
                       >
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm & Continue"}
