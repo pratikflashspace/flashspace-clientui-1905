@@ -1,5 +1,5 @@
-import axiosInstance from './api.service';
-import { VirtualOfficeItem } from '@/types/services';
+import axiosInstance from "./api.service";
+import { VirtualOfficeItem } from "@/types/services";
 
 /**
  * Virtual Office Service
@@ -17,23 +17,29 @@ interface ApiResponse<T> {
  * @param city - City name
  * @returns Array of virtual offices in that city
  */
-export const getVirtualOfficesByCity = async (city: string): Promise<VirtualOfficeItem[]> => {
+export const getVirtualOfficesByCity = async (
+  city: string,
+): Promise<VirtualOfficeItem[]> => {
   try {
     console.log(`📍 Fetching virtual offices for city: ${city}`);
-    const response = await axiosInstance.get(`/virtualOffice/getByCity/${city}`);
+    const response = await axiosInstance.get(
+      `/virtualOffice/getByCity/${city}`,
+    );
     const data = response.data as ApiResponse<VirtualOfficeItem[]>;
-    
+
     if (response.status === 200 && data.success) {
-      console.log(`✅ Successfully fetched ${data.data.length} virtual offices`);
+      console.log(
+        `✅ Successfully fetched ${data.data.length} virtual offices`,
+      );
       return data.data;
     }
-    
-    throw new Error(data.message || 'Failed to fetch virtual offices');
+
+    throw new Error(data.message || "Failed to fetch virtual offices");
   } catch (error: any) {
-    console.error('❌ Error fetching virtual offices:', {
+    console.error("❌ Error fetching virtual offices:", {
       error: error.message,
       status: error.response?.status,
-      data: error.response?.data
+      data: error.response?.data,
     });
     throw error;
   }
@@ -45,16 +51,16 @@ export const getVirtualOfficesByCity = async (city: string): Promise<VirtualOffi
  */
 export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
   try {
-    const response = await axiosInstance.get('/virtualOffice/getAll');
+    const response = await axiosInstance.get("/virtualOffice/getAll");
     const data = response.data as ApiResponse<VirtualOfficeItem[]>;
-    
+
     if (response.status === 200 && data.success) {
       return data.data;
     }
-    
-    throw new Error(data.message || 'Failed to fetch virtual offices');
+
+    throw new Error(data.message || "Failed to fetch virtual offices");
   } catch (error: any) {
-    console.error('Error fetching virtual offices:', error);
+    console.error("Error fetching virtual offices:", error);
     throw error;
   }
 };
@@ -64,18 +70,20 @@ export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
  * @param id - Virtual office ID
  * @returns Virtual office details
  */
-export const getVirtualOfficeById = async (id: string): Promise<VirtualOfficeItem> => {
+export const getVirtualOfficeById = async (
+  id: string,
+): Promise<VirtualOfficeItem> => {
   try {
     const response = await axiosInstance.get(`/virtualOffice/getById/${id}`);
     const data = response.data as ApiResponse<VirtualOfficeItem>;
-    
+
     if (response.status === 200 && data.success) {
       return data.data;
     }
-    
-    throw new Error(data.message || 'Failed to fetch virtual office');
+
+    throw new Error(data.message || "Failed to fetch virtual office");
   } catch (error: any) {
-    console.error('Error fetching virtual office:', error);
+    console.error("Error fetching virtual office:", error);
     throw error;
   }
 };
@@ -85,18 +93,20 @@ export const getVirtualOfficeById = async (id: string): Promise<VirtualOfficeIte
  * @param data - Virtual office data
  * @returns Created virtual office
  */
-export const createVirtualOffice = async (data: Partial<VirtualOfficeItem>): Promise<VirtualOfficeItem> => {
+export const createVirtualOffice = async (
+  data: Partial<VirtualOfficeItem>,
+): Promise<VirtualOfficeItem> => {
   try {
-    const response = await axiosInstance.post('/virtualOffice/create', data);
+    const response = await axiosInstance.post("/virtualOffice/create", data);
     const responseData = response.data as ApiResponse<VirtualOfficeItem>;
-    
+
     if (response.status === 200 && responseData.success) {
       return responseData.data;
     }
-    
-    throw new Error(responseData.message || 'Failed to create virtual office');
+
+    throw new Error(responseData.message || "Failed to create virtual office");
   } catch (error: any) {
-    console.error('Error creating virtual office:', error);
+    console.error("Error creating virtual office:", error);
     throw error;
   }
 };
@@ -107,18 +117,24 @@ export const createVirtualOffice = async (data: Partial<VirtualOfficeItem>): Pro
  * @param data - Updated virtual office data
  * @returns Updated virtual office
  */
-export const updateVirtualOffice = async (id: string, data: Partial<VirtualOfficeItem>): Promise<VirtualOfficeItem> => {
+export const updateVirtualOffice = async (
+  id: string,
+  data: Partial<VirtualOfficeItem>,
+): Promise<VirtualOfficeItem> => {
   try {
-    const response = await axiosInstance.put(`/virtualOffice/update/${id}`, data);
+    const response = await axiosInstance.put(
+      `/virtualOffice/update/${id}`,
+      data,
+    );
     const responseData = response.data as ApiResponse<VirtualOfficeItem>;
-    
+
     if (response.status === 200 && responseData.success) {
       return responseData.data;
     }
-    
-    throw new Error(responseData.message || 'Failed to update virtual office');
+
+    throw new Error(responseData.message || "Failed to update virtual office");
   } catch (error: any) {
-    console.error('Error updating virtual office:', error);
+    console.error("Error updating virtual office:", error);
     throw error;
   }
 };
@@ -132,14 +148,14 @@ export const deleteVirtualOffice = async (id: string): Promise<boolean> => {
   try {
     const response = await axiosInstance.delete(`/virtualOffice/delete/${id}`);
     const responseData = response.data as ApiResponse<any>;
-    
+
     if (response.status === 200 && responseData.success) {
       return true;
     }
-    
-    throw new Error(responseData.message || 'Failed to delete virtual office');
+
+    throw new Error(responseData.message || "Failed to delete virtual office");
   } catch (error: any) {
-    console.error('Error deleting virtual office:', error);
+    console.error("Error deleting virtual office:", error);
     throw error;
   }
 };
