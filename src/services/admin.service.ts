@@ -44,14 +44,25 @@ export interface BookingData {
     bookingNumber: string;
     userId: string;
     spaceId: string;
+    user?: {
+        fullName: string;
+        email: string;
+    };
+    spaceSnapshot?: {
+        name?: string;
+        city?: string;
+        address?: string;
+    };
     type: 'virtual_office' | 'coworking_space';
     status: 'pending_payment' | 'pending_kyc' | 'active' | 'expired' | 'cancelled';
     plan: {
         name: string;
         price: number;
         tenure: number;
+        tenureUnit?: string;
     };
     createdAt: string;
+    amount?: number; // Added for SalesAnalytics compatibility
 }
 
 export interface KYCData {
@@ -265,12 +276,12 @@ class AdminService {
     async getTicketStats(): Promise<ApiResponse<TicketStats>> {
         try {
             const response = await axiosInstance.get<ApiResponse<any>>('/api/tickets/admin/stats');
-            
+
             if (response.data.success && response.data.data) {
                 // Transform backend response to frontend format
                 const backendData = response.data.data;
                 const statusCounts = backendData.statusCounts || [];
-                
+
                 // Convert statusCounts array to object
                 const statsMap: any = {};
                 statusCounts.forEach((item: any) => {
@@ -292,7 +303,7 @@ class AdminService {
                     }
                 };
             }
-            
+
             return {
                 success: false,
                 message: 'Failed to fetch ticket stats',

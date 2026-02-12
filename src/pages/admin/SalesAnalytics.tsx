@@ -4,7 +4,7 @@ import {
     TrendingUp,
     Users,
     CreditCard,
-    Calendar,
+    Calendar as CalendarIcon,
     ArrowUpRight,
     ArrowDownRight,
     Filter,
@@ -12,20 +12,42 @@ import {
     Target,
     Wallet,
     Trophy,
-    Loader2
+    Loader2,
+    Search,
+    Package,
+    DollarSign,
+    X,
+    Building2,
+    Clock
 } from 'lucide-react';
-import { adminService, AdminDashboardStats } from '@/services/admin.service';
+import { adminService, AdminDashboardStats, BookingData } from '@/services/admin.service';
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { Calendar } from "@/components/ui/calender";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { toast } from 'sonner';
 
-export default function SalesAnalytics() {
+export default function BookingAnalysis() {
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState<AdminDashboardStats | null>(null);
-    const [bookings, setBookings] = useState<any[]>([]);
+    const [bookings, setBookings] = useState<BookingData[]>([]);
     const [revenueByCategory, setRevenueByCategory] = useState<any[]>([]);
     const [kpiData, setKpiData] = useState({
         revenueMTD: 0,
         avgDealSize: 0,
         conversionRate: 0
     });
+
+    // Booking Table State
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [date, setDate] = useState<DateRange | undefined>();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -39,13 +61,14 @@ export default function SalesAnalytics() {
                     setStats(statsRes.data);
                 }
 
-                if (bookingsRes.success && bookingsRes.data && bookingsRes.data.bookings) {
-                    const allBookings = bookingsRes.data.bookings;
+                if (bookingsRes.success && bookingsRes.data) {
+                    const allBookings = bookingsRes.data.bookings || [];
                     setBookings(allBookings);
                     processBookingData(allBookings, statsRes.data);
                 }
             } catch (error) {
                 console.error("Failed to fetch analytics data", error);
+                toast.error("Failed to fetch data");
             } finally {
                 setLoading(false);
             }
@@ -81,7 +104,7 @@ export default function SalesAnalytics() {
         });
 
         // KPI Calculations
-        const totalBookings = dashboardStats?.totalBookings || data.length || 1;
+        const totalBookings = dashboardStats?.totalBookings || data.length || 0;
         const totalRevenue = dashboardStats?.totalRevenue || 0;
         const totalUsers = dashboardStats?.totalUsers || 1;
 
@@ -110,6 +133,43 @@ export default function SalesAnalytics() {
         }).format(amount);
     };
 
+    const getStatusBadge = (status: string) => {
+        const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
+            active: { bg: 'bg-green-100', text: 'text-green-700', label: 'Active' },
+            pending_kyc: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending KYC' },
+            pending_payment: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Pending Payment' },
+            expired: { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Expired' },
+            cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: 'Cancelled' },
+        };
+
+        const config = statusConfig[status] || statusConfig.pending_payment;
+        return (
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
+                {config.label}
+            </span>
+        );
+    };
+
+    const filteredBookings = bookings.filter(booking => {
+        const matchesSearch =
+            booking.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            booking.spaceSnapshot?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            booking.bookingNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesFilter = filterStatus === 'all' || booking.status === filterStatus;
+
+        // Filter by Date Range (Created At)
+        let matchDate = true;
+        if (date?.from) {
+            const bookingTime = new Date(booking.createdAt).getTime();
+            const fromTime = new Date(date.from).setHours(0, 0, 0, 0);
+            const toTime = (date.to ? new Date(date.to) : new Date(date.from)).setHours(23, 59, 59, 999);
+            matchDate = bookingTime >= fromTime && bookingTime <= toTime;
+        }
+
+        return matchesSearch && matchesFilter && matchDate;
+    });
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -124,10 +184,10 @@ export default function SalesAnalytics() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                        Sales <span className="text-teal-500 italic">Analytics</span>
+                        Booking <span className="text-teal-500 italic">Analysis</span>
                     </h1>
                     <p className="text-gray-500 mt-2 text-lg font-light">
-                        Comprehensive sales performance metrics and insights
+                        Comprehensive booking performance metrics and insights
                     </p>
                 </div>
             </div>
@@ -152,11 +212,11 @@ export default function SalesAnalytics() {
                         iconBg: "bg-teal-50 text-teal-600"
                     },
                     {
-                        title: "Conversion Rate",
-                        value: `${kpiData.conversionRate.toFixed(1)}%`,
-                        change: "+2.1% from last month",
+                        title: "Active Bookings", // Using Active Bookings from AdminBookings concept
+                        value: bookings.filter(b => b.status === 'active' || b.status === 'pending_kyc').length.toString(),
+                        change: "+5% from last month",
                         trend: "up",
-                        icon: Target,
+                        icon: Target, // Or Users
                         iconBg: "bg-teal-50 text-teal-600"
                     },
                     {
@@ -189,9 +249,10 @@ export default function SalesAnalytics() {
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Revenue by Category - Takes up 2 columns */}
-                <div className="lg:col-span-2 bg-white rounded-[24px] p-8 shadow-sm border border-gray-100">
+            {/* Content Row: Revenue by Category & Bookings Table */}
+            <div className="space-y-8">
+                {/* Revenue by Category */}
+                <div className="bg-white rounded-[24px] p-8 shadow-sm border border-gray-100">
                     <h3 className="text-xl font-bold text-gray-900 mb-8">Revenue by Category</h3>
 
                     {revenueByCategory.length > 0 ? (
@@ -227,46 +288,185 @@ export default function SalesAnalytics() {
                     )}
                 </div>
 
-                {/* Top Performers */}
-                <div className="bg-white rounded-[24px] p-8 shadow-sm border border-gray-100">
-                    <h3 className="text-xl font-bold text-gray-900 mb-8">Top Performers</h3>
+                {/* Bookings Table Section (Merged from AdminBookings) */}
+                <div className="bg-white rounded-[24px] border border-gray-100 shadow-xl shadow-gray-100/50 overflow-hidden">
+                    <div className="p-6 border-b border-gray-100">
+                        <h3 className="text-xl font-bold text-gray-900 mb-6">Recent Bookings</h3>
+                        {/* Toolbar */}
+                        <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white">
+                            <div className="relative flex-1 w-full sm:max-w-md">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search by user, space, or booking number..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-gray-900 placeholder:text-gray-400"
+                                />
+                            </div>
 
-                    <div className="space-y-6">
-                        {[
-                            { name: "Rahul Sharma", role: "Sales Lead", amount: "₹8.5L", deals: "45 deals" },
-                            { name: "Priya Patel", role: "Sales Executive", amount: "₹6.2L", deals: "38 deals" },
-                            { name: "Amit Kumar", role: "Sales Executive", amount: "₹5.1L", deals: "32 deals" },
-                        ].map((person, idx) => (
-                            <div key={idx} className="flex items-center justify-between group">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-8 h-8 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-sm">
-                                        {idx + 1}
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-gray-900 text-sm">{person.name}</h4>
-                                        <p className="text-xs text-gray-500 font-medium">{person.role}</p>
-                                    </div>
+                            <div className="flex items-center gap-3 w-full sm:w-auto">
+                                {/* Date Range Picker */}
+                                <div className="relative">
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                id="date"
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-[240px] justify-start text-left font-normal border-none bg-gray-50 text-gray-700 hover:bg-gray-100",
+                                                    !date && "text-muted-foreground"
+                                                )}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {date?.from ? (
+                                                    date.to ? (
+                                                        <>
+                                                            {format(date.from, "LLL dd, y")} -{" "}
+                                                            {format(date.to, "LLL dd, y")}
+                                                        </>
+                                                    ) : (
+                                                        format(date.from, "LLL dd, y")
+                                                    )
+                                                ) : (
+                                                    <span>Pick a date</span>
+                                                )}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0 bg-white" align="end" side="bottom" avoidCollisions={false}>
+                                            <Calendar
+                                                initialFocus
+                                                mode="range"
+                                                defaultMonth={date?.from}
+                                                selected={date}
+                                                onSelect={setDate}
+                                                numberOfMonths={1}
+                                                captionLayout="dropdown-buttons"
+                                                fromYear={2020}
+                                                toYear={2030}
+                                                classNames={{
+                                                    caption_label: "hidden",
+                                                    caption_dropdowns: "flex justify-center gap-1",
+                                                    dropdown: "flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+                                                    dropdown_month: "w-[120px]",
+                                                    dropdown_year: "w-[100px]",
+                                                    dropdown_icon: "opacity-50 ml-auto"
+                                                }}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                    {date && (
+                                        <button
+                                            onClick={() => setDate(undefined)}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-200 rounded-full transition-colors"
+                                        >
+                                            <X className="w-3 h-3 text-gray-400" />
+                                        </button>
+                                    )}
                                 </div>
-                                <div className="text-right">
-                                    <h4 className="font-bold text-gray-900 text-sm">{person.amount}</h4>
-                                    <p className="text-xs text-gray-500 font-medium">{person.deals}</p>
+                                <div className="relative">
+                                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                                    <select
+                                        value={filterStatus}
+                                        onChange={(e) => setFilterStatus(e.target.value)}
+                                        className="pl-10 pr-8 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium text-gray-700 focus:ring-2 focus:ring-black/5 cursor-pointer hover:bg-gray-100 transition-colors appearance-none"
+                                    >
+                                        <option value="all">All Status</option>
+                                        <option value="active">Active</option>
+                                        <option value="pending_kyc">Pending KYC</option>
+                                        <option value="pending_payment">Pending Payment</option>
+                                        <option value="expired">Expired</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
                                 </div>
                             </div>
-                        ))}
+                        </div>
+                    </div>
+
+                    {/* Table */}
+                    <div className="overflow-x-auto">
+                        <table className="min-w-[1000px] w-full text-left">
+                            <thead className="bg-gray-50/50">
+                                <tr>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Booking #</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Space Details</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Plan & Price</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {filteredBookings.map((booking) => (
+                                    <tr key={booking.bookingNumber} className="hover:bg-gray-50 transition-colors group">
+                                        <td className="px-6 py-4">
+                                            <span className="font-mono text-sm font-semibold text-gray-900">
+                                                #{booking.bookingNumber}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                                    {booking.user?.fullName?.charAt(0) || 'U'}
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-gray-900">{booking.user?.fullName || 'Unknown'}</p>
+                                                    <p className="text-sm text-gray-500">{booking.user?.email}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-purple-50 rounded-lg text-purple-600">
+                                                    <Building2 className="w-4 h-4" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-gray-900">{booking.spaceSnapshot?.name || 'N/A'}</p>
+                                                    <p className="text-sm text-gray-500">{booking.spaceSnapshot?.city || 'N/A'}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div>
+                                                <p className="font-bold text-gray-900">₹{booking.plan?.price?.toLocaleString() || 0}</p>
+                                                <p className="text-sm text-gray-500">
+                                                    {booking.plan?.name} • {booking.plan?.tenure} {booking.plan?.tenureUnit || 'months'}
+                                                </p>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {getStatusBadge(booking.status)}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Clock className="w-4 h-4 text-gray-400" />
+                                                {new Date(booking.createdAt).toLocaleDateString(undefined, {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric'
+                                                })}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+
+                                {filteredBookings.length === 0 && (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-16 text-center text-gray-500">
+                                            <div className="flex flex-col items-center justify-center">
+                                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                    <Package className="w-6 h-6 text-gray-400" />
+                                                </div>
+                                                <p className="text-lg font-medium text-gray-900">No bookings found</p>
+                                                <p className="text-sm text-gray-400 mt-1">Try adjusting your search or filters.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
-
-            {/* AI Insight Section */}
-            <div className="bg-teal-50/50 rounded-[24px] p-6 border border-teal-100/50">
-                <div className="flex items-center gap-2 mb-3">
-                    <span className="bg-teal-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                        AI Insight
-                    </span>
-                </div>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                    Based on current trends, <span className="font-semibold text-gray-900">Team Space</span> bookings are growing <span className="font-semibold text-green-600">35% faster</span> than other categories. Consider increasing marketing efforts for this segment. Virtual Office renewals are due for <span className="font-semibold text-gray-900">12 clients</span> next week - prioritize outreach to maximize retention.
-                </p>
             </div>
         </div>
     );

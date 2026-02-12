@@ -28,7 +28,7 @@ export default function UserManagement() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filter, setFilter] = useState('all');
+    const [filter, setFilter] = useState('user');
     const [viewMode, setViewMode] = useState<'active' | 'deleted'>('active');
 
     // Add User Modal State
@@ -181,7 +181,7 @@ export default function UserManagement() {
                 return { label: 'Sales Team', className: 'bg-green-50 text-green-700 border-green-200', icon: <Users className="w-3 h-3" /> };
             case 'user':
             default:
-                return { label: 'Client', className: 'bg-blue-50 text-blue-700 border-blue-200', icon: null };
+                return { label: 'User', className: 'bg-blue-50 text-blue-700 border-blue-200', icon: null };
         }
     };
 
@@ -298,13 +298,9 @@ export default function UserManagement() {
                                 onChange={(e) => setFilter(e.target.value)}
                                 className="pl-10 pr-8 py-2.5 bg-gray-50 border-none rounded-xl text-sm font-medium text-gray-700 focus:ring-2 focus:ring-black/5 cursor-pointer hover:bg-gray-100 transition-colors appearance-none"
                             >
-                                <option value="all">All Users</option>
-                                <option value="verified">Verified</option>
-                                <option value="unverified">Unverified</option>
+                                <option value="user">Users</option>
                                 <option value="admin">Admins</option>
-                                <option value="user">Clients</option>
                                 <option value="partner">Partners</option>
-                                <option value="space_manager">Space Managers</option>
                                 <option value="sales">Sales Team</option>
                             </select>
                         </div>
@@ -320,7 +316,7 @@ export default function UserManagement() {
                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined Date</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                                {/* <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th> */}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -372,7 +368,7 @@ export default function UserManagement() {
                                                 })}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        {/* <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2 text-right">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -432,7 +428,7 @@ export default function UserManagement() {
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 )
                             })}
@@ -556,7 +552,7 @@ export default function UserManagement() {
                                                 onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                                                 className="w-full pl-14 pr-10 py-3 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-black/10 focus:ring-4 focus:ring-black/5 outline-none transition-all font-medium text-gray-900 appearance-none cursor-pointer"
                                             >
-                                                <option value="user">Client (User)</option>
+                                                <option value="user">User</option>
                                                 <option value="partner">Partner</option>
                                                 <option value="space_manager">Space Manager</option>
                                                 <option value="sales">Sales Team</option>

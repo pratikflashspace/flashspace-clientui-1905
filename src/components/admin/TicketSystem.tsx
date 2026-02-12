@@ -223,9 +223,10 @@ export default function TicketSystem() {
 
     const handleResolveTicket = async (ticketId: string) => {
         try {
-            const response = await adminService.resolveTicket(ticketId);
+            // Changed to closeTicket as per user request to close immediately
+            const response = await adminService.closeTicket(ticketId);
             if (response.success) {
-                toast.success('Ticket resolved successfully!');
+                toast.success('Ticket closed successfully!');
                 fetchTickets();
                 fetchStats();
                 if (selectedTicket?._id === ticketId) {
@@ -233,8 +234,8 @@ export default function TicketSystem() {
                 }
             }
         } catch (err: unknown) {
-            console.error('Failed to resolve ticket', err);
-            toast.error('Failed to resolve ticket');
+            console.error('Failed to close ticket', err);
+            toast.error('Failed to close ticket');
         }
     };
 

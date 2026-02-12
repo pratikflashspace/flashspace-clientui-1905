@@ -421,6 +421,20 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
                                             {/* Menu Items */}
                                             <div className="py-1">
+                                                {/* Admin Dashboard Button */}
+                                                {user?.role === 'admin' && (
+                                                    <button
+                                                        onClick={() => {
+                                                            navigate("/admin");
+                                                            setIsUserMenuOpen(false);
+                                                        }}
+                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-50 hover:text-purple-800 transition-colors duration-150"
+                                                    >
+                                                        <LayoutDashboard className="h-4 w-4" />
+                                                        <span className="">Admin Dashboard</span>
+                                                    </button>
+                                                )}
+
                                                 {/* Partner Portal Button */}
                                                 {user?.role === 'partner' && (
                                                     <button

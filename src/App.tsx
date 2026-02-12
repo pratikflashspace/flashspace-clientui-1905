@@ -62,7 +62,7 @@ import UserManagement from "./pages/admin/UserManagement";
 import Coupons from "./pages/admin/Coupons";
 import KYCRequests from "./pages/admin/KYCRequests";
 import SpaceManagement from "./pages/admin/SpaceManagement";
-import AdminBookings from "./pages/admin/AdminBookings";
+
 import AdminSettings from "./pages/admin/Settings";
 import LearningHub from "./pages/admin/learning-hub/LearningHub";
 import Clients from "./pages/admin/Clients";
@@ -238,13 +238,13 @@ const App = () => (
                     <Route path="users" element={<UserManagement />} />
                     <Route path="kyc-requests" element={<KYCRequests />} />
                     <Route path="spaces" element={<SpaceManagement />} />
-                    <Route path="bookings" element={<AdminBookings />} />
+
                     <Route path="settings" element={<AdminSettings />} />
                     <Route path="clients" element={<Clients />} />
                     <Route path="clients/:id" element={<ClientDetails />} />
                     <Route path="coupons" element={<Coupons />} />
                     <Route path="learning-hub" element={<LearningHub />} />
-                    <Route path="sales-analytics" element={<SalesAnalytics />} />
+                    <Route path="booking-analysis" element={<SalesAnalytics />} />
                     <Route path="tickets" element={<TicketSystem />} />
                     <Route path="leads" element={<LeadManagement />} />
                     <Route path="*" element={<AdminDashboard />} />
