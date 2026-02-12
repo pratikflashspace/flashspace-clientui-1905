@@ -20,7 +20,8 @@ import {
     LineChart,
     Target,
     Ticket,
-    Tag
+    Tag,
+    Headphones
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -39,6 +40,7 @@ export default function AdminLayout() {
         { icon: LineChart, label: 'Booking Analysis', path: '/admin/booking-analysis', roles: ['admin', 'sales', 'partner'] },
         { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['admin', 'sales'] },
         { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['admin', 'sales'] },
+        { icon: Headphones, label: 'Support Chats', path: '/admin/support', roles: ['admin', 'sales'] },
         { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['admin', 'sales'] },
         { icon: Briefcase, label: 'Clients', path: '/admin/clients', roles: ['admin', 'sales'] },
         { icon: Tag, label: 'Coupons & Vouchers', path: '/admin/coupons', roles: ['admin', 'sales'] },
