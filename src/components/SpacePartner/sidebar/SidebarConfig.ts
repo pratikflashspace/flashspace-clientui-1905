@@ -97,4 +97,12 @@ export const sidebarConfig = [
 
     icon: Building2,
   },
+  
+  {
+    label: "Team Management",
+
+    path: "/spaceportal/team-management",
+
+    icon: Users,
+  },
 ];
