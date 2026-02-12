@@ -73,6 +73,7 @@ import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
 import SupportChat from "./pages/admin/SupportChat";
+import Leaderboard from "./pages/admin/Leaderboard";
 
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
@@ -248,6 +249,7 @@ const App = () => (
                     <Route path="booking-analysis" element={<SalesAnalytics />} />
                     <Route path="tickets" element={<TicketSystem />} />
                     <Route path="support" element={<SupportChat />} />
+                    <Route path="leaderboard" element={<Leaderboard />} />
                     <Route path="leads" element={<LeadManagement />} />
                     <Route path="*" element={<AdminDashboard />} />
                   </Route>
