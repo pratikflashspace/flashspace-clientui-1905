@@ -72,6 +72,7 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
+import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
@@ -244,6 +245,7 @@ const App = () => (
                   <Route path="coupons" element={<Coupons />} />
                   <Route path="learning-hub" element={<LearningHub />} />
                   <Route path="sales-analytics" element={<SalesAnalytics />} />
+                  <Route path="revenue-dashboard" element={<RevenueDashboard />} />
                   <Route path="tickets" element={<TicketSystem />} />
                   <Route path="leads" element={<LeadManagement />} />
                   <Route path="*" element={<AdminDashboard />} />
