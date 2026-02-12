@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster as HotToaster } from 'react-hot-toast';
+import { Toaster as HotToaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -88,6 +88,7 @@ import SpacePortalSettings from "./pages/spacePortal/Settings";
 import AddSpace from "./pages/spacePortal/AddSpace";
 
 import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
+import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 
@@ -104,33 +105,33 @@ const App = () => (
         toastOptions={{
           duration: 2500,
           style: {
-            background: '#ffffff',
-            color: '#1f2937',
-            borderRadius: '16px',
-            padding: '20px 32px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            fontSize: '16px',
-            fontWeight: '500',
-            maxWidth: '400px',
+            background: "#ffffff",
+            color: "#1f2937",
+            borderRadius: "16px",
+            padding: "20px 32px",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+            fontSize: "16px",
+            fontWeight: "500",
+            maxWidth: "400px",
           },
           success: {
             style: {
-              background: '#ffffff',
-              border: '1px solid #e5e7eb',
+              background: "#ffffff",
+              border: "1px solid #e5e7eb",
             },
             iconTheme: {
-              primary: '#10b981',
-              secondary: 'white',
+              primary: "#10b981",
+              secondary: "white",
             },
           },
           error: {
             style: {
-              background: '#ffffff',
-              border: '1px solid #fecaca',
+              background: "#ffffff",
+              border: "1px solid #fecaca",
             },
             iconTheme: {
-              primary: '#ef4444',
-              secondary: 'white',
+              primary: "#ef4444",
+              secondary: "white",
             },
           },
         }}
@@ -142,8 +143,6 @@ const App = () => (
             {/* <MouseFollower/> */}
             <Routes>
               {/* Public Routes */}
-
-
 
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
@@ -256,8 +255,14 @@ const App = () => (
                   <Route path="dashboard" element={<Dashboard />} />
 
                   <Route path="clients" element={<SpacePortalClients />} />
-                  <Route path="clients/:clientId" element={<SpacePortalClientDetails />} />
-                  <Route path="client-enquiries" element={<ClientEnquiries />} />
+                  <Route
+                    path="clients/:clientId"
+                    element={<SpacePortalClientDetails />}
+                  />
+                  <Route
+                    path="client-enquiries"
+                    element={<ClientEnquiries />}
+                  />
                   <Route path="notifications" element={<Notifications />} />
                   <Route path="profile" element={<SpacePortalProfile />} />
                   <Route path="settings" element={<SpacePortalSettings />} />
@@ -271,7 +276,11 @@ const App = () => (
                   <Route path="space-management" element={<Spaces />} />
                   <Route path="space-management/add" element={<AddSpace />} />
                   <Route path="tickets" element={<Tickets />} />
-                  <Route path="feedback-nps" element={<SpacePortalFeedbackNPS />} />
+                  <Route
+                    path="feedback-nps"
+                    element={<SpacePortalFeedbackNPS />}
+                  />
+                  <Route path="tasks" element={<SpacePortalTicketAndTasks />} />
                 </Route>
               </Route>
 

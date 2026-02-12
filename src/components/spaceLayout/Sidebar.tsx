@@ -45,7 +45,10 @@ export default function Sidebar() {
           label="Dashboard"
           active
         />
-        <SidebarItem icon={<BarChart3 size={18} />} label="Bookings Analytics" />
+        <SidebarItem
+          icon={<BarChart3 size={18} />}
+          label="Bookings Analytics"
+        />
         <SidebarItem icon={<Users size={18} />} label="Clients" />
         <SidebarItem icon={<Ticket size={18} />} label="Ticket System" />
         <SidebarItem icon={<Building2 size={18} />} label="Space Management" />
