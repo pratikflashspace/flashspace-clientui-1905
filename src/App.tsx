@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
+import TeamManagement from "./pages/spacePortal/teamManagement";
 
 import Index from "./pages/Index";
 import Services from "./pages/Services";
@@ -71,6 +72,7 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
+import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
@@ -242,6 +244,7 @@ const App = () => (
                   <Route path="coupons" element={<Coupons />} />
                   <Route path="learning-hub" element={<LearningHub />} />
                   <Route path="sales-analytics" element={<SalesAnalytics />} />
+                  <Route path="revenue-dashboard" element={<RevenueDashboard />} />
                   <Route path="tickets" element={<TicketSystem />} />
                   <Route path="leads" element={<LeadManagement />} />
                   <Route path="*" element={<AdminDashboard />} />
@@ -275,6 +278,7 @@ const App = () => (
                   />
                   <Route path="space-management" element={<Spaces />} />
                   <Route path="space-management/add" element={<AddSpace />} />
+                  <Route path="team-management" element={<TeamManagement />} />
                   <Route path="tickets" element={<Tickets />} />
                   <Route
                     path="feedback-nps"
