@@ -85,15 +85,7 @@ const LeaderBoard = () => {
     return (
         <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-500">
             {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                    Affiliate{" "}
-                    <span className="italic text-[#5bb09c]">Leaderboard</span>
-                </h1>
-                <p className="text-gray-500 mt-2 font-medium">
-                    See how you rank against other affiliates
-                </p>
-            </div>
+{/* Header Removed */}
 
             {/* User Position Hero Card */}
             <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between animate-scale-up">

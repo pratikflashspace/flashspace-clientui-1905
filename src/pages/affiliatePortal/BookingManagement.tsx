@@ -15,6 +15,16 @@ import {
     FileText,
 } from "lucide-react";
 
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { isToday, isThisWeek, isThisMonth, parse } from "date-fns";
+
 // --- Types & Interfaces ---
 interface Booking {
     id: string;
@@ -368,12 +378,15 @@ const BookingDetailsModal = ({
     );
 };
 
+
+
 // --- MAIN PAGE COMPONENT ---
 const BookingManagement = () => {
     const [activeTab, setActiveTab] = useState<
         "active" | "pending" | "renewals"
     >("active");
     const [searchQuery, setSearchQuery] = useState("");
+    const [dateFilter, setDateFilter] = useState<"all" | "today" | "week" | "month">("all");
 
     // State for Modal
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(
@@ -393,11 +406,33 @@ const BookingManagement = () => {
         }
     };
 
-    const filteredData = getCurrentData().filter(
-        (item) =>
+    const filteredData = getCurrentData().filter((item) => {
+        const matchesSearch =
             item.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.id.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
+            item.id.toLowerCase().includes(searchQuery.toLowerCase());
+
+        let matchesDate = true;
+        if (dateFilter !== "all") {
+            try {
+                // Extract start date from duration string (e.g., "Jan 15, 2024 - Jan 15, 2025")
+                const startDateString = item.duration.split(" - ")[0];
+                const startDate = parse(startDateString, "MMM d, yyyy", new Date());
+
+                if (dateFilter === "today") {
+                    matchesDate = isToday(startDate);
+                } else if (dateFilter === "week") {
+                    matchesDate = isThisWeek(startDate);
+                } else if (dateFilter === "month") {
+                    matchesDate = isThisMonth(startDate);
+                }
+            } catch (error) {
+                console.error("Date parsing error", error);
+                matchesDate = false;
+            }
+        }
+
+        return matchesSearch && matchesDate;
+    });
 
     return (
         <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans w-full relative">
@@ -411,17 +446,7 @@ const BookingManagement = () => {
 
             <div className="w-full space-y-8 animate-fade-in">
                 {/* Header */}
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                        Booking{" "}
-                        <span className="text-[#5aa39c] italic">
-                            Management
-                        </span>
-                    </h1>
-                    <p className="text-gray-500 text-lg">
-                        Track all your referred clients and their bookings
-                    </p>
-                </div>
+{/* Header Removed */}
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -495,9 +520,35 @@ const BookingManagement = () => {
                                     className="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5aa39c]/20 focus:border-[#5aa39c] transition-all text-sm"
                                 />
                             </div>
-                            <button className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 transition-colors">
-                                <Filter size={18} />
-                            </button>
+                            
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className={`p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors ${dateFilter !== 'all' ? 'text-[#5aa39c] border-[#5aa39c]' : 'text-gray-600'}`}>
+                                        <Filter size={18} />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48 bg-white">
+                                    <DropdownMenuLabel>Filter by Date</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => setDateFilter("all")}>
+                                        All Time
+                                        {dateFilter === "all" && <span className="ml-auto text-[#5aa39c]">✓</span>}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setDateFilter("today")}>
+                                        Today
+                                        {dateFilter === "today" && <span className="ml-auto text-[#5aa39c]">✓</span>}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setDateFilter("week")}>
+                                        This Week
+                                        {dateFilter === "week" && <span className="ml-auto text-[#5aa39c]">✓</span>}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setDateFilter("month")}>
+                                        This Month
+                                        {dateFilter === "month" && <span className="ml-auto text-[#5aa39c]">✓</span>}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
                             <button className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 transition-colors">
                                 <Download size={18} />
                             </button>

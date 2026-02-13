@@ -26,10 +26,7 @@ const Support = () => {
   return (
     <div className=" mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-500">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight italic text-[#5bb09c]">Support</h1>
-        <p className="text-gray-500 mt-2 font-medium">Get help with AI-powered chat or raise a ticket</p>
-      </div>
+{/* Header Removed */}
 
       <Tabs defaultValue="chat" className="w-full">
         <TabsList className="bg-gray-100/50 p-1 mb-8">
@@ -100,12 +97,12 @@ const Support = () => {
                     { label: 'Commission Policy', icon: ShieldCheck },
                     { label: 'Video Tutorials', icon: PlayCircle }
                   ].map((link, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-all group cursor-pointer">
+                    <div key={i} className="flex items-center justify-between p-3 hover:bg-[#e59e4e]  rounded-xl transition-all group cursor-pointer">
                       <div className="flex items-center gap-3">
-                        <link.icon className="w-4 h-4 text-gray-400 group-hover:text-[#5bb09c]" />
-                        <span className="text-xs font-bold text-gray-700">{link.label}</span>
+                        <link.icon className="w-4 h-4 text-gray-400 group-hover:text-white" />
+                        <span className="text-xs font-bold text-gray-700 group-hover:text-white">{link.label}</span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#5bb09c]" />
+                      <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-white" />
                     </div>
                   ))}
                 </div>

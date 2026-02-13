@@ -62,16 +62,7 @@ const QuotationGenerator = () => {
     return (
         <div className=" mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-700">
             {/* Header Section */}
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                    Quotation{" "}
-                    <span className="italic text-[#5bb09c]">Generator</span>
-                </h1>
-                <p className="text-gray-500 mt-1 font-medium">
-                    Create instant quotations with FlashSpace and your affiliate
-                    branding
-                </p>
-            </div>
+{/* Header Removed */}
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* LEFT COLUMN: FORM AREA (7/12) */}

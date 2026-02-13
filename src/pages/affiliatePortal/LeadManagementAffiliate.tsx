@@ -3,10 +3,18 @@ import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+    Dialog, 
+    DialogContent, 
+    DialogTrigger, 
+    DialogTitle, 
+    DialogDescription 
+} from "@/components/ui/dialog"; 
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import LeadStatCard from "@/components/affiliatePortal/LeadStatCard";
 import LeadTableRow, { Lead } from "@/components/affiliatePortal/LeadTableRow";
+import AddLeadForm from "@/components/affiliatePortal/AddLeadForm";
 
-// --- Static Data for easy Backend swapping ---
 const INITIAL_LEADS: Lead[] = [
     {
         id: "1",
@@ -18,39 +26,39 @@ const INITIAL_LEADS: Lead[] = [
         lastContact: "2 hours ago",
     },
     {
-        id: "2",
-        name: "Sneha Reddy",
-        phone: "+91 87654 22222",
-        company: "Creative Hub",
-        interest: "Team Space",
-        status: "Warm",
-        lastContact: "1 day ago",
+        id: "1",
+        name: "Vikram Mehta",
+        phone: "+91 98765 11111",
+        company: "NextGen Tech",
+        interest: "Virtual Office",
+        status: "Hot",
+        lastContact: "2 hours ago",
     },
     {
-        id: "3",
-        name: "Arjun Kapoor",
-        phone: "+91 76543 33333",
-        company: "Fintech Sol",
-        interest: "Meeting Room",
-        status: "Cold",
-        lastContact: "5 days ago",
+        id: "1",
+        name: "Vikram Mehta",
+        phone: "+91 98765 11111",
+        company: "NextGen Tech",
+        interest: "Virtual Office",
+        status: "Hot",
+        lastContact: "2 hours ago",
     },
     {
-        id: "4",
-        name: "Pooja Singh",
-        phone: "+91 65432 44444",
-        company: "Design Co",
-        interest: "Day Pass",
-        status: "Warm",
-        lastContact: "3 hours ago",
+        id: "1",
+        name: "Vikram Mehta",
+        phone: "+91 98765 11111",
+        company: "NextGen Tech",
+        interest: "Virtual Office",
+        status: "Hot",
+        lastContact: "2 hours ago",
     },
 ];
 
 const LeadManagementAffiliate = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [activeTab, setActiveTab] = useState("all");
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Filter Logic: Search + Status Tabs
     const filteredLeads = useMemo(() => {
         return INITIAL_LEADS.filter((lead) => {
             const matchesSearch =
@@ -63,48 +71,47 @@ const LeadManagementAffiliate = () => {
     }, [searchQuery, activeTab]);
 
     return (
-        <div className=" mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-500">
+        <div className="mx-auto w-full p-6 lg:p-10 pb-2 lg:pb-4 space-y-8 animate-in fade-in duration-500">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                        Lead{" "}
-                        <span className="italic text-[#5bb09c]">
-                            Management
-                        </span>
-                    </h1>
-                    <p className="text-gray-500 mt-1 font-medium">
-                        Track and manage your referral leads
-                    </p>
-                </div>
-                <Button className="bg-[#5bb09c] text-white hover:bg-[#4a9b89] gap-2 shadow-md">
-                    <Plus className="w-4 h-4 text-white" /> Add Lead
-                </Button>
+                <h1 className="text-2xl font-bold text-gray-800">Lead Management</h1>
+                
+                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="bg-[#5bb09c] text-white hover:bg-[#4a9b89] gap-2 shadow-md">
+                            <Plus className="w-4 h-4 text-white" /> Add Lead
+                        </Button>
+                    </DialogTrigger>
+                    
+                    {/* [&>button]:hidden removes the default shadcn close (X) button.
+                        bg-transparent and border-none allow your AddLeadForm's 3xl rounded corners to show.
+                    */}
+                    <DialogContent className="sm:max-w-[600px] p-0 bg-transparent border-none shadow-none focus:outline-none overflow-y-auto max-h-[90vh] [&>button]:hidden">
+                        
+                        {/* Accessibility requirement: Title and Description hidden from sight but available to Screen Readers */}
+                        <VisuallyHidden.Root>
+                            <DialogTitle>Add New Lead</DialogTitle>
+                            <DialogDescription>Fill out the form to add a new potential client.</DialogDescription>
+                        </VisuallyHidden.Root>
+
+                        <div className="animate-in zoom-in-95 fade-in duration-200">
+                            <AddLeadForm onCancel={() => setIsModalOpen(false)} />
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up">
-                <LeadStatCard
-                    label="Total Leads"
-                    value={INITIAL_LEADS.length}
-                />
-                <LeadStatCard
-                    label="Hot Leads"
-                    value="1"
-                    highlightColor="text-red-500"
-                />
-                <LeadStatCard
-                    label="Converted"
-                    value="1"
-                    highlightColor="text-emerald-500"
-                />
+                <LeadStatCard label="Total Leads" value={INITIAL_LEADS.length} />
+                <LeadStatCard label="Hot Leads" value="1" highlightColor="text-red-500" />
+                <LeadStatCard label="Converted" value="1" highlightColor="text-emerald-500" />
                 <LeadStatCard label="Conversion Rate" value="38%" />
             </div>
 
             {/* Main Content Area */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-slide-up">
                 <div className="p-6 space-y-6">
-                    {/* Search Bar */}
                     <div className="relative max-w-md">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <Input
@@ -115,35 +122,18 @@ const LeadManagementAffiliate = () => {
                         />
                     </div>
 
-                    {/* Custom Tabs Logic */}
-                    <Tabs
-                        defaultValue="all"
-                        onValueChange={setActiveTab}
-                        className="w-full"
-                    >
+                    <Tabs defaultValue="all" onValueChange={setActiveTab} className="w-full">
                         <TabsList className="bg-transparent h-auto p-0 gap-2 mb-6">
-                            <TabsTrigger
-                                value="all"
-                                className="data-[state=active]:bg-[#5bb09c]/10 data-[state=active]:text-[#5bb09c] rounded-full px-6 py-2 border border-transparent data-[state=active]:border-[#5bb09c]/20"
-                            >
+                            <TabsTrigger value="all" className="data-[state=active]:bg-[#5bb09c]/10 data-[state=active]:text-[#5bb09c] rounded-full px-6 py-2 border border-transparent data-[state=active]:border-[#5bb09c]/20">
                                 All Leads ({INITIAL_LEADS.length})
                             </TabsTrigger>
-                            <TabsTrigger
-                                value="hot"
-                                className="data-[state=active]:bg-red-50 data-[state=active]:text-red-500 rounded-full px-6 py-2"
-                            >
+                            <TabsTrigger value="hot" className="data-[state=active]:bg-red-50 data-[state=active]:text-red-500 rounded-full px-6 py-2">
                                 Hot (1)
                             </TabsTrigger>
-                            <TabsTrigger
-                                value="warm"
-                                className="data-[state=active]:bg-orange-50 data-[state=active]:text-orange-500 rounded-full px-6 py-2"
-                            >
+                            <TabsTrigger value="warm" className="data-[state=active]:bg-orange-50 data-[state=active]:text-orange-500 rounded-full px-6 py-2">
                                 Warm (2)
                             </TabsTrigger>
-                            <TabsTrigger
-                                value="converted"
-                                className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-500 rounded-full px-6 py-2"
-                            >
+                            <TabsTrigger value="converted" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-500 rounded-full px-6 py-2">
                                 Converted (1)
                             </TabsTrigger>
                         </TabsList>
@@ -156,12 +146,8 @@ const LeadManagementAffiliate = () => {
                                         <th className="px-6 py-4">Company</th>
                                         <th className="px-6 py-4">Interest</th>
                                         <th className="px-6 py-4">Status</th>
-                                        <th className="px-6 py-4">
-                                            Last Contact
-                                        </th>
-                                        <th className="px-6 py-4 text-right">
-                                            Actions
-                                        </th>
+                                        <th className="px-6 py-4">Last Contact</th>
+                                        <th className="px-6 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
@@ -170,11 +156,6 @@ const LeadManagementAffiliate = () => {
                                     ))}
                                 </tbody>
                             </table>
-                            {filteredLeads.length === 0 && (
-                                <div className="py-20 text-center text-gray-400 italic">
-                                    No leads found matching your criteria.
-                                </div>
-                            )}
                         </div>
                     </Tabs>
                 </div>

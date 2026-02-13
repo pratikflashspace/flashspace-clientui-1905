@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
     Share2,
     Users,
@@ -207,14 +208,17 @@ const Dashboard = () => {
                 {
                     title: "Booking Management",
                     desc: "View companies you've referred and their booking status",
+                    path: "/affiliate-portal/booking-management",
                 },
                 {
                     title: "Client Tracking",
                     desc: "Track all clients from referral to conversion and beyond",
+                    path: "/affiliate-portal/booking-management",
                 },
                 {
                     title: "Status Updates",
                     desc: "Real-time updates on client booking progress",
+                    path: "/affiliate-portal/booking-management",
                 },
             ],
         },
@@ -227,14 +231,17 @@ const Dashboard = () => {
                 {
                     title: "Revenue Dashboard",
                     desc: "Complete view of your earnings and revenue trends",
+                    path: "/affiliate-portal/revenue-dashboard",
                 },
                 {
                     title: "Payout Tracking",
                     desc: "Track completed payouts, pending, and expected dates",
+                    path: "/affiliate-portal/payouts",
                 },
                 {
                     title: "Auto Invoicing",
                     desc: "Generate and share invoices automatically with clients",
+                    path: "/affiliate-portal/affiliate-invoices",
                 },
             ],
         },
@@ -247,14 +254,17 @@ const Dashboard = () => {
                 {
                     title: "Quotation Generator",
                     desc: "Create instant quotations with FlashSpace and affiliate branding",
+                    path: "/affiliate-portal/quotation-generator",
                 },
                 {
-                    title: "WhatsApp Follow-ups",
-                    desc: "Integrated WhatsApp and email follow-ups for all leads",
+                    title: "Lead Follow-ups",
+                    desc: "Integrated phone and email follow-ups for all leads",
+                    path: "/affiliate-portal/lead-management",
                 },
                 {
                     title: "Lead Management",
                     desc: "Manage all your leads in one place with status tracking",
+                    path: "/affiliate-portal/lead-management",
                 },
             ],
         },
@@ -267,15 +277,18 @@ const Dashboard = () => {
                 {
                     title: "Regional Rankings",
                     desc: "See your position among affiliates in your region",
+                    path: "/affiliate-portal/leaderboard",
                 },
                 {
                     title: "National Leaderboard",
                     desc: "Compete with affiliates pan-India for top positions",
+                    path: "/affiliate-portal/leaderboard",
                 },
                 {
                     title: "AI Support Chat",
                     desc: "Get queries resolved with AI that escalates to support when needed",
                     badge: "AI",
+                    path: "/affiliate-portal/support",
                 },
             ],
         },
@@ -285,17 +298,7 @@ const Dashboard = () => {
         <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans animate-fade-in relative">
             <div className="w-full space-y-10">
                 {/* 1. Page Header */}
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                        Affiliate{" "}
-                        <span className="text-[#5aa39c] italic ">
-                            Dashboard
-                        </span>
-                    </h1>
-                    <p className="text-gray-500 text-lg">
-                        Track your referrals, revenue, and performance
-                    </p>
-                </div>
+{/* Header Removed */}
 
                 {/* 2. Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -351,7 +354,7 @@ const Dashboard = () => {
 
                 {/* 4. Other Sections */}
                 {sections.map((section) => (
-                    <div key={section.id} onClick={()=>navigate("")} className="animate-slide-up">
+                    <div key={section.id} className="animate-slide-up">
                         <SectionHeader
                             icon={section.icon}
                             title={section.title}
@@ -359,12 +362,22 @@ const Dashboard = () => {
                         />
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {section.cards.map((card, idx) => (
-                                <ActionCard
-                                    key={idx}
-                                    title={card.title}
-                                    description={card.desc}
-                                    badge={card.badge}
-                                />
+                                <div 
+                                    key={idx} 
+                                    onClick={() => {
+                                        // Use the path directly from the card object
+                                        if (card.path) {
+                                            navigate(card.path);
+                                        }
+                                    }}
+                                    className="cursor-pointer transition-transform hover:scale-[1.02]"
+                                >
+                                    <ActionCard
+                                        title={card.title}
+                                        description={card.desc}
+                                        badge={card.badge}
+                                    />
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -372,8 +385,8 @@ const Dashboard = () => {
             </div>
 
             {/* --- AI ANALYZING / RESULT MODAL --- */}
-            {selectedInsight && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-fade-in p-4">
+            {selectedInsight && createPortal(
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-fade-in p-4">
                     <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden relative animate-scale-up">
                         {/* Modal Header */}
                         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
@@ -506,7 +519,8 @@ const Dashboard = () => {
                             )}
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
         </div>

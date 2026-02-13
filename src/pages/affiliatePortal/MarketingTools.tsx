@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Copy, QrCode, Share2, BarChart3, FileText, Download, Link2, Check } from "lucide-react";
+import { QRCodeSVG } from 'qrcode.react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -30,25 +31,25 @@ const ASSETS_DATA = [
 ];
 
 const QR_CODES_DATA = [
-  { title: "Main Referral QR", image: "/qr-placeholder.png" },
-  { title: "Virtual Office QR", image: "/qr-placeholder.png" },
-  { title: "Team Space QR", image: "/qr-placeholder.png" },
-  { title: "Event Promo QR", image: "/qr-placeholder.png" },
+  { title: "Main Referral QR", link: "https://flashspace.com/ref/AFF123" },
+  { title: "Virtual Office QR", link: "https://flashspace.com/ref/AFF123-vo" },
+  { title: "Team Space QR", link: "https://flashspace.com/ref/AFF123-ts" },
+  { title: "Event Promo QR", link: "https://flashspace.com/ref/AFF123-event" },
 ];
 
 const MarketingTools = () => {
-  const [copied, setCopied] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const referralLink = "https://flashspace.com/ref/AFF123";
 
   /* Refactored Handlers */
-  const handleCopy = (text: string) => {
+  const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
+    setCopiedId(id);
     toast.success("Link copied to clipboard!");
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleShare = async (link: string, title: string) => {
+  const handleShare = async (link: string, title: string, id: string) => {
     if (navigator.share) {
       try {
         await navigator.share({
@@ -63,19 +64,14 @@ const MarketingTools = () => {
         }
       }
     } else {
-      handleCopy(link);
+      handleCopy(link, id);
     }
   };
 
   return (
-    <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-500">
+    <div className="mx-auto w-full p-6 lg:p-10 pb-2 lg:pb-4 space-y-8 animate-in fade-in duration-500">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-          Marketing <span className="italic text-[#5bb09c]">Tools</span>
-        </h1>
-        <p className="text-gray-500 mt-2 font-medium">Referral links, assets, and promotional materials</p>
-      </div>
+{/* Header Removed */}
 
       <Tabs defaultValue="referral" className="w-full">
         <TabsList className="bg-gray-100/50 p-1 mb-8">
@@ -96,10 +92,10 @@ const MarketingTools = () => {
                 <Button 
                     variant="outline" 
                     className="flex-1 md:w-auto gap-2 border-gray-200 hover:bg-gray-50 text-gray-700"
-                    onClick={() => handleCopy(referralLink)}
+                    onClick={() => handleCopy(referralLink, 'main')}
                 >
-                  {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />} 
-                  {copied ? "Copied!" : "Copy"}
+                  {copiedId === 'main' ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />} 
+                  {copiedId === 'main' ? "Copied!" : "Copy"}
                 </Button>
                 
                 <Dialog>
@@ -117,12 +113,17 @@ const MarketingTools = () => {
                     </DialogHeader>
                     <div className="flex flex-col items-center justify-center p-6 space-y-4">
                        <div className="bg-white p-4 rounded-xl border-2 border-dashed border-gray-200 shadow-sm">
-                         {/* Placeholder QR Code - In a real app, use a QR library here */}
-                         <QrCode className="w-48 h-48 text-gray-900" strokeWidth={1} />
+                         {/* Dynamic QR Code */}
+                         <QRCodeSVG 
+                            value={referralLink} 
+                            size={192} 
+                            level="H" 
+                            className="w-48 h-48"
+                         />
                        </div>
                        <div className="text-center space-y-1">
                            <p className="text-xs text-gray-400 font-mono break-all px-8">{referralLink}</p>
-                           <Button variant="link" className="text-[#5bb09c] text-xs h-auto p-0" onClick={() => handleCopy(referralLink)}>Copy Link</Button>
+                           <Button variant="link" className="text-[#5bb09c] text-xs h-auto p-0" onClick={() => handleCopy(referralLink, 'qr-modal')}>Copy Link</Button>
                        </div>
                     </div>
                     <div className="flex justify-center">
@@ -135,7 +136,7 @@ const MarketingTools = () => {
 
                 <Button 
                     className="flex-[2] md:w-auto bg-[#5bb09c] hover:bg-[#4a9b89] text-white gap-2 shadow-sm"
-                    onClick={() => handleShare(referralLink, 'Join FlashSpace')}
+                    onClick={() => handleShare(referralLink, 'Join FlashSpace', 'main-share')}
                 >
                   <Share2 className="w-4 h-4" /> Share
                 </Button>
@@ -148,46 +149,46 @@ const MarketingTools = () => {
               <h3 className="font-bold text-gray-800 text-lg">Link Performance</h3>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[700px]">
+              <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-widest font-bold">
-                    <th className="px-6 py-4">Campaign</th>
-                    <th className="px-6 py-4">Link</th>
-                    <th className="px-6 py-4 text-center">Clicks</th>
-                    <th className="px-6 py-4 text-center">Conversions</th>
-                    <th className="px-6 py-4 text-center">Rate</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                  <tr className="bg-gray-50/50 border-b border-gray-100">
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Campaign</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">Link</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap text-center">Clicks</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap text-center">Conversions</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap text-center">Rate</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {PERFORMANCE_DATA.map((item, idx) => (
-                    <tr key={idx} className="group hover:bg-gray-50/30 transition-colors">
-                      <td className="px-6 py-5 font-bold text-gray-900 text-sm">{item.name}</td>
-                      <td className="px-6 py-5 text-sm text-[#5bb09c] hover:underline cursor-pointer">
+                    <tr key={idx} className="group hover:bg-[#fafafa] transition-colors duration-150">
+                      <td className="px-6 py-4 text-sm font-medium text-slate-900 whitespace-nowrap">{item.name}</td>
+                      <td className="px-6 py-4 text-sm text-[#5bb09c] font-medium whitespace-nowrap hover:underline cursor-pointer">
                         <div className="flex items-center gap-1.5"><Link2 className="w-3.5 h-3.5" /> {item.link}</div>
                       </td>
-                      <td className="px-6 py-5 text-center text-gray-600 font-medium">{item.clicks}</td>
-                      <td className="px-6 py-5 text-center font-bold text-gray-900">{item.conv}</td>
-                      <td className="px-6 py-5 text-center">
-                        <span className="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg text-[11px] font-bold">{item.rate}</span>
+                      <td className="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap text-center">{item.clicks}</td>
+                      <td className="px-6 py-4 text-sm font-bold text-slate-900 whitespace-nowrap text-center">{item.conv}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <span className="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-bold border border-emerald-100">{item.rate}</span>
                       </td>
-                      <td className="px-6 py-5 text-right">
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end gap-2">
                             <button 
-                                onClick={() => handleCopy(`https://${item.link}`)}
+                                onClick={() => handleCopy(`https://${item.link}`, `row-${idx}`)}
                                 className="p-2 bg-[#5bb09c]/10 text-[#5bb09c] rounded-lg hover:bg-[#5bb09c]/20 transition-colors" 
                                 title="Copy Link"
                             >
-                                <Copy className="w-4 h-4" />
+                                {copiedId === `row-${idx}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                             </button>
                             <button 
-                                onClick={() => handleShare(`https://${item.link}`, item.name)}
+                                onClick={() => handleShare(`https://${item.link}`, item.name, `share-${idx}`)}
                                 className="p-2 bg-[#5bb09c]/10 text-[#5bb09c] rounded-lg hover:bg-[#5bb09c]/20 transition-colors" 
                                 title="Share Link"
                             >
                                 <Share2 className="w-4 h-4" />
                             </button>
-                            <button className="p-2 text-gray-400 hover:text-[#5bb09c] transition-colors">
+                            <button className="p-2 text-gray-400 hover:text-[#5bb09c] transition-colors hover:bg-gray-50 rounded-lg">
                                 <BarChart3 className="w-4 h-4" />
                             </button>
                         </div>
@@ -245,7 +246,13 @@ const MarketingTools = () => {
                 {/* QR Code Container (Reduced padding) */}
                 <div className="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center mb-4 p-6">
                   <div className="w-full h-full bg-white rounded shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden">
-                    <QrCode className="w-3/4 h-3/4 text-gray-800" />
+                    <QRCodeSVG 
+                        id={`qr-${idx}`}
+                        value={qr.link} 
+                        size={128} 
+                        level="H" 
+                        className="w-full h-full" 
+                    />
                   </div>
                 </div>
 
@@ -258,6 +265,35 @@ const MarketingTools = () => {
                 <Button 
                   variant="outline" 
                   className="w-full gap-2 border-gray-200 hover:border-[#5bb09c] hover:text-[#5bb09c] hover:bg-teal-50/30 transition-all py-2 h-auto text-xs"
+                  onClick={() => {
+                    const canvas = document.createElement("canvas");
+                    const svg = document.querySelector(`#qr-${idx}`);
+                    if (svg) {
+                      const xml = new XMLSerializer().serializeToString(svg);
+                      const svg64 = btoa(xml);
+                      const b64Start = 'data:image/svg+xml;base64,';
+                      const image64 = b64Start + svg64;
+                      
+                      const img = new Image();
+                      img.onload = () => {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx?.drawImage(img, 0, 0);
+                        const pngUrl = canvas.toDataURL('image/png');
+                        const link = document.createElement('a');
+                        link.href = pngUrl;
+                        link.download = `${qr.title.replace(/\s+/g, '-').toLowerCase()}.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        toast.success("QR Code downloaded!");
+                      };
+                      img.src = image64;
+                    } else {
+                        toast.error("Could not find QR Code element.");
+                    }
+                  }}
                 >
                   <Download className="w-3 h-3" />
                   Download PNG

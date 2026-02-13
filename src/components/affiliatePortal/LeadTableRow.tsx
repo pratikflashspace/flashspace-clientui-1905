@@ -105,7 +105,7 @@ const LeadTableRow = (lead: Lead) => {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-9 w-9 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl"
+                                    className="h-9 w-9 text-gray-400 hover:text-white hover:bg-[#e59e4e] rounded-xl"
                                 >
                                     <MoreVertical className="w-4 h-4" />
                                 </Button>
@@ -115,19 +115,19 @@ const LeadTableRow = (lead: Lead) => {
                                 align="end"
                             >
                                 <div className="flex flex-col">
-                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-white bg-[#e59e4e] rounded-lg mb-1 transition-colors">
+                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-black text-gray-600 hover:text-white hover:bg-[#e59e4e] rounded-lg mb-1 transition-colors">
                                         <FileText className="w-4 h-4" /> Send
                                         Quotation
                                     </button>
-                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-black text-gray-600 hover:text-white hover:bg-[#e59e4e] rounded-lg mb-1 transition-colors">
                                         <Calendar className="w-4 h-4" />{" "}
                                         Schedule Follow-up
                                     </button>
-                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-black text-gray-600 hover:text-white hover:bg-[#e59e4e] rounded-lg mb-1 transition-colors">
                                         <StickyNote className="w-4 h-4" /> Add
                                         Note
                                     </button>
-                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-black text-gray-600 hover:text-white hover:bg-[#e59e4e] rounded-lg mb-1 transition-colors">
                                         <CheckCircle className="w-4 h-4" /> Mark
                                         as Converted
                                     </button>

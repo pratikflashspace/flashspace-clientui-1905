@@ -156,20 +156,10 @@ const Payouts = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans w-full">
+        <div className="w-full bg-[#fafafa] p-6 lg:p-10 pb-2 lg:pb-4 font-sans">
             <div className="w-full space-y-8 animate-fade-in">
                 {/* 1. Header */}
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                        Payout{" "}
-                        <span className="text-[#5aa39c] italic">
-                            Management
-                        </span>
-                    </h1>
-                    <p className="text-gray-500 text-lg">
-                        Track your commission payouts
-                    </p>
-                </div>
+{/* Header Removed */}
 
                 {/* 2. Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

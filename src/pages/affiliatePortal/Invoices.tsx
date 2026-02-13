@@ -369,7 +369,7 @@ const Invoices = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans w-full relative">
+        <div className="w-full bg-[#fafafa] p-6 lg:p-10 pb-2 lg:pb-4 font-sans relative">
             {/* --- HIDDEN PRINT AREA --- 
           This is what will be printed. It is hidden from screen but visible to print.
       */}
@@ -382,14 +382,7 @@ const Invoices = () => {
             {/* --- NORMAL SCREEN CONTENT (Hidden during print via CSS) --- */}
             <div className="w-full space-y-8 no-print animate-slide-up">
                 {/* Header */}
-                <div>
-                    <h1 className="text-3xl text-[#5aa39c] italic font-extrabold tracking-tight">
-                        Invoices
-                    </h1>
-                    <p className="text-gray-500 text-lg">
-                        Manage your commission payouts
-                    </p>
-                </div>
+{/* Header Removed */}
 
                 {/* Toolbar */}
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">

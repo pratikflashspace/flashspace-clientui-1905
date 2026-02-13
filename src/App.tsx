@@ -112,6 +112,8 @@ import QuotationGenerator from "./pages/affiliatePortal/QuotationGenerator";
 import MarketingTools from "./pages/affiliatePortal/MarketingTools";
 import LeaderBoard from "./pages/affiliatePortal/LeaderBoard";
 import Support from "./pages/affiliatePortal/Support";
+import AffiliateProfile from "./pages/affiliatePortal/Profile";
+import AffiliateSettings from "./pages/affiliatePortal/Settings";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -256,6 +258,8 @@ const App = () => (
                   <Route path="marketing-tools" element={<MarketingTools />} />
                   <Route path="leaderboard" element={<LeaderBoard />} />
                   <Route path="support" element={<Support />} />
+                  <Route path="profile" element={<AffiliateProfile />} />
+                  <Route path="settings" element={<AffiliateSettings />} />
               </Route>
 
 
