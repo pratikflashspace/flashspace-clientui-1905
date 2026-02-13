@@ -12,6 +12,7 @@ import { useDarkMode } from "@/contexts/DarkModeContext";
 import GetInTouch from "@/pages/GetInTouch";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { SignupModal } from "@/components/auth/SignupModal";
+import { NotificationBell } from "@/components/NotificationBell";
 
 // ✅ Country Data
 const countries = [
@@ -376,6 +377,13 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                                 </span>
                             </ModernFlairButton>
+
+                            {/* Notification Bell */}
+                            {isAuthenticated && (
+                                <div className="hidden lg:block">
+                                    <NotificationBell />
+                                </div>
+                            )}
 
                             {/* User Authentication - Profile Dropdown or Login */}
                             {isAuthenticated ? (

@@ -72,9 +72,10 @@ export const API_ENDPOINTS = {
     BOOKING_BY_ID: (id: string) => `/api/user/bookings/${id}`,
     BOOKING_AUTO_RENEW: (id: string) => `/api/user/bookings/${id}/auto-renew`,
     // KYC
-    KYC: '/api/user/kyc',
-    KYC_BUSINESS_INFO: '/api/user/kyc/business-info',
-    KYC_UPLOAD: '/api/user/kyc/upload',
+    KYC: '/user/kyc',
+    KYC_BUSINESS_INFO: '/user/kyc/business-info',
+    KYC_UPLOAD: '/user/kyc/upload',
+    KYC_SUBMIT: '/user/kyc/submit',
     // Invoices
     INVOICES: '/api/user/invoices',
     INVOICE_BY_ID: (id: string) => `/api/user/invoices/${id}`,
