@@ -1,48 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/admin.service';
-import { Search, Check, X, FileText, AlertCircle, User, Building2, Eye, Download, Clock, CheckCircle2, XCircle, ExternalLink, Calendar, File } from 'lucide-react';
+import { Search, Check, X, FileText, Handshake  ,AlertCircle, User, Building2, Eye, Download, Clock, CheckCircle2, XCircle, ExternalLink, Calendar, File } from 'lucide-react';
 import { toast } from "sonner";
 import { API_CONFIG } from '@/config/api.config';
-
-interface KYCDocument {
-    type: string;
-    name: string;
-    fileUrl?: string;
-    status?: string;
-    rejectionReason?: string;
-    uploadedAt?: string;
-    verifiedAt?: string;
-}
-
-interface KYCRequest {
-    _id: string;
-    profileName?: string;
-    kycType?: 'individual' | 'business';
-    isPartner?: boolean;
-    user: {
-        _id: string;
-        fullName: string;
-        email: string;
-        phoneNumber?: string;
-    };
-    personalInfo?: {
-        fullName?: string;
-        email?: string;
-        phone?: string;
-    };
-    businessInfo?: {
-        companyName?: string;
-        companyType?: string;
-        gstNumber?: string;
-        panNumber?: string;
-    };
-    overallStatus: 'pending' | 'approved' | 'rejected' | 'resubmit';
-    documents: KYCDocument[];
-    progress?: number;
-    createdAt: string;
-}
+import type { KYCDocument, KYCRequest } from '@/types/adminKyc';
 
 export default function KYCRequests() {
+    const navigate = useNavigate();
     const [requests, setRequests] = useState<KYCRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -169,14 +134,51 @@ export default function KYCRequests() {
         setShowDocumentModal(true);
     };
 
-    const updateDocumentStatus = (requestId: string, docIndex: number, status: 'approved' | 'rejected') => {
-        setRequests(prev => prev.map(req => {
-            if (req._id !== requestId) return req;
-            const updatedDocs = req.documents.map((doc, idx) =>
-                idx === docIndex ? { ...doc, status } : doc
-            );
-            return { ...req, documents: updatedDocs };
-        }));
+    const handleDocumentReview = async (
+        action: 'approve' | 'reject',
+        doc?: KYCDocument | null,
+        req?: KYCRequest | null
+    ) => {
+        const targetDoc = doc || selectedDocument;
+        const targetReq = req || selectedRequest;
+
+        if (!targetDoc || !targetReq || !targetDoc._id) return;
+
+        let reason: string | undefined;
+        if (action === 'reject') {
+            const input = window.prompt('Enter rejection reason for this document (optional)') || '';
+            reason = input.trim() || undefined;
+        }
+
+        try {
+            const res = await adminService.reviewKYCDocument(targetReq._id, targetDoc._id, action, reason);
+            if (res.success) {
+                toast.success(`Document ${action}ed successfully`);
+                setShowDocumentModal(false);
+                setSelectedDocument(null);
+                setSelectedRequest(null);
+                fetchKYCRequests();
+            } else {
+                toast.error(res.message || `Failed to ${action} document`);
+            }
+        } catch (error) {
+            console.error(`Failed to ${action} document`, error);
+            toast.error(`Failed to ${action} document`);
+        }
+    };
+
+    const openPartnerDetails = async (request: KYCRequest) => {
+        try {
+            const res = await adminService.getPartnerKYCList({ profileId: request._id });
+            if (res.success && Array.isArray(res.data) && res.data.length > 0 && res.data[0]._id) {
+                navigate(`/admin/kyc-partners/${res.data[0]._id}`);
+            } else {
+                toast.error('No partner KYC snapshot found for this profile yet');
+            }
+        } catch (error) {
+            console.error('Failed to open partner KYC details', error);
+            toast.error('Failed to open partner KYC details');
+        }
     };
 
     const filteredRequests = requests.filter(request =>
@@ -320,13 +322,16 @@ export default function KYCRequests() {
 
                             {/* Personal/Business Info */}
                             <div className="p-6 space-y-4">
+
                                 {request.personalInfo && (
-                                    <div className="bg-blue-50 rounded-xl p-4">
+                                    <div 
+                                    onClick={() => navigate(`/admin/kyc-requests/${request._id}`, { state: { request } })}
+                                    className="bg-blue-50 rounded-xl p-4 cursor-pointer">
                                         <div className="flex items-center gap-2 mb-3">
                                             <User className="w-4 h-4 text-blue-600" />
-                                            <h4 className="text-sm font-semibold text-blue-900">Partner's Personal Info</h4>
+                                            <h4 className="text-sm font-semibold text-blue-900">User Personal Info</h4>
                                         </div>
-                                        <div className="space-y-1 text-sm">
+                                        {/* <div className="space-y-1 text-sm">
                                             {request.personalInfo.fullName && (
                                                 <p className="text-gray-700"><span className="font-medium">Name:</span> {request.personalInfo.fullName}</p>
                                             )}
@@ -336,7 +341,29 @@ export default function KYCRequests() {
                                             {request.personalInfo.email && (
                                                 <p className="text-gray-700"><span className="font-medium">Email:</span> {request.personalInfo.email}</p>
                                             )}
+                                        </div> */}
+                                    </div>
+                                )}
+
+                                {request.personalInfo && (
+                                    <div 
+                                    onClick={() => openPartnerDetails(request)}
+                                    className="bg-blue-50 rounded-xl p-4 cursor-pointer">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Handshake  className="w-4 h-4 text-blue-600" />
+                                            <h4 className="text-sm font-semibold text-blue-900">Partner's Personal Info</h4>
                                         </div>
+                                        {/* <div className="space-y-1 text-sm">
+                                            {request.personalInfo.fullName && (
+                                                <p className="text-gray-700"><span className="font-medium">Name:</span> {request.personalInfo.fullName}</p>
+                                            )}
+                                            {request.personalInfo.phone && (
+                                                <p className="text-gray-700"><span className="font-medium">Phone:</span> {request.personalInfo.phone}</p>
+                                            )}
+                                            {request.personalInfo.email && (
+                                                <p className="text-gray-700"><span className="font-medium">Email:</span> {request.personalInfo.email}</p>
+                                            )}
+                                        </div> */}
                                     </div>
                                 )}
 
@@ -346,7 +373,7 @@ export default function KYCRequests() {
                                             <Building2 className="w-4 h-4 text-purple-600" />
                                             <h4 className="text-sm font-semibold text-purple-900">Business Info</h4>
                                         </div>
-                                        <div className="space-y-1 text-sm">
+                                        {/* <div className="space-y-1 text-sm">
                                             {request.businessInfo.companyName && (
                                                 <p className="text-gray-700"><span className="font-medium">Company:</span> {request.businessInfo.companyName}</p>
                                             )}
@@ -356,12 +383,12 @@ export default function KYCRequests() {
                                             {request.businessInfo.panNumber && (
                                                 <p className="text-gray-700"><span className="font-medium">PAN:</span> {request.businessInfo.panNumber}</p>
                                             )}
-                                        </div>
+                                        </div> */}
                                     </div>
                                 )}
 
-                                {/* Documents */}
-                                <div>
+                                {/* Documents - only quick summary & preview; full review happens on detail page */}
+                                {/* <div>
                                     <h4 className="text-xs font-semibold text-gray-500 uppercase mb-3">Documents Submitted ({request.documents?.length || 0})</h4>
                                     {request.documents && request.documents.length > 0 ? (
                                         <div className="space-y-2">
@@ -392,18 +419,6 @@ export default function KYCRequests() {
                                                             <Eye className="w-3 h-3" />
                                                             Details
                                                         </button>
-                                                        <button
-                                                            onClick={() => updateDocumentStatus(request._id, idx, 'approved')}
-                                                            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-50 text-green-700 hover:bg-green-100 transition-colors"
-                                                        >
-                                                            Approve
-                                                        </button>
-                                                        <button
-                                                            onClick={() => updateDocumentStatus(request._id, idx, 'rejected')}
-                                                            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                                                        >
-                                                            Reject
-                                                        </button>
                                                     </div>
                                                 </div>
                                             ))}
@@ -415,12 +430,12 @@ export default function KYCRequests() {
                                             <p className="text-xs text-orange-600 mt-1">User needs to upload KYC documents</p>
                                         </div>
                                     )}
-                                </div>
+                                </div> */}
                             </div>
 
                             {/* Actions */}
                             <div className="p-6 pt-0">
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-2 gap-3 mb-3">
                                     <button
                                         onClick={() => openRejectModal(request)}
                                         className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 transition-all text-sm font-semibold hover:scale-105"
@@ -438,6 +453,15 @@ export default function KYCRequests() {
                                     >
                                         <Check className="w-4 h-4" />
                                         Approve
+                                    </button>
+                                </div>
+                                <div className="flex items-center justify-center">
+                                    <button
+                                        onClick={() => navigate(`/admin/kyc-requests/${request._id}`, { state: { request } })}
+                                        className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                                    >
+                                        <Eye className="w-3 h-3" />
+                                        View Full Profile
                                     </button>
                                 </div>
                                 <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
@@ -608,14 +632,14 @@ export default function KYCRequests() {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3 flex-shrink-0">
+                        <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3 flex-shrink-0 flex-wrap">
                             {selectedDocument.fileUrl && (
                                 <>
                                     <a
                                         href={getFullUrl(selectedDocument.fileUrl)}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-blue-200 text-blue-600 hover:bg-blue-50 transition-colors font-semibold"
+                                        className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-blue-200 text-blue-600 hover:bg-blue-50 transition-colors font-semibold"
                                     >
                                         <ExternalLink className="w-4 h-4" />
                                         Open in New Tab
@@ -623,13 +647,27 @@ export default function KYCRequests() {
                                     <a
                                         href={getFullUrl(selectedDocument.fileUrl)}
                                         download
-                                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors font-semibold"
+                                        className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors font-semibold"
                                     >
                                         <Download className="w-4 h-4" />
                                         Download
                                     </a>
                                 </>
                             )}
+                            <button
+                                onClick={() => handleDocumentReview('approve')}
+                                className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-colors font-semibold"
+                            >
+                                <Check className="w-4 h-4" />
+                                Accept Document
+                            </button>
+                            <button
+                                onClick={() => handleDocumentReview('reject')}
+                                className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 transition-colors font-semibold"
+                            >
+                                <X className="w-4 h-4" />
+                                Reject Document
+                            </button>
                         </div>
                     </div>
                 </div>

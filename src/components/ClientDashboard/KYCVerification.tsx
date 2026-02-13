@@ -1090,33 +1090,38 @@ export default function KYCVerification() {
                       </div>
 
                       <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-                        <p className="text-sm text-gray-500 mb-2">Select verified partners to link to this company:</p>
-                        {[individualProfile, ...partnerProfiles].filter(p => p && p.overallStatus === 'approved').length === 0 && (
-                          <p className="text-sm text-red-400 italic">No verified partners found. Please complete personal verification for yourself and any partners first.</p>
+                        <p className="text-sm text-gray-500 mb-2">Select partners to link to this company (only verified partners are selectable):</p>
+                        {[individualProfile, ...partnerProfiles].filter(p => p).length === 0 && (
+                          <p className="text-sm text-red-400 italic">No partner profiles found. Please add partner profiles first.</p>
                         )}
 
-                        {[individualProfile, ...partnerProfiles].filter(p => p && p.overallStatus === 'approved').map(p => (
+                        {[individualProfile, ...partnerProfiles].filter(p => p).map(p => {
+                          const status = getOverallStatusConfig(p!.overallStatus || 'not_started');
+                          const isApproved = p!.overallStatus === 'approved';
+                          return (
                           <label key={p!._id} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
                             <input
                               type="checkbox"
                               checked={businessForm.partners.includes(p!._id!)}
                               onChange={(e) => {
+                                if (!isApproved) return; // Only allow linking verified partners
                                 const newPartners = e.target.checked
                                   ? [...businessForm.partners, p!._id!]
                                   : businessForm.partners.filter(id => id !== p!._id);
                                 setBusinessForm({ ...businessForm, partners: newPartners });
                               }}
                               className="w-5 h-5 text-yellow-500 rounded focus:ring-yellow-400"
+                              disabled={!isApproved}
                             />
                             <div>
                               <p className="font-medium text-gray-900">{p!.profileName}</p>
                               <p className="text-xs text-gray-500">{p!.personalInfo?.fullName || "Partner"}</p>
                             </div>
-                            <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3" /> Verified
+                            <span className={`ml-auto text-xs px-2 py-0.5 rounded-full flex items-center gap-1 text-white ${status.bg}`}>
+                              <status.icon className="w-3 h-3" /> {status.text}
                             </span>
                           </label>
-                        ))}
+                        )})}
                       </div>
                     </div>
 
