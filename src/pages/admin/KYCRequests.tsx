@@ -66,7 +66,8 @@ export default function KYCRequests() {
     const fetchKYCRequests = async () => {
         setLoading(true);
         try {
-            const response = await adminService.getPendingKYC();
+            // includeApproved=true so approved KYCs remain visible in the list
+            const response = await adminService.getPendingKYC(true);
             console.log('KYC Response:', response);
             if (response.success && response.data) {
                 console.log('KYC Data:', response.data);
@@ -186,6 +187,10 @@ export default function KYCRequests() {
         request.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const pendingCount = filteredRequests.filter(request =>
+        request.overallStatus === 'pending' || request.overallStatus === 'resubmit'
+    ).length;
+
     const getStatusBadge = (status: string) => {
         const config: Record<string, { bg: string; text: string; icon: any }> = {
             pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: Clock },
@@ -241,7 +246,7 @@ export default function KYCRequests() {
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl border border-blue-200">
                     <AlertCircle className="w-4 h-4" />
-                    <span className="text-sm font-medium">{filteredRequests.length} Pending Requests</span>
+                    <span className="text-sm font-medium">{pendingCount} Pending Requests</span>
                 </div>
             </div>
 
@@ -275,6 +280,8 @@ export default function KYCRequests() {
                             request.documents &&
                             request.documents.length > 0 &&
                             request.documents.every((doc) => doc.status === 'approved');
+
+                        const isKycApproved = request.overallStatus === 'approved';
 
                         return (
                             <div
@@ -435,7 +442,7 @@ export default function KYCRequests() {
 
                             {/* Actions */}
                             <div className="p-6 pt-0">
-                                <div className="grid grid-cols-2 gap-3 mb-3">
+                                {/* <div className="grid grid-cols-2 gap-3 mb-3">
                                     <button
                                         onClick={() => openRejectModal(request)}
                                         className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 transition-all text-sm font-semibold hover:scale-105"
@@ -445,16 +452,24 @@ export default function KYCRequests() {
                                     </button>
                                     <button
                                         onClick={() => handleApprove(request)}
-                                        disabled={!allDocsApproved}
+                                        disabled={!allDocsApproved || isKycApproved}
                                         className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white transition-all text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-105 opacity-0 group-hover:opacity-100 ${
-                                            !allDocsApproved ? 'cursor-not-allowed opacity-60 hover:scale-100 hover:shadow-lg' : 'hover:from-green-700 hover:to-emerald-700'
+                                            !allDocsApproved || isKycApproved
+                                                ? 'cursor-not-allowed opacity-60 hover:scale-100 hover:shadow-lg'
+                                                : 'hover:from-green-700 hover:to-emerald-700'
                                         }`}
-                                        title={allDocsApproved ? 'Approve KYC' : 'Approve all documents first'}
+                                        title={
+                                            isKycApproved
+                                                ? 'KYC already approved'
+                                                : allDocsApproved
+                                                    ? 'Approve KYC'
+                                                    : 'Approve all documents first'
+                                        }
                                     >
                                         <Check className="w-4 h-4" />
                                         Approve
                                     </button>
-                                </div>
+                                </div> */}
                                 <div className="flex items-center justify-center">
                                     <button
                                         onClick={() => navigate(`/admin/kyc-requests/${request._id}`, { state: { request } })}

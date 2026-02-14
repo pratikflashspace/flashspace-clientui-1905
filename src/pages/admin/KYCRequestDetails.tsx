@@ -123,6 +123,11 @@ export default function KYCRequestDetails() {
 		return request.documents.every((doc) => doc.status === "approved");
 	}, [request]);
 
+	const isKycVerified = useMemo(() => {
+		if (!request) return false;
+		return request.overallStatus === "approved" && allDocsApproved;
+	}, [request, allDocsApproved]);
+
 	const handleApprove = async () => {
 		if (!request) return;
 		if (!confirm(`Approve KYC for ${request.user?.fullName || "this user"}?`)) return;
@@ -228,11 +233,18 @@ export default function KYCRequestDetails() {
 						Back to KYC Requests
 					</button>
 					<h1 className="text-2xl font-bold text-gray-900 tracking-tight font-[Poppins]">
-						{isPartnerProfile ? "Partner KYC Profile" : "KYC Profile"}
+						{/* {isPartnerProfile ? "Partner KYC Profile" : "KYC Profile"} */}
+					 KYC Profile
 					</h1>
 					<p className="text-gray-500 mt-1 text-sm">
 						Review all details, documents, and take an approval decision.
 					</p>
+					{isKycVerified && (
+						<div className="mt-3 inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-green-50 border border-green-200 text-xs font-medium text-green-800">
+							<CheckCircle2 className="w-4 h-4" />
+							<span>KYC is verified with the submitted documents.</span>
+						</div>
+					)}
 				</div>
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex items-center gap-2">
@@ -271,12 +283,13 @@ export default function KYCRequestDetails() {
 						)}
 					</div>
 
-					{/* {request.personalInfo && (
+					{request.personalInfo && (
 						<div className="bg-white rounded-2xl border border-blue-100 shadow-sm p-5">
 							<div className="flex items-center gap-2 mb-3">
 								<User className="w-4 h-4 text-blue-600" />
 								<h3 className="text-sm font-semibold text-blue-900">
-									{isPartnerProfile ? "Partner Personal Info" : "Personal Info"}
+									{/* {isPartnerProfile ? "Partner Personal Info" : "Personal Info"} */}
+									Personal Info
 								</h3>
 							</div>
 							<div className="space-y-1 text-sm">
@@ -295,9 +308,19 @@ export default function KYCRequestDetails() {
 										<span className="font-medium">Email:</span> {request.personalInfo.email}
 									</p>
 								)}
+								{request.personalInfo.panNumber && (
+									<p className="text-gray-700">
+										<span className="font-medium">Pan Number:</span> {request.personalInfo.panNumber}
+									</p>
+								)}
+								{request.personalInfo.aadhaarNumber && (
+									<p className="text-gray-700">
+										<span className="font-medium">Aadhaar Number:</span> {request.personalInfo.aadhaarNumber}
+									</p>
+								)}
 							</div>
 						</div>
-					)} */}
+					)}
 
 					{/* Actions */}
 					<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">

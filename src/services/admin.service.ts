@@ -162,8 +162,10 @@ class AdminService {
         return response.data;
     }
 
-    async getPendingKYC(): Promise<ApiResponse<KYCData[]>> {
-        const response = await axiosInstance.get<ApiResponse<KYCData[]>>('/api/admin/kyc/pending');
+    async getPendingKYC(includeApproved: boolean = false): Promise<ApiResponse<KYCData[]>> {
+        const response = await axiosInstance.get<ApiResponse<KYCData[]>>('/api/admin/kyc/pending', {
+            params: includeApproved ? { includeApproved: true } : undefined,
+        });
         return response.data;
     }
 
