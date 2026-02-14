@@ -12,8 +12,6 @@ import {
     Menu,
     X,
     Bell,
-    Headphones,
-    Trophy,
     Search,
     BookOpen,
     Briefcase,
@@ -23,7 +21,8 @@ import {
     Target,
     Ticket,
     Tag,
-    Banknote
+    Headphones,
+    Trophy
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -39,8 +38,7 @@ export default function AdminLayout() {
 
     const allNavItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['admin', 'partner', 'space_manager', 'sales'] },
-        { icon: LineChart, label: 'Sales Analytics', path: '/admin/sales-analytics', roles: ['admin', 'sales', 'partner'] },
-        { icon: Banknote, label: 'Revenue Dashboard', path: '/admin/revenue-dashboard', roles: ['admin', 'sales'] },
+        { icon: LineChart, label: 'Booking Analysis', path: '/admin/booking-analysis', roles: ['admin', 'sales', 'partner'] },
         { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['admin', 'sales'] },
         { icon: Headphones, label: 'Support Chats', path: '/admin/support', roles: ['admin', 'sales'] },
         { icon: Trophy, label: 'Leaderboard', path: '/admin/leaderboard', roles: ['admin', 'sales'] },
@@ -51,7 +49,6 @@ export default function AdminLayout() {
         { icon: Users, label: 'User Management', path: '/admin/users', roles: ['admin'] },
         { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['admin', 'partner', 'space_manager'] },
         { icon: Building2, label: 'Space Management', path: '/admin/spaces', roles: ['admin', 'partner', 'space_manager'] },
-        { icon: CreditCard, label: 'Bookings & Payments', path: '/admin/bookings', roles: ['admin', 'partner', 'space_manager', 'sales'] },
         { icon: Settings, label: 'Settings', path: '/admin/settings', roles: ['admin', 'partner'] },
     ];
 

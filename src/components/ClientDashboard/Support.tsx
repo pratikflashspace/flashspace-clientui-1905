@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { SupportTicket, TicketPriority, TicketStatus } from "@/types/services";
 import userDashboardService from "@/services/userDashboard.service";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSocket } from "@/contexts/SocketContext";
 import toast from "react-hot-toast";
 import {
   MessageCircle,
@@ -99,6 +100,7 @@ const contactOptions = [
 
 export default function Support() {
   const { user } = useAuth();
+  const { socket } = useSocket(); // Use socket context
   const [activeTab, setActiveTab] = useState<"help" | "tickets" | "contact">("help");
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
   const [showNewTicket, setShowNewTicket] = useState(false);
@@ -110,7 +112,6 @@ export default function Support() {
   const [formData, setFormData] = useState({
     subject: "",
     category: "",
-    priority: "medium" as TicketPriority,
     description: "",
   });
   const [submitted, setSubmitted] = useState(false);
@@ -120,8 +121,21 @@ export default function Support() {
     try {
       const response = await userDashboardService.getTickets();
       if (response.success && response.data) {
-        // API returns { tickets: [], total, page, ... } - extract the tickets array
-        const ticketsData = Array.isArray(response.data) ? response.data : response.data.tickets || [];
+        // Handle various response interfaces for robustness
+        let ticketsData: SupportTicket[] = [];
+
+        if (Array.isArray(response.data)) {
+          ticketsData = response.data;
+        } else if (response.data && typeof response.data === 'object') {
+          // @ts-ignore - Backend returns paginated object sometimes
+          if (Array.isArray(response.data.tickets)) {
+            // @ts-ignore
+            ticketsData = response.data.tickets;
+          } else {
+            // Fallback or specific type handling
+            ticketsData = [];
+          }
+        }
         setTickets(ticketsData);
       }
     } catch (err: unknown) {
@@ -138,6 +152,51 @@ export default function Support() {
     }
   }, [activeTab]);
 
+  // Socket listener for new messages
+  useEffect(() => {
+    if (!socket || !selectedTicket) return;
+
+    // Join the ticket room
+    socket.emit('join_ticket', selectedTicket._id);
+
+    const handleNewMessage = (data: { ticketId: string, message: any }) => {
+      if (data.ticketId === selectedTicket._id) {
+        setSelectedTicket((prev) => {
+          if (!prev) return null;
+          // Check if message already exists to verify duplication
+          const exists = prev.messages.some(m =>
+            new Date(m.createdAt).getTime() === new Date(data.message.createdAt).getTime() &&
+            m.message === data.message.message
+          );
+
+          if (exists) return prev;
+
+          return {
+            ...prev,
+            messages: [...prev.messages, data.message]
+          };
+        });
+        // Also refresh list to update last message preview if we had one
+        fetchTickets();
+      }
+    };
+
+    const handleTicketUpdated = (data: { ticketId: string, ticket: any }) => {
+      if (data.ticketId === selectedTicket._id) {
+        setSelectedTicket(data.ticket);
+        fetchTickets();
+      }
+    };
+
+    socket.on('new_message', handleNewMessage);
+    socket.on('ticket_updated', handleTicketUpdated);
+
+    return () => {
+      socket.off('new_message', handleNewMessage);
+      socket.off('ticket_updated', handleTicketUpdated);
+    };
+  }, [socket, selectedTicket?._id]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -145,7 +204,6 @@ export default function Support() {
       const response = await userDashboardService.createTicket({
         subject: formData.subject,
         category: formData.category,
-        priority: formData.priority,
         description: formData.description,
       });
 
@@ -155,7 +213,7 @@ export default function Support() {
         setTimeout(() => {
           setSubmitted(false);
           setShowNewTicket(false);
-          setFormData({ subject: "", category: "", priority: "medium", description: "" });
+          setFormData({ subject: "", category: "", description: "" });
         }, 3000);
       } else {
         alert(response.message || "Failed to create ticket");
@@ -218,19 +276,7 @@ export default function Support() {
     }
   };
 
-  const getPriorityConfig = (priority: TicketPriority) => {
-    switch (priority) {
-      case "urgent":
-      case "high":
-        return { bg: "bg-red-100", text: "text-red-700" };
-      case "medium":
-        return { bg: "bg-yellow-100", text: "text-yellow-700" };
-      case "low":
-        return { bg: "bg-gray-100", text: "text-gray-600" };
-      default:
-        return { bg: "bg-gray-100", text: "text-gray-600" };
-    }
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
@@ -359,9 +405,6 @@ export default function Support() {
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusConfig(selectedTicket.status).bg} ${getStatusConfig(selectedTicket.status).text}`}>
                         {getStatusConfig(selectedTicket.status).label}
                       </span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityConfig(selectedTicket.priority).bg} ${getPriorityConfig(selectedTicket.priority).text}`}>
-                        {selectedTicket.priority.charAt(0).toUpperCase() + selectedTicket.priority.slice(1)} Priority
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -478,20 +521,6 @@ export default function Support() {
                         </div>
 
                         <div>
-                          <label className="block text-sm text-gray-600 mb-1">Priority</label>
-                          <select
-                            value={formData.priority}
-                            onChange={(e) => setFormData({ ...formData, priority: e.target.value as TicketPriority })}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                          >
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
-                          </select>
-                        </div>
-
-                        <div>
                           <label className="block text-sm text-gray-600 mb-1">Description</label>
                           <textarea
                             required
@@ -501,12 +530,15 @@ export default function Support() {
                             className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                             placeholder="Please provide detailed information about your issue..."
                           />
+                          {formData.description.length > 0 && formData.description.length < 10 && (
+                            <p className="text-red-500 text-xs mt-1">Description must be at least 10 characters.</p>
+                          )}
                         </div>
                         <div className="flex gap-3">
                           <button
                             type="submit"
-                            disabled={submitting}
-                            className="px-6 py-2.5 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50"
+                            disabled={submitting || formData.description.length < 10}
+                            className="px-6 py-2.5 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Submit Ticket"}
                           </button>
@@ -539,7 +571,6 @@ export default function Support() {
                     <div className="divide-y divide-gray-100">
                       {tickets.map((ticket) => {
                         const statusConfig = getStatusConfig(ticket.status);
-                        const priorityConfig = getPriorityConfig(ticket.priority);
                         return (
                           <div key={ticket._id} className="p-5 hover:bg-gray-50 transition-colors">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -549,9 +580,7 @@ export default function Support() {
                                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
                                     {statusConfig.label}
                                   </span>
-                                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${priorityConfig.bg} ${priorityConfig.text}`}>
-                                    {ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)} Priority
-                                  </span>
+
                                 </div>
                                 <p className="font-medium text-gray-900">{ticket.subject}</p>
                                 <p className="text-xs text-gray-400 mt-1">
