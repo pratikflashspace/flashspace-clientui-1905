@@ -254,7 +254,7 @@ const App = () => (
                       <Route path="clients/:id" element={<ClientDetails />} />
                       <Route path="coupons" element={<Coupons />} />
                       <Route path="learning-hub" element={<LearningHub />} />
-                      <Route path="sales-analytics" element={<SalesAnalytics />} />
+                      <Route path="booking-analysis" element={<SalesAnalytics />} />
                       <Route path="leaderboard" element={<Leaderboard />} />
                       <Route path="support" element={<SupportChat />} />
                       <Route path="revenue-dashboard" element={<RevenueDashboard />} />
