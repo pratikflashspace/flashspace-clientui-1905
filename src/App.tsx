@@ -101,19 +101,19 @@ import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 // Affiliate Portal
-import AffiliateDashboard from "./pages/affiliatePortal/Dashboard";
-import BookingManagement from "./pages/affiliatePortal/BookingManagement";
-import RevenueDashboard from "./pages/affiliatePortal/RevenueDashboard";
-import AffiliateInvoices from "./pages/affiliatePortal/Invoices";
-import Payouts from "./pages/affiliatePortal/Payouts";
+import AffiliateDashboard from "./pages/affiliatePortal/AffiliateDashboard";
+import BookingManagement from "./pages/affiliatePortal/AffiliateBookingManagement";
+import AffiliateRevenueDashboard from "./pages/affiliatePortal/AffiliateRevenueDashboard";
+import AffiliateInvoices from "./pages/affiliatePortal/AffiliateInvoices";
+import Payouts from "./pages/affiliatePortal/AffiliatePayouts";
 import AffiliateLayout from "./pages/affiliatePortal/AffiliateLayout";
-import LeadManagementAffiliate from "./pages/affiliatePortal/LeadManagementAffiliate";
-import QuotationGenerator from "./pages/affiliatePortal/QuotationGenerator";
-import MarketingTools from "./pages/affiliatePortal/MarketingTools";
-import LeaderBoard from "./pages/affiliatePortal/LeaderBoard";
-import Support from "./pages/affiliatePortal/Support";
-import AffiliateProfile from "./pages/affiliatePortal/Profile";
-import AffiliateSettings from "./pages/affiliatePortal/Settings";
+import LeadManagementAffiliate from "./pages/affiliatePortal/AffiliateLeadManagement";
+import QuotationGenerator from "./pages/affiliatePortal/AffiliateQuotationGenerator";
+import MarketingTools from "./pages/affiliatePortal/AffiliateMarketingTools";
+import LeaderBoard from "./pages/affiliatePortal/AffiliateLeaderBoard";
+import Support from "./pages/affiliatePortal/AffiliateSupport";
+import AffiliateProfile from "./pages/affiliatePortal/AffiliateProfile";
+import AffiliateSettings from "./pages/affiliatePortal/AffiliateSettings";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
