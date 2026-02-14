@@ -168,19 +168,26 @@ export default function KYCRequests() {
         }
     };
 
-    const openPartnerDetails = async (request: KYCRequest) => {
-        try {
-            const res = await adminService.getPartnerKYCList({ profileId: request._id });
-            if (res.success && Array.isArray(res.data) && res.data.length > 0 && res.data[0]._id) {
-                navigate(`/admin/kyc-partners/${res.data[0]._id}`);
-            } else {
-                toast.error('No partner KYC snapshot found for this profile yet');
-            }
-        } catch (error) {
-            console.error('Failed to open partner KYC details', error);
-            toast.error('Failed to open partner KYC details');
-        }
-    };
+   const openPartnerDetails = async (request: KYCRequest) => {
+  try {
+    const res = await adminService.getPartnerKYCList({
+      profileId: request._id,
+    });
+
+    if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+      // Go to partner list page instead of single partner
+      navigate(`/admin/kyc/${request._id}/partners`, {
+        state: { partners: res.data },
+      });
+    } else {
+      toast.error("No partner KYC snapshot found for this profile yet");
+    }
+  } catch (error) {
+    console.error("Failed to open partner KYC details", error);
+    toast.error("Failed to open partner KYC details");
+  }
+};
+
 
     const filteredRequests = requests.filter(request =>
         request.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
