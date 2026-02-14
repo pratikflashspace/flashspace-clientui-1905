@@ -134,7 +134,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
   const footer = [
     { label: "Updates", href: "/updates", icon: Bell },
     { label: "Settings", href: "/settings", icon: SettingsIcon },
-    { label: "More", href: "#more", icon: MoreHorizontal }
+    // { label: "More", href: "#more", icon: MoreHorizontal }
   ];
 
   useEffect(() => {

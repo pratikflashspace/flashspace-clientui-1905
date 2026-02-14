@@ -115,23 +115,50 @@ const BookingPage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Using the service to fetch fresh data from backend
-        const data = await getVirtualOfficeById(id);
-
-        if (!data) {
-          setError("Space not found");
+        
+        const type = searchParams.get('type');
+        
+        if (type === 'coworking') {
+            const { getCoworkingSpaceById } = await import('@/services/coworkingSpace.service');
+            const { parsePrice } = await import('@/utils/priceUtils');
+            
+            const data = await getCoworkingSpaceById(id);
+            if (!data) {
+                setError("Space not found");
+            } else {
+                setSpaceDetails(data as any);
+                
+                const desks = parseInt(searchParams.get('desks') || '1');
+                const monthlyPrice = parsePrice(data.price);
+                const totalMonthly = monthlyPrice * desks;
+                
+                setSelectedPlanDetails({
+                    key: 'coworking',
+                    name: `Coworking Desk (${desks} Desk${desks > 1 ? 's' : ''})`,
+                    monthlyPrice: totalMonthly,
+                    yearlyPrice: totalMonthly * 12,
+                    features: data.features || ["High Speed WiFi", "Unlimited Coffee", "Office Supplies"]
+                });
+            }
         } else {
-          setSpaceDetails(data);
-
-          // Calculate pricing using utility
-          const pricing = getVirtualOfficePricing(data);
-          if (pricing && planKeyId in pricing) {
-            // @ts-ignore - we know Key exists
-            setSelectedPlanDetails(pricing[planKeyId as keyof typeof pricing]);
-          } else {
-            // Fallback if plan invalid
-            setSelectedPlanDetails(pricing?.gst || null);
-          }
+            // Using the service to fetch fresh data from backend
+            const data = await getVirtualOfficeById(id);
+    
+            if (!data) {
+              setError("Space not found");
+            } else {
+              setSpaceDetails(data);
+    
+              // Calculate pricing using utility
+              const pricing = getVirtualOfficePricing(data);
+              if (pricing && planKeyId in pricing) {
+                // @ts-ignore - we know Key exists
+                setSelectedPlanDetails(pricing[planKeyId as keyof typeof pricing]);
+              } else {
+                // Fallback if plan invalid
+                setSelectedPlanDetails(pricing?.gst || null);
+              }
+            }
         }
       } catch (err) {
         console.error(err);
@@ -142,7 +169,7 @@ const BookingPage = () => {
     };
 
     fetchData();
-  }, [id, planKeyId]);
+  }, [id, planKeyId, searchParams]);
 
   // Loading State
   if (loading) {
@@ -248,7 +275,7 @@ const BookingPage = () => {
         totalAmount: finalPayableAmount,
         discountPercent: selectedOption.savingsPercent + (appliedCoupon?.discountValue || 0),
         discountAmount: selectedOption.savings + couponDiscountAmount,
-        paymentType: "virtual_office",
+        paymentType: searchParams.get('type') === 'coworking' ? "coworking_space" : "virtual_office",
       });
 
       // Open Razorpay checkout
@@ -357,7 +384,7 @@ const BookingPage = () => {
         totalAmount: finalPayableAmount,
         discountPercent: selectedOption.savingsPercent + (appliedCoupon?.discountValue || 0),
         discountAmount: selectedOption.savings + couponDiscountAmount,
-        paymentType: "virtual_office",
+        paymentType: searchParams.get('type') === 'coworking' ? "coworking_space" : "virtual_office",
       });
 
       toast({

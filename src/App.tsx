@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster as HotToaster } from 'react-hot-toast';
+import { Toaster as HotToaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import { SocketProvider } from "@/contexts/SocketContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import TeamManagement from "./pages/spacePortal/teamManagement";
 
 import Index from "./pages/Index";
 import Services from "./pages/Services";
@@ -73,8 +74,12 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
+
+import RevenueDashboard from "./pages/admin/RevenueDashboard";
+
 import SupportChat from "./pages/admin/SupportChat";
 import Leaderboard from "./pages/admin/Leaderboard";
+
 
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
@@ -92,6 +97,7 @@ import SpacePortalSettings from "./pages/spacePortal/Settings";
 import AddSpace from "./pages/spacePortal/AddSpace";
 
 import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
+import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 
@@ -108,33 +114,33 @@ const App = () => (
         toastOptions={{
           duration: 2500,
           style: {
-            background: '#ffffff',
-            color: '#1f2937',
-            borderRadius: '16px',
-            padding: '20px 32px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            fontSize: '16px',
-            fontWeight: '500',
-            maxWidth: '400px',
+            background: "#ffffff",
+            color: "#1f2937",
+            borderRadius: "16px",
+            padding: "20px 32px",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+            fontSize: "16px",
+            fontWeight: "500",
+            maxWidth: "400px",
           },
           success: {
             style: {
-              background: '#ffffff',
-              border: '1px solid #e5e7eb',
+              background: "#ffffff",
+              border: "1px solid #e5e7eb",
             },
             iconTheme: {
-              primary: '#10b981',
-              secondary: 'white',
+              primary: "#10b981",
+              secondary: "white",
             },
           },
           error: {
             style: {
-              background: '#ffffff',
-              border: '1px solid #fecaca',
+              background: "#ffffff",
+              border: "1px solid #fecaca",
             },
             iconTheme: {
-              primary: '#ef4444',
-              secondary: 'white',
+              primary: "#ef4444",
+              secondary: "white",
             },
           },
         }}
@@ -153,6 +159,7 @@ const App = () => (
 
                   <Route path="/" element={<Index />} />
                   <Route path="/services" element={<Services />} />
+
                   <Route
                     path="/services/virtual-office"
                     element={<VirtualOffice />}
@@ -242,16 +249,16 @@ const App = () => (
                       <Route path="users" element={<UserManagement />} />
                       <Route path="kyc-requests" element={<KYCRequests />} />
                       <Route path="spaces" element={<SpaceManagement />} />
-
                       <Route path="settings" element={<AdminSettings />} />
                       <Route path="clients" element={<Clients />} />
                       <Route path="clients/:id" element={<ClientDetails />} />
                       <Route path="coupons" element={<Coupons />} />
                       <Route path="learning-hub" element={<LearningHub />} />
-                      <Route path="booking-analysis" element={<SalesAnalytics />} />
-                      <Route path="tickets" element={<TicketSystem />} />
-                      <Route path="support" element={<SupportChat />} />
+                      <Route path="sales-analytics" element={<SalesAnalytics />} />
                       <Route path="leaderboard" element={<Leaderboard />} />
+                      <Route path="support" element={<SupportChat />} />
+                      <Route path="revenue-dashboard" element={<RevenueDashboard />} />
+                      <Route path="tickets" element={<TicketSystem />} />
                       <Route path="leads" element={<LeadManagement />} />
                       <Route path="*" element={<AdminDashboard />} />
                     </Route>
@@ -264,8 +271,14 @@ const App = () => (
                       <Route path="dashboard" element={<Dashboard />} />
 
                       <Route path="clients" element={<SpacePortalClients />} />
-                      <Route path="clients/:clientId" element={<SpacePortalClientDetails />} />
-                      <Route path="client-enquiries" element={<ClientEnquiries />} />
+                      <Route
+                        path="clients/:clientId"
+                        element={<SpacePortalClientDetails />}
+                      />
+                      <Route
+                        path="client-enquiries"
+                        element={<ClientEnquiries />}
+                      />
                       <Route path="notifications" element={<Notifications />} />
                       <Route path="profile" element={<SpacePortalProfile />} />
                       <Route path="settings" element={<SpacePortalSettings />} />
@@ -276,12 +289,19 @@ const App = () => (
                         path="booking-analytics"
                         element={<BookingAnalytics />}
                       />
+
                       <Route path="space-management" element={<Spaces />} />
                       <Route path="space-management/add" element={<AddSpace />} />
+                      <Route path="team-management" element={<TeamManagement />} />
                       <Route path="tickets" element={<Tickets />} />
-                      <Route path="feedback-nps" element={<SpacePortalFeedbackNPS />} />
+                      <Route
+                        path="feedback-nps"
+                        element={<SpacePortalFeedbackNPS />}
+                      />
+                      <Route path="tasks" element={<SpacePortalTicketAndTasks />} />
                     </Route>
                   </Route>
+
 
                   <Route path="/list-your-space" element={<ListYourSpace />} />
                   <Route path="/partner" element={<PartnerWithUs />} />

@@ -209,10 +209,10 @@ export default function UserManagement() {
                         <Plus className="w-5 h-5" />
                         Add User
                     </button>
-                    <button className="px-6 py-3 bg-white text-gray-700 border border-gray-200 rounded-2xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm hover:shadow-md flex items-center gap-2 font-semibold">
+                    {/* <button className="px-6 py-3 bg-white text-gray-700 border border-gray-200 rounded-2xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm hover:shadow-md flex items-center gap-2 font-semibold">
                         <Download className="w-5 h-5" />
                         Export
-                    </button>
+                    </button> */}
                     <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-sm">
                         <button
                             onClick={() => setViewMode('active')}
