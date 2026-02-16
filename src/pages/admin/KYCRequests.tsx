@@ -153,13 +153,24 @@ export default function KYCRequests() {
   ]);
 
   // Derived Stats
-  const stats = {
-    total: requests.length,
-    pending: requests.filter((r) => r.overallStatus === "pending").length,
-    approved: requests.filter((r) => r.overallStatus === "approved").length,
-    rejected: requests.filter((r) => r.overallStatus === "rejected").length,
-    partners: partnerRequests.length,
-  };
+  const stats = React.useMemo(() => {
+    if (activeTab === "partners" || viewMode === "user_partners") {
+      return {
+        total: partnerRequests.length,
+        pending: partnerRequests.filter((r) => r.status === "pending").length,
+        approved: partnerRequests.filter((r) => r.status === "approved").length,
+        rejected: partnerRequests.filter((r) => r.status === "rejected").length,
+        partners: partnerRequests.length,
+      };
+    }
+    return {
+      total: requests.length,
+      pending: requests.filter((r) => r.overallStatus === "pending").length,
+      approved: requests.filter((r) => r.overallStatus === "approved").length,
+      rejected: requests.filter((r) => r.overallStatus === "rejected").length,
+      partners: partnerRequests.length, // This might need adjustment if we want total partners here
+    };
+  }, [requests, partnerRequests, activeTab, viewMode]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -425,12 +436,21 @@ export default function KYCRequests() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-[Poppins]">
-            {viewMode === "user_partners"
-              ? `Partners for ${selectedUserForPartners?.name}`
-              : "KYC Verification"}
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            {viewMode === "user_partners" ? (
+              <>
+                Partners{" "}
+                <span className="text-teal-500 italic">
+                  for {selectedUserForPartners?.name}
+                </span>
+              </>
+            ) : (
+              <>
+                KYC <span className="text-teal-500 italic">Verification</span>
+              </>
+            )}
           </h1>
-          <p className="text-gray-500 mt-2 text-lg">
+          <p className="text-gray-500 mt-2 text-lg font-light">
             {viewMode === "user_partners"
               ? "Review partner applications for this user"
               : "Review and approve identity documents"}
