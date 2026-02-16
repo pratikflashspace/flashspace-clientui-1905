@@ -74,6 +74,7 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
+import AdminNotifications from "./pages/admin/Notifications";
 
 import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
@@ -295,6 +296,7 @@ const App = () => (
                       <Route path="support" element={<SupportChat />} />
                       <Route path="revenue-dashboard" element={<RevenueDashboard />} />
                       <Route path="tickets" element={<TicketSystem />} />
+                      <Route path="notifications" element={<AdminNotifications />} />
                       <Route path="leads" element={<LeadManagement />} />
                       <Route path="*" element={<AdminDashboard />} />
                     </Route>

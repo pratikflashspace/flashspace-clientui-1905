@@ -22,12 +22,62 @@ import {
     FileCheck,
     CheckCircle,
     Scale,
+    Bell,
+    Trash2,
+    X
 } from 'lucide-react';
+import { useSocket } from '@/contexts/SocketContext';
+import { AdminNotificationService, AdminNotification } from '@/services/adminNotification.service';
 
 export default function AdminDashboard() {
     const navigate = useNavigate();
     const [stats, setStats] = useState<AdminDashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
+
+    // Notification State
+    const { socket } = useSocket();
+    const [notifications, setNotifications] = useState<AdminNotification[]>([]);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const unreadCount = notifications.filter(n => !n.read).length;
+
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const data = await AdminNotificationService.getAll();
+                setNotifications(data);
+            } catch (error) {
+                console.error("Failed to fetch notifications", error);
+            }
+        };
+        fetchNotifications();
+
+        if (socket) {
+            // Join admin feed
+            socket.emit('join_admin_feed');
+
+            const handleNewNotification = (newNotification: AdminNotification) => {
+                setNotifications(prev => [newNotification, ...prev]);
+                // Optional: Play sound
+            };
+
+            socket.on('notification:new', handleNewNotification);
+
+            return () => {
+                socket.off('notification:new', handleNewNotification);
+            };
+        }
+    }, [socket]);
+
+    const handleRemoveNotification = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        try {
+            await AdminNotificationService.delete(id);
+            setNotifications(prev => prev.filter(n => n._id !== id));
+        } catch (error) {
+            console.error("Failed to delete notification", error);
+        }
+    };
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -122,13 +172,78 @@ export default function AdminDashboard() {
     return (
         <div className="min-h-screen bg-transparent space-y-10 font-sans animate-in fade-in duration-500 pb-12">
             {/* Header */}
-            <div>
-                <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                    Admin <span className="text-teal-500 italic">Portal</span>
-                </h1>
-                <p className="text-gray-500 mt-2 text-base font-light">
-                    Complete control over sales, support, and finance operations
-                </p>
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                        Admin <span className="text-teal-500 italic">Portal</span>
+                    </h1>
+                    <p className="text-gray-500 mt-2 text-base font-light">
+                        Complete control over sales, support, and finance operations
+                    </p>
+                </div>
+
+                {/* Notification Bell */}
+                <div className="relative">
+                    <button
+                        onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                        className="p-3 bg-white rounded-full shadow-sm border border-gray-100 hover:bg-gray-50 transition-all relative"
+                    >
+                        <Bell className="w-6 h-6 text-gray-600" />
+                        {unreadCount > 0 && (
+                            <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white"></span>
+                        )}
+                    </button>
+
+                    {/* Dropdown */}
+                    {isNotificationsOpen && (
+                        <div className="absolute right-0 top-full mt-4 w-96 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden transform origin-top-right transition-all">
+                            <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                                <h3 className="font-bold text-gray-900">Notifications</h3>
+                                <div className="text-xs text-gray-500">{notifications.length} total</div>
+                            </div>
+                            <div className="max-h-96 overflow-y-auto custom-scrollbar">
+                                {notifications.length === 0 ? (
+                                    <div className="p-8 text-center text-gray-400 flex flex-col items-center gap-2">
+                                        <Bell className="w-8 h-8 opacity-20" />
+                                        <span>No new notifications</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {notifications.slice(0, 5).map(notif => (
+                                            <div key={notif._id} className={`p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors ${!notif.read ? 'bg-blue-50/30' : ''}`}>
+                                                <div className="flex justify-between items-start gap-3">
+                                                    <div className="flex-1">
+                                                        <p className="font-semibold text-sm text-gray-900 mb-1">{notif.title}</p>
+                                                        <p className="text-xs text-gray-500 leading-relaxed mb-1.5">{notif.message}</p>
+                                                        <p className="text-[10px] text-gray-400">{new Date(notif.createdAt).toLocaleString()}</p>
+                                                    </div>
+                                                    <button
+                                                        onClick={(e) => handleRemoveNotification(e, notif._id)}
+                                                        className="text-gray-400 hover:text-red-500 transition-colors p-1.5 hover:bg-red-50 rounded-lg"
+                                                        title="Remove"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {notifications.length > 5 && (
+                                            <div
+                                                onClick={() => {
+                                                    setIsNotificationsOpen(false);
+                                                    navigate('/admin/notifications');
+                                                }}
+                                                className="p-3 text-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer border-t border-gray-100"
+                                            >
+                                                <span className="text-xs font-bold text-teal-600">View all notifications</span>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* KPI Cards Row */}
