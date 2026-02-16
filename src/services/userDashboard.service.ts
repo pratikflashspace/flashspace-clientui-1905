@@ -1,5 +1,5 @@
-import axiosInstance from '@/lib/axios';
-import { API_ENDPOINTS } from '@/config/api.config';
+import axiosInstance from "@/lib/axios";
+import { API_ENDPOINTS } from "@/config/api.config";
 import {
   ApiResponse,
   DashboardData,
@@ -21,8 +21,10 @@ import {
   KYCType,
   KYCDocument,
   PersonalInfo,
-  BusinessInfo
-} from '@/types/services';
+  BusinessInfo,
+} from "@/types/services";
+
+export type { KYCData };
 
 // ============ SERVICE CLASS ============
 
@@ -31,10 +33,13 @@ class UserDashboardService {
 
   async getDashboard(): Promise<ApiResponse<DashboardData>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<DashboardData>>(API_ENDPOINTS.USER.DASHBOARD);
+      const response = await axiosInstance.get<ApiResponse<DashboardData>>(
+        API_ENDPOINTS.USER.DASHBOARD,
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch dashboard';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch dashboard";
       return {
         success: false,
         message: errorMessage,
@@ -51,10 +56,14 @@ class UserDashboardService {
     limit?: number;
   }): Promise<ApiResponse<Booking[]>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<Booking[]>>(API_ENDPOINTS.USER.BOOKINGS, { params });
+      const response = await axiosInstance.get<ApiResponse<Booking[]>>(
+        API_ENDPOINTS.USER.BOOKINGS,
+        { params },
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch bookings';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch bookings";
       return {
         success: false,
         message: errorMessage,
@@ -64,10 +73,13 @@ class UserDashboardService {
 
   async getBookingById(id: string): Promise<ApiResponse<Booking>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<Booking>>(API_ENDPOINTS.USER.BOOKING_BY_ID(id));
+      const response = await axiosInstance.get<ApiResponse<Booking>>(
+        API_ENDPOINTS.USER.BOOKING_BY_ID(id),
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch booking';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch booking";
       return {
         success: false,
         message: errorMessage,
@@ -75,12 +87,21 @@ class UserDashboardService {
     }
   }
 
-  async toggleAutoRenew(id: string, autoRenew: boolean): Promise<ApiResponse<void>> {
+  async toggleAutoRenew(
+    id: string,
+    autoRenew: boolean,
+  ): Promise<ApiResponse<void>> {
     try {
-      const response = await axiosInstance.patch<ApiResponse<void>>(API_ENDPOINTS.USER.BOOKING_AUTO_RENEW(id), { autoRenew });
+      const response = await axiosInstance.patch<ApiResponse<void>>(
+        API_ENDPOINTS.USER.BOOKING_AUTO_RENEW(id),
+        { autoRenew },
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update auto-renewal';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to update auto-renewal";
       return {
         success: false,
         message: errorMessage,
@@ -93,10 +114,13 @@ class UserDashboardService {
   async getKYC(profileId?: string): Promise<ApiResponse<KYCData | KYCData[]>> {
     try {
       const params = profileId ? { profileId } : {};
-      const response = await axiosInstance.get<ApiResponse<KYCData | KYCData[]>>(API_ENDPOINTS.USER.KYC, { params });
+      const response = await axiosInstance.get<
+        ApiResponse<KYCData | KYCData[]>
+      >(API_ENDPOINTS.USER.KYC, { params });
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch KYC data';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch KYC data";
       return {
         success: false,
         message: errorMessage,
@@ -121,12 +145,19 @@ class UserDashboardService {
     personalAadhaar?: string;
     personalPan?: string;
     personalFullName?: string;
+    personalEmail?: string;
   }): Promise<ApiResponse<KYCData>> {
     try {
-      const response = await axiosInstance.put<ApiResponse<KYCData>>(API_ENDPOINTS.USER.KYC_BUSINESS_INFO, data);
+      const response = await axiosInstance.put<ApiResponse<KYCData>>(
+        API_ENDPOINTS.USER.KYC_BUSINESS_INFO,
+        data,
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update business info';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to update business info";
       return {
         success: false,
         message: errorMessage,
@@ -137,26 +168,25 @@ class UserDashboardService {
   async uploadKYCDocument(
     documentType: string,
     file: File,
-    profileId: string
+    profileId: string,
   ): Promise<ApiResponse<UploadKYCDocumentResponse>> {
     try {
       const formData = new FormData();
-      formData.append('documentType', documentType);
-      formData.append('profileId', profileId);
-      formData.append('file', file);
+      formData.append("documentType", documentType);
+      formData.append("profileId", profileId);
+      formData.append("file", file);
 
-      const response = await axiosInstance.post<ApiResponse<UploadKYCDocumentResponse>>(
-        API_ENDPOINTS.USER.KYC_UPLOAD,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+      const response = await axiosInstance.post<
+        ApiResponse<UploadKYCDocumentResponse>
+      >(API_ENDPOINTS.USER.KYC_UPLOAD, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to upload document';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to upload document";
       return {
         success: false,
         message: errorMessage,
@@ -166,7 +196,7 @@ class UserDashboardService {
 
   async deleteKYCDocument(
     documentType: string,
-    profileId: string
+    profileId: string,
   ): Promise<ApiResponse<void>> {
     try {
       const response = await axiosInstance.delete<ApiResponse<void>>(
@@ -176,11 +206,12 @@ class UserDashboardService {
             documentType,
             profileId,
           },
-        }
+        },
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to delete document';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete document";
       return {
         success: false,
         message: errorMessage,
@@ -193,27 +224,31 @@ class UserDashboardService {
     try {
       const response = await axiosInstance.post<ApiResponse<KYCData>>(
         API_ENDPOINTS.USER.KYC_SUBMIT,
-        { profileId }
+        { profileId },
       );
       return response.data;
     } catch (error: any) {
       return {
         success: false,
-        message: error.response?.data?.message || 'Failed to submit KYC for review',
+        message:
+          error.response?.data?.message || "Failed to submit KYC for review",
       };
     }
   }
 
   // Link booking to profile
-  async linkBookingToProfile(bookingId: string, profileId: string): Promise<ApiResponse<LinkBookingResponse>> {
+  async linkBookingToProfile(
+    bookingId: string,
+    profileId: string,
+  ): Promise<ApiResponse<LinkBookingResponse>> {
     try {
-      const response = await axiosInstance.post<ApiResponse<LinkBookingResponse>>(
-        `/api/user/bookings/${bookingId}/link-profile`,
-        { profileId }
-      );
+      const response = await axiosInstance.post<
+        ApiResponse<LinkBookingResponse>
+      >(`/api/user/bookings/${bookingId}/link-profile`, { profileId });
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to link booking';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to link booking";
       return {
         success: false,
         message: errorMessage,
@@ -231,10 +266,14 @@ class UserDashboardService {
     limit?: number;
   }): Promise<ApiResponse<InvoicesResponse>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<InvoicesResponse>>(API_ENDPOINTS.USER.INVOICES, { params });
+      const response = await axiosInstance.get<ApiResponse<InvoicesResponse>>(
+        API_ENDPOINTS.USER.INVOICES,
+        { params },
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch invoices';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch invoices";
       return {
         success: false,
         message: errorMessage,
@@ -244,10 +283,13 @@ class UserDashboardService {
 
   async getInvoiceById(id: string): Promise<ApiResponse<Invoice>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<Invoice>>(API_ENDPOINTS.USER.INVOICE_BY_ID(id));
+      const response = await axiosInstance.get<ApiResponse<Invoice>>(
+        API_ENDPOINTS.USER.INVOICE_BY_ID(id),
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch invoice';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch invoice";
       return {
         success: false,
         message: errorMessage,
@@ -263,10 +305,14 @@ class UserDashboardService {
     limit?: number;
   }): Promise<ApiResponse<SupportTicket[]>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<SupportTicket[]>>('/api/tickets/my-tickets', { params });
+      const response = await axiosInstance.get<ApiResponse<SupportTicket[]>>(
+        "/api/tickets/my-tickets",
+        { params },
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch tickets';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch tickets";
       return {
         success: false,
         message: errorMessage,
@@ -282,10 +328,13 @@ class UserDashboardService {
     bookingId?: string;
   }): Promise<ApiResponse<CreateTicketResponse>> {
     try {
-      const response = await axiosInstance.post<ApiResponse<CreateTicketResponse>>('/api/tickets', data);
+      const response = await axiosInstance.post<
+        ApiResponse<CreateTicketResponse>
+      >("/api/tickets", data);
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create ticket';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create ticket";
       return {
         success: false,
         message: errorMessage,
@@ -295,10 +344,13 @@ class UserDashboardService {
 
   async getTicketById(id: string): Promise<ApiResponse<SupportTicket>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<SupportTicket>>(`/api/tickets/${id}`);
+      const response = await axiosInstance.get<ApiResponse<SupportTicket>>(
+        `/api/tickets/${id}`,
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch ticket';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch ticket";
       return {
         success: false,
         message: errorMessage,
@@ -306,12 +358,19 @@ class UserDashboardService {
     }
   }
 
-  async replyToTicket(id: string, message: string): Promise<ApiResponse<SupportTicket>> {
+  async replyToTicket(
+    id: string,
+    message: string,
+  ): Promise<ApiResponse<SupportTicket>> {
     try {
-      const response = await axiosInstance.post<ApiResponse<SupportTicket>>(`/api/tickets/${id}/reply`, { message });
+      const response = await axiosInstance.post<ApiResponse<SupportTicket>>(
+        `/api/tickets/${id}/reply`,
+        { message },
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to send reply';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to send reply";
       return {
         success: false,
         message: errorMessage,
@@ -323,10 +382,13 @@ class UserDashboardService {
 
   async getCredits(): Promise<ApiResponse<CreditsResponse>> {
     try {
-      const response = await axiosInstance.get<ApiResponse<CreditsResponse>>(API_ENDPOINTS.USER.CREDITS);
+      const response = await axiosInstance.get<ApiResponse<CreditsResponse>>(
+        API_ENDPOINTS.USER.CREDITS,
+      );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch credits';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch credits";
       return {
         success: false,
         message: errorMessage,
@@ -334,15 +396,88 @@ class UserDashboardService {
     }
   }
 
-  async redeemReward(data: RewardRedeemData): Promise<ApiResponse<{ rewardId: string; amount: number; status: string }>> {
+  async redeemReward(
+    data: RewardRedeemData,
+  ): Promise<
+    ApiResponse<{ rewardId: string; amount: number; status: string }>
+  > {
     try {
-      const response = await axiosInstance.post<ApiResponse<{ rewardId: string; amount: number; status: string }>>(
-        API_ENDPOINTS.USER.REDEEM_REWARD,
-        data
+      const response = await axiosInstance.post<
+        ApiResponse<{ rewardId: string; amount: number; status: string }>
+      >(API_ENDPOINTS.USER.REDEEM_REWARD, data);
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to redeem reward";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  // ========== PARTNER KYC ==========
+
+  async addPartner(data: any): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        "/api/user/kyc/partner",
+        data,
       );
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to redeem reward';
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to add partner";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  async getPartners(profileId: string): Promise<ApiResponse<any[]>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any[]>>(
+        `/api/user/kyc/partner/${profileId}`,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch partners";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  async removePartner(partnerId: string): Promise<ApiResponse<void>> {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<void>>(
+        `/api/user/kyc/partner/${partnerId}`,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to remove partner";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  async getPartnerDetails(partnerId: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/api/user/kyc/partner-details/${partnerId}`,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch partner details";
       return {
         success: false,
         message: errorMessage,
