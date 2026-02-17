@@ -266,22 +266,7 @@ const App = () => (
                   <Route path="/signup" element={<Index openSignup={true} />} />
                   <Route path="/verify-otp" element={<VerifyOTP />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
-              {/* Affiliate Portal Routes */}
-              {/* <Route path="/affiliate-portal" element={<AffiliateLayout />}>
-                  <Route index element={<Navigate to="affiliate-dashboard" replace />} />
-                  <Route path="affiliate-dashboard" element={<AffiliateDashboard />} />
-                  <Route path="booking-management" element={<AffiliateBookingManagement />} />
-                  <Route path="revenue-dashboard" element={<AffiliateRevenueDashboard />} />
-                  <Route path="affiliate-invoices" element={<AffiliateInvoices />} />
-                  <Route path="payouts" element={<AffiliatePayouts />} />
-                  <Route path="lead-management" element={<AffiliateLeadManagement/>} />
-                  <Route path="quotation-generator" element={<AffiliateQuotationGenerator />} />
-                  <Route path="marketing-tools" element={<AffiliateMarketingTools />} />
-                  <Route path="leaderboard" element={<AffiliateLeaderBoard />} />
-                  <Route path="support" element={<AffiliateSupport />} />
-                  <Route path="profile" element={<AffiliateProfile />} />
-                  <Route path="settings" element={<AffiliateSettings />} />
-              </Route> */}
+
 
 
                   <Route path="/list-your-space" element={<ListYourSpace />} />
