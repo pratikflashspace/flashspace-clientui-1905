@@ -9,6 +9,7 @@ import {
   Ticket,
   Building2,
   Star,
+  Mail,
 } from "lucide-react";
 
 export const sidebarConfig = [
@@ -75,6 +76,12 @@ export const sidebarConfig = [
   },
 
   {
+    label: "Mail & Visits",
+    path: "/spaceportal/mail-visits",
+    icon: Mail,
+  },
+
+  {
     label: "Invoices & Payments",
 
     path: "/spaceportal/invoices-payments",
@@ -90,6 +97,8 @@ export const sidebarConfig = [
     icon: Ticket,
   },
 
+
+
   {
     label: "Space Management",
 
@@ -97,7 +106,7 @@ export const sidebarConfig = [
 
     icon: Building2,
   },
-  
+
   {
     label: "Team Management",
 
@@ -105,4 +114,6 @@ export const sidebarConfig = [
 
     icon: Users,
   },
+
+
 ];

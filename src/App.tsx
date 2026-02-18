@@ -81,7 +81,7 @@ import RevenueDashboard from "./pages/admin/RevenueDashboard";
 import SupportChat from "./pages/admin/SupportChat";
 import Leaderboard from "./pages/admin/Leaderboard";
 
-  `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     `
+`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     `
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
 import SpacePortalClientDetails from "@/pages/spacePortal/ClientsDetails";
@@ -100,6 +100,7 @@ import AddSpace from "./pages/spacePortal/AddSpace";
 import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
 import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
+import MailAndVisits from "./pages/spacePortal/MailAndVisits";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 // Affiliate Portal
 import AffiliateDashboard from "./pages/affiliatePortal/AffiliateDashboard";
@@ -246,28 +247,28 @@ const App = () => (
                   <Route path="/signup" element={<Index openSignup={true} />} />
                   <Route path="/verify-otp" element={<VerifyOTP />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
-              {/* Affiliate Portal Routes */}
-              <Route path="/affiliate-portal" element={<AffiliateLayout />}>
-                  <Route index element={<Navigate to="affiliate-dashboard" replace />} />
-                  <Route path="affiliate-dashboard" element={<AffiliateDashboard />} />
-                  <Route path="booking-management" element={<AffiliateBookingManagement />} />
-                  <Route path="revenue-dashboard" element={<AffiliateRevenueDashboard />} />
-                  <Route path="affiliate-invoices" element={<AffiliateInvoices />} />
-                  <Route path="payouts" element={<AffiliatePayouts />} />
-                  <Route path="lead-management" element={<AffiliateLeadManagement/>} />
-                  <Route path="quotation-generator" element={<AffiliateQuotationGenerator />} />
-                  <Route path="marketing-tools" element={<AffiliateMarketingTools />} />
-                  <Route path="leaderboard" element={<AffiliateLeaderBoard />} />
-                  <Route path="support" element={<AffiliateSupport />} />
-                  <Route path="profile" element={<AffiliateProfile />} />
-                  <Route path="settings" element={<AffiliateSettings />} />
-              </Route>
+                  {/* Affiliate Portal Routes */}
+                  <Route path="/affiliate-portal" element={<AffiliateLayout />}>
+                    <Route index element={<Navigate to="affiliate-dashboard" replace />} />
+                    <Route path="affiliate-dashboard" element={<AffiliateDashboard />} />
+                    <Route path="booking-management" element={<AffiliateBookingManagement />} />
+                    <Route path="revenue-dashboard" element={<AffiliateRevenueDashboard />} />
+                    <Route path="affiliate-invoices" element={<AffiliateInvoices />} />
+                    <Route path="payouts" element={<AffiliatePayouts />} />
+                    <Route path="lead-management" element={<AffiliateLeadManagement />} />
+                    <Route path="quotation-generator" element={<AffiliateQuotationGenerator />} />
+                    <Route path="marketing-tools" element={<AffiliateMarketingTools />} />
+                    <Route path="leaderboard" element={<AffiliateLeaderBoard />} />
+                    <Route path="support" element={<AffiliateSupport />} />
+                    <Route path="profile" element={<AffiliateProfile />} />
+                    <Route path="settings" element={<AffiliateSettings />} />
+                  </Route>
 
 
-              <Route path="/list-your-space" element={<ListYourSpace />} />
-              <Route path="/partner" element={<PartnerWithUs />} />
-              <Route path="/coming-soon" element={<ComingSoon />} />
-              <Route path="/start-chatting" element={<StartChatting />} />
+                  <Route path="/list-your-space" element={<ListYourSpace />} />
+                  <Route path="/partner" element={<PartnerWithUs />} />
+                  <Route path="/coming-soon" element={<ComingSoon />} />
+                  <Route path="/start-chatting" element={<StartChatting />} />
 
                   {/* Protected Routes */}
                   <Route element={<ProtectedRoute />}>
@@ -332,11 +333,13 @@ const App = () => (
                       <Route path="space-management/add" element={<AddSpace />} />
                       <Route path="team-management" element={<TeamManagement />} />
                       <Route path="tickets" element={<Tickets />} />
+
                       <Route
                         path="feedback-nps"
                         element={<SpacePortalFeedbackNPS />}
                       />
                       <Route path="tasks" element={<SpacePortalTicketAndTasks />} />
+                      <Route path="mail-visits" element={<MailAndVisits />} />
                     </Route>
                   </Route>
 
