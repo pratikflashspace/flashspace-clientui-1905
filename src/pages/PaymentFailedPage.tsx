@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { XCircle, RefreshCcw, Home, HelpCircle, ArrowLeft } from 'lucide-react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
+import React, { useEffect } from "react";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
+import { XCircle, RefreshCcw, Home, HelpCircle, ArrowLeft } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
 
 const PaymentFailedPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const orderId = searchParams.get('orderId');
-  const reason = searchParams.get('reason');
+  const orderId = searchParams.get("orderId");
+  const reason = searchParams.get("reason");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -28,9 +28,12 @@ const PaymentFailedPage = () => {
           </div>
 
           {/* Error Message */}
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">Payment Failed</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">
+            Payment Failed
+          </h1>
           <p className="text-gray-600 mb-4">
-            We couldn't process your payment. Don't worry, no money has been deducted.
+            We couldn't process your payment. Don't worry, no money has been
+            deducted.
           </p>
 
           {/* Error Details */}
@@ -81,16 +84,16 @@ const PaymentFailedPage = () => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
+            <Button
               onClick={() => navigate(-1)}
               className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-3"
             >
               <RefreshCcw className="w-4 h-4 mr-2" />
               Try Again
             </Button>
-            <Button 
+            <Button
               variant="outline"
-              onClick={() => navigate('/')}
+              onClick={() => navigate("/")}
               className="border-gray-300 text-gray-700 font-semibold px-6 py-3"
             >
               <Home className="w-4 h-4 mr-2" />
@@ -100,7 +103,10 @@ const PaymentFailedPage = () => {
 
           {/* Help Text */}
           <p className="text-sm text-gray-500 mt-8">
-            Still facing issues? <Link to="/contact" className="text-yellow-600 hover:underline">Contact Support</Link>
+            Still facing issues?{" "}
+            <Link to="/contact" className="text-yellow-600 hover:underline">
+              Contact Support
+            </Link>
           </p>
         </div>
       </main>

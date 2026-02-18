@@ -63,6 +63,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import Coupons from "./pages/admin/Coupons";
 import KYCRequests from "./pages/admin/KYCRequests";
+import KYCDetail from "./pages/admin/KYCDetail";
 import SpaceManagement from "./pages/admin/SpaceManagement";
 
 import AdminSettings from "./pages/admin/Settings";
@@ -81,7 +82,7 @@ import RevenueDashboard from "./pages/admin/RevenueDashboard";
 import SupportChat from "./pages/admin/SupportChat";
 import Leaderboard from "./pages/admin/Leaderboard";
 
-  `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     `
+  `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  `
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
 import SpacePortalClientDetails from "@/pages/spacePortal/ClientsDetails";
@@ -181,8 +182,6 @@ const App = () => (
                 <Routes>
                   {/* Public Routes */}
 
-
-
                   <Route path="/" element={<Index />} />
                   <Route path="/services" element={<Services />} />
 
@@ -195,7 +194,10 @@ const App = () => (
                     element={<CoworkingSpace />}
                   />
                   <Route path="/services/on-demand" element={<OnDemand />} />
-                  <Route path="/services/event-spaces" element={<EventSpaces />} />
+                  <Route
+                    path="/services/event-spaces"
+                    element={<EventSpaces />}
+                  />
                   <Route
                     path="/services/business-setup"
                     element={<BusinessSetup />}
@@ -243,8 +245,14 @@ const App = () => (
                   <Route path="/booking/:id" element={<BookingPage />} />
 
                   {/* Payment Routes */}
-                  <Route path="/payment/success" element={<PaymentSuccessPage />} />
-                  <Route path="/payment/failed" element={<PaymentFailedPage />} />
+                  <Route
+                    path="/payment/success"
+                    element={<PaymentSuccessPage />}
+                  />
+                  <Route
+                    path="/payment/failed"
+                    element={<PaymentFailedPage />}
+                  />
 
                   <Route path="/city-listing" element={<CityListing />} />
                   <Route path="/career" element={<Career />} />
@@ -296,16 +304,23 @@ const App = () => (
                       <Route index element={<AdminDashboard />} />
                       <Route path="users" element={<UserManagement />} />
                       <Route path="kyc-requests" element={<KYCRequests />} />
+                      <Route path="kyc-requests/:id" element={<KYCDetail />} />
                       <Route path="spaces" element={<SpaceManagement />} />
                       <Route path="settings" element={<AdminSettings />} />
                       <Route path="clients" element={<Clients />} />
                       <Route path="clients/:id" element={<ClientDetails />} />
                       <Route path="coupons" element={<Coupons />} />
                       <Route path="learning-hub" element={<LearningHub />} />
-                      <Route path="booking-analysis" element={<SalesAnalytics />} />
+                      <Route
+                        path="booking-analysis"
+                        element={<SalesAnalytics />}
+                      />
                       <Route path="leaderboard" element={<Leaderboard />} />
                       <Route path="support" element={<SupportChat />} />
-                      <Route path="revenue-dashboard" element={<RevenueDashboard />} />
+                      <Route
+                        path="revenue-dashboard"
+                        element={<RevenueDashboard />}
+                      />
                       <Route path="tickets" element={<TicketSystem />} />
                       <Route path="notifications" element={<AdminNotifications />} />
                       <Route path="leads" element={<LeadManagement />} />
@@ -316,7 +331,10 @@ const App = () => (
                   {/* Space Partner Portal Routes */}
                   <Route element={<PartnerRoute />}>
                     <Route path="/spaceportal" element={<SpacePortalLayout />}>
-                      <Route index element={<Navigate to="dashboard" replace />} />
+                      <Route
+                        index
+                        element={<Navigate to="dashboard" replace />}
+                      />
                       <Route path="dashboard" element={<Dashboard />} />
 
                       <Route path="clients" element={<SpacePortalClients />} />
@@ -330,24 +348,39 @@ const App = () => (
                       />
                       <Route path="notifications" element={<Notifications />} />
                       <Route path="profile" element={<SpacePortalProfile />} />
-                      <Route path="settings" element={<SpacePortalSettings />} />
+                      <Route
+                        path="settings"
+                        element={<SpacePortalSettings />}
+                      />
                       <Route path="invoices-payments" element={<Invoices />} />
                       <Route path="booking-calendar" element={<Calendar />} />
-                      <Route path="active-requests" element={<ActiveRequests />} />
+                      <Route
+                        path="active-requests"
+                        element={<ActiveRequests />}
+                      />
                       <Route
                         path="booking-analytics"
                         element={<BookingAnalytics />}
                       />
 
                       <Route path="space-management" element={<Spaces />} />
-                      <Route path="space-management/add" element={<AddSpace />} />
-                      <Route path="team-management" element={<TeamManagement />} />
+                      <Route
+                        path="space-management/add"
+                        element={<AddSpace />}
+                      />
+                      <Route
+                        path="team-management"
+                        element={<TeamManagement />}
+                      />
                       <Route path="tickets" element={<Tickets />} />
                       <Route
                         path="feedback-nps"
                         element={<SpacePortalFeedbackNPS />}
                       />
-                      <Route path="tasks" element={<SpacePortalTicketAndTasks />} />
+                      <Route
+                        path="tasks"
+                        element={<SpacePortalTicketAndTasks />}
+                      />
                     </Route>
                   </Route>
 
