@@ -21,6 +21,7 @@ import {
   ToggleLeft,
   ToggleRight,
   ShieldCheck,
+  MessageSquare,
 } from "lucide-react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -32,6 +33,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "react-hot-toast";
 
 // Type definitions
 type BookingType = "virtual_office" | "coworking_space";
@@ -49,6 +51,12 @@ const MyBookings: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [togglingAutoRenew, setTogglingAutoRenew] = useState<string | null>(null);
   const [date, setDate] = useState<DateRange | undefined>();
+
+  // Raise Query state
+  const [queryModalBooking, setQueryModalBooking] = useState<Booking | null>(null);
+  const [querySubject, setQuerySubject] = useState("");
+  const [queryMessage, setQueryMessage] = useState("");
+  const [submittingQuery, setSubmittingQuery] = useState(false);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -95,9 +103,34 @@ const MyBookings: React.FC = () => {
     }
   };
 
+  const handleRaiseQuery = async () => {
+    if (!queryModalBooking || !querySubject.trim() || !queryMessage.trim()) return;
+    setSubmittingQuery(true);
+    try {
+      const response = await userDashboardService.createTicket({
+        subject: querySubject.trim(),
+        description: queryMessage.trim(),
+        category: "bookings",
+        bookingId: queryModalBooking._id,
+      });
+      if (response.success) {
+        toast.success("Query raised successfully! The space partner will get back to you.");
+        setQueryModalBooking(null);
+        setQuerySubject("");
+        setQueryMessage("");
+      } else {
+        toast.error(response.message || "Failed to raise query");
+      }
+    } catch (err) {
+      toast.error("Failed to raise query");
+    } finally {
+      setSubmittingQuery(false);
+    }
+  };
+
   // Lock body scroll when modal is open
   useEffect(() => {
-    if (selectedBooking) {
+    if (selectedBooking || queryModalBooking) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -105,7 +138,7 @@ const MyBookings: React.FC = () => {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [selectedBooking]);
+  }, [selectedBooking, queryModalBooking]);
 
   // Filter bookings client-side for search
   const filteredBookings = bookings.filter((b) => {
@@ -481,6 +514,13 @@ const MyBookings: React.FC = () => {
                               {booking.autoRenew ? "Auto Renew On" : "Auto Renew Off"}
                             </button>
                           )}
+                          {/* Raise Query button — shows for all active/pending bookings */}
+                          <button
+                            onClick={() => setQueryModalBooking(booking)}
+                            className="flex items-center gap-1.5 px-4 py-2 bg-teal-50 text-teal-700 border border-teal-200 rounded-lg text-sm font-medium hover:bg-teal-100 transition-colors"
+                          >
+                            <MessageSquare className="w-4 h-4" /> Raise Query
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -625,6 +665,82 @@ const MyBookings: React.FC = () => {
                     Close
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Raise Query Modal */}
+        {queryModalBooking && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl">
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Raise a Query</h2>
+                    <p className="text-sm text-gray-500 mt-0.5">
+                      {queryModalBooking.spaceSnapshot?.name} — {queryModalBooking.bookingNumber}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setQueryModalBooking(null);
+                      setQuerySubject("");
+                      setQueryMessage("");
+                    }}
+                    className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Issue with mail forwarding"
+                    value={querySubject}
+                    onChange={(e) => setQuerySubject(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Describe your concern</label>
+                  <textarea
+                    placeholder="Tell us what you need help with..."
+                    rows={4}
+                    value={queryMessage}
+                    onChange={(e) => setQueryMessage(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent text-sm resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="p-6 pt-0 flex gap-3">
+                <button
+                  onClick={() => {
+                    setQueryModalBooking(null);
+                    setQuerySubject("");
+                    setQueryMessage("");
+                  }}
+                  className="flex-1 border border-gray-200 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRaiseQuery}
+                  disabled={submittingQuery || !querySubject.trim() || !queryMessage.trim()}
+                  className="flex-1 bg-teal-600 text-white py-2.5 rounded-lg font-medium hover:bg-teal-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {submittingQuery ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <MessageSquare className="w-4 h-4" />
+                  )}
+                  {submittingQuery ? "Submitting..." : "Submit Query"}
+                </button>
               </div>
             </div>
           </div>

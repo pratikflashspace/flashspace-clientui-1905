@@ -10,7 +10,21 @@ export default function ScrollToTop() {
             window.history.scrollRestoration = 'manual';
         }
 
-        window.scrollTo(0, 0);
+        // Use a small timeout to ensure the DOM is ready and layout is stable
+        const timeoutId = setTimeout(() => {
+            if (pathname.includes('/affiliate-portal')) {
+                // For affiliate portal, scroll the inner container
+                const mainContent = document.getElementById('affiliate-main-content');
+                if (mainContent) {
+                    mainContent.scrollTo({ top: 0, behavior: 'instant' });
+                }
+            } else {
+                // For other pages, scroll the window
+                window.scrollTo({ top: 0, behavior: 'instant' });
+            }
+        }, 0);
+
+        return () => clearTimeout(timeoutId);
     }, [pathname]);
 
     return null;

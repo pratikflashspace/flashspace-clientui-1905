@@ -1,0 +1,464 @@
+import React, { useState, useEffect } from "react";
+import {
+    Share2,
+    Users,
+    TrendingUp,
+    Wallet,
+    Sparkles,
+    Send,
+    Trophy,
+    X,
+    RefreshCw,
+    Lightbulb,
+    ArrowUpRight,
+    Loader2,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+import { affiliatePortalService } from "@/services/affiliatePortal.service";
+
+// --- Types & Data ---
+
+type InsightType = "renewal" | "crossSell" | "performance" | "revenue";
+
+interface InsightMetric {
+    label: string; // The big number/text
+    value: string; // The big number/text
+    subtext: string; // The smaller description below
+    trend?: string; // Optional green trend badge text
+    isHighlight?: boolean; // For "Follow-ups" style highlight
+}
+
+interface InsightContent {
+    title: string;
+    loadingText: string;
+    recommendation: string;
+    metrics: InsightMetric[];
+}
+
+// Stats Data Interface
+interface DashboardStats {
+    totalReferrals: number;
+    convertedClients: number;
+    totalEarnings: number;
+    pendingPayout: number;
+}
+
+// --- Sub-Components ---
+
+import StatCardDashboard from "@/components/affiliatePortal/StatCardDashboard";
+import InsightCard from "@/components/affiliatePortal/InsightCard";
+import SectionHeader from "@/components/affiliatePortal/SectionHeader";
+import ActionCard from "@/components/affiliatePortal/ActionCard";
+
+
+// --- Main Dashboard Component ---
+
+const Dashboard = () => {
+    const [selectedInsight, setSelectedInsight] = useState<InsightType | null>(null);
+    const [isLoadingInsight, setIsLoadingInsight] = useState(false);
+    const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+    const [insightData, setInsightData] = useState<Record<InsightType, InsightContent> | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
+
+    // Fetch Data
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [statsRes, insightsRes] = await Promise.all([
+                    affiliatePortalService.getDashboardStats(),
+                    affiliatePortalService.getAIInsights(),
+                ]);
+
+                if (statsRes && statsRes.data) setDashboardStats(statsRes.data as DashboardStats);
+                if (insightsRes && insightsRes.data) setInsightData(insightsRes.data as Record<InsightType, InsightContent>);
+            } catch (error) {
+                console.error("Failed to fetch dashboard data", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // Handle opening the modal
+    const handleInsightClick = (id: InsightType) => {
+        if (!insightData || !insightData[id]) return;
+        setSelectedInsight(id);
+        // No need to simulate loading if data is already there, but we can keep it for effect
+        setIsLoadingInsight(true);
+    };
+
+    // Handle the "Refresh" simulation
+    const handleRefresh = () => {
+        setIsLoadingInsight(true);
+        // Re-fetch logic could go here
+        setTimeout(() => setIsLoadingInsight(false), 1500); 
+    };
+
+    // Effect to simulate loading delay (2 seconds)
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (selectedInsight && isLoadingInsight) {
+            timer = setTimeout(() => {
+                setIsLoadingInsight(false);
+            }, 1000); // reduced to 1 second
+        }
+        return () => clearTimeout(timer);
+    }, [selectedInsight, isLoadingInsight]);
+
+    // -- Data Definitions --
+    const stats = [
+        {
+            label: "Total Referrals",
+            value: dashboardStats?.totalReferrals?.toString() || "0",
+            trend: "15% from last month", // Backend doesn't provide trend yet
+            icon: Share2,
+        },
+        {
+            label: "Converted Clients",
+            value: dashboardStats?.convertedClients?.toString() || "0",
+            trend: "22% from last month",
+            icon: Users,
+        },
+        {
+            label: "Total Earnings",
+            value: `₹${(dashboardStats?.totalEarnings || 0).toLocaleString()}`,
+            trend: "18% from last month",
+            icon: TrendingUp,
+        },
+        { 
+            label: "Pending Payout", 
+            value: `₹${(dashboardStats?.pendingPayout || 0).toLocaleString()}`, 
+            trend: null, 
+            icon: Wallet 
+        },
+    ];
+
+    const sections = [
+        {
+            id: "booking",
+            icon: Users,
+            title: "Booking Management",
+            subtitle: "Track all your referrals and their status",
+            cards: [
+                {
+                    title: "Booking Management",
+                    desc: "View companies you've referred and their booking status",
+                },
+                {
+                    title: "Client Tracking",
+                    desc: "Track all clients from referral to conversion and beyond",
+                },
+                {
+                    title: "Status Updates",
+                    desc: "Real-time updates on client booking progress",
+                },
+            ],
+        },
+        {
+            id: "revenue",
+            icon: Wallet,
+            title: "Revenue & Payouts",
+            subtitle: "Track your earnings and payments",
+            cards: [
+                {
+                    title: "Revenue Dashboard",
+                    desc: "Complete view of your earnings and revenue trends",
+                },
+                {
+                    title: "Payout Tracking",
+                    desc: "Track completed payouts, pending, and expected dates",
+                },
+                {
+                    title: "Auto Invoicing",
+                    desc: "Generate and share invoices automatically with clients",
+                },
+            ],
+        },
+        {
+            id: "marketing",
+            icon: Send,
+            title: "Marketing Tools",
+            subtitle: "Tools to help you close more deals",
+            cards: [
+                {
+                    title: "Quotation Generator",
+                    desc: "Create instant quotations with FlashSpace and affiliate branding",
+                },
+                {
+                    title: "WhatsApp Follow-ups",
+                    desc: "Integrated WhatsApp and email follow-ups for all leads",
+                },
+                {
+                    title: "Lead Management",
+                    desc: "Manage all your leads in one place with status tracking",
+                },
+            ],
+        },
+        {
+            id: "leaderboard",
+            icon: Trophy,
+            title: "Leaderboard & Support",
+            subtitle: "Compete and get help when needed",
+            cards: [
+                {
+                    title: "Regional Rankings",
+                    desc: "See your position among affiliates in your region",
+                },
+                {
+                    title: "National Leaderboard",
+                    desc: "Compete with affiliates pan-India for top positions",
+                },
+                {
+                    title: "AI Support Chat",
+                    desc: "Get queries resolved with AI that escalates to support when needed",
+                    badge: "AI",
+                },
+            ],
+        },
+    ];
+    
+    if (isLoading) {
+         return (
+             <div className="flex h-screen items-center justify-center">
+                 <Loader2 className="h-8 w-8 animate-spin text-[#5aa39c]" />
+             </div>
+         );
+    }
+
+    return (
+        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans animate-fade-in relative">
+            <div className="w-full space-y-10">
+                {/* 1. Page Header */}
+                <div className="space-y-2">
+                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                        Affiliate{" "}
+                        <span className="text-[#5aa39c] italic ">
+                            Dashboard
+                        </span>
+                    </h1>
+                    <p className="text-gray-500 text-lg">
+                        Track your referrals, revenue, and performance
+                    </p>
+                </div>
+
+                {/* 2. Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {stats.map((stat, idx) => (
+                        <StatCardDashboard
+                            key={idx}
+                            {...stat}
+                            delay={idx * 100}
+                        />
+                    ))}
+                </div>
+
+                {/* 3. AI Insights Section (Interactive) */}
+                <div className="space-y-6">
+                    <div className="space-y-1">
+                        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <Sparkles size={20} className="text-[#5aa39c]" />{" "}
+                            AI-Powered Insights
+                        </h2>
+                        <p className="text-sm text-gray-500">
+                            Leverage AI to maximize your earnings
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                        {/* Note: I mapped these manually to ensure they pass the correct IDs */}
+                        <InsightCard
+                            id="renewal"
+                            title="Renewal Forecasting"
+                            description="AI predicts renewals and expected revenue from existing clients"
+                            onClick={handleInsightClick}
+                        />
+                        <InsightCard
+                            id="crossSell"
+                            title="Cross-Sell Suggestions"
+                            description="AI-based suggestions for additional services to increase revenue"
+                            onClick={handleInsightClick}
+                        />
+                        <InsightCard
+                            id="performance"
+                            title="Performance Insights"
+                            description="AI suggestions on how to improve your performance ranking"
+                            onClick={handleInsightClick}
+                        />
+                        <InsightCard
+                            id="revenue"
+                            title="Revenue Predictions"
+                            description="AI forecasts revenue for coming months with growth suggestions"
+                            onClick={handleInsightClick}
+                        />
+                    </div>
+                </div>
+
+                {/* 4. Other Sections */}
+                {sections.map((section) => (
+                    <div key={section.id} onClick={()=>navigate("")} className="animate-slide-up">
+                        <SectionHeader
+                            icon={section.icon}
+                            title={section.title}
+                            subtitle={section.subtitle}
+                        />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {section.cards.map((card, idx) => (
+                                <ActionCard
+                                    key={idx}
+                                    title={card.title}
+                                    description={card.desc}
+                                    badge={card.badge}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* --- AI ANALYZING / RESULT MODAL --- */}
+            {selectedInsight && insightData && insightData[selectedInsight] && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-fade-in p-4">
+                    <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden relative animate-scale-up">
+                        {/* Modal Header */}
+                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+                            <div className="flex items-center gap-2">
+                                <Sparkles
+                                    size={18}
+                                    className="text-[#5aa39c] fill-[#5aa39c]"
+                                />
+                                <h3 className="font-bold text-slate-800 text-lg">
+                                    {insightData[selectedInsight].title}
+                                </h3>
+                                <span className="px-2 py-0.5 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                                    AI Powered
+                                </span>
+                            </div>
+                            <button
+                                onClick={() => setSelectedInsight(null)}
+                                className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6 min-h-[320px] flex flex-col">
+                            {/* LOADING STATE */}
+                            {isLoadingInsight ? (
+                                <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 animate-fade-in">
+                                    <div className="relative">
+                                        <div className="w-16 h-16 border-4 border-[#eaf4f3] border-t-[#5aa39c] rounded-full animate-spin"></div>
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <Sparkles
+                                                size={20}
+                                                className="text-[#5aa39c] animate-pulse"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-slate-800 font-medium text-lg">
+                                            {
+                                                insightData[selectedInsight]
+                                                    .loadingText
+                                            }
+                                        </p>
+                                        <p className="text-gray-400 text-sm mt-1">
+                                            Processing data points...
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                /* RESULT STATE */
+                                <div className="space-y-6 animate-fade-in">
+                                    {/* Metrics List */}
+                                    <div className="space-y-6">
+                                        {insightData[
+                                            selectedInsight
+                                        ].metrics.map((metric, idx) => (
+                                            <div
+                                                key={idx}
+                                                className="flex justify-between items-start group"
+                                            >
+                                                <div>
+                                                    <p className="text-sm font-bold text-slate-800 mb-1">
+                                                        {metric.label}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {metric.subtext}
+                                                    </p>
+                                                </div>
+                                                <div className="text-right">
+                                                    {metric.isHighlight ? (
+                                                        <span className="text-[#5aa39c] font-bold text-lg">
+                                                            {metric.value}
+                                                        </span>
+                                                    ) : (
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <span className="font-bold text-lg text-slate-900">
+                                                                {metric.value}
+                                                            </span>
+                                                            {metric.trend && (
+                                                                <span className="bg-green-50 text-green-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-green-100 flex items-center gap-0.5">
+                                                                    <ArrowUpRight
+                                                                        size={
+                                                                            10
+                                                                        }
+                                                                    />{" "}
+                                                                    {
+                                                                        metric.trend
+                                                                    }
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* AI Recommendation Box */}
+                                    <div className="bg-[#eaf4f3]/50 border border-[#5aa39c]/20 rounded-xl p-4 flex gap-3 items-start">
+                                        <Lightbulb
+                                            size={20}
+                                            className="text-[#5aa39c] shrink-0 mt-0.5"
+                                        />
+                                        <div>
+                                            <p className="text-xs font-bold text-[#5aa39c] mb-1">
+                                                AI Recommendation
+                                            </p>
+                                            <p className="text-sm text-slate-700 leading-relaxed">
+                                                {
+                                                    insightData[
+                                                        selectedInsight
+                                                    ].recommendation
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Refresh Button */}
+                                    <div className="pt-2 flex justify-end">
+                                        <button
+                                            onClick={handleRefresh}
+                                            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 shadow-sm rounded-lg text-sm font-semibold text-gray-600 hover:text-[#5aa39c] hover:border-[#5aa39c] transition-all"
+                                        >
+                                            <RefreshCw size={14} /> Refresh
+                                            Insights
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+        </div>
+    );
+};
+
+export default Dashboard;
