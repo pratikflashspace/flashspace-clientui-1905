@@ -63,6 +63,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import Coupons from "./pages/admin/Coupons";
 import KYCRequests from "./pages/admin/KYCRequests";
+import KYCDetail from "./pages/admin/KYCDetail";
 import SpaceManagement from "./pages/admin/SpaceManagement";
 
 import AdminSettings from "./pages/admin/Settings";
@@ -254,6 +255,7 @@ const App = () => (
                       <Route index element={<AdminDashboard />} />
                       <Route path="users" element={<UserManagement />} />
                       <Route path="kyc-requests" element={<KYCRequests />} />
+                      <Route path="kyc-requests/:id" element={<KYCDetail />} />
                       <Route path="spaces" element={<SpaceManagement />} />
                       <Route path="settings" element={<AdminSettings />} />
                       <Route path="clients" element={<Clients />} />

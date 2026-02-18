@@ -27,6 +27,7 @@ import {
   StopCircle,
   Play,
   Lock,
+  Edit,
 } from "lucide-react";
 import { API_CONFIG } from "@/config/api.config";
 import DemoKYCVideo from "@/assets/kycVideo/DemoKYCVideo.mp4";
@@ -118,8 +119,8 @@ export default function KYCVerification() {
             const pData = partnerResp.data;
             const mappedData: any = {
               _id: pData._id,
-              isPartner: true,
-              kycType: "individual",
+              isPartner: true, // Explicitly flag as partner
+              kycType: "individual", // Partners are individuals
               personalInfo: {
                 fullName: pData.fullName,
                 email: pData.email,
@@ -133,12 +134,17 @@ export default function KYCVerification() {
                 companyName: "N/A", // Not applicable for partner
                 partners: [],
               },
+              overallStatus: pData.status,
             };
             response = {
               success: true,
               data: mappedData,
               message: "Partner loaded",
             };
+
+            // Critical: Set state immediately for partner mode
+            setIsPartnerMode(true);
+            setKycType("individual");
           }
         } catch (e) {
           console.log("Not a partner ID either");
@@ -151,18 +157,21 @@ export default function KYCVerification() {
           const data = response.data as KYCData;
           setKycData(data);
 
-          // Detect if this is a partner profile
-          if (
+          // Detect if this is a partner profile (handling both nested and flat structures)
+          const isPartner =
             data.isPartner ||
             (data.kycType === "individual" &&
-              data.personalInfo?.fullName &&
-              data.personalInfo.fullName !== user?.fullName)
-          ) {
+              (data.personalInfo?.fullName || (data as any).fullName) &&
+              (data.personalInfo?.fullName !== user?.fullName ||
+                ((data as any).fullName &&
+                  (data as any).fullName !== user?.fullName)));
+
+          if (isPartner) {
             setIsPartnerMode(true);
+            setKycType("individual");
           } else {
             setIsPartnerMode(false);
           }
-          // ... existing logic to populate form ...
 
           setBusinessForm({
             profileName: data.profileName || "",
@@ -175,19 +184,29 @@ export default function KYCVerification() {
             partners: data.businessInfo?.partners || [],
           });
 
-          // Pre-fill personal form if exist
-          setPersonalForm((prev) => ({
-            phone: data.personalInfo?.phone || user?.phoneNumber || "",
-            dateOfBirth: data.personalInfo?.dateOfBirth
-              ? new Date(data.personalInfo.dateOfBirth)
-                  .toISOString()
-                  .split("T")[0]
-              : "",
-            aadhaar: prev.aadhaar || data.personalInfo?.aadhaarNumber || "", // Keep existing value or use full number
-            pan: data.personalInfo?.panNumber || "",
-            fullName: data.personalInfo?.fullName || "",
-            email: data.personalInfo?.email || user?.email || "",
-          }));
+          // Pre-fill personal form if exist (handling both nested and flat structures)
+          setPersonalForm((prev) => {
+            const info = data.personalInfo || {};
+            const flatData = data as any; // Fallback to root level properties
+
+            return {
+              phone: info.phone || flatData.phone || user?.phoneNumber || "",
+              dateOfBirth:
+                info.dateOfBirth || flatData.dob
+                  ? new Date(info.dateOfBirth || flatData.dob)
+                      .toISOString()
+                      .split("T")[0]
+                  : "",
+              aadhaar:
+                prev.aadhaar ||
+                info.aadhaarNumber ||
+                flatData.aadhaarNumber ||
+                "",
+              pan: info.panNumber || flatData.panNumber || "",
+              fullName: info.fullName || flatData.fullName || "",
+              email: info.email || flatData.email || user?.email || "",
+            };
+          });
 
           if (data.kycType) {
             setKycType(data.kycType as KYCType);
@@ -218,13 +237,23 @@ export default function KYCVerification() {
                 mainIndProfile._id,
               );
               if (partnersResp.success && Array.isArray(partnersResp.data)) {
-                setPartnerProfiles(partnersResp.data);
+                const mappedPartners = partnersResp.data.map((p: any) => ({
+                  ...p,
+                  profileName: p.fullName,
+                  personalInfo: {
+                    fullName: p.fullName,
+                    email: p.email,
+                    phone: p.phone,
+                  },
+                  overallStatus: p.status,
+                }));
+                setPartnerProfiles(mappedPartners);
               } else {
                 setPartnerProfiles([]);
               }
             } catch (e) {
               console.error("Failed to fetch partners", e);
-              setPartnerProfiles([]); // Fallback
+              setPartnerProfiles([]);
             }
           } else {
             setPartnerProfiles([]);
@@ -261,6 +290,7 @@ export default function KYCVerification() {
   };
 
   useEffect(() => {
+    setActiveStep("personal");
     fetchKYC();
   }, [profileId]);
 
@@ -283,7 +313,7 @@ export default function KYCVerification() {
           panNumber: personalForm.pan,
           aadhaarNumber: personalForm.aadhaar,
           dob: personalForm.dateOfBirth,
-          address: "N/A", // Address is not currently in the form for partners, passing placeholder
+          address: "N/A",
         };
 
         const partnerResponse =
@@ -291,9 +321,8 @@ export default function KYCVerification() {
 
         if (partnerResponse.success) {
           setEditMode(false);
-          // Refresh to show in list
           fetchKYC();
-          setProfileId(null); // Go back to list
+          setProfileId(null);
           return;
         } else {
           setError(partnerResponse.message || "Failed to add partner");
@@ -328,10 +357,9 @@ export default function KYCVerification() {
             return params;
           });
         }
-        // fetchKYC(); // Relies on useEffect [profileId]
       }
     } catch (err) {
-      console.error("Failed to save business info");
+      console.error("Failed to save business info", err);
     } finally {
       setSaving(false);
     }
@@ -405,8 +433,6 @@ export default function KYCVerification() {
     setTimeout(() => fileInputRef.current?.click(), 0);
   };
 
-  // Video KYC Handlers removed - using triggerFileUpload instead
-
   const getStatusConfig = (status: DocumentStatus) => {
     switch (status) {
       case "approved":
@@ -458,6 +484,12 @@ export default function KYCVerification() {
           text: "Resubmission Required",
           icon: RefreshCw,
         };
+      case "in_progress":
+        return {
+          bg: "bg-blue-500",
+          text: "Draft",
+          icon: Edit,
+        };
       default:
         return { bg: "bg-gray-500", text: "Not Started", icon: Info };
     }
@@ -468,9 +500,7 @@ export default function KYCVerification() {
     ...(kycType === "business"
       ? [{ id: "business", label: "Business Info", icon: Building2 }]
       : []),
-    ...(!isPartnerMode
-      ? [{ id: "video", label: "Video KYC", icon: FileVideo }]
-      : []),
+    { id: "video", label: "Video KYC", icon: FileVideo },
     { id: "documents", label: "Documents", icon: FileText },
     { id: "review", label: "Review", icon: Shield },
   ];
@@ -512,7 +542,7 @@ export default function KYCVerification() {
   };
 
   const isBusinessInfoSaved = () => {
-    if (kycType !== "business") return true;
+    if (kycType !== "business" || isPartnerMode) return true;
     return !!(
       kycData?.businessInfo?.companyName &&
       kycData?.businessInfo?.companyType &&
@@ -530,29 +560,19 @@ export default function KYCVerification() {
       return isPersonalInfoSaved();
     }
 
-    // Video KYC - accessible after previous steps are saved (not shown for partners)
+    // Video KYC - accessible after business info is saved
     if (step === "video") {
-      if (isPartnerMode) return false; // Partners don't have video KYC
-      if (kycType === "business") {
-        return isPersonalInfoSaved() && isBusinessInfoSaved();
-      }
-      return isPersonalInfoSaved();
+      return isPersonalInfoSaved() && isBusinessInfoSaved();
     }
 
     // Documents - accessible after previous steps are saved
     if (step === "documents") {
-      if (kycType === "business") {
-        return isPersonalInfoSaved() && isBusinessInfoSaved();
-      }
-      return isPersonalInfoSaved();
+      return isPersonalInfoSaved() && isBusinessInfoSaved();
     }
 
     // Review - accessible after all previous steps including documents
     if (step === "review") {
-      if (kycType === "business") {
-        return isPersonalInfoSaved() && isBusinessInfoSaved();
-      }
-      return isPersonalInfoSaved();
+      return isPersonalInfoSaved() && isBusinessInfoSaved();
     }
 
     return false;
@@ -573,10 +593,10 @@ export default function KYCVerification() {
     const hasBusinessInfo =
       isBusinessInfoComplete() || kycData?.businessInfo?.companyName;
 
-    // Check video KYC completion (not applicable for partners)
-    const hasVideoKYC =
-      !isPartnerMode &&
-      !!kycData?.documents?.find((d) => d.type === "video_kyc");
+    // Check video KYC completion
+    const hasVideoKYC = !!kycData?.documents?.find(
+      (d) => d.type === "video_kyc",
+    );
 
     if (isBusiness) {
       // Personal Info - 20%
@@ -585,31 +605,31 @@ export default function KYCVerification() {
       // Business Info - 20%
       if (hasBusinessInfo) progress += 20;
 
-      // Video KYC - 20% (not for partners)
-      if (!isPartnerMode && hasVideoKYC) progress += 20;
+      // Video KYC - 20%
+      if (hasVideoKYC) progress += 20;
 
-      // Documents - 40% or 60% for partners (reaches 100% when all docs uploaded)
+      // Documents - 40% (reaches 100% when all docs uploaded)
       const uploadedDocsCount =
         kycData?.documents?.filter((d) => d.type !== "video_kyc").length || 0;
-      const requiredDocsCount = 4; // pan, gst, coi, address (video removed)
-      const docWeight = isPartnerMode ? 60 : 40; // Higher weight for partners since no video KYC
+      const requiredDocsCount = 4;
+      const docWeight = 40;
       progress += Math.min(
         docWeight,
         Math.round((uploadedDocsCount / requiredDocsCount) * docWeight),
       );
     } else {
-      // Personal Info - 30% or 50% for partners
-      const personalWeight = isPartnerMode ? 50 : 30;
+      // Personal Info - 30%
+      const personalWeight = 30;
       if (hasPersonalInfo) progress += personalWeight;
 
-      // Video KYC - 30% (not for partners)
-      if (!isPartnerMode && hasVideoKYC) progress += 30;
+      // Video KYC - 30%
+      if (hasVideoKYC) progress += 30;
 
-      // Documents - 40% or 50% for partners (reaches 100% when all docs uploaded)
+      // Documents - 40% (reaches 100% when all docs uploaded)
       const uploadedDocsCount =
         kycData?.documents?.filter((d) => d.type !== "video_kyc").length || 0;
-      const requiredDocsCount = 2; // pan, aadhaar (video removed)
-      const docWeight = isPartnerMode ? 50 : 40; // Higher weight for partners since no video KYC
+      const requiredDocsCount = 2;
+      const docWeight = 40;
       progress += Math.min(
         docWeight,
         Math.round((uploadedDocsCount / requiredDocsCount) * docWeight),
@@ -801,7 +821,6 @@ export default function KYCVerification() {
               </h2>
 
               {individualProfile ? (
-                // Existing Individual Logic
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-yellow-400"></div>
                   <div className="flex items-start justify-between mb-4 pl-2">
@@ -847,7 +866,6 @@ export default function KYCVerification() {
                   </div>
                 </div>
               ) : (
-                // No Individual Profile -> Call to Action
                 <div className="bg-white rounded-xl shadow-sm border-2 border-dashed border-yellow-200 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-yellow-50 rounded-full">
@@ -867,7 +885,6 @@ export default function KYCVerification() {
                       setProfileId("new");
                       setKycType("individual");
                       setActiveStep("personal");
-                      // Reset form
                       setBusinessForm({
                         profileName: user?.fullName
                           ? `${user.fullName} (Personal)`
@@ -924,7 +941,9 @@ export default function KYCVerification() {
                         </span>
                       </div>
                       <h3 className="font-semibold text-gray-900 truncate mb-1">
-                        {p.profileName}
+                        {p.profileName ||
+                          p.personalInfo?.fullName ||
+                          "Unnamed Partner"}
                       </h3>
                       <p className="text-xs text-gray-500 mb-4 uppercase tracking-wide">
                         Partner
@@ -1386,10 +1405,8 @@ export default function KYCVerification() {
                           // Navigate based on profile type
                           if (kycType === "business") {
                             setActiveStep("business");
-                          } else if (isPartnerMode) {
-                            setActiveStep("documents"); // Partners skip video KYC
                           } else {
-                            setActiveStep("video"); // Regular individual goes to video
+                            setActiveStep("video"); // Everyone goes to video now
                           }
                         }}
                         disabled={
@@ -1613,7 +1630,6 @@ export default function KYCVerification() {
                       <button
                         onClick={async () => {
                           await handleSaveBusinessInfo();
-                          // Business profiles go to video unless it's somehow a partner (edge case)
                           setActiveStep(isPartnerMode ? "documents" : "video");
                         }}
                         disabled={
@@ -1637,7 +1653,7 @@ export default function KYCVerification() {
                   </div>
                 )}
 
-                {activeStep === "video" && !isPartnerMode && (
+                {activeStep === "video" && (
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
@@ -1696,18 +1712,38 @@ export default function KYCVerification() {
                           const isUploading = uploading === "video_kyc";
 
                           if (videoDoc) {
+                            const isRejected = videoDoc.status === "rejected";
                             return (
                               <div className="text-center space-y-4">
-                                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                                  <CheckCircle2 className="w-8 h-8 text-green-600" />
+                                <div
+                                  className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto ${isRejected ? "bg-red-100" : "bg-green-100"}`}
+                                >
+                                  {isRejected ? (
+                                    <AlertCircle className="w-8 h-8 text-red-600" />
+                                  ) : (
+                                    <CheckCircle2 className="w-8 h-8 text-green-600" />
+                                  )}
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-gray-900">
-                                    Video Uploaded
+                                  <h3
+                                    className={`font-semibold ${isRejected ? "text-red-700" : "text-gray-900"}`}
+                                  >
+                                    {isRejected
+                                      ? "Video Rejected"
+                                      : "Video Uploaded"}
                                   </h3>
                                   <p className="text-sm text-gray-500 mt-1">
                                     {videoDoc.name}
                                   </p>
+                                  {isRejected && videoDoc.rejectionReason && (
+                                    <div className="mt-2 p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-600 text-left">
+                                      <p className="font-semibold flex items-center gap-1">
+                                        <AlertCircle className="w-3 h-3" />{" "}
+                                        Reason:
+                                      </p>
+                                      {videoDoc.rejectionReason}
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="flex gap-2 justify-center">
                                   <button

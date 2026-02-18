@@ -64,9 +64,13 @@ interface KYCRequest {
   progress?: number;
   createdAt: string;
   partnerCount?: number;
+  businessInfoCount?: number;
 }
 
+import { useNavigate } from "react-router-dom";
+
 export default function KYCRequests() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<KYCRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [userSearchTerm, setUserSearchTerm] = useState("");
@@ -85,8 +89,14 @@ export default function KYCRequests() {
   const [partnerRequests, setPartnerRequests] = useState<any[]>([]);
   const [loadingPartnerRequests, setLoadingPartnerRequests] = useState(false);
   const [activeTab, setActiveTab] = useState("users");
-  const [viewMode, setViewMode] = useState<"list" | "user_partners">("list");
+  const [viewMode, setViewMode] = useState<
+    "list" | "user_partners" | "user_business"
+  >("list");
   const [selectedUserForPartners, setSelectedUserForPartners] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [selectedUserForBusiness, setSelectedUserForBusiness] = useState<{
     id: string;
     name: string;
   } | null>(null);
@@ -102,6 +112,11 @@ export default function KYCRequests() {
   const [selectedPersonalInfo, setSelectedPersonalInfo] = useState<any | null>(
     null,
   );
+
+  // Business Info Modal State
+  const [showBusinessInfoModal, setShowBusinessInfoModal] = useState(false);
+  const [businessInfo, setBusinessInfo] = useState<any[]>([]); // Changed to array
+  const [loadingBusinessInfo, setLoadingBusinessInfo] = useState(false);
 
   // Helper to construct full URL from relative path
   const getFullUrl = (url?: string): string => {
@@ -136,21 +151,16 @@ export default function KYCRequests() {
           setShowPartnerModal(false);
           setPartners([]);
         }
-        if (showPersonalInfoModal) {
-          setShowPersonalInfoModal(false);
-          setSelectedPersonalInfo(null);
+        if (showBusinessInfoModal) {
+          setShowBusinessInfoModal(false);
+          setBusinessInfo([]);
         }
       }
     };
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [
-    showDocumentModal,
-    showRejectModal,
-    showPartnerModal,
-    showPersonalInfoModal,
-  ]);
+  }, [showDocumentModal, showRejectModal, showPartnerModal]);
 
   // Derived Stats
   const stats = React.useMemo(() => {
@@ -163,6 +173,21 @@ export default function KYCRequests() {
         partners: partnerRequests.length,
       };
     }
+    if (viewMode === "user_business") {
+      return {
+        total: businessInfo.length,
+        pending: businessInfo.filter(
+          (r) => r.status === "pending" || r.overallStatus === "pending",
+        ).length,
+        approved: businessInfo.filter(
+          (r) => r.status === "approved" || r.overallStatus === "approved",
+        ).length,
+        rejected: businessInfo.filter(
+          (r) => r.status === "rejected" || r.overallStatus === "rejected",
+        ).length,
+        partners: partnerRequests.length,
+      };
+    }
     return {
       total: requests.length,
       pending: requests.filter((r) => r.overallStatus === "pending").length,
@@ -170,7 +195,7 @@ export default function KYCRequests() {
       rejected: requests.filter((r) => r.overallStatus === "rejected").length,
       partners: partnerRequests.length, // This might need adjustment if we want total partners here
     };
-  }, [requests, partnerRequests, activeTab, viewMode]);
+  }, [requests, partnerRequests, businessInfo, activeTab, viewMode]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -178,7 +203,7 @@ export default function KYCRequests() {
       showDocumentModal ||
       showRejectModal ||
       showPartnerModal ||
-      showPersonalInfoModal
+      showBusinessInfoModal
     ) {
       document.body.style.overflow = "hidden";
     } else {
@@ -188,7 +213,12 @@ export default function KYCRequests() {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [showDocumentModal, showRejectModal, showPartnerModal]);
+  }, [
+    showDocumentModal,
+    showRejectModal,
+    showPartnerModal,
+    showBusinessInfoModal,
+  ]);
 
   const fetchKYCRequests = async () => {
     setLoading(true);
@@ -250,7 +280,9 @@ export default function KYCRequests() {
   const handleBackToRequests = () => {
     setViewMode("list");
     setSelectedUserForPartners(null);
+    setSelectedUserForBusiness(null);
     setPartnerRequests([]);
+    setBusinessInfo([]);
     // Re-fetch all partners or reset to blank if we want lazy load
     // For now, let's just reset tab to Users or fetch all partners if that was the active tab
     if (activeTab === "partners") {
@@ -274,6 +306,42 @@ export default function KYCRequests() {
     } finally {
       setLoadingPartners(false);
     }
+  };
+
+  const fetchBusinessInfo = async (userId: string) => {
+    setLoadingBusinessInfo(true);
+    try {
+      const response = await adminService.getBusinessInfoByUser(userId);
+      if (response.success && response.data) {
+        if (Array.isArray(response.data)) {
+          setBusinessInfo(response.data);
+        } else if (response.data) {
+          setBusinessInfo([response.data]);
+        } else {
+          setBusinessInfo([]);
+        }
+      } else {
+        // toast.error("Business info not found for this user");
+        setBusinessInfo([]);
+      }
+    } catch (error) {
+      console.error("Error fetching business info:", error);
+      toast.error("Failed to fetch business info");
+    } finally {
+      setLoadingBusinessInfo(false);
+    }
+  };
+
+  const handleViewBusinessInfo = (userId: string, userName: string) => {
+    console.log("View Business Info clicked:", { userId, userName });
+    if (!userId) {
+      console.error("No userId provided to handleViewBusinessInfo");
+      return;
+    }
+    setSelectedUserForBusiness({ id: userId, name: userName });
+    setViewMode("user_business");
+    setBusinessInfo([]);
+    fetchBusinessInfo(userId);
   };
 
   const handlePartnerAction = async (
@@ -357,6 +425,14 @@ export default function KYCRequests() {
     setSelectedDocument(doc);
     setSelectedRequest(request);
     setShowDocumentModal(true);
+  };
+
+  const openPersonalInfoModal = (partner: any) => {
+    setSelectedPersonalInfo({
+      ...partner,
+      originalRequest: partner,
+    });
+    setShowPersonalInfoModal(true);
   };
 
   const filteredRequests = requests.filter(
@@ -444,6 +520,13 @@ export default function KYCRequests() {
                   for {selectedUserForPartners?.name}
                 </span>
               </>
+            ) : viewMode === "user_business" ? (
+              <>
+                Business Profiles{" "}
+                <span className="text-purple-500 italic">
+                  for {selectedUserForBusiness?.name}
+                </span>
+              </>
             ) : (
               <>
                 KYC <span className="text-teal-500 italic">Verification</span>
@@ -453,11 +536,13 @@ export default function KYCRequests() {
           <p className="text-gray-500 mt-2 text-lg font-light">
             {viewMode === "user_partners"
               ? "Review partner applications for this user"
-              : "Review and approve identity documents"}
+              : viewMode === "user_business"
+                ? "Review business info for this user"
+                : "Review and approve identity documents"}
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {viewMode === "user_partners" && (
+          {(viewMode === "user_partners" || viewMode === "user_business") && (
             <button
               onClick={handleBackToRequests}
               className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-medium shadow-sm"
@@ -471,9 +556,11 @@ export default function KYCRequests() {
             <span className="text-sm font-medium">
               {viewMode === "user_partners"
                 ? `${filteredPartnerRequests.length} Partners Found`
-                : activeTab === "users"
-                  ? `${filteredRequests.length} Pending Requests`
-                  : `${filteredPartnerRequests.length} Pending Partners`}
+                : viewMode === "user_business"
+                  ? `${businessInfo.length} Business Profiles`
+                  : activeTab === "users"
+                    ? `${filteredRequests.length} User Found`
+                    : `${filteredPartnerRequests.length} Pending Partners`}
             </span>
           </div>
         </div>
@@ -589,80 +676,311 @@ export default function KYCRequests() {
                         </span>{" "}
                         <span className="capitalize">{partner.gender}</span>
                       </div>
-                      {partner.rejectionReason &&
-                        partner.status === "rejected" && (
-                          <div className="mt-3 p-3 bg-red-50 text-red-700 rounded-lg text-xs">
-                            <strong>Rejection Reason:</strong>{" "}
-                            {partner.rejectionReason}
-                          </div>
-                        )}
                     </div>
 
-                    {/* Partner Documents */}
-                    {partner.documents && partner.documents.length > 0 && (
-                      <div className="mb-6 pt-4 border-t border-gray-100">
-                        <p className="text-xs font-semibold text-gray-500 uppercase mb-3">
-                          Documents ({partner.documents.length})
-                        </p>
-                        <div className="space-y-2">
-                          {partner.documents.map((doc: any, idx: number) => (
-                            <div
-                              key={idx}
-                              className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-100"
-                            >
-                              <div className="flex items-center gap-2 overflow-hidden">
-                                <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                                <span className="text-xs text-gray-600 truncate">
-                                  {doc.name}
-                                </span>
-                              </div>
-                              <button
-                                onClick={() => openDocumentModal(doc, partner)}
-                                className="text-blue-600 hover:text-blue-700 text-xs font-medium px-2 py-1 bg-blue-50 hover:bg-blue-100 rounded transition-colors"
-                              >
-                                View
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex gap-3 pt-4 border-t border-gray-100">
-                      {partner.status !== "approved" && (
-                        <button
-                          onClick={() =>
-                            handlePartnerAction(partner._id, "approve")
-                          }
-                          className="flex-1 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm"
-                        >
-                          Approve
-                        </button>
-                      )}
-                      {partner.status !== "rejected" && (
-                        <button
-                          onClick={() => {
-                            // Quick reject prompt
-                            const reason = prompt(
-                              "Enter rejection reason for partner:",
-                            );
-                            if (reason)
-                              handlePartnerAction(
-                                partner._id,
-                                "reject",
-                                reason,
-                              );
-                          }}
-                          className="flex-1 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors"
-                        >
-                          Reject
-                        </button>
-                      )}
+                    <div className="pt-4 border-t border-gray-100">
+                      <button
+                        onClick={() =>
+                          navigate(
+                            `/admin/kyc-requests/${partner._id}?type=partner`,
+                          )
+                        }
+                        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all text-sm font-semibold shadow-md hover:shadow-lg hover:scale-[1.02]"
+                      >
+                        <Eye className="w-4 h-4" />
+                        View Details
+                      </button>
                     </div>
                   </div>
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      ) : viewMode === "user_business" ? (
+        /* Business View Mode */
+        <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-100 flex items-center gap-4">
+            <button
+              onClick={handleBackToRequests}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                Business Profiles
+              </h2>
+              <p className="text-gray-500 text-sm">
+                Managing business profiles for{" "}
+                <span className="font-semibold text-gray-900">
+                  {selectedUserForBusiness?.name}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div className="p-6">
+            {loadingBusinessInfo ? (
+              <div className="text-center py-12">
+                <div className="animate-spin w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-gray-500">Loading business profiles...</p>
+              </div>
+            ) : businessInfo.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 font-medium">
+                  No business profiles found for this user
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {businessInfo.map((profile, index) => (
+                  <div
+                    key={profile._id || index}
+                    className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col"
+                  >
+                    {/* Card Header */}
+                    <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-white flex justify-between items-start">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
+                          <Building2 className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900 line-clamp-1">
+                            {profile.companyName || "N/A"}
+                          </h4>
+                          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+                            {profile.profileName || "Business Profile"}
+                          </p>
+                        </div>
+                      </div>
+                      {getStatusBadge(profile.status || "pending")}
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="p-5 space-y-4 flex-1">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                          <span className="text-xs font-medium text-gray-500 uppercase">
+                            GST Number
+                          </span>
+                          <span className="text-sm font-medium text-gray-900 font-mono">
+                            {profile.gstNumber || "N/A"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                          <span className="text-xs font-medium text-gray-500 uppercase">
+                            PAN Number
+                          </span>
+                          <span className="text-sm font-medium text-gray-900 font-mono">
+                            {profile.panNumber || "N/A"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                          <span className="text-xs font-medium text-gray-500 uppercase">
+                            CIN Number
+                          </span>
+                          <span className="text-sm font-medium text-gray-900 font-mono">
+                            {profile.cinNumber || "N/A"}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-xs font-medium text-gray-500 uppercase block mb-1">
+                            Company Type
+                          </span>
+                          <span className="text-sm font-medium text-gray-900 font-mono">
+                            {profile.companyType || "N/A"}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-xs font-medium text-gray-500 uppercase block mb-1">
+                            Registered Address
+                          </span>
+                          <span
+                            className="text-sm text-gray-700 block line-clamp-2"
+                            title={profile.registeredAddress}
+                          >
+                            {profile.registeredAddress || "N/A"}
+                          </span>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            console.log(
+                              "Navigating to business detail:",
+                              profile._id,
+                            );
+                            navigate(
+                              `/admin/kyc-requests/${profile._id}?type=businessinfo`,
+                            );
+                          }}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700"
+                        >
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Card Footer */}
+                    <div className="p-4 bg-gray-50 border-t border-gray-100 mt-auto flex justify-between items-center">
+                      <div className="text-xs text-gray-400">
+                        Updated:{" "}
+                        {new Date(
+                          profile.updatedAt || Date.now(),
+                        ).toLocaleDateString()}
+                      </div>
+                      {/* Add ability to view documents or other actions here if needed */}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : viewMode === "user_business" ? (
+        /* Business Info View */
+        <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-100 flex items-center gap-4">
+            <button
+              onClick={handleBackToRequests}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                Business Profiles
+              </h2>
+              <p className="text-gray-500 text-sm">
+                Managing business profiles for {selectedUserForBusiness?.name}
+              </p>
+            </div>
+          </div>
+
+          <div className="p-6">
+            {(() => {
+              const profiles = Array.isArray(businessInfo)
+                ? businessInfo
+                : [businessInfo];
+
+              if (profiles.length === 0) {
+                return (
+                  <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                    <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500 font-medium">
+                      No business profiles found.
+                    </p>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {profiles.map((profile: any, index: number) => {
+                    console.log("Rendering profile:", profile);
+                    return (
+                      <div
+                        key={profile._id || index}
+                        className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col"
+                      >
+                        {/* Card Header */}
+                        <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-white flex justify-between items-start">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
+                              <Building2 className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-gray-900 line-clamp-1">
+                                {profile.companyName || "N/A"}
+                              </h4>
+                              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+                                {profile.profileName || "Business Profile"}
+                              </p>
+                            </div>
+                          </div>
+                          {getStatusBadge(profile.status || "pending")}
+                        </div>
+
+                        {/* Card Body */}
+                        <div className="p-5 space-y-4 flex-1">
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                              <span className="text-xs font-medium text-gray-500 uppercase">
+                                GST Number
+                              </span>
+                              <span className="text-sm font-medium text-gray-900 font-mono">
+                                {profile.gstNumber || "N/A"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                              <span className="text-xs font-medium text-gray-500 uppercase">
+                                PAN Number
+                              </span>
+                              <span className="text-sm font-medium text-gray-900 font-mono">
+                                {profile.panNumber || "N/A"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
+                              <span className="text-xs font-medium text-gray-500 uppercase">
+                                CIN Number
+                              </span>
+                              <span className="text-sm font-medium text-gray-900 font-mono">
+                                {profile.cinNumber || "N/A"}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-gray-500 uppercase block mb-1">
+                                Company Type
+                              </span>
+                              <span className="text-sm font-medium text-gray-900">
+                                {profile.companyType || "N/A"}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-xs font-medium text-gray-500 uppercase block mb-1">
+                                Registered Address
+                              </span>
+                              <span
+                                className="text-sm text-gray-700 block line-clamp-2"
+                                title={profile.registeredAddress}
+                              >
+                                {profile.registeredAddress || "N/A"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Card Footer */}
+                        <div className="p-4 bg-gray-50 border-t border-gray-100 mt-auto flex items-center justify-between">
+                          <div className="text-xs text-gray-400">
+                            Updated:{" "}
+                            {new Date(
+                              profile.updatedAt || Date.now(),
+                            ).toLocaleDateString()}
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log(
+                                "Navigating to business detail:",
+                                profile._id,
+                              );
+                              navigate(
+                                `/admin/kyc-requests/${profile._id}?type=business`,
+                              );
+                            }}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700"
+                          >
+                            View Details
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
         </div>
       ) : (
@@ -750,6 +1068,13 @@ export default function KYCRequests() {
                                   Partner KYC Pending
                                 </span>
                               )}
+                            {request.overallStatus === "approved" &&
+                              (request.businessInfoCount || 0) > 0 && (
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 uppercase">
+                                  <AlertCircle className="w-3 h-3" />
+                                  Business Info Pending
+                                </span>
+                              )}
                           </div>
                         </div>
 
@@ -773,14 +1098,20 @@ export default function KYCRequests() {
                       </div>
 
                       {/* Personal/Business Info */}
-                      <div className="p-6 space-y-4">
+                      <div className="p-6 space-y-4 flex-grow">
                         {request.personalInfo && (
-                          <div className="bg-blue-50 rounded-xl p-4">
+                          <div
+                            className="bg-blue-50 rounded-xl p-4 cursor-pointer hover:bg-blue-100 transition-colors group/personal relative"
+                            onClick={() =>
+                              navigate(`/admin/kyc-requests/${request._id}`)
+                            }
+                          >
                             <div className="flex items-center gap-2 mb-3">
                               <User className="w-4 h-4 text-blue-600" />
                               <h4 className="text-sm font-semibold text-blue-900">
                                 Personal Info
                               </h4>
+                              <ExternalLink className="w-3 h-3 text-blue-400 opacity-0 group-hover/personal:opacity-100 transition-opacity ml-auto absolute top-4 right-4" />
                             </div>
                             <div className="space-y-1 text-sm">
                               {request.personalInfo.fullName && (
@@ -796,23 +1127,6 @@ export default function KYCRequests() {
                                 </p>
                               )}
                             </div>
-                            {request.overallStatus === "approved" && (
-                              <button
-                                onClick={() => {
-                                  setSelectedPersonalInfo({
-                                    ...request.personalInfo,
-                                    email: request.user.email, // Ensure email is available
-                                    documents: request.documents, // Pass documents
-                                    originalRequest: request, // Pass full request for document modal context
-                                  });
-                                  setShowPersonalInfoModal(true);
-                                }}
-                                className="mt-3 text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 hover:underline"
-                              >
-                                <Eye className="w-3 h-3" />
-                                View Details
-                              </button>
-                            )}
                           </div>
                         )}
 
@@ -844,36 +1158,39 @@ export default function KYCRequests() {
                           </button>
                         )}
 
-                        {request.businessInfo && (
-                          <div className="bg-purple-50 rounded-xl p-4">
-                            <div className="flex items-center gap-2 mb-3">
+                        {/* Business Info Button */}
+                        <button
+                          onClick={() =>
+                            handleViewBusinessInfo(
+                              request.user._id || (request.user as any).id,
+                              request.user.fullName,
+                            )
+                          }
+                          className="w-full bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl p-4 transition-colors text-left group/business"
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2">
                               <Building2 className="w-4 h-4 text-purple-600" />
-                              <h4 className="text-sm font-semibold text-purple-900">
+                              <h4 className="text-sm font-semibold text-purple-900 group-hover/business:text-purple-700">
                                 Business Info
                               </h4>
                             </div>
-                            <div className="space-y-1 text-sm">
-                              {request.businessInfo.companyName && (
-                                <p className="text-gray-700">
-                                  <span className="font-medium">Company:</span>{" "}
-                                  {request.businessInfo.companyName}
-                                </p>
-                              )}
-                              {request.businessInfo.gstNumber && (
-                                <p className="text-gray-700">
-                                  <span className="font-medium">GST:</span>{" "}
-                                  {request.businessInfo.gstNumber}
-                                </p>
-                              )}
-                              {request.businessInfo.panNumber && (
-                                <p className="text-gray-700">
-                                  <span className="font-medium">PAN:</span>{" "}
-                                  {request.businessInfo.panNumber}
-                                </p>
-                              )}
-                            </div>
+                            <ExternalLink className="w-4 h-4 text-purple-400 group-hover/business:text-purple-600" />
                           </div>
-                        )}
+                          <div className="space-y-1 text-sm">
+                            {request.businessInfo?.companyName && (
+                              <p className="text-purple-700">
+                                <span className="font-medium">Company:</span>{" "}
+                                {request.businessInfo.companyName}
+                              </p>
+                            )}
+                            {!request.businessInfo?.companyName && (
+                              <p className="text-xs text-purple-700">
+                                View detailed business information
+                              </p>
+                            )}
+                          </div>
+                        </button>
 
                         {/* Documents - Hide if Approved */}
                         {request.overallStatus !== "approved" && (
@@ -1091,165 +1408,6 @@ export default function KYCRequests() {
             </TabsContent>
 
             <TabsContent value="partners" className="space-y-6">
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search partners by name or email..."
-                  value={partnerSearchTerm}
-                  onChange={(e) => setPartnerSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all text-sm shadow-sm"
-                />
-              </div>
-
-              {/* Partner KYC Requests Grid */}
-              {loadingPartnerRequests ? (
-                <div className="p-12 text-center bg-white rounded-[24px] border border-gray-100">
-                  <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                  <p className="text-gray-500">Loading partner requests...</p>
-                </div>
-              ) : filteredPartnerRequests.length === 0 ? (
-                <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm p-16 text-center">
-                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <User className="w-10 h-10 text-gray-300" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    No Partners Found
-                  </h3>
-                  <p className="text-gray-500">
-                    No partner KYC requests match your criteria.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filteredPartnerRequests.map((request) => (
-                    <div
-                      key={request._id}
-                      className="bg-white rounded-[24px] border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group flex flex-col h-full"
-                    >
-                      <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                        <div className="flex items-center justify-between mb-4 gap-3">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
-                              {request.fullName?.charAt(0) || "P"}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <h3 className="font-bold text-gray-900 truncate">
-                                {request.fullName}
-                              </h3>
-                              <p className="text-sm text-gray-500 truncate">
-                                {request.email}
-                              </p>
-                              <p className="text-xs text-purple-600 font-medium truncate mt-0.5">
-                                🤝 Partner
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex-shrink-0">
-                            {getStatusBadge(request.status)}
-                          </div>
-                        </div>
-
-                        <div className="space-y-2 text-sm text-gray-600">
-                          <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-gray-400" />
-                            <span className="truncate">
-                              User ID: {request.user}
-                            </span>
-                          </div>
-                          {request.phone && (
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">Phone:</span>{" "}
-                              {request.phone}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Documents */}
-                      <div className="p-6 flex-1 bg-white">
-                        {request.documents && request.documents.length > 0 ? (
-                          <div>
-                            <h4 className="text-xs font-semibold text-gray-500 uppercase mb-3">
-                              Documents ({request.documents.length})
-                            </h4>
-                            <div className="space-y-2">
-                              {request.documents
-                                .slice(0, 3)
-                                .map((doc: any, idx: number) => (
-                                  <div
-                                    key={idx}
-                                    className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-100"
-                                  >
-                                    <div className="flex items-center gap-2 overflow-hidden">
-                                      <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                                      <span className="text-xs text-gray-600 truncate">
-                                        {doc.name}
-                                      </span>
-                                    </div>
-                                    <button
-                                      onClick={() =>
-                                        openDocumentModal(doc, request)
-                                      }
-                                      className="text-blue-600 hover:text-blue-700 text-xs font-medium"
-                                    >
-                                      View
-                                    </button>
-                                  </div>
-                                ))}
-                              {request.documents.length > 3 && (
-                                <p className="text-xs text-gray-400 text-center pt-1">
-                                  + {request.documents.length - 3} more
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-center py-4 text-gray-400 text-sm">
-                            No documents uploaded
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="p-4 border-t border-gray-100 gap-2 flex bg-gray-50">
-                        {request.status !== "approved" && (
-                          <button
-                            onClick={() =>
-                              handlePartnerAction(request._id, "approve")
-                            }
-                            className="flex-1 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors shadow-sm"
-                          >
-                            Approve
-                          </button>
-                        )}
-                        {request.status !== "rejected" && (
-                          <button
-                            onClick={() => {
-                              const reason = prompt(
-                                "Enter rejection reason for partner:",
-                              );
-                              if (reason)
-                                handlePartnerAction(
-                                  request._id,
-                                  "reject",
-                                  reason,
-                                );
-                            }}
-                            className="flex-1 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors"
-                          >
-                            Reject
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="partners" className="space-y-6">
               {/* Partner Search Bar */}
               <div className="relative">
                 <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -1315,11 +1473,13 @@ export default function KYCRequests() {
 
                       <div className="p-6 space-y-4 flex-1">
                         <div className="bg-indigo-50 rounded-xl p-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <User className="w-4 h-4 text-indigo-600" />
-                            <h4 className="text-sm font-semibold text-indigo-900">
-                              Partner Details
-                            </h4>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-indigo-600" />
+                              <h4 className="text-sm font-semibold text-indigo-900">
+                                Partner Details
+                              </h4>
+                            </div>
                           </div>
                           <div className="space-y-1 text-sm">
                             {request.panNumber && (
@@ -1334,83 +1494,23 @@ export default function KYCRequests() {
                                 {request.aadhaarNumber}
                               </p>
                             )}
+                            <p className="text-gray-700">
+                              <span className="font-medium">Documents:</span>{" "}
+                              {request.documents?.length || 0} uploaded
+                            </p>
                           </div>
-                        </div>
-
-                        <div className="pt-2">
-                          <h4 className="text-xs font-semibold text-gray-500 uppercase mb-3">
-                            Documents Submitted (
-                            {request.documents?.length || 0})
-                          </h4>
-                          {request.documents && request.documents.length > 0 ? (
-                            <div className="space-y-2">
-                              {request.documents.map(
-                                (doc: any, idx: number) => (
-                                  <div
-                                    key={idx}
-                                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors"
-                                  >
-                                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                                      <div className="p-1.5 bg-blue-100 rounded-lg">
-                                        <FileText className="w-4 h-4 text-blue-600" />
-                                      </div>
-                                      <div className="flex-1 min-w-0">
-                                        <p className="text-sm text-gray-700 font-medium capitalize truncate">
-                                          {doc.type}
-                                        </p>
-                                        <p className="text-xs text-gray-500 truncate">
-                                          {doc.name}
-                                        </p>
-                                      </div>
-                                    </div>
-                                    <button
-                                      onClick={() =>
-                                        openDocumentModal(doc, request)
-                                      }
-                                      className="flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-                                    >
-                                      <Eye className="w-3 h-3" />
-                                      View
-                                    </button>
-                                  </div>
-                                ),
-                              )}
-                            </div>
-                          ) : (
-                            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
-                              <AlertCircle className="w-8 h-8 text-orange-400 mx-auto mb-2" />
-                              <p className="text-sm font-medium text-orange-900">
-                                No documents uploaded yet
-                              </p>
-                            </div>
-                          )}
                         </div>
                       </div>
 
-                      {request.status !== "approved" && (
-                        <div className="p-6 pt-0">
-                          <div className="grid grid-cols-2 gap-3">
-                            <button
-                              onClick={() =>
-                                handlePartnerAction(request._id, "reject")
-                              }
-                              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 transition-all text-sm font-semibold hover:scale-105"
-                            >
-                              <X className="w-4 h-4" />
-                              Reject
-                            </button>
-                            <button
-                              onClick={() =>
-                                handlePartnerAction(request._id, "approve")
-                              }
-                              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-105"
-                            >
-                              <Check className="w-4 h-4" />
-                              Approve
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                      <div className="p-6 pt-0">
+                        <button
+                          onClick={() => openPersonalInfoModal(request)}
+                          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all text-sm font-semibold shadow-md hover:shadow-lg hover:scale-[1.02]"
+                        >
+                          <Eye className="w-4 h-4" />
+                          View Details
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1713,12 +1813,11 @@ export default function KYCRequests() {
         </div>
       )}
       {/* Personal Info Modal */}
-      {showPersonalInfoModal && selectedPersonalInfo && (
+      {selectedPersonalInfo && (
         <div
           className="fixed inset-0 flex items-center justify-center z-40 p-4 backdrop-blur-sm bg-black/30"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
-              setShowPersonalInfoModal(false);
               setSelectedPersonalInfo(null);
             }
           }}
@@ -1731,7 +1830,6 @@ export default function KYCRequests() {
               </h3>
               <button
                 onClick={() => {
-                  setShowPersonalInfoModal(false);
                   setSelectedPersonalInfo(null);
                 }}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"

@@ -91,12 +91,18 @@ export interface KYCData {
     fullName?: string;
     email?: string;
     phone?: string;
+    panNumber?: string;
+    aadhaarNumber?: string;
+    dateOfBirth?: string;
   };
   businessInfo?: {
     companyName?: string;
     companyType?: string;
     gstNumber?: string;
     panNumber?: string;
+    cinNumber?: string;
+    registeredAddress?: string;
+    partners?: string[];
   };
   overallStatus:
     | "not_started"
@@ -223,6 +229,36 @@ class AdminService {
   ): Promise<ApiResponse<void>> {
     const response = await axiosInstance.put<ApiResponse<void>>(
       `/api/admin/kyc/partner/${partnerId}/status`,
+      {
+        action,
+        rejectionReason,
+      },
+    );
+    return response.data;
+  }
+
+  async getKYCDetails(id: string): Promise<ApiResponse<KYCData>> {
+    const response = await axiosInstance.get<ApiResponse<KYCData>>(
+      `/api/admin/kyc/${id}`,
+    );
+    return response.data;
+  }
+
+  async getPartnerDetails(id: string): Promise<ApiResponse<KYCData>> {
+    const response = await axiosInstance.get<ApiResponse<KYCData>>(
+      `/api/admin/kyc/partner/${id}`,
+    );
+    return response.data;
+  }
+
+  async reviewKYCDocument(
+    kycId: string,
+    docId: string,
+    action: "approve" | "reject",
+    rejectionReason?: string,
+  ): Promise<ApiResponse<void>> {
+    const response = await axiosInstance.put<ApiResponse<void>>(
+      `/api/admin/kyc/${kycId}/document/${docId}/review`,
       {
         action,
         rejectionReason,
@@ -568,6 +604,36 @@ class AdminService {
     const response = await axiosInstance.post<ApiResponse<ClientNote>>(
       `/api/admin/clients/${clientId}/notes`,
       note,
+    );
+    return response.data;
+  }
+
+  // Business Info
+  async getBusinessInfoByUser(userId: string): Promise<ApiResponse<any>> {
+    const response = await axiosInstance.get<ApiResponse<any>>(
+      `/api/admin/kyc/user/${userId}/business-info`,
+    );
+    return response.data;
+  }
+
+  async updateBusinessInfoStatus(
+    id: string,
+    action: "approve" | "reject",
+    rejectionReason?: string,
+  ): Promise<ApiResponse<any>> {
+    const response = await axiosInstance.put<ApiResponse<any>>(
+      `/api/admin/kyc/business-info/${id}/status`,
+      {
+        action,
+        rejectionReason,
+      },
+    );
+    return response.data;
+  }
+
+  async getBusinessInfoById(id: string): Promise<ApiResponse<any>> {
+    const response = await axiosInstance.get<ApiResponse<any>>(
+      `/api/admin/kyc/business-info/${id}`,
     );
     return response.data;
   }

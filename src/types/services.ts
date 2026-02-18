@@ -307,6 +307,8 @@ export interface BusinessInfo {
   panNumber?: string;
   cinNumber?: string;
   registeredAddress?: string;
+  address?: string; // Alias or specific field
+  businessNature?: string;
   industry?: string;
   verified?: boolean;
   partners?: string[]; // IDs of linked individual profiles

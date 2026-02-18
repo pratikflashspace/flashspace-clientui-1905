@@ -451,6 +451,24 @@ class UserDashboardService {
     }
   }
 
+  async getPartnerDetails(partnerId: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        `/api/user/kyc/partner-details/${partnerId}`,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch partner details";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
   async removePartner(partnerId: string): Promise<ApiResponse<void>> {
     try {
       const response = await axiosInstance.delete<ApiResponse<void>>(
