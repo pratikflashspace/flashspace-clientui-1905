@@ -6,7 +6,7 @@ export interface User {
   email: string;
   fullName: string;
   phoneNumber?: string;
-  role: 'user' | 'admin' | 'vendor' | 'partner' | 'space_manager' | 'sales';
+  role: 'user' | 'admin' | 'vendor' | 'partner' | 'space_manager' | 'sales' | 'affiliate';
   isEmailVerified: boolean;
   profilePicture?: string;
   authProvider?: 'local' | 'google';

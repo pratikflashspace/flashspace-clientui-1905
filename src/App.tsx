@@ -75,12 +75,14 @@ import AdminLayout from "./components/layouts/AdminLayout";
 import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
+import AdminNotifications from "./pages/admin/Notifications";
 
 import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
 import SupportChat from "./pages/admin/SupportChat";
 import Leaderboard from "./pages/admin/Leaderboard";
 
+  `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  `
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
 import SpacePortalClientDetails from "@/pages/spacePortal/ClientsDetails";
@@ -100,6 +102,31 @@ import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
 import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
+import { AffiliateRoute } from "./components/auth/AffiliateRoute";
+
+// Affiliate Portal
+
+import AffiliateDashboard from "./pages/affiliatePortal/Dashboard";
+
+import BookingManagement from "./pages/affiliatePortal/BookingManagement";
+
+import DashboardRevenue from "./pages/affiliatePortal/RevenueDashboard";
+
+import AffiliateInvoices from "./pages/affiliatePortal/Invoices";
+
+import Payouts from "./pages/affiliatePortal/Payouts";
+
+import AffiliateLayout from "./pages/affiliatePortal/AffiliateLayout";
+
+import LeadManagementAffiliate from "./pages/affiliatePortal/LeadManagementAffiliate";
+
+import QuotationGenerator from "./pages/affiliatePortal/QuotationGenerator";
+
+import MarketingTools from "./pages/affiliatePortal/MarketingTools";
+
+import LeaderBoard from "./pages/affiliatePortal/LeaderBoard";
+
+import Support from "./pages/affiliatePortal/Support";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -238,6 +265,28 @@ const App = () => (
                   <Route path="/signup" element={<Index openSignup={true} />} />
                   <Route path="/verify-otp" element={<VerifyOTP />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
+              {/* Affiliate Portal Routes */}
+              {/* <Route path="/affiliate-portal" element={<AffiliateLayout />}>
+                  <Route index element={<Navigate to="affiliate-dashboard" replace />} />
+                  <Route path="affiliate-dashboard" element={<AffiliateDashboard />} />
+                  <Route path="booking-management" element={<AffiliateBookingManagement />} />
+                  <Route path="revenue-dashboard" element={<AffiliateRevenueDashboard />} />
+                  <Route path="affiliate-invoices" element={<AffiliateInvoices />} />
+                  <Route path="payouts" element={<AffiliatePayouts />} />
+                  <Route path="lead-management" element={<AffiliateLeadManagement/>} />
+                  <Route path="quotation-generator" element={<AffiliateQuotationGenerator />} />
+                  <Route path="marketing-tools" element={<AffiliateMarketingTools />} />
+                  <Route path="leaderboard" element={<AffiliateLeaderBoard />} />
+                  <Route path="support" element={<AffiliateSupport />} />
+                  <Route path="profile" element={<AffiliateProfile />} />
+                  <Route path="settings" element={<AffiliateSettings />} />
+              </Route> */}
+
+
+              <Route path="/list-your-space" element={<ListYourSpace />} />
+              <Route path="/partner" element={<PartnerWithUs />} />
+              <Route path="/coming-soon" element={<ComingSoon />} />
+              <Route path="/start-chatting" element={<StartChatting />} />
 
                   {/* Protected Routes */}
                   <Route element={<ProtectedRoute />}>
@@ -273,6 +322,7 @@ const App = () => (
                         element={<RevenueDashboard />}
                       />
                       <Route path="tickets" element={<TicketSystem />} />
+                      <Route path="notifications" element={<AdminNotifications />} />
                       <Route path="leads" element={<LeadManagement />} />
                       <Route path="*" element={<AdminDashboard />} />
                     </Route>
@@ -331,6 +381,23 @@ const App = () => (
                         path="tasks"
                         element={<SpacePortalTicketAndTasks />}
                       />
+                    </Route>
+                  </Route>
+
+                  {/* Affiliate Portal Routes */}
+                  <Route element={<AffiliateRoute />}>
+                    <Route path="/affiliate-portal" element={<AffiliateLayout />}>
+                      <Route index element={<Navigate to="affiliate-dashboard" replace />} />
+                      <Route path="affiliate-dashboard" element={<AffiliateDashboard />} />
+                      <Route path="booking-management" element={<BookingManagement />} />
+                      <Route path="revenue-dashboard" element={<DashboardRevenue />} />
+                      <Route path="affiliate-invoices" element={<AffiliateInvoices />} />
+                      <Route path="payouts" element={<Payouts />} />
+                      <Route path="lead-management" element={<LeadManagementAffiliate />} />
+                      <Route path="quotation-generator" element={<QuotationGenerator />} />
+                      <Route path="marketing-tools" element={<MarketingTools />} />
+                      <Route path="leaderboard" element={<LeaderBoard />} />
+                      <Route path="support" element={<Support />} />
                     </Route>
                   </Route>
 

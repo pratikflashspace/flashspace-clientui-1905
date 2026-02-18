@@ -33,6 +33,7 @@ export interface CreateOrderPayload {
   discountPercent: number;
   discountAmount: number;
   paymentType?: "virtual_office" | "coworking_space" | "meeting_room";
+  startDate?: string; // ISO date string for booking start
 }
 
 export interface CreateOrderResponse {
