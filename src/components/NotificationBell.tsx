@@ -41,14 +41,25 @@ export const NotificationBell: React.FC = () => {
                     {/* Header */}
                     <div className="px-4 py-3 border-b flex justify-between items-center bg-gray-50">
                         <h3 className="text-sm font-semibold text-gray-700">Notifications</h3>
-                        {unreadCount > 0 && (
+                        <div className="flex gap-2">
                             <button
-                                onClick={markAllAsRead}
-                                className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    window.location.href = '/dashboard/notifications';
+                                }}
+                                className="text-xs text-blue-600 hover:text-blue-800 font-medium"
                             >
-                                <Check className="w-3 h-3" /> Mark all read
+                                View All
                             </button>
-                        )}
+                            {unreadCount > 0 && (
+                                <button
+                                    onClick={markAllAsRead}
+                                    className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                                >
+                                    <Check className="w-3 h-3" /> Mark all read
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {/* List */}

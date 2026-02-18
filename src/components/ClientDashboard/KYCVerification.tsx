@@ -29,6 +29,7 @@ import {
   Lock,
   Edit,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import { API_CONFIG } from "@/config/api.config";
 import DemoKYCVideo from "@/assets/kycVideo/DemoKYCVideo.mp4";
 
@@ -56,6 +57,7 @@ export default function KYCVerification() {
   const [activeStep, setActiveStep] = useState<VerificationStep>("personal");
   const [kycType, setKycType] = useState<KYCType>("individual");
   const [kycData, setKycData] = useState<KYCData | null>(null);
+  const [isConfirmed, setIsConfirmed] = useState(false); // Confirmation Checkbox State
 
   // Multi-Level State
   const [profiles, setProfiles] = useState<KYCData[]>([]);
@@ -194,8 +196,8 @@ export default function KYCVerification() {
               dateOfBirth:
                 info.dateOfBirth || flatData.dob
                   ? new Date(info.dateOfBirth || flatData.dob)
-                      .toISOString()
-                      .split("T")[0]
+                    .toISOString()
+                    .split("T")[0]
                   : "",
               aadhaar:
                 prev.aadhaar ||
@@ -388,13 +390,14 @@ export default function KYCVerification() {
         profileId,
       );
       if (response.success) {
+        toast.success("Document deleted successfully");
         fetchKYC();
       } else {
-        alert(response.message || "Failed to delete document");
+        toast.error(response.message || "Failed to delete document");
       }
     } catch (err) {
       console.error("Failed to delete document");
-      alert("Failed to delete document");
+      toast.error("Failed to delete document");
     } finally {
       setDeleting(null);
     }
@@ -402,7 +405,7 @@ export default function KYCVerification() {
 
   const handleUploadDocument = async (docType: string, file: File) => {
     if (!profileId || profileId === "new") {
-      alert(
+      toast.error(
         "Please save your profile information first before uploading documents.",
       );
       return;
@@ -415,13 +418,14 @@ export default function KYCVerification() {
         profileId,
       );
       if (response.success) {
+        toast.success("Document uploaded successfully");
         fetchKYC();
       } else {
-        alert(response.message || "Failed to upload document");
+        toast.error(response.message || "Failed to upload document");
       }
     } catch (err) {
       console.error("Failed to upload document", err);
-      alert(
+      toast.error(
         "An error occurred while uploading the document. Please try again.",
       );
     } finally {
@@ -435,7 +439,7 @@ export default function KYCVerification() {
     if (file && uploadingDocType) {
       // Validation for Document Uploads (excluding video)
       if (uploadingDocType !== "video_kyc" && file.type !== "application/pdf") {
-        alert("Only PDF files are allowed for documents.");
+        toast.error("Only PDF files are allowed for documents.");
         // Reset the input so the user can select again
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
@@ -662,45 +666,45 @@ export default function KYCVerification() {
   const requiredDocTypes =
     kycType === "individual"
       ? [
-          {
-            type: "pan_card",
-            name: "PAN Card",
-            description: "Individual PAN Card",
-            required: true,
-          },
-          {
-            type: "aadhaar",
-            name: "Aadhaar Card",
-            description: "Aadhaar Card (Front & Back)",
-            required: true,
-          },
-        ]
+        {
+          type: "pan_card",
+          name: "PAN Card",
+          description: "Individual PAN Card",
+          required: true,
+        },
+        {
+          type: "aadhaar",
+          name: "Aadhaar Card",
+          description: "Aadhaar Card (Front & Back)",
+          required: true,
+        },
+      ]
       : [
-          {
-            type: "pan_card",
-            name: "PAN Card",
-            description: "Company PAN Card",
-            required: true,
-          },
-          {
-            type: "gst_certificate",
-            name: "GST Certificate",
-            description: "GST Registration Certificate",
-            required: true,
-          },
-          {
-            type: "coi",
-            name: "Certificate of Incorporation",
-            description: "Company incorporation certificate",
-            required: false,
-          },
-          {
-            type: "address_proof",
-            name: "Address Proof",
-            description: "Utility bill or rent agreement",
-            required: true,
-          },
-        ];
+        {
+          type: "pan_card",
+          name: "PAN Card",
+          description: "Company PAN Card",
+          required: true,
+        },
+        {
+          type: "gst_certificate",
+          name: "GST Certificate",
+          description: "GST Registration Certificate",
+          required: true,
+        },
+        {
+          type: "coi",
+          name: "Certificate of Incorporation",
+          description: "Company incorporation certificate",
+          required: false,
+        },
+        {
+          type: "address_proof",
+          name: "Address Proof",
+          description: "Utility bill or rent agreement",
+          required: true,
+        },
+      ];
 
   // Check if all required documents are uploaded
   const areAllRequiredDocsUploaded = () => {
@@ -1037,10 +1041,10 @@ export default function KYCVerification() {
                 </h2>
                 {(!individualProfile ||
                   individualProfile.overallStatus !== "approved") && (
-                  <span className="text-xs font-medium text-red-500 bg-red-50 px-2 py-1 rounded">
-                    Locked until Personal Verification is Approved
-                  </span>
-                )}
+                    <span className="text-xs font-medium text-red-500 bg-red-50 px-2 py-1 rounded">
+                      Locked until Personal Verification is Approved
+                    </span>
+                  )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1223,13 +1227,12 @@ export default function KYCVerification() {
                           }
                         }}
                         disabled={!isAccessible}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors relative ${
-                          activeStep === step.id
-                            ? "bg-yellow-400 text-black"
-                            : isAccessible
-                              ? "text-gray-600 hover:bg-gray-100 cursor-pointer"
-                              : "text-gray-300 cursor-not-allowed opacity-50 bg-gray-50"
-                        }`}
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors relative ${activeStep === step.id
+                          ? "bg-yellow-400 text-black"
+                          : isAccessible
+                            ? "text-gray-600 hover:bg-gray-100 cursor-pointer"
+                            : "text-gray-300 cursor-not-allowed opacity-50 bg-gray-50"
+                          }`}
                         title={
                           !isAccessible ? "Complete previous steps first" : ""
                         }
@@ -1288,10 +1291,10 @@ export default function KYCVerification() {
                           Full Name <span className="text-red-500">*</span>
                         </label>
                         {isPartnerMode ||
-                        (profileId !== "new" &&
-                          kycData?.kycType === "individual" &&
-                          kycData?.profileName !== user?.fullName &&
-                          kycData?.personalInfo?.fullName !==
+                          (profileId !== "new" &&
+                            kycData?.kycType === "individual" &&
+                            kycData?.profileName !== user?.fullName &&
+                            kycData?.personalInfo?.fullName !==
                             user?.fullName) ? (
                           <input
                             type="text"
@@ -1609,11 +1612,11 @@ export default function KYCVerification() {
                         {[individualProfile, ...partnerProfiles].filter(
                           (p) => p && p.overallStatus === "approved",
                         ).length === 0 && (
-                          <p className="text-sm text-red-400 italic">
-                            No verified partners found. Please complete personal
-                            verification for yourself and any partners first.
-                          </p>
-                        )}
+                            <p className="text-sm text-red-400 italic">
+                              No verified partners found. Please complete personal
+                              verification for yourself and any partners first.
+                            </p>
+                          )}
 
                         {[individualProfile, ...partnerProfiles]
                           .filter((p) => p && p.overallStatus === "approved")
@@ -1631,8 +1634,8 @@ export default function KYCVerification() {
                                   const newPartners = e.target.checked
                                     ? [...businessForm.partners, p!._id!]
                                     : businessForm.partners.filter(
-                                        (id) => id !== p!._id,
-                                      );
+                                      (id) => id !== p!._id,
+                                    );
                                   setBusinessForm({
                                     ...businessForm,
                                     partners: newPartners,
@@ -1790,7 +1793,7 @@ export default function KYCVerification() {
                                           mimeType: "video/mp4",
                                         });
                                       } else {
-                                        alert(
+                                        toast.error(
                                           "Video URL not found. Please try uploading again.",
                                         );
                                       }
@@ -2029,8 +2032,8 @@ export default function KYCVerification() {
                           </span>
                         </div>
                         {kycData?.personalInfo?.fullName &&
-                        kycData?.personalInfo?.phone &&
-                        kycData?.personalInfo?.aadhaarNumber ? (
+                          kycData?.personalInfo?.phone &&
+                          kycData?.personalInfo?.aadhaarNumber ? (
                           <CheckCircle2 className="w-5 h-5 text-green-500" />
                         ) : (
                           <Clock className="w-5 h-5 text-yellow-500" />
@@ -2089,32 +2092,38 @@ export default function KYCVerification() {
                         {kycData?.documents?.filter(
                           (d) => d.type !== "video_kyc",
                         ).length >=
-                        requiredDocTypes.filter((d) => d.required).length ? (
+                          requiredDocTypes.filter((d) => d.required).length ? (
                           <CheckCircle2 className="w-5 h-5 text-green-500" />
                         ) : (
                           <Clock className="w-5 h-5 text-yellow-500" />
                         )}
                       </div>
                     </div>
+                    {/* Confirmation Checkbox */}
                     <div className="pt-4 border-t border-gray-100">
-                      <label className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          className="mt-1 w-4 h-4 text-yellow-500 rounded focus:ring-yellow-400"
-                        />
-                        <span className="text-sm text-gray-600">
-                          I confirm that all the information provided is
-                          accurate and I agree to FlashSpace{" "}
+                      <label className="flex items-start gap-3 cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={isConfirmed}
+                            onChange={(e) => setIsConfirmed(e.target.checked)}
+                            className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-yellow-500 checked:bg-yellow-500 hover:border-yellow-400"
+                          />
+                          <CheckCircle2 className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                        </div>
+                        <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+                          I hereby confirm that the information provided is true
+                          and accurate. I agree to the FlashSpace{" "}
                           <a
                             href="/terms"
-                            className="text-yellow-600 hover:underline"
+                            className="text-yellow-600 hover:underline font-medium"
                           >
                             Terms of Service
                           </a>{" "}
                           and{" "}
                           <a
                             href="/privacy"
-                            className="text-yellow-600 hover:underline"
+                            className="text-yellow-600 hover:underline font-medium"
                           >
                             Privacy Policy
                           </a>
@@ -2127,28 +2136,28 @@ export default function KYCVerification() {
                     {!isReadyForSubmission() &&
                       kycData?.overallStatus !== "approved" &&
                       kycData?.overallStatus !== "pending" && (
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 animate-in fade-in slide-in-from-bottom-2">
                           <p className="text-sm text-amber-800 font-medium flex items-start gap-2">
                             <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
                             <span>
                               Please complete all required steps before
                               submitting:
                               {!isPersonalInfoSaved() && (
-                                <span className="block">
+                                <span className="block ml-2">
                                   • Personal Information
                                 </span>
                               )}
                               {kycType === "business" &&
                                 !isBusinessInfoSaved() && (
-                                  <span className="block">
+                                  <span className="block ml-2">
                                     • Business Information
                                   </span>
                                 )}
                               {!isPartnerMode && !isVideoKYCComplete() && (
-                                <span className="block">• Video KYC</span>
+                                <span className="block ml-2">• Video KYC</span>
                               )}
                               {!areAllRequiredDocsUploaded() && (
-                                <span className="block">
+                                <span className="block ml-2">
                                   • Upload all required documents
                                 </span>
                               )}
@@ -2161,11 +2170,10 @@ export default function KYCVerification() {
                     {isReadyForSubmission() &&
                       kycData?.overallStatus !== "approved" &&
                       kycData?.overallStatus !== "pending" && (
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 animate-in fade-in slide-in-from-bottom-2">
                           <p className="text-sm text-green-800 font-medium flex items-center gap-2">
                             <CheckCircle2 className="w-4 h-4" /> All
-                            requirements completed (100%)! You can now submit
-                            for verification.
+                            requirements completed. Please confirm the details above to submit.
                           </p>
                         </div>
                       )}
@@ -2192,28 +2200,34 @@ export default function KYCVerification() {
                           kycData?.overallStatus !== "pending"
                         ) {
                           if (!isReadyForSubmission()) {
-                            alert(
+                            toast.error(
                               "Please complete all required steps before submitting.",
                             );
                             return;
                           }
 
+                          if (!isConfirmed) {
+                            toast.error("Please confirm that the information provided is accurate.");
+                            return;
+                          }
+
                           // Submit KYC for review
                           setSaving(true);
+                          const toastId = toast.loading("Submitting KYC...");
                           try {
                             const response =
                               await userDashboardService.submitKYC(profileId!);
                             if (response.success) {
-                              alert(
-                                "Your KYC has been submitted for verification. Our team will review it shortly.",
+                              toast.success(
+                                "KYC Submitted! Our team will review it shortly.", { id: toastId }
                               );
                               fetchKYC(); // Refresh to show new status
                             } else {
-                              alert(response.message || "Failed to submit KYC");
+                              toast.error(response.message || "Failed to submit KYC", { id: toastId });
                             }
                           } catch (err) {
                             console.error("Failed to submit KYC:", err);
-                            alert("Failed to submit KYC for review");
+                            toast.error("Failed to submit KYC for review", { id: toastId });
                           } finally {
                             setSaving(false);
                           }
@@ -2226,11 +2240,14 @@ export default function KYCVerification() {
                         (!linkBookingId &&
                           kycData?.overallStatus === "pending") ||
                         (!linkBookingId &&
-                          !isReadyForSubmission() &&
+                          (!isReadyForSubmission() || !isConfirmed) &&
                           kycData?.overallStatus !== "approved" &&
                           kycData?.overallStatus !== "pending")
                       }
-                      className="w-full py-3 bg-yellow-400 text-black rounded-xl font-semibold hover:bg-yellow-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 
+                        ${saving || (!linkBookingId && (!isReadyForSubmission() || !isConfirmed) && kycData?.overallStatus !== "approved" && kycData?.overallStatus !== "pending")
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-yellow-400 text-black hover:bg-yellow-500 shadow-md hover:shadow-lg"}`}
                     >
                       {saving ? (
                         <>

@@ -32,6 +32,10 @@ export const AdminNotificationService = {
         await axiosInstance.delete(`/notifications/${id}`);
     },
 
+    deleteAll: async (): Promise<void> => {
+        await axiosInstance.delete(`/notifications/admin/all`);
+    },
+
     markAsRead: async (id: string): Promise<AdminNotification> => {
         const response = await axiosInstance.patch<{ success: boolean; data: AdminNotification }>(`/notifications/${id}/read`);
         return response.data.data;
