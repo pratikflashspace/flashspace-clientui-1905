@@ -98,4 +98,26 @@ export const API_ENDPOINTS = {
     KYC_REVIEW: (id: string) => `/api/admin/kyc/${id}/review`,
     // Tickets - directly use ticket routes
   },
+
+  // Affiliate Portal
+
+  AFFILIATE: {
+
+    LEADS: '/api/affiliate/leads',
+
+    QUOTATIONS: '/api/affiliate/quotations',
+
+    QUOTATIONS_RECENT: '/api/affiliate/quotations/recent',
+
+    QUOTATIONS_STATS: '/api/affiliate/quotations/stats',
+
+    SUPPORT_TICKETS: '/api/affiliate/support/tickets',
+
+    LEADERBOARD: '/api/affiliate/leaderboard',
+
+    DASHBOARD_STATS: '/api/affiliate/dashboard/stats',
+
+    DASHBOARD_INSIGHTS: '/api/affiliate/dashboard/insights',
+
+  },
 };
