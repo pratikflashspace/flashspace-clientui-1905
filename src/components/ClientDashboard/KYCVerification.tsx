@@ -321,8 +321,20 @@ export default function KYCVerification() {
 
         if (partnerResponse.success) {
           setEditMode(false);
-          fetchKYC();
-          setProfileId(null);
+          // Redirect to new partner profile
+          if (partnerResponse.data && partnerResponse.data._id) {
+            const newPartnerId = partnerResponse.data._id;
+            setProfileId(newPartnerId);
+            setSearchParams((params) => {
+              params.set("profileId", newPartnerId);
+              return params;
+            });
+            // Force fetch to load partner data
+            setTimeout(() => fetchKYC(), 100);
+          } else {
+            fetchKYC();
+            setProfileId(null);
+          }
           return;
         } else {
           setError(partnerResponse.message || "Failed to add partner");
@@ -421,14 +433,22 @@ export default function KYCVerification() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && uploadingDocType) {
+      // Validation for Document Uploads (excluding video)
+      if (uploadingDocType !== "video_kyc" && file.type !== "application/pdf") {
+        alert("Only PDF files are allowed for documents.");
+        // Reset the input so the user can select again
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        return;
+      }
       handleUploadDocument(uploadingDocType, file);
     }
   };
 
   const triggerFileUpload = (docType: string) => {
     setUploadingDocType(docType);
-    const accept =
-      docType === "video_kyc" ? ".mp4,.webm,.mov" : ".pdf,.jpg,.jpeg,.png";
+    const accept = docType === "video_kyc" ? ".mp4,.webm,.mov" : ".pdf";
     setUploadAccept(accept);
     setTimeout(() => fileInputRef.current?.click(), 0);
   };
@@ -1325,17 +1345,21 @@ export default function KYCVerification() {
                           type="tel"
                           placeholder="Enter 10-digit number"
                           value={personalForm.phone}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            // Allow only numbers and limit to 10 digits
+                            const value = e.target.value
+                              .replace(/\D/g, "")
+                              .slice(0, 10);
                             setPersonalForm({
                               ...personalForm,
-                              phone: e.target.value,
-                            })
-                          }
+                              phone: value,
+                            });
+                          }}
                           className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                           required
-                          minLength={10}
-                          maxLength={10}
                           pattern="[0-9]{10}"
+                          title="Please enter exactly 10 digits"
+                          inputMode="numeric"
                         />
                       </div>
                       <div>
@@ -1363,17 +1387,23 @@ export default function KYCVerification() {
                           type="text"
                           placeholder="12-digit Aadhaar Number"
                           value={personalForm.aadhaar}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            // Allow only numbers and limit to 12 digits
+                            const value = e.target.value
+                              .replace(/\D/g, "")
+                              .slice(0, 12);
                             setPersonalForm({
                               ...personalForm,
-                              aadhaar: e.target.value,
-                            })
-                          }
+                              aadhaar: value,
+                            });
+                          }}
                           className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                           required
                           minLength={12}
                           maxLength={12}
                           pattern="[0-9]{12}"
+                          title="Please enter exactly 12 digits"
+                          inputMode="numeric"
                         />
                       </div>
                       <div>

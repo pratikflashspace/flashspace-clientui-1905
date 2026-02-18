@@ -1158,39 +1158,41 @@ export default function KYCRequests() {
                           </button>
                         )}
 
-                        {/* Business Info Button */}
-                        <button
-                          onClick={() =>
-                            handleViewBusinessInfo(
-                              request.user._id || (request.user as any).id,
-                              request.user.fullName,
-                            )
-                          }
-                          className="w-full bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl p-4 transition-colors text-left group/business"
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="flex items-center gap-2">
-                              <Building2 className="w-4 h-4 text-purple-600" />
-                              <h4 className="text-sm font-semibold text-purple-900 group-hover/business:text-purple-700">
-                                Business Info
-                              </h4>
+                        {/* Business Info Button - Only show if Approved */}
+                        {request.overallStatus === "approved" && (
+                          <button
+                            onClick={() =>
+                              handleViewBusinessInfo(
+                                request.user._id || (request.user as any).id,
+                                request.user.fullName,
+                              )
+                            }
+                            className="w-full bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl p-4 transition-colors text-left group/business"
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center gap-2">
+                                <Building2 className="w-4 h-4 text-purple-600" />
+                                <h4 className="text-sm font-semibold text-purple-900 group-hover/business:text-purple-700">
+                                  Business Info
+                                </h4>
+                              </div>
+                              <ExternalLink className="w-4 h-4 text-purple-400 group-hover/business:text-purple-600" />
                             </div>
-                            <ExternalLink className="w-4 h-4 text-purple-400 group-hover/business:text-purple-600" />
-                          </div>
-                          <div className="space-y-1 text-sm">
-                            {request.businessInfo?.companyName && (
-                              <p className="text-purple-700">
-                                <span className="font-medium">Company:</span>{" "}
-                                {request.businessInfo.companyName}
-                              </p>
-                            )}
-                            {!request.businessInfo?.companyName && (
-                              <p className="text-xs text-purple-700">
-                                View detailed business information
-                              </p>
-                            )}
-                          </div>
-                        </button>
+                            <div className="space-y-1 text-sm">
+                              {request.businessInfo?.companyName && (
+                                <p className="text-purple-700">
+                                  <span className="font-medium">Company:</span>{" "}
+                                  {request.businessInfo.companyName}
+                                </p>
+                              )}
+                              {!request.businessInfo?.companyName && (
+                                <p className="text-xs text-purple-700">
+                                  View detailed business information
+                                </p>
+                              )}
+                            </div>
+                          </button>
+                        )}
 
                         {/* Documents - Hide if Approved */}
                         {request.overallStatus !== "approved" && (
@@ -1252,18 +1254,13 @@ export default function KYCRequests() {
                         <div className="p-6 pt-0">
                           <div className="grid grid-cols-2 gap-3">
                             <button
-                              onClick={() => openRejectModal(request)}
-                              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 transition-all text-sm font-semibold hover:scale-105"
+                              onClick={() =>
+                                navigate(`/admin/kyc-requests/${request._id}`)
+                              }
+                              className="col-span-2 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all text-sm font-semibold shadow-md hover:shadow-lg hover:scale-105"
                             >
-                              <X className="w-4 h-4" />
-                              Reject
-                            </button>
-                            <button
-                              onClick={() => handleApprove(request)}
-                              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-105"
-                            >
-                              <Check className="w-4 h-4" />
-                              Approve
+                              <Eye className="w-4 h-4" />
+                              View Details
                             </button>
                           </div>
                           <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">

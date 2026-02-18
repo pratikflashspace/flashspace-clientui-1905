@@ -24,7 +24,7 @@ import {
   BusinessInfo,
 } from "@/types/services";
 
-export type { KYCData };
+export type { KYCData, DashboardData };
 
 // ============ SERVICE CLASS ============
 
@@ -478,24 +478,6 @@ class UserDashboardService {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to remove partner";
-      return {
-        success: false,
-        message: errorMessage,
-      };
-    }
-  }
-
-  async getPartnerDetails(partnerId: string): Promise<ApiResponse<any>> {
-    try {
-      const response = await axiosInstance.get<ApiResponse<any>>(
-        `/api/user/kyc/partner-details/${partnerId}`,
-      );
-      return response.data;
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to fetch partner details";
       return {
         success: false,
         message: errorMessage,
