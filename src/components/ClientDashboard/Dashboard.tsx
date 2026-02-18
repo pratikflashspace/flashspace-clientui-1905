@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import userDashboardService, { DashboardData } from "@/services/userDashboard.service";
+import userDashboardService, {
+  DashboardData,
+} from "@/services/userDashboard.service";
 import {
   LineChart,
   Line,
@@ -27,7 +29,9 @@ const COLORS = ["#f9c909", "#ffea80"];
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,6 +75,8 @@ export default function Dashboard() {
 
   const getKYCStatusDisplay = (status: string) => {
     switch (status) {
+      case "in_progress":
+        return { text: "Draft", color: "text-blue-600" };
       case "approved":
         return { text: "Verified", color: "text-green-600" };
       case "pending":
@@ -110,16 +116,25 @@ export default function Dashboard() {
     );
   }
 
-  const kycStatus = getKYCStatusDisplay(dashboardData?.kycStatus || "not_started");
+  const kycStatus = getKYCStatusDisplay(
+    dashboardData?.kycStatus || "not_started",
+  );
 
-  const lineData = dashboardData?.monthlyBookings?.map((m) => ({
-    month: m.month,
-    bookings: m.count,
-  })) || [];
+  const lineData =
+    dashboardData?.monthlyBookings?.map((m) => ({
+      month: m.month,
+      bookings: m.count,
+    })) || [];
 
   const pieData = [
-    { name: "Virtual Office", value: dashboardData?.usageBreakdown?.virtualOffice || 0 },
-    { name: "Coworking Space", value: dashboardData?.usageBreakdown?.coworkingSpace || 0 },
+    {
+      name: "Virtual Office",
+      value: dashboardData?.usageBreakdown?.virtualOffice || 0,
+    },
+    {
+      name: "Coworking Space",
+      value: dashboardData?.usageBreakdown?.coworkingSpace || 0,
+    },
   ];
 
   const summaryCards = [
@@ -174,12 +189,16 @@ export default function Dashboard() {
             className="bg-white rounded-xl p-5 shadow-sm border border-gray-100"
           >
             <div className="flex items-center gap-3 mb-3">
-              <div className={`w-10 h-10 ${card.iconBg} rounded-lg flex items-center justify-center`}>
+              <div
+                className={`w-10 h-10 ${card.iconBg} rounded-lg flex items-center justify-center`}
+              >
                 <card.icon className={`w-5 h-5 ${card.iconColor}`} />
               </div>
               <span className="text-sm text-gray-500">{card.title}</span>
             </div>
-            <p className={`text-xl font-bold ${card.valueColor || "text-gray-900"}`}>
+            <p
+              className={`text-xl font-bold ${card.valueColor || "text-gray-900"}`}
+            >
               {card.value}
             </p>
           </div>
@@ -189,7 +208,9 @@ export default function Dashboard() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-900 mb-4 font-[Poppins]">Monthly Bookings</h3>
+          <h3 className="font-semibold text-gray-900 mb-4 font-[Poppins]">
+            Monthly Bookings
+          </h3>
           {lineData.length > 0 ? (
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={lineData}>
@@ -213,8 +234,10 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-900 mb-4 font-[Poppins]">Usage Breakdown</h3>
-          {pieData.some(d => d.value > 0) ? (
+          <h3 className="font-semibold text-gray-900 mb-4 font-[Poppins]">
+            Usage Breakdown
+          </h3>
+          {pieData.some((d) => d.value > 0) ? (
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
@@ -244,21 +267,30 @@ export default function Dashboard() {
 
       {/* Recent Activity */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <h3 className="font-semibold text-gray-900 mb-4 font-[Poppins]">Recent Activity</h3>
-        {dashboardData?.recentActivity && dashboardData.recentActivity.length > 0 ? (
+        <h3 className="font-semibold text-gray-900 mb-4 font-[Poppins]">
+          Recent Activity
+        </h3>
+        {dashboardData?.recentActivity &&
+        dashboardData.recentActivity.length > 0 ? (
           <ul className="space-y-3">
             {dashboardData.recentActivity.map((activity, idx) => (
               <li key={idx} className="flex items-start gap-3 text-sm">
-                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-                  activity.type === "payment" ? "bg-green-100 text-green-600" :
-                  activity.type === "booking" ? "bg-blue-100 text-blue-600" :
-                  activity.type === "kyc" ? "bg-purple-100 text-purple-600" :
-                  "bg-gray-100 text-gray-600"
-                }`}>
+                <span
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                    activity.type === "payment"
+                      ? "bg-green-100 text-green-600"
+                      : activity.type === "booking"
+                        ? "bg-blue-100 text-blue-600"
+                        : activity.type === "kyc"
+                          ? "bg-purple-100 text-purple-600"
+                          : "bg-gray-100 text-gray-600"
+                  }`}
+                >
                   {activity.type === "payment" && "$"}
                   {activity.type === "booking" && "B"}
                   {activity.type === "kyc" && "K"}
-                  {!["payment", "booking", "kyc"].includes(activity.type) && "N"}
+                  {!["payment", "booking", "kyc"].includes(activity.type) &&
+                    "N"}
                 </span>
                 <div>
                   <p className="text-gray-700">{activity.message}</p>
