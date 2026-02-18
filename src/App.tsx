@@ -82,7 +82,7 @@ import RevenueDashboard from "./pages/admin/RevenueDashboard";
 import SupportChat from "./pages/admin/SupportChat";
 import Leaderboard from "./pages/admin/Leaderboard";
 
-  `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  `
+`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     `
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
 import SpacePortalClientDetails from "@/pages/spacePortal/ClientsDetails";
@@ -101,6 +101,7 @@ import AddSpace from "./pages/spacePortal/AddSpace";
 import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
 import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
+import MailAndVisits from "./pages/spacePortal/MailAndVisits";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 import { AffiliateRoute } from "./components/auth/AffiliateRoute";
 
@@ -283,10 +284,10 @@ const App = () => (
               </Route> */}
 
 
-              <Route path="/list-your-space" element={<ListYourSpace />} />
-              <Route path="/partner" element={<PartnerWithUs />} />
-              <Route path="/coming-soon" element={<ComingSoon />} />
-              <Route path="/start-chatting" element={<StartChatting />} />
+                  <Route path="/list-your-space" element={<ListYourSpace />} />
+                  <Route path="/partner" element={<PartnerWithUs />} />
+                  <Route path="/coming-soon" element={<ComingSoon />} />
+                  <Route path="/start-chatting" element={<StartChatting />} />
 
                   {/* Protected Routes */}
                   <Route element={<ProtectedRoute />}>
@@ -373,14 +374,13 @@ const App = () => (
                         element={<TeamManagement />}
                       />
                       <Route path="tickets" element={<Tickets />} />
+
                       <Route
                         path="feedback-nps"
                         element={<SpacePortalFeedbackNPS />}
                       />
-                      <Route
-                        path="tasks"
-                        element={<SpacePortalTicketAndTasks />}
-                      />
+                      <Route path="tasks" element={<SpacePortalTicketAndTasks />} />
+                      <Route path="mail-visits" element={<MailAndVisits />} />
                     </Route>
                   </Route>
 
