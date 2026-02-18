@@ -1,31 +1,42 @@
 import { Send, Eye, CheckCircle, PieChart } from "lucide-react";
 
-const QuotationStats = () => {
+interface QuotationStatsData {
+    totalSent: number;
+    viewRate: number;
+    accepted: number;
+    conversion: number;
+}
+
+interface QuotationStatsProps {
+    data?: QuotationStatsData;
+}
+
+const QuotationStats = ({ data }: QuotationStatsProps) => {
     const stats = [
         {
             label: "Total Sent",
-            value: "89",
+            value: `${data?.totalSent ?? 89}`,
             icon: Send,
             color: "text-blue-500",
             bg: "bg-blue-50",
         },
         {
             label: "View Rate",
-            value: "67%",
+            value: `${data?.viewRate ?? 67}%`,
             icon: Eye,
             color: "text-amber-500",
             bg: "bg-amber-50",
         },
         {
             label: "Accepted",
-            value: "34",
+            value: `${data?.accepted ?? 34}`,
             icon: CheckCircle,
             color: "text-emerald-500",
             bg: "bg-emerald-50",
         },
         {
             label: "Conversion",
-            value: "38%",
+            value: `${data?.conversion ?? 38}%`,
             icon: PieChart, // Or any other suitable icon for conversion
             color: "text-[#5bb09c]",
             bg: "bg-[#5bb09c]/10",

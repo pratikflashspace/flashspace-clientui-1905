@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom"; // Import Router hooks
-import Sidebar from "@/components/affiliatePortal/Sidebar";
+import Sidebar from "@/components/affiliatePrtal/Sidebar";
 import { Menu } from "lucide-react";
-import "./portal-animations.css";
 
-const AffiliateLayout = () => {
+const AffiliatePortalDashboard = () => {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
 
@@ -18,9 +17,7 @@ const AffiliateLayout = () => {
         if (path.includes("booking-management")) return "Booking Management";
         if (path.includes("revenue-dashboard")) return "Revenue Dashboard";
         if (path.includes("payouts")) return "Payouts";
-        if (path.includes("revenue-dashboard")) return "Revenue Dashboard";
-        if (path.includes("payouts")) return "Payouts";
-        if (path.includes("affiliate-invoices")) return "Invoices";
+        if (path.includes("invoices")) return "Invoices";
         if (path.includes("lead-management")) return "Lead Management";
         if (path.includes("quotation-generator")) return "Quotation Generator";
         if (path.includes("marketing-tools")) return "Marketing Tools";
@@ -35,7 +32,7 @@ const AffiliateLayout = () => {
     const handleNavigation = (pageName: string) => {
         switch (pageName) {
             case "Dashboard":
-                navigate("/affiliate-portal/affiliate-dashboard");
+                navigate("/affiliate-portal/dashboard");
                 break;
             case "Booking Management":
                 navigate("/affiliate-portal/booking-management");
@@ -47,7 +44,7 @@ const AffiliateLayout = () => {
                 navigate("/affiliate-portal/payouts");
                 break;
             case "Invoices":
-                navigate("/affiliate-portal/affiliate-invoices");
+                navigate("/affiliate-portal/invoices");
                 break;
             case "Lead Management":
                 navigate("/affiliate-portal/lead-management");
@@ -98,7 +95,7 @@ const AffiliateLayout = () => {
                 </header>
 
                 {/* --- Main Content Area --- */}
-                <main id="affiliate-main-content" className="flex-1 overflow-auto relative" data-lenis-prevent>
+                <main className="flex-1 overflow-auto relative">
                     {/* <Outlet /> renders the child route (e.g., Dashboard.tsx) here */}
                     <Outlet />
                 </main>
@@ -107,4 +104,4 @@ const AffiliateLayout = () => {
     );
 };
 
-export default AffiliateLayout;
+export default AffiliatePortalDashboard;

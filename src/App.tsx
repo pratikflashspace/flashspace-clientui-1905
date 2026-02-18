@@ -102,20 +102,31 @@ import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import MailAndVisits from "./pages/spacePortal/MailAndVisits";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
+import { AffiliateRoute } from "./components/auth/AffiliateRoute";
+
 // Affiliate Portal
-import AffiliateDashboard from "./pages/affiliatePortal/AffiliateDashboard";
-import AffiliateBookingManagement from "./pages/affiliatePortal/AffiliateBookingManagement";
-import AffiliateRevenueDashboard from "./pages/affiliatePortal/AffiliateRevenueDashboard";
-import AffiliateInvoices from "./pages/affiliatePortal/AffiliateInvoices";
-import AffiliatePayouts from "./pages/affiliatePortal/AffiliatePayouts";
+
+import AffiliateDashboard from "./pages/affiliatePortal/Dashboard";
+
+import BookingManagement from "./pages/affiliatePortal/BookingManagement";
+
+import DashboardRevenue from "./pages/affiliatePortal/RevenueDashboard";
+
+import AffiliateInvoices from "./pages/affiliatePortal/Invoices";
+
+import Payouts from "./pages/affiliatePortal/Payouts";
+
 import AffiliateLayout from "./pages/affiliatePortal/AffiliateLayout";
-import AffiliateLeadManagement from "./pages/affiliatePortal/AffiliateLeadManagement";
-import AffiliateQuotationGenerator from "./pages/affiliatePortal/AffiliateQuotationGenerator";
-import AffiliateMarketingTools from "./pages/affiliatePortal/AffiliateMarketingTools";
-import AffiliateLeaderBoard from "./pages/affiliatePortal/AffiliateLeaderBoard";
-import AffiliateSupport from "./pages/affiliatePortal/AffiliateSupport";
-import AffiliateProfile from "./pages/affiliatePortal/AffiliateProfile";
-import AffiliateSettings from "./pages/affiliatePortal/AffiliateSettings";
+
+import LeadManagementAffiliate from "./pages/affiliatePortal/LeadManagementAffiliate";
+
+import QuotationGenerator from "./pages/affiliatePortal/QuotationGenerator";
+
+import MarketingTools from "./pages/affiliatePortal/MarketingTools";
+
+import LeaderBoard from "./pages/affiliatePortal/LeaderBoard";
+
+import Support from "./pages/affiliatePortal/Support";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -247,22 +258,22 @@ const App = () => (
                   <Route path="/signup" element={<Index openSignup={true} />} />
                   <Route path="/verify-otp" element={<VerifyOTP />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
-                  {/* Affiliate Portal Routes */}
-                  <Route path="/affiliate-portal" element={<AffiliateLayout />}>
-                    <Route index element={<Navigate to="affiliate-dashboard" replace />} />
-                    <Route path="affiliate-dashboard" element={<AffiliateDashboard />} />
-                    <Route path="booking-management" element={<AffiliateBookingManagement />} />
-                    <Route path="revenue-dashboard" element={<AffiliateRevenueDashboard />} />
-                    <Route path="affiliate-invoices" element={<AffiliateInvoices />} />
-                    <Route path="payouts" element={<AffiliatePayouts />} />
-                    <Route path="lead-management" element={<AffiliateLeadManagement />} />
-                    <Route path="quotation-generator" element={<AffiliateQuotationGenerator />} />
-                    <Route path="marketing-tools" element={<AffiliateMarketingTools />} />
-                    <Route path="leaderboard" element={<AffiliateLeaderBoard />} />
-                    <Route path="support" element={<AffiliateSupport />} />
-                    <Route path="profile" element={<AffiliateProfile />} />
-                    <Route path="settings" element={<AffiliateSettings />} />
-                  </Route>
+              {/* Affiliate Portal Routes */}
+              {/* <Route path="/affiliate-portal" element={<AffiliateLayout />}>
+                  <Route index element={<Navigate to="affiliate-dashboard" replace />} />
+                  <Route path="affiliate-dashboard" element={<AffiliateDashboard />} />
+                  <Route path="booking-management" element={<AffiliateBookingManagement />} />
+                  <Route path="revenue-dashboard" element={<AffiliateRevenueDashboard />} />
+                  <Route path="affiliate-invoices" element={<AffiliateInvoices />} />
+                  <Route path="payouts" element={<AffiliatePayouts />} />
+                  <Route path="lead-management" element={<AffiliateLeadManagement/>} />
+                  <Route path="quotation-generator" element={<AffiliateQuotationGenerator />} />
+                  <Route path="marketing-tools" element={<AffiliateMarketingTools />} />
+                  <Route path="leaderboard" element={<AffiliateLeaderBoard />} />
+                  <Route path="support" element={<AffiliateSupport />} />
+                  <Route path="profile" element={<AffiliateProfile />} />
+                  <Route path="settings" element={<AffiliateSettings />} />
+              </Route> */}
 
 
                   <Route path="/list-your-space" element={<ListYourSpace />} />
@@ -343,6 +354,22 @@ const App = () => (
                     </Route>
                   </Route>
 
+                  {/* Affiliate Portal Routes */}
+                  <Route element={<AffiliateRoute />}>
+                    <Route path="/affiliate-portal" element={<AffiliateLayout />}>
+                      <Route index element={<Navigate to="affiliate-dashboard" replace />} />
+                      <Route path="affiliate-dashboard" element={<AffiliateDashboard />} />
+                      <Route path="booking-management" element={<BookingManagement />} />
+                      <Route path="revenue-dashboard" element={<DashboardRevenue />} />
+                      <Route path="affiliate-invoices" element={<AffiliateInvoices />} />
+                      <Route path="payouts" element={<Payouts />} />
+                      <Route path="lead-management" element={<LeadManagementAffiliate />} />
+                      <Route path="quotation-generator" element={<QuotationGenerator />} />
+                      <Route path="marketing-tools" element={<MarketingTools />} />
+                      <Route path="leaderboard" element={<LeaderBoard />} />
+                      <Route path="support" element={<Support />} />
+                    </Route>
+                  </Route>
 
                   <Route path="/list-your-space" element={<ListYourSpace />} />
                   <Route path="/partner" element={<PartnerWithUs />} />
