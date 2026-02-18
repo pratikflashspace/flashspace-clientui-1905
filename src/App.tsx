@@ -258,7 +258,7 @@ const App = () => (
                   <Route path="/verify-otp" element={<VerifyOTP />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
               {/* Affiliate Portal Routes */}
-              <Route path="/affiliate-portal" element={<AffiliateLayout />}>
+              {/* <Route path="/affiliate-portal" element={<AffiliateLayout />}>
                   <Route index element={<Navigate to="affiliate-dashboard" replace />} />
                   <Route path="affiliate-dashboard" element={<AffiliateDashboard />} />
                   <Route path="booking-management" element={<AffiliateBookingManagement />} />
@@ -272,7 +272,7 @@ const App = () => (
                   <Route path="support" element={<AffiliateSupport />} />
                   <Route path="profile" element={<AffiliateProfile />} />
                   <Route path="settings" element={<AffiliateSettings />} />
-              </Route>
+              </Route> */}
 
 
               <Route path="/list-your-space" element={<ListYourSpace />} />
