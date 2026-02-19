@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Mail, User, Building2, FileText, Loader2 } from 'lucide-react';
-import axios from 'axios';
 import { toast } from 'sonner';
+import { mailService, CreateMailData } from '../../services/mailService';
 
 interface LogMailModalProps {
     isOpen: boolean;
@@ -11,7 +11,7 @@ interface LogMailModalProps {
 
 const LogMailModal = ({ isOpen, onClose, onSuccess }: LogMailModalProps) => {
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<CreateMailData>({
         client: '',
         sender: '',
         type: 'Letter',
@@ -24,19 +24,32 @@ const LogMailModal = ({ isOpen, onClose, onSuccess }: LogMailModalProps) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const isFormValid = () => {
+        return formData.client.trim() !== '' &&
+            formData.sender.trim() !== '' &&
+            formData.space.trim() !== '';
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!isFormValid()) {
+            toast.error("Please fill in all required fields.");
+            return;
+        }
+
         setLoading(true);
 
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/mail`, formData);
+            await mailService.create(formData);
             toast.success('Mail logged successfully');
             onSuccess();
             onClose();
             setFormData({ client: '', sender: '', type: 'Letter', space: '' });
         } catch (error: any) {
             console.error('Failed to log mail', error);
-            toast.error(error.response?.data?.message || 'Failed to log mail');
+            const message = error.response?.data?.message || 'Failed to log mail';
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -141,7 +154,7 @@ const LogMailModal = ({ isOpen, onClose, onSuccess }: LogMailModalProps) => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 py-2.5 rounded-xl bg-teal-600 text-white font-semibold hover:bg-teal-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-teal-100"
+                            className="flex-1 py-2.5 rounded-xl bg-teal-600 text-white font-semibold hover:bg-teal-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-teal-100 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                             Log Mail
