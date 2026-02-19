@@ -199,7 +199,25 @@ export default function AdminDashboard() {
                         <div className="absolute right-0 top-full mt-4 w-96 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden transform origin-top-right transition-all">
                             <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                                 <h3 className="font-bold text-gray-900">Notifications</h3>
-                                <div className="text-xs text-gray-500">{notifications.length} total</div>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xs text-gray-500">{notifications.length} total</span>
+                                    {notifications.length > 0 && (
+                                        <button
+                                            onClick={async (e) => {
+                                                e.stopPropagation();
+                                                try {
+                                                    await AdminNotificationService.deleteAll();
+                                                    setNotifications([]);
+                                                } catch (err) {
+                                                    console.error("Failed to clear notifications", err);
+                                                }
+                                            }}
+                                            className="text-xs text-red-500 hover:text-red-700 font-medium hover:underline"
+                                        >
+                                            Clear All
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <div className="max-h-96 overflow-y-auto custom-scrollbar">
                                 {notifications.length === 0 ? (

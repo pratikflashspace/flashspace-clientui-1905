@@ -32,6 +32,7 @@ export default function KYCDetail() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<any | null>(null);
+  const [showApproveModal, setShowApproveModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -152,10 +153,12 @@ export default function KYCDetail() {
     }
   };
 
-  const handleApproveKYC = async () => {
+  const handleApproveKYC = () => {
+    setShowApproveModal(true);
+  };
+
+  const performApproveKYC = async () => {
     if (!id) return;
-    if (!confirm("Are you sure you want to approve this KYC application?"))
-      return;
 
     setProcessing(true);
     try {
@@ -178,40 +181,14 @@ export default function KYCDetail() {
       toast.error("Failed to approve KYC");
     } finally {
       setProcessing(false);
+      setShowApproveModal(false);
     }
   };
 
-  const handleRejectKYC = async () => {
-    if (!id) return;
-    const reason = prompt("Enter rejection reason for the entire application:");
-    if (!reason) return;
-
-    setProcessing(true);
-    try {
-      let response;
-      if (type === "business") {
-        response = await adminService.updateBusinessInfoStatus(
-          id,
-          "reject",
-          reason,
-        );
-      } else if (type === "partner") {
-        response = await adminService.updatePartnerStatus(id, "reject", reason);
-      } else {
-        response = await adminService.reviewKYC(id, "reject", reason);
-      }
-      if (response.success) {
-        toast.success("KYC rejected successfully");
-        navigate("/admin/kyc-requests");
-      } else {
-        toast.error(response.message || "Failed to reject KYC");
-      }
-    } catch (error) {
-      console.error("Error rejecting KYC:", error);
-      toast.error("Failed to reject KYC");
-    } finally {
-      setProcessing(false);
-    }
+  const handleRejectKYC = () => {
+    setRejectionReason("");
+    setSelectedDocId("kyc"); // Special ID for full KYC rejection
+    setShowRejectModal(true);
   };
 
   const openRejectModal = (docId: string) => {
@@ -439,23 +416,22 @@ export default function KYCDetail() {
                         (doc) => doc.status === "approved",
                       )
                     }
-                    className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-sm ${
-                      !kycData.documents?.every(
-                        (doc) => doc.status === "approved",
-                      )
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-green-500 hover:bg-green-600 text-white"
-                    }`}
+                    className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-sm ${!kycData.documents?.every(
+                      (doc) => doc.status === "approved",
+                    )
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-green-500 hover:bg-green-600 text-white"
+                      }`}
                   >
                     <CheckCircle2 className="w-4 h-4" /> Approve KYC
                   </button>
                   {!kycData.documents?.every(
                     (doc) => doc.status === "approved",
                   ) && (
-                    <p className="text-xs text-orange-500 text-center mt-2">
-                      All documents must be approved before approving KYC.
-                    </p>
-                  )}
+                      <p className="text-xs text-orange-500 text-center mt-2">
+                        All documents must be approved before approving KYC.
+                      </p>
+                    )}
                 </div>
               </div>
             )}
@@ -623,7 +599,7 @@ export default function KYCDetail() {
           <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg text-gray-900">
-                Reject Document
+                {selectedDocId === "kyc" ? "Reject Application" : "Reject Document"}
               </h3>
               <button
                 onClick={() => setShowRejectModal(false)}
@@ -633,14 +609,14 @@ export default function KYCDetail() {
               </button>
             </div>
             <p className="text-gray-500 text-sm mb-4">
-              Please provide a reason for rejecting this document. This will be
+              Please provide a reason for rejecting this {selectedDocId === "kyc" ? "application" : "document"}. This will be
               visible to the user.
             </p>
             <textarea
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               className="w-full border border-gray-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-red-100 min-h-[100px] mb-4 text-sm resize-none"
-              placeholder="e.g., Image is blurry, Incorrect document type..."
+              placeholder={selectedDocId === "kyc" ? "e.g., Inconsistent information, Blurred documents..." : "e.g., Image is blurry, Incorrect document type..."}
               autoFocus
             />
             <div className="flex gap-3">
@@ -651,19 +627,79 @@ export default function KYCDetail() {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  if (selectedDocId && rejectionReason) {
-                    handleDocumentAction(
-                      selectedDocId,
-                      "reject",
-                      rejectionReason,
-                    );
+                onClick={async () => {
+                  if (rejectionReason) {
+                    if (selectedDocId === "kyc") {
+                      // Handle KYC Rejection
+                      setProcessing(true);
+                      try {
+                        let response;
+                        if (type === "business") {
+                          response = await adminService.updateBusinessInfoStatus(id!, "reject", rejectionReason);
+                        } else if (type === "partner") {
+                          response = await adminService.updatePartnerStatus(id!, "reject", rejectionReason);
+                        } else {
+                          response = await adminService.reviewKYC(id!, "reject", rejectionReason);
+                        }
+                        if (response.success) {
+                          toast.success("KYC rejected successfully");
+                          navigate("/admin/kyc-requests");
+                        } else {
+                          toast.error(response.message || "Failed to reject KYC");
+                        }
+                      } catch (error) {
+                        console.error("Error rejecting KYC:", error);
+                        toast.error("Failed to reject KYC");
+                      } finally {
+                        setProcessing(false);
+                        setShowRejectModal(false);
+                      }
+                    } else if (selectedDocId) {
+                      handleDocumentAction(
+                        selectedDocId,
+                        "reject",
+                        rejectionReason,
+                      );
+                    }
                   }
                 }}
                 disabled={!rejectionReason.trim() || processing}
                 className="flex-1 py-2.5 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
               >
-                Confirm Rejection
+                {processing ? "Processing..." : "Confirm Rejection"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Approve Confirmation Modal */}
+      {showApproveModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl animate-in zoom-in-95 duration-200">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Approve KYC?</h3>
+              <p className="text-gray-500 text-sm">
+                Are you sure you want to approve this KYC application? This action cannot be undone efficiently.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowApproveModal(false)}
+                className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                disabled={processing}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={performApproveKYC}
+                className="flex-1 py-2.5 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors disabled:opacity-50"
+                disabled={processing}
+              >
+                {processing ? "Approving..." : "Yes, Approve"}
               </button>
             </div>
           </div>
