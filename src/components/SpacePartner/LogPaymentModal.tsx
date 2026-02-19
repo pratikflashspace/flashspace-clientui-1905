@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Loader2, Calendar, User, FileText, IndianRupee, Layout, CreditCard } from 'lucide-react';
+import { axiosInstance } from '../../lib/axios';
 
 interface LogPaymentModalProps {
     isOpen: boolean;
@@ -27,24 +28,14 @@ const LogPaymentModal = ({ isOpen, onClose, onSuccess }: LogPaymentModalProps) =
         setLoading(true);
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/partner-payment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            const response = await axiosInstance.post('/api/spacePartner/payments', formData);
 
-            const data = await response.json();
-
-            if (data.success) {
-                onSuccess();
-                onClose();
+            if (response.data.success) {
                 onSuccess();
                 onClose();
                 setFormData({ paymentId: '', client: '', amount: '', method: 'Cash', purpose: '', space: '', invoiceId: '', commission: '' });
             } else {
-                console.error('Failed to log payment:', data.message);
+                console.error('Failed to log payment:', response.data.message);
             }
         } catch (error) {
             console.error('Failed to log payment', error);

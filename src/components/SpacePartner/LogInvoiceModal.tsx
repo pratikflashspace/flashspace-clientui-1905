@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Loader2, Calendar, User, FileText, IndianRupee, Layout } from 'lucide-react';
+import { axiosInstance } from '../../lib/axios';
 
 interface LogInvoiceModalProps {
     isOpen: boolean;
@@ -25,22 +26,14 @@ const LogInvoiceModal = ({ isOpen, onClose, onSuccess }: LogInvoiceModalProps) =
         setLoading(true);
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/partner-invoice`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            const response = await axiosInstance.post('/api/spacePartner/invoices', formData);
 
-            const data = await response.json();
-
-            if (data.success) {
+            if (response.data.success) {
                 onSuccess();
                 onClose();
                 setFormData({ invoiceId: '', client: '', description: '', amount: '', dueDate: '', space: '' });
             } else {
-                console.error('Failed to log invoice:', data.message);
+                console.error('Failed to log invoice:', response.data.message);
             }
         } catch (error) {
             console.error('Failed to log invoice', error);

@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 import { Button } from "../../components/ui/button";
-import axios from 'axios';
+import { axiosInstance } from '../../lib/axios';
 import { toast } from 'sonner';
 import LogInvoiceModal from '../../components/SpacePartner/LogInvoiceModal';
 import LogPaymentModal from '../../components/SpacePartner/LogPaymentModal';
@@ -54,7 +54,7 @@ const InvoicesAndPayments = () => {
 
   const fetchInvoices = async () => {
     try {
-      const response = await axios.get<ApiResponse<InvoiceRecord[]>>(`${import.meta.env.VITE_API_URL}/api/partner-invoice`);
+      const response = await axiosInstance.get<ApiResponse<InvoiceRecord[]>>('/api/spacePartner/invoices');
       if (response.data.success) {
         const sortedData = response.data.data.sort((a, b) => {
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -69,7 +69,7 @@ const InvoicesAndPayments = () => {
 
   const fetchPayments = async () => {
     try {
-      const response = await axios.get<ApiResponse<PaymentRecord[]>>(`${import.meta.env.VITE_API_URL}/api/partner-payment`);
+      const response = await axiosInstance.get<ApiResponse<PaymentRecord[]>>('/api/spacePartner/payments');
       if (response.data.success) {
         const sortedData = response.data.data.sort((a, b) => {
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
