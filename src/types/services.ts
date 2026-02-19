@@ -329,6 +329,7 @@ export interface KYCData {
   profileName?: string; // e.g., "TechCorp Pvt Ltd" or "John Doe (Personal)"
   linkedBookings?: string[]; // Array of booking IDs
   overallStatus: KYCStatus;
+  status?: string; // Add status field to match DashboardData
   kycType?: KYCType;
   isPartner?: boolean;
   partnerCount?: number;
