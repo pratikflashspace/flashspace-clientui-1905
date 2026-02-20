@@ -63,3 +63,27 @@ export const fetchScheduledCalls = async (
     return handleApiError(error);
   }
 };
+
+/**
+ * Fetch overview stats and clients for the Space Portal dashboard.
+ */
+export const fetchPartnerDashboard = async () => {
+  try {
+    const response = await axiosInstance.get("/user/partner/dashboard");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
+ * Fetch all types of spaces for the logged-in partner.
+ */
+export const fetchAllPartnerSpaces = async () => {
+  try {
+    const response = await axiosInstance.get("/user/partner/spaces");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};

@@ -1,7 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
-import { CLIENTS } from "@/data/spacePortal/clients";
-import type { ClientStatus, ClientPlan } from "@/types/spacePortal/client";
+import type {
+  ClientStatus,
+  ClientPlan,
+  Client,
+} from "@/types/spacePortal/client";
+import { fetchPartnerDashboard } from "@/services/spacePortal/spacePartner.service";
 
 import StatCard from "@/components/ui/SpacePartner/StatCard";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
@@ -28,6 +32,26 @@ export default function Dashboard() {
   // Filters state
   const [statusFilter, setStatusFilter] = useState<ClientStatus | "ALL">("ALL");
   const [planFilter, setPlanFilter] = useState<ClientPlan | "ALL">("ALL");
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch real data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const payload: any = await fetchPartnerDashboard();
+        if (payload?.success) {
+          setClients(payload.data.clients);
+        }
+      } catch (err) {
+        console.error("Failed to load partner dashboard data", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
   /**
    * Dropdown filter options (keeps JSX clean and avoids duplication)
@@ -39,19 +63,22 @@ export default function Dashboard() {
       { label: "Expiring Soon", value: "EXPIRING_SOON" },
       { label: "Inactive", value: "INACTIVE" },
     ],
-    []
+    [],
   );
 
-  const planOptions = useMemo(
-    () => [
-      { label: "All Plans", value: "ALL" },
-      { label: "Virtual Office Premium", value: "Virtual Office Premium" },
-      { label: "Virtual Office Standard", value: "Virtual Office Standard" },
-      { label: "Team Space", value: "Team Space" },
-      { label: "Hot Desk Monthly", value: "Hot Desk Monthly" },
-    ],
-    []
-  );
+  const planOptions = useMemo(() => {
+    // Extract unique plan names from the fetched clients
+    const uniquePlans = Array.from(new Set(clients.map((c) => c.plan))).filter(
+      Boolean,
+    );
+
+    const options = [{ label: "All Plans", value: "ALL" }];
+    uniquePlans.forEach((planName) => {
+      options.push({ label: planName, value: planName });
+    });
+
+    return options;
+  }, [clients]);
 
   /**
    * Normalize query once instead of doing trim().toLowerCase() repeatedly.
@@ -65,7 +92,7 @@ export default function Dashboard() {
    * - Plan filter
    */
   const filteredClients = useMemo(() => {
-    return CLIENTS.filter((c) => {
+    return clients.filter((c) => {
       const matchesQuery =
         c.companyName.toLowerCase().includes(normalizedQuery) ||
         c.contactName.toLowerCase().includes(normalizedQuery) ||
@@ -79,18 +106,20 @@ export default function Dashboard() {
 
       return matchesQuery && matchesStatus && matchesPlan;
     });
-  }, [normalizedQuery, statusFilter, planFilter]);
+  }, [normalizedQuery, statusFilter, planFilter, clients]);
 
   /**
    * Dashboard stats computed once.
    * This is cleaner + prevents repeated CLIENTS.filter calls.
    */
   const stats = useMemo(() => {
-    const total = CLIENTS.length;
+    const total = clients.length;
 
-    const active = CLIENTS.filter((c) => c.status === "ACTIVE").length;
-    const expiringSoon = CLIENTS.filter((c) => c.status === "EXPIRING_SOON").length;
-    const inactive = CLIENTS.filter((c) => c.status === "INACTIVE").length;
+    const active = clients.filter((c) => c.status === "ACTIVE").length;
+    const expiringSoon = clients.filter(
+      (c) => c.status === "EXPIRING_SOON",
+    ).length;
+    const inactive = clients.filter((c) => c.status === "INACTIVE").length;
 
     return {
       total,
@@ -98,7 +127,15 @@ export default function Dashboard() {
       expiringSoon,
       inactive,
     };
-  }, []);
+  }, [clients]);
+
+  if (loading) {
+    return (
+      <div className="flex h-full flex-1 items-center justify-center">
+        <div className="text-slate-500">Loading your dashboard...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1">
@@ -184,9 +221,7 @@ export default function Dashboard() {
 
           {/* Empty State */}
           {filteredClients.length === 0 && (
-            <p className="mt-6 text-center text-slate-500">
-              No clients found.
-            </p>
+            <p className="mt-6 text-center text-slate-500">No clients found.</p>
           )}
         </div>
       </div>
@@ -203,8 +238,8 @@ function StatusPill({ status }: { status: ClientStatus }) {
     status === "ACTIVE"
       ? { label: "Active", className: "bg-emerald-50 text-[#3FA69E]" }
       : status === "EXPIRING_SOON"
-      ? { label: "Expiring Soon", className: "bg-amber-50 text-amber-700" }
-      : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
+        ? { label: "Expiring Soon", className: "bg-amber-50 text-amber-700" }
+        : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
 
   return (
     <span
