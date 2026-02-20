@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, User, Building2, FileText, Loader2, Briefcase } from 'lucide-react';
-import axios from 'axios';
+import { X, User, Building2, Loader2, Briefcase } from 'lucide-react';
 import { toast } from 'sonner';
+import { visitService, CreateVisitData } from '../../services/visitService';
 
 interface LogVisitModalProps {
     isOpen: boolean;
@@ -11,7 +11,7 @@ interface LogVisitModalProps {
 
 const LogVisitModal = ({ isOpen, onClose, onSuccess }: LogVisitModalProps) => {
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<CreateVisitData>({
         client: '',
         visitor: '',
         purpose: '',
@@ -24,19 +24,33 @@ const LogVisitModal = ({ isOpen, onClose, onSuccess }: LogVisitModalProps) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const isFormValid = () => {
+        return formData.client.trim() !== '' &&
+            formData.visitor.trim() !== '' &&
+            formData.purpose.trim() !== '' &&
+            formData.space.trim() !== '';
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!isFormValid()) {
+            toast.error("Please fill in all required fields.");
+            return;
+        }
+
         setLoading(true);
 
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/visit`, formData);
+            await visitService.create(formData);
             toast.success('Visit logged successfully');
             onSuccess();
             onClose();
             setFormData({ client: '', visitor: '', purpose: '', space: '' });
         } catch (error: any) {
             console.error('Failed to log visit', error);
-            toast.error(error.response?.data?.message || 'Failed to log visit');
+            const message = error.response?.data?.message || 'Failed to log visit';
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -137,7 +151,7 @@ const LogVisitModal = ({ isOpen, onClose, onSuccess }: LogVisitModalProps) => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 py-2.5 rounded-xl bg-teal-600 text-white font-semibold hover:bg-teal-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-teal-100"
+                            className="flex-1 py-2.5 rounded-xl bg-teal-600 text-white font-semibold hover:bg-teal-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-teal-100 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                             Log Visit

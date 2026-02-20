@@ -13,6 +13,7 @@ export enum NotificationType {
     TICKET_UPDATE = 'TICKET_UPDATE',
     MEETING_BOOKED = 'MEETING_BOOKED'
 }
+import { API_CONFIG } from '@/config/api.config';
 
 export interface INotification {
     _id: string;
@@ -35,7 +36,7 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { user, token } = useAuth(); // Get current user
+    const { user } = useAuth(); // Get current user
     const [socket, setSocket] = useState<Socket | null>(null);
     const [notifications, setNotifications] = useState<INotification[]>([]);
 
@@ -43,14 +44,33 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     // 1. Fetch History
     const fetchNotifications = async () => {
-        if (!user || !token) return;
+        if (!user) return;
+
+        // Debug user object to see why _id is undefined
+        console.log("Current User Object:", user);
+        // Fallback for ID if _id is missing
+        const userId = user._id || user.id;
+        console.log("Fetching notifications for user ID:", userId);
+
+        const baseUrl = API_CONFIG.BASE_URL; // Use config with fallback
+
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notifications`, {
-                headers: { Authorization: `Bearer ${token}` }
+            const res = await fetch(`${baseUrl}/api/notifications`, {
+                credentials: 'include'
             });
+
+            // Check content type to avoid JSON parse error on HTML response
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") === -1) {
+                console.error("Received non-JSON response:", await res.text());
+                return;
+            }
+
             const data = await res.json();
+            console.log("Notification API Response:", data);
+
             if (data.success) {
-                setNotifications(data.notifications);
+                setNotifications(data.data);
             }
         } catch (err) {
             console.error("Failed to fetch notifications", err);
@@ -68,20 +88,19 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     // 3. Socket Connection
     useEffect(() => {
-        if (!user || !token) return;
+        if (!user) return;
+
+        const userId = user._id || user.id;
+        const baseUrl = API_CONFIG.BASE_URL;
 
         // Connect to Backend
-        const socketInstance = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
-            auth: { token }, // If your socket middleware uses this
-            query: { userId: user._id } // Or this
+        const socketInstance = io(baseUrl, {
+            withCredentials: true,
+            query: { userId: userId }
         });
 
         // Listen for new notifications
         socketInstance.on('notification:new', (newNotification: INotification) => {
-            // Play sound?
-            // const audio = new Audio('/notification.mp3');
-            // audio.play();
-
             // Show Toast
             toast(
                 (t) => (
@@ -101,7 +120,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (user.role === 'admin') {
             socketInstance.emit('join_admin_feed');
         } else {
-            socketInstance.emit('join_ticket', user._id); // Example: joining user room
+            socketInstance.emit('join_user_feed', user._id);
         }
 
         setSocket(socketInstance);
@@ -109,17 +128,18 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return () => {
             socketInstance.disconnect();
         };
-    }, [user, token]);
+    }, [user]);
 
+    // 4. Actions
     // 4. Actions
     const markAsRead = async (id: string) => {
         // Optimistic Update
         setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
 
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/${id}/read`, {
+            await fetch(`${API_CONFIG.BASE_URL}/api/notifications/${id}/read`, {
                 method: 'PATCH',
-                headers: { Authorization: `Bearer ${token}` }
+                credentials: 'include'
             });
         } catch (err) {
             console.error("Failed to mark read", err);
@@ -129,9 +149,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const markAllAsRead = async () => {
         setNotifications(prev => prev.map(n => ({ ...n, read: true })));
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/read-all`, {
+            await fetch(`${API_CONFIG.BASE_URL}/api/notifications/read-all`, {
                 method: 'PATCH',
-                headers: { Authorization: `Bearer ${token}` }
+                credentials: 'include'
             });
         } catch (err) {
             console.error("Failed to mark all read", err);

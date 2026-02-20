@@ -7,37 +7,11 @@ import {
     DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
 import { Button } from "../../components/ui/button";
-import axios from 'axios';
 import { toast } from 'sonner';
 import LogMailModal from '../../components/SpacePartner/LogMailModal';
 import LogVisitModal from '../../components/SpacePartner/LogVisitModal';
-
-interface MailRecord {
-    _id: string;
-    client: string;
-    sender: string;
-    type: string;
-    space: string;
-    received: string;
-    status: 'Pending Action' | 'Forwarded' | 'Collected';
-    createdAt: string;
-}
-
-interface VisitRecord {
-    _id: string;
-    client: string;
-    visitor: string;
-    purpose: string;
-    space: string;
-    date: string;
-    status: 'Pending' | 'Completed';
-    createdAt: string;
-}
-
-interface ApiResponse<T> {
-    success: boolean;
-    data: T;
-}
+import { mailService, MailRecord } from '../../services/mailService';
+import { visitService, VisitRecord } from '../../services/visitService';
 
 const MailAndVisits = () => {
     const [activeTab, setActiveTab] = useState<'mail' | 'visits'>('mail');
@@ -49,9 +23,9 @@ const MailAndVisits = () => {
 
     const fetchMails = async () => {
         try {
-            const response = await axios.get<ApiResponse<MailRecord[]>>(`${import.meta.env.VITE_API_URL}/api/mail`);
-            if (response.data.success) {
-                const sortedData = response.data.data.sort((a, b) => {
+            const response = await mailService.getAll();
+            if (response.success) {
+                const sortedData = response.data.sort((a, b) => {
                     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
                 });
                 setMailRecords(sortedData);
@@ -64,9 +38,9 @@ const MailAndVisits = () => {
 
     const fetchVisits = async () => {
         try {
-            const response = await axios.get<ApiResponse<VisitRecord[]>>(`${import.meta.env.VITE_API_URL}/api/visit`);
-            if (response.data.success) {
-                const sortedData = response.data.data.sort((a, b) => {
+            const response = await visitService.getAll();
+            if (response.success) {
+                const sortedData = response.data.sort((a, b) => {
                     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
                 });
                 setVisitRecords(sortedData);
@@ -153,11 +127,9 @@ const MailAndVisits = () => {
 
     const handleUpdate = async (id: string, nextStatus: string) => {
         try {
-            const response = await axios.patch<ApiResponse<unknown>>(`${import.meta.env.VITE_API_URL}/api/mail/${id}/status`, {
-                status: nextStatus
-            });
+            const response = await mailService.updateStatus(id, nextStatus);
 
-            if (response.data.success) {
+            if (response.success) {
                 setMailRecords(prev => {
                     const updatedRecords = prev.map(record =>
                         record._id === id ? { ...record, status: nextStatus as any } : record
@@ -177,11 +149,9 @@ const MailAndVisits = () => {
 
     const handleVisitUpdate = async (id: string, nextStatus: string) => {
         try {
-            const response = await axios.patch<ApiResponse<unknown>>(`${import.meta.env.VITE_API_URL}/api/visit/${id}/status`, {
-                status: nextStatus
-            });
+            const response = await visitService.updateStatus(id, nextStatus);
 
-            if (response.data.success) {
+            if (response.success) {
                 setVisitRecords(prev => {
                     const updatedRecords = prev.map(record =>
                         record._id === id ? { ...record, status: nextStatus as any } : record
@@ -301,7 +271,14 @@ const MailAndVisits = () => {
                                             </td>
                                             <td className="px-6 py-5 text-sm font-medium text-slate-900">{record.client}</td>
                                             <td className="px-6 py-5 text-sm text-slate-600">{record.sender}</td>
-                                            <td className="px-6 py-5 text-sm text-slate-600">{record.type}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                                        {record.type === 'Check' ? <Package className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
+                                                    </span>
+                                                    <span className="font-medium text-gray-900">{record.type}</span>
+                                                </div>
+                                            </td>
                                             <td className="px-6 py-5 text-sm text-slate-500">
                                                 <div className="flex items-center gap-2">
                                                     <MapPin className="w-4 h-4 text-slate-400" />
