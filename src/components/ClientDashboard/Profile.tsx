@@ -17,11 +17,12 @@ import {
   CheckCircle2,
   Clock,
   FileText,
-  Briefcase,
+  ShieldCheck,
   Loader2,
   AlertCircle,
   RefreshCw,
 } from "lucide-react";
+import KYCVerification from "./KYCVerification";
 
 // Profile data interfaces
 interface ProfileDataState {
@@ -82,7 +83,7 @@ const Profile: React.FC = () => {
             ...prev,
             fullName: user.fullName || "",
             email: user.email || "",
-            phone: user.phone || "",
+            phone: user.phoneNumber || "",
           }));
         }
 
@@ -188,10 +189,28 @@ const Profile: React.FC = () => {
             <CheckCircle2 className="w-4 h-4" /> Verified
           </span>
         );
+      case "approved":
+        return (
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+            <CheckCircle2 className="w-4 h-4" /> Verified
+          </span>
+        );
       case "pending":
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-700">
             <Clock className="w-4 h-4" /> Pending
+          </span>
+        );
+      case "in_progress":
+        return (
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">
+            <FileText className="w-4 h-4" /> Draft
+          </span>
+        );
+      case "rejected":
+        return (
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
+            <AlertCircle className="w-4 h-4" /> Rejected
           </span>
         );
       default:
@@ -206,7 +225,7 @@ const Profile: React.FC = () => {
   const tabs = [
     { id: "personal", label: "Personal Info", icon: User },
     { id: "company", label: "Company Details", icon: Building2 },
-    { id: "subscription", label: "Subscription", icon: Briefcase },
+    { id: "subscription", label: "KYC Verification", icon: ShieldCheck },
   ];
 
   return (
@@ -285,7 +304,7 @@ const Profile: React.FC = () => {
 
                   {/* KYC Status */}
                   <div className="flex flex-col items-center sm:items-end gap-2">
-                    {getKYCBadge(kycData?.status || "not_submitted")}
+                    {getKYCBadge(kycData?.overallStatus || "not_submitted")}
                     {!isEditing ? (
                       <button
                         onClick={() => setIsEditing(true)}
@@ -682,105 +701,10 @@ const Profile: React.FC = () => {
               )}
 
               {/* Subscription Tab */}
+              {/* Subscription Tab (now KYC Verification) */}
               {activeTab === "subscription" && (
                 <div className="space-y-6">
-                  <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                    <Briefcase className="w-5 h-5 text-yellow-500" />{" "}
-                    Subscription Details
-                  </h2>
-
-                  {activeBooking ? (
-                    <>
-                      {/* Current Plan Card */}
-                      <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200 rounded-xl p-6">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                          <div>
-                            <p className="text-sm text-yellow-700 mb-1">
-                              Current Plan
-                            </p>
-                            <h3 className="text-2xl font-bold text-gray-900">
-                              {activeBooking.plan?.name ||
-                                activeBooking.spaceSnapshot?.name}
-                            </h3>
-                            <p className="text-gray-600 mt-1">
-                              Valid from{" "}
-                              {activeBooking.startDate
-                                ? formatDate(activeBooking.startDate)
-                                : "N/A"}{" "}
-                              to{" "}
-                              {activeBooking.endDate
-                                ? formatDate(activeBooking.endDate)
-                                : "N/A"}
-                            </p>
-                          </div>
-                          <div className="flex gap-3">
-                            <a
-                              href="/dashboard/billing"
-                              className="px-5 py-2.5 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors"
-                            >
-                              Upgrade Plan
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Account Details */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-gray-50 p-5 rounded-xl">
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-                              <MapPin className="w-5 h-5 text-yellow-600" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">Location</p>
-                              <p className="font-medium text-gray-900">
-                                {activeBooking.spaceSnapshot?.address || "N/A"}
-                              </p>
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-600 flex items-center gap-2">
-                            <Building2 className="w-4 h-4" />{" "}
-                            {activeBooking.type === "virtual_office"
-                              ? "Virtual Office"
-                              : "Coworking Space"}
-                          </p>
-                        </div>
-
-                        <div className="bg-gray-50 p-5 rounded-xl">
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                              <Calendar className="w-5 h-5 text-green-600" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">
-                                Member Since
-                              </p>
-                              <p className="font-medium text-gray-900">
-                                {user?.createdAt
-                                  ? formatDate(user.createdAt)
-                                  : "N/A"}
-                              </p>
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            Booking ID:{" "}
-                            {activeBooking._id?.slice(-8).toUpperCase()}
-                          </p>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                      <p>No active subscription found.</p>
-                      <a
-                        href="/spaces"
-                        className="text-yellow-600 hover:underline mt-2 inline-block"
-                      >
-                        Browse available spaces
-                      </a>
-                    </div>
-                  )}
+                  <KYCVerification />
                 </div>
               )}
             </div>

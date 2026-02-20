@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Calendar,
   CreditCard,
-  ShieldCheck,
   Headphones,
   LogOut,
   User,
@@ -28,7 +27,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import MyBookings from "./MyBookings";
 import Billing from "./Billing";
-import KYCVerification from "./KYCVerification";
+
 import Support from "./Support";
 import Logout from "./Logout";
 import Profile from "./Profile";
@@ -36,17 +35,67 @@ import Viewdetails from "./Viewdetails";
 import Notifications from "./Notifications"; // Import the new Notifications component
 
 const menuItems = [
-  { name: "Dashboard", icon: LayoutDashboard, section: "main", path: "/dashboard" },
-  { name: "My Bookings", icon: Calendar, section: "main", path: "/dashboard/my-bookings" },
-  { name: "Notifications", icon: Bell, section: "main", path: "/dashboard/notifications" },
-  { name: "Billing", icon: CreditCard, section: "main", path: "/dashboard/billing" },
-  { name: "KYC Verification", icon: ShieldCheck, section: "main", path: "/dashboard/kyc-verification" },
-  { name: "Mail Records", icon: Mail, section: "main", path: "/dashboard/mail-records" },
-  { name: "Visit Records", icon: Users, section: "main", path: "/dashboard/visit-records" },
-  { name: "Documents", icon: FileText, section: "main", path: "/dashboard/documents" },
-  { name: "Support", icon: Headphones, section: "main", path: "/dashboard/support" },
-  { name: "Profile", icon: User, section: "account", path: "/dashboard/profile" },
-  { name: "Logout", icon: LogOut, section: "account", path: "/dashboard/logout" },
+  {
+    name: "Dashboard",
+    icon: LayoutDashboard,
+    section: "main",
+    path: "/dashboard",
+  },
+  {
+    name: "My Bookings",
+    icon: Calendar,
+    section: "main",
+    path: "/dashboard/my-bookings",
+  },
+  {
+    name: "Notifications",
+    icon: Bell,
+    section: "main",
+    path: "/dashboard/notifications",
+  },
+  {
+    name: "Billing",
+    icon: CreditCard,
+    section: "main",
+    path: "/dashboard/billing",
+  },
+
+  {
+    name: "Mail Records",
+    icon: Mail,
+    section: "main",
+    path: "/dashboard/mail-records",
+  },
+  {
+    name: "Visit Records",
+    icon: Users,
+    section: "main",
+    path: "/dashboard/visit-records",
+  },
+  {
+    name: "Documents",
+    icon: FileText,
+    section: "main",
+    path: "/dashboard/documents",
+  },
+  {
+    name: "Support",
+    icon: Headphones,
+    section: "main",
+    path: "/dashboard/support",
+  },
+  {
+    name: "Profile",
+    icon: User,
+    section: "account",
+    path: "/dashboard/profile",
+  },
+  {
+    name: "Logout",
+    icon: LogOut,
+    section: "account",
+    path: "/dashboard/logout",
+  },
 ];
 
 export default function ClientDashboard() {
@@ -99,18 +148,28 @@ export default function ClientDashboard() {
       case 3:
         return <Billing />;
       case 4:
-        return <KYCVerification />;
+        return (
+          <div className="p-8 text-center text-gray-500">
+            Mail Records - Coming Soon
+          </div>
+        );
       case 5:
-        return <div className="p-8 text-center text-gray-500">Mail Records - Coming Soon</div>;
+        return (
+          <div className="p-8 text-center text-gray-500">
+            Visit Records - Coming Soon
+          </div>
+        );
       case 6:
-        return <div className="p-8 text-center text-gray-500">Visit Records - Coming Soon</div>;
+        return (
+          <div className="p-8 text-center text-gray-500">
+            Documents - Coming Soon
+          </div>
+        );
       case 7:
-        return <div className="p-8 text-center text-gray-500">Documents - Coming Soon</div>;
-      case 8:
         return <Support />;
-      case 9:
+      case 8:
         return <Profile />;
-      case 10:
+      case 9:
         return <Logout />;
       case 100: // Special case for View Details
         return <Viewdetails />;
@@ -120,12 +179,14 @@ export default function ClientDashboard() {
   }, [activeIndex]);
 
   const mainMenuItems = menuItems.filter((item) => item.section === "main");
-  const accountMenuItems = menuItems.filter((item) => item.section === "account");
+  const accountMenuItems = menuItems.filter(
+    (item) => item.section === "account",
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="flex pt-16">
         {/* Sidebar */}
         <aside className="hidden lg:block w-72 min-h-[calc(100vh-64px)] bg-white border-r border-gray-200 p-6 sticky top-16">
@@ -136,15 +197,21 @@ export default function ClientDashboard() {
                 {user?.fullName?.charAt(0) || "U"}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 truncate">{user?.fullName || "User"}</p>
-                <p className="text-sm text-gray-500 truncate">{user?.email || "user@email.com"}</p>
+                <p className="font-semibold text-gray-900 truncate">
+                  {user?.fullName || "User"}
+                </p>
+                <p className="text-sm text-gray-500 truncate">
+                  {user?.email || "user@email.com"}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Main Navigation */}
           <nav>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">Main Menu</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
+              Main Menu
+            </p>
             <ul className="space-y-1">
               {mainMenuItems.map((item, idx) => {
                 const isActive = activeIndex === idx;
@@ -158,7 +225,9 @@ export default function ClientDashboard() {
                           : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                       }`}
                     >
-                      <item.icon className={`w-5 h-5 ${isActive ? "text-black" : "text-gray-400"}`} />
+                      <item.icon
+                        className={`w-5 h-5 ${isActive ? "text-black" : "text-gray-400"}`}
+                      />
                       <span>{item.name}</span>
                       {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
                     </button>
@@ -168,10 +237,14 @@ export default function ClientDashboard() {
             </ul>
 
             {/* Account Section */}
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-8 mb-3 px-3">Account</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-8 mb-3 px-3">
+              Account
+            </p>
             <ul className="space-y-1">
               {accountMenuItems.map((item) => {
-                const actualIndex = menuItems.findIndex((m) => m.name === item.name);
+                const actualIndex = menuItems.findIndex(
+                  (m) => m.name === item.name,
+                );
                 const isActive = activeIndex === actualIndex;
                 const isLogout = item.name === "Logout";
                 return (
@@ -184,11 +257,13 @@ export default function ClientDashboard() {
                             ? "bg-red-100 text-red-700"
                             : "bg-yellow-400 text-black shadow-sm"
                           : isLogout
-                          ? "text-gray-600 hover:bg-red-50 hover:text-red-600"
-                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            ? "text-gray-600 hover:bg-red-50 hover:text-red-600"
+                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                       }`}
                     >
-                      <item.icon className={`w-5 h-5 ${isActive ? (isLogout ? "text-red-600" : "text-black") : "text-gray-400"}`} />
+                      <item.icon
+                        className={`w-5 h-5 ${isActive ? (isLogout ? "text-red-600" : "text-black") : "text-gray-400"}`}
+                      />
                       <span>{item.name}</span>
                     </button>
                   </li>
@@ -201,8 +276,13 @@ export default function ClientDashboard() {
           <div className="mt-8 p-4 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl text-white">
             <Building2 className="w-8 h-8 text-yellow-400 mb-3" />
             <p className="font-semibold mb-1">Need a new space?</p>
-            <p className="text-sm text-gray-300 mb-3">Explore our virtual office locations across India.</p>
-            <a href="/spaces" className="inline-block px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-300 transition-colors">
+            <p className="text-sm text-gray-300 mb-3">
+              Explore our virtual office locations across India.
+            </p>
+            <a
+              href="/spaces"
+              className="inline-block px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-300 transition-colors"
+            >
               Browse Spaces
             </a>
           </div>
@@ -218,7 +298,10 @@ export default function ClientDashboard() {
 
         {/* Mobile Menu Overlay */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setIsMobileMenuOpen(false)}>
+          <div
+            className="lg:hidden fixed inset-0 z-40 bg-black/50"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
             <div
               className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
@@ -254,9 +337,7 @@ export default function ClientDashboard() {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 min-h-[calc(100vh-64px)]">
-          {mainContent}
-        </main>
+        <main className="flex-1 min-h-[calc(100vh-64px)]">{mainContent}</main>
       </div>
 
       {showFooter && <Footer />}
