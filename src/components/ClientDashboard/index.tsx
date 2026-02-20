@@ -38,6 +38,7 @@ import Logout from "./Logout";
 import Profile from "./Profile";
 import Viewdetails from "./Viewdetails";
 import Notifications from "./Notifications"; // Import the new Notifications component
+import ChatSupport from "./ChatSupport"; // Import ChatSupport
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, section: "main", path: "/dashboard" },
@@ -110,11 +111,11 @@ export default function ClientDashboard() {
       case 6:
         return <KYCVerification />;
       case 7: // Chat Support
-        return <Support />;
+        return <ChatSupport />;
       case 8: // Notifications
         return <Notifications />;
       case 9: // Help Center
-        return <div className="p-8 text-center text-gray-500">Help Center - Coming Soon</div>;
+        return <Support />;
       case 10:
         return <Profile />;
       case 11:
@@ -148,8 +149,8 @@ export default function ClientDashboard() {
                     <button
                       onClick={() => handleNavigation(idx)}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                          ? "bg-[#0d3b2e] text-white shadow-sm"
-                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        ? "bg-[#35503F] text-white shadow-sm"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         }`}
                     >
                       <item.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-gray-400"}`} />
@@ -172,12 +173,12 @@ export default function ClientDashboard() {
                     <button
                       onClick={() => handleNavigation(actualIndex)}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                          ? isLogout
-                            ? "bg-red-100 text-red-700"
-                            : "bg-[#0d3b2e] text-white shadow-sm"
-                          : isLogout
-                            ? "text-gray-600 hover:bg-red-50 hover:text-red-600"
-                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        ? isLogout
+                          ? "bg-red-100 text-red-700"
+                          : "bg-[#35503F] text-white shadow-sm"
+                        : isLogout
+                          ? "text-gray-600 hover:bg-red-50 hover:text-red-600"
+                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         }`}
                     >
                       <item.icon className={`w-5 h-5 ${isActive ? (isLogout ? "text-red-600" : "text-white") : "text-gray-400"}`} />
@@ -227,10 +228,10 @@ export default function ClientDashboard() {
                         <button
                           onClick={() => handleNavigation(idx)}
                           className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-base font-medium ${isActive
-                              ? isLogout
-                                ? "bg-red-100 text-red-700"
-                                : "bg-yellow-400 text-black"
-                              : "text-gray-600 hover:bg-gray-100"
+                            ? isLogout
+                              ? "bg-red-100 text-red-700"
+                              : "bg-yellow-400 text-black"
+                            : "text-gray-600 hover:bg-gray-100"
                             }`}
                         >
                           <item.icon className="w-5 h-5" />
@@ -246,7 +247,7 @@ export default function ClientDashboard() {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 min-h-[calc(100vh-64px)]">
+        <main className="flex-1 min-w-0 overflow-x-hidden min-h-[calc(100vh-64px)]">
           {mainContent}
         </main>
       </div>

@@ -32,7 +32,7 @@ export default function Logout() {
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold font-[Poppins] text-gray-900 mb-2">
+          <h1 className="text-2xl font-bold  text-gray-900 mb-2">
             Sign Out
           </h1>
           <p className="text-gray-500 mb-8">
