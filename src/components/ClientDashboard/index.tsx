@@ -5,15 +5,19 @@ import {
   Calendar,
   CreditCard,
   ShieldCheck,
-  Headphones,
+  Headphones, // Keep for fallback or remove if unused
   LogOut,
   User,
-  Building2,
+  // Building2, // Removing unused
   ChevronRight,
   Bell,
   Mail,
-  Users,
+  // Users, // Removing unused if replaced
   FileText,
+  CalendarCheck, // For Visit Records
+  MessageSquare, // For Chat Support
+  HelpCircle, // For Help Center
+  Home, // For Back to Home
 } from "lucide-react";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,13 +42,14 @@ import Notifications from "./Notifications"; // Import the new Notifications com
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, section: "main", path: "/dashboard" },
   { name: "My Bookings", icon: Calendar, section: "main", path: "/dashboard/my-bookings" },
-  { name: "Notifications", icon: Bell, section: "main", path: "/dashboard/notifications" },
-  { name: "Billing", icon: CreditCard, section: "main", path: "/dashboard/billing" },
-  { name: "KYC Verification", icon: ShieldCheck, section: "main", path: "/dashboard/kyc-verification" },
   { name: "Mail Records", icon: Mail, section: "main", path: "/dashboard/mail-records" },
-  { name: "Visit Records", icon: Users, section: "main", path: "/dashboard/visit-records" },
+  { name: "Visit Records", icon: CalendarCheck, section: "main", path: "/dashboard/visit-records" },
+  { name: "Payments", icon: CreditCard, section: "main", path: "/dashboard/payments" },
   { name: "Documents", icon: FileText, section: "main", path: "/dashboard/documents" },
-  { name: "Support", icon: Headphones, section: "main", path: "/dashboard/support" },
+  { name: "KYC Verification", icon: ShieldCheck, section: "main", path: "/dashboard/kyc-verification" },
+  { name: "Chat Support", icon: MessageSquare, section: "main", path: "/dashboard/support" },
+  { name: "Notifications", icon: Bell, section: "main", path: "/dashboard/notifications" },
+  { name: "Help Center", icon: HelpCircle, section: "main", path: "/dashboard/help" },
   { name: "Profile", icon: User, section: "account", path: "/dashboard/profile" },
   { name: "Logout", icon: LogOut, section: "account", path: "/dashboard/logout" },
 ];
@@ -95,22 +100,24 @@ export default function ClientDashboard() {
       case 1:
         return <MyBookings />;
       case 2:
-        return <Notifications />; // Notifications page
-      case 3:
-        return <Billing />;
-      case 4:
-        return <KYCVerification />;
-      case 5:
         return <div className="p-8 text-center text-gray-500">Mail Records - Coming Soon</div>;
-      case 6:
+      case 3:
         return <div className="p-8 text-center text-gray-500">Visit Records - Coming Soon</div>;
-      case 7:
+      case 4: // Payments
+        return <Billing />; // Using Billing component for Payments for now
+      case 5:
         return <div className="p-8 text-center text-gray-500">Documents - Coming Soon</div>;
-      case 8:
+      case 6:
+        return <KYCVerification />;
+      case 7: // Chat Support
         return <Support />;
-      case 9:
-        return <Profile />;
+      case 8: // Notifications
+        return <Notifications />;
+      case 9: // Help Center
+        return <div className="p-8 text-center text-gray-500">Help Center - Coming Soon</div>;
       case 10:
+        return <Profile />;
+      case 11:
         return <Logout />;
       case 100: // Special case for View Details
         return <Viewdetails />;
@@ -125,26 +132,14 @@ export default function ClientDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <div className="flex pt-16">
         {/* Sidebar */}
         <aside className="hidden lg:block w-72 min-h-[calc(100vh-64px)] bg-white border-r border-gray-200 p-6 sticky top-16">
-          {/* User Info */}
-          <div className="mb-8 p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-lg">
-                {user?.fullName?.charAt(0) || "U"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 truncate">{user?.fullName || "User"}</p>
-                <p className="text-sm text-gray-500 truncate">{user?.email || "user@email.com"}</p>
-              </div>
-            </div>
-          </div>
+          {/* User Info removed from here */}
 
           {/* Main Navigation */}
-          <nav>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">Main Menu</p>
+          <nav className="flex-1 overflow-y-auto">
             <ul className="space-y-1">
               {mainMenuItems.map((item, idx) => {
                 const isActive = activeIndex === idx;
@@ -152,15 +147,13 @@ export default function ClientDashboard() {
                   <li key={item.name}>
                     <button
                       onClick={() => handleNavigation(idx)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                        isActive
-                          ? "bg-yellow-400 text-black shadow-sm"
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
+                          ? "bg-[#0d3b2e] text-white shadow-sm"
                           : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                      }`}
+                        }`}
                     >
-                      <item.icon className={`w-5 h-5 ${isActive ? "text-black" : "text-gray-400"}`} />
+                      <item.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-gray-400"}`} />
                       <span>{item.name}</span>
-                      {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
                     </button>
                   </li>
                 );
@@ -178,17 +171,16 @@ export default function ClientDashboard() {
                   <li key={item.name}>
                     <button
                       onClick={() => handleNavigation(actualIndex)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                        isActive
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
                           ? isLogout
                             ? "bg-red-100 text-red-700"
-                            : "bg-yellow-400 text-black shadow-sm"
+                            : "bg-[#0d3b2e] text-white shadow-sm"
                           : isLogout
-                          ? "text-gray-600 hover:bg-red-50 hover:text-red-600"
-                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                      }`}
+                            ? "text-gray-600 hover:bg-red-50 hover:text-red-600"
+                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        }`}
                     >
-                      <item.icon className={`w-5 h-5 ${isActive ? (isLogout ? "text-red-600" : "text-black") : "text-gray-400"}`} />
+                      <item.icon className={`w-5 h-5 ${isActive ? (isLogout ? "text-red-600" : "text-white") : "text-gray-400"}`} />
                       <span>{item.name}</span>
                     </button>
                   </li>
@@ -197,14 +189,15 @@ export default function ClientDashboard() {
             </ul>
           </nav>
 
-          {/* Promo Card */}
-          <div className="mt-8 p-4 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl text-white">
-            <Building2 className="w-8 h-8 text-yellow-400 mb-3" />
-            <p className="font-semibold mb-1">Need a new space?</p>
-            <p className="text-sm text-gray-300 mb-3">Explore our virtual office locations across India.</p>
-            <a href="/spaces" className="inline-block px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-300 transition-colors">
-              Browse Spaces
-            </a>
+          {/* Back to Home Button */}
+          <div className="mt-auto pt-4 border-t border-gray-100">
+            <button
+              onClick={() => navigate('/')}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
+            >
+              <Home className="w-4 h-4" />
+              <span>Back to Home</span>
+            </button>
           </div>
         </aside>
 
@@ -233,13 +226,12 @@ export default function ClientDashboard() {
                       <li key={item.name}>
                         <button
                           onClick={() => handleNavigation(idx)}
-                          className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-base font-medium ${
-                            isActive
+                          className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-base font-medium ${isActive
                               ? isLogout
                                 ? "bg-red-100 text-red-700"
                                 : "bg-yellow-400 text-black"
                               : "text-gray-600 hover:bg-gray-100"
-                          }`}
+                            }`}
                         >
                           <item.icon className="w-5 h-5" />
                           <span>{item.name}</span>
