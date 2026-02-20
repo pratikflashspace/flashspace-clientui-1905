@@ -26,9 +26,12 @@ import {
 } from "@/components/ui/dialog";
 import { adminService, AdminTicketData, TicketStats } from '@/services/admin.service';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSocket } from '@/contexts/SocketContext';
+import playNotificationSound, { initAudioContext } from '@/utils/sound.util';
 
 export default function TicketSystem() {
     const { user } = useAuth();
+    const { socket } = useSocket();
     const [activeTab, setActiveTab] = useState('All Tickets');
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState<AdminTicketData | null>(null);
@@ -52,7 +55,6 @@ export default function TicketSystem() {
         title: '',
         client: '',
         category: 'technical',
-        priority: 'medium',
         description: ''
     });
 
@@ -101,6 +103,85 @@ export default function TicketSystem() {
         fetchStats();
     }, [activeTab, searchTerm]);
 
+    // Socket listener
+    useEffect(() => {
+        if (!socket || !selectedTicket) return;
+
+        socket.emit('join_ticket', selectedTicket._id);
+
+        const handleNewMessage = (data: { ticketId: string, message: any }) => {
+            if (data.ticketId === selectedTicket._id) {
+                // Update selected ticket messages
+                setSelectedTicket((prev) => {
+                    if (!prev) return null;
+                    const exists = prev.messages.some(m =>
+                        new Date(m.createdAt).getTime() === new Date(data.message.createdAt).getTime() &&
+                        m.message === data.message.message
+                    );
+                    if (exists) return prev;
+                    return {
+                        ...prev,
+                        messages: [...prev.messages, data.message]
+                    };
+                });
+
+                // Refresh list to update previews/unread status if needed
+                fetchTickets();
+            }
+        };
+
+        const handleTicketUpdated = (data: { ticketId: string, ticket: any }) => {
+            if (data.ticketId === selectedTicket._id) {
+                setSelectedTicket(data.ticket);
+                fetchTickets();
+                fetchStats();
+            }
+        };
+
+        socket.on('new_message', handleNewMessage);
+        socket.on('ticket_updated', handleTicketUpdated);
+
+        return () => {
+            socket.off('new_message', handleNewMessage);
+            socket.off('ticket_updated', handleTicketUpdated);
+        };
+    }, [socket, selectedTicket?._id]);
+
+    // Admin Feed Listener (Global)
+    useEffect(() => {
+        if (!socket) {
+            console.log("Socket not available for admin feed");
+            return;
+        }
+
+        console.log("Emitting join_admin_feed");
+        socket.emit('join_admin_feed');
+
+        const handleNewTicket = (ticket: any) => {
+            console.log("Received new_ticket_created event!", ticket);
+            try {
+                playNotificationSound();
+                console.log("Sound played");
+            } catch (e) {
+                console.error("Error playing sound:", e);
+            }
+
+            toast.success(`New Ticket: ${ticket.subject}`, {
+                duration: 5000,
+                position: 'top-right',
+                icon: '🎫'
+            });
+            fetchTickets();
+            fetchStats();
+        };
+
+        socket.on('new_ticket_created', handleNewTicket);
+
+        return () => {
+            socket.off('new_ticket_created', handleNewTicket);
+        };
+    }, [socket]);
+
     const handleCreateTicket = async () => {
         if (!newTicket.title || !newTicket.client) return;
 
@@ -113,7 +194,6 @@ export default function TicketSystem() {
                 title: '',
                 client: '',
                 category: 'technical',
-                priority: 'medium',
                 description: ''
             });
             fetchTickets();
@@ -143,9 +223,10 @@ export default function TicketSystem() {
 
     const handleResolveTicket = async (ticketId: string) => {
         try {
-            const response = await adminService.resolveTicket(ticketId);
+            // Changed to closeTicket as per user request to close immediately
+            const response = await adminService.closeTicket(ticketId);
             if (response.success) {
-                toast.success('Ticket resolved successfully!');
+                toast.success('Ticket closed successfully!');
                 fetchTickets();
                 fetchStats();
                 if (selectedTicket?._id === ticketId) {
@@ -153,8 +234,8 @@ export default function TicketSystem() {
                 }
             }
         } catch (err: unknown) {
-            console.error('Failed to resolve ticket', err);
-            toast.error('Failed to resolve ticket');
+            console.error('Failed to close ticket', err);
+            toast.error('Failed to close ticket');
         }
     };
 
@@ -208,14 +289,7 @@ export default function TicketSystem() {
         }
     };
 
-    const getPriorityStyle = (priority: string) => {
-        switch (priority) {
-            case 'high': return 'bg-red-50 text-red-600 border-red-100';
-            case 'medium': return 'bg-yellow-50 text-yellow-600 border-yellow-100';
-            case 'low': return 'bg-green-50 text-green-600 border-green-100';
-            default: return 'bg-gray-50 text-gray-600 border-gray-100';
-        }
-    };
+
 
     const getStatusStyle = (status: string) => {
         switch (status) {
@@ -250,9 +324,7 @@ export default function TicketSystem() {
         }
     };
 
-    const formatPriority = (priority: string) => {
-        return priority.charAt(0).toUpperCase() + priority.slice(1);
-    };
+
 
     const formatCategory = (category: string) => {
         return category.split('_').map(word =>
@@ -367,7 +439,6 @@ export default function TicketSystem() {
                                             <th className="px-6 py-5">Ticket</th>
                                             <th className="px-6 py-5">Client</th>
                                             <th className="px-6 py-5">Category</th>
-                                            <th className="px-6 py-5">Priority</th>
                                             <th className="px-6 py-5">Assignee</th>
                                             <th className="px-6 py-5">Created</th>
                                             <th className="px-6 py-5">Status</th>
@@ -397,11 +468,6 @@ export default function TicketSystem() {
                                                 <td className="px-6 py-5">
                                                     <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium border border-gray-200">
                                                         {formatCategory(ticket.category)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-5">
-                                                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold border ${getPriorityStyle(ticket.priority)}`}>
-                                                        {formatPriority(ticket.priority)}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-5">
@@ -474,10 +540,9 @@ export default function TicketSystem() {
                                         <p className="text-xs text-gray-400">{selectedTicket.user?.email}</p>
                                     </div>
                                     <div className="bg-gray-50 p-4 rounded-xl">
-                                        <p className="text-sm text-gray-500">Priority</p>
-                                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${getPriorityStyle(selectedTicket.priority)}`}>
-                                            {formatPriority(selectedTicket.priority)}
-                                        </span>
+                                        <p className="text-sm text-gray-500">Client</p>
+                                        <p className="font-medium">{selectedTicket.user?.fullName}</p>
+                                        <p className="text-xs text-gray-400">{selectedTicket.user?.email}</p>
                                     </div>
                                     <div className="bg-gray-50 p-4 rounded-xl">
                                         <p className="text-sm text-gray-500">Status</p>
@@ -659,18 +724,6 @@ export default function TicketSystem() {
                                         <option value="bookings">Bookings</option>
                                         <option value="compliance">Compliance</option>
                                         <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm text-gray-600 mb-1">Priority</label>
-                                    <select
-                                        value={newTicket.priority}
-                                        onChange={(e) => setNewTicket({ ...newTicket, priority: e.target.value })}
-                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                                    >
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
                                     </select>
                                 </div>
                                 <div>

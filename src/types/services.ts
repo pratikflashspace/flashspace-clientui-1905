@@ -44,8 +44,11 @@ export interface VirtualOfficeItem {
   __v?: number;
 }
 
-export type VirtualOfficeCityKey = 'delhi' | 'mumbai' | 'bangalore' | 'pune';
-export type VirtualOfficesByCity = Record<VirtualOfficeCityKey, VirtualOfficeItem[]>;
+export type VirtualOfficeCityKey = "delhi" | "mumbai" | "bangalore" | "pune";
+export type VirtualOfficesByCity = Record<
+  VirtualOfficeCityKey,
+  VirtualOfficeItem[]
+>;
 
 // Event Spaces specific types
 export interface EventSpaceItem {
@@ -73,7 +76,7 @@ export interface ServiceItem {
   description: string;
 }
 
-export type EventSpaceCityKey = 'delhi' | 'mumbai' | 'bangalore' | 'pune';
+export type EventSpaceCityKey = "delhi" | "mumbai" | "bangalore" | "pune";
 export type EventSpacesByCity = Record<EventSpaceCityKey, EventSpaceItem[]>;
 
 // Coworking Space specific types
@@ -104,8 +107,11 @@ export interface CoworkingSpaceItem {
   __v?: number;
 }
 
-export type CoworkingSpaceCityKey = 'delhi' | 'mumbai' | 'bangalore' | 'pune';
-export type CoworkingSpacesByCity = Record<CoworkingSpaceCityKey, CoworkingSpaceItem[]>;
+export type CoworkingSpaceCityKey = "delhi" | "mumbai" | "bangalore" | "pune";
+export type CoworkingSpacesByCity = Record<
+  CoworkingSpaceCityKey,
+  CoworkingSpaceItem[]
+>;
 
 // Meeting Room specific types
 export interface MeetingRoomItem {
@@ -135,7 +141,13 @@ export interface MeetingRoomItem {
   __v?: number;
 }
 
-export type MeetingRoomCityKey = 'delhi' | 'mumbai' | 'bangalore' | 'pune' | 'ahmedabad' | 'chandigarh';
+export type MeetingRoomCityKey =
+  | "delhi"
+  | "mumbai"
+  | "bangalore"
+  | "pune"
+  | "ahmedabad"
+  | "chandigarh";
 export type MeetingRoomsByCity = Record<MeetingRoomCityKey, MeetingRoomItem[]>;
 
 // Business Setup specific types
@@ -156,12 +168,15 @@ export interface BusinessSetupService {
   features: string[];
 }
 
-export type BusinessSetupCityKey = 'delhi' | 'mumbai' | 'bangalore' | 'pune';
-export type BusinessSetupServicesByCity = Record<BusinessSetupCityKey, BusinessSetupService[]>;
+export type BusinessSetupCityKey = "delhi" | "mumbai" | "bangalore" | "pune";
+export type BusinessSetupServicesByCity = Record<
+  BusinessSetupCityKey,
+  BusinessSetupService[]
+>;
 
 // Common UI types
-export type ViewMode = 'grid' | 'list';
-export type SortBy = 'popularity' | 'price-low' | 'price-high' | 'rating';
+export type ViewMode = "grid" | "list";
+export type SortBy = "popularity" | "price-low" | "price-high" | "rating";
 
 // Common filter states
 export interface FilterState {
@@ -220,8 +235,13 @@ export interface SpaceSnapshot {
   coordinates?: { lat: number; lng: number };
 }
 
-export type BookingType = 'virtual_office' | 'coworking_space';
-export type BookingStatus = 'pending_payment' | 'pending_kyc' | 'active' | 'expired' | 'cancelled';
+export type BookingType = "virtual_office" | "coworking_space";
+export type BookingStatus =
+  | "pending_payment"
+  | "pending_kyc"
+  | "active"
+  | "expired"
+  | "cancelled";
 
 export interface Booking {
   _id: string;
@@ -259,9 +279,14 @@ export interface Booking {
   createdAt: string;
 }
 
-export type KYCStatus = 'not_started' | 'pending' | 'approved' | 'rejected' | 'resubmit';
-export type KYCType = 'individual' | 'business';
-export type DocumentStatus = 'pending' | 'approved' | 'rejected';
+export type KYCStatus =
+  | "not_started"
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "resubmit";
+export type KYCType = "individual" | "business";
+export type DocumentStatus = "pending" | "approved" | "rejected";
 
 export interface PersonalInfo {
   fullName?: string;
@@ -282,6 +307,8 @@ export interface BusinessInfo {
   panNumber?: string;
   cinNumber?: string;
   registeredAddress?: string;
+  address?: string; // Alias or specific field
+  businessNature?: string;
   industry?: string;
   verified?: boolean;
   partners?: string[]; // IDs of linked individual profiles
@@ -302,14 +329,17 @@ export interface KYCData {
   profileName?: string; // e.g., "TechCorp Pvt Ltd" or "John Doe (Personal)"
   linkedBookings?: string[]; // Array of booking IDs
   overallStatus: KYCStatus;
+  status?: string; // Add status field to match DashboardData
   kycType?: KYCType;
+  isPartner?: boolean;
+  partnerCount?: number;
   progress: number;
   personalInfo?: PersonalInfo;
   businessInfo?: BusinessInfo;
   documents?: KYCDocument[];
 }
 
-export type InvoiceStatus = 'paid' | 'pending' | 'overdue' | 'cancelled';
+export type InvoiceStatus = "paid" | "pending" | "overdue" | "cancelled";
 
 export interface Invoice {
   _id: string;
@@ -339,11 +369,17 @@ export interface InvoicesResponse {
 
 // ============ TICKET TYPES ============
 
-export type TicketPriority = 'low' | 'medium' | 'high';
-export type TicketStatus = 'open' | 'in_progress' | 'escalated' | 'resolved' | 'closed';
+export type TicketPriority = "low" | "medium" | "high" | "urgent";
+export type TicketStatus =
+  | "open"
+  | "in_progress"
+  | "escalated"
+  | "resolved"
+  | "closed"
+  | "waiting_customer";
 
 export interface TicketMessage {
-  sender: 'user' | 'support' | 'admin';
+  sender: "user" | "support" | "admin";
   senderName?: string;
   message: string;
   attachments?: string[];
@@ -447,8 +483,8 @@ export interface AdminTicketData {
     phoneNumber?: string;
   };
   category: string;
-  priority: 'low' | 'medium' | 'high';
-  status: 'open' | 'in_progress' | 'escalated' | 'resolved' | 'closed';
+  priority: "low" | "medium" | "high";
+  status: "open" | "in_progress" | "escalated" | "resolved" | "closed";
   assignee?: {
     _id: string;
     fullName: string;
@@ -458,7 +494,7 @@ export interface AdminTicketData {
   updatedAt: string;
   deadline?: string;
   messages: Array<{
-    sender: 'user' | 'support' | 'admin';
+    sender: "user" | "support" | "admin";
     message: string;
     createdAt: string;
   }>;
@@ -495,7 +531,7 @@ export interface AuthUser {
   _id: string;
   id: string;
   email: string;
-  role: 'user' | 'admin' | 'support';
+  role: "user" | "admin" | "support";
   fullName?: string;
 }
 
@@ -503,7 +539,7 @@ export interface AuthUser {
 
 export interface Notification {
   id: string;
-  type: 'info' | 'success' | 'warning' | 'error';
+  type: "info" | "success" | "warning" | "error";
   title: string;
   message: string;
   read: boolean;

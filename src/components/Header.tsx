@@ -12,6 +12,7 @@ import { useDarkMode } from "@/contexts/DarkModeContext";
 import GetInTouch from "@/pages/GetInTouch";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { SignupModal } from "@/components/auth/SignupModal";
+import { NotificationBell } from "@/components/NotificationBell";
 
 // ✅ Country Data
 const countries = [
@@ -199,7 +200,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                         transform: "translateX(-50%)",
                                     }}
                                 >
-                                    <div className="p-4 grid grid-cols-2 gap-4">
+                                    <div className="p-4 grid grid-cols-2 gap-4"
+                                    onMouseLeave={()=>setIsSolutionsOpen(false)}>
                                         <div className="border border-gray-100 dark:border-white/10 rounded-lg p-4 bg-[#f8faf9] dark:bg-white/5">
                                             <div className="flex items-center gap-2 mb-1 cursor-pointer" onClick={() => { handleNavigation("/Solutions/on-demand"); setIsSolutionsOpen(false); }}>
                                                 <Zap className="w-4 h-4 text-[#D96832]" />
@@ -292,7 +294,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 </button>
 
                                 {isMoreOpen && (
-                                    <ul className="absolute bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50">
+                                    <ul className="absolute bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50"
+                                    onMouseLeave={()=>setIsMoreOpen(false)}>
                                         {[
                                             { label: "About Us", href: "/about" },
                                             { label: "Career", href: "/career" },
@@ -379,6 +382,13 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 </span>
                             </ModernFlairButton>
 
+                            {/* Notification Bell */}
+                            {isAuthenticated && (
+                                <div className="hidden lg:block">
+                                    <NotificationBell />
+                                </div>
+                            )}
+
                             {/* User Authentication - Profile Dropdown or Login */}
                             {isAuthenticated ? (
                                 <div ref={userMenuRef} className="relative hidden lg:block">
@@ -423,6 +433,20 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
                                             {/* Menu Items */}
                                             <div className="py-1">
+                                                {/* Admin Dashboard Button */}
+                                                {user?.role === 'admin' && (
+                                                    <button
+                                                        onClick={() => {
+                                                            navigate("/admin");
+                                                            setIsUserMenuOpen(false);
+                                                        }}
+                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-50 hover:text-purple-800 transition-colors duration-150"
+                                                    >
+                                                        <LayoutDashboard className="h-4 w-4" />
+                                                        <span className="">Admin Dashboard</span>
+                                                    </button>
+                                                )}
+
                                                 {/* Partner Portal Button */}
                                                 {user?.role === 'partner' && (
                                                     <button

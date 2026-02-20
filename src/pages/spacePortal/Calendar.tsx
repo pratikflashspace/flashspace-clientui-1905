@@ -1,50 +1,42 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { addMonths, addYears, subMonths, subYears, format, startOfMonth, endOfMonth, addDays, subDays } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
+import { fetchPartnerSpaces, fetchSpaceBookings, fetchPartnerVirtualOffices, fetchScheduledCalls } from "@/services/spacePortal/spacePartner.service";
 
 import CalendarHeader from "@/components/SpacePartner/calendar/CalendarHeader";
 import WeeklyCalendarGrid from "@/components/SpacePartner/calendar/WeeklyCalendarGrid";
 import PendingRequestsPanel from "@/components/SpacePartner/calendar/PendingRequestPanel";
+import YearView from "@/components/SpacePartner/calendar/YearView";
+import MonthView from "@/components/SpacePartner/calendar/MonthView";
+import MonthDatesView from "@/components/SpacePartner/calendar/MonthDatesView";
+import MeetingDayView from "@/components/SpacePartner/calendar/MeetingDayView";
+import MeetingMonthView from "@/components/SpacePartner/calendar/MeetingMonthView";
 
-import { BOOKINGS, PENDING_REQUESTS } from "@/data/spacePortal/bookings";
+import { PENDING_REQUESTS } from "@/data/spacePortal/bookings";
 import type { Booking, BookingRequest } from "@/types/spacePortal/booking";
 
 /**
  * BookingCalendar Page
  *
  * Features:
- * - Weekly calendar view (desktop)
- * - Single-day view with day selector (mobile)
- * - Pending booking requests approval/decline
- *
- * Currently uses mock data (BOOKINGS, PENDING_REQUESTS)
- * Later backend will replace this with API calls.
+ * - Three Views: Year, Month, Month Dates (List)
+ * - Property Type & Property Selection
+ * - Pending Requests Panel
  */
 export default function BookingCalendar() {
-  /**
-   * weekOffset = 0 means current week
-   * weekOffset = 1 means next week
-   * weekOffset = -1 means previous week
-   */
-  const [weekOffset, setWeekOffset] = useState(0);
-
-  /**
-   * selectedDayIndex = 0-6 (Monday-Sunday)
-   * used mainly for mobile view.
-   */
-  const [selectedDayIndex, setSelectedDayIndex] = useState(getTodayIndex());
-
+  const { user, isAuthenticated } = useAuth();
+  
+  // --- View State ---
+  const [currentDate, setCurrentDate] = useState(new Date());
+  
   /**
    * bookings state holds confirmed bookings shown on calendar
-   * currently loaded from mock data.
    */
-  const [bookings, setBookings] = useState<Booking[]>(BOOKINGS);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isLoadingBookings, setIsLoadingBookings] = useState(false);
 
   /**
    * Tracks approval/decline state of each pending request
-   * Example:
-   * {
-   *   "REQ-1": "APPROVED",
-   *   "REQ-2": "DECLINED"
-   * }
    */
   const [requestStatus, setRequestStatus] = useState<
     Record<string, "PENDING" | "APPROVED" | "DECLINED">
@@ -52,65 +44,190 @@ export default function BookingCalendar() {
     Object.fromEntries(PENDING_REQUESTS.map((req) => [req.id, "PENDING"]))
   );
 
-  /**
-   * Generate week dates + week title based on offset
-   * Using useMemo to avoid recalculating every render.
-   */
-  const { weekDates, title } = useMemo(() => {
-    const weekDates = getWeekDates(weekOffset);
-    const title = getWeekTitleFromDates(weekDates);
+  // --- NEW STATE for Property Selection & View Mode ---
+  const [propertyType, setPropertyType] = useState<"COWORKING" | "VIRTUAL_OFFICE" | "DAY_PASS" | "MEETING_ROOM">("COWORKING");
+  const [properties, setProperties] = useState<any[]>([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+  const [viewMode, setViewMode] = useState<"YEAR" | "MONTH" | "MONTH_DATES">("MONTH_DATES");
 
-    return { weekDates, title };
-  }, [weekOffset]);
+  // Fetch Properties on Mount
+  useEffect(() => {
+    const loadProperties = async () => {
+      // Wait for auth check to complete
+      if (!isAuthenticated) return; 
 
-  /**
-   * Week day labels like: Mon, Tue, Wed...
-   */
-  const weekDays = useMemo(() => {
-    return weekDates.map((date) =>
-      date.toLocaleDateString("en-US", { weekday: "short" })
-    );
-  }, [weekDates]);
-
-  /**
-   * Selected date for mobile calendar view.
-   * If index is invalid, fallback to first day.
-   */
-  const selectedDate = weekDates[selectedDayIndex] ?? weekDates[0];
-
-  /**
-   * Go to previous day (mobile view)
-   * If already Monday -> move to previous week Sunday.
-   */
-  const handlePrevDay = () => {
-    setSelectedDayIndex((prev) => {
-      if (prev === 0) {
-        setWeekOffset((offset) => offset - 1);
-        return 6;
+      try {
+        const [coworkingSpaces, virtualOffices] = await Promise.all([
+            fetchPartnerSpaces(),
+            fetchPartnerVirtualOffices()
+        ]);
+        
+        const allProperties = [...(coworkingSpaces || []), ...(virtualOffices || [])];
+        setProperties(allProperties);
+        
+        // Select first property of current type if available
+        if (allProperties.length > 0) {
+            const firstMatching = allProperties.find((p: any) => 
+               p.type === (propertyType === "COWORKING" ? "Coworking Space" : 
+                           propertyType === "VIRTUAL_OFFICE" ? "Virtual Office" :
+                           propertyType === "MEETING_ROOM" ? "Meeting Room" : "Hot Desk")
+            );
+            if (firstMatching) setSelectedPropertyId(firstMatching._id);
+        }
+      } catch (error) {
+        console.error("Failed to fetch properties", error);
       }
-      return prev - 1;
-    });
+    };
+    loadProperties();
+  }, [isAuthenticated]); // Only load on auth change, not propertyType change (filtering handles that)
+
+  // Filter properties based on selected type
+  const filteredProperties = useMemo(() => {
+      // Mapping frontend type to backend type strings if needed. 
+      // Backend types assumed: "Coworking Space", "Virtual Office", "Meeting Room", "Hot Desk"
+      // Adjust this mapping based on actual backend data
+      return properties.filter(p => {
+          if (propertyType === "COWORKING") return p.type === "Coworking Space" || p.type === "Shared Desk" || p.type === "Dedicated Desk" || p.type === "Private Office";
+          if (propertyType === "VIRTUAL_OFFICE") return p.type === "Virtual Office";
+          if (propertyType === "MEETING_ROOM") return p.type === "Meeting Room";
+          if (propertyType === "DAY_PASS") return p.type === "Hot Desk"; // Assumption
+          return true;
+      });
+  }, [properties, propertyType]);
+
+  // Select first property when filtered list changes if current selection is invalid
+  useEffect(() => {
+      if (filteredProperties.length > 0) {
+          const currentExists = filteredProperties.find(p => p._id === selectedPropertyId);
+          if (!currentExists) {
+              setSelectedPropertyId(filteredProperties[0]._id);
+          }
+      } else {
+          setSelectedPropertyId("");
+      }
+  }, [filteredProperties, selectedPropertyId]);
+
+  // Fetch Bookings when Property Selection or Date Changes
+  useEffect(() => {
+    const loadBookings = async () => {
+      if (!isAuthenticated) return;
+      
+      if (propertyType !== "MEETING_ROOM" && !selectedPropertyId) return;
+
+      setIsLoadingBookings(true);
+      try {
+        let mappedBookings = [];
+
+        if (propertyType === "MEETING_ROOM") {
+           // Determine date range based on View Mode
+           let start, end;
+           
+           if (viewMode === "MONTH") {
+               // Month View: Fetch whole month
+               start = startOfMonth(currentDate).toISOString();
+               end = endOfMonth(currentDate).toISOString();
+           } else {
+               // Day View (MONTH_DATES): Fetch single day (start of day to end of day)
+               // Using user's logic or a cleaner approach:
+               // The API expects ISO strings. 
+               // currentDate is the day.
+               // Let's ensure time is set to 00:00:00 for start and 23:59:59 for end or just next day.
+               const startDate = new Date(currentDate);
+               startDate.setHours(0, 0, 0, 0);
+               start = startDate.toISOString();
+
+               const endDate = new Date(currentDate);
+               endDate.setHours(23, 59, 59, 999);
+               end = endDate.toISOString();
+           }
+
+           const meetings = await fetchScheduledCalls(start, end);
+           mappedBookings = meetings;
+        } else {
+            const year = currentDate.getFullYear();
+            const month = viewMode === "YEAR" ? undefined : currentDate.getMonth() + 1;
+
+            const fetchedBookings = await fetchSpaceBookings(null, selectedPropertyId, month, year);
+            mappedBookings = fetchedBookings.map((b: any) => ({
+                id: b._id,
+                clientName: b.user?.fullName || "Unknown Client",
+                space: b.spaceSnapshot?.name || "Unknown Space",
+                startTime: b.startDate || b.createdAt,
+                endTime: b.endDate || b.createdAt,
+                status: (b.status === "active" || b.status === "approved") ? "CONFIRMED" : 
+                        b.status === "pending_kyc" ? "PENDING_KYC" :
+                        b.status === "pending_payment" ? "PENDING_PAYMENT" :
+                        b.status === "pending" ? "PENDING" : 
+                        "CANCELLED"
+            }));
+        }
+        setBookings(mappedBookings);
+      } catch (error) {
+        console.error("Failed to fetch bookings", error);
+      } finally {
+        setIsLoadingBookings(false);
+      }
+    };
+    loadBookings();
+  }, [selectedPropertyId, isAuthenticated, currentDate, propertyType, viewMode]);
+
+  // --- Navigation Logic ---
+  const handlePrev = () => {
+    if (propertyType === "MEETING_ROOM" && (viewMode === "MONTH_DATES" || viewMode === "YEAR")) {
+        // Meeting Room + Day View -> Go back 1 day
+        setCurrentDate(subDays(currentDate, 1));
+        return;
+    }
+
+    if (viewMode === "YEAR") {
+      setCurrentDate(subYears(currentDate, 1));
+    } else {
+      setCurrentDate(subMonths(currentDate, 1));
+    }
   };
 
-  /**
-   * Go to next day (mobile view)
-   * If already Sunday -> move to next week Monday.
-   */
-  const handleNextDay = () => {
-    setSelectedDayIndex((prev) => {
-      if (prev === 6) {
-        setWeekOffset((offset) => offset + 1);
-        return 0;
-      }
-      return prev + 1;
-    });
+  const handleNext = () => {
+    if (propertyType === "MEETING_ROOM" && (viewMode === "MONTH_DATES" || viewMode === "YEAR")) {
+        // Meeting Room + Day View -> Go forward 1 day
+        setCurrentDate(addDays(currentDate, 1));
+        console.log("Meeting Room + Day View -> Go forward 1 day", currentDate);
+        return;
+    }
+
+    if (viewMode === "YEAR") {
+      setCurrentDate(addYears(currentDate, 1));
+    } else {
+      setCurrentDate(addMonths(currentDate, 1));
+    }
   };
+
+  const handleToday = () => {
+    setCurrentDate(new Date());
+  };
+  
+  const handleMonthClick = (monthIndex: number) => {
+      const newDate = new Date(currentDate);
+      newDate.setMonth(monthIndex);
+      setCurrentDate(newDate);
+      setViewMode("MONTH");
+  };
+
+  const handleDateClick = (date: Date) => {
+      setCurrentDate(date);
+      setViewMode("MONTH_DATES");
+  };
+
+  // --- Title Logic ---
+  const title = useMemo(() => {
+    if (viewMode === "YEAR") {
+      return format(currentDate, "yyyy");
+    }
+    return format(currentDate, "MMMM yyyy");
+  }, [currentDate, viewMode]);
+
 
   /**
    * Approve a booking request:
-   * - mark requestStatus as APPROVED
-   * - convert request into confirmed booking
-   * - add booking to calendar list
    */
   const handleApprove = (id: string) => {
     setRequestStatus((prev) => ({ ...prev, [id]: "APPROVED" }));
@@ -130,7 +247,6 @@ export default function BookingCalendar() {
 
   /**
    * Decline request:
-   * only updates requestStatus
    */
   const handleDecline = (id: string) => {
     setRequestStatus((prev) => ({ ...prev, [id]: "DECLINED" }));
@@ -138,7 +254,6 @@ export default function BookingCalendar() {
 
   /**
    * Undo decline:
-   * request goes back to PENDING
    */
   const handleUndoDecline = (id: string) => {
     setRequestStatus((prev) => ({ ...prev, [id]: "PENDING" }));
@@ -146,135 +261,143 @@ export default function BookingCalendar() {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* --- Property Type Selector --- */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative inline-block w-full sm:w-64">
+              <label htmlFor="propertyType" className="mb-1 block text-sm font-medium text-slate-700">Property Type</label>
+              <select
+                  id="propertyType"
+                  value={propertyType}
+                  onChange={(e) => setPropertyType(e.target.value as any)}
+                  className="block w-full rounded-xl border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm focus:border-[#3FA69E] focus:ring-[#3FA69E]"
+              >
+                  <option value="COWORKING">Coworking Space</option>
+                  <option value="VIRTUAL_OFFICE">Virtual Office</option>
+                  <option value="DAY_PASS">Day Pass (Meeting Rooms)</option>
+                  <option value="MEETING_ROOM">Meeting Room</option>
+              </select>
+          </div>
+
+          {/* --- View Mode Selector --- */}
+           <div className="flex items-center rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+              {propertyType !== "MEETING_ROOM" && (
+                <button
+                    onClick={() => setViewMode("YEAR")}
+                    className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${viewMode === "YEAR" ? "bg-[#3FA69E] text-white" : "text-slate-600 hover:bg-slate-50"}`}
+                >
+                    Year
+                </button>
+              )}
+              <button
+                  onClick={() => setViewMode("MONTH")}
+                  className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${viewMode === "MONTH" ? "bg-[#3FA69E] text-white" : "text-slate-600 hover:bg-slate-50"}`}
+              >
+                  Months
+              </button>
+              <button
+                  onClick={() => setViewMode("MONTH_DATES")}
+                  className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${viewMode === "MONTH_DATES" ? "bg-[#3FA69E] text-white" : "text-slate-600 hover:bg-slate-50"}`}
+              >
+                  {propertyType === "MEETING_ROOM" ? "Day View" : "Dates"}
+              </button>
+          </div>
+      </div>
+
+      {/* --- Horizontal Property List --- */}
+      {propertyType !== "MEETING_ROOM" && (
+        <div className="no-scrollbar flex w-full gap-4 overflow-x-auto pb-2">
+            {filteredProperties.map((property) => (
+                <button
+                    key={property._id}
+                    onClick={() => setSelectedPropertyId(property._id)}
+                    className={`w-[280px] h-[150px] shrink-0 overflow-hidden rounded-2xl border p-4 text-left transition-all flex flex-col justify-between ${
+                        selectedPropertyId === property._id
+                            ? "border-[#3FA69E] bg-[#3FA69E]/5 shadow-md ring-1 ring-[#3FA69E]"
+                            : "border-slate-200 bg-white hover:border-[#3FA69E]/50 hover:shadow-sm"
+                    }`}
+                >
+                    <div className="w-full">
+                        <h3 className={`font-bold truncate text-sm mb-1 ${selectedPropertyId === property._id ? "text-[#3FA69E]" : "text-slate-800"}`} title={property.name}>
+                            {property.name}
+                        </h3>
+                        <p className="line-clamp-3 text-xs text-slate-500 leading-relaxed" title={property.address}>
+                            {property.address}
+                        </p>
+                    </div>
+                    <div className="flex items-center justify-between mt-2">
+                        <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold truncate max-w-full ${selectedPropertyId === property._id ? "bg-[#3FA69E]/10 text-[#3FA69E]" : "bg-slate-100 text-slate-600"}`}>
+                            {property.type}
+                        </span>
+                    </div>
+                </button>
+            ))}
+            {filteredProperties.length === 0 && (
+                <div className="flex h-24 w-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-slate-500">
+                    No properties found for this type.
+                </div>
+            )}
+        </div>
+      )}
+
+
       {/* Header */}
       <CalendarHeader
         title={title}
-        onPrev={() => setWeekOffset((prev) => prev - 1)}
-        onNext={() => setWeekOffset((prev) => prev + 1)}
-        onToday={() => {
-          setWeekOffset(0);
-          setSelectedDayIndex(getTodayIndex());
-        }}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onToday={handleToday}
       />
 
       {/* Main Layout */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-4">
-        {/* Calendar */}
-        <div className="xl:col-span-3">
-          {/* Mobile View */}
-          <div className="sm:hidden">
-            <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700">
-                <button
-                  type="button"
-                  onClick={handlePrevDay}
-                  className="rounded-lg px-2 py-1 text-slate-600 hover:bg-white"
-                >
-                  Prev
-                </button>
-
-                <span>
-                  {selectedDate
-                    ? selectedDate.toLocaleDateString("en-US", {
-                        weekday: "short",
-                        month: "short",
-                        day: "numeric",
-                      })
-                    : title}
-                </span>
-
-                <button
-                  type="button"
-                  onClick={handleNextDay}
-                  className="rounded-lg px-2 py-1 text-slate-600 hover:bg-white"
-                >
-                  Next
-                </button>
-              </div>
-
-              <p className="mt-3 text-xs font-semibold text-slate-500">
-                Select day
-              </p>
-
-              <div className="mt-2 grid grid-cols-7 gap-1">
-                {weekDays.map((day, index) => {
-                  const isActive = index === selectedDayIndex;
-                  const dateLabel = weekDates[index]?.getDate();
-
-                  return (
-                    <button
-                      key={`${day}-${index}`}
-                      type="button"
-                      onClick={() => setSelectedDayIndex(index)}
-                      aria-pressed={isActive}
-                      className={`rounded-lg px-2 py-2 text-[11px] font-semibold transition-colors ${
-                        isActive
-                          ? "bg-[#3FA69E] text-white shadow-sm"
-                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                      }`}
-                    >
-                      <span className="block">{day}</span>
-                      <span className="block text-[10px] opacity-80">
-                        {dateLabel ?? ""}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Mobile shows only selected day */}
-            <WeeklyCalendarGrid
-              weekDates={selectedDate ? [selectedDate] : weekDates.slice(0, 1)}
-              bookings={bookings}
-            />
-          </div>
-
-          {/* Desktop View */}
-          <div className="hidden sm:block">
-            <WeeklyCalendarGrid weekDates={weekDates} bookings={bookings} />
-          </div>
-        </div>
-
-        {/* Pending Requests */}
-        <div className="xl:col-span-1">
-          <PendingRequestsPanel
-            requests={PENDING_REQUESTS}
-            requestStatus={requestStatus}
-            onApprove={handleApprove}
-            onDecline={handleDecline}
-            onUndoDecline={handleUndoDecline}
-          />
+      <div className="w-full">
+        {/* Calendar View Area */}
+        <div className="w-full">
+            {propertyType === "MEETING_ROOM" ? (
+                <>
+                    {viewMode === "MONTH" && (
+                        <MeetingMonthView 
+                            currentDate={currentDate} 
+                            meetings={bookings as any[]}
+                            onDateClick={handleDateClick}
+                        />
+                    )}
+                    {(viewMode === "MONTH_DATES" || viewMode === "YEAR") && ( 
+                        <MeetingDayView 
+                            currentDate={currentDate} 
+                            meetings={bookings as any[]}
+                        />
+                    )}
+                </>
+            ) : (
+                <>
+                    {viewMode === "YEAR" && (
+                        <YearView 
+                            year={currentDate.getFullYear()} 
+                            bookings={bookings} 
+                            onMonthClick={handleMonthClick} 
+                        />
+                    )}
+                    
+                    {viewMode === "MONTH" && (
+                        <MonthView 
+                            currentDate={currentDate} 
+                            bookings={bookings}
+                            onDateClick={handleDateClick}
+                        />
+                    )}
+                    
+                    {viewMode === "MONTH_DATES" && (
+                        <MonthDatesView 
+                            currentDate={currentDate} 
+                            bookings={bookings} 
+                        />
+                    )}
+                </>
+            )}
         </div>
       </div>
     </div>
   );
-}
-
-/**
- * Returns current day index based on Monday start.
- * Monday = 0 ... Sunday = 6
- */
-function getTodayIndex() {
-  const day = new Date().getDay(); // 0=Sunday, 1=Monday...
-  return day === 0 ? 6 : day - 1;
-}
-
-/**
- * Generates an array of 7 dates for the week based on offset.
- * Always starts from Monday.
- */
-function getWeekDates(offset: number) {
-  const baseDate = new Date();
-  baseDate.setDate(baseDate.getDate() + offset * 7);
-
-  const monday = getMonday(baseDate);
-
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    return d;
-  });
 }
 
 /**

@@ -1,4 +1,9 @@
-export type BookingStatus = "CONFIRMED" | "PENDING" | "CANCELLED";
+export type BookingStatus =
+  | "CONFIRMED"
+  | "PENDING"
+  | "CANCELLED"
+  | "PENDING_KYC"
+  | "PENDING_PAYMENT";
 
 export type Booking = {
   id: string;
@@ -6,7 +11,7 @@ export type Booking = {
   space: string;
 
   startTime: string; // ISO string
-  endTime: string;   // ISO string
+  endTime: string; // ISO string
 
   status: BookingStatus;
 };

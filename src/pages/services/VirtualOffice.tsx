@@ -361,6 +361,8 @@ const VirtualOffice = () => {
             </div>
           </div> */}
 
+
+
               {/* Results Header */}
               <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
                 <p className="text-sm text-gray-600">

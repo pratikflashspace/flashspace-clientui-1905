@@ -20,7 +20,9 @@ import {
     LineChart,
     Target,
     Ticket,
-    Tag
+    Tag,
+    Headphones,
+    Trophy
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -36,8 +38,11 @@ export default function AdminLayout() {
 
     const allNavItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['admin', 'partner', 'space_manager', 'sales'] },
-        { icon: LineChart, label: 'Sales Analytics', path: '/admin/sales-analytics', roles: ['admin', 'sales', 'partner'] },
+        { icon: LineChart, label: 'Booking Analysis', path: '/admin/booking-analysis', roles: ['admin', 'sales', 'partner'] },
         { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['admin', 'sales'] },
+        { icon: Headphones, label: 'Support Chats', path: '/admin/support', roles: ['admin', 'sales'] },
+        { icon: Bell, label: 'Notifications', path: '/admin/notifications', roles: ['admin', 'sales'] },
+        { icon: Trophy, label: 'Leaderboard', path: '/admin/leaderboard', roles: ['admin', 'sales'] },
         { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['admin', 'sales'] },
         { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['admin', 'sales'] },
         { icon: Briefcase, label: 'Clients', path: '/admin/clients', roles: ['admin', 'sales'] },
@@ -45,7 +50,6 @@ export default function AdminLayout() {
         { icon: Users, label: 'User Management', path: '/admin/users', roles: ['admin'] },
         { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['admin', 'partner', 'space_manager'] },
         { icon: Building2, label: 'Space Management', path: '/admin/spaces', roles: ['admin', 'partner', 'space_manager'] },
-        { icon: CreditCard, label: 'Bookings & Payments', path: '/admin/bookings', roles: ['admin', 'partner', 'space_manager', 'sales'] },
         { icon: Settings, label: 'Settings', path: '/admin/settings', roles: ['admin', 'partner'] },
     ];
 
