@@ -4,7 +4,7 @@ import { Bell, Check, Trash2, X } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const NotificationBell: React.FC = () => {
-    const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+    const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications } = useNotifications();
     const [isOpen, setIsOpen] = useState(false);
     const [clearedIds, setClearedIds] = useState<Set<string>>(new Set());
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -61,11 +61,12 @@ export const NotificationBell: React.FC = () => {
                             <button
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    // Clear visually without deleting
-                                    setClearedIds(new Set(notifications.map(n => n._id)));
+                                    if (window.confirm("Are you sure you want to clear all notifications?")) {
+                                        deleteAllNotifications();
+                                    }
                                 }}
                                 className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1 font-medium transition-colors"
-                                title="Clear all visually"
+                                title="Clear all notifications permanently"
                             >
                                 <X className="w-3.5 h-3.5" /> Clear all
                             </button>

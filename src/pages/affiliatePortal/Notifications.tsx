@@ -47,7 +47,7 @@ const getSenderFromType = (type: NotificationType, title: string, message: strin
 }
 
 const Notifications: React.FC = () => {
-    const { notifications, unreadCount, fetchNotifications, markAsRead, deleteNotification } = useNotifications();
+    const { notifications, unreadCount, fetchNotifications, markAsRead, deleteNotification, markAllAsRead, deleteAllNotifications } = useNotifications();
     const [searchQuery, setSearchQuery] = useState("");
     const [filterType, setFilterType] = useState<'all' | 'unread' | 'read'>('all');
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
@@ -159,6 +159,33 @@ const Notifications: React.FC = () => {
                                     </>
                                 )}
                             </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            {unreadCount > 0 && (
+                                <button
+                                    onClick={() => markAllAsRead()}
+                                    className="flex items-center gap-1.5 text-xs font-medium text-[#5aa39c] hover:text-[#4a8a83] transition-colors"
+                                    title="Mark all notifications as read"
+                                >
+                                    <Check className="w-3.5 h-3.5" />
+                                    Mark all read
+                                </button>
+                            )}
+                            {notifications.length > 0 && (
+                                <button
+                                    onClick={() => {
+                                        if (window.confirm("Are you sure you want to clear all notifications?")) {
+                                            deleteAllNotifications();
+                                        }
+                                    }}
+                                    className="flex items-center gap-1.5 text-xs font-medium text-red-400 hover:text-red-600 transition-colors"
+                                    title="Clear all notifications permanently"
+                                >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    Clear all
+                                </button>
+                            )}
                         </div>
 
                         <div className="flex items-center gap-5 text-[13px] text-gray-400">
