@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import userDashboardService, {
   KYCData,
 } from "@/services/userDashboard.service";
@@ -101,6 +102,8 @@ export default function KYCVerification() {
     type: string;
     mimeType: string;
   } | null>(null);
+
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   const fetchKYC = async () => {
     setLoading(true);
@@ -1713,7 +1716,7 @@ export default function KYCVerification() {
                                         mimeType: "video/mp4",
                                       });
                                     } else {
-                                      alert(
+                                      toast.error(
                                         "Video URL not found. Please try uploading again.",
                                       );
                                     }
@@ -2123,6 +2126,11 @@ export default function KYCVerification() {
                           return;
                         }
 
+                        if (!isConfirmed) {
+                          toast.error("Please confirm the verification statement.");
+                          return;
+                        }
+
                         // Submit KYC for review
                         setSaving(true);
                         try {
@@ -2150,6 +2158,9 @@ export default function KYCVerification() {
                         kycData?.overallStatus === "approved") ||
                       (!linkBookingId &&
                         kycData?.overallStatus === "pending") ||
+                      (!isConfirmed &&
+                        kycData?.overallStatus !== "approved" &&
+                        kycData?.overallStatus !== "pending") ||
                       (!linkBookingId &&
                         !isReadyForSubmission() &&
                         kycData?.overallStatus !== "approved" &&

@@ -8,6 +8,7 @@ export interface User {
   phoneNumber?: string;
   role: 'user' | 'admin' | 'vendor' | 'partner' | 'space_manager' | 'sales' | 'affiliate';
   isEmailVerified: boolean;
+  kycVerified?: boolean;
   profilePicture?: string;
   authProvider?: 'local' | 'google';
   lastLogin?: string;

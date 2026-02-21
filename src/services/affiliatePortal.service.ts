@@ -257,6 +257,20 @@ class AffiliatePortalService {
 
     }
 
+    async generateCoupon() {
+        const response = await axiosInstance.post<ApiResponse<any>>(
+            API_ENDPOINTS.AFFILIATE.COUPON_GENERATE
+        );
+        return response.data;
+    }
+
+    async getMyCoupon() {
+        const response = await axiosInstance.get<ApiResponse<any>>(
+            API_ENDPOINTS.AFFILIATE.MY_COUPON
+        );
+        return response.data;
+    }
+
 }
 
 

@@ -11,6 +11,8 @@ import {
     Trophy,
     MessageSquare,
     Home,
+    Shield,
+    Bell,
     ChevronLeft,
     ChevronRight,
     X,
@@ -95,6 +97,18 @@ const Sidebar: React.FC<SidebarProps> = ({
             section: "main",
             path: "/affiliate-portal/support",
         },
+        {
+            name: "KYC Verification",
+            icon: Shield,
+            section: "main",
+            path: "/affiliate-portal/kyc",
+        },
+        {
+            name: "Notifications",
+            icon: Bell,
+            section: "main",
+            path: "/affiliate-portal/notifications",
+        },
     ];
 
     const sidebarClasses = `
@@ -175,11 +189,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 className={`
                   flex items-center transition-all duration-200 rounded-lg group relative
                   ${isDesktopCollapsed ? "justify-center w-full py-3 px-0" : "justify-start w-full px-4 py-3 gap-3"}
-                  ${
-                      isActive
-                          ? "bg-[#5aa39c] text-white shadow-sm"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-slate-900"
-                  }
+                  ${isActive
+                                        ? "bg-[#5aa39c] text-white shadow-sm"
+                                        : "text-gray-600 hover:bg-gray-50 hover:text-slate-900"
+                                    }
                 `}
                             >
                                 <Icon
