@@ -17,12 +17,11 @@ import {
   CheckCircle2,
   Clock,
   FileText,
-  ShieldCheck,
+  Briefcase,
   Loader2,
   AlertCircle,
   RefreshCw,
 } from "lucide-react";
-import KYCVerification from "./KYCVerification";
 
 // Profile data interfaces
 interface ProfileDataState {
@@ -83,7 +82,7 @@ const Profile: React.FC = () => {
             ...prev,
             fullName: user.fullName || "",
             email: user.email || "",
-            phone: user.phoneNumber || "",
+            phone: (user as any).phone || "",
           }));
         }
 
@@ -95,7 +94,7 @@ const Profile: React.FC = () => {
             : kycResponse.data;
           setKycData(kyc);
 
-          if (kyc.businessInfo) {
+          if (kyc && kyc.businessInfo) {
             setProfileData((prev) => ({
               ...prev,
               registeredAddress: kyc.businessInfo?.address || "",
@@ -189,28 +188,10 @@ const Profile: React.FC = () => {
             <CheckCircle2 className="w-4 h-4" /> Verified
           </span>
         );
-      case "approved":
-        return (
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
-            <CheckCircle2 className="w-4 h-4" /> Verified
-          </span>
-        );
       case "pending":
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-700">
             <Clock className="w-4 h-4" /> Pending
-          </span>
-        );
-      case "in_progress":
-        return (
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">
-            <FileText className="w-4 h-4" /> Draft
-          </span>
-        );
-      case "rejected":
-        return (
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
-            <AlertCircle className="w-4 h-4" /> Rejected
           </span>
         );
       default:
@@ -225,7 +206,7 @@ const Profile: React.FC = () => {
   const tabs = [
     { id: "personal", label: "Personal Info", icon: User },
     { id: "company", label: "Company Details", icon: Building2 },
-    { id: "subscription", label: "KYC Verification", icon: ShieldCheck },
+    { id: "subscription", label: "Subscription", icon: Briefcase },
   ];
 
   return (
@@ -234,7 +215,7 @@ const Profile: React.FC = () => {
         {/* Loading State */}
         {loading && (
           <div className="flex items-center justify-center h-64">
-            <Loader2 className="w-8 h-8 text-yellow-500 animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#35503F] animate-spin" />
           </div>
         )}
 
@@ -259,7 +240,7 @@ const Profile: React.FC = () => {
           <>
             {/* Header Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-24" />
+              <div className="bg-[#35503F] h-24" />
               <div className="px-6 pb-6">
                 <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-12">
                   {/* Profile Image */}
@@ -272,13 +253,13 @@ const Profile: React.FC = () => {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-yellow-100 flex items-center justify-center">
-                          <User className="w-10 h-10 text-yellow-600" />
+                        <div className="w-full h-full bg-[#35503F]/10 flex items-center justify-center">
+                          <User className="w-10 h-10 text-[#35503F]" />
                         </div>
                       )}
                     </div>
-                    <label className="absolute bottom-0 right-0 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center cursor-pointer hover:bg-yellow-500 transition-colors shadow-md">
-                      <Camera className="w-4 h-4 text-black" />
+                    <label className="absolute bottom-0 right-0 w-8 h-8 bg-[#FAF6D3] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#F2EEB3] transition-colors shadow-md border border-gray-200">
+                      <Camera className="w-4 h-4 text-gray-700" />
                       <input
                         type="file"
                         accept="image/*"
@@ -290,7 +271,7 @@ const Profile: React.FC = () => {
 
                   {/* Name and ID */}
                   <div className="text-center sm:text-left flex-1">
-                    <h1 className="text-2xl font-bold text-gray-900 font-[Poppins]">
+                    <h1 className="text-2xl font-bold text-gray-900 ">
                       Welcome back, {user?.fullName?.split(" ")[0] || "User"}!
                       👋
                     </h1>
@@ -303,12 +284,12 @@ const Profile: React.FC = () => {
                   </div>
 
                   {/* KYC Status */}
-                  <div className="flex flex-col items-center sm:items-end gap-2">
-                    {getKYCBadge(kycData?.overallStatus || "not_submitted")}
+                  <div className="flex flex-row items-center sm:items-end gap-3 mt-4 sm:mt-0">
+                    {getKYCBadge((kycData as any)?.status || "not_submitted")}
                     {!isEditing ? (
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-[#35503F] text-white rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
                       >
                         <Edit3 className="w-4 h-4" /> Edit Profile
                       </button>
@@ -346,11 +327,10 @@ const Profile: React.FC = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                      activeTab === tab.id
-                        ? "bg-yellow-400 text-black"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
+                      ? "bg-[#35503F] text-white"
+                      : "text-gray-600 hover:bg-gray-100"
+                      }`}
                   >
                     <tab.icon className="w-4 h-4" />
                     <span className="hidden sm:inline">{tab.label}</span>
@@ -364,8 +344,8 @@ const Profile: React.FC = () => {
               {/* Personal Info Tab */}
               {activeTab === "personal" && (
                 <div className="space-y-6">
-                  <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                    <User className="w-5 h-5 text-yellow-500" /> Personal
+                  <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
+                    <User className="w-5 h-5 text-[#35503F]" /> Personal
                     Information
                   </h2>
 
@@ -381,7 +361,7 @@ const Profile: React.FC = () => {
                           onChange={(e) =>
                             handleInputChange("fullName", e.target.value)
                           }
-                          className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
                         />
                       ) : (
                         <p className="text-gray-900 font-medium">
@@ -403,7 +383,7 @@ const Profile: React.FC = () => {
                             onChange={(e) =>
                               handleInputChange("email", e.target.value)
                             }
-                            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
                           />
                         ) : (
                           <p className="text-gray-900">{profileData.email}</p>
@@ -424,7 +404,7 @@ const Profile: React.FC = () => {
                             onChange={(e) =>
                               handleInputChange("phone", e.target.value)
                             }
-                            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
                           />
                         ) : (
                           <p className="text-gray-900">{profileData.phone}</p>
@@ -448,7 +428,7 @@ const Profile: React.FC = () => {
                                 e.target.value,
                               )
                             }
-                            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
                           />
                         ) : (
                           <p className="text-gray-900">
@@ -462,7 +442,7 @@ const Profile: React.FC = () => {
                   {/* Address Section */}
                   <div className="pt-4 border-t border-gray-100">
                     <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-yellow-500" /> Address
+                      <MapPin className="w-4 h-4 text-[#35503F]" /> Address
                       Details
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -480,7 +460,7 @@ const Profile: React.FC = () => {
                               )
                             }
                             rows={2}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
                           />
                         ) : (
                           <p className="text-gray-900">
@@ -508,8 +488,8 @@ const Profile: React.FC = () => {
               {/* Company Tab */}
               {activeTab === "company" && (
                 <div className="space-y-6">
-                  <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-yellow-500" /> Company
+                  <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-[#35503F]" /> Company
                     Information
                   </h2>
 
@@ -609,7 +589,7 @@ const Profile: React.FC = () => {
                       {/* Legal Documents */}
                       <div className="pt-4 border-t border-gray-100">
                         <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                          <Shield className="w-4 h-4 text-yellow-500" /> Legal &
+                          <Shield className="w-4 h-4 text-[#35503F]" /> Legal &
                           Tax Information
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -701,10 +681,105 @@ const Profile: React.FC = () => {
               )}
 
               {/* Subscription Tab */}
-              {/* Subscription Tab (now KYC Verification) */}
               {activeTab === "subscription" && (
                 <div className="space-y-6">
-                  <KYCVerification />
+                  <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-[#35503F]" />{" "}
+                    Subscription Details
+                  </h2>
+
+                  {activeBooking ? (
+                    <>
+                      {/* Current Plan Card */}
+                      <div className="bg-gradient-to-r from-[#FAF6D3] to-white border border-[#F2EEB3] rounded-xl p-6">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          <div>
+                            <p className="text-sm text-[#35503F] mb-1">
+                              Current Plan
+                            </p>
+                            <h3 className="text-2xl font-bold text-gray-900">
+                              {activeBooking.plan?.name ||
+                                activeBooking.spaceSnapshot?.name}
+                            </h3>
+                            <p className="text-gray-600 mt-1">
+                              Valid from{" "}
+                              {activeBooking.startDate
+                                ? formatDate(activeBooking.startDate)
+                                : "N/A"}{" "}
+                              to{" "}
+                              {activeBooking.endDate
+                                ? formatDate(activeBooking.endDate)
+                                : "N/A"}
+                            </p>
+                          </div>
+                          <div className="flex gap-3">
+                            <a
+                              href="/dashboard/billing"
+                              className="px-5 py-2.5 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors"
+                            >
+                              Upgrade Plan
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Account Details */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-gray-50 p-5 rounded-xl">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-full bg-[#FAF6D3] flex items-center justify-center">
+                              <MapPin className="w-5 h-5 text-[#35503F]" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Location</p>
+                              <p className="font-medium text-gray-900">
+                                {activeBooking.spaceSnapshot?.address || "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-600 flex items-center gap-2">
+                            <Building2 className="w-4 h-4" />{" "}
+                            {activeBooking.type === "virtual_office"
+                              ? "Virtual Office"
+                              : "Coworking Space"}
+                          </p>
+                        </div>
+
+                        <div className="bg-gray-50 p-5 rounded-xl">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                              <Calendar className="w-5 h-5 text-green-600" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">
+                                Member Since
+                              </p>
+                              <p className="font-medium text-gray-900">
+                                {user?.createdAt
+                                  ? formatDate(user.createdAt)
+                                  : "N/A"}
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            Booking ID:{" "}
+                            {activeBooking._id?.slice(-8).toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                      <p>No active subscription found.</p>
+                      <a
+                        href="/spaces"
+                        className="text-[#35503F] hover:underline mt-2 inline-block font-medium"
+                      >
+                        Browse available spaces
+                      </a>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

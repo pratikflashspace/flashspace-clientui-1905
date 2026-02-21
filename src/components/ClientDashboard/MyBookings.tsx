@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import userDashboardService, { Booking } from "@/services/userDashboard.service";
+import userDashboardService from "@/services/userDashboard.service";
+import { Booking, BookingType, BookingStatus } from "@/types/services";
 import {
   Building2,
   Briefcase,
@@ -22,6 +23,7 @@ import {
   ToggleRight,
   ShieldCheck,
   MessageSquare,
+  MoreVertical,
 } from "lucide-react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -34,10 +36,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "react-hot-toast";
-
-// Type definitions
-type BookingType = "virtual_office" | "coworking_space";
-type BookingStatus = "active" | "expired" | "pending" | "pending_kyc" | "cancelled" | "pending_payment";
 
 const MyBookings: React.FC = () => {
   const navigate = useNavigate();
@@ -236,148 +234,136 @@ const MyBookings: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold font-[Poppins] text-gray-900">
-              My <span className="text-yellow-500">Bookings</span>
+            <h1 className="text-3xl md:text-4xl font-bold  text-[#35503F]">
+              My <span className="italic">Bookings</span>
             </h1>
-            <p className="text-gray-500 mt-1">Manage your virtual offices and coworking spaces</p>
+            <p className="text-gray-500 mt-2">Manage your virtual offices and coworking spaces</p>
           </div>
           <a
             href="/services/virtual-office"
-            className="inline-flex items-center gap-2 bg-yellow-400 text-black px-5 py-2.5 rounded-lg font-medium hover:bg-yellow-500 transition-colors"
+            className="inline-flex items-center gap-2 bg-[#35503F] text-white px-6 py-3 rounded-full font-medium hover:bg-[#35503F]/90 transition-colors"
           >
-            <Building2 className="w-4 h-4" />
+            <span className="text-lg">+</span>
             Book New Space
           </a>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-            <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-            <p className="text-sm text-gray-500">Total Bookings</p>
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-150">
+            <p className="text-3xl font-bold text-[#35503F] mb-1">{stats.total}</p>
+            <p className="text-xs text-gray-500">Total Bookings</p>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-            <p className="text-2xl font-bold text-green-600">{stats.active}</p>
-            <p className="text-sm text-gray-500">Active</p>
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-150">
+            <p className="text-3xl font-bold text-[#10B981] mb-1">{stats.active}</p>
+            <p className="text-xs text-gray-500">Active</p>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-            <p className="text-2xl font-bold text-yellow-600">{stats.virtualOffice}</p>
-            <p className="text-sm text-gray-500">Virtual Offices</p>
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-150">
+            <p className="text-3xl font-bold text-[#35503F] mb-1">{stats.virtualOffice}</p>
+            <p className="text-xs text-gray-500">Virtual Offices</p>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-            <p className="text-2xl font-bold text-blue-600">{stats.coworking}</p>
-            <p className="text-sm text-gray-500">Coworking</p>
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-150">
+            <p className="text-3xl font-bold text-[#35503F] mb-1">{stats.coworking}</p>
+            <p className="text-xs text-gray-500">Coworking</p>
           </div>
         </div>
 
         {/* Filters Bar */}
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Service Type Tabs */}
-            <div className="flex gap-2">
-              {[
-                { id: "all", label: "All", icon: null },
-                { id: "virtual_office", label: "Virtual Office", icon: Building2 },
-                { id: "coworking_space", label: "Coworking", icon: Briefcase },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                    ? "bg-yellow-400 text-black"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                >
-                  {tab.icon && <tab.icon className="w-4 h-4" />}
-                  {tab.label}
-                </button>
-              ))}
-            </div>
+        <div className="flex flex-col md:flex-row justify-between gap-4 items-center">
+          {/* Service Type Tabs */}
+          <div className="flex p-1 rounded-lg shadow-sm bg-gray-100">
+            {[
+              { id: "all", label: "All", icon: null },
+              { id: "virtual_office", label: "Virtual Office", icon: Building2 },
+              { id: "coworking_space", label: "Coworking", icon: Briefcase },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all ${activeTab === tab.id
+                  ? "bg-white text-black shadow-md"
+                  : "text-gray-500 hover:text-gray-700"
+                  }`}
+              >
+                {tab.icon && <tab.icon className="w-4 h-4" />}
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
+          <div className="flex flex-wrap gap-3 items-center w-full md:w-auto">
             {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div className="relative flex-1 md:w-64">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search by name, ID, or city..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2.5 bg-white rounded-full border border-gray-100 focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 text-sm"
               />
             </div>
 
             {/* Date Range Picker */}
-            <div className="relative">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="date"
-                    variant={"outline"}
-                    className={cn(
-                      "w-[260px] justify-start text-left font-normal border-gray-200 hover:bg-gray-50",
-                      !date && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date?.from ? (
-                      date.to ? (
-                        <>
-                          {format(date.from, "LLL dd, y")} -{" "}
-                          {format(date.to, "LLL dd, y")}
-                        </>
-                      ) : (
-                        format(date.from, "LLL dd, y")
-                      )
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-white" align="end">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={date?.from}
-                    selected={date}
-                    onSelect={setDate}
-                    numberOfMonths={2}
-                  />
-                </PopoverContent>
-              </Popover>
-              {date && (
-                <button
-                  onClick={() => setDate(undefined)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full"
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="date"
+                  variant={"outline"}
+                  className={cn(
+                    "justify-start text-left font-normal bg-white border-gray-100 rounded-full hover:bg-white px-4 h-11",
+                    !date && "text-muted-foreground"
+                  )}
                 >
-                  <X className="w-3 h-3 text-gray-400" />
-                </button>
-              )}
-            </div>
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date?.from ? (
+                    date.to ? (
+                      <>
+                        {format(date.from, "LLL dd")} - {format(date.to, "LLL dd")}
+                      </>
+                    ) : (
+                      format(date.from, "LLL dd")
+                    )
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-white" align="end">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={date?.from}
+                  selected={date}
+                  onSelect={setDate}
+                  numberOfMonths={2}
+                />
+              </PopoverContent>
+            </Popover>
 
             {/* Status Filter */}
             <div className="relative">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-full hover:bg-gray-50 transition-colors text-sm"
               >
                 <Filter className="w-4 h-4" />
                 Status
-                <ChevronDown className="w-4 h-4" />
               </button>
               {showFilters && (
-                <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[150px]">
-                  {["all", "active", "pending", "expired", "cancelled"].map((status) => (
+                <div className="absolute right-0 top-full mt-2 bg-white border border-gray-100 rounded-xl shadow-lg z-10 min-w-[150px] p-1">
+                  {["all", "active", "pending_payment", "expired", "cancelled"].map((status) => (
                     <button
                       key={status}
                       onClick={() => {
                         setStatusFilter(status as typeof statusFilter);
                         setShowFilters(false);
                       }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${statusFilter === status ? "bg-yellow-50 text-yellow-700" : ""
+                      className={`w-full text-left px-4 py-2 text-sm rounded-lg hover:bg-gray-50 ${statusFilter === status ? "bg-[#35503F]/5 text-[#35503F]" : "text-gray-600"
                         }`}
                     >
                       {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -389,112 +375,104 @@ const MyBookings: React.FC = () => {
           </div>
         </div>
 
-        {/* Bookings List */}
+        {/* Bookings Grid */}
         {filteredBookings.length === 0 ? (
-          <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-100">
-            <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">No bookings found</h3>
-            <p className="text-gray-500 mb-6">
-              {searchQuery ? "Try adjusting your search or filters" : "Book your first workspace to get started"}
+          <div className="bg-white rounded-2xl p-12 text-center shadow-sm">
+            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Building2 className="w-8 h-8 text-gray-300" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No bookings found</h3>
+            <p className="text-gray-500 mb-6 max-w-sm mx-auto text-sm">
+              {searchQuery ? "We couldn't find any bookings matching your search. Try adjusting your filters." : "You haven't made any bookings yet."}
             </p>
             <a
               href="/services/virtual-office"
-              className="inline-flex items-center gap-2 bg-yellow-400 text-black px-6 py-2.5 rounded-lg font-medium hover:bg-yellow-500 transition-colors"
+              className="inline-flex items-center gap-2 bg-[#35503F] text-white px-6 py-2.5 rounded-full font-medium hover:bg-[#35503F]/90 transition-colors text-sm"
             >
               Browse Spaces
             </a>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredBookings.map((booking) => {
               const statusConfig = getStatusConfig(booking.status);
               const daysRemaining = calculateDaysRemaining(booking.endDate || "");
-              const isExpiring = booking.status === "active" && daysRemaining <= 30;
 
               return (
                 <div
                   key={booking._id}
-                  className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                  className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group relative"
                 >
-                  <div className="flex flex-col md:flex-row">
-                    {/* Image */}
-                    <div className="md:w-48 h-32 md:h-auto relative">
-                      <img
-                        src={booking.spaceSnapshot?.images?.[0] || booking.spaceSnapshot?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"}
-                        alt={booking.spaceSnapshot?.name || "Space"}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-3 left-3">
-                        <span
-                          className={`px-2.5 py-1 rounded-full text-xs font-medium ${booking.type === "virtual_office"
-                            ? "bg-yellow-400 text-black"
-                            : "bg-blue-500 text-white"
-                            }`}
-                        >
-                          {booking.type === "virtual_office" ? "Virtual Office" : "Coworking"}
-                        </span>
-                      </div>
+                  {/* Header: ID & Status */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
+                        {booking.bookingNumber || "BO-2024-XXX"}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${booking.type === 'virtual_office' ? 'bg-gray-50 border-gray-200 text-gray-600' : 'bg-blue-50 border-blue-100 text-blue-600'}`}>
+                        {booking.type === 'virtual_office' ? 'Virtual Office' : 'Coworking'}
+                      </span>
+                    </div>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConfig.bg} ${statusConfig.text}`}>
+                      <statusConfig.icon className="w-3 h-3" />
+                      {statusConfig.label}
+                    </span>
+                  </div>
+
+                  {/* Main Content */}
+                  <div className="mb-4">
+                    <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-[#35503F] transition-colors line-clamp-1">
+                      {booking.spaceSnapshot?.name}
+                    </h3>
+                    <div className="flex items-start gap-1.5 text-gray-500 text-xs mb-2 h-8">
+                      <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                      <span className="line-clamp-2">{booking.spaceSnapshot?.address}, {booking.spaceSnapshot?.city}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <CalendarIcon className="w-3.5 h-3.5 text-gray-400" />
+                      <span>
+                        {formatDate(booking.startDate || "")} — {formatDate(booking.endDate || "")}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-gray-100 my-3" />
+
+                  {/* Footer: Price & Actions */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-base font-bold text-gray-900">
+                        {formatCurrency(booking.plan.price)}
+                        <span className="text-xs font-normal text-gray-500">/{booking.plan.tenureUnit === 'year' ? 'yr' : 'mo'}</span>
+                      </p>
+                      <p className="text-[10px] text-gray-400 capitalize">{booking.plan.tenure} {booking.plan.tenureUnit} Plan</p>
                     </div>
 
-                    {/* Content */}
-                    <div className="flex-1 p-5">
-                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                        {/* Left Info */}
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-lg font-semibold text-gray-900">{booking.spaceSnapshot?.name}</h3>
-                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
-                              <statusConfig.icon className="w-3 h-3" />
-                              {statusConfig.label}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-500 flex items-center gap-1 mb-2">
-                            <MapPin className="w-3.5 h-3.5" /> {booking.spaceSnapshot?.address}, {booking.spaceSnapshot?.city}
-                          </p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setSelectedBooking(booking)}
+                        className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-[#35503F] hover:text-[#35503F] transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
 
-                          <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-3">
-                            <span className="flex items-center gap-1">
-                              <CalendarIcon className="w-4 h-4 text-gray-400" />
-                              {formatDate(booking.startDate || "")} - {formatDate(booking.endDate || "")}
-                            </span>
-                            <span className="font-medium">Plan: {booking.plan.name}</span>
-                            <span className="font-semibold text-gray-900">{formatCurrency(booking.plan.price)}/{booking.plan.tenure} {booking.plan.tenureUnit}</span>
-                          </div>
-
-                          {/* Features Pills */}
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            {booking.plan.gstIncluded && (
-                              <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full">GST Included</span>
-                            )}
-                            {booking.autoRenew && (
-                              <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">Auto Renew</span>
-                            )}
-                            {isExpiring && (
-                              <span className="px-2 py-1 bg-orange-50 text-orange-700 text-xs rounded-full flex items-center gap-1">
-                                <RefreshCw className="w-3 h-3" /> Renews in {daysRemaining} days
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Right Actions */}
-                        <div className="flex flex-row md:flex-col gap-2 md:items-end">
-                          <button
-                            onClick={() => setSelectedBooking(booking)}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
-                          >
-                            <Eye className="w-4 h-4" /> View Details
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-[#35503F] hover:text-[#35503F] transition-colors">
+                            <MoreVertical className="w-3.5 h-3.5" />
                           </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-48 p-1 bg-white" align="end">
                           {booking.status === "pending_kyc" && (
                             <button
                               onClick={() => navigate(`/dashboard/kyc-verification?linkBookingId=${booking._id}`)}
-                              className="flex items-center gap-1.5 px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors"
+                              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
                             >
-                              <ShieldCheck className="w-4 h-4" /> Verify Now
+                              <ShieldCheck className="w-4 h-4" /> Verify KYC
                             </button>
                           )}
                           {booking.documents && booking.documents.length > 0 && (
-                            <button className="flex items-center gap-1.5 px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors">
+                            <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2">
                               <Download className="w-4 h-4" /> Documents
                             </button>
                           )}
@@ -502,27 +480,20 @@ const MyBookings: React.FC = () => {
                             <button
                               onClick={() => handleToggleAutoRenew(booking._id, booking.autoRenew)}
                               disabled={togglingAutoRenew === booking._id}
-                              className="flex items-center gap-1.5 px-4 py-2 border border-yellow-400 text-yellow-600 rounded-lg text-sm font-medium hover:bg-yellow-50 transition-colors disabled:opacity-50"
+                              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
                             >
-                              {togglingAutoRenew === booking._id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : booking.autoRenew ? (
-                                <ToggleRight className="w-4 h-4" />
-                              ) : (
-                                <ToggleLeft className="w-4 h-4" />
-                              )}
-                              {booking.autoRenew ? "Auto Renew On" : "Auto Renew Off"}
+                              <RefreshCw className={`w-4 h-4 ${togglingAutoRenew === booking._id ? "animate-spin" : ""}`} />
+                              {booking.autoRenew ? "Disable Auto-Renew" : "Enable Auto-Renew"}
                             </button>
                           )}
-                          {/* Raise Query button — shows for all active/pending bookings */}
                           <button
                             onClick={() => setQueryModalBooking(booking)}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-teal-50 text-teal-700 border border-teal-200 rounded-lg text-sm font-medium hover:bg-teal-100 transition-colors"
+                            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
                           >
                             <MessageSquare className="w-4 h-4" /> Raise Query
                           </button>
-                        </div>
-                      </div>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
                 </div>

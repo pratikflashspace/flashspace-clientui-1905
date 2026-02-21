@@ -31,6 +31,7 @@ interface NotificationContextType {
     markAsRead: (id: string) => void;
     markAllAsRead: () => void;
     fetchNotifications: () => void;
+    deleteNotification: (id: string) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -156,10 +157,25 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         } catch (err) {
             console.error("Failed to mark all read", err);
         }
-    }
+    };
+
+    const deleteNotification = async (id: string) => {
+        // Optimistic Update
+        setNotifications(prev => prev.filter(n => n._id !== id));
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/notifications/${id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+        } catch (err) {
+            console.error("Failed to delete notification", err);
+            // Optionally could rollback the state if delete fails
+        }
+    };
 
     return (
-        <NotificationContext.Provider value={{ notifications, unreadCount, markAsRead, markAllAsRead, fetchNotifications }}>
+        <NotificationContext.Provider value={{ notifications, unreadCount, markAsRead, markAllAsRead, fetchNotifications, deleteNotification }}>
             {children}
         </NotificationContext.Provider>
     );

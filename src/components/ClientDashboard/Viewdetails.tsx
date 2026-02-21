@@ -160,7 +160,7 @@ const ViewDetails: React.FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-xl md:text-2xl font-bold font-[Poppins] text-gray-900">
+                  <h1 className="text-xl md:text-2xl font-bold  text-gray-900">
                     {bookingData.workspace.name}
                   </h1>
                   <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold uppercase">
