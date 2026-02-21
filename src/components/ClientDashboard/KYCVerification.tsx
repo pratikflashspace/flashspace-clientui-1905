@@ -30,6 +30,7 @@ import {
   Edit,
   ArrowUpRight,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import { API_CONFIG } from "@/config/api.config";
 import DemoKYCVideo from "@/assets/kycVideo/DemoKYCVideo.mp4";
 
@@ -57,6 +58,7 @@ export default function KYCVerification() {
   const [activeStep, setActiveStep] = useState<VerificationStep>("personal");
   const [kycType, setKycType] = useState<KYCType>("individual");
   const [kycData, setKycData] = useState<KYCData | null>(null);
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   // Multi-Level State
   const [profiles, setProfiles] = useState<KYCData[]>([]);
@@ -2021,6 +2023,8 @@ export default function KYCVerification() {
                     <label className="flex items-start gap-3">
                       <input
                         type="checkbox"
+                        checked={isConfirmed}
+                        onChange={(e) => setIsConfirmed(e.target.checked)}
                         className="mt-1 w-4 h-4 text-[#35503F] rounded focus:ring-[#35503F]"
                       />
                       <span className="text-sm text-gray-600">
@@ -2113,7 +2117,7 @@ export default function KYCVerification() {
                         kycData?.overallStatus !== "pending"
                       ) {
                         if (!isReadyForSubmission()) {
-                          alert(
+                          toast.error(
                             "Please complete all required steps before submitting.",
                           );
                           return;
@@ -2125,16 +2129,16 @@ export default function KYCVerification() {
                           const response =
                             await userDashboardService.submitKYC(profileId!);
                           if (response.success) {
-                            alert(
+                            toast.success(
                               "Your KYC has been submitted for verification. Our team will review it shortly.",
                             );
                             fetchKYC(); // Refresh to show new status
                           } else {
-                            alert(response.message || "Failed to submit KYC");
+                            toast.error(response.message || "Failed to submit KYC");
                           }
                         } catch (err) {
                           console.error("Failed to submit KYC:", err);
-                          alert("Failed to submit KYC for review");
+                          toast.error("Failed to submit KYC for review");
                         } finally {
                           setSaving(false);
                         }
@@ -2149,7 +2153,11 @@ export default function KYCVerification() {
                       (!linkBookingId &&
                         !isReadyForSubmission() &&
                         kycData?.overallStatus !== "approved" &&
-                        kycData?.overallStatus !== "pending")
+                        kycData?.overallStatus !== "pending") ||
+                      (!linkBookingId &&
+                        kycData?.overallStatus !== "approved" &&
+                        kycData?.overallStatus !== "pending" &&
+                        !isConfirmed)
                     }
                     className="w-full py-3 bg-[#35503F] text-white rounded-xl font-semibold hover:bg-[#35503F]/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
