@@ -128,6 +128,8 @@ import MarketingTools from "./pages/affiliatePortal/MarketingTools";
 import LeaderBoard from "./pages/affiliatePortal/LeaderBoard";
 
 import Support from "./pages/affiliatePortal/Support";
+import AffiliateKYC from "./pages/affiliatePortal/KYC";
+import AffiliateNotifications from "./pages/affiliatePortal/Notifications";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -383,6 +385,8 @@ const App = () => (
                       <Route path="marketing-tools" element={<MarketingTools />} />
                       <Route path="leaderboard" element={<LeaderBoard />} />
                       <Route path="support" element={<Support />} />
+                      <Route path="kyc" element={<AffiliateKYC />} />
+                      <Route path="notifications" element={<AffiliateNotifications />} />
                     </Route>
                   </Route>
 

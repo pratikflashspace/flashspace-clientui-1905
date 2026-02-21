@@ -121,7 +121,14 @@ export const NotificationBell: React.FC = () => {
                                 <button
                                     onClick={() => {
                                         setIsOpen(false);
-                                        window.location.href = '/dashboard/notifications';
+                                        const currentPath = window.location.pathname;
+                                        if (currentPath.includes('/affiliate-portal')) {
+                                            window.location.href = '/affiliate-portal/notifications';
+                                        } else if (currentPath.includes('/spaceportal')) {
+                                            window.location.href = '/spaceportal/notifications';
+                                        } else {
+                                            window.location.href = '/dashboard/notifications';
+                                        }
                                     }}
                                     className="w-full py-2 text-xs font-medium text-[#0d3b2e] hover:bg-[#0d3b2e]/5 rounded-md transition-colors"
                                 >

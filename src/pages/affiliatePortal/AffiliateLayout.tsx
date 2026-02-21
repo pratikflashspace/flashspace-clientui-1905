@@ -26,6 +26,8 @@ const AffiliateLayout = () => {
         if (path.includes("marketing-tools")) return "Marketing Tools";
         if (path.includes("leaderboard")) return "Leaderboard";
         if (path.includes("support")) return "Support";
+        if (path.includes("kyc")) return "KYC Verification";
+        if (path.includes("notifications")) return "Notifications";
         return "Dashboard"; // Default
     };
 
@@ -63,6 +65,12 @@ const AffiliateLayout = () => {
                 break;
             case "Support":
                 navigate("/affiliate-portal/support");
+                break;
+            case "KYC Verification":
+                navigate("/affiliate-portal/kyc");
+                break;
+            case "Notifications":
+                navigate("/affiliate-portal/notifications");
                 break;
             default:
                 navigate("/affiliate-portal/dashboard");

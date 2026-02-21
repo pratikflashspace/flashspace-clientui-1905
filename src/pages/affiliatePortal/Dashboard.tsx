@@ -14,6 +14,7 @@ import {
     Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { NotificationBell } from "@/components/NotificationBell";
 
 import { affiliatePortalService } from "@/services/affiliatePortal.service";
 
@@ -95,7 +96,7 @@ const Dashboard = () => {
     const handleRefresh = () => {
         setIsLoadingInsight(true);
         // Re-fetch logic could go here
-        setTimeout(() => setIsLoadingInsight(false), 1500); 
+        setTimeout(() => setIsLoadingInsight(false), 1500);
     };
 
     // Effect to simulate loading delay (2 seconds)
@@ -129,11 +130,11 @@ const Dashboard = () => {
             trend: "18% from last month",
             icon: TrendingUp,
         },
-        { 
-            label: "Pending Payout", 
-            value: `₹${(dashboardStats?.pendingPayout || 0).toLocaleString()}`, 
-            trend: null, 
-            icon: Wallet 
+        {
+            label: "Pending Payout",
+            value: `₹${(dashboardStats?.pendingPayout || 0).toLocaleString()}`,
+            trend: null,
+            icon: Wallet
         },
     ];
 
@@ -220,29 +221,36 @@ const Dashboard = () => {
             ],
         },
     ];
-    
+
     if (isLoading) {
-         return (
-             <div className="flex h-screen items-center justify-center">
-                 <Loader2 className="h-8 w-8 animate-spin text-[#5aa39c]" />
-             </div>
-         );
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-[#5aa39c]" />
+            </div>
+        );
     }
 
     return (
         <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans animate-fade-in relative">
             <div className="w-full space-y-10">
                 {/* 1. Page Header */}
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                        Affiliate{" "}
-                        <span className="text-[#5aa39c] italic ">
-                            Dashboard
-                        </span>
-                    </h1>
-                    <p className="text-gray-500 text-lg">
-                        Track your referrals, revenue, and performance
-                    </p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-2">
+                        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                            Affiliate{" "}
+                            <span className="text-[#5aa39c] italic ">
+                                Dashboard
+                            </span>
+                        </h1>
+                        <p className="text-gray-500 text-lg">
+                            Track your referrals, revenue, and performance
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="bg-white p-1 rounded-full shadow-sm border border-gray-100">
+                            <NotificationBell />
+                        </div>
+                    </div>
                 </div>
 
                 {/* 2. Stats Grid */}
@@ -299,7 +307,7 @@ const Dashboard = () => {
 
                 {/* 4. Other Sections */}
                 {sections.map((section) => (
-                    <div key={section.id} onClick={()=>navigate("")} className="animate-slide-up">
+                    <div key={section.id} onClick={() => navigate("")} className="animate-slide-up">
                         <SectionHeader
                             icon={section.icon}
                             title={section.title}
