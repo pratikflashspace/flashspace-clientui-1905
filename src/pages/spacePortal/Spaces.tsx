@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { SPACES } from "@/data/spacePortal/spaces";
 import type { SpaceStatus } from "@/types/spacePortal/space";
+import { fetchAllPartnerSpaces } from "@/services/spacePortal/spacePartner.service";
 
 import StatCard from "@/components/ui/SpacePartner/StatCard";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
@@ -14,13 +14,10 @@ import { Building2, CheckCircle2, Wrench, XCircle, Plus } from "lucide-react";
  * Spaces Page
  *
  * Features:
- * - Show spaces list
+ * - Show spaces list fetched from backend
  * - Search spaces by name/city/location/id
  * - Filter by status and city
  * - KPI stats
- *
- * Backend-ready:
- * - Replace SPACES with API response.
  */
 export default function Spaces() {
   const navigate = useNavigate();
@@ -29,18 +26,37 @@ export default function Spaces() {
   const [statusFilter, setStatusFilter] = useState<SpaceStatus | "ALL">("ALL");
   const [cityFilter, setCityFilter] = useState<string | "ALL">("ALL");
 
+  const [spaces, setSpaces] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const payload: any = await fetchAllPartnerSpaces();
+        if (payload?.success) {
+          setSpaces(payload.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to load spaces", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
   /**
    * Normalize search query once.
    */
   const normalizedQuery = useMemo(() => query.trim().toLowerCase(), [query]);
 
   /**
-   * Compute unique cities list from SPACES.
-   * Later backend can provide list of cities directly.
+   * Compute unique cities list from fetched spaces.
    */
   const cities = useMemo(() => {
-    return Array.from(new Set(SPACES.map((s) => s.city)));
-  }, []);
+    return Array.from(new Set(spaces.map((s) => s.city))).filter(Boolean);
+  }, [spaces]);
 
   /**
    * Filter dropdown options
@@ -52,7 +68,7 @@ export default function Spaces() {
       { label: "Maintenance", value: "MAINTENANCE" },
       { label: "Inactive", value: "INACTIVE" },
     ],
-    []
+    [],
   );
 
   const cityOptions = useMemo(
@@ -60,37 +76,38 @@ export default function Spaces() {
       { label: "All Cities", value: "ALL" },
       ...cities.map((city) => ({ label: city, value: city })),
     ],
-    [cities]
+    [cities],
   );
 
   /**
    * Filter spaces list based on query + filters.
    */
   const filteredSpaces = useMemo(() => {
-    return SPACES.filter((space) => {
+    return spaces.filter((space) => {
       const matchesQuery =
-        space.name.toLowerCase().includes(normalizedQuery) ||
-        space.city.toLowerCase().includes(normalizedQuery) ||
-        space.location.toLowerCase().includes(normalizedQuery) ||
-        space.id.toLowerCase().includes(normalizedQuery);
+        space.name?.toLowerCase().includes(normalizedQuery) ||
+        space.city?.toLowerCase().includes(normalizedQuery) ||
+        space.location?.toLowerCase().includes(normalizedQuery) ||
+        space.id?.toLowerCase().includes(normalizedQuery);
 
       const matchesStatus =
         statusFilter === "ALL" ? true : space.status === statusFilter;
 
-      const matchesCity = cityFilter === "ALL" ? true : space.city === cityFilter;
+      const matchesCity =
+        cityFilter === "ALL" ? true : space.city === cityFilter;
 
       return matchesQuery && matchesStatus && matchesCity;
     });
-  }, [normalizedQuery, statusFilter, cityFilter]);
+  }, [normalizedQuery, statusFilter, cityFilter, spaces]);
 
   /**
    * Stats (computed once)
    */
   const stats = useMemo(() => {
-    const total = SPACES.length;
-    const active = SPACES.filter((s) => s.status === "ACTIVE").length;
-    const inactive = SPACES.filter((s) => s.status === "INACTIVE").length;
-    const maintenance = SPACES.filter((s) => s.status === "MAINTENANCE").length;
+    const total = spaces.length;
+    const active = spaces.filter((s) => s.status === "ACTIVE").length;
+    const inactive = spaces.filter((s) => s.status === "INACTIVE").length;
+    const maintenance = spaces.filter((s) => s.status === "MAINTENANCE").length;
 
     return {
       total,
@@ -98,7 +115,15 @@ export default function Spaces() {
       inactive,
       maintenance,
     };
-  }, []);
+  }, [spaces]);
+
+  if (loading) {
+    return (
+      <div className="flex h-full flex-1 items-center justify-center">
+        <div className="text-slate-500">Loading spaces...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1">
@@ -254,8 +279,8 @@ function SpaceStatusPill({ status }: { status: SpaceStatus }) {
     status === "ACTIVE"
       ? { label: "Active", className: "bg-emerald-50 text-[#3FA69E]" }
       : status === "MAINTENANCE"
-      ? { label: "Maintenance", className: "bg-amber-50 text-amber-700" }
-      : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
+        ? { label: "Maintenance", className: "bg-amber-50 text-amber-700" }
+        : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
 
   return (
     <span
