@@ -119,5 +119,9 @@ export const API_ENDPOINTS = {
 
     DASHBOARD_INSIGHTS: '/api/affiliate/dashboard/insights',
 
+    COUPON_GENERATE: '/api/coupons/affiliate/generate',
+
+    MY_COUPON: '/api/coupons/affiliate/my-coupon',
+
   },
 };

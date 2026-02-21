@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { NotificationBell } from "@/components/NotificationBell";
+import { useAuth } from "@/contexts/AuthContext";
+import toast from "react-hot-toast";
+import { Copy, CheckCircle } from "lucide-react";
 
 import { affiliatePortalService } from "@/services/affiliatePortal.service";
 
@@ -61,19 +64,33 @@ const Dashboard = () => {
     const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
     const [insightData, setInsightData] = useState<Record<InsightType, InsightContent> | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [coupon, setCoupon] = useState<any>(null);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const { user, refreshProfile } = useAuth();
     const navigate = useNavigate();
 
     // Fetch Data
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [statsRes, insightsRes] = await Promise.all([
+                // Refresh profile to get latest KYC status
+                await refreshProfile();
+
+                const [statsRes, insightsRes, couponRes] = await Promise.allSettled([
                     affiliatePortalService.getDashboardStats(),
                     affiliatePortalService.getAIInsights(),
+                    affiliatePortalService.getMyCoupon()
                 ]);
 
-                if (statsRes && statsRes.data) setDashboardStats(statsRes.data as DashboardStats);
-                if (insightsRes && insightsRes.data) setInsightData(insightsRes.data as Record<InsightType, InsightContent>);
+                if (statsRes.status === 'fulfilled' && statsRes.value?.data) {
+                    setDashboardStats(statsRes.value.data as DashboardStats);
+                }
+                if (insightsRes.status === 'fulfilled' && insightsRes.value?.data) {
+                    setInsightData(insightsRes.value.data as Record<InsightType, InsightContent>);
+                }
+                if (couponRes.status === 'fulfilled' && couponRes.value?.data) {
+                    setCoupon(couponRes.value.data);
+                }
             } catch (error) {
                 console.error("Failed to fetch dashboard data", error);
             } finally {
@@ -83,6 +100,33 @@ const Dashboard = () => {
 
         fetchData();
     }, []);
+
+    const handleGenerateCoupon = async () => {
+        if (!user?.kycVerified) {
+            toast.error("Your KYC must be approved by admin before generating a coupon.");
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const response = await affiliatePortalService.generateCoupon();
+            if (response.success) {
+                setCoupon(response.data);
+                toast.success("Coupon generated successfully!");
+            } else {
+                toast.error(response.message || "Failed to generate coupon");
+            }
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Error generating coupon");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast.success("Coupon code copied to clipboard!");
+    };
 
     // Handle opening the modal
     const handleInsightClick = (id: InsightType) => {
@@ -302,6 +346,77 @@ const Dashboard = () => {
                             description="AI forecasts revenue for coming months with growth suggestions"
                             onClick={handleInsightClick}
                         />
+                    </div>
+                </div>
+
+                {/* Referral Reward Program (Coupon Generation) */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#5aa39c]/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110 duration-700"></div>
+
+                    <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+                        <div className="space-y-4 max-w-2xl">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-[#eaf4f3] rounded-lg">
+                                    <Trophy size={24} className="text-[#5aa39c]" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-slate-900">Referral Reward Program</h2>
+                            </div>
+                            <p className="text-gray-500 leading-relaxed">
+                                Share your unique coupon code with potential clients. They get a <span className="text-[#5aa39c] font-bold text-lg">10% discount</span> on their first booking, and you earn commissions on every successful conversion!
+                            </p>
+                            {!user?.kycVerified && (
+                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-100 rounded-full text-amber-700 text-xs font-semibold">
+                                    <X size={12} /> KYC Approval Pending
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="shrink-0">
+                            {coupon ? (
+                                <div className="bg-slate-50 border-2 border-dashed border-[#5aa39c]/30 rounded-2xl p-6 flex flex-col items-center gap-4 animate-fade-in min-w-[280px]">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Your Unique Code</span>
+                                    <div className="flex items-center gap-3">
+                                        <code className="text-3xl font-black text-slate-900 tracking-tighter bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+                                            {coupon.code}
+                                        </code>
+                                        <button
+                                            onClick={() => copyToClipboard(coupon.code)}
+                                            className="p-3 bg-[#5aa39c] text-white rounded-xl hover:bg-[#4a8a83] transition-colors shadow-md hover:shadow-lg active:scale-95 translate-y-0 hover:-translate-y-1 duration-200"
+                                            title="Copy Code"
+                                        >
+                                            <Copy size={20} />
+                                        </button>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[#5aa39c] text-xs font-bold">
+                                        <CheckCircle size={14} /> Ready to share
+                                    </div>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={handleGenerateCoupon}
+                                    disabled={!user?.kycVerified || isGenerating}
+                                    className={`relative px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-xl flex items-center gap-3 overflow-hidden ${user?.kycVerified
+                                        ? "bg-[#5aa39c] text-white hover:bg-[#4a8a83] hover:shadow-[#5aa39c]/20 hover:-translate-y-1 active:translate-y-0 active:scale-95"
+                                        : "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200 shadow-none"
+                                        }`}
+                                >
+                                    {isGenerating ? (
+                                        <>
+                                            <RefreshCw size={24} className="animate-spin" />
+                                            Generating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles size={24} />
+                                            Generate My Code
+                                        </>
+                                    )}
+                                    {!user?.kycVerified && (
+                                        <div className="absolute inset-0 bg-gray-50/10 backdrop-blur-[1px]"></div>
+                                    )}
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
 
