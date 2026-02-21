@@ -6,11 +6,13 @@ import { Loader2 } from 'lucide-react';
 interface GoogleLoginButtonProps {
   onSuccess?: () => void;
   onError?: () => void;
+  role?: string;
 }
 
 export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
   onSuccess,
-  onError
+  onError,
+  role
 }) => {
   const { googleLogin, isLoading } = useAuth();
   const { toast } = useToast();
@@ -21,7 +23,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
         throw new Error('No credential received from Google');
       }
 
-      await googleLogin(credentialResponse.credential);
+      await googleLogin(credentialResponse.credential, role);
 
       toast({
         title: 'Success',

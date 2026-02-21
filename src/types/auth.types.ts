@@ -26,7 +26,7 @@ export interface SignupRequest {
   confirmPassword: string;
   fullName: string;
   phoneNumber?: string;
-  role?: 'user' | 'partner';
+  role?: 'user' | 'partner' | 'affiliate';
 }
 
 export interface LoginRequest {

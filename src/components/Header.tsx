@@ -12,6 +12,7 @@ import { useDarkMode } from "@/contexts/DarkModeContext";
 import GetInTouch from "@/pages/GetInTouch";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { SignupModal } from "@/components/auth/SignupModal";
+import { PartnerChoiceModal } from "@/components/auth/PartnerChoiceModal";
 import { NotificationBell } from "@/components/NotificationBell";
 
 // ✅ Country Data
@@ -64,6 +65,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
     const [isContactOpen, setIsContactOpen] = useState(false);
     const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
     const [isSignupOpen, setIsSignupOpen] = useState(openSignup);
+    const [isPartnerChoiceOpen, setIsPartnerChoiceOpen] = useState(false);
+    const [signupRole, setSignupRole] = useState<'user' | 'partner' | 'affiliate'>('user');
 
     // Ref helpers for closing modals with redirection
     const closeLogin = () => {
@@ -137,6 +140,12 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         setIsMenuOpen(false);
     };
 
+    const openPartnerSignup = (role: 'partner' | 'affiliate') => {
+        setSignupRole(role);
+        setIsPartnerChoiceOpen(false);
+        setIsSignupOpen(true);
+    };
+
     return (
         <>
             <header
@@ -179,7 +188,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 <button
                                     className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-gray-100 dark:hover:text-white"}`}
                                     onMouseEnter={() => setIsSolutionsOpen(true)}
-                                    onClick={()=>setIsSolutionsOpen(false)}
+                                    onClick={() => setIsSolutionsOpen(false)}
                                 >
                                     <span className="relative">
                                         Get Workspaces
@@ -201,7 +210,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                     }}
                                 >
                                     <div className="p-4 grid grid-cols-2 gap-4"
-                                    onMouseLeave={()=>setIsSolutionsOpen(false)}>
+                                        onMouseLeave={() => setIsSolutionsOpen(false)}>
                                         <div className="border border-gray-100 dark:border-white/10 rounded-lg p-4 bg-[#f8faf9] dark:bg-white/5">
                                             <div className="flex items-center gap-2 mb-1 cursor-pointer" onClick={() => { handleNavigation("/Solutions/on-demand"); setIsSolutionsOpen(false); }}>
                                                 <Zap className="w-4 h-4 text-[#D96832]" />
@@ -283,7 +292,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 <button
                                     className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${(scrolled || forceWhiteBackground) ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-gray-100 dark:hover:text-white"}`}
                                     onMouseEnter={() => setIsMoreOpen(true)}
-                                    onClick={()=>setIsMoreOpen(false)}
+                                    onClick={() => setIsMoreOpen(false)}
                                 >
                                     <span className="relative">
                                         More
@@ -295,7 +304,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
                                 {isMoreOpen && (
                                     <ul className="absolute bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50"
-                                    onMouseLeave={()=>setIsMoreOpen(false)}>
+                                        onMouseLeave={() => setIsMoreOpen(false)}>
                                         {[
                                             { label: "About Us", href: "/about" },
                                             { label: "Career", href: "/career" },
@@ -448,16 +457,16 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                                 )}
 
                                                 {/* Partner Portal Button */}
-                                                {user?.role === 'partner' && (
+                                                {(user?.role === 'partner' || user?.role === 'affiliate') && (
                                                     <button
                                                         onClick={() => {
-                                                            navigate("/spaceportal");
+                                                            navigate(user?.role === 'partner' ? "/spaceportal" : "/affiliate-portal");
                                                             setIsUserMenuOpen(false);
                                                         }}
                                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-50 hover:text-amber-800 transition-colors duration-150"
                                                     >
                                                         <Building2 className="h-4 w-4" />
-                                                        <span className="">Your Space Portal</span>
+                                                        <span className="">{user?.role === 'partner' ? "Your Space Portal" : "Affiliate Portal"}</span>
                                                     </button>
                                                 )}
 
@@ -513,16 +522,29 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                     )}
                                 </div>
                             ) : (
-                                <ModernFlairButton
-                                    onClick={() => navigate('/login')}
-                                    className="hidden lg:inline-flex group px-6 py-2.5 bg-white text-[#164e4e] text-sm font-bold rounded-full border border-[#164e4e]/20 transition-all duration-300 hover:bg-[#164e4e] hover:text-white hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
-                                    flairColor="rgba(255, 255, 255, 0.1)"
-                                >
-                                    <span className="flex items-center gap-2">
-                                        <UserIcon className="w-3.5 h-3.5" />
-                                        Log in
-                                    </span>
-                                </ModernFlairButton>
+                                <div className="flex items-center gap-3">
+                                    <ModernFlairButton
+                                        onClick={() => navigate('/login')}
+                                        className="hidden lg:inline-flex group px-6 py-2.5 bg-white text-[#164e4e] text-sm font-bold rounded-full border border-[#164e4e]/20 transition-all duration-300 hover:bg-[#164e4e] hover:text-white hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
+                                        flairColor="rgba(255, 255, 255, 0.1)"
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <UserIcon className="w-3.5 h-3.5" />
+                                            Log in
+                                        </span>
+                                    </ModernFlairButton>
+
+                                    <ModernFlairButton
+                                        onClick={() => setIsPartnerChoiceOpen(true)}
+                                        className="hidden lg:inline-flex group px-6 py-2.5 bg-[#EDB003] text-white text-sm font-bold rounded-full transition-all duration-300 hover:shadow-lg hover:bg-[#d99f03] border border-white/10 active:scale-95"
+                                        flairColor="rgba(255, 255, 255, 0.2)"
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            <Building2 className="w-3.5 h-3.5" />
+                                            Become a Partner
+                                        </span>
+                                    </ModernFlairButton>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -539,7 +561,6 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
             {/* === Contact Popup === */}
             {isContactOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all">
-                    {/* ... (existing contact popup content) ... */}
                     <div className="flex flex-col md:flex-row gap-10 w-[95%] max-w-5xl items-start justify-center">
                         {/* ====== LEFT SIDE CARDS ====== */}
                         <div className="flex flex-col gap-5 w-full md:w-[45%]">
@@ -653,7 +674,14 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
             <LoginModal isOpen={isLoginOpen} onClose={closeLogin} />
 
             {/* === Signup Modal === */}
-            <SignupModal isOpen={isSignupOpen} onClose={closeSignup} />
+            <SignupModal isOpen={isSignupOpen} onClose={closeSignup} initialRole={signupRole} />
+
+            {/* === Partner Choice Modal === */}
+            <PartnerChoiceModal
+                isOpen={isPartnerChoiceOpen}
+                onClose={() => setIsPartnerChoiceOpen(false)}
+                onSelect={openPartnerSignup}
+            />
         </>
     );
 };

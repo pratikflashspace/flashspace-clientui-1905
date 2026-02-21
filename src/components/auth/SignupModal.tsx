@@ -8,9 +8,10 @@ interface SignupModalProps {
     isOpen: boolean;
     onClose: () => void;
     onLoginClick?: () => void;
+    initialRole?: 'user' | 'partner' | 'affiliate';
 }
 
-export const SignupModal = ({ isOpen, onClose, onLoginClick }: SignupModalProps) => {
+export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user' }: SignupModalProps) => {
     useEffect(() => {
         const lenis = getLenis();
         if (isOpen) {
@@ -63,7 +64,7 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick }: SignupModalProps)
                     </p>
                 </div>
 
-                <SignupForm />
+                <SignupForm initialRole={initialRole} />
 
                 <div className="mt-6 text-center">
                     <p className="text-sm text-slate-600">
