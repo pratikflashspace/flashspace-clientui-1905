@@ -108,24 +108,31 @@ export interface SupportTicketDto {
 
 
 
-export interface LeaderboardDto {
-
+export interface LeaderboardEntry {
+    rank: number;
     affiliateId: string;
-
     name: string;
-
-    location: string;
-
-    referrals: number;
-
-    earnings: number;
-
-    conversion: number;
-
     initials: string;
-
+    successfulBookings: number;
+    totalCommission: number;
     isUser: boolean;
+}
 
+export interface LeaderboardResponse {
+    leaderboard: LeaderboardEntry[];
+    pagination: {
+        page: number;
+        limit: number;
+        totalEntries: number;
+        totalPages: number;
+        hasNext: boolean;
+        hasPrev: boolean;
+    };
+    currentUser: {
+        rank: number | null;
+        successfulBookings: number;
+        totalCommission: number;
+    } | null;
 }
 
 
@@ -217,16 +224,11 @@ class AffiliatePortalService {
 
 
 
-    async getLeaderboard() {
-
-        const response = await axiosInstance.get<ApiResponse<LeaderboardDto[]>>(
-
-            API_ENDPOINTS.AFFILIATE.LEADERBOARD,
-
+    async getLeaderboard(page = 1, limit = 10) {
+        const response = await axiosInstance.get<ApiResponse<LeaderboardResponse>>(
+            `${API_ENDPOINTS.AFFILIATE.LEADERBOARD}?page=${page}&limit=${limit}`,
         );
-
         return response.data;
-
     }
 
 

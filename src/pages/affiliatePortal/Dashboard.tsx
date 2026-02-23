@@ -154,31 +154,28 @@ const Dashboard = () => {
         return () => clearTimeout(timer);
     }, [selectedInsight, isLoadingInsight]);
 
-    // -- Data Definitions --
+    // 3 stat cards: Total Earnings (dynamic), Total Clients (dynamic), Pending Payout (static)
+    const formatCurrency = (v: number) =>
+        new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(v);
+
     const stats = [
         {
-            label: "Total Referrals",
-            value: dashboardStats?.totalReferrals?.toString() || "0",
-            trend: "15% from last month", // Backend doesn't provide trend yet
-            icon: Share2,
-        },
-        {
-            label: "Converted Clients",
-            value: dashboardStats?.convertedClients?.toString() || "0",
-            trend: "22% from last month",
-            icon: Users,
-        },
-        {
             label: "Total Earnings",
-            value: `₹${(dashboardStats?.totalEarnings || 0).toLocaleString()}`,
-            trend: "18% from last month",
+            value: dashboardStats?.totalEarnings !== undefined ? formatCurrency(dashboardStats.totalEarnings) : "₹0",
+            trend: "Commission @ 15% of paid amount",
             icon: TrendingUp,
         },
         {
+            label: "Total Clients",
+            value: dashboardStats?.convertedClients?.toString() || "0",
+            trend: "Bookings via your coupon code",
+            icon: Users,
+        },
+        {
             label: "Pending Payout",
-            value: `₹${(dashboardStats?.pendingPayout || 0).toLocaleString()}`,
+            value: "₹0",
             trend: null,
-            icon: Wallet
+            icon: Wallet,
         },
     ];
 
@@ -298,7 +295,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* 2. Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {stats.map((stat, idx) => (
                         <StatCardDashboard
                             key={idx}

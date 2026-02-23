@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Users2, TrendingUp, BookOpen, IndianRupee, ExternalLink, Loader2, AlertCircle, Search, Filter } from "lucide-react";
+import {
+    Users2, TrendingUp, BookOpen, IndianRupee, Loader2,
+    AlertCircle, Search, Filter, BadgePercent,
+} from "lucide-react";
 import axiosInstance from "@/lib/axios";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -12,6 +15,8 @@ interface ClientBooking {
     plan: string;
     tenure: string;
     amount: number;
+    discountAmount: number;
+    commissionAmount: number; // ← replaces revenue
     couponCode: string;
     status: string;
     startDate?: string;
@@ -20,8 +25,10 @@ interface ClientBooking {
 
 interface ClientStats {
     totalClients: number;
-    totalRevenue: number;
+    totalCommission: number; // ← replaces totalRevenue
     activeBookings: number;
+    successfulBookings: number;
+    commissionRate: number;
 }
 
 const statusColors: Record<string, string> = {
@@ -43,7 +50,10 @@ const formatDate = (dateStr?: string) => {
 // ─── Component ──────────────────────────────────────────────────────────────
 const AffiliateClientManagement: React.FC = () => {
     const [clients, setClients] = useState<ClientBooking[]>([]);
-    const [stats, setStats] = useState<ClientStats>({ totalClients: 0, totalRevenue: 0, activeBookings: 0 });
+    const [stats, setStats] = useState<ClientStats>({
+        totalClients: 0, totalCommission: 0, activeBookings: 0,
+        successfulBookings: 0, commissionRate: 15,
+    });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -53,9 +63,11 @@ const AffiliateClientManagement: React.FC = () => {
         const fetchClients = async () => {
             try {
                 setLoading(true);
-                const response = await axiosInstance.get<{ success: boolean; data: { clients: ClientBooking[]; stats: ClientStats } }>(
-                    "/api/affiliate/clients"
-                );
+                const response = await axiosInstance.get<{
+                    success: boolean;
+                    data: { clients: ClientBooking[]; stats: ClientStats };
+                }>("/api/affiliate/clients");
+
                 if (response.data.success) {
                     setClients(response.data.data.clients);
                     setStats(response.data.data.stats);
@@ -85,7 +97,7 @@ const AffiliateClientManagement: React.FC = () => {
         return matchesSearch && matchesStatus;
     });
 
-    // ─── Loading ────────────────────────────────────────────────────────────
+    // ─── Loading ──────────────────────────────────────────────────────────────
     if (loading) {
         return (
             <div className="min-h-[400px] flex items-center justify-center">
@@ -108,17 +120,20 @@ const AffiliateClientManagement: React.FC = () => {
         );
     }
 
-    // ─── Render ──────────────────────────────────────────────────────────────
+    // ─── Render ───────────────────────────────────────────────────────────────
     return (
         <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-bold text-slate-900">Client Management</h1>
-                <p className="text-gray-500 text-sm mt-1">All clients who booked through your affiliate coupon code.</p>
+                <p className="text-gray-500 text-sm mt-1">
+                    Clients who booked through your affiliate coupon code.{" "}
+                    <span className="font-medium text-[#5aa39c]">{stats.commissionRate}% commission</span> on paid amount.
+                </p>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm flex items-center gap-4">
                     <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center">
                         <Users2 className="w-5 h-5 text-blue-600" />
@@ -130,22 +145,12 @@ const AffiliateClientManagement: React.FC = () => {
                 </div>
 
                 <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm flex items-center gap-4">
-                    <div className="w-11 h-11 bg-green-50 rounded-xl flex items-center justify-center">
-                        <IndianRupee className="w-5 h-5 text-green-600" />
+                    <div className="w-11 h-11 bg-emerald-50 rounded-xl flex items-center justify-center">
+                        <BadgePercent className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                        <p className="text-2xl font-bold text-slate-900">{formatCurrency(stats.totalRevenue)}</p>
-                        <p className="text-xs text-gray-500">Total Revenue Generated</p>
-                    </div>
-                </div>
-
-                <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm flex items-center gap-4">
-                    <div className="w-11 h-11 bg-[#5aa39c]/10 rounded-xl flex items-center justify-center">
-                        <TrendingUp className="w-5 h-5 text-[#5aa39c]" />
-                    </div>
-                    <div>
-                        <p className="text-2xl font-bold text-slate-900">{stats.activeBookings}</p>
-                        <p className="text-xs text-gray-500">Active Bookings</p>
+                        <p className="text-2xl font-bold text-slate-900">{formatCurrency(stats.totalCommission)}</p>
+                        <p className="text-xs text-gray-500">Total Commission Earned</p>
                     </div>
                 </div>
             </div>
@@ -162,21 +167,6 @@ const AffiliateClientManagement: React.FC = () => {
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5aa39c]/30"
                     />
                 </div>
-                <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-gray-400 shrink-0" />
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="border border-gray-200 rounded-xl text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#5aa39c]/30"
-                    >
-                        <option value="all">All Statuses</option>
-                        <option value="active">Active</option>
-                        <option value="pending_kyc">Pending KYC</option>
-                        <option value="pending_payment">Pending Payment</option>
-                        <option value="expired">Expired</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                </div>
             </div>
 
             {/* Table / Empty State */}
@@ -188,7 +178,7 @@ const AffiliateClientManagement: React.FC = () => {
                     </h3>
                     <p className="text-sm text-gray-400 max-w-sm mx-auto">
                         {clients.length === 0
-                            ? "Share your affiliate coupon code with prospects. When they book using it, they'll appear here."
+                            ? "Share your affiliate coupon code. When someone books using it, they'll appear here."
                             : "Try adjusting your search or filter."}
                     </p>
                 </div>
@@ -201,22 +191,19 @@ const AffiliateClientManagement: React.FC = () => {
                                     <th className="px-5 py-3">Client</th>
                                     <th className="px-5 py-3">Space</th>
                                     <th className="px-5 py-3">Plan / Tenure</th>
-                                    <th className="px-5 py-3">Amount</th>
+                                    <th className="px-5 py-3">Paid</th>
+                                    <th className="px-5 py-3">Commission (15%)</th>
                                     <th className="px-5 py-3">Coupon</th>
-                                    <th className="px-5 py-3">Status</th>
                                     <th className="px-5 py-3">Booked On</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filtered.map((c) => (
-                                    <tr key={c.bookingId} className="hover:bg-gray-50/50 transition-colors">
+                                    <tr key={String(c.bookingId)} className="hover:bg-gray-50/50 transition-colors">
                                         {/* Client */}
                                         <td className="px-5 py-4">
                                             <p className="font-semibold text-slate-800">{c.user.fullName}</p>
                                             <p className="text-xs text-gray-400">{c.user.email}</p>
-                                            {c.user.phone && c.user.phone !== "—" && (
-                                                <p className="text-xs text-gray-400">{c.user.phone}</p>
-                                            )}
                                         </td>
 
                                         {/* Space */}
@@ -231,9 +218,21 @@ const AffiliateClientManagement: React.FC = () => {
                                             <p className="text-xs text-gray-400">{c.tenure}</p>
                                         </td>
 
-                                        {/* Amount */}
+                                        {/* Paid Amount */}
                                         <td className="px-5 py-4 font-semibold text-slate-800">
                                             {formatCurrency(c.amount)}
+                                            {c.discountAmount > 0 && (
+                                                <p className="text-xs text-green-600 font-normal">
+                                                    −{formatCurrency(c.discountAmount)} disc.
+                                                </p>
+                                            )}
+                                        </td>
+
+                                        {/* Commission */}
+                                        <td className="px-5 py-4">
+                                            <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg text-sm">
+                                                {formatCurrency(c.commissionAmount)}
+                                            </span>
                                         </td>
 
                                         {/* Coupon */}
@@ -243,17 +242,10 @@ const AffiliateClientManagement: React.FC = () => {
                                             </span>
                                         </td>
 
-                                        {/* Status */}
-                                        <td className="px-5 py-4">
-                                            <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold border ${statusColors[c.status] || "bg-gray-100 text-gray-500 border-gray-200"}`}>
-                                                {c.status.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                                            </span>
-                                        </td>
+
 
                                         {/* Date */}
-                                        <td className="px-5 py-4 text-gray-500">
-                                            {formatDate(c.createdAt)}
-                                        </td>
+                                        <td className="px-5 py-4 text-gray-500">{formatDate(c.createdAt)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -261,8 +253,11 @@ const AffiliateClientManagement: React.FC = () => {
                     </div>
 
                     {/* Footer */}
-                    <div className="px-5 py-3 border-t border-gray-100 text-xs text-gray-400">
-                        Showing {filtered.length} of {clients.length} client{clients.length !== 1 ? "s" : ""}
+                    <div className="px-5 py-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+                        <span>Showing {filtered.length} of {clients.length} client{clients.length !== 1 ? "s" : ""}</span>
+                        <span className="font-semibold text-emerald-600">
+                            Filtered Commission: {formatCurrency(filtered.reduce((s, c) => s + c.commissionAmount, 0))}
+                        </span>
                     </div>
                 </div>
             )}
