@@ -56,24 +56,6 @@ const CoworkingSpace = () => {
     setSearchCity(city);
   }, [searchParams]);
 
-  // Disable Lenis smooth scroll for this specific container
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
-
-    scrollContainer.setAttribute('data-lenis-prevent', 'true');
-
-    const preventLenis = (e: WheelEvent) => {
-      e.stopPropagation();
-    };
-
-    scrollContainer.addEventListener('wheel', preventLenis, { passive: false });
-
-    return () => {
-      scrollContainer.removeEventListener('wheel', preventLenis);
-    };
-  }, []);
-
   // Fetch coworking spaces from API
   useEffect(() => {
     const fetchCoworkingSpaces = async () => {
@@ -287,7 +269,7 @@ const CoworkingSpace = () => {
           <div
             ref={scrollContainerRef}
             className="w-full h-full overflow-y-auto"
-            data-lenis-prevent
+
           >
             <div className="px-4 sm:px-6 py-4 sm:py-6">
               {/* Mobile Back Button */}

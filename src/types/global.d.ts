@@ -1,10 +1,9 @@
-// Global type augmentation for Lenis instance attached to window
-import type Lenis from 'lenis';
-
+// Global type augmentation
 declare global {
   interface Window {
-    __lenis?: Lenis;
+    // any existing globals besides lenis
   }
 }
 
-export {};
+
+export { };

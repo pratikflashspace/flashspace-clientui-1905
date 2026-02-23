@@ -11,18 +11,33 @@ interface LoginFormProps {
 
 export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   const navigate = useNavigate();
-  const { login, isLoading, isAuthenticated } = useAuth();
+  const { login, isLoading, isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     // Only redirect if authenticated and not currently loading
-    if (isAuthenticated && !isLoading) {
+    if (isAuthenticated && !isLoading && user) {
       if (onSuccess) {
         onSuccess();
       } else {
-        navigate('/dashboard', { replace: true });
+        // Smart Redirection based on user role
+        switch (user.role) {
+          case 'super_admin':
+          case 'admin':
+            navigate('/admin', { replace: true });
+            break;
+          case 'partner':
+            navigate('/spaceportal', { replace: true });
+            break;
+          case 'affiliate':
+            navigate('/affiliate-portal', { replace: true });
+            break;
+          default:
+            // Default assumes "user" (Client)
+            navigate('/dashboard', { replace: true });
+        }
       }
     }
-  }, [isAuthenticated, isLoading, navigate, onSuccess]);
+  }, [isAuthenticated, isLoading, navigate, onSuccess, user]);
 
   const [formData, setFormData] = useState({
     email: '',

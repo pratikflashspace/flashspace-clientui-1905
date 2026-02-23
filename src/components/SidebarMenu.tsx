@@ -154,7 +154,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
     }
     if (href.startsWith("#")) {
       try {
-        smoothScrollTo(href, { offset: -90 });
+        window.scrollTo({ top: 0, behavior: "smooth" });
       } catch {
         document.querySelector(href)?.scrollIntoView({
           behavior: "smooth",
@@ -243,7 +243,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
         {/* Menu items */}
         <div
           className="flex-1 overflow-y-auto pb-32 flex flex-col overscroll-contain touch-pan-y min-h-0"
-          data-lenis-prevent
+         
         >
           <div className="p-5 space-y-2 text-sm tracking-wide flex-1">
             <nav className="space-y-2">

@@ -6,7 +6,7 @@ export interface User {
   email: string;
   fullName: string;
   phoneNumber?: string;
-  role: 'user' | 'admin' | 'vendor' | 'partner' | 'space_manager' | 'sales' | 'affiliate';
+  role: 'user' | 'super_admin' | 'admin' | 'vendor' | 'partner' | 'space_manager' | 'sales' | 'affiliate_manager' | 'space_partner_manager' | 'support' | 'affiliate';
   isEmailVerified: boolean;
   kycVerified?: boolean;
   profilePicture?: string;

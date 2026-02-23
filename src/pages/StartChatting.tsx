@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { getLenis } from '@/lib/lenis.ts';
 import { useDarkMode } from '@/contexts/DarkModeContext';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -1134,9 +1133,9 @@ const StartChatting = () => {
                   overscrollBehavior: 'contain',
                   touchAction: 'pan-y'
                 }}
-                data-lenis-prevent
-                data-lenis-prevent-wheel
-                data-lenis-prevent-touch
+               
+               
+               
               >
                 {showMap ? (
                   // Full Height Map View (Mindtrip Style)
@@ -1309,9 +1308,9 @@ const StartChatting = () => {
                 tabIndex={0}
                 role="region"
                 aria-label="Chat messages"
-                data-lenis-prevent
-                data-lenis-prevent-wheel
-                data-lenis-prevent-touch
+               
+               
+               
               >
                 {chatMessages.length === 0 ? (
                   // Empty State

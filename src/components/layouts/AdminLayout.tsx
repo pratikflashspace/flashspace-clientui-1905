@@ -15,6 +15,7 @@ import {
     Search,
     BookOpen,
     Briefcase,
+    Shield,
     ChevronLeft,
     Home,
     LineChart,
@@ -38,21 +39,36 @@ export default function AdminLayout() {
     };
 
     const allNavItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['admin', 'partner', 'space_manager', 'sales'] },
-        { icon: LineChart, label: 'Booking Analysis', path: '/admin/booking-analysis', roles: ['admin', 'sales', 'partner'] },
-        { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['admin', 'sales'] },
-        { icon: Headphones, label: 'Support Chats', path: '/admin/support', roles: ['admin', 'sales'] },
-        { icon: Bell, label: 'Notifications', path: '/admin/notifications', roles: ['admin', 'sales'] },
-        { icon: Trophy, label: 'Leaderboard', path: '/admin/leaderboard', roles: ['admin', 'sales'] },
-        { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['admin', 'sales'] },
-        { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['admin', 'sales'] },
-        { icon: Briefcase, label: 'Clients', path: '/admin/clients', roles: ['admin', 'sales'] },
-        { icon: Network, label: 'Affiliate Management', path: '/admin/affiliates', roles: ['admin'] },
-        { icon: Tag, label: 'Coupons & Vouchers', path: '/admin/coupons', roles: ['admin', 'sales'] },
-        { icon: Users, label: 'User Management', path: '/admin/users', roles: ['admin'] },
-        { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['admin', 'partner', 'space_manager'] },
-        { icon: Building2, label: 'Space Management', path: '/admin/spaces', roles: ['admin', 'partner', 'space_manager'] },
-        { icon: Settings, label: 'Settings', path: '/admin/settings', roles: ['admin', 'partner'] },
+        // 1. Dashboard (All 6 roles)
+        { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['super_admin', 'admin', 'partner', 'space_manager', 'sales', 'affiliate_manager', 'space_partner_manager', 'support'] },
+        // 2. Booking Analysis (Super Admin, Admin)
+        { icon: LineChart, label: 'Booking Analysis', path: '/admin/booking-analysis', roles: ['super_admin', 'admin', 'partner'] },
+        // 3. Lead Management (Super Admin, Admin, Sales)
+        { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['super_admin', 'admin', 'sales'] },
+        // 4. Support Chats (Super Admin, Admin, Support)
+        { icon: Headphones, label: 'Support Chats', path: '/admin/support', roles: ['super_admin', 'admin', 'support'] },
+        // 5. Notifications (Super Admin, Admin, Sales, Support)
+        { icon: Bell, label: 'Notifications', path: '/admin/notifications', roles: ['super_admin', 'admin', 'sales', 'support'] },
+        // 6. Leaderboard (Super Admin, Admin, Sales, Support)
+        { icon: Trophy, label: 'Leaderboard', path: '/admin/leaderboard', roles: ['super_admin', 'admin', 'sales', 'support'] },
+        // 7. Ticket System (Super Admin, Admin, Support)
+        { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['super_admin', 'admin', 'support'] },
+        // 8. Learning Hub (Super Admin, Admin, Sales, Support)
+        { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['super_admin', 'admin', 'sales', 'support'] },
+        // 9. Clients (Super Admin, Admin, Sales, Support)
+        { icon: Briefcase, label: 'Clients', path: '/admin/clients', roles: ['super_admin', 'admin', 'sales', 'support'] },
+        // 10. Coupons & Vouchers (Super Admin, Admin, Sales)
+        { icon: Tag, label: 'Coupons & Vouchers', path: '/admin/coupons', roles: ['super_admin', 'admin', 'sales'] },
+        // 11. User Management (Super Admin)
+        { icon: Users, label: 'User Management', path: '/admin/users', roles: ['super_admin'] },
+        // 12. Team Management (Super Admin, Admin)
+        { icon: Shield, label: 'Team Management', path: '/admin/team', roles: ['super_admin', 'admin'] },
+        // 13. KYC Verification (Super Admin, Admin)
+        { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['super_admin', 'admin', 'partner', 'space_manager'] },
+        // 14. Space Management (Super Admin, Admin, Space Partner Manager)
+        { icon: Building2, label: 'Space Management', path: '/admin/spaces', roles: ['super_admin', 'admin', 'partner', 'space_manager', 'space_partner_manager'] },
+        // 15. Settings (All 6 roles)
+        { icon: Settings, label: 'Settings', path: '/admin/settings', roles: ['super_admin', 'admin', 'partner', 'affiliate_manager', 'space_partner_manager', 'sales', 'support'] },
     ];
 
     const navItems = allNavItems.filter(item => user?.role && item.roles.includes(user.role));
@@ -84,27 +100,32 @@ export default function AdminLayout() {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
-                    {navItems.map((item) => (
-                        <NavLink
-                            key={item.path}
-                            to={item.path}
-                            end={item.path === '/admin'}
-                            className={({ isActive }) =>
-                                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                    ? 'bg-teal-600 text-white shadow-md shadow-teal-200'
-                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium'
-                                }`
-                            }
-                        >
-                            <item.icon className={`w-5 h-5 flex-shrink-0 transition-colors ${
-                                // Active styles handled by parent class
-                                ''
-                                }`} />
-                            {isSidebarOpen && <span className="whitespace-nowrap font-medium text-sm">{item.label}</span>}
-                        </NavLink>
-                    ))}
-                </nav>
+                <div
+                    className="flex-1 min-h-0 w-full overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-300"
+
+                >
+                    <nav className="px-4 space-y-2 pb-4">
+                        {navItems.map((item) => (
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                end={item.path === '/admin'}
+                                className={({ isActive }) =>
+                                    `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                                        ? 'bg-teal-600 text-white shadow-md shadow-teal-200'
+                                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium'
+                                    }`
+                                }
+                            >
+                                <item.icon className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                                    // Active styles handled by parent class
+                                    ''
+                                    }`} />
+                                {isSidebarOpen && <span className="whitespace-nowrap font-medium text-sm">{item.label}</span>}
+                            </NavLink>
+                        ))}
+                    </nav>
+                </div>
 
                 {/* Bottom Actions */}
                 <div className="p-4 mt-auto border-t border-gray-100 space-y-2">
@@ -160,25 +181,30 @@ export default function AdminLayout() {
                         </div>
 
                         {/* Nav Links */}
-                        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                            {navItems.map((item) => (
-                                <NavLink
-                                    key={item.path}
-                                    to={item.path}
-                                    onClick={() => setIsMobileOpen(false)}
-                                    end={item.path === '/admin'}
-                                    className={({ isActive }) =>
-                                        `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${isActive
-                                            ? 'bg-teal-600 text-white shadow-md shadow-teal-200'
-                                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium'
-                                        }`
-                                    }
-                                >
-                                    <item.icon className="w-5 h-5 flex-shrink-0" />
-                                    <span className="font-medium text-sm">{item.label}</span>
-                                </NavLink>
-                            ))}
-                        </nav>
+                        <div
+                            className="flex-1 min-h-0 w-full overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-300"
+
+                        >
+                            <nav className="px-4 py-6 space-y-2 pb-8">
+                                {navItems.map((item) => (
+                                    <NavLink
+                                        key={item.path}
+                                        to={item.path}
+                                        onClick={() => setIsMobileOpen(false)}
+                                        end={item.path === '/admin'}
+                                        className={({ isActive }) =>
+                                            `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${isActive
+                                                ? 'bg-teal-600 text-white shadow-md shadow-teal-200'
+                                                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium'
+                                            }`
+                                        }
+                                    >
+                                        <item.icon className="w-5 h-5 flex-shrink-0" />
+                                        <span className="font-medium text-sm">{item.label}</span>
+                                    </NavLink>
+                                ))}
+                            </nav>
+                        </div>
 
                         {/* Bottom */}
                         <div className="p-4 border-t border-gray-100 space-y-2">
