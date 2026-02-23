@@ -20,23 +20,42 @@ export interface VirtualOfficeItem {
   area: string;
   price: string;
   originalPrice: string;
-  gstPlanPrice: string;
+
+  // Updated fields from Backend
+  gstPlanPricePerYear?: number;
+  mailingPlanPricePerYear?: number;
+  brPlanPricePerYear?: number;
+
+  // Legacy fields (optional)
+  gstPlanPrice?: string;
   gstPlanPriceYearly?: string;
-  mailingPlanPrice: string;
+  mailingPlanPrice?: string;
   mailingPlanPriceYearly?: string;
-  brPlanPrice: string;
+  brPlanPrice?: string;
   brPlanPriceYearly?: string;
   priceYearly?: string;
-  rating: number;
-  reviews: number;
+
+  // Updated from Backend
+  avgRating: number;
+  totalReviews: number;
+  rating?: number; // legacy
+  reviews?: number; // legacy
+
   features: string[];
   availability: string;
   popular: boolean;
-  image?: string;
+  image?: string; // legacy
+  images: string[];
+
+  location?: {
+    type: string;
+    coordinates: number[];
+  };
   coordinates?: {
     lat: number;
     lng: number;
   };
+
   isDeleted?: boolean;
   isActive?: boolean;
   createdAt?: string;
@@ -235,7 +254,11 @@ export interface SpaceSnapshot {
   coordinates?: { lat: number; lng: number };
 }
 
-export type BookingType = "virtual_office" | "coworking_space";
+export type BookingType =
+  | "virtual_office"
+  | "coworking_space"
+  | "seat_booking"
+  | "meeting_room";
 export type BookingStatus =
   | "pending_payment"
   | "pending_kyc"

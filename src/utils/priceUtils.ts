@@ -1,4 +1,3 @@
-
 import { VirtualOfficeItem } from "@/types/services";
 
 export interface PlanDetails {
@@ -20,53 +19,69 @@ export interface PricingStructure {
  */
 export const parsePrice = (priceStr: string | number | undefined): number => {
   if (priceStr === undefined || priceStr === null) return 0;
-  if (typeof priceStr === 'number') return priceStr;
+  if (typeof priceStr === "number") return priceStr;
 
   const match = priceStr.toString().match(/[\d,]+/);
-  return match ? parseInt(match[0].replace(/,/g, ''), 10) : 0;
+  return match ? parseInt(match[0].replace(/,/g, ""), 10) : 0;
 };
 
 /**
  * Generates the standardized pricing structure for a Virtual Office.
  * Includes calculated yearly prices.
  */
-export const getVirtualOfficePricing = (spaceDetails: VirtualOfficeItem | null): PricingStructure | null => {
+export const getVirtualOfficePricing = (
+  spaceDetails: VirtualOfficeItem | null,
+): PricingStructure | null => {
   if (!spaceDetails) return null;
 
-  const gstPrice = parsePrice(spaceDetails.gstPlanPrice || spaceDetails.price);
-  const mailingPrice = parsePrice(spaceDetails.mailingPlanPrice || spaceDetails.price);
-  const brPrice = parsePrice(spaceDetails.brPlanPrice || spaceDetails.price);
+  // Prioritize new numeric fields from backend, fallback to legacy string parsing
+  const gstPriceYearly =
+    spaceDetails.gstPlanPricePerYear !== undefined
+      ? spaceDetails.gstPlanPricePerYear
+      : parsePrice(spaceDetails.gstPlanPriceYearly);
 
-  const gstPriceYearly = parsePrice(spaceDetails.gstPlanPriceYearly);
-  const mailingPriceYearly = parsePrice(spaceDetails.mailingPlanPriceYearly);
-  const brPriceYearly = parsePrice(spaceDetails.brPlanPriceYearly);
+  const mailingPriceYearly =
+    spaceDetails.mailingPlanPricePerYear !== undefined
+      ? spaceDetails.mailingPlanPricePerYear
+      : parsePrice(spaceDetails.mailingPlanPriceYearly);
 
-  // Helper to prioritize explicit yearly price but fallback to calculation
-  const resolveYearly = (monthly: number, yearlyExplicit: number) => {
-    return yearlyExplicit > 0 ? yearlyExplicit : monthly * 12;
-  };
+  const brPriceYearly =
+    spaceDetails.brPlanPricePerYear !== undefined
+      ? spaceDetails.brPlanPricePerYear
+      : parsePrice(spaceDetails.brPlanPriceYearly);
+
+  // For monthly price, if we only have yearly, we can estimate it, or use legacy
+  const gstPriceMonthly = parsePrice(
+    spaceDetails.gstPlanPrice || spaceDetails.price,
+  );
+  const mailingPriceMonthly = parsePrice(
+    spaceDetails.mailingPlanPrice || spaceDetails.price,
+  );
+  const brPriceMonthly = parsePrice(
+    spaceDetails.brPlanPrice || spaceDetails.price,
+  );
 
   return {
     gst: {
       key: "gst",
       name: "GST Plan",
-      monthlyPrice: gstPrice,
-      yearlyPrice: resolveYearly(gstPrice, gstPriceYearly),
-      features: ["Virtual Address", "GST Registration", "Mail Handling"]
+      monthlyPrice: gstPriceMonthly,
+      yearlyPrice: gstPriceYearly || gstPriceMonthly * 12,
+      features: ["Virtual Address", "GST Registration", "Mail Handling"],
     },
     mailing: {
       key: "mailing",
       name: "Mailing Plan",
-      monthlyPrice: mailingPrice,
-      yearlyPrice: resolveYearly(mailingPrice, mailingPriceYearly),
-      features: ["Mail Handling", "Courier Receipt"]
+      monthlyPrice: mailingPriceMonthly,
+      yearlyPrice: mailingPriceYearly || mailingPriceMonthly * 12,
+      features: ["Mail Handling", "Courier Receipt"],
     },
     br: {
       key: "br",
       name: "BR Plan",
-      monthlyPrice: brPrice,
-      yearlyPrice: resolveYearly(brPrice, brPriceYearly),
-      features: ["Business Registration", "Lounge Access", "Meeting Rooms"]
+      monthlyPrice: brPriceMonthly,
+      yearlyPrice: brPriceYearly || brPriceMonthly * 12,
+      features: ["Business Registration", "Lounge Access", "Meeting Rooms"],
     },
   };
 };

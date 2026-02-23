@@ -1,7 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { CLIENTS } from "@/data/spacePortal/clients";
 import type {
   Client,
   ClientPlan,
@@ -9,10 +8,18 @@ import type {
   KycStatus,
 } from "@/types/spacePortal/client";
 
-import { MapPin, Eye, MessageSquare, MoreVertical, Filter } from "lucide-react";
+import {
+  MapPin,
+  Eye,
+  MessageSquare,
+  MoreVertical,
+  Filter,
+  Loader2,
+} from "lucide-react";
 
 import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
+import { userDashboardService } from "@/services/userDashboard.service";
 
 /**
  * Clients Page
@@ -31,6 +38,9 @@ export default function Clients() {
   const navigate = useNavigate();
   const { query } = useSpacePortalSearch();
 
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+
   /**
    * Filters state (UI dropdown filters)
    */
@@ -39,8 +49,29 @@ export default function Clients() {
   const [kycFilter, setKycFilter] = useState<KycStatus | "ALL">("ALL");
 
   /**
+   * Fetch clients from backend
+   */
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        setLoading(true);
+        const response = await userDashboardService.getPartnerClients();
+        if (response.success && response.data) {
+          setClients(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch clients:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClients();
+  }, []);
+
+  /**
    * Filter dropdown options (keeps JSX clean)
    */
+  // ... (rest of the code using clients instead of CLIENTS)
   const statusOptions = useMemo(
     () => [
       { label: "All Status", value: "ALL" },
@@ -48,7 +79,7 @@ export default function Clients() {
       { label: "Expiring Soon", value: "EXPIRING_SOON" },
       { label: "Inactive", value: "INACTIVE" },
     ],
-    []
+    [],
   );
 
   const planOptions = useMemo(
@@ -59,7 +90,7 @@ export default function Clients() {
       { label: "Team Space", value: "Team Space" },
       { label: "Hot Desk Monthly", value: "Hot Desk Monthly" },
     ],
-    []
+    [],
   );
 
   const kycOptions = useMemo(
@@ -68,7 +99,7 @@ export default function Clients() {
       { label: "Verified", value: "VERIFIED" },
       { label: "Pending", value: "PENDING" },
     ],
-    []
+    [],
   );
 
   /**
@@ -91,7 +122,7 @@ export default function Clients() {
    * - kyc filter
    */
   const filteredClients = useMemo(() => {
-    return CLIENTS.filter((client) => {
+    return clients.filter((client) => {
       const matchesQuery =
         client.companyName.toLowerCase().includes(normalizedQuery) ||
         client.contactName.toLowerCase().includes(normalizedQuery) ||
@@ -104,7 +135,7 @@ export default function Clients() {
 
       return matchesQuery && matchesStatus && matchesPlan && matchesKyc;
     });
-  }, [normalizedQuery, statusFilter, planFilter, kycFilter]);
+  }, [clients, normalizedQuery, statusFilter, planFilter, kycFilter]);
 
   return (
     <div className="flex-1">
@@ -160,15 +191,23 @@ export default function Clients() {
               <ClientRow
                 key={client.id}
                 client={client}
-                onView={() => navigate(`/spaceportal/clients/${client.id}`)}
+                onView={() => navigate(`/spaceportal/clients/${client.userId}`)}
               />
             ))}
           </tbody>
         </table>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center p-12">
+            <Loader2 className="h-8 w-8 animate-spin text-[#3FA69E]" />
+            <p className="mt-2 text-sm text-slate-500">Loading clients...</p>
+          </div>
+        )}
+
         {/* Empty State */}
-        {filteredClients.length === 0 && (
-          <p className="p-6 text-center text-slate-500">No clients found.</p>
+        {!loading && filteredClients.length === 0 && (
+          <p className="p-12 text-center text-slate-500">No clients found.</p>
         )}
       </div>
     </div>
@@ -179,13 +218,7 @@ export default function Clients() {
  * Client Row Component
  * Displays one client record in table.
  */
-function ClientRow({
-  client,
-  onView,
-}: {
-  client: Client;
-  onView: () => void;
-}) {
+function ClientRow({ client, onView }: { client: Client; onView: () => void }) {
   /**
    * Create initials from company name.
    * Example: "Flash Space" => "FS"
@@ -292,12 +325,12 @@ function StatusPill({ status }: { status: ClientStatus }) {
     status === "ACTIVE"
       ? { label: "Active", className: "bg-emerald-50 text-emerald-700" }
       : status === "EXPIRING_SOON"
-      ? { label: "Expiring Soon", className: "bg-amber-50 text-amber-700" }
-      : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
+        ? { label: "Expiring Soon", className: "bg-amber-50 text-amber-700" }
+        : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
 
   return (
     <span
-      className={`rounded-full px-4 py-1 text-xs font-semibold ${config.className}`}
+      className={`inline-flex items-center justify-center rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap ${config.className}`}
     >
       {config.label}
     </span>
@@ -315,7 +348,7 @@ function KycPill({ status }: { status: KycStatus }) {
 
   return (
     <span
-      className={`rounded-full px-4 py-1 text-xs font-semibold ${config.className}`}
+      className={`inline-flex items-center justify-center rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap ${config.className}`}
     >
       {config.label}
     </span>

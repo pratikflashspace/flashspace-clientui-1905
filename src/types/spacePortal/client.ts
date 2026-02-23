@@ -5,6 +5,7 @@ export type ClientPlan = string;
 
 export type Client = {
   id: string;
+  userId: string;
 
   companyName: string;
   contactName: string;

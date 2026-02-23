@@ -1,26 +1,57 @@
-import { memo, useState } from 'react';
-import { MapPin, Star, Heart, Plus, ChevronLeft, ChevronRight, Phone } from 'lucide-react';
-import { VirtualOfficeItem, CoworkingSpaceItem, MeetingRoomItem } from '@/types/services';
-import MeetingBookingModal from '@/components/ui/MeetingBookingModal';
+import { memo, useState } from "react";
+import {
+  MapPin,
+  Star,
+  Heart,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  Phone,
+} from "lucide-react";
+import {
+  VirtualOfficeItem,
+  CoworkingSpaceItem,
+  MeetingRoomItem,
+} from "@/types/services";
+import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
 
 // Union type that works with all service types
-export type ListingItem = VirtualOfficeItem | CoworkingSpaceItem | MeetingRoomItem | {
-  _id: string;
-  name: string;
-  address: string;
-  area: string;
-  price: string;
-  originalPrice?: string;
-  rating: number;
-  reviews: number;
-  image?: string;
-  features: string[];
-  popular?: boolean;
-  availability?: string;
-  coordinates?: {
-    lat: number;
-    lng: number;
-  };
+export type ListingItem = (
+  | VirtualOfficeItem
+  | CoworkingSpaceItem
+  | MeetingRoomItem
+  | {
+      _id: string;
+      name: string;
+      address: string;
+      area: string;
+      price: string;
+      originalPrice?: string;
+      rating: number;
+      reviews: number;
+      image?: string;
+      features: string[];
+      popular?: boolean;
+      availability?: string;
+      coordinates?: {
+        lat: number;
+        lng: number;
+      };
+    }
+) & {
+  images?: string[];
+  avgRating?: number;
+  totalReviews?: number;
+  gstPlanPricePerYear?: number;
+  mailingPlanPricePerYear?: number;
+  brPlanPricePerYear?: number;
+  gstPlanPrice?: string;
+  gstPlanPriceYearly?: string;
+  mailingPlanPrice?: string;
+  mailingPlanPriceYearly?: string;
+  brPlanPrice?: string;
+  brPlanPriceYearly?: string;
+  priceYearly?: string;
 };
 
 interface ListingCardModernProps {
@@ -33,10 +64,10 @@ interface ListingCardModernProps {
 
 // Multiple images for carousel effect
 const PLACEHOLDER_IMAGES = [
-  'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80',
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80",
 ];
 
 /**
@@ -54,19 +85,26 @@ const ListingCardModern = memo<ListingCardModernProps>(
     const [isHovered, setIsHovered] = useState(false);
     const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
 
-    // Use item image as first, then placeholders
-    const images = item.image
-      ? [item.image, ...PLACEHOLDER_IMAGES.slice(1)]
-      : PLACEHOLDER_IMAGES;
+    // Priority: item.images (array) -> item.image (legacy string) -> placeholders
+    const images =
+      item.images && item.images.length > 0
+        ? item.images
+        : item.image
+          ? [item.image, ...PLACEHOLDER_IMAGES.slice(1)]
+          : PLACEHOLDER_IMAGES;
 
     const handlePrevImage = (e: React.MouseEvent) => {
       e.stopPropagation();
-      setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+      setCurrentImageIndex((prev) =>
+        prev === 0 ? images.length - 1 : prev - 1,
+      );
     };
 
     const handleNextImage = (e: React.MouseEvent) => {
       e.stopPropagation();
-      setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+      setCurrentImageIndex((prev) =>
+        prev === images.length - 1 ? 0 : prev + 1,
+      );
     };
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -86,6 +124,21 @@ const ListingCardModern = memo<ListingCardModernProps>(
       }
       return reviews.toString();
     };
+
+    // Helper to format currency
+    const formatCurrency = (amount: number) => {
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0,
+      }).format(amount);
+    };
+
+    // Get rating and reviews from new (avgRating/totalReviews) or legacy (rating/reviews)
+    const displayRating =
+      "avgRating" in item ? item.avgRating : item.rating || 0;
+    const displayReviews =
+      "totalReviews" in item ? item.totalReviews : item.reviews || 0;
 
     return (
       <div
@@ -129,12 +182,15 @@ const ListingCardModern = memo<ListingCardModernProps>(
           <div className="absolute top-3 right-3 flex items-center gap-2">
             <button
               onClick={handleFavoriteClick}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${isFavorite
-                ? 'bg-white text-red-500'
-                : 'bg-white/80 hover:bg-white text-gray-600 hover:text-red-500'
-                }`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+                isFavorite
+                  ? "bg-white text-red-500"
+                  : "bg-white/80 hover:bg-white text-gray-600 hover:text-red-500"
+              }`}
             >
-              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              <Heart
+                className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`}
+              />
             </button>
             <button
               onClick={(e) => e.stopPropagation()}
@@ -172,10 +228,11 @@ const ListingCardModern = memo<ListingCardModernProps>(
                     e.stopPropagation();
                     setCurrentImageIndex(index);
                   }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${index === currentImageIndex
-                    ? 'bg-white w-2.5'
-                    : 'bg-white/60 hover:bg-white/80'
-                    }`}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
+                    index === currentImageIndex
+                      ? "bg-white w-2.5"
+                      : "bg-white/60 hover:bg-white/80"
+                  }`}
                 />
               ))}
             </div>
@@ -192,8 +249,12 @@ const ListingCardModern = memo<ListingCardModernProps>(
             {/* Rating */}
             <div className="flex items-center gap-1 flex-shrink-0">
               <Star className="w-4 h-4 text-gray-900 fill-current" />
-              <span className="font-medium text-sm text-gray-900">{item.rating}</span>
-              <span className="text-gray-500 text-sm">({formatReviews(item.reviews)})</span>
+              <span className="font-medium text-sm text-gray-900">
+                {displayRating}
+              </span>
+              <span className="text-gray-500 text-sm">
+                ({formatReviews(displayReviews)})
+              </span>
             </div>
           </div>
 
@@ -217,46 +278,96 @@ const ListingCardModern = memo<ListingCardModernProps>(
 
           {/* Pricing - All 3 Plans Vertical */}
           <div className="flex flex-col gap-1 mb-2">
-            {'gstPlanPrice' in item && item.gstPlanPrice && (
+            {/* GST Plan */}
+            {(("gstPlanPricePerYear" in item && item.gstPlanPricePerYear) ||
+              ("gstPlanPrice" in item && item.gstPlanPrice)) && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">GST Plan</span>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-gray-900 block">{item.gstPlanPrice}</span>
-                  {item.gstPlanPriceYearly && (
-                    <span className="text-xs text-gray-500 block">₹{item.gstPlanPriceYearly}/yr</span>
+                  {"gstPlanPricePerYear" in item && item.gstPlanPricePerYear ? (
+                    <span className="text-sm font-semibold text-gray-900 block">
+                      {formatCurrency(item.gstPlanPricePerYear)}/yr
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-sm font-semibold text-gray-900 block">
+                        {item.gstPlanPrice}
+                      </span>
+                      {item.gstPlanPriceYearly && (
+                        <span className="text-xs text-gray-500 block">
+                          ₹{item.gstPlanPriceYearly}/yr
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
             )}
-            {'mailingPlanPrice' in item && item.mailingPlanPrice && (
+
+            {/* Mailing Plan */}
+            {(("mailingPlanPricePerYear" in item &&
+              item.mailingPlanPricePerYear) ||
+              ("mailingPlanPrice" in item && item.mailingPlanPrice)) && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Mailing Plan</span>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-gray-900 block">{item.mailingPlanPrice}</span>
-                  {item.mailingPlanPriceYearly && (
-                    <span className="text-xs text-gray-500 block">₹{item.mailingPlanPriceYearly}/yr</span>
+                  {"mailingPlanPricePerYear" in item &&
+                  item.mailingPlanPricePerYear ? (
+                    <span className="text-sm font-semibold text-gray-900 block">
+                      {formatCurrency(item.mailingPlanPricePerYear)}/yr
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-sm font-semibold text-gray-900 block">
+                        {item.mailingPlanPrice}
+                      </span>
+                      {item.mailingPlanPriceYearly && (
+                        <span className="text-xs text-gray-500 block">
+                          ₹{item.mailingPlanPriceYearly}/yr
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
             )}
-            {'brPlanPrice' in item && item.brPlanPrice && (
+
+            {/* Business Registration Plan */}
+            {(("brPlanPricePerYear" in item && item.brPlanPricePerYear) ||
+              ("brPlanPrice" in item && item.brPlanPrice)) && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Business Reg</span>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-gray-900 block">{item.brPlanPrice}</span>
-                  {item.brPlanPriceYearly && (
-                    <span className="text-xs text-gray-500 block">₹{item.brPlanPriceYearly}/yr</span>
+                  {"brPlanPricePerYear" in item && item.brPlanPricePerYear ? (
+                    <span className="text-sm font-semibold text-gray-900 block">
+                      {formatCurrency(item.brPlanPricePerYear)}/yr
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-sm font-semibold text-gray-900 block">
+                        {item.brPlanPrice}
+                      </span>
+                      {item.brPlanPriceYearly && (
+                        <span className="text-xs text-gray-500 block">
+                          ₹{item.brPlanPriceYearly}/yr
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
             )}
-            {!('gstPlanPrice' in item) && (
+
+            {/* Default Price (for Coworking/Meeting Rooms) */}
+            {!("gstPlanPricePerYear" in item) && !("gstPlanPrice" in item) && (
               <div className="text-right">
                 <span className="text-lg font-bold text-gray-900 block">
                   {item.price}
                 </span>
-                {'priceYearly' in item && item.priceYearly && (
-                  <span className="text-xs text-gray-500 block">₹{item.priceYearly}/yr</span>
+                {"priceYearly" in item && item.priceYearly && (
+                  <span className="text-xs text-gray-500 block">
+                    ₹{item.priceYearly}/yr
+                  </span>
                 )}
               </div>
             )}
@@ -264,7 +375,9 @@ const ListingCardModern = memo<ListingCardModernProps>(
 
           {/* Negotiable Tag */}
           <div className="mb-3">
-            <span className="text-xs text-gray-500 italic">Price negotiable</span>
+            <span className="text-xs text-gray-500 italic">
+              Price negotiable
+            </span>
           </div>
 
           {/* Action Buttons */}
@@ -298,13 +411,20 @@ const ListingCardModern = memo<ListingCardModernProps>(
     );
   },
   (prevProps, nextProps) => {
+    const prevRating =
+      prevProps.item.avgRating !== undefined
+        ? prevProps.item.avgRating
+        : prevProps.item.rating;
+    const nextRating =
+      nextProps.item.avgRating !== undefined
+        ? nextProps.item.avgRating
+        : nextProps.item.rating;
     return (
-      prevProps.item._id === nextProps.item._id &&
-      prevProps.item.rating === nextProps.item.rating
+      prevProps.item._id === nextProps.item._id && prevRating === nextRating
     );
-  }
+  },
 );
 
-ListingCardModern.displayName = 'ListingCardModern';
+ListingCardModern.displayName = "ListingCardModern";
 
 export default ListingCardModern;

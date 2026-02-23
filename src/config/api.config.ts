@@ -1,35 +1,35 @@
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
+  BASE_URL: import.meta.env.VITE_API_URL || "http://localhost:5000",
   TIMEOUT: 30000,
-  CREDENTIALS: 'include' as RequestCredentials,
+  CREDENTIALS: "include" as RequestCredentials,
 };
 
 // API Endpoints
 export const API_ENDPOINTS = {
   // Auth endpoints
   AUTH: {
-    SIGNUP: '/api/auth/signup',
-    LOGIN: '/api/auth/login',
-    LOGOUT: '/api/auth/logout',
-    LOGOUT_ALL: '/api/auth/logout-all',
-    VERIFY_OTP: '/api/auth/verify-otp',
-    RESEND_OTP: '/api/auth/resend-otp',
-    VERIFY_EMAIL: '/api/auth/verify-email',
-    FORGOT_PASSWORD: '/api/auth/forgot-password',
-    RESET_PASSWORD: '/api/auth/reset-password',
-    CHANGE_PASSWORD: '/api/auth/change-password',
-    REFRESH_TOKEN: '/api/auth/refresh-token',
-    CHECK_AUTH: '/api/auth/check-auth',
-    GET_PROFILE: '/api/auth/profile',
-    GOOGLE: '/api/auth/google',
-    GOOGLE_CALLBACK: '/api/auth/google/callback',
+    SIGNUP: "/api/auth/signup",
+    LOGIN: "/api/auth/login",
+    LOGOUT: "/api/auth/logout",
+    LOGOUT_ALL: "/api/auth/logout-all",
+    VERIFY_OTP: "/api/auth/verify-otp",
+    RESEND_OTP: "/api/auth/resend-otp",
+    VERIFY_EMAIL: "/api/auth/verify-email",
+    FORGOT_PASSWORD: "/api/auth/forgot-password",
+    RESET_PASSWORD: "/api/auth/reset-password",
+    CHANGE_PASSWORD: "/api/auth/change-password",
+    REFRESH_TOKEN: "/api/auth/refresh-token",
+    CHECK_AUTH: "/api/auth/check-auth",
+    GET_PROFILE: "/api/auth/profile",
+    GOOGLE: "/api/auth/google",
+    GOOGLE_CALLBACK: "/api/auth/google/callback",
   },
 
   // Contact Form
   CONTACT: {
-    CREATE: '/api/contactForm/createContactForm',
-    GET_ALL: '/api/contactForm/getAllContactForm',
+    CREATE: "/api/contactForm/createContactForm",
+    GET_ALL: "/api/contactForm/getAllContactForm",
     GET_BY_ID: (id: string) => `/api/contactForm/getContactFormById/${id}`,
     UPDATE: (id: string) => `/api/contactForm/updateContactForm/${id}`,
     DELETE: (id: string) => `/api/contactForm/deleteContactForm/${id}`,
@@ -37,8 +37,8 @@ export const API_ENDPOINTS = {
 
   // Space Provider
   SPACE_PROVIDER: {
-    CREATE: '/api/spaceProvider/createSpaceProvider',
-    GET_ALL: '/api/spaceProvider/getAllSpaceProviders',
+    CREATE: "/api/spaceProvider/createSpaceProvider",
+    GET_ALL: "/api/spaceProvider/getAllSpaceProviders",
     GET_BY_ID: (id: string) => `/api/spaceProvider/getSpaceProviderById/${id}`,
     UPDATE: (id: string) => `/api/spaceProvider/updateSpaceProvider/${id}`,
     DELETE: (id: string) => `/api/spaceProvider/deleteSpaceProvider/${id}`,
@@ -46,8 +46,8 @@ export const API_ENDPOINTS = {
 
   // Virtual Office
   VIRTUAL_OFFICE: {
-    CREATE: '/api/virtualOffice/create',
-    GET_ALL: '/api/virtualOffice/getAll',
+    CREATE: "/api/virtualOffice/create",
+    GET_ALL: "/api/virtualOffice/getAll",
     GET_BY_CITY: (city: string) => `/api/virtualOffice/getByCity/${city}`,
     GET_BY_ID: (id: string) => `/api/virtualOffice/getById/${id}`,
     UPDATE: (id: string) => `/api/virtualOffice/update/${id}`,
@@ -56,8 +56,8 @@ export const API_ENDPOINTS = {
 
   // Coworking Space
   COWORKING_SPACE: {
-    CREATE: '/api/coworkingSpace/create',
-    GET_ALL: '/api/coworkingSpace/getAll',
+    CREATE: "/api/coworkingSpace/create",
+    GET_ALL: "/api/coworkingSpace/getAll",
     GET_BY_CITY: (city: string) => `/api/coworkingSpace/getByCity/${city}`,
     GET_BY_ID: (id: string) => `/api/coworkingSpace/getById/${id}`,
     UPDATE: (id: string) => `/api/coworkingSpace/update/${id}`,
@@ -66,35 +66,43 @@ export const API_ENDPOINTS = {
 
   // User Dashboard
   USER: {
-    DASHBOARD: '/api/user/dashboard',
+    DASHBOARD: "/api/user/dashboard",
     // Bookings
-    BOOKINGS: '/api/user/bookings',
+    BOOKINGS: "/api/user/bookings",
     BOOKING_BY_ID: (id: string) => `/api/user/bookings/${id}`,
     BOOKING_AUTO_RENEW: (id: string) => `/api/user/bookings/${id}/auto-renew`,
     // KYC
-    KYC: '/api/user/kyc',
-    KYC_BUSINESS_INFO: '/api/user/kyc/business-info',
-    KYC_UPLOAD: '/api/user/kyc/upload',
-    KYC_SUBMIT: '/api/user/kyc/submit',
+    KYC: "/api/user/kyc",
+    KYC_BUSINESS_INFO: "/api/user/kyc/business-info",
+    KYC_UPLOAD: "/api/user/kyc/upload",
+    KYC_SUBMIT: "/api/user/kyc/submit",
     // Invoices
-    INVOICES: '/api/user/invoices',
+    INVOICES: "/api/user/invoices",
     INVOICE_BY_ID: (id: string) => `/api/user/invoices/${id}`,
     // Support
-    TICKETS: '/api/tickets',
-    MY_TICKETS: '/api/tickets/my-tickets',
+    TICKETS: "/api/tickets",
+    MY_TICKETS: "/api/tickets/my-tickets",
     TICKET_BY_ID: (id: string) => `/api/tickets/${id}`,
     TICKET_REPLY: (id: string) => `/api/tickets/${id}/reply`,
+    // Seat Bookings
+    SEAT_BOOKING_HOLD: "/api/seat-bookings/hold",
+    SEAT_BOOKING_CONFIRM: (id: string) => `/api/seat-bookings/confirm/${id}`,
+    SEAT_BOOKING_AVAILABILITY: (id: string, start: string, end: string) =>
+      `/api/seat-bookings/availability/${id}?start=${start}&end=${end}`,
     // Credits
-    CREDITS: '/api/user/credits',
-    REDEEM_REWARD: '/api/user/credits/redeem',
+    CREDITS: "/api/user/credits",
+    REDEEM_REWARD: "/api/user/credits/redeem",
+    // Partner
+    PARTNER_CLIENTS: "/api/user/partner/clients",
+    PARTNER_CLIENT_DETAILS: (id: string) => `/api/user/partner/clients/${id}`,
   },
 
   // Admin endpoints
   ADMIN: {
-    DASHBOARD: '/api/admin/dashboard',
-    USERS: '/api/admin/users',
-    BOOKINGS: '/api/admin/bookings',
-    KYC_PENDING: '/api/admin/kyc/pending',
+    DASHBOARD: "/api/admin/dashboard",
+    USERS: "/api/admin/users",
+    BOOKINGS: "/api/admin/bookings",
+    KYC_PENDING: "/api/admin/kyc/pending",
     KYC_REVIEW: (id: string) => `/api/admin/kyc/${id}/review`,
     // Tickets - directly use ticket routes
   },
@@ -102,22 +110,20 @@ export const API_ENDPOINTS = {
   // Affiliate Portal
 
   AFFILIATE: {
+    LEADS: "/api/affiliate/leads",
 
-    LEADS: '/api/affiliate/leads',
+    QUOTATIONS: "/api/affiliate/quotations",
 
-    QUOTATIONS: '/api/affiliate/quotations',
+    QUOTATIONS_RECENT: "/api/affiliate/quotations/recent",
 
-    QUOTATIONS_RECENT: '/api/affiliate/quotations/recent',
+    QUOTATIONS_STATS: "/api/affiliate/quotations/stats",
 
-    QUOTATIONS_STATS: '/api/affiliate/quotations/stats',
+    SUPPORT_TICKETS: "/api/affiliate/support/tickets",
 
-    SUPPORT_TICKETS: '/api/affiliate/support/tickets',
+    LEADERBOARD: "/api/affiliate/leaderboard",
 
-    LEADERBOARD: '/api/affiliate/leaderboard',
+    DASHBOARD_STATS: "/api/affiliate/dashboard/stats",
 
-    DASHBOARD_STATS: '/api/affiliate/dashboard/stats',
-
-    DASHBOARD_INSIGHTS: '/api/affiliate/dashboard/insights',
-
+    DASHBOARD_INSIGHTS: "/api/affiliate/dashboard/insights",
   },
 };

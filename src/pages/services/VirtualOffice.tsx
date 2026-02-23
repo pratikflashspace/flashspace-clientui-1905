@@ -1,4 +1,15 @@
-import { Building, MapPin, Phone, Users, ChevronDown, ChevronLeft, Grid3X3, List, Search, Presentation } from "lucide-react";
+import {
+  Building,
+  MapPin,
+  Phone,
+  Users,
+  ChevronDown,
+  ChevronLeft,
+  Grid3X3,
+  List,
+  Search,
+  Presentation,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
@@ -15,7 +26,7 @@ import {
   BusinessSolution,
   VirtualOfficeItem,
   ViewMode,
-  SortBy
+  SortBy,
 } from "@/types/services";
 
 const VirtualOffice = () => {
@@ -45,12 +56,12 @@ const VirtualOffice = () => {
     { name: "Gurgaon", key: "gurgaon" },
     { name: "Hyderabad", key: "hyderabad" },
     { name: "Jaipur", key: "jaipur" },
-    { name: "Jammu", key: "jammu" }
+    { name: "Jammu", key: "jammu" },
   ];
 
   useEffect(() => {
-    const city = searchParams.get('city') || 'Delhi';
-    const location = searchParams.get('location') || '';
+    const city = searchParams.get("city") || "Delhi";
+    const location = searchParams.get("location") || "";
     setSelectedCity(city);
     setSelectedLocation(location);
     setSearchCity(city);
@@ -62,17 +73,17 @@ const VirtualOffice = () => {
     if (!scrollContainer) return;
 
     // Add data attribute to tell Lenis to ignore this element
-    scrollContainer.setAttribute('data-lenis-prevent', 'true');
+    scrollContainer.setAttribute("data-lenis-prevent", "true");
 
     // Also prevent Lenis from handling wheel events on this container
     const preventLenis = (e: WheelEvent) => {
       e.stopPropagation();
     };
 
-    scrollContainer.addEventListener('wheel', preventLenis, { passive: false });
+    scrollContainer.addEventListener("wheel", preventLenis, { passive: false });
 
     return () => {
-      scrollContainer.removeEventListener('wheel', preventLenis);
+      scrollContainer.removeEventListener("wheel", preventLenis);
     };
   }, []);
 
@@ -88,7 +99,9 @@ const VirtualOffice = () => {
         const data = await getVirtualOfficesByCity(selectedCity);
         setVirtualOffices(data);
       } catch (err: any) {
-        setError(err.message || "Error connecting to server. Please try again later.");
+        setError(
+          err.message || "Error connecting to server. Please try again later.",
+        );
         setVirtualOffices([]);
         console.error("Error fetching virtual offices:", err);
       } finally {
@@ -100,8 +113,8 @@ const VirtualOffice = () => {
   }, [selectedCity]);
 
   // Filter cities based on search input
-  const filteredCities: City[] = availableCities.filter(city =>
-    city.name.toLowerCase().includes(searchCity.toLowerCase())
+  const filteredCities: City[] = availableCities.filter((city) =>
+    city.name.toLowerCase().includes(searchCity.toLowerCase()),
   );
 
   // Handle city search
@@ -112,12 +125,14 @@ const VirtualOffice = () => {
 
     // Update URL with new city
     const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set('city', cityName);
+    newSearchParams.set("city", cityName);
     navigate(`?${newSearchParams.toString()}`, { replace: true });
   };
 
   // Handle search input change
-  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleSearchInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ): void => {
     setSearchCity(e.target.value);
     setShowSuggestions(true);
   };
@@ -153,32 +168,32 @@ const VirtualOffice = () => {
       label: "Virtual Office",
       href: "/services/virtual-office",
       icon: Building,
-      description: "Professional business address solutions"
+      description: "Professional business address solutions",
     },
     {
       label: "Coworking Space",
       href: "/services/coworking-space",
       icon: Users,
-      description: "Flexible workspace solutions"
+      description: "Flexible workspace solutions",
     },
     {
       label: "On Demand",
       href: "/services/on-demand",
       icon: Phone,
-      description: "Meeting rooms & services"
+      description: "Meeting rooms & services",
     },
     {
       label: "Meeting Rooms",
       href: "/services/meeting-rooms",
       icon: Presentation,
-      description: "Book meeting rooms hourly"
+      description: "Book meeting rooms hourly",
     },
     {
       label: "Event Spaces",
       href: "/services/event-spaces",
       icon: MapPin,
-      description: "Premium event venues"
-    }
+      description: "Premium event venues",
+    },
   ];
 
   const handleNavigation = (href: string): void => {
@@ -191,23 +206,37 @@ const VirtualOffice = () => {
   };
 
   // Get unique areas for filtering
-  const areas = [...new Set(virtualOffices.map(office => office.area))];
+  const areas = [...new Set(virtualOffices.map((office) => office.area))];
 
   // Resolve map center by selected city (fallback to Delhi)
   const resolvedCenter = (() => {
-    const cityKeyFromState = selectedCity.trim().toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
-    if (["ahmedabad", "amdavad"].includes(cityKeyFromState)) return cityCenters.ahmedabad;
-    if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
-    if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
-    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
-    if (["dharamshala", "dharamsala"].includes(cityKeyFromState)) return cityCenters.dharamshala;
-    if (["gurgaon", "gurugram"].includes(cityKeyFromState)) return cityCenters.gurgaon;
-    if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
+    const cityKeyFromState = selectedCity
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/-/g, "");
+    if (["ahmedabad", "amdavad"].includes(cityKeyFromState))
+      return cityCenters.ahmedabad;
+    if (["bangalore", "bengaluru"].includes(cityKeyFromState))
+      return cityCenters.bangalore;
+    if (["chennai", "madras"].includes(cityKeyFromState))
+      return cityCenters.chennai;
+    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState))
+      return cityCenters.delhi;
+    if (["dharamshala", "dharamsala"].includes(cityKeyFromState))
+      return cityCenters.dharamshala;
+    if (["gurgaon", "gurugram"].includes(cityKeyFromState))
+      return cityCenters.gurgaon;
+    if (["hyderabad", "hyd"].includes(cityKeyFromState))
+      return cityCenters.hyderabad;
     if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
     if (["jammu"].includes(cityKeyFromState)) return cityCenters.jammu;
-    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
-    if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
-    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
+    if (["mumbai", "bombay"].includes(cityKeyFromState))
+      return cityCenters.mumbai;
+    if (["pune", "punecity"].includes(cityKeyFromState))
+      return cityCenters.pune;
+    if (["kolkata", "calcutta"].includes(cityKeyFromState))
+      return cityCenters.kolkata;
     if (["lucknow"].includes(cityKeyFromState)) return cityCenters.lucknow;
     if (["surat"].includes(cityKeyFromState)) return cityCenters.surat;
     if (["noida"].includes(cityKeyFromState)) return cityCenters.noida;
@@ -216,7 +245,10 @@ const VirtualOffice = () => {
   })();
 
   // Generate random coordinates around city center if not available
-  const generateRandomCoordinates = (center: { lat: number; lng: number }, index: number) => {
+  const generateRandomCoordinates = (
+    center: { lat: number; lng: number },
+    index: number,
+  ) => {
     // Generate different offsets for each office (0.01 to 0.05 degrees)
     const seed = index + 1;
     const latOffset = ((seed * 17) % 50) / 1000 - 0.025; // -0.025 to +0.025
@@ -224,7 +256,7 @@ const VirtualOffice = () => {
 
     return {
       lat: center.lat + latOffset,
-      lng: center.lng + lngOffset
+      lng: center.lng + lngOffset,
     };
   };
 
@@ -232,15 +264,29 @@ const VirtualOffice = () => {
   // Memoize to prevent unnecessary recalculations
   const mapMarkers = useMemo(() => {
     return virtualOffices.map((office, index) => {
-      const imageSrc = office.image || "https://shorturl.at/Fyr6o";
+      // Use images[0] or image (legacy) or placeholder
+      const imageSrc =
+        office.images && office.images.length > 0
+          ? office.images[0]
+          : office.image || "https://shorturl.at/Fyr6o";
 
       return {
-        position: office.coordinates || generateRandomCoordinates(resolvedCenter, index),
+        position:
+          office.coordinates ||
+          generateRandomCoordinates(resolvedCenter, index),
         title: office.name,
         address: office.address,
-        price: office.price,
-        rating: office.rating,
-        reviews: office.reviews,
+        price: office.gstPlanPricePerYear
+          ? `₹${office.gstPlanPricePerYear.toLocaleString("en-IN")}/yr`
+          : office.price,
+        rating:
+          office.avgRating !== undefined
+            ? office.avgRating
+            : office.rating || 0,
+        reviews:
+          office.totalReviews !== undefined
+            ? office.totalReviews
+            : office.reviews || 0,
         image: imageSrc,
         features: office.features,
       };
@@ -255,7 +301,10 @@ const VirtualOffice = () => {
       </div>
 
       {/* Main Content - Responsive Layout with Resizable Map */}
-      <div className="flex overflow-hidden mt-16 md:mt-20" style={{ height: 'calc(100vh - 4rem)' }}>
+      <div
+        className="flex overflow-hidden mt-16 md:mt-20"
+        style={{ height: "calc(100vh - 4rem)" }}
+      >
         <ResizableMapLayout
           defaultListingWidth={50}
           mapContent={
@@ -277,7 +326,7 @@ const VirtualOffice = () => {
             <div className="px-4 sm:px-6 py-4 sm:py-6">
               {/* Mobile Back Button */}
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate("/")}
                 className="md:hidden flex items-center gap-2 text-sm text-gray-500 mb-4 hover:text-black transition"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -285,16 +334,22 @@ const VirtualOffice = () => {
               </button>
 
               {/* Breadcrumb */}
-              <div className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+              <div
+                className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+              >
                 <span>Home</span>
                 <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
                 <span>Virtual Office</span>
                 <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
-                <span className="text-gray-900 font-medium truncate">{selectedCity}</span>
+                <span className="text-gray-900 font-medium truncate">
+                  {selectedCity}
+                </span>
               </div>
 
               {/* Page Title */}
-              <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+              <h1
+                className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+              >
                 Virtual Office Space In {selectedCity}
               </h1>
 
@@ -361,12 +416,16 @@ const VirtualOffice = () => {
             </div>
           </div> */}
 
-
-
               {/* Results Header */}
-              <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+              <div
+                className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+              >
                 <p className="text-sm text-gray-600">
-                  Showing <span className="font-semibold text-gray-900">{virtualOffices.length} result(s)</span> for virtual office space in {selectedCity}
+                  Showing{" "}
+                  <span className="font-semibold text-gray-900">
+                    {virtualOffices.length} result(s)
+                  </span>{" "}
+                  for virtual office space in {selectedCity}
                 </p>
 
                 <div className="flex items-center gap-2">
@@ -392,7 +451,9 @@ const VirtualOffice = () => {
               </div>
 
               {/* Office Cards Grid - Modern MindTrip Style Cards */}
-              <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+              <div
+                className={`grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+              >
                 {loading ? (
                   <SkeletonCardGrid count={6} />
                 ) : error ? (
@@ -401,18 +462,23 @@ const VirtualOffice = () => {
                   </div>
                 ) : virtualOffices.length === 0 ? (
                   <div className="col-span-full text-center py-8 sm:py-12">
-                    <p className="text-sm sm:text-base text-gray-600">No virtual offices found for {selectedCity}</p>
+                    <p className="text-sm sm:text-base text-gray-600">
+                      No virtual offices found for {selectedCity}
+                    </p>
                   </div>
-                ) : virtualOffices.map((office) => (
-                  <ListingCardModern
-                    key={office._id}
-                    item={office}
-                    onGetBestPrice={() => handleGetBestPrice(office._id)}
-                    onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
-                  />
-                ))}
+                ) : (
+                  virtualOffices.map((office) => (
+                    <ListingCardModern
+                      key={office._id}
+                      item={office}
+                      onGetBestPrice={() => handleGetBestPrice(office._id)}
+                      onToggleFavorite={(itemId) =>
+                        console.log("Toggle favorite for:", itemId)
+                      }
+                    />
+                  ))
+                )}
               </div>
-
             </div>
           </div>
         </ResizableMapLayout>
