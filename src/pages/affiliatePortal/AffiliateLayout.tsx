@@ -15,6 +15,7 @@ const AffiliateLayout = () => {
     // Helper: Determine active sidebar item based on current URL
     const getActivePageFromUrl = () => {
         const path = location.pathname;
+        if (path.includes("client-management")) return "Client Management";
         if (path.includes("booking-management")) return "Booking Management";
         if (path.includes("revenue-dashboard")) return "Revenue Dashboard";
         if (path.includes("payouts")) return "Payouts";
@@ -38,6 +39,9 @@ const AffiliateLayout = () => {
         switch (pageName) {
             case "Dashboard":
                 navigate("/affiliate-portal/affiliate-dashboard");
+                break;
+            case "Client Management":
+                navigate("/affiliate-portal/client-management");
                 break;
             case "Booking Management":
                 navigate("/affiliate-portal/booking-management");

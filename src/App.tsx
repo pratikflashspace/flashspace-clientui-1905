@@ -57,6 +57,7 @@ import SpaceComponent from "./components/Spaces/SpaceComponent";
 import MeetingRoomSpaceComponent from "./components/Spaces/MeetingRoomSpaceComponent";
 import CoworkingSpaceComponent from "./components/Spaces/CoworkingSpaceComponent";
 import BookingPage from "./pages/BookingPage";
+import CompleteBookingPage from "./pages/CompleteBookingPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentFailedPage from "./pages/PaymentFailedPage";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -130,6 +131,7 @@ import LeaderBoard from "./pages/affiliatePortal/LeaderBoard";
 import Support from "./pages/affiliatePortal/Support";
 import AffiliateKYC from "./pages/affiliatePortal/KYC";
 import AffiliateNotifications from "./pages/affiliatePortal/Notifications";
+import AffiliateClientManagement from "./pages/affiliatePortal/AffiliateClientManagement";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -246,6 +248,7 @@ const App = () => (
                     element={<MeetingRoomSpaceComponent />}
                   />
                   <Route path="/booking/:id" element={<BookingPage />} />
+                  <Route path="/booking/:id/complete" element={<CompleteBookingPage />} />
 
                   {/* Payment Routes */}
                   <Route
@@ -387,6 +390,7 @@ const App = () => (
                       <Route path="support" element={<Support />} />
                       <Route path="kyc" element={<AffiliateKYC />} />
                       <Route path="notifications" element={<AffiliateNotifications />} />
+                      <Route path="client-management" element={<AffiliateClientManagement />} />
                     </Route>
                   </Route>
 

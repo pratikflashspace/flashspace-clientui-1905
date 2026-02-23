@@ -28,11 +28,14 @@ export interface CreateCouponDTO {
 }
 
 export interface ValidateCouponResponse {
+    success?: boolean;
     valid: boolean;
     message: string;
     data?: {
         code: string;
         discountType: string;
         discountValue: number;
+        affiliateId?: string; // Present if this is an affiliate coupon
+        isAffiliateCoupon?: boolean;
     };
 }

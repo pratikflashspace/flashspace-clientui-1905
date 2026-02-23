@@ -105,7 +105,7 @@ const SpaceComponent = () => {
   const handleBookNow = () => {
     if (!spaceDetails || !pricing) return;
     if (spaceDetails.availability?.toLowerCase() === 'unavailable') return;
-    navigate(`/booking/${spaceDetails._id}?plan=${selectedPlan}&direct=true`);
+    navigate(`/booking/${spaceDetails._id}/complete?plan=${selectedPlan}&type=virtual_office`);
   };
 
   // Loading State - Show Skeleton

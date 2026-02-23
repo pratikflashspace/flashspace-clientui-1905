@@ -2,6 +2,7 @@ import React from "react";
 import {
     LayoutGrid,
     Users,
+    Users2,
     LineChart,
     Wallet,
     FileText,
@@ -42,6 +43,12 @@ const Sidebar: React.FC<SidebarProps> = ({
             icon: LayoutGrid,
             section: "main",
             path: "/affiliate-portal/affiliate-dashboard",
+        },
+        {
+            name: "Client Management",
+            icon: Users2,
+            section: "main",
+            path: "/affiliate-portal/client-management",
         },
         {
             name: "Booking Management",
