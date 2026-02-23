@@ -49,6 +49,7 @@ const MyBookings: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [togglingAutoRenew, setTogglingAutoRenew] = useState<string | null>(null);
   const [date, setDate] = useState<DateRange | undefined>();
+  const [totalCount, setTotalCount] = useState(0);
 
   // Raise Query state
   const [queryModalBooking, setQueryModalBooking] = useState<Booking | null>(null);
@@ -66,6 +67,11 @@ const MyBookings: React.FC = () => {
       });
       if (response.success && response.data) {
         setBookings(response.data);
+        if (response.pagination) {
+          setTotalCount(response.pagination.total);
+        } else {
+          setTotalCount(response.data.length);
+        }
       } else {
         setError(response.message || "Failed to load bookings");
       }
@@ -198,7 +204,7 @@ const MyBookings: React.FC = () => {
 
   // Stats
   const stats = {
-    total: bookings.length,
+    total: totalCount,
     active: bookings.filter((b) => b.status === "active").length,
     virtualOffice: bookings.filter((b) => b.type === "virtual_office").length,
     coworking: bookings.filter((b) => b.type === "coworking_space").length,

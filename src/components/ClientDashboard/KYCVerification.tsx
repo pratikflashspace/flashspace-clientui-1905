@@ -31,7 +31,6 @@ import {
   Edit,
   ArrowUpRight,
 } from "lucide-react";
-import toast from "react-hot-toast";
 import { API_CONFIG } from "@/config/api.config";
 import DemoKYCVideo from "@/assets/kycVideo/DemoKYCVideo.mp4";
 
@@ -103,7 +102,6 @@ export default function KYCVerification() {
     mimeType: string;
   } | null>(null);
 
-  const [isConfirmed, setIsConfirmed] = useState(false);
 
   const fetchKYC = async () => {
     setLoading(true);
