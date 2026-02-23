@@ -208,8 +208,8 @@ const StatusBadge = ({ status }: { status: string }) => {
             {status === "Renewal Due"
                 ? "⚠ Renewal Due"
                 : status === "Active"
-                  ? "✓ Active"
-                  : "⏳ Pending"}
+                    ? "✓ Active"
+                    : "⏳ Pending"}
         </span>
     );
 };
@@ -557,18 +557,17 @@ const BookingManagement = () => {
                                         onClick={() => setActiveTab(tab)}
                                         className={`
                     px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-300 capitalize whitespace-nowrap
-                    ${
-                        activeTab === tab
-                            ? "bg-white text-slate-900 shadow-sm"
-                            : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
-                    }
+                    ${activeTab === tab
+                                                ? "bg-white text-slate-900 shadow-sm"
+                                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+                                            }
                   `}
                                     >
                                         {tab === "active"
                                             ? "Active Bookings"
                                             : tab === "renewals"
-                                              ? "Upcoming Renewals"
-                                              : "Pending"}
+                                                ? "Upcoming Renewals"
+                                                : "Pending"}
                                     </button>
                                 ),
                             )}
