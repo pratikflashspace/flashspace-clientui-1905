@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { getAllSpacePartnerKyc, SpaceUserKycResponse } from '@/Api/spacePartnerKyc.service';
+import SpacePartnerKycRequest from './SpacePartnerKycRequest';
 import { useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/admin.service';
 import { Search, Check, X, FileText, Handshake  ,AlertCircle, User, Building2, Eye, Download, Clock, CheckCircle2, XCircle, ExternalLink, Calendar, File } from 'lucide-react';
@@ -16,6 +18,9 @@ export default function KYCRequests() {
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [showDocumentModal, setShowDocumentModal] = useState(false);
     const [selectedDocument, setSelectedDocument] = useState<KYCDocument | null>(null);
+    const [requestSourceFilter, setRequestSourceFilter] = useState<'all' | 'user' | 'partner'>('all');
+    const [partnerRequests, setPartnerRequests] = useState<SpaceUserKycResponse[]>([]);
+    const [partnerLoading, setPartnerLoading] = useState(false);
 
     // Helper to construct full URL from relative path
     const getFullUrl = (url?: string): string => {
@@ -29,6 +34,17 @@ export default function KYCRequests() {
     useEffect(() => {
         fetchKYCRequests();
     }, []);
+
+    // Fetch partner KYC requests when filter is partner
+    useEffect(() => {
+        if (requestSourceFilter === 'partner') {
+            setPartnerLoading(true);
+            getAllSpacePartnerKyc()
+                .then((data) => setPartnerRequests(data))
+                .catch(() => setPartnerRequests([]))
+                .finally(() => setPartnerLoading(false));
+        }
+    }, [requestSourceFilter]);
 
     // Close modal on ESC key
     useEffect(() => {
@@ -187,16 +203,29 @@ export default function KYCRequests() {
     toast.error("Failed to open partner KYC details");
   }
 };
+    const filteredRequests = requests
+        .filter(request =>
+            request.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            request.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .filter(request => {
+            if (requestSourceFilter === 'all') return true;
+            if (requestSourceFilter === 'partner') return !!request.isPartner;
+            // 'user' filter: treat undefined isPartner as user request
+            return !request.isPartner;
+        });
 
-
-    const filteredRequests = requests.filter(request =>
-        request.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        request.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const pendingCount = filteredRequests.filter(request =>
-        request.overallStatus === 'pending' || request.overallStatus === 'resubmit'
-    ).length;
+    // Calculate pending count based on filter
+    let pendingCount = 0;
+    if (requestSourceFilter === 'partner') {
+        pendingCount = partnerRequests.filter(
+            req => req.overallStatus === 'pending' || req.overallStatus === 'resubmit'
+        ).length;
+    } else {
+        pendingCount = filteredRequests.filter(request =>
+            request.overallStatus === 'pending' || request.overallStatus === 'resubmit'
+        ).length;
+    }
 
     const getStatusBadge = (status: string) => {
         const config: Record<string, { bg: string; text: string; icon: any }> = {
@@ -235,7 +264,7 @@ export default function KYCRequests() {
         return ['mp4', 'webm', 'mov', 'avi', 'mkv'].includes(ext);
     };
 
-    if (loading) {
+    if (loading || (requestSourceFilter === 'partner' && partnerLoading)) {
         return (
             <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
@@ -257,9 +286,9 @@ export default function KYCRequests() {
                 </div>
             </div>
 
-            {/* Search Bar */}
-            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="relative max-w-md">
+            {/* Search Bar + Source Filter */}
+            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="relative max-w-md w-full">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                         type="text"
@@ -269,7 +298,54 @@ export default function KYCRequests() {
                         className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-gray-900 placeholder:text-gray-400"
                     />
                 </div>
+                <div className="flex items-center gap-3">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Source</span>
+                    <div className="inline-flex rounded-full bg-gray-100 p-1">
+                        {/* <button
+                            type="button"
+                            onClick={() => setRequestSourceFilter('all')}
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-full flex items-center gap-1 transition-colors ${
+                                requestSourceFilter === 'all'
+                                    ? 'bg-white text-gray-900 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-800'
+                            }`}
+                        >
+                            All
+                        </button> */}
+                        <button
+                            type="button"
+                            onClick={() => setRequestSourceFilter('user')}
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-full flex items-center gap-1 transition-colors ${
+                                requestSourceFilter === 'user'
+                                    ? 'bg-white text-blue-900 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-800'
+                            }`}
+                        >
+                            <User className="w-3 h-3" />
+                            Users
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setRequestSourceFilter('partner')}
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-full flex items-center gap-1 transition-colors ${
+                                requestSourceFilter === 'partner'
+                                    ? 'bg-white text-blue-900 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-800'
+                            }`}
+                        >
+                            <Handshake className="w-3 h-3" />
+                            Space Partners
+                        </button>
+                    </div>
+                </div>
             </div>
+
+            {/* Main Content */}
+            {requestSourceFilter === 'partner' ? (
+                <SpacePartnerKycRequest />
+            ) : (
+                <>
+                {/* ...existing user KYC content... */}
 
             {/* KYC Requests Grid */}
             {filteredRequests.length === 0 ? (
@@ -764,6 +840,8 @@ export default function KYCRequests() {
                         </div>
                     </div>
                 </div>
+            )}
+                </>
             )}
         </div>
     );

@@ -62,7 +62,8 @@ import Coupons from "./pages/admin/Coupons";
 import KYCRequests from "./pages/admin/KYCRequests";
 import KYCRequestDetails from "./pages/admin/KYCRequestDetails";
 import KYCPartnerRequests from "./pages/admin/KYCPartnerRequests";
-import KYCPartnerDetails from "./pages/admin/KYCPartnerDetails";
+import SpacePartnerKycDetails from "./pages/admin/SpacePartnerKycDetails";
+import SpaceDetail from "./pages/admin/SpaceDetail";
 import SpaceManagement from "./pages/admin/SpaceManagement";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminSettings from "./pages/admin/Settings";
@@ -93,6 +94,7 @@ import AddSpace from "./pages/spacePortal/AddSpace";
 import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
+import KycVerification from "./components/Spaces/KycVerification";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -240,8 +242,9 @@ const App = () => (
                   <Route path="kyc-requests" element={<KYCRequests />} />
                   <Route path="kyc-requests/:id" element={<KYCRequestDetails />} />
                   <Route path="kyc-partners" element={<KYCPartnerRequests />} />
-                  <Route path="kyc-partners/:id" element={<KYCPartnerDetails />} />
+                  <Route path="kyc-partners/:id" element={<SpacePartnerKycDetails />} />
                   <Route path="spaces" element={<SpaceManagement />} />
+                  <Route path="space-details/:id" element={<SpaceDetail />} />
                   <Route path="bookings" element={<AdminBookings />} />
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="clients" element={<Clients />} />
@@ -270,6 +273,7 @@ const App = () => (
                   <Route path="invoices-payments" element={<Invoices />} />
                   <Route path="booking-calendar" element={<Calendar />} />
                   <Route path="active-requests" element={<ActiveRequests />} />
+                  <Route path="kyc-verification" element={<KycVerification />} />
                   <Route
                     path="booking-analytics"
                     element={<BookingAnalytics />}

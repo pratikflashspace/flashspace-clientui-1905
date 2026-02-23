@@ -18,6 +18,7 @@ import {
   Building2,
 
   Star,
+  ShieldCheck,
 
 } from "lucide-react";
 
@@ -62,6 +63,15 @@ export const sidebarConfig = [
     path: "/spaceportal/active-requests",
 
     icon: FileText,
+
+  },
+    {
+
+    label: "KYC Verification",
+
+    path: "/spaceportal/kyc-verification",
+
+    icon: ShieldCheck,
 
   },
 
