@@ -9,7 +9,7 @@ import { SpaceDetailSkeleton } from '@/components/ui/skeleton-loaders';
 import ImageGalleryModal from '../ui/ImageGalleryModal';
 import { useAuth } from "@/contexts/AuthContext";
 import { createPaymentOrder, verifyPayment } from "@/services/payment.service";
-import { toast } from "sonner";
+import hotToast from "react-hot-toast";
 
 // Default photos for spaces that don't have images
 const DEFAULT_PHOTOS = [
@@ -100,8 +100,8 @@ const MeetingRoomSpaceComponent = () => {
 
     const handleBookNow = async () => {
         if (!user) {
-            toast.error("Please login to book a meeting room");
-            navigate("/login");
+            hotToast.error("Please login to book a meeting room");
+            navigate(`/login?redirect=${location.pathname}`);
             return;
         }
 
@@ -140,12 +140,12 @@ const MeetingRoomSpaceComponent = () => {
                 devMode: true
             });
 
-            toast.success("Booking Successful! Credits Earned!");
+            hotToast.success("Booking Successful! Credits Earned! 🎉");
             // navigate('/bookings'); // Optional: redirect to bookings
 
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || "Booking failed");
+            hotToast.error(error.message || "Booking failed");
         } finally {
             setIsProcessing(false);
         }

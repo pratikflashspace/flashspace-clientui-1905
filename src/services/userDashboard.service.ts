@@ -58,7 +58,12 @@ class UserDashboardService {
     try {
       const response = await axiosInstance.get<ApiResponse<Booking[]>>(
         API_ENDPOINTS.USER.BOOKINGS,
-        { params },
+        {
+          params: {
+            limit: 100,
+            ...params
+          }
+        },
       );
       return response.data;
     } catch (error: unknown) {
