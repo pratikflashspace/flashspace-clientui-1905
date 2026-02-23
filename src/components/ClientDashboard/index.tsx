@@ -18,9 +18,11 @@ import {
   MessageSquare, // For Chat Support
   HelpCircle, // For Help Center
   Home, // For Back to Home
+  AlertCircle,
 } from "lucide-react";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect as useEffectReact, useState as useStateReact } from "react";
 
 // Remove this type definition if useAuth already provides the correct user type
 // type User = {
@@ -58,6 +60,24 @@ export default function ClientDashboard() {
   const [showFooter, setShowFooter] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
+  const [kycStatus, setKycStatus] = useStateReact<string | null>(null);
+
+  // Fetch KYC status for indicator
+  useEffectReact(() => {
+    async function fetchKycStatus() {
+      try {
+        const res = await import("@/services/userDashboard.service");
+        const kycResponse = await res.default.getKYC();
+        if (kycResponse.success && kycResponse.data) {
+          const kyc = Array.isArray(kycResponse.data) ? kycResponse.data[0] : kycResponse.data;
+          setKycStatus(kyc?.overallStatus || null);
+        }
+      } catch (e) {
+        setKycStatus(null);
+      }
+    }
+    fetchKycStatus();
+  }, []);
   const location = useLocation();
   const navigate = useNavigate();
   const showFooterRef = useRef(false);
@@ -141,6 +161,7 @@ export default function ClientDashboard() {
             <ul className="space-y-1">
               {mainMenuItems.map((item, idx) => {
                 const isActive = activeIndex === idx;
+                const showKycDot = item.name === "Profile & KYC" && kycStatus === "pending";
                 return (
                   <li key={item.name}>
                     <button
@@ -151,7 +172,15 @@ export default function ClientDashboard() {
                         }`}
                     >
                       <item.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-gray-400"}`} />
-                      <span>{item.name}</span>
+                      <span className="flex items-center gap-1">
+                        {item.name}
+                        {showKycDot && (
+                          <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Pending">
+                            <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
+                            KYC 
+                          </span>
+                        )}
+                      </span>
                     </button>
                   </li>
                 );
@@ -165,6 +194,7 @@ export default function ClientDashboard() {
                 const actualIndex = menuItems.findIndex((m) => m.name === item.name);
                 const isActive = activeIndex === actualIndex;
                 const isLogout = item.name === "Logout";
+                const showKycDot = item.name === "Profile & KYC" && kycStatus === "pending";
                 return (
                   <li key={item.name}>
                     <button
@@ -179,7 +209,15 @@ export default function ClientDashboard() {
                         }`}
                     >
                       <item.icon className={`w-5 h-5 ${isActive ? (isLogout ? "text-red-600" : "text-white") : "text-gray-400"}`} />
-                      <span>{item.name}</span>
+                      <span className="flex items-center gap-1">
+                        {item.name}
+                        {showKycDot && (
+                          <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Pending">
+                            <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
+                            KYC 
+                          </span>
+                        )}
+                      </span>
                     </button>
                   </li>
                 );
@@ -220,6 +258,7 @@ export default function ClientDashboard() {
                   {menuItems.map((item, idx) => {
                     const isActive = activeIndex === idx;
                     const isLogout = item.name === "Logout";
+                    const showKycDot = item.name === "Profile & KYC" && kycStatus === "pending";
                     return (
                       <li key={item.name}>
                         <button
@@ -232,7 +271,15 @@ export default function ClientDashboard() {
                             }`}
                         >
                           <item.icon className="w-5 h-5" />
-                          <span>{item.name}</span>
+                          <span className="flex items-center gap-1">
+                            {item.name}
+                            {showKycDot && (
+                              <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Pending">
+                                <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
+                                KYC Pending
+                              </span>
+                            )}
+                          </span>
                         </button>
                       </li>
                     );
