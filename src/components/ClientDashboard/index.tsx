@@ -47,11 +47,10 @@ const menuItems = [
   { name: "Visit Records", icon: CalendarCheck, section: "main", path: "/dashboard/visit-records" },
   { name: "Payments", icon: CreditCard, section: "main", path: "/dashboard/payments" },
   { name: "Documents", icon: FileText, section: "main", path: "/dashboard/documents" },
-  { name: "KYC Verification", icon: ShieldCheck, section: "main", path: "/dashboard/kyc-verification" },
   { name: "Chat Support", icon: MessageSquare, section: "main", path: "/dashboard/support" },
   { name: "Notifications", icon: Bell, section: "main", path: "/dashboard/notifications" },
   { name: "Help Center", icon: HelpCircle, section: "main", path: "/dashboard/help" },
-  { name: "Profile", icon: User, section: "account", path: "/dashboard/profile" },
+  { name: "Profile & KYC", icon: User, section: "account", path: "/dashboard/profile" },
   { name: "Logout", icon: LogOut, section: "account", path: "/dashboard/logout" },
 ];
 
@@ -108,17 +107,15 @@ export default function ClientDashboard() {
         return <Billing />; // Using Billing component for Payments for now
       case 5:
         return <div className="p-8 text-center text-gray-500">Documents - Coming Soon</div>;
-      case 6:
-        return <KYCVerification />;
-      case 7: // Chat Support
+      case 6: // Chat Support
         return <ChatSupport />;
-      case 8: // Notifications
+      case 7: // Notifications
         return <Notifications />;
-      case 9: // Help Center
+      case 8: // Help Center
         return <Support />;
-      case 10:
+      case 9:
         return <Profile />;
-      case 11:
+      case 10:
         return <Logout />;
       case 100: // Special case for View Details
         return <Viewdetails />;

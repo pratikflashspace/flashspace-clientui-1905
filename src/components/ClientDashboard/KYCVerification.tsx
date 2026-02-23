@@ -31,6 +31,7 @@ import {
   Edit,
   ArrowUpRight,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import { API_CONFIG } from "@/config/api.config";
 import DemoKYCVideo from "@/assets/kycVideo/DemoKYCVideo.mp4";
 
@@ -58,6 +59,7 @@ export default function KYCVerification() {
   const [activeStep, setActiveStep] = useState<VerificationStep>("personal");
   const [kycType, setKycType] = useState<KYCType>("individual");
   const [kycData, setKycData] = useState<KYCData | null>(null);
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   // Multi-Level State
   const [profiles, setProfiles] = useState<KYCData[]>([]);
@@ -2162,7 +2164,11 @@ export default function KYCVerification() {
                       (!linkBookingId &&
                         !isReadyForSubmission() &&
                         kycData?.overallStatus !== "approved" &&
-                        kycData?.overallStatus !== "pending")
+                        kycData?.overallStatus !== "pending") ||
+                      (!linkBookingId &&
+                        kycData?.overallStatus !== "approved" &&
+                        kycData?.overallStatus !== "pending" &&
+                        !isConfirmed)
                     }
                     className="w-full py-3 bg-[#35503F] text-white rounded-xl font-semibold hover:bg-[#35503F]/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
