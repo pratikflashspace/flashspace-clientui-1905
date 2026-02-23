@@ -34,6 +34,8 @@ export interface CreateOrderPayload {
   discountAmount: number;
   paymentType?: "virtual_office" | "coworking_space" | "meeting_room";
   startDate?: string; // ISO date string for booking start
+  couponCode?: string; // Coupon code applied by user (for affiliate attribution)
+  affiliateId?: string; // Affiliate user ID (resolved from coupon)
 }
 
 export interface CreateOrderResponse {
