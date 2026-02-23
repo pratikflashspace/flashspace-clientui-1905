@@ -32,6 +32,7 @@ import { VirtualOfficeItem } from '@/types/services';
 import { getVirtualOfficePricing, PlanDetails } from '@/utils/priceUtils';
 import { BookingPageSkeleton } from '@/components/ui/skeleton-loaders';
 import { useAuth } from '@/contexts/AuthContext';
+import hotToast from 'react-hot-toast';
 import { useToast } from '@/hooks/use-toast';
 import { validateCoupon, markCouponUsed } from '@/services/coupon.service';
 import {
@@ -59,8 +60,10 @@ const BookingPage = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
 
+  const isDirect = searchParams.get('direct') === 'true';
+
   // WIZARD STATE
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(isDirect ? 4 : 1);
   const [animating, setAnimating] = useState(false);
 
   // DATA STATE
@@ -184,7 +187,7 @@ const BookingPage = () => {
     if (!couponCode.trim()) return;
     if (!isAuthenticated || !user) {
       toast({ title: "Login Required", description: "Please login to apply coupons", variant: "destructive" });
-      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}`);
+      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}${isDirect ? '&direct=true' : ''}`);
       return;
     }
     setCouponLoading(true);
@@ -267,7 +270,7 @@ const BookingPage = () => {
   const handleProceedToPayment = async () => {
     if (!isAuthenticated || !user) {
       toast({ title: "Login Required", description: "Please login to continue with your booking", variant: "destructive" });
-      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}`);
+      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}${isDirect ? '&direct=true' : ''}`);
       return;
     }
     if (!spaceDetails || !selectedPlanDetails) return;
@@ -309,7 +312,7 @@ const BookingPage = () => {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             });
-            toast({ title: "Payment Successful! 🎉", description: "Your booking has been confirmed" });
+            hotToast.success("Payment Successful! 🎉");
             if (appliedCoupon) {
               try { await markCouponUsed(appliedCoupon.code); } catch (err) { console.error("Failed to mark coupon used", err); }
             }
@@ -340,7 +343,7 @@ const BookingPage = () => {
   const handleSimulatePayment = async () => {
     if (!isAuthenticated || !user) {
       toast({ title: "Login Required", description: "Please login to continue", variant: "destructive" });
-      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}`);
+      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}${isDirect ? '&direct=true' : ''}`);
       return;
     }
     if (!spaceDetails || !selectedPlanDetails) return;
@@ -367,7 +370,7 @@ const BookingPage = () => {
 
       toast({ title: "Simulating Payment...", description: "Creating mock payment for testing" });
       const result = await simulatePayment(orderData.orderId);
-      toast({ title: "Payment Simulated! 🎉", description: "Mock booking has been created successfully" });
+      hotToast.success("Payment Simulated! 🎉");
       if (appliedCoupon) {
         try { await markCouponUsed(appliedCoupon.code); } catch (err) { console.error("Failed to mark coupon used", err); }
       }
@@ -424,34 +427,36 @@ const BookingPage = () => {
           </button>
 
           {/* ========== STEPPER ========== */}
-          <div className="mb-10">
-            <div className="flex items-center justify-between relative">
-              <div className="absolute top-6 left-0 right-0 h-0.5 bg-gray-200 -z-0" />
-              <div
-                className="absolute top-6 left-0 h-0.5 bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-700 ease-out -z-0"
-                style={{ width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%` }}
-              />
-              {STEPS.map((step) => {
-                const isCompleted = currentStep > step.id;
-                const isActive = currentStep === step.id;
-                const Icon = step.icon;
-                return (
-                  <div key={step.id} className="flex flex-col items-center relative z-10">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ease-out shadow-sm border-2
+          {!isDirect && (
+            <div className="mb-10">
+              <div className="flex items-center justify-between relative">
+                <div className="absolute top-6 left-0 right-0 h-0.5 bg-gray-200 -z-0" />
+                <div
+                  className="absolute top-6 left-0 h-0.5 bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-700 ease-out -z-0"
+                  style={{ width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%` }}
+                />
+                {STEPS.map((step) => {
+                  const isCompleted = currentStep > step.id;
+                  const isActive = currentStep === step.id;
+                  const Icon = step.icon;
+                  return (
+                    <div key={step.id} className="flex flex-col items-center relative z-10">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ease-out shadow-sm border-2
                       ${isCompleted ? 'bg-gradient-to-br from-teal-500 to-emerald-400 border-teal-400 text-white shadow-teal-200 shadow-md'
-                        : isActive ? 'bg-white border-teal-500 text-teal-600 shadow-teal-100 shadow-lg scale-110 ring-4 ring-teal-50'
-                          : 'bg-white border-gray-200 text-gray-400'}`}>
-                      {isCompleted ? <Check className="w-5 h-5" strokeWidth={3} /> : <Icon className="w-5 h-5" />}
-                    </div>
-                    <span className={`mt-2.5 text-xs font-semibold tracking-wide transition-colors duration-300
+                          : isActive ? 'bg-white border-teal-500 text-teal-600 shadow-teal-100 shadow-lg scale-110 ring-4 ring-teal-50'
+                            : 'bg-white border-gray-200 text-gray-400'}`}>
+                        {isCompleted ? <Check className="w-5 h-5" strokeWidth={3} /> : <Icon className="w-5 h-5" />}
+                      </div>
+                      <span className={`mt-2.5 text-xs font-semibold tracking-wide transition-colors duration-300
                       ${isActive ? 'text-teal-700' : isCompleted ? 'text-teal-500' : 'text-gray-400'}`}>
-                      {step.label}
-                    </span>
-                  </div>
-                );
-              })}
+                        {step.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* ========== STEP CONTENT ========== */}
           <div className={`transition-all duration-300 ${animating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
@@ -843,11 +848,11 @@ const BookingPage = () => {
           {/* ========== NAVIGATION BUTTONS ========== */}
           <div className="flex justify-between items-center mt-8">
             <button
-              onClick={currentStep === 1 ? () => navigate(-1) : goBack}
+              onClick={currentStep === 1 || (isDirect && currentStep === 4) ? () => navigate(-1) : goBack}
               className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all text-sm shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
-              {currentStep === 1 ? 'Cancel' : 'Back'}
+              {currentStep === 1 || (isDirect && currentStep === 4) ? 'Cancel' : 'Back'}
             </button>
 
             {currentStep < 4 && (

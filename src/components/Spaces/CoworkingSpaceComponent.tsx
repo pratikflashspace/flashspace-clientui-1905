@@ -95,12 +95,12 @@ const CoworkingSpaceComponent = () => {
   const handleBookNow = () => {
     if (!spaceDetails) return;
     if (spaceDetails.availability?.toLowerCase() === 'unavailable') return;
-    
+
     // Navigate to booking page with params
     // SpaceComponent sends ?plan=...
     // Here we send deskCount and date
-    const dateStr = selectedDate.toISOString(); 
-    navigate(`/booking/${spaceDetails._id}?desks=${deskCount}&date=${dateStr}&type=coworking`);
+    const dateStr = selectedDate.toISOString();
+    navigate(`/booking/${spaceDetails._id}?desks=${deskCount}&date=${dateStr}&type=coworking&direct=true`);
   };
 
   // Loading State - Show Skeleton
