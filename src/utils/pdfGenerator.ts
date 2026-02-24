@@ -14,7 +14,7 @@ interface jsPDFWithAutoTable extends jsPDF {
  * Utility function to generate a well-formatted PDF invoice
  * based on the provided schema and best practices.
  */
-export const generateInvoicePDF = (invoice: Invoice) => {
+export const generateInvoicePDF = (invoice: Invoice, action: "download" | "preview" = "download"): string | void => {
     const doc = new jsPDF();
     const primaryColor: [number, number, number] = [53, 80, 63]; // Flashspace Green (#35503F)
     const secondaryColor: [number, number, number] = [234, 179, 8]; // Flashspace Yellow (#eab308)
@@ -179,7 +179,11 @@ export const generateInvoicePDF = (invoice: Invoice) => {
     doc.setTextColor(150, 150, 150);
     doc.text("This is a computer generated invoice and does not require a signature.", 14, pageHeight - 15);
 
-    // Save the PDF
-    const filename = invoice.invoiceNumber ? `invoice_${invoice.invoiceNumber}.pdf` : `invoice_${invoice._id}.pdf`;
-    doc.save(filename);
+    // Output based on action
+    if (action === "preview") {
+        return doc.output('bloburl').toString();
+    } else {
+        const filename = invoice.invoiceNumber ? `invoice_${invoice.invoiceNumber}.pdf` : `invoice_${invoice._id}.pdf`;
+        doc.save(filename);
+    }
 };
