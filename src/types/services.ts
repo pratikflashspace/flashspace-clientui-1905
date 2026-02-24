@@ -354,6 +354,19 @@ export interface Invoice {
   dueDate?: string;
   paidAt?: string;
   createdAt: string;
+  user?: {
+    _id?: string;
+    name?: string;
+    fullName?: string;
+    email?: string;
+    phoneNumber?: string;
+  };
+  lineItems?: Array<{
+    description: string;
+    quantity: number;
+    rate: number;
+    amount: number;
+  }>;
 }
 
 export interface InvoicesSummary {
