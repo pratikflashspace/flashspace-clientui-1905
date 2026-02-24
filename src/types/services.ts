@@ -379,7 +379,7 @@ export type TicketStatus =
   | "waiting_customer";
 
 export interface TicketMessage {
-  sender: "user" | "support" | "admin";
+  sender: "user" | "support" | "admin" | "affiliate";
   senderName?: string;
   message: string;
   attachments?: string[];
