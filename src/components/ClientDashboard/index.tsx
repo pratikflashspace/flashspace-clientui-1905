@@ -161,7 +161,7 @@ export default function ClientDashboard() {
             <ul className="space-y-1">
               {mainMenuItems.map((item, idx) => {
                 const isActive = activeIndex === idx;
-                const showKycDot = item.name === "Profile & KYC" && kycStatus === "pending";
+                const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
                 return (
                   <li key={item.name}>
                     <button
@@ -175,9 +175,9 @@ export default function ClientDashboard() {
                       <span className="flex items-center gap-1">
                         {item.name}
                         {showKycDot && (
-                          <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Pending">
+                          <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
                             <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
-                            KYC 
+                            <span className="text-red-600 font-bold">KYC</span>
                           </span>
                         )}
                       </span>
@@ -194,7 +194,7 @@ export default function ClientDashboard() {
                 const actualIndex = menuItems.findIndex((m) => m.name === item.name);
                 const isActive = activeIndex === actualIndex;
                 const isLogout = item.name === "Logout";
-                const showKycDot = item.name === "Profile & KYC" && kycStatus === "pending";
+                const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
                 return (
                   <li key={item.name}>
                     <button
@@ -212,9 +212,9 @@ export default function ClientDashboard() {
                       <span className="flex items-center gap-1">
                         {item.name}
                         {showKycDot && (
-                          <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Pending">
+                          <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
                             <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
-                            KYC 
+                            <span className="text-red-600 font-bold">KYC</span>
                           </span>
                         )}
                       </span>
@@ -258,7 +258,7 @@ export default function ClientDashboard() {
                   {menuItems.map((item, idx) => {
                     const isActive = activeIndex === idx;
                     const isLogout = item.name === "Logout";
-                    const showKycDot = item.name === "Profile & KYC" && kycStatus === "pending";
+                    const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
                     return (
                       <li key={item.name}>
                         <button
@@ -274,9 +274,9 @@ export default function ClientDashboard() {
                           <span className="flex items-center gap-1">
                             {item.name}
                             {showKycDot && (
-                              <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Pending">
+                              <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
                                 <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
-                                KYC Pending
+                                <span className="text-red-600 font-bold">KYC</span>
                               </span>
                             )}
                           </span>
