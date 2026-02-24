@@ -295,6 +295,14 @@ class AffiliatePortalService {
         return response.data;
     }
 
+    async getAvailableSpaces(city: string, type: string) {
+        const response = await axiosInstance.get<ApiResponse<any[]>>(
+            API_ENDPOINTS.AFFILIATE.AVAILABLE_SPACES,
+            { params: { city, type } }
+        );
+        return response.data;
+    }
+
 }
 
 

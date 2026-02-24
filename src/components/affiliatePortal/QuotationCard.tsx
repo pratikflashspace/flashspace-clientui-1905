@@ -27,6 +27,73 @@ const QuotationCard = ({
         Accepted: "bg-emerald-50 text-emerald-600 border-emerald-100",
     };
 
+    const handleDownloadPDF = () => {
+        try {
+            // Dynamically import jsPDF so we don't break SSR or initial bundle if not needed
+            import("jspdf").then(({ default: jsPDF }) => {
+                const doc = new jsPDF();
+
+                // Add Company Header
+                doc.setFontSize(22);
+                doc.setTextColor(91, 176, 156); // #5bb09c
+                doc.text("FlashSpace", 105, 20, { align: "center" });
+
+                doc.setFontSize(16);
+                doc.setTextColor(40, 40, 40);
+                doc.text("Quotation", 105, 30, { align: "center" });
+
+                // Add Line separator
+                doc.setDrawColor(200, 200, 200);
+                doc.line(20, 35, 190, 35);
+
+                // Add Details
+                doc.setFontSize(12);
+                doc.setTextColor(80, 80, 80);
+
+                const startY = 50;
+                const lineHeight = 10;
+
+                doc.text(`Quotation ID: ${id}`, 20, startY);
+                doc.text(`Date: ${date}`, 140, startY);
+
+                doc.setFont("helvetica", "bold");
+                doc.text("Prepared For:", 20, startY + lineHeight * 2);
+                doc.setFont("helvetica", "normal");
+                doc.text(clientName, 20, startY + lineHeight * 2.6);
+
+                doc.setFont("helvetica", "bold");
+                doc.text("Space Requirements:", 20, startY + lineHeight * 4);
+                doc.setFont("helvetica", "normal");
+                doc.text(spaceDetails, 20, startY + lineHeight * 4.6);
+                doc.text(location, 20, startY + lineHeight * 5.2);
+
+                // Total Box
+                doc.setFillColor(242, 250, 249); // bg-[#f2faf9] approximate
+                doc.roundedRect(20, startY + lineHeight * 7, 170, 25, 3, 3, "F");
+
+                doc.setFontSize(14);
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(91, 176, 156);
+                doc.text("Total Amount:", 25, startY + lineHeight * 8.6);
+
+                doc.setFontSize(18);
+                doc.setTextColor(40, 40, 40);
+                doc.text(price, 185, startY + lineHeight * 8.6, { align: "right" });
+
+                // Footer
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(150, 150, 150);
+                doc.text("Thank you for choosing FlashSpace. This is a system generated quotation.", 105, 280, { align: "center" });
+
+                // Save PDF
+                doc.save(`Quotation_${id}.pdf`);
+            });
+        } catch (error) {
+            console.error("Failed to generate PDF:", error);
+        }
+    };
+
     return (
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative transition-all hover:border-[#5bb09c]/30">
             {/* Top Row: ID and Status Badge */}
@@ -68,14 +135,15 @@ const QuotationCard = ({
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50"
+                        className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
                     >
                         <Share2 className="w-4 h-4" />
                     </Button>
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50"
+                        className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
+                        onClick={handleDownloadPDF}
                     >
                         <Download className="w-4 h-4" />
                     </Button>
