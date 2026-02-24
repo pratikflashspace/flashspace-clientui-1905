@@ -1,7 +1,14 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
-import { Invoice } from "@/types/services";
+import { Invoice, KYCDocument } from "@/types/services";
+
+// Define a type extension for jsPDF to include autoTable methods and properties
+interface jsPDFWithAutoTable extends jsPDF {
+    lastAutoTable?: {
+        finalY: number;
+    };
+}
 
 /**
  * Utility function to generate a well-formatted PDF invoice
@@ -129,7 +136,7 @@ export const generateInvoicePDF = (invoice: Invoice) => {
         }
     });
 
-    const finalY = (doc as any).lastAutoTable.finalY + 10;
+    const finalY = (doc as jsPDFWithAutoTable).lastAutoTable?.finalY ? (doc as jsPDFWithAutoTable).lastAutoTable!.finalY + 10 : 130;
 
     // Invoice Summary Section (Bottom Right)
     const summaryX = 130;
