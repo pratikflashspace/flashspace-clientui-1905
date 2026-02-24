@@ -189,6 +189,7 @@ const AffiliateClientManagement: React.FC = () => {
                             <thead>
                                 <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
                                     <th className="px-5 py-3">Client</th>
+                                    <th className="px-5 py-3">Booking ID</th>
                                     <th className="px-5 py-3">Space</th>
                                     <th className="px-5 py-3">Plan / Tenure</th>
                                     <th className="px-5 py-3">Paid</th>
@@ -204,6 +205,13 @@ const AffiliateClientManagement: React.FC = () => {
                                         <td className="px-5 py-4">
                                             <p className="font-semibold text-slate-800">{c.user.fullName}</p>
                                             <p className="text-xs text-gray-400">{c.user.email}</p>
+                                        </td>
+
+                                        {/* Booking Number */}
+                                        <td className="px-5 py-4">
+                                            <span className="font-mono text-xs bg-slate-50 border border-slate-100 px-2 py-0.5 rounded text-slate-600">
+                                                {c.bookingNumber}
+                                            </span>
                                         </td>
 
                                         {/* Space */}

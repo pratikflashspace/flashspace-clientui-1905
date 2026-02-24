@@ -51,12 +51,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             path: "/affiliate-portal/client-management",
         },
         {
-            name: "Booking Management",
-            icon: Users,
-            section: "main",
-            path: "/affiliate-portal/booking-management",
-        },
-        {
             name: "Revenue Dashboard",
             icon: LineChart,
             section: "main",
