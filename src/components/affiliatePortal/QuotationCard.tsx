@@ -27,68 +27,151 @@ const QuotationCard = ({
         Accepted: "bg-emerald-50 text-emerald-600 border-emerald-100",
     };
 
-    const handleDownloadPDF = () => {
+    const handleDownloadPDF = async () => {
         try {
             // Dynamically import jsPDF so we don't break SSR or initial bundle if not needed
-            import("jspdf").then(({ default: jsPDF }) => {
-                const doc = new jsPDF();
+            const { default: jsPDF } = await import("jspdf");
+            const doc = new jsPDF();
 
-                // Add Company Header
-                doc.setFontSize(22);
+            const loadImage = (url: string): Promise<HTMLImageElement> => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = 'Anonymous';
+                    img.onload = () => resolve(img);
+                    img.onerror = (e) => reject(e);
+                    img.src = url;
+                });
+            };
+
+            let logo: HTMLImageElement | null = null;
+            try {
+                logo = await loadImage('/Logo/Flashspace Logo.png');
+            } catch (err) {
+                console.warn("Could not load logo for PDF", err);
+            }
+
+            // Header Section
+            if (logo) {
+                const imgWidth = 45;
+                const imgHeight = (logo.height * imgWidth) / logo.width;
+                doc.addImage(logo, 'PNG', 20, 15, imgWidth, imgHeight);
+            } else {
+                doc.setFontSize(24);
                 doc.setTextColor(91, 176, 156); // #5bb09c
-                doc.text("FlashSpace", 105, 20, { align: "center" });
-
-                doc.setFontSize(16);
-                doc.setTextColor(40, 40, 40);
-                doc.text("Quotation", 105, 30, { align: "center" });
-
-                // Add Line separator
-                doc.setDrawColor(200, 200, 200);
-                doc.line(20, 35, 190, 35);
-
-                // Add Details
-                doc.setFontSize(12);
-                doc.setTextColor(80, 80, 80);
-
-                const startY = 50;
-                const lineHeight = 10;
-
-                doc.text(`Quotation ID: ${id}`, 20, startY);
-                doc.text(`Date: ${date}`, 140, startY);
-
                 doc.setFont("helvetica", "bold");
-                doc.text("Prepared For:", 20, startY + lineHeight * 2);
-                doc.setFont("helvetica", "normal");
-                doc.text(clientName, 20, startY + lineHeight * 2.6);
+                doc.text("FlashSpace", 20, 25);
+            }
 
-                doc.setFont("helvetica", "bold");
-                doc.text("Space Requirements:", 20, startY + lineHeight * 4);
-                doc.setFont("helvetica", "normal");
-                doc.text(spaceDetails, 20, startY + lineHeight * 4.6);
-                doc.text(location, 20, startY + lineHeight * 5.2);
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont("helvetica", "normal");
+            doc.text("www.flashspace.in", 190, 20, { align: "right" });
+            doc.text("hello@flashspace.in", 190, 25, { align: "right" });
 
-                // Total Box
-                doc.setFillColor(242, 250, 249); // bg-[#f2faf9] approximate
-                doc.roundedRect(20, startY + lineHeight * 7, 170, 25, 3, 3, "F");
+            // Title
+            doc.setFontSize(28);
+            doc.setTextColor(40, 40, 40);
+            doc.setFont("helvetica", "bold");
+            doc.text("QUOTATION", 190, 45, { align: "right" });
 
-                doc.setFontSize(14);
-                doc.setFont("helvetica", "bold");
-                doc.setTextColor(91, 176, 156);
-                doc.text("Total Amount:", 25, startY + lineHeight * 8.6);
+            // Line separator
+            doc.setDrawColor(91, 176, 156);
+            doc.setLineWidth(0.5);
+            doc.line(20, 55, 190, 55);
 
-                doc.setFontSize(18);
-                doc.setTextColor(40, 40, 40);
-                doc.text(price, 185, startY + lineHeight * 8.6, { align: "right" });
+            // Meta details
+            doc.setFontSize(10);
+            doc.setTextColor(80, 80, 80);
+            const startY = 70;
 
-                // Footer
-                doc.setFontSize(10);
-                doc.setFont("helvetica", "normal");
-                doc.setTextColor(150, 150, 150);
-                doc.text("Thank you for choosing FlashSpace. This is a system generated quotation.", 105, 280, { align: "center" });
+            doc.setFont("helvetica", "bold");
+            doc.text("Quotation No:", 20, startY);
+            doc.setFont("helvetica", "normal");
+            doc.text(id, 50, startY);
 
-                // Save PDF
-                doc.save(`Quotation_${id}.pdf`);
-            });
+            doc.setFont("helvetica", "bold");
+            doc.text("Date:", 140, startY);
+            doc.setFont("helvetica", "normal");
+            doc.text(date, 155, startY);
+
+            // Client Details Box
+            doc.setFillColor(249, 250, 251);
+            doc.roundedRect(20, startY + 15, 80, 40, 3, 3, "F");
+
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(40, 40, 40);
+            doc.text("Prepared For:", 25, startY + 25);
+
+            doc.setFontSize(12);
+            doc.setTextColor(91, 176, 156);
+            doc.text(clientName, 25, startY + 35);
+
+            // Space Details Box
+            doc.setFillColor(249, 250, 251);
+            doc.roundedRect(110, startY + 15, 80, 40, 3, 3, "F");
+
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(40, 40, 40);
+            doc.text("Space Requirements:", 115, startY + 25);
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(80, 80, 80);
+
+            const splitDetails = doc.splitTextToSize(spaceDetails, 70);
+            doc.text(splitDetails, 115, startY + 35);
+            doc.text(location, 115, startY + 35 + (splitDetails.length * 5));
+
+            // Pricing Section
+            const tableY = startY + 75;
+
+            // Table Header
+            doc.setFillColor(91, 176, 156);
+            doc.rect(20, tableY, 170, 12, "F");
+
+            doc.setFontSize(10);
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.text("Description", 25, tableY + 8);
+            doc.text("Total", 185, tableY + 8, { align: "right" });
+
+            // Table Row
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(230, 230, 230);
+            doc.rect(20, tableY + 12, 170, 20);
+
+            doc.setTextColor(60, 60, 60);
+            doc.setFont("helvetica", "normal");
+            doc.text("Office Space Rental - As per requirements", 25, tableY + 24);
+
+            // Avoid missing char encoding issues in jsPDF default fonts
+            const safePrice = price.replace('₹', 'INR ');
+            doc.setFont("helvetica", "bold");
+            doc.text(safePrice, 185, tableY + 24, { align: "right" });
+
+            // Total Box
+            doc.setFillColor(242, 250, 249);
+            doc.rect(20, tableY + 32, 170, 20, "F");
+
+            doc.setFontSize(14);
+            doc.setTextColor(40, 40, 40);
+            doc.text("Net Total Amount:", 120, tableY + 45);
+
+            doc.setTextColor(91, 176, 156);
+            doc.setFontSize(16);
+            doc.text(safePrice, 185, tableY + 45, { align: "right" });
+
+            // Footer
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "italic");
+            doc.setTextColor(150, 150, 150);
+            doc.text("Thank you for choosing FlashSpace.", 105, 275, { align: "center" });
+            doc.text("This is a system generated quotation and does not require a signature.", 105, 280, { align: "center" });
+
+            // Save PDF
+            doc.save(`Quotation_${id}.pdf`);
         } catch (error) {
             console.error("Failed to generate PDF:", error);
         }
