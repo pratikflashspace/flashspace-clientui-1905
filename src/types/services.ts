@@ -1,4 +1,5 @@
 // Common types for all services
+import { Review } from "./review";
 export interface City {
   name: string;
   key: string;
@@ -235,7 +236,13 @@ export interface SpaceSnapshot {
   coordinates?: { lat: number; lng: number };
 }
 
-export type BookingType = "virtual_office" | "coworking_space";
+export type BookingType =
+  | "virtual_office"
+  | "coworking_space"
+  | "meeting_room"
+  | "VirtualOffice"
+  | "CoworkingSpace"
+  | "MeetingRoom";
 export type BookingStatus =
   | "pending_payment"
   | "pending_kyc"
@@ -276,6 +283,7 @@ export interface Booking {
   daysRemaining?: number;
   autoRenew?: boolean;
   features?: string[];
+  existingReview?: Review | null;
   createdAt: string;
 }
 
@@ -440,6 +448,13 @@ export interface ApiResponse<T = any> {
   success: boolean;
   message?: string;
   data?: T;
+  stats?: {
+    total: number;
+    active: number;
+    virtualOffice: number;
+    coworking: number;
+    meetingRoom: number;
+  };
   pagination?: PaginationInfo;
   error?: string;
 }

@@ -25,6 +25,7 @@ export default function Spaces() {
 
   const [statusFilter, setStatusFilter] = useState<SpaceStatus | "ALL">("ALL");
   const [cityFilter, setCityFilter] = useState<string | "ALL">("ALL");
+  const [spaceTypeFilter, setSpaceTypeFilter] = useState<string | "ALL">("ALL");
 
   const [spaces, setSpaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,6 +80,16 @@ export default function Spaces() {
     [cities],
   );
 
+  const typeOptions = useMemo(
+    () => [
+      { label: "All Types", value: "ALL" },
+      { label: "Coworking Space", value: "Coworking Space" },
+      { label: "Virtual Office", value: "Virtual Office" },
+      { label: "Meeting Room", value: "Meeting Room" },
+    ],
+    [],
+  );
+
   /**
    * Filter spaces list based on query + filters.
    */
@@ -96,9 +107,12 @@ export default function Spaces() {
       const matchesCity =
         cityFilter === "ALL" ? true : space.city === cityFilter;
 
-      return matchesQuery && matchesStatus && matchesCity;
+      const matchesType =
+        spaceTypeFilter === "ALL" ? true : space.type === spaceTypeFilter;
+
+      return matchesQuery && matchesStatus && matchesCity && matchesType;
     });
-  }, [normalizedQuery, statusFilter, cityFilter, spaces]);
+  }, [normalizedQuery, statusFilter, cityFilter, spaceTypeFilter, spaces]);
 
   /**
    * Stats (computed once)
@@ -192,6 +206,12 @@ export default function Spaces() {
             value={cityFilter}
             onChange={(val) => setCityFilter(val)}
             options={cityOptions}
+          />
+
+          <SelectBox
+            value={spaceTypeFilter}
+            onChange={(val) => setSpaceTypeFilter(val)}
+            options={typeOptions}
           />
         </div>
       </div>
