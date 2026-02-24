@@ -39,6 +39,7 @@ import Profile from "./Profile";
 import Viewdetails from "./Viewdetails";
 import Notifications from "./Notifications"; // Import the new Notifications component
 import ChatSupport from "./ChatSupport"; // Import ChatSupport
+import Documents from "./Documents";
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, section: "main", path: "/dashboard" },
@@ -106,7 +107,7 @@ export default function ClientDashboard() {
       case 4: // Payments
         return <Billing />; // Using Billing component for Payments for now
       case 5:
-        return <div className="p-8 text-center text-gray-500">Documents - Coming Soon</div>;
+        return <Documents />;
       case 6: // Chat Support
         return <ChatSupport />;
       case 7: // Notifications
