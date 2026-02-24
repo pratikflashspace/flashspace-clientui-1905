@@ -125,7 +125,7 @@ const PaymentSuccessPage = () => {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              onClick={() => navigate('/bookings')}
+              onClick={() => navigate('/dashboard/my-bookings')}
               className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-3"
             >
               <Calendar className="w-4 h-4 mr-2" />
