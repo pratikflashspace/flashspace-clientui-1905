@@ -1,6 +1,7 @@
 import axiosInstance from "@/lib/axios";
 
 import { API_ENDPOINTS } from "@/config/api.config";
+import { SupportTicket } from "@/types/services";
 
 
 
@@ -233,18 +234,60 @@ class AffiliatePortalService {
 
 
     async getSupportTickets() {
-
-        const response = await axiosInstance.get<ApiResponse<SupportTicketDto[]>>(
-
-            API_ENDPOINTS.AFFILIATE.SUPPORT_TICKETS,
-
+        const response = await axiosInstance.get<ApiResponse<SupportTicket[]>>(
+            "/api/tickets/my-tickets",
         );
-
         return response.data;
-
     }
 
+    async createSupportTicket(data: {
+        subject: string;
+        category: string;
+        priority?: 'low' | 'medium' | 'high';
+        description: string;
+    }): Promise<ApiResponse<any>> {
+        try {
+            const response = await axiosInstance.post<ApiResponse<any>>(
+                "/api/tickets",
+                data
+            );
+            return response.data;
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || "Failed to create ticket"
+            };
+        }
+    }
 
+    async getSupportTicketById(id: string): Promise<ApiResponse<any>> {
+        try {
+            const response = await axiosInstance.get<ApiResponse<any>>(
+                `/api/tickets/${id}`
+            );
+            return response.data;
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || "Failed to fetch ticket"
+            };
+        }
+    }
+
+    async replyToSupportTicket(id: string, message: string): Promise<ApiResponse<any>> {
+        try {
+            const response = await axiosInstance.post<ApiResponse<any>>(
+                `/api/tickets/${id}/reply`,
+                { message }
+            );
+            return response.data;
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || "Failed to send reply"
+            };
+        }
+    }
 
     async getLeaderboard(page = 1, limit = 10) {
         const response = await axiosInstance.get<ApiResponse<LeaderboardResponse>>(
