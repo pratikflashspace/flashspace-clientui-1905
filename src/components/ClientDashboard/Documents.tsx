@@ -6,6 +6,7 @@ import { Invoice, KYCData, KYCDocument } from "@/types/services";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { generateInvoicePDF } from "@/utils/pdfGenerator";
+import { API_CONFIG } from "@/config/api.config";
 
 export default function Documents() {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -286,11 +287,16 @@ export default function Documents() {
                                                 <td className="px-6 py-4 text-right">
                                                     {doc.fileUrl ? (
                                                         <button
-                                                            onClick={() => setPreviewDocument({
-                                                                title: doc.name,
-                                                                url: doc.fileUrl!,
-                                                                type: isPdf(doc.fileUrl!) ? 'pdf' : 'image'
-                                                            })}
+                                                            onClick={() => {
+                                                                const fullUrl = doc.fileUrl!.startsWith("http") || doc.fileUrl!.startsWith("blob:")
+                                                                    ? doc.fileUrl!
+                                                                    : `${API_CONFIG.BASE_URL}${doc.fileUrl!}`;
+                                                                setPreviewDocument({
+                                                                    title: doc.name,
+                                                                    url: fullUrl,
+                                                                    type: isPdf(doc.fileUrl!) ? 'pdf' : 'image'
+                                                                });
+                                                            }}
                                                             className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
                                                         >
                                                             <Eye className="w-4 h-4 text-gray-600" />
