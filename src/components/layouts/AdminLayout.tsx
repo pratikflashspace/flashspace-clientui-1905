@@ -22,7 +22,8 @@ import {
     Ticket,
     Tag,
     Headphones,
-    Trophy
+    Trophy,
+    Network
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -46,6 +47,7 @@ export default function AdminLayout() {
         { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['admin', 'sales'] },
         { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['admin', 'sales'] },
         { icon: Briefcase, label: 'Clients', path: '/admin/clients', roles: ['admin', 'sales'] },
+        { icon: Network, label: 'Affiliate Management', path: '/admin/affiliates', roles: ['admin'] },
         { icon: Tag, label: 'Coupons & Vouchers', path: '/admin/coupons', roles: ['admin', 'sales'] },
         { icon: Users, label: 'User Management', path: '/admin/users', roles: ['admin'] },
         { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['admin', 'partner', 'space_manager'] },
