@@ -122,6 +122,7 @@ export const API_ENDPOINTS = {
     COUPON_GENERATE: '/api/coupons/affiliate/generate',
 
     MY_COUPON: '/api/coupons/affiliate/my-coupon',
+    AVAILABLE_SPACES: '/api/affiliate/spaces',
 
   },
 };
