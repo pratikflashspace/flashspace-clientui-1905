@@ -6,8 +6,18 @@ import {
     Banknote,
     Sparkles,
     ArrowUpRight,
-    DollarSign,
+    Loader2,
 } from "lucide-react";
+import {
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts";
+import { affiliatePortalService, RevenueDashboardStats } from "../../services/affiliatePortal.service";
 
 // --- Custom Hook for Number Counting Animation ---
 const useCountUp = (end: number, duration: number = 2000) => {
@@ -35,7 +45,6 @@ const useCountUp = (end: number, duration: number = 2000) => {
 };
 
 // --- Sub-Component: Animated Counter ---
-// Handles formatting like "₹2.8L" while animating the "2.8" part
 const AnimatedCounter = ({
     value,
     prefix = "",
@@ -47,7 +56,7 @@ const AnimatedCounter = ({
     suffix?: string;
     decimals?: number;
 }) => {
-    const count = useCountUp(value, 1500); // 1.5s duration for smooth count
+    const count = useCountUp(value, 1500);
     return (
         <span>
             {prefix}
@@ -57,105 +66,96 @@ const AnimatedCounter = ({
     );
 };
 
-// --- Sub-Component: Animated Progress Bar ---
-const AnimatedBar = ({
-    percentage,
-    color = "bg-[#5aa39c]",
-}: {
-    percentage: number;
-    color?: string;
-}) => {
-    const [width, setWidth] = useState(0);
-
-    useEffect(() => {
-        // Small delay to ensure render happens before transition
-        const timer = setTimeout(() => {
-            setWidth(percentage);
-        }, 100);
-        return () => clearTimeout(timer);
-    }, [percentage]);
-
-    return (
-        <div className="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden">
-            <div
-                className={`h-full ${color} rounded-full transition-all duration-1000 ease-out`}
-                style={{ width: `${width}%` }}
-            />
-        </div>
-    );
+// --- Custom Tooltip for Area Chart ---
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+                <p className="font-bold text-slate-800 mb-2">{label}</p>
+                <div className="space-y-1">
+                    <p className="text-[#5aa39c] font-medium flex justify-between gap-4">
+                        <span>Earnings:</span>
+                        <span>₹{payload[0].value.toLocaleString()}</span>
+                    </p>
+                    <p className="text-[#8fb6b1] font-medium flex justify-between gap-4">
+                        <span>Clients:</span>
+                        <span>{payload[1].value}</span>
+                    </p>
+                </div>
+            </div>
+        );
+    }
+    return null;
 };
-
-// --- Mock Data ---
-const stats = [
-    {
-        label: "Total Earnings",
-        value: 2.8,
-        prefix: "₹",
-        suffix: "L",
-        decimals: 1,
-        change: "22% from last month",
-        icon: TrendingUp,
-    },
-    {
-        label: "This Month",
-        value: 45,
-        prefix: "₹",
-        suffix: "K",
-        decimals: 0,
-        change: "15% from last month",
-        icon: Wallet,
-    },
-    {
-        label: "Pending Payout",
-        value: 28,
-        prefix: "₹",
-        suffix: "K",
-        decimals: 0,
-        change: null, // No change metric in screenshot
-        icon: Banknote,
-    },
-    {
-        label: "Avg Commission",
-        value: 3.2,
-        prefix: "₹",
-        suffix: "K",
-        decimals: 1,
-        change: "8% from last month",
-        icon: CreditCard,
-    },
-];
-
-const earningsTrend = [
-    { month: "Oct 2023", amount: 18500, deals: 5, width: 40 },
-    { month: "Nov 2023", amount: 24200, deals: 7, width: 55 },
-    { month: "Dec 2023", amount: 32800, deals: 9, width: 70 },
-    { month: "Jan 2024", amount: 45000, deals: 12, width: 100 },
-    { month: "Feb 2024 (MTD)", amount: 28000, deals: 8, width: 60 },
-];
-
-const revenueByProduct = [
-    {
-        product: "Virtual Office Premium",
-        amount: 85000,
-        percent: 35,
-        width: 100,
-    },
-    { product: "Team Space", amount: 62000, percent: 26, width: 75 },
-    {
-        product: "Virtual Office Standard",
-        amount: 48000,
-        percent: 20,
-        width: 58,
-    },
-    { product: "Meeting Rooms", amount: 28000, percent: 12, width: 35 },
-    { product: "Day Pass", amount: 17000, percent: 7, width: 20 },
-];
 
 // --- Main Component ---
 const DashboardRevenue = () => {
+    const [stats, setStats] = useState<RevenueDashboardStats | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await affiliatePortalService.getRevenueDashboardStats();
+                if (res.success && res.data) {
+                    setStats(res.data);
+                }
+            } catch (error) {
+                console.error("Failed to load dashboard stats", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStats();
+    }, []);
+
+    if (loading || !stats) {
+        return (
+            <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4 animate-pulse">
+                    <Loader2 className="w-10 h-10 animate-spin text-[#5aa39c]" />
+                    <p className="text-gray-500 font-medium">Loading your revenue data...</p>
+                </div>
+            </div>
+        );
+    }
+
+    const monthlyEarnings = stats.monthlyEarnings || [];
+
+    const topCards = [
+        {
+            label: "Total Earnings",
+            value: stats.totalEarnings || 0,
+            prefix: "₹",
+            decimals: 2,
+            change: stats.momGrowth ? `${stats.momGrowth > 0 ? "+" : ""}${stats.momGrowth}% MoM` : null,
+            icon: TrendingUp,
+        },
+        {
+            label: "Converted Clients",
+            value: stats.convertedClients || 0,
+            decimals: 0,
+            icon: Wallet,
+        },
+        {
+            label: "Pending Payout",
+            value: stats.pendingPayout || 0,
+            prefix: "₹",
+            decimals: 2,
+            icon: Banknote,
+        },
+        {
+            label: "Commission Rate",
+            value: stats.commissionRate || 15,
+            suffix: "%",
+            decimals: 0,
+            icon: CreditCard,
+        },
+    ];
+
     return (
         <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans w-full animate-fade-in">
-            <div className="w-full space-y-8">
+            <div className="max-w-[1600px] mx-auto space-y-8">
                 {/* 1. Header */}
                 <div className="space-y-2">
                     <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
@@ -165,32 +165,32 @@ const DashboardRevenue = () => {
                         </span>
                     </h1>
                     <p className="text-gray-500 text-lg">
-                        Track your earnings and commission trends
+                        Track your real-time earnings and commission trends
                     </p>
                 </div>
 
                 {/* 2. Top Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {stats.map((stat, idx) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                    {topCards.map((stat, idx) => (
                         <div
                             key={idx}
-                            className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group"
+                            className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 group"
                             style={{ animationDelay: `${idx * 100}ms` }}
                         >
                             <div className="flex justify-between items-start mb-4">
                                 <span className="text-gray-500 font-medium text-sm">
                                     {stat.label}
                                 </span>
-                                <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-[#eaf4f3] transition-colors">
+                                <div className="p-3 bg-gray-50 rounded-xl group-hover:bg-[#eaf4f3] group-hover:scale-110 transition-all duration-500">
                                     <stat.icon
-                                        size={18}
+                                        size={20}
                                         className="text-gray-400 group-hover:text-[#5aa39c] transition-colors"
                                     />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <h3 className="text-4xl font-bold text-slate-900">
+                                <h3 className="text-4xl font-bold text-slate-900 tracking-tight">
                                     <AnimatedCounter
                                         value={stat.value}
                                         prefix={stat.prefix}
@@ -199,8 +199,8 @@ const DashboardRevenue = () => {
                                     />
                                 </h3>
                                 {stat.change && (
-                                    <div className="flex items-center gap-1 text-sm font-medium text-green-600">
-                                        <ArrowUpRight size={14} />
+                                    <div className={`flex items-center gap-1 text-sm font-semibold ${stat.change.includes("-") ? "text-red-500" : "text-emerald-500"}`}>
+                                        <ArrowUpRight size={16} className={stat.change.includes("-") ? "rotate-90 text-red-500" : ""} />
                                         <span>{stat.change}</span>
                                     </div>
                                 )}
@@ -210,81 +210,111 @@ const DashboardRevenue = () => {
                 </div>
 
                 {/* 3. Charts Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Left Chart: Monthly Earnings Trend */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
-                        <h3 className="font-bold text-slate-900 mb-6">
-                            Monthly Earnings Trend
-                        </h3>
-                        <div className="space-y-6">
-                            {earningsTrend.map((item, idx) => (
-                                <div key={idx} className="space-y-2">
-                                    <div className="flex justify-between items-end text-sm">
-                                        <span className="font-medium text-slate-700">
-                                            {item.month}
-                                        </span>
-                                        <div className="flex items-center gap-3">
-                                            <span className="font-bold text-slate-900">
-                                                ₹{item.amount.toLocaleString()}
-                                            </span>
-                                            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full border border-gray-200">
-                                                {item.deals} deals
-                                            </span>
-                                        </div>
-                                    </div>
-                                    {/* Animated Bar */}
-                                    <AnimatedBar percentage={item.width} />
-                                </div>
-                            ))}
+                <div className="grid grid-cols-1 gap-6">
+                    {/* Main Highlight: Full Width Area Chart */}
+                    <div className="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 h-[500px] flex flex-col">
+                        <div className="mb-8">
+                            <h3 className="text-xl font-bold text-slate-900">
+                                Earnings Overview
+                            </h3>
+                            <p className="text-sm text-gray-500 font-medium mt-1">
+                                Last 6 months performance and client acquisition
+                            </p>
                         </div>
-                    </div>
 
-                    {/* Right Chart: Revenue by Product */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
-                        <h3 className="font-bold text-slate-900 mb-6">
-                            Revenue by Product
-                        </h3>
-                        <div className="space-y-6">
-                            {revenueByProduct.map((item, idx) => (
-                                <div key={idx} className="space-y-2">
-                                    <div className="flex justify-between items-end text-sm">
-                                        <span className="font-medium text-slate-700">
-                                            {item.product}
-                                        </span>
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-bold text-slate-900">
-                                                ₹{item.amount.toLocaleString()}
-                                            </span>
-                                            <span className="text-gray-400 text-xs">
-                                                ({item.percent}%)
-                                            </span>
-                                        </div>
-                                    </div>
-                                    {/* Animated Bar */}
-                                    <AnimatedBar percentage={item.width} />
-                                </div>
-                            ))}
+                        <div className="flex-1 w-full min-h-0 relative">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart
+                                    data={monthlyEarnings}
+                                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                                >
+                                    <defs>
+                                        <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#5aa39c" stopOpacity={0.4} />
+                                            <stop offset="95%" stopColor="#5aa39c" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="colorClients" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#94d2bd" stopOpacity={0.2} />
+                                            <stop offset="95%" stopColor="#94d2bd" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis
+                                        dataKey="month"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }}
+                                        dy={10}
+                                    />
+                                    <YAxis
+                                        yAxisId="left"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }}
+                                        tickFormatter={(value) => `₹${value >= 1000 ? (value / 1000).toFixed(0) + 'k' : value}`}
+                                    />
+                                    <YAxis
+                                        yAxisId="right"
+                                        orientation="right"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }}
+                                    />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Area
+                                        yAxisId="left"
+                                        type="monotone"
+                                        dataKey="earnings"
+                                        stroke="#5aa39c"
+                                        strokeWidth={4}
+                                        fillOpacity={1}
+                                        fill="url(#colorEarnings)"
+                                        animationDuration={2000}
+                                        activeDot={{ r: 6, strokeWidth: 0, fill: '#5aa39c' }}
+                                    />
+                                    <Area
+                                        yAxisId="right"
+                                        type="monotone"
+                                        dataKey="clients"
+                                        stroke="#8fb6b1"
+                                        strokeWidth={3}
+                                        fillOpacity={1}
+                                        fill="url(#colorClients)"
+                                        animationDuration={2000}
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
                         </div>
                     </div>
                 </div>
 
                 {/* 4. AI Insight Footer */}
-                <div className="bg-[#eaf4f3]/40 border border-[#5aa39c]/20 p-6 rounded-2xl animate-slide-up relative overflow-hidden">
-                    <div className="flex items-center gap-3 mb-2">
-                        <span className="bg-[#5aa39c] text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                            <Sparkles size={12} fill="white" /> AI Insight
-                        </span>
+                <div className="bg-gradient-to-r from-[#eaf4f3] to-[#f4fafa] border border-[#5aa39c]/20 p-6 lg:p-8 rounded-3xl animate-slide-up relative overflow-hidden shadow-sm">
+                    {/* Decorative blurred blob */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#5aa39c]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+
+                    <div className="relative z-10 w-full flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+                        <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#5aa39c]/10 shrink-0">
+                            <Sparkles className="w-8 h-8 text-[#5aa39c]" />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-3">
+                                <h4 className="font-bold text-slate-900 text-lg">AI Performance Insight</h4>
+                                {stats.momGrowth !== undefined && stats.momGrowth > 0 && (
+                                    <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                                        Growing {stats.momGrowth}% MoM
+                                    </span>
+                                )}
+                            </div>
+                            <p className="text-slate-600 text-base leading-relaxed max-w-4xl">
+                                {stats.momGrowth !== undefined && stats.momGrowth > 0 ? (
+                                    <>Your earnings have grown <strong>{stats.momGrowth}%</strong> compared to last month. You've successfully converted <strong>{stats.convertedClients || 0} clients</strong> so far. Keep up the momentum to maximize your 15% commission rate, and focus on your Hot Leads pipeline to ensure this month's payouts peak.</>
+                                ) : (
+                                    <>You've successfully converted <strong>{stats.convertedClients || 0} clients</strong> and have a 15% recurring commission rate. Focus on engaging your Warm and Hot leads to see Month-over-Month growth.</>
+                                )}
+                            </p>
+                        </div>
                     </div>
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                        Your earnings have grown <strong>43%</strong> over the
-                        last 3 months.{" "}
-                        <span className="font-semibold text-slate-800">
-                            Virtual Office Premium
-                        </span>{" "}
-                        shows the highest conversion rate (68%). Focus on Team
-                        Space promotions to increase revenue share in this
-                        segment.
-                    </p>
                 </div>
             </div>
 
@@ -299,10 +329,10 @@ const DashboardRevenue = () => {
           to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in {
-          animation: fadeIn 0.8s ease-out forwards;
+          animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .animate-slide-up {
-          animation: slideUp 0.8s ease-out forwards;
+          animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
         </div>

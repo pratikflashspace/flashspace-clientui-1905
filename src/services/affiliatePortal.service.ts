@@ -135,6 +135,28 @@ export interface LeaderboardResponse {
     } | null;
 }
 
+export interface MonthlyEarningPoint {
+    month: string;
+    earnings: number;
+    clients: number;
+}
+
+export interface RevenueDashboardStats {
+    totalEarnings: number;
+    convertedClients: number;
+    pendingPayout: number;
+    totalLeads: number;
+    commissionRate: number;
+    monthlyEarnings: MonthlyEarningPoint[];
+    leadsByStatus: {
+        Hot: number;
+        Warm: number;
+        Cold: number;
+        Converted: number;
+    };
+    momGrowth: number;
+}
+
 
 
 class AffiliatePortalService {
@@ -233,16 +255,16 @@ class AffiliatePortalService {
 
 
 
-    async getDashboardStats() {
-
-        const response = await axiosInstance.get<ApiResponse<any>>(
-
+    async getRevenueDashboardStats() {
+        const response = await axiosInstance.get<ApiResponse<RevenueDashboardStats>>(
             API_ENDPOINTS.AFFILIATE.DASHBOARD_STATS,
-
         );
-
         return response.data;
+    }
 
+    // Alias for backward compatibility
+    async getDashboardStats() {
+        return this.getRevenueDashboardStats();
     }
 
 
