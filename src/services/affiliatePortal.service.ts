@@ -158,6 +158,32 @@ export interface RevenueDashboardStats {
     momGrowth: number;
 }
 
+export interface AffiliateInvoice {
+    _id: string;
+    invoiceNumber: string;
+    date: string;
+    client: string;
+    clientAddress: string[];
+    clientGstin: string;
+    amount: number;
+    commission: number;
+    status: "paid" | "pending" | "overdue" | "cancelled";
+    items: {
+        desc: string;
+        qty: number;
+        rate: number;
+        total: number;
+    }[];
+}
+
+export interface AffiliateInvoicesResponse {
+    invoices: AffiliateInvoice[];
+    summary: {
+        totalEarnings: number;
+        totalClients: number;
+    };
+}
+
 
 
 class AffiliatePortalService {
@@ -342,6 +368,20 @@ class AffiliatePortalService {
         const response = await axiosInstance.get<ApiResponse<any[]>>(
             API_ENDPOINTS.AFFILIATE.AVAILABLE_SPACES,
             { params: { city, type } }
+        );
+        return response.data;
+    }
+
+    async getInvoices() {
+        const response = await axiosInstance.get<ApiResponse<AffiliateInvoicesResponse>>(
+            API_ENDPOINTS.AFFILIATE.INVOICES
+        );
+        return response.data;
+    }
+
+    async getInvoiceById(id: string) {
+        const response = await axiosInstance.get<ApiResponse<AffiliateInvoice>>(
+            API_ENDPOINTS.AFFILIATE.INVOICE_BY_ID(id)
         );
         return response.data;
     }
