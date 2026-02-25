@@ -99,7 +99,7 @@ const QuotationCard = ({
             }
 
             // Company Info (Left)
-            let currentY = 35;
+            let currentY = 55;
             doc.setFontSize(10);
             doc.setFont("helvetica", "bold");
             doc.setTextColor(0, 0, 0);
@@ -140,7 +140,7 @@ const QuotationCard = ({
             // ==========================================
             // META DETAILS (Middle)
             // ==========================================
-            currentY = 75;
+            currentY = 85;
 
             // Client details (Left)
             doc.setFontSize(10);
