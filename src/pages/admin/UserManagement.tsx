@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { adminService } from '@/services/admin.service';
+import { useAuth } from '@/contexts/AuthContext';
 import { Search, Shield, MoreVertical, Users, UserCheck, UserPlus, Download, Filter, Trash2, RotateCcw, X, Plus, Mail, Lock, ChevronDown } from 'lucide-react';
 import { toast } from "sonner";
 import {
@@ -19,12 +20,13 @@ interface User {
     id: string;
     fullName: string;
     email: string;
-    role: "user" | "admin" | "support" | "partner" | "sales";
+    role: "user" | "admin" | "support" | "partner" | "sales" | "affiliate" | "super_admin";
     isEmailVerified?: boolean;
     createdAt: string;
 }
 
 export default function UserManagement() {
+    const { user: currentSessionUser } = useAuth();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -40,7 +42,7 @@ export default function UserManagement() {
         fullName: '',
         email: '',
         password: '',
-        role: 'user' as "user" | "admin" | "support" | "partner" | "sales"
+        role: 'user' as "user" | "admin" | "support" | "partner" | "sales" | "super_admin"
     });
 
     useEffect(() => {
@@ -350,10 +352,48 @@ export default function UserManagement() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${roleBadge.className}`}>
-                                            {roleBadge.icon}
-                                            {roleBadge.label}
-                                        </span>
+                                        {viewMode === 'active' ? (
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger className="focus:outline-none">
+                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border hover:opacity-80 transition-opacity ${roleBadge.className}`}>
+                                                        {roleBadge.icon}
+                                                        {roleBadge.label}
+                                                        <ChevronDown className="w-3 h-3 ml-0.5 opacity-70" />
+                                                    </span>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="start" className="w-48 bg-white shadow-lg border border-gray-200 z-[60]">
+                                                    <DropdownMenuLabel className="text-xs font-normal text-gray-500 px-2 py-1.5">Change Role</DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem onClick={() => handleUpdateRole(user, 'user')} className="cursor-pointer">
+                                                        <span>Client</span>
+                                                        {user.role === 'user' && <span className="ml-auto w-2 h-2 rounded-full bg-blue-500"></span>}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleUpdateRole(user, 'partner')} className="cursor-pointer">
+                                                        <span>Space Partner</span>
+                                                        {user.role === 'partner' && <span className="ml-auto w-2 h-2 rounded-full bg-orange-500"></span>}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleUpdateRole(user, 'affiliate')} className="cursor-pointer">
+                                                        <span>Affiliate Partner</span>
+                                                        {user.role === 'affiliate' && <span className="ml-auto w-2 h-2 rounded-full bg-cyan-500"></span>}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleUpdateRole(user, 'admin')} className="cursor-pointer">
+                                                        <span>Admin</span>
+                                                        {user.role === 'admin' && <span className="ml-auto w-2 h-2 rounded-full bg-purple-500"></span>}
+                                                    </DropdownMenuItem>
+                                                    {currentSessionUser?.role === 'super_admin' && (
+                                                        <DropdownMenuItem onClick={() => handleUpdateRole(user, 'super_admin')} className="cursor-pointer">
+                                                            <span>Super Admin</span>
+                                                            {user.role === 'super_admin' && <span className="ml-auto w-2 h-2 rounded-full bg-red-500"></span>}
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        ) : (
+                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${roleBadge.className}`}>
+                                                {roleBadge.icon}
+                                                {roleBadge.label}
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4">
                                         {viewMode === 'deleted' ? (
@@ -532,7 +572,9 @@ export default function UserManagement() {
                                             <option value="partner">Space Partner</option>
                                             <option value="affiliate">Affiliate Partner</option>
                                             <option value="admin">Admin</option>
-                                            <option value="super_admin">Super Admin</option>
+                                            {currentSessionUser?.role === 'super_admin' && (
+                                                <option value="super_admin">Super Admin</option>
+                                            )}
                                         </select>
                                         <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                                             <ChevronDown className="w-5 h-5 text-gray-400" />

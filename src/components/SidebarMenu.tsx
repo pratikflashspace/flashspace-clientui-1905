@@ -243,7 +243,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
         {/* Menu items */}
         <div
           className="flex-1 overflow-y-auto pb-32 flex flex-col overscroll-contain touch-pan-y min-h-0"
-         
+
         >
           <div className="p-5 space-y-2 text-sm tracking-wide flex-1">
             <nav className="space-y-2">
@@ -334,22 +334,32 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
 
                       {/* Action Buttons */}
                       <div className="space-y-2">
-                        {user?.role === 'partner' && (
+                        {user?.role === 'admin' && (
                           <button
-                            onClick={() => handleNavigation("/spaceportal")}
+                            onClick={() => handleNavigation("/admin")}
+                            className="w-full rounded-lg bg-purple-600 text-white font-semibold py-2.5 text-sm hover:bg-purple-700 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm font-poppins"
+                          >
+                            <LayoutDashboard className="w-4 h-4" />
+                            Admin Dashboard
+                          </button>
+                        )}
+
+                        {(user?.role === 'partner' || user?.role === 'affiliate') && (
+                          <button
+                            onClick={() => handleNavigation(user?.role === 'partner' ? "/spaceportal" : "/affiliate-portal")}
                             className="w-full rounded-lg bg-amber-500 text-white font-semibold py-2.5 text-sm hover:bg-amber-600 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm font-poppins"
                           >
                             <Building className="w-4 h-4" />
-                            Your Space Portal
+                            {user?.role === 'partner' ? "Your Space Portal" : "Affiliate Portal"}
                           </button>
                         )}
 
                         <button
                           onClick={() => handleNavigation("/dashboard")}
-                          className="w-full rounded-lg bg-blue-600 text-white font-semibold py-2.5 text-sm hover:bg-blue-700 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm font-poppins"
+                          className="w-full rounded-lg bg-teal-600 text-white font-semibold py-2.5 text-sm hover:bg-teal-700 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm font-poppins"
                         >
                           <LayoutDashboard className="w-4 h-4" />
-                          Go to Dashboard
+                          User Dashboard
                         </button>
 
                         <button

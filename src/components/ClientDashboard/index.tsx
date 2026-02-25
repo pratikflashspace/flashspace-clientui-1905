@@ -8,11 +8,11 @@ import {
   Headphones, // Keep for fallback or remove if unused
   LogOut,
   User,
-  // Building2, // Removing unused
+  Building2,
   ChevronRight,
   Bell,
   Mail,
-  // Users, // Removing unused if replaced
+  Users,
   FileText,
   CalendarCheck, // For Visit Records
   MessageSquare, // For Chat Support
@@ -228,8 +228,38 @@ export default function ClientDashboard() {
             </ul>
           </nav>
 
-          {/* Back to Home Button */}
-          <div className="mt-auto pt-4 border-t border-gray-100">
+          {/* Back to Home Button & Portal Links */}
+          <div className="mt-auto pt-4 border-t border-gray-100 space-y-2">
+            {user?.role && ['super_admin', 'admin', 'sales', 'support', 'affiliate_manager', 'space_partner_manager'].includes(user.role) && (
+              <button
+                onClick={() => navigate('/admin')}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-50 border border-purple-100 rounded-xl text-sm font-semibold text-purple-700 hover:bg-purple-100 transition-all shadow-sm shadow-purple-900/5 group"
+              >
+                <ShieldCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span>Admin Portal</span>
+              </button>
+            )}
+
+            {user?.role === 'partner' && (
+              <button
+                onClick={() => navigate('/spaceportal')}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-50 border border-orange-100 rounded-xl text-sm font-semibold text-orange-700 hover:bg-orange-100 transition-all shadow-sm shadow-orange-900/5 group"
+              >
+                <Building2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span>Partner Portal</span>
+              </button>
+            )}
+
+            {user?.role === 'affiliate' && (
+              <button
+                onClick={() => navigate('/affiliate-portal')}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-50 border border-cyan-100 rounded-xl text-sm font-semibold text-cyan-700 hover:bg-cyan-100 transition-all shadow-sm shadow-cyan-900/5 group"
+              >
+                <Users className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span>Affiliate Portal</span>
+              </button>
+            )}
+
             <button
               onClick={() => navigate('/')}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"

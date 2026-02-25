@@ -30,8 +30,9 @@ export default function TeamManagement() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filter, setFilter] = useState('all'); // default to all for Team Management
+    const [filter, setFilter] = useState('all');
     const [viewMode, setViewMode] = useState<'active' | 'deleted'>('active');
+    const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
     const [stats, setStats] = useState({ total: 0, verified: 0, newThisMonth: 0 });
 
     // Add User Modal State
@@ -45,19 +46,32 @@ export default function TeamManagement() {
     });
 
     useEffect(() => {
-        fetchUsers();
-    }, [viewMode]);
+        const timer = setTimeout(() => {
+            fetchUsers(1);
+        }, 500);
 
-    const fetchUsers = async () => {
+        return () => clearTimeout(timer);
+    }, [searchTerm, filter, viewMode]);
+
+    const fetchUsers = async (page = pagination.page) => {
         setLoading(true);
         try {
-            const response = await adminService.getAllUsers({ deleted: viewMode === 'deleted' });
+            const response = await adminService.getAllUsers({
+                deleted: viewMode === 'deleted',
+                search: searchTerm,
+                role: filter === 'all' ? 'team' : filter,
+                page: page,
+                limit: 10
+            });
             if (response.success && response.data) {
-                // Filter users to ONLY include team roles for this dashboard.
-                // explicitly isolating space and affiliate partners into their own tables.
-                const teamRoles = ['super_admin', 'admin', 'space_partner_manager', 'affiliate_manager', 'sales', 'support'];
-                const teamMembers = (response.data.users || []).filter(u => teamRoles.includes(u.role)).map(u => ({ ...u, id: u.id || u._id }));
-                setUsers(teamMembers as User[]);
+                const mappedUsers = (response.data.users || [])
+                    .map(u => ({
+                        ...u,
+                        id: u.id || u._id
+                    }))
+                    .filter(u => u.role !== 'super_admin');
+                setUsers(mappedUsers as User[]);
+                setPagination(response.data.pagination || { page: 1, pages: 1, total: 0 });
                 if (response.data.stats) {
                     setStats(response.data.stats);
                 }
@@ -140,18 +154,10 @@ export default function TeamManagement() {
         }
     };
 
-    const filteredUsers = users.filter(user => {
-        const matchesSearch = user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesFilter = filter === 'all' ? true :
-            filter === 'verified' ? user.isEmailVerified :
-                filter === 'unverified' ? !user.isEmailVerified :
-                    user.role === filter;
-        return matchesSearch && matchesFilter;
-    });
+    const filteredUsers = users; // Server-side filtering now
 
     // Stats are now fetched from backend to support server-side pagination
-    const displayTotal = viewMode === 'active' ? stats.total : users.length;
+    const displayTotal = viewMode === 'active' ? stats.total : pagination.total;
     const verifiedUsersCount = stats.verified;
     const newUsersCount = stats.newThisMonth;
 
@@ -353,10 +359,53 @@ export default function TeamManagement() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${roleBadge.className}`}>
-                                                {roleBadge.icon}
-                                                {roleBadge.label}
-                                            </span>
+                                            {viewMode === 'active' ? (
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger className="focus:outline-none">
+                                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border hover:opacity-80 transition-opacity ${roleBadge.className}`}>
+                                                            {roleBadge.icon}
+                                                            {roleBadge.label}
+                                                            {/* Only Super Admins can change other Super Admins. Hide chevron for Super Admin role if current user is not Super Admin */}
+                                                            {!(user.role === 'super_admin' && currentSessionUser?.role !== 'super_admin') && (
+                                                                <ChevronDown className="w-3 h-3 ml-0.5 opacity-70" />
+                                                            )}
+                                                        </span>
+                                                    </DropdownMenuTrigger>
+
+                                                    {/* Conditional rendering for content: don't show menu if trying to edit a super admin without being one */}
+                                                    {!(user.role === 'super_admin' && currentSessionUser?.role !== 'super_admin') && (
+                                                        <DropdownMenuContent align="start" className="w-56 bg-white shadow-lg border border-gray-200 z-[60]">
+                                                            <DropdownMenuLabel className="text-xs font-normal text-gray-500 px-2 py-1.5">Change Internal Role</DropdownMenuLabel>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem onClick={() => handleUpdateRole(user, 'sales')} className="cursor-pointer">
+                                                                <span>Sales Team</span>
+                                                                {user.role === 'sales' && <span className="ml-auto w-2 h-2 rounded-full bg-green-500"></span>}
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleUpdateRole(user, 'support')} className="cursor-pointer">
+                                                                <span>Support Team</span>
+                                                                {user.role === 'support' && <span className="ml-auto w-2 h-2 rounded-full bg-sky-500"></span>}
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleUpdateRole(user, 'affiliate_manager')} className="cursor-pointer">
+                                                                <span>Affiliate Manager</span>
+                                                                {user.role === 'affiliate_manager' && <span className="ml-auto w-2 h-2 rounded-full bg-cyan-500"></span>}
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleUpdateRole(user, 'space_partner_manager')} className="cursor-pointer">
+                                                                <span>Space Partner Manager</span>
+                                                                {user.role === 'space_partner_manager' && <span className="ml-auto w-2 h-2 rounded-full bg-orange-500"></span>}
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => handleUpdateRole(user, 'admin')} className="cursor-pointer">
+                                                                <span>Admin</span>
+                                                                {user.role === 'admin' && <span className="ml-auto w-2 h-2 rounded-full bg-purple-500"></span>}
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    )}
+                                                </DropdownMenu>
+                                            ) : (
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${roleBadge.className}`}>
+                                                    {roleBadge.icon}
+                                                    {roleBadge.label}
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4">
                                             {viewMode === 'deleted' ? (
@@ -468,6 +517,31 @@ export default function TeamManagement() {
                 </div>
             </div >
 
+            {/* Pagination */}
+            <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-6 rounded-3xl border border-gray-100 shadow-sm gap-4">
+                <p className="text-sm text-gray-500 font-medium font-sans">
+                    Showing page <span className="text-gray-900 font-bold">{pagination.page}</span> of <span className="text-gray-900 font-bold">{pagination.pages}</span>
+                    <span className="mx-2 text-gray-300">|</span>
+                    Total <span className="text-gray-900 font-bold">{pagination.total}</span> team members
+                </p>
+                <div className="flex gap-2">
+                    <button
+                        disabled={pagination.page <= 1}
+                        onClick={() => fetchUsers(pagination.page - 1)}
+                        className="px-5 py-2.5 bg-gray-50 text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold text-sm hover:border-gray-300"
+                    >
+                        Previous
+                    </button>
+                    <button
+                        disabled={pagination.page >= pagination.pages}
+                        onClick={() => fetchUsers(pagination.page + 1)}
+                        className="px-5 py-2.5 bg-gray-100 text-gray-900 border border-gray-200 rounded-xl hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold text-sm border-transparent hover:shadow-sm"
+                    >
+                        Next
+                    </button>
+                </div>
+            </div>
+
             {/* Add User Modal */}
             {/* Add User Modal */}
             {
@@ -570,9 +644,6 @@ export default function TeamManagement() {
                                                 <option value="space_partner_manager">Space Partner Manager</option>
                                                 <option value="affiliate_manager">Affiliate Manager</option>
                                                 <option value="admin">Admin</option>
-                                                {currentSessionUser?.role === 'super_admin' && (
-                                                    <option value="super_admin">Super Admin</option>
-                                                )}
                                             </select>
                                             <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                                                 <ChevronDown className="w-4 h-4 text-gray-400" />

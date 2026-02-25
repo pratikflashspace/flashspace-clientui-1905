@@ -1,7 +1,7 @@
 import React from "react";
-import { X, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, LogOut, LayoutDashboard, Home } from "lucide-react";
 import { sidebarConfig } from "./SidebarConfig";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 type SidebarItemProps = {
   icon: React.ReactNode;
@@ -17,10 +17,9 @@ function SidebarItem({ icon, label, to, collapsed }: SidebarItemProps) {
       title={label}
       aria-label={label}
       className={({ isActive }) =>
-        `flex w-full items-center rounded-xl text-left text-sm font-semibold transition ${
-          isActive
-            ? "bg-[#3FA69E] text-white shadow-sm"
-            : "text-slate-600 hover:bg-slate-100"
+        `flex w-full items-center rounded-xl text-left text-sm font-semibold transition ${isActive
+          ? "bg-[#3FA69E] text-white shadow-sm"
+          : "text-slate-600 hover:bg-slate-100"
         } ${collapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"}`
       }
     >
@@ -47,11 +46,11 @@ export default function Sidebar({
   isCollapsed = false,
   onToggleCollapse,
 }: SidebarProps) {
+  const navigate = useNavigate();
   return (
     <aside
-      className={`flex h-screen flex-col overflow-hidden border-r border-slate-200 bg-white py-6 transition-[width,padding] duration-200 ${
-        isCollapsed ? "w-20 px-3" : "w-72 px-4"
-      }`}
+      className={`flex h-screen flex-col overflow-hidden border-r border-slate-200 bg-white py-6 transition-[width,padding] duration-200 ${isCollapsed ? "w-20 px-3" : "w-72 px-4"
+        }`}
     >
       {/* Logo */}
       {isCollapsed ? (
@@ -147,14 +146,32 @@ export default function Sidebar({
 
 
       {/* Bottom */}
-      {isCollapsed ? null : (
-        <div className="mt-auto pt-6 text-sm text-slate-500">
-          <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-semibold hover:bg-slate-50">
-            <LogOut size={16} />
-            <span>Logout</span>
-          </button>
-        </div>
-      )}
+      <div className="mt-auto pt-6 flex flex-col gap-2">
+        {!isCollapsed && (
+          <>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-50 border border-teal-100 px-4 py-3 font-semibold text-teal-700 hover:bg-teal-100 transition-colors"
+            >
+              <LayoutDashboard size={16} className="text-teal-600" />
+              <span>User Dashboard</span>
+            </button>
+
+            <button
+              onClick={() => navigate('/')}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+            >
+              <Home size={16} />
+              <span>Back to Home</span>
+            </button>
+          </>
+        )}
+
+        <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-semibold text-red-500 hover:bg-red-50 transition-colors">
+          <LogOut size={16} />
+          {!isCollapsed && <span>Logout</span>}
+        </button>
+      </div>
     </aside>
   );
 }
