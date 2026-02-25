@@ -362,6 +362,19 @@ export interface Invoice {
   dueDate?: string;
   paidAt?: string;
   createdAt: string;
+  user?: {
+    _id?: string;
+    name?: string;
+    fullName?: string;
+    email?: string;
+    phoneNumber?: string;
+  };
+  lineItems?: Array<{
+    description: string;
+    quantity: number;
+    rate: number;
+    amount: number;
+  }>;
 }
 
 export interface InvoicesSummary {
@@ -387,7 +400,7 @@ export type TicketStatus =
   | "waiting_customer";
 
 export interface TicketMessage {
-  sender: "user" | "support" | "admin";
+  sender: "user" | "support" | "admin" | "affiliate";
   senderName?: string;
   message: string;
   attachments?: string[];

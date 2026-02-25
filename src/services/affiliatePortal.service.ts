@@ -1,6 +1,7 @@
 import axiosInstance from "@/lib/axios";
 
 import { API_ENDPOINTS } from "@/config/api.config";
+import { SupportTicket } from "@/types/services";
 
 
 
@@ -135,6 +136,54 @@ export interface LeaderboardResponse {
     } | null;
 }
 
+export interface MonthlyEarningPoint {
+    month: string;
+    earnings: number;
+    clients: number;
+}
+
+export interface RevenueDashboardStats {
+    totalEarnings: number;
+    convertedClients: number;
+    pendingPayout: number;
+    totalLeads: number;
+    commissionRate: number;
+    monthlyEarnings: MonthlyEarningPoint[];
+    leadsByStatus: {
+        Hot: number;
+        Warm: number;
+        Cold: number;
+        Converted: number;
+    };
+    momGrowth: number;
+}
+
+export interface AffiliateInvoice {
+    _id: string;
+    invoiceNumber: string;
+    date: string;
+    client: string;
+    clientAddress: string[];
+    clientGstin: string;
+    amount: number;
+    commission: number;
+    status: "paid" | "pending" | "overdue" | "cancelled";
+    items: {
+        desc: string;
+        qty: number;
+        rate: number;
+        total: number;
+    }[];
+}
+
+export interface AffiliateInvoicesResponse {
+    invoices: AffiliateInvoice[];
+    summary: {
+        totalEarnings: number;
+        totalClients: number;
+    };
+}
+
 
 
 class AffiliatePortalService {
@@ -211,18 +260,60 @@ class AffiliatePortalService {
 
 
     async getSupportTickets() {
-
-        const response = await axiosInstance.get<ApiResponse<SupportTicketDto[]>>(
-
-            API_ENDPOINTS.AFFILIATE.SUPPORT_TICKETS,
-
+        const response = await axiosInstance.get<ApiResponse<SupportTicket[]>>(
+            "/api/tickets/my-tickets",
         );
-
         return response.data;
-
     }
 
+    async createSupportTicket(data: {
+        subject: string;
+        category: string;
+        priority?: 'low' | 'medium' | 'high';
+        description: string;
+    }): Promise<ApiResponse<any>> {
+        try {
+            const response = await axiosInstance.post<ApiResponse<any>>(
+                "/api/tickets",
+                data
+            );
+            return response.data;
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || "Failed to create ticket"
+            };
+        }
+    }
 
+    async getSupportTicketById(id: string): Promise<ApiResponse<any>> {
+        try {
+            const response = await axiosInstance.get<ApiResponse<any>>(
+                `/api/tickets/${id}`
+            );
+            return response.data;
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || "Failed to fetch ticket"
+            };
+        }
+    }
+
+    async replyToSupportTicket(id: string, message: string): Promise<ApiResponse<any>> {
+        try {
+            const response = await axiosInstance.post<ApiResponse<any>>(
+                `/api/tickets/${id}/reply`,
+                { message }
+            );
+            return response.data;
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || "Failed to send reply"
+            };
+        }
+    }
 
     async getLeaderboard(page = 1, limit = 10) {
         const response = await axiosInstance.get<ApiResponse<LeaderboardResponse>>(
@@ -233,16 +324,16 @@ class AffiliatePortalService {
 
 
 
-    async getDashboardStats() {
-
-        const response = await axiosInstance.get<ApiResponse<any>>(
-
+    async getRevenueDashboardStats() {
+        const response = await axiosInstance.get<ApiResponse<RevenueDashboardStats>>(
             API_ENDPOINTS.AFFILIATE.DASHBOARD_STATS,
-
         );
-
         return response.data;
+    }
 
+    // Alias for backward compatibility
+    async getDashboardStats() {
+        return this.getRevenueDashboardStats();
     }
 
 
@@ -269,6 +360,28 @@ class AffiliatePortalService {
     async getMyCoupon() {
         const response = await axiosInstance.get<ApiResponse<any>>(
             API_ENDPOINTS.AFFILIATE.MY_COUPON
+        );
+        return response.data;
+    }
+
+    async getAvailableSpaces(city: string, type: string) {
+        const response = await axiosInstance.get<ApiResponse<any[]>>(
+            API_ENDPOINTS.AFFILIATE.AVAILABLE_SPACES,
+            { params: { city, type } }
+        );
+        return response.data;
+    }
+
+    async getInvoices() {
+        const response = await axiosInstance.get<ApiResponse<AffiliateInvoicesResponse>>(
+            API_ENDPOINTS.AFFILIATE.INVOICES
+        );
+        return response.data;
+    }
+
+    async getInvoiceById(id: string) {
+        const response = await axiosInstance.get<ApiResponse<AffiliateInvoice>>(
+            API_ENDPOINTS.AFFILIATE.INVOICE_BY_ID(id)
         );
         return response.data;
     }
