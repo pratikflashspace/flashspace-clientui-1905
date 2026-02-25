@@ -471,7 +471,8 @@ const MyBookings: React.FC = () => {
                         <PopoverContent className="w-48 p-1 bg-white" align="end">
                           {booking.status === "pending_kyc" && (
                             <button
-                              onClick={() => navigate(`/dashboard/kyc-verification?linkBookingId=${booking._id}`)}
+                              // onClick={() => navigate(`/dashboard/kyc-verification?linkBookingId=${booking._id}`)}
+                              onClick={()=>navigate('/dashboard/profile')}
                               className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
                             >
                               <ShieldCheck className="w-4 h-4" /> Verify KYC
