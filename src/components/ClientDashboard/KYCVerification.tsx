@@ -159,7 +159,6 @@ export default function KYCVerification() {
           const data = response.data as KYCData;
           setKycData(data);
 
-<<<<<<< HEAD
           // Detect if this is a partner profile (handling both nested and flat structures)
           const isPartner =
             data.isPartner ||
@@ -175,11 +174,6 @@ export default function KYCVerification() {
           } else {
             setIsPartnerMode(false);
           }
-=======
-          // Detect if this is a partner profile
-          const isPartnerProfile = data.isPartner || (data.kycType === 'individual' && data.personalInfo?.fullName && data.personalInfo.fullName !== user?.fullName);
-          setIsPartnerMode(!!isPartnerProfile);
->>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
 
           setBusinessForm({
             profileName: data.profileName || "",
@@ -192,7 +186,6 @@ export default function KYCVerification() {
             partners: data.businessInfo?.partners || [],
           });
 
-<<<<<<< HEAD
           // Pre-fill personal form if exist (handling both nested and flat structures)
           setPersonalForm((prev) => {
             const info = data.personalInfo || {};
@@ -203,8 +196,8 @@ export default function KYCVerification() {
               dateOfBirth:
                 info.dateOfBirth || flatData.dob
                   ? new Date(info.dateOfBirth || flatData.dob)
-                    .toISOString()
-                    .split("T")[0]
+                      .toISOString()
+                      .split("T")[0]
                   : "",
               aadhaar:
                 prev.aadhaar ||
@@ -216,18 +209,6 @@ export default function KYCVerification() {
               email: info.email || flatData.email || user?.email || "",
             };
           });
-=======
-          // Pre-fill personal form if exist
-          setPersonalForm(prev => ({
-            phone: data.personalInfo?.phone || user?.phoneNumber || "",
-            dateOfBirth: data.personalInfo?.dateOfBirth ? new Date(data.personalInfo.dateOfBirth).toISOString().split('T')[0] : "",
-            aadhaar: prev.aadhaar || data.personalInfo?.aadhaarNumber || "",  // Keep existing value or use full number
-            pan: data.personalInfo?.panNumber || "",
-            fullName: data.personalInfo?.fullName || "",
-            // For partners, do not fall back to logged-in user's email
-            email: data.personalInfo?.email || (isPartnerProfile ? "" : (user?.email || "")),
-          }));
->>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
 
           if (data.kycType) {
             setKycType(data.kycType as KYCType);
@@ -376,7 +357,6 @@ export default function KYCVerification() {
         personalAadhaar: personalForm.aadhaar,
         personalPan: personalForm.pan,
         personalFullName: personalForm.fullName,
-        personalEmail: personalForm.email,
         partners: businessForm.partners, // Include selected partners
       });
 
@@ -551,7 +531,6 @@ export default function KYCVerification() {
 
   // Step validation functions
   const isPersonalInfoComplete = () => {
-<<<<<<< HEAD
     if (isPartnerMode && !personalForm.fullName) return false;
     return !!(
       personalForm.phone &&
@@ -559,10 +538,6 @@ export default function KYCVerification() {
       personalForm.aadhaar &&
       personalForm.pan
     );
-=======
-    if (isPartnerMode && (!personalForm.fullName || !personalForm.email)) return false;
-    return !!(personalForm.phone && personalForm.dateOfBirth && personalForm.aadhaar && personalForm.pan);
->>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
   };
 
   const isBusinessInfoComplete = () => {
@@ -691,45 +666,45 @@ export default function KYCVerification() {
   const requiredDocTypes =
     kycType === "individual"
       ? [
-        {
-          type: "pan_card",
-          name: "PAN Card",
-          description: "Individual PAN Card",
-          required: true,
-        },
-        {
-          type: "aadhaar",
-          name: "Aadhaar Card",
-          description: "Aadhaar Card (Front & Back)",
-          required: true,
-        },
-      ]
+          {
+            type: "pan_card",
+            name: "PAN Card",
+            description: "Individual PAN Card",
+            required: true,
+          },
+          {
+            type: "aadhaar",
+            name: "Aadhaar Card",
+            description: "Aadhaar Card (Front & Back)",
+            required: true,
+          },
+        ]
       : [
-        {
-          type: "pan_card",
-          name: "PAN Card",
-          description: "Company PAN Card",
-          required: true,
-        },
-        {
-          type: "gst_certificate",
-          name: "GST Certificate",
-          description: "GST Registration Certificate",
-          required: true,
-        },
-        {
-          type: "coi",
-          name: "Certificate of Incorporation",
-          description: "Company incorporation certificate",
-          required: false,
-        },
-        {
-          type: "address_proof",
-          name: "Address Proof",
-          description: "Utility bill or rent agreement",
-          required: true,
-        },
-      ];
+          {
+            type: "pan_card",
+            name: "PAN Card",
+            description: "Company PAN Card",
+            required: true,
+          },
+          {
+            type: "gst_certificate",
+            name: "GST Certificate",
+            description: "GST Registration Certificate",
+            required: true,
+          },
+          {
+            type: "coi",
+            name: "Certificate of Incorporation",
+            description: "Company incorporation certificate",
+            required: false,
+          },
+          {
+            type: "address_proof",
+            name: "Address Proof",
+            description: "Utility bill or rent agreement",
+            required: true,
+          },
+        ];
 
   // Check if all required documents are uploaded
   const areAllRequiredDocsUploaded = () => {
@@ -1034,16 +1009,12 @@ export default function KYCVerification() {
                       partners: [],
                     });
                     setPersonalForm({
-<<<<<<< HEAD
                       phone: "",
                       dateOfBirth: "",
                       aadhaar: "",
                       pan: "",
                       fullName: "",
                       email: "",
-=======
-                      phone: "", dateOfBirth: "", aadhaar: "", pan: "", fullName: "", email: ""
->>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                     });
                   }}
                   disabled={
@@ -1070,10 +1041,10 @@ export default function KYCVerification() {
                 </h2>
                 {(!individualProfile ||
                   individualProfile.overallStatus !== "approved") && (
-                    <span className="text-xs font-medium text-red-500 bg-red-50 px-2 py-1 rounded">
-                      Locked until Personal Verification is Approved
-                    </span>
-                  )}
+                  <span className="text-xs font-medium text-red-500 bg-red-50 px-2 py-1 rounded">
+                    Locked until Personal Verification is Approved
+                  </span>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1256,12 +1227,13 @@ export default function KYCVerification() {
                           }
                         }}
                         disabled={!isAccessible}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors relative ${activeStep === step.id
-                          ? "bg-yellow-400 text-black"
-                          : isAccessible
-                            ? "text-gray-600 hover:bg-gray-100 cursor-pointer"
-                            : "text-gray-300 cursor-not-allowed opacity-50 bg-gray-50"
-                          }`}
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors relative ${
+                          activeStep === step.id
+                            ? "bg-yellow-400 text-black"
+                            : isAccessible
+                              ? "text-gray-600 hover:bg-gray-100 cursor-pointer"
+                              : "text-gray-300 cursor-not-allowed opacity-50 bg-gray-50"
+                        }`}
                         title={
                           !isAccessible ? "Complete previous steps first" : ""
                         }
@@ -1310,12 +1282,10 @@ export default function KYCVerification() {
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-<<<<<<< HEAD
-                        <User className="w-5 h-5 text-yellow-500" /> Personal
-                        Information
-=======
-                        <User className="w-5 h-5 text-yellow-500" /> {isPartnerMode ? "Partner Personal Information" : "Personal Information"}
->>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
+                        <User className="w-5 h-5 text-yellow-500" />{" "}
+                        {isPartnerMode
+                          ? "Partner Personal Information"
+                          : "Personal Information"}
                       </h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1324,10 +1294,10 @@ export default function KYCVerification() {
                           Full Name <span className="text-red-500">*</span>
                         </label>
                         {isPartnerMode ||
-                          (profileId !== "new" &&
-                            kycData?.kycType === "individual" &&
-                            kycData?.profileName !== user?.fullName &&
-                            kycData?.personalInfo?.fullName !==
+                        (profileId !== "new" &&
+                          kycData?.kycType === "individual" &&
+                          kycData?.profileName !== user?.fullName &&
+                          kycData?.personalInfo?.fullName !==
                             user?.fullName) ? (
                           <input
                             type="text"
@@ -1351,19 +1321,14 @@ export default function KYCVerification() {
                         )}
                       </div>
                       <div>
-<<<<<<< HEAD
                         <label className="block text-sm text-gray-500 mb-1">
-                          Email
+                          Email <span className="text-red-500">*</span>
                         </label>
-=======
-                        <label className="block text-sm text-gray-500 mb-1">Email <span className="text-red-500">*</span></label>
->>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                         {isPartnerMode ? (
                           <input
                             type="email"
                             placeholder="Partner Email"
                             value={personalForm.email}
-<<<<<<< HEAD
                             onChange={(e) =>
                               setPersonalForm({
                                 ...personalForm,
@@ -1376,14 +1341,6 @@ export default function KYCVerification() {
                           <p className="text-gray-900">
                             {user?.email || kycData?.personalInfo?.email || "-"}
                           </p>
-=======
-                            onChange={(e) => setPersonalForm({ ...personalForm, email: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                            required
-                          />
-                        ) : (
-                          <p className="text-gray-900">{user?.email || kycData?.personalInfo?.email || "-"}</p>
->>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                         )}
                       </div>
                       <div>
@@ -1494,11 +1451,8 @@ export default function KYCVerification() {
                           !personalForm.dateOfBirth ||
                           !personalForm.aadhaar ||
                           !personalForm.pan ||
-<<<<<<< HEAD
-                          (isPartnerMode && !personalForm.fullName)
-=======
-                          (isPartnerMode && (!personalForm.fullName || !personalForm.email))
->>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
+                          (isPartnerMode &&
+                            (!personalForm.fullName || !personalForm.email))
                         }
                         className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2 disabled:opacity-50"
                       >
@@ -1656,91 +1610,68 @@ export default function KYCVerification() {
                       </div>
 
                       <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-<<<<<<< HEAD
                         <p className="text-sm text-gray-500 mb-2">
-                          Select verified partners to link to this company:
+                          Select partners to link to this company (only verified
+                          partners are selectable):
                         </p>
                         {[individualProfile, ...partnerProfiles].filter(
-                          (p) => p && p.overallStatus === "approved",
+                          (p) => p,
                         ).length === 0 && (
-                            <p className="text-sm text-red-400 italic">
-                              No verified partners found. Please complete personal
-                              verification for yourself and any partners first.
-                            </p>
-                          )}
-
-                        {[individualProfile, ...partnerProfiles]
-                          .filter((p) => p && p.overallStatus === "approved")
-                          .map((p) => (
-                            <label
-                              key={p!._id}
-                              className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={businessForm.partners.includes(
-                                  p!._id!,
-                                )}
-                                onChange={(e) => {
-                                  const newPartners = e.target.checked
-                                    ? [...businessForm.partners, p!._id!]
-                                    : businessForm.partners.filter(
-                                      (id) => id !== p!._id,
-                                    );
-                                  setBusinessForm({
-                                    ...businessForm,
-                                    partners: newPartners,
-                                  });
-                                }}
-                                className="w-5 h-5 text-yellow-500 rounded focus:ring-yellow-400"
-                              />
-                              <div>
-                                <p className="font-medium text-gray-900">
-                                  {p!.profileName}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {p!.personalInfo?.fullName || "Partner"}
-                                </p>
-                              </div>
-                              <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                <CheckCircle2 className="w-3 h-3" /> Verified
-                              </span>
-                            </label>
-                          ))}
-=======
-                        <p className="text-sm text-gray-500 mb-2">Select partners to link to this company (only verified partners are selectable):</p>
-                        {[individualProfile, ...partnerProfiles].filter(p => p).length === 0 && (
-                          <p className="text-sm text-red-400 italic">No partner profiles found. Please add partner profiles first.</p>
+                          <p className="text-sm text-red-400 italic">
+                            No partner profiles found. Please add partner
+                            profiles first.
+                          </p>
                         )}
 
-                        {[individualProfile, ...partnerProfiles].filter(p => p).map(p => {
-                          const status = getOverallStatusConfig(p!.overallStatus || 'not_started');
-                          const isApproved = p!.overallStatus === 'approved';
-                          return (
-                          <label key={p!._id} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
-                            <input
-                              type="checkbox"
-                              checked={businessForm.partners.includes(p!._id!)}
-                              onChange={(e) => {
-                                if (!isApproved) return; // Only allow linking verified partners
-                                const newPartners = e.target.checked
-                                  ? [...businessForm.partners, p!._id!]
-                                  : businessForm.partners.filter(id => id !== p!._id);
-                                setBusinessForm({ ...businessForm, partners: newPartners });
-                              }}
-                              className="w-5 h-5 text-yellow-500 rounded focus:ring-yellow-400"
-                              disabled={!isApproved}
-                            />
-                            <div>
-                              <p className="font-medium text-gray-900">{p!.profileName}</p>
-                              <p className="text-xs text-gray-500">{p!.personalInfo?.fullName || "Partner"}</p>
-                            </div>
-                            <span className={`ml-auto text-xs px-2 py-0.5 rounded-full flex items-center gap-1 text-white ${status.bg}`}>
-                              <status.icon className="w-3 h-3" /> {status.text}
-                            </span>
-                          </label>
-                        )})}
->>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
+                        {[individualProfile, ...partnerProfiles]
+                          .filter((p) => p)
+                          .map((p) => {
+                            const status = getOverallStatusConfig(
+                              p!.overallStatus || "not_started",
+                            );
+                            const isApproved = p!.overallStatus === "approved";
+                            return (
+                              <label
+                                key={p!._id}
+                                className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={businessForm.partners.includes(
+                                    p!._id!,
+                                  )}
+                                  onChange={(e) => {
+                                    if (!isApproved) return; // Only allow linking verified partners
+                                    const newPartners = e.target.checked
+                                      ? [...businessForm.partners, p!._id!]
+                                      : businessForm.partners.filter(
+                                          (id) => id !== p!._id,
+                                        );
+                                    setBusinessForm({
+                                      ...businessForm,
+                                      partners: newPartners,
+                                    });
+                                  }}
+                                  className="w-5 h-5 text-yellow-500 rounded focus:ring-yellow-400"
+                                  disabled={!isApproved}
+                                />
+                                <div>
+                                  <p className="font-medium text-gray-900">
+                                    {p!.profileName}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {p!.personalInfo?.fullName || "Partner"}
+                                  </p>
+                                </div>
+                                <span
+                                  className={`ml-auto text-xs px-2 py-0.5 rounded-full flex items-center gap-1 text-white ${status.bg}`}
+                                >
+                                  <status.icon className="w-3 h-3" />{" "}
+                                  {status.text}
+                                </span>
+                              </label>
+                            );
+                          })}
                       </div>
                     </div>
 
@@ -2117,8 +2048,8 @@ export default function KYCVerification() {
                           </span>
                         </div>
                         {kycData?.personalInfo?.fullName &&
-                          kycData?.personalInfo?.phone &&
-                          kycData?.personalInfo?.aadhaarNumber ? (
+                        kycData?.personalInfo?.phone &&
+                        kycData?.personalInfo?.aadhaarNumber ? (
                           <CheckCircle2 className="w-5 h-5 text-green-500" />
                         ) : (
                           <Clock className="w-5 h-5 text-yellow-500" />
@@ -2177,7 +2108,7 @@ export default function KYCVerification() {
                         {kycData?.documents?.filter(
                           (d) => d.type !== "video_kyc",
                         ).length >=
-                          requiredDocTypes.filter((d) => d.required).length ? (
+                        requiredDocTypes.filter((d) => d.required).length ? (
                           <CheckCircle2 className="w-5 h-5 text-green-500" />
                         ) : (
                           <Clock className="w-5 h-5 text-yellow-500" />
@@ -2258,7 +2189,8 @@ export default function KYCVerification() {
                         <div className="bg-green-50 border border-green-200 rounded-xl p-4 animate-in fade-in slide-in-from-bottom-2">
                           <p className="text-sm text-green-800 font-medium flex items-center gap-2">
                             <CheckCircle2 className="w-4 h-4" /> All
-                            requirements completed. Please confirm the details above to submit.
+                            requirements completed. Please confirm the details
+                            above to submit.
                           </p>
                         </div>
                       )}
@@ -2292,7 +2224,9 @@ export default function KYCVerification() {
                           }
 
                           if (!isConfirmed) {
-                            toast.error("Please confirm that the information provided is accurate.");
+                            toast.error(
+                              "Please confirm that the information provided is accurate.",
+                            );
                             return;
                           }
 
@@ -2304,15 +2238,21 @@ export default function KYCVerification() {
                               await userDashboardService.submitKYC(profileId!);
                             if (response.success) {
                               toast.success(
-                                "KYC Submitted! Our team will review it shortly.", { id: toastId }
+                                "KYC Submitted! Our team will review it shortly.",
+                                { id: toastId },
                               );
                               fetchKYC(); // Refresh to show new status
                             } else {
-                              toast.error(response.message || "Failed to submit KYC", { id: toastId });
+                              toast.error(
+                                response.message || "Failed to submit KYC",
+                                { id: toastId },
+                              );
                             }
                           } catch (err) {
                             console.error("Failed to submit KYC:", err);
-                            toast.error("Failed to submit KYC for review", { id: toastId });
+                            toast.error("Failed to submit KYC for review", {
+                              id: toastId,
+                            });
                           } finally {
                             setSaving(false);
                           }
@@ -2330,9 +2270,15 @@ export default function KYCVerification() {
                           kycData?.overallStatus !== "pending")
                       }
                       className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 
-                        ${saving || (!linkBookingId && (!isReadyForSubmission() || !isConfirmed) && kycData?.overallStatus !== "approved" && kycData?.overallStatus !== "pending")
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-yellow-400 text-black hover:bg-yellow-500 shadow-md hover:shadow-lg"}`}
+                        ${
+                          saving ||
+                          (!linkBookingId &&
+                            (!isReadyForSubmission() || !isConfirmed) &&
+                            kycData?.overallStatus !== "approved" &&
+                            kycData?.overallStatus !== "pending")
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-yellow-400 text-black hover:bg-yellow-500 shadow-md hover:shadow-lg"
+                        }`}
                     >
                       {saving ? (
                         <>
