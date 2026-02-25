@@ -59,7 +59,7 @@ export default function Documents() {
             setIsGenerating(invoice._id);
             // Wait a tiny bit for the UI to update to loading state
             await new Promise(resolve => setTimeout(resolve, 100));
-            generateInvoicePDF(invoice, "download");
+            await generateInvoicePDF(invoice, "download");
             toast.success("Invoice downloaded successfully");
         } catch (error) {
             console.error("Error generating PDF:", error);
@@ -74,7 +74,7 @@ export default function Documents() {
             setIsPreviewing(invoice._id);
             // Wait a tiny bit for the UI to update to loading state
             await new Promise(resolve => setTimeout(resolve, 100));
-            const blobUrl = generateInvoicePDF(invoice, "preview");
+            const blobUrl = await generateInvoicePDF(invoice, "preview");
             if (blobUrl) {
                 setPreviewDocument({
                     title: `Invoice ${invoice.invoiceNumber || invoice._id}`,
