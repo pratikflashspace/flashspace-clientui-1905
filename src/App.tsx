@@ -112,10 +112,9 @@ import { AffiliateRoute } from "./components/auth/AffiliateRoute";
 import AffiliateDashboard from "./pages/affiliatePortal/Dashboard";
 
 import BookingManagement from "./pages/affiliatePortal/BookingManagement";
-
 import DashboardRevenue from "./pages/affiliatePortal/RevenueDashboard";
 
-import AffiliateInvoices from "./pages/affiliatePortal/Invoices";
+import AffiliateInvoices from "./pages/affiliatePortal/AffiliateInvoices";
 
 import Payouts from "./pages/affiliatePortal/Payouts";
 
