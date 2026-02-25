@@ -167,12 +167,7 @@ const VirtualOffice = () => {
       icon: Phone,
       description: "Meeting rooms & services"
     },
-    {
-      label: "Meeting Rooms",
-      href: "/services/meeting-rooms",
-      icon: Presentation,
-      description: "Book meeting rooms hourly"
-    },
+
     {
       label: "Event Spaces",
       href: "/services/event-spaces",

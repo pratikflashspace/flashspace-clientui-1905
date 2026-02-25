@@ -30,7 +30,7 @@ const Footer = () => {
   const services = [
     { name: "Virtual Office", icon: <Building className="w-4 h-4" />, href: "/services/virtual-office" },
     { name: "Coworking Space", icon: <Briefcase className="w-4 h-4" />, href: "/services/coworking-space" },
-    { name: "Meeting Rooms", icon: <Users className="w-4 h-4" />, href: "/services/meeting-rooms" },
+    { name: "Meeting Rooms", icon: <Users className="w-4 h-4" />, href: "/services/on-demand" },
     { name: "Event Spaces", icon: <Globe className="w-4 h-4" />, href: "/services/event-spaces" },
     { name: "Business Setup", icon: <FileText className="w-4 h-4" />, href: "/services/business-setup" },
     { name: "On-Demand", icon: <Clock className="w-4 h-4" />, href: "/services/on-demand" },

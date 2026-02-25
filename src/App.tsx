@@ -17,7 +17,7 @@ import ListYourSpace from "./pages/ListYourSpace";
 import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 import VirtualOffice from "./pages/services/VirtualOffice";
-import MeetingRooms from "./pages/services/MeetingRooms";
+
 import CoworkingSpace from "./pages/services/CoworkingSpace";
 import OnDemand from "./pages/services/OnDemand";
 import EventSpaces from "./pages/services/EventSpaces";
@@ -223,10 +223,7 @@ const App = () => (
                     path="/Solutions/business-setup"
                     element={<BusinessSetupSolution />}
                   />
-                  <Route
-                    path="/services/meeting-rooms"
-                    element={<MeetingRooms />}
-                  />
+
                   <Route
                     path="/Solutions/meetingsroom"
                     element={<MeetingsRoom />}
