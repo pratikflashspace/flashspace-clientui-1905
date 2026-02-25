@@ -39,36 +39,21 @@ export default function AdminLayout() {
     };
 
     const allNavItems = [
-        // 1. Dashboard (All 6 roles)
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['super_admin', 'admin', 'partner', 'space_manager', 'sales', 'affiliate_manager', 'space_partner_manager', 'support'] },
-        // 2. Booking Analysis (Super Admin, Admin)
-        { icon: LineChart, label: 'Booking Analysis', path: '/admin/booking-analysis', roles: ['super_admin', 'admin', 'partner'] },
-        // 3. Lead Management (Super Admin, Admin, Sales)
-        { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['super_admin', 'admin', 'sales'] },
-        // 4. Support Chats (Super Admin, Admin, Support)
-        { icon: Headphones, label: 'Support Chats', path: '/admin/support', roles: ['super_admin', 'admin', 'support'] },
-        // 5. Notifications (Super Admin, Admin, Sales, Support)
-        { icon: Bell, label: 'Notifications', path: '/admin/notifications', roles: ['super_admin', 'admin', 'sales', 'support'] },
-        // 6. Leaderboard (Super Admin, Admin, Sales, Support)
-        { icon: Trophy, label: 'Leaderboard', path: '/admin/leaderboard', roles: ['super_admin', 'admin', 'sales', 'support'] },
-        // 7. Ticket System (Super Admin, Admin, Support)
-        { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['super_admin', 'admin', 'support'] },
-        // 8. Learning Hub (Super Admin, Admin, Sales, Support)
-        { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['super_admin', 'admin', 'sales', 'support'] },
-        // 9. Clients (Super Admin, Admin, Sales, Support)
-        { icon: Briefcase, label: 'Clients', path: '/admin/clients', roles: ['super_admin', 'admin', 'sales', 'support'] },
-        // 10. Coupons & Vouchers (Super Admin, Admin, Sales)
-        { icon: Tag, label: 'Coupons & Vouchers', path: '/admin/coupons', roles: ['super_admin', 'admin', 'sales'] },
-        // 11. User Management (Super Admin)
-        { icon: Users, label: 'User Management', path: '/admin/users', roles: ['super_admin'] },
-        // 12. Team Management (Super Admin, Admin)
-        { icon: Shield, label: 'Team Management', path: '/admin/team', roles: ['super_admin', 'admin'] },
-        // 13. KYC Verification (Super Admin, Admin)
-        { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['super_admin', 'admin', 'partner', 'space_manager'] },
-        // 14. Space Management (Super Admin, Admin, Space Partner Manager)
-        { icon: Building2, label: 'Space Management', path: '/admin/spaces', roles: ['super_admin', 'admin', 'partner', 'space_manager', 'space_partner_manager'] },
-        // 15. Settings (All 6 roles)
-        { icon: Settings, label: 'Settings', path: '/admin/settings', roles: ['super_admin', 'admin', 'partner', 'affiliate_manager', 'space_partner_manager', 'sales', 'support'] },
+        { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['admin', 'super_admin', 'partner', 'space_partner_manager', 'sales', 'support', 'affiliate_manager'] },
+        { icon: LineChart, label: 'Booking Analysis', path: '/admin/booking-analysis', roles: ['admin', 'super_admin', 'sales', 'partner', 'space_partner_manager'] },
+        { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['admin', 'super_admin', 'sales'] },
+        { icon: Headphones, label: 'Support Chats', path: '/admin/support', roles: ['admin', 'super_admin', 'support'] },
+        { icon: Bell, label: 'Notifications', path: '/admin/notifications', roles: ['admin', 'super_admin', 'sales', 'support', 'affiliate_manager', 'space_partner_manager', 'partner'] },
+        { icon: Trophy, label: 'Leaderboard', path: '/admin/leaderboard', roles: ['admin', 'super_admin', 'sales', 'support'] },
+        { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['admin', 'super_admin', 'support'] },
+        { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['admin', 'super_admin', 'sales', 'support', 'partner'] },
+        { icon: Briefcase, label: 'Clients', path: '/admin/clients', roles: ['admin', 'super_admin', 'sales', 'support'] },
+        { icon: Network, label: 'Affiliate Management', path: '/admin/affiliates', roles: ['admin', 'super_admin', 'affiliate_manager'] },
+        { icon: Tag, label: 'Coupons & Vouchers', path: '/admin/coupons', roles: ['admin', 'super_admin', 'sales'] },
+        { icon: Users, label: 'User Management', path: '/admin/users', roles: ['admin', 'super_admin'] },
+        { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['admin', 'super_admin', 'partner'] },
+        { icon: Building2, label: 'Space Management', path: '/admin/spaces', roles: ['admin', 'super_admin', 'partner', 'space_partner_manager'] },
+        { icon: Settings, label: 'Settings', path: '/admin/settings', roles: ['admin', 'super_admin', 'partner', 'space_partner_manager', 'sales', 'support', 'affiliate_manager'] },
     ];
 
     const navItems = allNavItems.filter(item => user?.role && item.roles.includes(user.role));
