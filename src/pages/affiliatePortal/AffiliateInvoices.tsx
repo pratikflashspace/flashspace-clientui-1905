@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { affiliatePortalService, AffiliateInvoice } from "@/services/affiliatePortal.service";
 import { format } from "date-fns";
+import { generateInvoicePDF } from "@/utils/pdfGenerator";
 
 // --- Types ---
 interface InvoiceItem {
@@ -264,17 +265,13 @@ const Invoices = () => {
         return matchesSearch && matchesStatus;
     });
 
-    // Print Handler
-    const handlePrint = (invoice: AffiliateInvoice) => {
-        // 1. Set the specific invoice to be printed into a hidden state/view
-        setPrintInvoiceData(invoice);
-        // 2. Wait for state update then trigger print
-        setTimeout(() => {
-            window.print();
-            // 3. Clear print data after printing to return to normal view if needed
-            // (Optional, but keeping it ensures normal render isn't affected)
-            setPrintInvoiceData(null);
-        }, 100);
+    // Print / Download Handler
+    const handleDownload = async (invoice: AffiliateInvoice) => {
+        try {
+            await generateInvoicePDF(invoice, "download");
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+        }
     };
 
     return (
@@ -445,7 +442,7 @@ const Invoices = () => {
                                                         </button>
                                                         <button
                                                             onClick={() =>
-                                                                handlePrint(inv)
+                                                                handleDownload(inv)
                                                             }
                                                             className="p-2 bg-white border border-gray-200 text-gray-500 hover:text-slate-900 hover:bg-gray-50 rounded-lg transition-all"
                                                             title="Download/Print PDF"
@@ -510,13 +507,13 @@ const Invoices = () => {
                             </button>
                             <div className="flex gap-3">
                                 <button
-                                    onClick={() => handlePrint(selectedInvoice)}
+                                    onClick={() => handleDownload(selectedInvoice)}
                                     className="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 transition text-gray-700"
                                 >
                                     <Printer size={16} /> Print
                                 </button>
                                 <button
-                                    onClick={() => handlePrint(selectedInvoice)}
+                                    onClick={() => handleDownload(selectedInvoice)}
                                     className="flex items-center gap-2 px-4 py-2 bg-[#5aa39c] text-white rounded-lg text-sm font-medium hover:bg-[#4a8b85] shadow-sm hover:shadow transition"
                                 >
                                     <Download size={16} /> Download PDF
