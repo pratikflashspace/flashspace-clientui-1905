@@ -25,6 +25,22 @@ import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calender";
 import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    XAxis,
+    YAxis,
+    Cell,
+} from "recharts";
+import {
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+    ChartConfig,
+    ChartLegend,
+    ChartLegendContent,
+} from "@/components/ui/chart";
+import {
     Popover,
     PopoverContent,
     PopoverTrigger,
@@ -32,6 +48,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from 'sonner';
+
+const chartConfig = {
+    revenue: {
+        label: "Revenue",
+        color: "#3FA69E",
+    },
+    bookings: {
+        label: "Bookings",
+        color: "#1D3932",
+    },
+} satisfies ChartConfig;
 
 export default function BookingAnalysis() {
     const [loading, setLoading] = useState(true);
@@ -251,41 +278,132 @@ export default function BookingAnalysis() {
 
             {/* Content Row: Revenue by Category & Bookings Table */}
             <div className="space-y-8">
-                {/* Revenue by Category */}
-                <div className="bg-white rounded-[24px] p-8 shadow-sm border border-gray-100">
-                    <h3 className="text-xl font-bold text-gray-900 mb-8">Revenue by Category</h3>
-
-                    {revenueByCategory.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="text-left text-sm font-semibold text-gray-500 border-b border-gray-100/50">
-                                        <th className="pb-4 pl-2">Category</th>
-                                        <th className="pb-4 text-right">Bookings</th>
-                                        <th className="pb-4 text-right">Revenue</th>
-                                        <th className="pb-4 text-right pr-2">Growth</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {revenueByCategory.map((item, i) => (
-                                        <tr key={i} className="group hover:bg-gray-50/50 transition-colors">
-                                            <td className="py-5 pl-2 font-medium text-gray-900">{item.name}</td>
-                                            <td className="py-5 text-right text-gray-500 font-medium">{item.bookings}</td>
-                                            <td className="py-5 text-right text-gray-900 font-bold">{formatCurrency(item.revenue)}</td>
-                                            <td className="py-5 text-right pr-2">
-                                                <div className="inline-flex items-center gap-1 text-green-600 font-semibold bg-green-50 px-2.5 py-1 rounded-full text-xs">
-                                                    <ArrowUpRight className="w-3 h-3" />
-                                                    {item.growth}%
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Booking Distribution Chart */}
+                    <div className="bg-white rounded-[24px] p-8 shadow-sm border border-gray-100 flex flex-col">
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="text-xl font-bold text-gray-900">Booking Distribution</h3>
+                            <div className="flex gap-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-[#1D3932]"></div>
+                                    <span className="text-xs font-medium text-gray-500">Bookings</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-[#3FA69E]"></div>
+                                    <span className="text-xs font-medium text-gray-500">Revenue</span>
+                                </div>
+                            </div>
                         </div>
-                    ) : (
-                        <div className="text-center py-10 text-gray-500">No booking data available</div>
-                    )}
+
+                        {revenueByCategory.length > 0 ? (
+                            <ChartContainer config={chartConfig} className="h-[350px] w-full">
+                                <BarChart data={revenueByCategory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <defs>
+                                        <filter id="chartGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feGaussianBlur stdDeviation="3" result="blur" />
+                                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                        </filter>
+                                    </defs>
+                                    <CartesianGrid vertical={false} strokeDasharray="8 8" stroke="#f1f5f9" strokeOpacity={0.8} />
+                                    <XAxis
+                                        dataKey="name"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tickMargin={15}
+                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
+                                    />
+                                    <YAxis
+                                        yAxisId="left"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tickMargin={15}
+                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
+                                        tickFormatter={(value) => `₹${value >= 1000 ? (value / 1000).toFixed(0) + 'k' : value}`}
+                                    />
+                                    <YAxis
+                                        yAxisId="right"
+                                        orientation="right"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tickMargin={15}
+                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
+                                    />
+                                    <ChartTooltip
+                                        content={({ active, payload }) => {
+                                            if (active && payload && payload.length) {
+                                                return (
+                                                    <div className="bg-[#1D3932]/95 backdrop-blur-md border border-white/10 p-4 rounded-[20px] shadow-2xl min-w-[160px] animate-in fade-in zoom-in duration-200">
+                                                        <p className="text-[10px] font-bold text-teal-400 uppercase tracking-[0.2em] mb-3">{payload[0].payload.name}</p>
+                                                        <div className="space-y-2">
+                                                            <div className="flex justify-between items-center gap-4">
+                                                                <span className="text-white/60 text-[11px] font-medium">Revenue</span>
+                                                                <span className="text-white font-black text-sm">₹{payload.find(p => p.dataKey === 'revenue')?.value?.toLocaleString()}</span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center gap-4">
+                                                                <span className="text-white/60 text-[11px] font-medium">Bookings</span>
+                                                                <span className="text-white font-black text-sm">{payload.find(p => p.dataKey === 'bookings')?.value}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                            return null;
+                                        }}
+                                    />
+                                    <Bar
+                                        yAxisId="left"
+                                        dataKey="revenue"
+                                        fill="#3FA69E"
+                                        radius={[6, 6, 0, 0]}
+                                        barSize={32}
+                                        style={{ filter: 'url(#chartGlow)' }}
+                                    />
+                                    <Bar
+                                        yAxisId="right"
+                                        dataKey="bookings"
+                                        fill="#1D3932"
+                                        radius={[6, 6, 0, 0]}
+                                        barSize={32}
+                                        style={{ filter: 'url(#chartGlow)' }}
+                                    />
+                                </BarChart>
+                            </ChartContainer>
+                        ) : (
+                            <div className="flex-1 flex items-center justify-center text-gray-400">
+                                No distribution data available
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Revenue by Category Table */}
+                    <div className="bg-white rounded-[24px] p-8 shadow-sm border border-gray-100 overflow-hidden">
+                        <h3 className="text-xl font-bold text-gray-900 mb-8">Revenue Breakdown</h3>
+
+                        {revenueByCategory.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="text-left text-sm font-semibold text-gray-500 border-b border-gray-100/50">
+                                            <th className="pb-4 pl-2">Category</th>
+                                            <th className="pb-4 text-right">Bookings</th>
+                                            <th className="pb-4 text-right pr-2">Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {revenueByCategory.map((item, i) => (
+                                            <tr key={i} className="group hover:bg-gray-50/50 transition-colors">
+                                                <td className="py-5 pl-2 font-medium text-gray-900">{item.name}</td>
+                                                <td className="py-5 text-right text-gray-500 font-medium">{item.bookings}</td>
+                                                <td className="py-5 text-right text-gray-900 font-bold pr-2">{formatCurrency(item.revenue)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className="text-center py-10 text-gray-500">No booking data available</div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Bookings Table Section (Merged from AdminBookings) */}
