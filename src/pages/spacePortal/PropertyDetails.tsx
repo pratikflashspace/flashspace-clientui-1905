@@ -159,7 +159,12 @@ export default function PropertyDetails() {
           >
             KYC: {property.kycStatus?.toUpperCase()}
           </span>
-          <button className="rounded-xl bg-[#3FA69E] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:opacity-90 transition-all">
+          <button
+            onClick={() =>
+              navigate(`/spaceportal/space-management/add?id=${property._id}`)
+            }
+            className="rounded-xl bg-[#3FA69E] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:opacity-90 transition-all"
+          >
             Edit Property
           </button>
         </div>

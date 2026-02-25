@@ -514,6 +514,8 @@ export default function KYCVerification() {
           text: "Draft",
           icon: Edit,
         };
+      case "not_started":
+        return { bg: "bg-gray-500", text: "Not Started", icon: Info };
       default:
         return { bg: "bg-gray-500", text: "Not Started", icon: Info };
     }
@@ -1600,81 +1602,6 @@ export default function KYCVerification() {
                       </div>
                     </div>
 
-                    {/* Company Partners Section */}
-                    <div className="border-t border-gray-100 pt-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-medium text-gray-900 flex items-center gap-2">
-                          <Users className="w-4 h-4 text-gray-500" /> Company
-                          Partners
-                        </h3>
-                      </div>
-
-                      <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-                        <p className="text-sm text-gray-500 mb-2">
-                          Select partners to link to this company (only verified
-                          partners are selectable):
-                        </p>
-                        {[individualProfile, ...partnerProfiles].filter(
-                          (p) => p,
-                        ).length === 0 && (
-                          <p className="text-sm text-red-400 italic">
-                            No partner profiles found. Please add partner
-                            profiles first.
-                          </p>
-                        )}
-
-                        {[individualProfile, ...partnerProfiles]
-                          .filter((p) => p)
-                          .map((p) => {
-                            const status = getOverallStatusConfig(
-                              p!.overallStatus || "not_started",
-                            );
-                            const isApproved = p!.overallStatus === "approved";
-                            return (
-                              <label
-                                key={p!._id}
-                                className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors"
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={businessForm.partners.includes(
-                                    p!._id!,
-                                  )}
-                                  onChange={(e) => {
-                                    if (!isApproved) return; // Only allow linking verified partners
-                                    const newPartners = e.target.checked
-                                      ? [...businessForm.partners, p!._id!]
-                                      : businessForm.partners.filter(
-                                          (id) => id !== p!._id,
-                                        );
-                                    setBusinessForm({
-                                      ...businessForm,
-                                      partners: newPartners,
-                                    });
-                                  }}
-                                  className="w-5 h-5 text-yellow-500 rounded focus:ring-yellow-400"
-                                  disabled={!isApproved}
-                                />
-                                <div>
-                                  <p className="font-medium text-gray-900">
-                                    {p!.profileName}
-                                  </p>
-                                  <p className="text-xs text-gray-500">
-                                    {p!.personalInfo?.fullName || "Partner"}
-                                  </p>
-                                </div>
-                                <span
-                                  className={`ml-auto text-xs px-2 py-0.5 rounded-full flex items-center gap-1 text-white ${status.bg}`}
-                                >
-                                  <status.icon className="w-3 h-3" />{" "}
-                                  {status.text}
-                                </span>
-                              </label>
-                            );
-                          })}
-                      </div>
-                    </div>
-
                     <div className="mt-6 flex justify-end">
                       <button
                         onClick={async () => {
@@ -2153,32 +2080,126 @@ export default function KYCVerification() {
                       kycData?.overallStatus !== "approved" &&
                       kycData?.overallStatus !== "pending" && (
                         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 animate-in fade-in slide-in-from-bottom-2">
-                          <p className="text-sm text-amber-800 font-medium flex items-start gap-2">
-                            <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span>
-                              Please complete all required steps before
-                              submitting:
+                          <div className="text-sm text-amber-800 font-medium space-y-2">
+                            <div className="flex items-start gap-2">
+                              <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                              <span>
+                                Please complete all required steps before
+                                submitting:
+                              </span>
+                            </div>
+
+                            <ul className="ml-6 space-y-2 list-disc">
                               {!isPersonalInfoSaved() && (
-                                <span className="block ml-2">
-                                  • Personal Information
-                                </span>
+                                <li>
+                                  <span className="font-semibold underline">
+                                    Personal Information:
+                                  </span>
+                                  <div className="text-xs mt-0.5 text-amber-700 flex flex-wrap gap-1">
+                                    {!kycData?.personalInfo?.fullName && (
+                                      <span className="bg-amber-100 px-1.5 py-0.5 rounded">
+                                        Full Name
+                                      </span>
+                                    )}
+                                    {!kycData?.personalInfo?.phone && (
+                                      <span className="bg-amber-100 px-1.5 py-0.5 rounded">
+                                        Phone Number
+                                      </span>
+                                    )}
+                                    {!kycData?.personalInfo?.dateOfBirth && (
+                                      <span className="bg-amber-100 px-1.5 py-0.5 rounded">
+                                        Date of Birth
+                                      </span>
+                                    )}
+                                    {!kycData?.personalInfo?.aadhaarNumber && (
+                                      <span className="bg-amber-100 px-1.5 py-0.5 rounded">
+                                        Aadhaar Card
+                                      </span>
+                                    )}
+                                    {!kycData?.personalInfo?.panNumber && (
+                                      <span className="bg-amber-100 px-1.5 py-0.5 rounded">
+                                        PAN Card
+                                      </span>
+                                    )}
+                                  </div>
+                                </li>
                               )}
+
                               {kycType === "business" &&
                                 !isBusinessInfoSaved() && (
-                                  <span className="block ml-2">
-                                    • Business Information
-                                  </span>
+                                  <li>
+                                    <span className="font-semibold underline">
+                                      Business Information:
+                                    </span>
+                                    <div className="text-xs mt-0.5 text-amber-700 flex flex-wrap gap-1">
+                                      {!kycData?.businessInfo?.companyName && (
+                                        <span className="bg-amber-100 px-1.5 py-0.5 rounded">
+                                          Company Name
+                                        </span>
+                                      )}
+                                      {!kycData?.businessInfo?.companyType && (
+                                        <span className="bg-amber-100 px-1.5 py-0.5 rounded">
+                                          Company Type
+                                        </span>
+                                      )}
+                                      {!kycData?.businessInfo?.gstNumber && (
+                                        <span className="bg-amber-100 px-1.5 py-0.5 rounded">
+                                          GST Number
+                                        </span>
+                                      )}
+                                      {!kycData?.businessInfo
+                                        ?.registeredAddress && (
+                                        <span className="bg-amber-100 px-1.5 py-0.5 rounded">
+                                          Registered Address
+                                        </span>
+                                      )}
+                                      {!kycData?.businessInfo?.industry && (
+                                        <span className="bg-amber-100 px-1.5 py-0.5 rounded">
+                                          Industry
+                                        </span>
+                                      )}
+                                    </div>
+                                  </li>
                                 )}
+
                               {!isPartnerMode && !isVideoKYCComplete() && (
-                                <span className="block ml-2">• Video KYC</span>
+                                <li>
+                                  <span className="font-semibold underline">
+                                    Video KYC:
+                                  </span>
+                                  <span className="text-xs ml-2 text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                                    Selfie video is required
+                                  </span>
+                                </li>
                               )}
+
                               {!areAllRequiredDocsUploaded() && (
-                                <span className="block ml-2">
-                                  • Upload all required documents
-                                </span>
+                                <li>
+                                  <span className="font-semibold underline">
+                                    Required Documents:
+                                  </span>
+                                  <div className="text-xs mt-0.5 text-amber-700 flex flex-wrap gap-1">
+                                    {requiredDocTypes
+                                      .filter(
+                                        (doc) =>
+                                          doc.required &&
+                                          !kycData?.documents?.find(
+                                            (d) => d.type === doc.type,
+                                          ),
+                                      )
+                                      .map((doc) => (
+                                        <span
+                                          key={doc.type}
+                                          className="bg-amber-100 px-1.5 py-0.5 rounded"
+                                        >
+                                          {doc.name}
+                                        </span>
+                                      ))}
+                                  </div>
+                                </li>
                               )}
-                            </span>
-                          </p>
+                            </ul>
+                          </div>
                         </div>
                       )}
 
@@ -2236,7 +2257,13 @@ export default function KYCVerification() {
                           try {
                             const response =
                               await userDashboardService.submitKYC(profileId!);
-                            if (response.success) {
+                            // API response structure might differ between services
+                            // spacePartnerKyc.service returns SpaceUserKycResponse (raw data)
+                            // userDashboardService.submitKYC returns { success, data, message }
+
+                            const isSuccess = (response as any).success;
+
+                            if (isSuccess) {
                               toast.success(
                                 "KYC Submitted! Our team will review it shortly.",
                                 { id: toastId },
@@ -2244,15 +2271,19 @@ export default function KYCVerification() {
                               fetchKYC(); // Refresh to show new status
                             } else {
                               toast.error(
-                                response.message || "Failed to submit KYC",
+                                (response as any).message ||
+                                  "Failed to submit KYC",
                                 { id: toastId },
                               );
                             }
-                          } catch (err) {
+                          } catch (err: any) {
                             console.error("Failed to submit KYC:", err);
-                            toast.error("Failed to submit KYC for review", {
-                              id: toastId,
-                            });
+                            toast.error(
+                              err.message || "Failed to submit KYC for review",
+                              {
+                                id: toastId,
+                              },
+                            );
                           } finally {
                             setSaving(false);
                           }

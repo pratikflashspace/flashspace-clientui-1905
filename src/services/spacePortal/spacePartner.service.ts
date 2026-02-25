@@ -254,6 +254,7 @@ export const createCoworkingSpace = async (data: any) => {
  */
 export const fetchAllCoworkingSpacesPublic = async (params?: {
   deleted?: boolean;
+  property?: string;
 }) => {
   try {
     const response: any = await axiosInstance.get("/coworkingSpace/getAll", {
@@ -331,6 +332,7 @@ export const fetchAllMeetingRooms = async (params?: {
   type?: string;
   minPrice?: number;
   maxPrice?: number;
+  property?: string;
 }) => {
   try {
     const response: any = await axiosInstance.get("/meetingRoom/getAll", {
@@ -428,9 +430,14 @@ export const fetchPartnerMeetingRooms = async () => {
 /**
  * Get all virtual offices (Public).
  */
-export const fetchAllVirtualOfficesPublic = async () => {
+export const fetchAllVirtualOfficesPublic = async (params?: {
+  deleted?: boolean;
+  property?: string;
+}) => {
   try {
-    const response: any = await axiosInstance.get("/virtualOffice/getAll");
+    const response: any = await axiosInstance.get("/virtualOffice/getAll", {
+      params,
+    });
     return response.data.data;
   } catch (error) {
     return handleApiError(error);

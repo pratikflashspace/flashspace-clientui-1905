@@ -42,6 +42,7 @@ import {
   simulatePayment,
 } from "@/services/payment.service";
 import { API_CONFIG, API_ENDPOINTS } from "@/config/api.config";
+import axiosInstance from "@/services/api.service";
 
 // ============ STEP DEFINITIONS ============
 const STEPS = [
@@ -109,6 +110,7 @@ const BookingPage = () => {
   const [holdTimeLeft, setHoldTimeLeft] = useState<number | null>(null);
   const [holdExpiresAt, setHoldExpiresAt] = useState<string | null>(null);
   const [holdFetchError, setHoldFetchError] = useState<boolean>(false);
+  const [fixedAmount, setFixedAmount] = useState<number | null>(null);
 
   // Load user data from auth
   useEffect(() => {
@@ -151,7 +153,10 @@ const BookingPage = () => {
             setSpaceDetails(data as any);
             const desks = parseInt(searchParams.get("desks") || "1");
             const monthlyPrice =
-              (data as any).pricePerMonth || parsePrice(data.price);
+              (data as any).finalPricePerMonth ||
+              (data as any).pricePerMonth ||
+              parsePrice((data as any).price) ||
+              0;
             const totalMonthly = monthlyPrice * desks;
             setSelectedPlanDetails({
               key: "coworking",
@@ -202,105 +207,99 @@ const BookingPage = () => {
     }
   }, [selectedPlanKey, allPricing]);
 
-  // Fetch Hold Details for Timer
+  // Fetch Hold Details for Timer (always for coworking type, even without holdId)
   useEffect(() => {
-    const holdId = searchParams.get("holdId");
     const type = searchParams.get("type")?.toLowerCase();
+    const holdId = searchParams.get("holdId");
 
-    if (holdId && type === "coworking" && isAuthenticated) {
+    if (type === "coworking" && isAuthenticated) {
       const fetchHoldDetails = async () => {
+        if (!id) return;
         try {
-          const token =
-            localStorage.getItem("accessToken") ||
-            localStorage.getItem("token");
-
-          // Try fetching the specific booking directly first
-          const response = await axios.get<any>(
-            `${API_CONFIG.BASE_URL}/api/seat-bookings/${holdId}`,
-            {
-              headers: {
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-              },
-              withCredentials: true,
-            },
-          );
-
-          if (response.data?.success && response.data?.data?.holdExpiresAt) {
-            setHoldExpiresAt(response.data.data.holdExpiresAt);
-            setHoldFetchError(false);
-          } else {
-            console.warn("Direct hold fetch failed, trying list fallback...");
-
-            // Fallback to user list if direct fetch failed (sometimes permissions vary)
-            const listResponse = await axios.get<any>(
-              `${API_CONFIG.BASE_URL}/api/seat-bookings/user`,
-              {
-                headers: {
-                  ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
-                withCredentials: true,
-              },
-            );
-
-            if (listResponse.data?.success && listResponse.data?.data) {
-              const activeBooking = listResponse.data.data.find(
-                (b: any) => String(b._id) === String(holdId),
+          // 1. Try fetching specific hold if holdId is present
+          if (holdId) {
+            try {
+              const holdResponse = await axiosInstance.get<any>(
+                `/seat-bookings/${holdId}`,
               );
-              if (activeBooking?.holdExpiresAt) {
-                setHoldExpiresAt(activeBooking.holdExpiresAt);
-                setHoldFetchError(false);
-              } else {
-                setHoldFetchError(true);
+              if (holdResponse.data?.success && holdResponse.data?.data) {
+                const b = holdResponse.data.data;
+                // Basic validation - ensure it's still pending and for same space
+                const matchId =
+                  typeof b.space === "object" && b.space !== null
+                    ? b.space._id === id
+                    : b.space === id;
+                const validStatus =
+                  b.status === "pending" &&
+                  new Date(b.holdExpiresAt) > new Date();
+
+                if (matchId && validStatus) {
+                  setHoldExpiresAt(b.holdExpiresAt);
+                  setFixedAmount(b.totalAmount || 0);
+                  return; // Successfully loaded specific hold
+                }
               }
+            } catch (specificError) {
+              console.error("Error fetching specific hold:", specificError);
+              // Fallback to searching user bookings
+            }
+          }
+
+          // 2. Fallback: Search user holdings to find an active one for this space
+          const response = await axiosInstance.get<any>("/seat-bookings/user");
+          if (response.data?.success && response.data?.data) {
+            const activeBooking = response.data.data.find((b: any) => {
+              const matchId =
+                typeof b.space === "object" && b.space !== null
+                  ? b.space._id === id
+                  : b.space === id;
+              const validStatus =
+                b.status === "pending" &&
+                new Date(b.holdExpiresAt) > new Date();
+              return matchId && validStatus;
+            });
+
+            if (activeBooking) {
+              setHoldExpiresAt(activeBooking.holdExpiresAt);
+              setFixedAmount(activeBooking.totalAmount || 0);
             } else {
-              setHoldFetchError(true);
+              setHoldExpiresAt(null); // No active hold
+              setFixedAmount(null);
             }
           }
         } catch (err) {
-          console.error("Failed to fetch hold details for timer", err);
+          console.error("Error fetching user seat bookings:", err);
           setHoldFetchError(true);
         }
       };
       fetchHoldDetails();
-    } else if (holdId && type === "coworking" && !isAuthenticated) {
-      // If not authenticated yet, we wait, but if it stays that way for too long, might be an issue
-      console.log("Waiting for authentication for timer...");
     }
-  }, [searchParams, isAuthenticated]);
+  }, [id, isAuthenticated, searchParams]);
 
   // Timer Countdown Logic
   useEffect(() => {
-    if (!holdExpiresAt) return;
+    if (!holdExpiresAt) {
+      setHoldTimeLeft(null);
+      return;
+    }
 
-    const calculateTimeLeft = () => {
-      const expiry = new Date(holdExpiresAt).getTime();
+    const interval = setInterval(() => {
       const now = new Date().getTime();
-      const diff = Math.max(0, Math.floor((expiry - now) / 1000));
-      setHoldTimeLeft(diff);
+      const expiry = new Date(holdExpiresAt).getTime();
+      const diff = Math.floor((expiry - now) / 1000);
 
       if (diff <= 0) {
-        toast({
-          title: "Session Expired",
-          description:
-            "Your seat hold has expired. Redirecting to space details...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          // Redirect to property dashboard/details
-          if (id) {
-            navigate(`/coworking-space/${id}`);
-          } else {
-            navigate(-1);
-          }
-        }, 2000);
+        clearInterval(interval);
+        setHoldTimeLeft(0);
+        // Optionally clear hold state
+        setHoldExpiresAt(null);
+      } else {
+        setHoldTimeLeft(diff);
       }
-    };
+    }, 1000);
 
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
-
-    return () => clearInterval(timer);
-  }, [holdExpiresAt, navigate, toast]);
+    return () => clearInterval(interval);
+  }, [holdExpiresAt]);
 
   // ============ COUPON HANDLERS ============
   const handleApplyCoupon = async () => {
@@ -334,6 +333,7 @@ const BookingPage = () => {
         });
         setAppliedCoupon(null);
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast({
         title: "Error",
@@ -386,6 +386,7 @@ const BookingPage = () => {
   };
 
   // ============ PRICING CALCULATIONS ============
+  const isCoworking = searchParams.get("type") === "coworking";
   const yearlyPrice = selectedPlanDetails?.yearlyPrice || 0;
 
   const tenureOptions = [
@@ -416,12 +417,14 @@ const BookingPage = () => {
   ];
 
   const selectedOption = tenureOptions.find((t) => t.years === selectedTenure)!;
+  const basePrice =
+    isCoworking && fixedAmount !== null
+      ? fixedAmount
+      : selectedOption.totalPrice;
   const couponDiscountAmount = appliedCoupon
-    ? Math.round(
-        (selectedOption.totalPrice * appliedCoupon.discountValue) / 100,
-      )
+    ? Math.round((basePrice * appliedCoupon.discountValue) / 100)
     : 0;
-  const finalPayableAmount = selectedOption.totalPrice - couponDiscountAmount;
+  const finalPayableAmount = basePrice - couponDiscountAmount;
 
   // Compute end date from start date + tenure
   const computedEndDate = (() => {
@@ -464,15 +467,17 @@ const BookingPage = () => {
         spaceName: spaceDetails.name,
         planName: selectedPlanDetails.name,
         planKey: selectedPlanKey,
-        tenure: selectedTenure,
-        yearlyPrice: yearlyPrice,
+        tenure: isCoworking ? 0 : selectedTenure,
+        yearlyPrice: isCoworking ? 0 : yearlyPrice,
         totalAmount: finalPayableAmount,
         discountPercent:
-          selectedOption.savingsPercent + (appliedCoupon?.discountValue || 0),
-        discountAmount: selectedOption.savings + couponDiscountAmount,
+          (isCoworking ? 0 : selectedOption.savingsPercent) +
+          (appliedCoupon?.discountValue || 0),
+        discountAmount:
+          (isCoworking ? 0 : selectedOption.savings) + couponDiscountAmount,
         paymentType: searchParams.get("holdId")
           ? "seat_booking"
-          : searchParams.get("type") === "coworking"
+          : isCoworking
             ? "coworking_space"
             : "virtual_office",
         startDate: new Date(selectedStartDate).toISOString(),
@@ -569,11 +574,12 @@ const BookingPage = () => {
           });
         },
       });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Payment initiation error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to initiate payment.",
+        description: error?.message || "Failed to initiate payment.",
         variant: "destructive",
       });
     } finally {
@@ -604,15 +610,17 @@ const BookingPage = () => {
         spaceName: spaceDetails.name,
         planName: selectedPlanDetails.name,
         planKey: selectedPlanKey,
-        tenure: selectedTenure,
-        yearlyPrice: yearlyPrice,
+        tenure: isCoworking ? 0 : selectedTenure,
+        yearlyPrice: isCoworking ? 0 : yearlyPrice,
         totalAmount: finalPayableAmount,
         discountPercent:
-          selectedOption.savingsPercent + (appliedCoupon?.discountValue || 0),
-        discountAmount: selectedOption.savings + couponDiscountAmount,
+          (isCoworking ? 0 : selectedOption.savingsPercent) +
+          (appliedCoupon?.discountValue || 0),
+        discountAmount:
+          (isCoworking ? 0 : selectedOption.savings) + couponDiscountAmount,
         paymentType: searchParams.get("holdId")
           ? "seat_booking"
-          : searchParams.get("type") === "coworking"
+          : isCoworking
             ? "coworking_space"
             : "virtual_office",
         startDate: new Date(selectedStartDate).toISOString(),
@@ -629,19 +637,13 @@ const BookingPage = () => {
       const holdId = searchParams.get("holdId");
       if (holdId) {
         try {
-          const token =
-            localStorage.getItem("accessToken") ||
-            localStorage.getItem("token");
-          await fetch(
-            `${API_CONFIG.BASE_URL}${API_ENDPOINTS.USER.SEAT_BOOKING_CONFIRM(holdId)}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-              },
-              body: JSON.stringify({ paymentId: result.paymentId }),
-            },
+          // Use axiosInstance to ensure cookies are sent
+          await axiosInstance.post(
+            API_ENDPOINTS.USER.SEAT_BOOKING_CONFIRM(holdId).replace(
+              /^\/api/,
+              "",
+            ),
+            { paymentId: result.paymentId },
           );
         } catch (e) {
           console.error("Booking confirmation failed", e);
@@ -662,11 +664,12 @@ const BookingPage = () => {
       navigate(
         `/payment/success?orderId=${orderData.orderId}&paymentId=${result.paymentId}`,
       );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Payment simulation error:", error);
       toast({
         title: "Simulation Failed",
-        description: error.message || "Failed to simulate payment.",
+        description: error?.message || "Failed to simulate payment.",
         variant: "destructive",
       });
     } finally {
@@ -727,37 +730,33 @@ const BookingPage = () => {
             Back to space details
           </button>
 
-          {/* Seat Hold Timer Banner */}
-          {searchParams.get("holdId") && (
-            <div className="sticky top-24 z-30 mb-8 bg-amber-50 border border-amber-200 rounded-2xl p-4 md:p-5 flex items-center justify-between shadow-md animate-in fade-in slide-in-from-top-4 duration-500">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
-                  <Clock className="w-5 h-5 animate-pulse" />
+          {/* Seat Hold Timer Banner - shown whenever there is an active hold */}
+          {holdTimeLeft !== null && holdTimeLeft > 0 && (
+            <div className="sticky top-24 z-30 mb-8 animate-in fade-in slide-in-from-top-4 duration-500 w-full max-w-sm mx-auto md:max-w-none md:w-auto">
+              <div className="bg-amber-400 text-black px-4 py-3 rounded-2xl shadow-xl border border-amber-300 flex items-center justify-between backdrop-blur-md bg-opacity-95">
+                <div className="flex items-center gap-3">
+                  <div className="bg-black text-amber-400 p-2 rounded-xl">
+                    <Clock className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm leading-tight">
+                      Seat Reserved
+                    </p>
+                    <p className="text-xs font-medium text-black/70">
+                      Complete booking soon
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-amber-900 font-bold text-sm md:text-base leading-tight">
-                    Seat Reservation Hold
-                  </p>
-                  <p className="text-amber-700 text-xs md:text-sm mt-0.5">
-                    {holdFetchError
-                      ? "Unable to verify seat hold. Please check your internet or try again."
-                      : holdTimeLeft !== null
-                        ? "Payment window is active. Please complete to secure seats."
-                        : "Securing your selection..."}
-                  </p>
+                <div className="bg-white/20 px-3 py-1.5 rounded-lg border border-black/10">
+                  <div className="font-mono font-black text-lg tracking-wider">
+                    {Math.floor(holdTimeLeft / 60)}:
+                    {(holdTimeLeft % 60).toString().padStart(2, "0")}
+                  </div>
+                  <div className="text-[9px] uppercase font-bold tracking-wider text-center text-black/60">
+                    Remaining
+                  </div>
                 </div>
               </div>
-              {holdTimeLeft !== null && !holdFetchError && (
-                <div className="flex flex-col items-end">
-                  <div className="text-amber-700 font-mono font-black text-xl md:text-3xl tracking-tighter bg-white/60 px-4 py-1.5 rounded-xl border border-amber-200 shadow-sm">
-                    {Math.floor(holdTimeLeft / 60)}:
-                    {String(holdTimeLeft % 60).padStart(2, "0")}
-                  </div>
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-amber-600/80 mr-2 mt-1">
-                    Remaining
-                  </span>
-                </div>
-              )}
             </div>
           )}
 
@@ -1032,120 +1031,148 @@ const BookingPage = () => {
                 )}
 
                 {/* Tenure Selection */}
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-indigo-600" />
+                {!isCoworking && (
+                  <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                        <Clock className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">
+                          Select Tenure
+                        </h2>
+                        <p className="text-sm text-gray-500">
+                          Longer tenure = bigger savings
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">
-                        Select Tenure
-                      </h2>
-                      <p className="text-sm text-gray-500">
-                        Longer tenure = bigger savings
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {tenureOptions.map((option) => (
-                      <div
-                        key={option.years}
-                        onClick={() =>
-                          setSelectedTenure(option.years as 1 | 2 | 3)
-                        }
-                        className={`relative border-2 rounded-2xl p-5 cursor-pointer transition-all duration-300
-                          ${
-                            selectedTenure === option.years
-                              ? "border-teal-500 bg-teal-50 shadow-lg scale-[1.02]"
-                              : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
-                          }`}
-                      >
-                        {option.popular && (
-                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-teal-500 to-emerald-400 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md">
-                            Most Popular
-                          </div>
-                        )}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {tenureOptions.map((option) => (
                         <div
-                          className={`absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedTenure === option.years ? "border-teal-500 bg-teal-500" : "border-gray-300"}`}
+                          key={option.years}
+                          onClick={() =>
+                            setSelectedTenure(option.years as 1 | 2 | 3)
+                          }
+                          className={`relative border-2 rounded-2xl p-5 cursor-pointer transition-all duration-300
+                            ${
+                              selectedTenure === option.years
+                                ? "border-teal-500 bg-teal-50 shadow-lg scale-[1.02]"
+                                : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
+                            }`}
                         >
-                          {selectedTenure === option.years && (
-                            <Check className="w-3 h-3 text-white" />
+                          {option.popular && (
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-teal-500 to-emerald-400 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md">
+                              Most Popular
+                            </div>
+                          )}
+                          <div
+                            className={`absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selectedTenure === option.years ? "border-teal-500 bg-teal-500" : "border-gray-300"}`}
+                          >
+                            {selectedTenure === option.years && (
+                              <Check className="w-3 h-3 text-white" />
+                            )}
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900 mb-1 mt-1">
+                            {option.label}
+                          </h3>
+                          <div className="mb-2">
+                            <span className="text-2xl font-extrabold text-gray-900">
+                              ₹{option.totalPrice.toLocaleString()}
+                            </span>
+                            <span className="text-gray-500 text-sm ml-1">
+                              total
+                            </span>
+                          </div>
+                          {option.savings > 0 && (
+                            <div className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-md inline-block">
+                              Save ₹{option.savings.toLocaleString()} (
+                              {option.savingsPercent}% OFF)
+                            </div>
                           )}
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-1 mt-1">
-                          {option.label}
-                        </h3>
-                        <div className="mb-2">
-                          <span className="text-2xl font-extrabold text-gray-900">
-                            ₹{option.totalPrice.toLocaleString()}
-                          </span>
-                          <span className="text-gray-500 text-sm ml-1">
-                            total
-                          </span>
-                        </div>
-                        {option.savings > 0 && (
-                          <div className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-md inline-block">
-                            Save ₹{option.savings.toLocaleString()} (
-                            {option.savingsPercent}% OFF)
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* Start Date Picker */}
-                <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                      <CalendarDays className="w-5 h-5 text-emerald-600" />
+                {/* Start Date Picker (Custom dates already chosen for coworking seats) */}
+                {!isCoworking ? (
+                  <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                        <CalendarDays className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">
+                          Select Start Date
+                        </h2>
+                        <p className="text-sm text-gray-500">
+                          When would you like your booking to begin?
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">
-                        Select Start Date
-                      </h2>
-                      <p className="text-sm text-gray-500">
-                        When would you like your booking to begin?
-                      </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                          <CalendarDays className="w-3.5 h-3.5" /> Start Date
+                        </label>
+                        <input
+                          type="date"
+                          value={selectedStartDate}
+                          min={tomorrow.toISOString().split("T")[0]}
+                          onChange={(e) => setSelectedStartDate(e.target.value)}
+                          className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-400 transition-all text-sm font-medium cursor-pointer"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                          <Clock className="w-3.5 h-3.5" /> End Date{" "}
+                          <span className="text-gray-300 text-[10px] normal-case font-normal">
+                            (auto-calculated)
+                          </span>
+                        </label>
+                        <div className="w-full px-4 py-3.5 bg-gray-100 border border-gray-200 rounded-xl text-gray-600 text-sm font-medium">
+                          {formatDisplayDate(computedEndDate)}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
-                        <CalendarDays className="w-3.5 h-3.5" /> Start Date
-                      </label>
-                      <input
-                        type="date"
-                        value={selectedStartDate}
-                        min={tomorrow.toISOString().split("T")[0]}
-                        onChange={(e) => setSelectedStartDate(e.target.value)}
-                        className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-400 transition-all text-sm font-medium cursor-pointer"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5" /> End Date{" "}
-                        <span className="text-gray-300 text-[10px] normal-case font-normal">
-                          (auto-calculated)
-                        </span>
-                      </label>
-                      <div className="w-full px-4 py-3.5 bg-gray-100 border border-gray-200 rounded-xl text-gray-600 text-sm font-medium">
+                    <div className="mt-4 bg-teal-50 border border-teal-100 rounded-xl p-4 flex items-start gap-3">
+                      <CalendarDays className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-teal-700">
+                        <span className="font-semibold">Booking Period:</span>{" "}
+                        {formatDisplayDate(selectedStartDate)} →{" "}
                         {formatDisplayDate(computedEndDate)}
+                        <span className="text-teal-500 ml-2">
+                          ({selectedTenure} year{selectedTenure > 1 ? "s" : ""})
+                        </span>
                       </div>
                     </div>
                   </div>
-                  <div className="mt-4 bg-teal-50 border border-teal-100 rounded-xl p-4 flex items-start gap-3">
-                    <CalendarDays className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-teal-700">
-                      <span className="font-semibold">Booking Period:</span>{" "}
-                      {formatDisplayDate(selectedStartDate)} →{" "}
-                      {formatDisplayDate(computedEndDate)}
-                      <span className="text-teal-500 ml-2">
-                        ({selectedTenure} year{selectedTenure > 1 ? "s" : ""})
-                      </span>
+                ) : (
+                  <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
+                        <CheckCircle2 className="w-5 h-5 text-teal-600" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">
+                          Seat Reservation Selected
+                        </h2>
+                        <p className="text-sm text-gray-500">
+                          You have selected dates for your coworking seats.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
+                      <div className="text-gray-700 font-medium">
+                        Total Reservation Cost:
+                      </div>
+                      <div className="text-lg font-bold text-teal-700">
+                        ₹{fixedAmount?.toLocaleString() || 0}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -1309,14 +1336,20 @@ const BookingPage = () => {
                     <div className="space-y-3">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">
-                          {selectedPlanDetails.name} × {selectedTenure} year
-                          {selectedTenure > 1 ? "s" : ""}
+                          {selectedPlanDetails.name}{" "}
+                          {isCoworking
+                            ? ""
+                            : `× ${selectedTenure} year${selectedTenure > 1 ? "s" : ""}`}
                         </span>
                         <span className="font-semibold">
-                          ₹{(yearlyPrice * selectedTenure).toLocaleString()}
+                          ₹
+                          {(isCoworking && fixedAmount !== null
+                            ? fixedAmount
+                            : yearlyPrice * selectedTenure
+                          ).toLocaleString()}
                         </span>
                       </div>
-                      {selectedOption.savings > 0 && (
+                      {!isCoworking && selectedOption.savings > 0 && (
                         <div className="flex justify-between text-sm text-green-400">
                           <span>
                             Tenure Discount ({selectedOption.savingsPercent}%)
@@ -1379,8 +1412,10 @@ const BookingPage = () => {
                         ₹{finalPayableAmount.toLocaleString()}
                       </p>
                       <p className="text-xs text-teal-100 mt-1">
-                        {selectedPlanDetails.name} • {selectedTenure} Year
-                        {selectedTenure > 1 ? "s" : ""}
+                        {selectedPlanDetails.name}{" "}
+                        {isCoworking
+                          ? ""
+                          : `• ${selectedTenure} Year${selectedTenure > 1 ? "s" : ""}`}
                       </p>
                     </div>
                     <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">

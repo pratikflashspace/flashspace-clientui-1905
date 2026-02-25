@@ -27,11 +27,16 @@ export const getVirtualOfficesByCity = async (
     );
     const data = response.data as ApiResponse<VirtualOfficeItem[]>;
 
-    if (response.status === 200 && data.success) {
+    if ([200, 201].includes(response.status) && data.success) {
+      // Backend returns either an array directly or a paginated object { offices: [], total: 0, ... }
+      const offices = Array.isArray(data.data)
+        ? data.data
+        : (data.data as any).offices;
+
       console.log(
-        `✅ Successfully fetched ${data.data.length} virtual offices`,
+        `✅ Successfully fetched ${offices?.length || 0} virtual offices`,
       );
-      return data.data;
+      return offices || [];
     }
 
     throw new Error(data.message || "Failed to fetch virtual offices");
@@ -54,8 +59,11 @@ export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
     const response = await axiosInstance.get("/virtualOffice/getAll");
     const data = response.data as ApiResponse<VirtualOfficeItem[]>;
 
-    if (response.status === 200 && data.success) {
-      return data.data;
+    if ([200, 201].includes(response.status) && data.success) {
+      const offices = Array.isArray(data.data)
+        ? data.data
+        : (data.data as any).offices;
+      return offices || [];
     }
 
     throw new Error(data.message || "Failed to fetch virtual offices");
@@ -77,7 +85,7 @@ export const getVirtualOfficeById = async (
     const response = await axiosInstance.get(`/virtualOffice/getById/${id}`);
     const data = response.data as ApiResponse<VirtualOfficeItem>;
 
-    if (response.status === 200 && data.success) {
+    if ([200, 201].includes(response.status) && data.success) {
       return data.data;
     }
 
@@ -100,7 +108,7 @@ export const createVirtualOffice = async (
     const response = await axiosInstance.post("/virtualOffice/create", data);
     const responseData = response.data as ApiResponse<VirtualOfficeItem>;
 
-    if (response.status === 200 && responseData.success) {
+    if ([200, 201].includes(response.status) && responseData.success) {
       return responseData.data;
     }
 
@@ -128,7 +136,7 @@ export const updateVirtualOffice = async (
     );
     const responseData = response.data as ApiResponse<VirtualOfficeItem>;
 
-    if (response.status === 200 && responseData.success) {
+    if ([200, 201].includes(response.status) && responseData.success) {
       return responseData.data;
     }
 
@@ -149,7 +157,7 @@ export const deleteVirtualOffice = async (id: string): Promise<boolean> => {
     const response = await axiosInstance.delete(`/virtualOffice/delete/${id}`);
     const responseData = response.data as ApiResponse<any>;
 
-    if (response.status === 200 && responseData.success) {
+    if ([200, 201].includes(response.status) && responseData.success) {
       return true;
     }
 

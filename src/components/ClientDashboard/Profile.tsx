@@ -90,25 +90,35 @@ const Profile: React.FC = () => {
         // Fetch KYC data for business info
         const kycResponse = await userDashboardService.getKYC();
         if (kycResponse.success && kycResponse.data) {
-          const kyc = Array.isArray(kycResponse.data)
-            ? kycResponse.data[0]
-            : kycResponse.data;
-          setKycData(kyc);
+          const profiles = Array.isArray(kycResponse.data)
+            ? kycResponse.data
+            : [kycResponse.data];
 
-          if (kyc.businessInfo) {
-            setProfileData((prev) => ({
-              ...prev,
-              registeredAddress: kyc.businessInfo?.address || "",
-            }));
-            setBusinessInfoForm({
-              companyName: kyc.businessInfo.companyName || "",
-              companyType: kyc.businessInfo.companyType || "",
-              gstNumber: kyc.businessInfo.gstNumber || "",
-              panNumber: kyc.businessInfo.panNumber || "",
-              cinNumber: kyc.businessInfo.cinNumber || "",
-              address: kyc.businessInfo.address || "",
-              businessNature: kyc.businessInfo.businessNature || "",
-            });
+          // Find the best profile: approved/verified first, then any profile
+          const approvedKyc = profiles.find(
+            (p) =>
+              p.overallStatus === "approved" || p.overallStatus === "verified",
+          );
+          const kyc = approvedKyc || profiles[0];
+
+          if (kyc) {
+            setKycData(kyc);
+
+            if (kyc.businessInfo) {
+              setProfileData((prev) => ({
+                ...prev,
+                registeredAddress: kyc.businessInfo?.address || "",
+              }));
+              setBusinessInfoForm({
+                companyName: kyc.businessInfo.companyName || "",
+                companyType: kyc.businessInfo.companyType || "",
+                gstNumber: kyc.businessInfo.gstNumber || "",
+                panNumber: kyc.businessInfo.panNumber || "",
+                cinNumber: kyc.businessInfo.cinNumber || "",
+                address: kyc.businessInfo.address || "",
+                businessNature: kyc.businessInfo.businessNature || "",
+              });
+            }
           }
         }
 
@@ -147,10 +157,18 @@ const Profile: React.FC = () => {
         // Refresh data after save
         const kycResponse = await userDashboardService.getKYC();
         if (kycResponse.success && kycResponse.data) {
-          const kyc = Array.isArray(kycResponse.data)
-            ? kycResponse.data[0]
-            : kycResponse.data;
-          setKycData(kyc);
+          const profiles = Array.isArray(kycResponse.data)
+            ? kycResponse.data
+            : [kycResponse.data];
+
+          const approvedKyc = profiles.find(
+            (p) => p.overallStatus === "approved",
+          );
+          const kyc = approvedKyc || profiles[0];
+
+          if (kyc) {
+            setKycData(kyc);
+          }
         }
       }
       setIsEditing(false);

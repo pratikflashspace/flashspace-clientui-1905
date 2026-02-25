@@ -102,7 +102,7 @@ export const createCoworkingSpace = async (
     const response = await axiosInstance.post("/coworkingSpace/create", data);
     const responseData = response.data as ApiResponse<CoworkingSpaceItem>;
 
-    if (response.status === 200 && responseData.success) {
+    if ([200, 201].includes(response.status) && responseData.success) {
       return responseData.data;
     }
 
@@ -130,7 +130,7 @@ export const updateCoworkingSpace = async (
     );
     const responseData = response.data as ApiResponse<CoworkingSpaceItem>;
 
-    if (response.status === 200 && responseData.success) {
+    if ([200, 201].includes(response.status) && responseData.success) {
       return responseData.data;
     }
 
@@ -151,7 +151,7 @@ export const deleteCoworkingSpace = async (id: string): Promise<boolean> => {
     const response = await axiosInstance.delete(`/coworkingSpace/delete/${id}`);
     const responseData = response.data as ApiResponse<any>;
 
-    if (response.status === 200 && responseData.success) {
+    if ([200, 201].includes(response.status) && responseData.success) {
       return true;
     }
 

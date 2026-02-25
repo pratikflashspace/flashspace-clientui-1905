@@ -279,12 +279,19 @@ const ListingCardModern = memo<ListingCardModernProps>(
           {/* Pricing - All 3 Plans Vertical */}
           <div className="flex flex-col gap-1 mb-2">
             {/* GST Plan */}
-            {(("gstPlanPricePerYear" in item && item.gstPlanPricePerYear) ||
+            {(("finalGstPricePerYear" in item && item.finalGstPricePerYear) ||
+              ("gstPlanPricePerYear" in item && item.gstPlanPricePerYear) ||
               ("gstPlanPrice" in item && item.gstPlanPrice)) && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">GST Plan</span>
                 <div className="text-right">
-                  {"gstPlanPricePerYear" in item && item.gstPlanPricePerYear ? (
+                  {"finalGstPricePerYear" in item &&
+                  item.finalGstPricePerYear ? (
+                    <span className="text-sm font-semibold text-gray-900 block">
+                      {formatCurrency(item.finalGstPricePerYear)}/yr
+                    </span>
+                  ) : "gstPlanPricePerYear" in item &&
+                    item.gstPlanPricePerYear ? (
                     <span className="text-sm font-semibold text-gray-900 block">
                       {formatCurrency(item.gstPlanPricePerYear)}/yr
                     </span>
@@ -305,14 +312,21 @@ const ListingCardModern = memo<ListingCardModernProps>(
             )}
 
             {/* Mailing Plan */}
-            {(("mailingPlanPricePerYear" in item &&
-              item.mailingPlanPricePerYear) ||
+            {(("finalMailingPricePerYear" in item &&
+              item.finalMailingPricePerYear) ||
+              ("mailingPlanPricePerYear" in item &&
+                item.mailingPlanPricePerYear) ||
               ("mailingPlanPrice" in item && item.mailingPlanPrice)) && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Mailing Plan</span>
                 <div className="text-right">
-                  {"mailingPlanPricePerYear" in item &&
-                  item.mailingPlanPricePerYear ? (
+                  {"finalMailingPricePerYear" in item &&
+                  item.finalMailingPricePerYear ? (
+                    <span className="text-sm font-semibold text-gray-900 block">
+                      {formatCurrency(item.finalMailingPricePerYear)}/yr
+                    </span>
+                  ) : "mailingPlanPricePerYear" in item &&
+                    item.mailingPlanPricePerYear ? (
                     <span className="text-sm font-semibold text-gray-900 block">
                       {formatCurrency(item.mailingPlanPricePerYear)}/yr
                     </span>
@@ -333,12 +347,18 @@ const ListingCardModern = memo<ListingCardModernProps>(
             )}
 
             {/* Business Registration Plan */}
-            {(("brPlanPricePerYear" in item && item.brPlanPricePerYear) ||
+            {(("finalBrPricePerYear" in item && item.finalBrPricePerYear) ||
+              ("brPlanPricePerYear" in item && item.brPlanPricePerYear) ||
               ("brPlanPrice" in item && item.brPlanPrice)) && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Business Reg</span>
                 <div className="text-right">
-                  {"brPlanPricePerYear" in item && item.brPlanPricePerYear ? (
+                  {"finalBrPricePerYear" in item && item.finalBrPricePerYear ? (
+                    <span className="text-sm font-semibold text-gray-900 block">
+                      {formatCurrency(item.finalBrPricePerYear)}/yr
+                    </span>
+                  ) : "brPlanPricePerYear" in item &&
+                    item.brPlanPricePerYear ? (
                     <span className="text-sm font-semibold text-gray-900 block">
                       {formatCurrency(item.brPlanPricePerYear)}/yr
                     </span>

@@ -87,8 +87,8 @@ export default function Spaces() {
       const matchesQuery =
         space.name?.toLowerCase().includes(normalizedQuery) ||
         space.city?.toLowerCase().includes(normalizedQuery) ||
-        space.location?.toLowerCase().includes(normalizedQuery) ||
-        space.id?.toLowerCase().includes(normalizedQuery);
+        space.area?.toLowerCase().includes(normalizedQuery) ||
+        space._id?.toLowerCase().includes(normalizedQuery);
 
       const matchesStatus =
         statusFilter === "ALL" ? true : space.status === statusFilter;
@@ -204,17 +204,15 @@ export default function Spaces() {
               <th className="px-6 py-4 font-semibold">Space ID</th>
               <th className="px-6 py-4 font-semibold">Space Name</th>
               <th className="px-6 py-4 font-semibold">City</th>
-              <th className="px-6 py-4 font-semibold">Location</th>
-              <th className="px-6 py-4 font-semibold">Seats</th>
-              <th className="px-6 py-4 font-semibold">Meeting Rooms</th>
-              <th className="px-6 py-4 font-semibold">Cabins</th>
+              <th className="px-6 py-4 font-semibold">Area</th>
               <th className="px-6 py-4 font-semibold">Status</th>
+              <th className="px-6 py-4 font-semibold">Details</th>
             </tr>
           </thead>
 
           <tbody>
             {filteredSpaces.map((space) => (
-              <SpaceRow key={space.id} space={space} />
+              <SpaceRow key={space._id} space={space} />
             ))}
           </tbody>
         </table>
@@ -235,37 +233,35 @@ function SpaceRow({
   space,
 }: {
   space: {
-    id: string;
+    _id: string;
     name: string;
     city: string;
-    location: string;
-    availableSeats: number;
-    totalSeats: number;
-    meetingRooms: number;
-    cabins: number;
+    area: string;
     status: SpaceStatus;
   };
 }) {
+  const navigate = useNavigate();
   return (
     <tr className="border-t border-slate-100 hover:bg-slate-50">
-      <td className="px-6 py-5 font-semibold text-slate-900">{space.id}</td>
+      <td className="px-6 py-5 font-semibold text-slate-900">{space._id}</td>
 
       <td className="px-6 py-5 font-semibold text-slate-900">{space.name}</td>
 
       <td className="px-6 py-5 text-slate-600">{space.city}</td>
 
-      <td className="px-6 py-5 text-slate-600">{space.location}</td>
-
-      <td className="px-6 py-5 font-semibold text-slate-700">
-        {space.availableSeats}/{space.totalSeats}
-      </td>
-
-      <td className="px-6 py-5 text-slate-600">{space.meetingRooms}</td>
-
-      <td className="px-6 py-5 text-slate-600">{space.cabins}</td>
+      <td className="px-6 py-5 text-slate-600 font-medium">{space.area}</td>
 
       <td className="px-6 py-5">
         <SpaceStatusPill status={space.status} />
+      </td>
+
+      <td className="px-6 py-5">
+        <button
+          onClick={() => navigate(`/spaceportal/space-management/${space._id}`)}
+          className="px-4 py-2 text-xs font-bold text-white bg-[#3FA69E] rounded-lg hover:opacity-90 transition-all shadow-sm hover:shadow-md"
+        >
+          View Details
+        </button>
       </td>
     </tr>
   );

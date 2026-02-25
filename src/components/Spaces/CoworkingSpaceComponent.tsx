@@ -22,7 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { userDashboardService } from "@/services/userDashboard.service";
 import axios from "axios";
 import { API_CONFIG } from "@/config/api.config";
-import { CoworkingSpaceItem } from "@/types/services";
+import { CoworkingSpaceItem, ApiResponse } from "@/types/services";
 import { SpaceDetailSkeleton } from "@/components/ui/skeleton-loaders";
 import ImageGalleryModal from "../ui/ImageGalleryModal";
 
@@ -84,7 +84,7 @@ const CoworkingSpaceComponent = () => {
       if (!id || !isAuthenticated) return;
       try {
         const token = localStorage.getItem("accessToken");
-        const response = await axios.get(
+        const response = await axios.get<ApiResponse<any[]>>(
           `${API_CONFIG.BASE_URL}/api/seat-bookings/user`,
           {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -175,10 +175,11 @@ const CoworkingSpaceComponent = () => {
   // Get monthly price per desk
   const getMonthlyPrice = () => {
     if (!spaceDetails) return 0;
-    // Prefer the new root pricePerMonth, fallback to old parsed price
     return (
-      (spaceDetails as any).pricePerMonth ||
-      parsePrice((spaceDetails as any).price)
+      spaceDetails.finalPricePerMonth ||
+      spaceDetails.partnerPricePerMonth ||
+      parsePrice(spaceDetails.price) ||
+      0
     );
   };
 
@@ -190,6 +191,18 @@ const CoworkingSpaceComponent = () => {
   // Get photos - use API image or fallback to defaults
   const getPhotos = () => {
     if (!spaceDetails) return DEFAULT_PHOTOS;
+
+    // Check if we have an array of images from the new schema
+    if (spaceDetails.images && spaceDetails.images.length > 0) {
+      // Pad with defaults if less than 4 images
+      const apiImages = [...spaceDetails.images];
+      while (apiImages.length < 4) {
+        apiImages.push(DEFAULT_PHOTOS[apiImages.length]);
+      }
+      return apiImages;
+    }
+
+    // Fallback to legacy single image or defaults
     const mainImage = spaceDetails.image || DEFAULT_PHOTOS[0];
     return [mainImage, ...DEFAULT_PHOTOS.slice(1)];
   };
@@ -301,10 +314,16 @@ const CoworkingSpaceComponent = () => {
                   <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md">
                     <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                     <span className="font-semibold text-black">
-                      {spaceDetails.rating}
+                      {(spaceDetails as any).avgRating ||
+                        spaceDetails.rating ||
+                        0}
                     </span>
                     <span className="text-gray-400">
-                      ({spaceDetails.reviews} reviews)
+                      (
+                      {(spaceDetails as any).totalReviews ||
+                        spaceDetails.reviews ||
+                        0}{" "}
+                      reviews)
                     </span>
                   </div>
 
@@ -477,7 +496,11 @@ const CoworkingSpaceComponent = () => {
                   </div>
                   <div className="flex items-center gap-1 text-sm">
                     <span>⭐</span>
-                    <span className="font-semibold">{spaceDetails.rating}</span>
+                    <span className="font-semibold">
+                      {(spaceDetails as any).avgRating ||
+                        spaceDetails.rating ||
+                        0}
+                    </span>
                   </div>
                 </div>
 

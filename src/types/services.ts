@@ -11,6 +11,27 @@ export interface BusinessSolution {
   description: string;
 }
 
+export interface Property {
+  _id: string;
+  id?: string;
+  name: string;
+  address: string;
+  city: string;
+  area: string;
+  features: string[];
+  location?: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+  images: string[];
+  kycStatus: string;
+  status?: string;
+  isActive?: boolean;
+  partner: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Virtual Office specific types
 export interface VirtualOfficeItem {
   _id: string;
@@ -22,11 +43,14 @@ export interface VirtualOfficeItem {
   originalPrice: string;
 
   // Updated fields from Backend
+  finalGstPricePerYear?: number;
+  finalMailingPricePerYear?: number;
+  finalBrPricePerYear?: number;
+
+  // Legacy fields (managed as optional for backward compatibility)
   gstPlanPricePerYear?: number;
   mailingPlanPricePerYear?: number;
   brPlanPricePerYear?: number;
-
-  // Legacy fields (optional)
   gstPlanPrice?: string;
   gstPlanPriceYearly?: string;
   mailingPlanPrice?: string;
@@ -108,8 +132,15 @@ export interface CoworkingSpaceItem {
   price: string;
   priceYearly?: string;
   originalPrice: string;
+
+  // Updated from Backend
+  partnerPricePerMonth?: number;
+  adminMarkupPerMonth?: number;
+  finalPricePerMonth?: number;
+
   rating: number;
   reviews: number;
+
   type: string;
   features: string[];
   availability: string;
@@ -141,8 +172,21 @@ export interface MeetingRoomItem {
   area: string;
   price: string; // e.g., "₹1,000/hour"
   originalPrice?: string;
+
+  // Updated from Backend
+  partnerPricePerHour?: number;
+  adminMarkupPerHour?: number;
+  finalPricePerHour?: number;
+
+  partnerPricePerDay?: number;
+  adminMarkupPerDay?: number;
+  finalPricePerDay?: number;
+
+  avgRating?: number;
+  totalReviews?: number;
   rating: number;
   reviews: number;
+
   type: string; // e.g. "Meeting Room", "Conference Room", "Cabin"
   features: string[];
   availability: string;
@@ -307,7 +351,8 @@ export type KYCStatus =
   | "pending"
   | "approved"
   | "rejected"
-  | "resubmit";
+  | "resubmit"
+  | "verified";
 export type KYCType = "individual" | "business";
 export type DocumentStatus = "pending" | "approved" | "rejected";
 

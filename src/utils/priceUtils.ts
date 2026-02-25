@@ -36,19 +36,25 @@ export const getVirtualOfficePricing = (
 
   // Prioritize new numeric fields from backend, fallback to legacy string parsing
   const gstPriceYearly =
-    spaceDetails.gstPlanPricePerYear !== undefined
-      ? spaceDetails.gstPlanPricePerYear
-      : parsePrice(spaceDetails.gstPlanPriceYearly);
+    spaceDetails.finalGstPricePerYear !== undefined
+      ? spaceDetails.finalGstPricePerYear
+      : spaceDetails.gstPlanPricePerYear !== undefined
+        ? spaceDetails.gstPlanPricePerYear
+        : parsePrice(spaceDetails.gstPlanPriceYearly);
 
   const mailingPriceYearly =
-    spaceDetails.mailingPlanPricePerYear !== undefined
-      ? spaceDetails.mailingPlanPricePerYear
-      : parsePrice(spaceDetails.mailingPlanPriceYearly);
+    spaceDetails.finalMailingPricePerYear !== undefined
+      ? spaceDetails.finalMailingPricePerYear
+      : spaceDetails.mailingPlanPricePerYear !== undefined
+        ? spaceDetails.mailingPlanPricePerYear
+        : parsePrice(spaceDetails.mailingPlanPriceYearly);
 
   const brPriceYearly =
-    spaceDetails.brPlanPricePerYear !== undefined
-      ? spaceDetails.brPlanPricePerYear
-      : parsePrice(spaceDetails.brPlanPriceYearly);
+    spaceDetails.finalBrPricePerYear !== undefined
+      ? spaceDetails.finalBrPricePerYear
+      : spaceDetails.brPlanPricePerYear !== undefined
+        ? spaceDetails.brPlanPricePerYear
+        : parsePrice(spaceDetails.brPlanPriceYearly);
 
   // For monthly price, if we only have yearly, we can estimate it, or use legacy
   const gstPriceMonthly = parsePrice(

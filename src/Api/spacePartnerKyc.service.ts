@@ -129,6 +129,32 @@ export const getMySpaceUserKyc =
     }
   };
 
+export const submitSpaceUserKyc = async (): Promise<SpaceUserKycResponse> => {
+  try {
+    const response = await axios.post(
+      `${API.domain}/api/spacePartner/kyc/submit`,
+      {},
+      { withCredentials: true },
+    );
+
+    if (response.status === 200 && response.data.success) {
+      return response.data.data as SpaceUserKycResponse;
+    }
+
+    throw new Error(response.data?.message || "Failed to submit KYC");
+  } catch (error: unknown) {
+    console.error("Error submitting space user KYC:", error);
+
+    const message = axios.isAxiosError(error)
+      ? error.response?.data?.message || error.message || "Failed to submit KYC"
+      : error instanceof Error
+        ? error.message
+        : "Failed to submit KYC";
+
+    throw new Error(message);
+  }
+};
+
 export type UpsertSpaceUserKycPayload = {
   fullName: string;
   email: string;

@@ -102,6 +102,7 @@ import SpacePortalProfile from "./pages/spacePortal/Profile";
 import Notifications from "./pages/spacePortal/Notifications";
 import SpacePortalSettings from "./pages/spacePortal/Settings";
 import AddSpace from "./pages/spacePortal/AddSpace";
+import PropertyDetails from "./pages/spacePortal/PropertyDetails";
 
 import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
 import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
@@ -278,7 +279,10 @@ const App = () => (
 
                   {/* Protected Routes */}
                   <Route element={<ProtectedRoute />}>
-                    <Route path="/bookings" element={<Bookings />} />
+                    <Route
+                      path="/bookings"
+                      element={<Navigate to="/dashboard/my-bookings" replace />}
+                    />
                     <Route path="/community" element={<Community />} />
                     <Route path="/settings" element={<Settings />} />
 
@@ -374,6 +378,10 @@ const App = () => (
                       <Route
                         path="space-management/add"
                         element={<AddSpace />}
+                      />
+                      <Route
+                        path="space-management/:id"
+                        element={<PropertyDetails />}
                       />
                       <Route
                         path="team-management"
