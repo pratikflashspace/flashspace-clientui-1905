@@ -201,7 +201,13 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                     }}
                                 >
                                     <div className="p-4 grid grid-cols-2 gap-4"
+<<<<<<< HEAD
                                     onMouseLeave={()=>setIsSolutionsOpen(false)}>
+=======
+                                        onMouseLeave={()=>setIsSolutionsOpen(false)}
+                                    >
+                                        
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                                         <div className="border border-gray-100 dark:border-white/10 rounded-lg p-4 bg-[#f8faf9] dark:bg-white/5">
                                             <div className="flex items-center gap-2 mb-1 cursor-pointer" onClick={() => { handleNavigation("/Solutions/on-demand"); setIsSolutionsOpen(false); }}>
                                                 <Zap className="w-4 h-4 text-[#D96832]" />
@@ -294,8 +300,14 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 </button>
 
                                 {isMoreOpen && (
+<<<<<<< HEAD
                                     <ul className="absolute bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50"
                                     onMouseLeave={()=>setIsMoreOpen(false)}>
+=======
+                                    <ul 
+                                    onMouseLeave={() => setIsMoreOpen(false)}
+                                    className="absolute bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50">
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                                         {[
                                             { label: "About Us", href: "/about" },
                                             { label: "Career", href: "/career" },

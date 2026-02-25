@@ -65,6 +65,10 @@ import UserManagement from "./pages/admin/UserManagement";
 import Coupons from "./pages/admin/Coupons";
 import KYCRequests from "./pages/admin/KYCRequests";
 import KYCDetail from "./pages/admin/KYCDetail";
+import KYCRequestDetails from "./pages/admin/KYCRequestDetails";
+import KYCPartnerRequests from "./pages/admin/KYCPartnerRequests";
+import SpacePartnerKycDetails from "./pages/admin/SpacePartnerKycDetails";
+import SpaceDetail from "./pages/admin/SpaceDetail";
 import SpaceManagement from "./pages/admin/SpaceManagement";
 
 import AdminSettings from "./pages/admin/Settings";
@@ -129,6 +133,7 @@ import MarketingTools from "./pages/affiliatePortal/MarketingTools";
 import LeaderBoard from "./pages/affiliatePortal/LeaderBoard";
 
 import Support from "./pages/affiliatePortal/Support";
+import KycVerification from "./components/Spaces/KycVerification";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -180,13 +185,10 @@ const App = () => (
             <DarkModeProvider>
               <NotificationProvider>
                 <ScrollToTop />
-                {/* <MouseFollower/> */}
                 <Routes>
                   {/* Public Routes */}
-
                   <Route path="/" element={<Index />} />
                   <Route path="/services" element={<Services />} />
-
                   <Route
                     path="/services/virtual-office"
                     element={<VirtualOffice />}
@@ -291,7 +293,19 @@ const App = () => (
                       <Route path="users" element={<UserManagement />} />
                       <Route path="kyc-requests" element={<KYCRequests />} />
                       <Route path="kyc-requests/:id" element={<KYCDetail />} />
+                      <Route
+                        path="kyc-partners"
+                        element={<KYCPartnerRequests />}
+                      />
+                      <Route
+                        path="kyc-partners/:id"
+                        element={<SpacePartnerKycDetails />}
+                      />
                       <Route path="spaces" element={<SpaceManagement />} />
+                      <Route
+                        path="space-details/:id"
+                        element={<SpaceDetail />}
+                      />
                       <Route path="settings" element={<AdminSettings />} />
                       <Route path="clients" element={<Clients />} />
                       <Route path="clients/:id" element={<ClientDetails />} />
@@ -350,6 +364,10 @@ const App = () => (
                       <Route
                         path="booking-analytics"
                         element={<BookingAnalytics />}
+                      />
+                      <Route
+                        path="kyc-verification"
+                        element={<KycVerification />}
                       />
 
                       <Route path="space-management" element={<Spaces />} />
@@ -419,12 +437,6 @@ const App = () => (
                     </Route>
                   </Route>
 
-                  <Route path="/list-your-space" element={<ListYourSpace />} />
-                  <Route path="/partner" element={<PartnerWithUs />} />
-                  <Route path="/coming-soon" element={<ComingSoon />} />
-                  <Route path="/start-chatting" element={<StartChatting />} />
-
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </NotificationProvider>

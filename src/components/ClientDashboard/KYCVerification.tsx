@@ -159,6 +159,7 @@ export default function KYCVerification() {
           const data = response.data as KYCData;
           setKycData(data);
 
+<<<<<<< HEAD
           // Detect if this is a partner profile (handling both nested and flat structures)
           const isPartner =
             data.isPartner ||
@@ -174,6 +175,11 @@ export default function KYCVerification() {
           } else {
             setIsPartnerMode(false);
           }
+=======
+          // Detect if this is a partner profile
+          const isPartnerProfile = data.isPartner || (data.kycType === 'individual' && data.personalInfo?.fullName && data.personalInfo.fullName !== user?.fullName);
+          setIsPartnerMode(!!isPartnerProfile);
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
 
           setBusinessForm({
             profileName: data.profileName || "",
@@ -186,6 +192,7 @@ export default function KYCVerification() {
             partners: data.businessInfo?.partners || [],
           });
 
+<<<<<<< HEAD
           // Pre-fill personal form if exist (handling both nested and flat structures)
           setPersonalForm((prev) => {
             const info = data.personalInfo || {};
@@ -209,6 +216,18 @@ export default function KYCVerification() {
               email: info.email || flatData.email || user?.email || "",
             };
           });
+=======
+          // Pre-fill personal form if exist
+          setPersonalForm(prev => ({
+            phone: data.personalInfo?.phone || user?.phoneNumber || "",
+            dateOfBirth: data.personalInfo?.dateOfBirth ? new Date(data.personalInfo.dateOfBirth).toISOString().split('T')[0] : "",
+            aadhaar: prev.aadhaar || data.personalInfo?.aadhaarNumber || "",  // Keep existing value or use full number
+            pan: data.personalInfo?.panNumber || "",
+            fullName: data.personalInfo?.fullName || "",
+            // For partners, do not fall back to logged-in user's email
+            email: data.personalInfo?.email || (isPartnerProfile ? "" : (user?.email || "")),
+          }));
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
 
           if (data.kycType) {
             setKycType(data.kycType as KYCType);
@@ -357,6 +376,7 @@ export default function KYCVerification() {
         personalAadhaar: personalForm.aadhaar,
         personalPan: personalForm.pan,
         personalFullName: personalForm.fullName,
+        personalEmail: personalForm.email,
         partners: businessForm.partners, // Include selected partners
       });
 
@@ -531,6 +551,7 @@ export default function KYCVerification() {
 
   // Step validation functions
   const isPersonalInfoComplete = () => {
+<<<<<<< HEAD
     if (isPartnerMode && !personalForm.fullName) return false;
     return !!(
       personalForm.phone &&
@@ -538,6 +559,10 @@ export default function KYCVerification() {
       personalForm.aadhaar &&
       personalForm.pan
     );
+=======
+    if (isPartnerMode && (!personalForm.fullName || !personalForm.email)) return false;
+    return !!(personalForm.phone && personalForm.dateOfBirth && personalForm.aadhaar && personalForm.pan);
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
   };
 
   const isBusinessInfoComplete = () => {
@@ -1009,12 +1034,16 @@ export default function KYCVerification() {
                       partners: [],
                     });
                     setPersonalForm({
+<<<<<<< HEAD
                       phone: "",
                       dateOfBirth: "",
                       aadhaar: "",
                       pan: "",
                       fullName: "",
                       email: "",
+=======
+                      phone: "", dateOfBirth: "", aadhaar: "", pan: "", fullName: "", email: ""
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                     });
                   }}
                   disabled={
@@ -1281,8 +1310,12 @@ export default function KYCVerification() {
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
+<<<<<<< HEAD
                         <User className="w-5 h-5 text-yellow-500" /> Personal
                         Information
+=======
+                        <User className="w-5 h-5 text-yellow-500" /> {isPartnerMode ? "Partner Personal Information" : "Personal Information"}
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                       </h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1318,14 +1351,19 @@ export default function KYCVerification() {
                         )}
                       </div>
                       <div>
+<<<<<<< HEAD
                         <label className="block text-sm text-gray-500 mb-1">
                           Email
                         </label>
+=======
+                        <label className="block text-sm text-gray-500 mb-1">Email <span className="text-red-500">*</span></label>
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                         {isPartnerMode ? (
                           <input
                             type="email"
                             placeholder="Partner Email"
                             value={personalForm.email}
+<<<<<<< HEAD
                             onChange={(e) =>
                               setPersonalForm({
                                 ...personalForm,
@@ -1338,6 +1376,14 @@ export default function KYCVerification() {
                           <p className="text-gray-900">
                             {user?.email || kycData?.personalInfo?.email || "-"}
                           </p>
+=======
+                            onChange={(e) => setPersonalForm({ ...personalForm, email: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            required
+                          />
+                        ) : (
+                          <p className="text-gray-900">{user?.email || kycData?.personalInfo?.email || "-"}</p>
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                         )}
                       </div>
                       <div>
@@ -1448,7 +1494,11 @@ export default function KYCVerification() {
                           !personalForm.dateOfBirth ||
                           !personalForm.aadhaar ||
                           !personalForm.pan ||
+<<<<<<< HEAD
                           (isPartnerMode && !personalForm.fullName)
+=======
+                          (isPartnerMode && (!personalForm.fullName || !personalForm.email))
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                         }
                         className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2 disabled:opacity-50"
                       >
@@ -1606,6 +1656,7 @@ export default function KYCVerification() {
                       </div>
 
                       <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+<<<<<<< HEAD
                         <p className="text-sm text-gray-500 mb-2">
                           Select verified partners to link to this company:
                         </p>
@@ -1656,6 +1707,40 @@ export default function KYCVerification() {
                               </span>
                             </label>
                           ))}
+=======
+                        <p className="text-sm text-gray-500 mb-2">Select partners to link to this company (only verified partners are selectable):</p>
+                        {[individualProfile, ...partnerProfiles].filter(p => p).length === 0 && (
+                          <p className="text-sm text-red-400 italic">No partner profiles found. Please add partner profiles first.</p>
+                        )}
+
+                        {[individualProfile, ...partnerProfiles].filter(p => p).map(p => {
+                          const status = getOverallStatusConfig(p!.overallStatus || 'not_started');
+                          const isApproved = p!.overallStatus === 'approved';
+                          return (
+                          <label key={p!._id} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-yellow-400 transition-colors">
+                            <input
+                              type="checkbox"
+                              checked={businessForm.partners.includes(p!._id!)}
+                              onChange={(e) => {
+                                if (!isApproved) return; // Only allow linking verified partners
+                                const newPartners = e.target.checked
+                                  ? [...businessForm.partners, p!._id!]
+                                  : businessForm.partners.filter(id => id !== p!._id);
+                                setBusinessForm({ ...businessForm, partners: newPartners });
+                              }}
+                              className="w-5 h-5 text-yellow-500 rounded focus:ring-yellow-400"
+                              disabled={!isApproved}
+                            />
+                            <div>
+                              <p className="font-medium text-gray-900">{p!.profileName}</p>
+                              <p className="text-xs text-gray-500">{p!.personalInfo?.fullName || "Partner"}</p>
+                            </div>
+                            <span className={`ml-auto text-xs px-2 py-0.5 rounded-full flex items-center gap-1 text-white ${status.bg}`}>
+                              <status.icon className="w-3 h-3" /> {status.text}
+                            </span>
+                          </label>
+                        )})}
+>>>>>>> aaac7a4dd1b08aa8680d4f4e8824e0355ace502a
                       </div>
                     </div>
 
