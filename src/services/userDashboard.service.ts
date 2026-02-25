@@ -22,6 +22,8 @@ import {
   KYCDocument,
   PersonalInfo,
   BusinessInfo,
+  MailRecord,
+  VisitRecord,
 } from "@/types/services";
 
 export type { KYCData, DashboardData };
@@ -40,6 +42,40 @@ class UserDashboardService {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to fetch dashboard";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  // ========== MAIL & VISITS ==========
+
+  async getUserMails(): Promise<ApiResponse<MailRecord[]>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<MailRecord[]>>(
+        API_ENDPOINTS.USER.MAIL,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch mails";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  async getUserVisits(): Promise<ApiResponse<VisitRecord[]>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<VisitRecord[]>>(
+        API_ENDPOINTS.USER.VISIT,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch visits";
       return {
         success: false,
         message: errorMessage,

@@ -434,6 +434,32 @@ export interface SupportTicket {
   closedAt?: string;
 }
 
+export interface MailRecord {
+  _id: string;
+  mailId: string;
+  client: string;
+  sender: string;
+  type: string;
+  space: string;
+  received: string;
+  status: "Pending Action" | "Forwarded" | "Collected";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VisitRecord {
+  _id: string;
+  visitId: string;
+  client: string;
+  visitor: string;
+  purpose: string;
+  space: string;
+  date: string;
+  status: "Pending" | "Completed";
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CreditHistoryItem {
   amount: number;
   source: string;
