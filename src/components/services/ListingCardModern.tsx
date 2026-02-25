@@ -1,27 +1,43 @@
-import { memo, useState } from 'react';
-import { MapPin, Star, Heart, Plus, ChevronLeft, ChevronRight, Phone } from 'lucide-react';
-import { VirtualOfficeItem, CoworkingSpaceItem, MeetingRoomItem } from '@/types/services';
-import MeetingBookingModal from '@/components/ui/MeetingBookingModal';
+import { memo, useState } from "react";
+import {
+  MapPin,
+  Star,
+  Heart,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  Phone,
+} from "lucide-react";
+import {
+  VirtualOfficeItem,
+  CoworkingSpaceItem,
+  MeetingRoomItem,
+} from "@/types/services";
+import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
 
 // Union type that works with all service types
-export type ListingItem = VirtualOfficeItem | CoworkingSpaceItem | MeetingRoomItem | {
-  _id: string;
-  name: string;
-  address: string;
-  area: string;
-  price: string;
-  originalPrice?: string;
-  rating: number;
-  reviews: number;
-  image?: string;
-  features: string[];
-  popular?: boolean;
-  availability?: string;
-  coordinates?: {
-    lat: number;
-    lng: number;
-  };
-};
+export type ListingItem =
+  | VirtualOfficeItem
+  | CoworkingSpaceItem
+  | MeetingRoomItem
+  | {
+      _id: string;
+      name: string;
+      address: string;
+      area: string;
+      price: string;
+      originalPrice?: string;
+      rating: number;
+      reviews: number;
+      image?: string;
+      features: string[];
+      popular?: boolean;
+      availability?: string;
+      coordinates?: {
+        lat: number;
+        lng: number;
+      };
+    };
 
 interface ListingCardModernProps {
   item: ListingItem;
@@ -33,10 +49,10 @@ interface ListingCardModernProps {
 
 // Multiple images for carousel effect
 const PLACEHOLDER_IMAGES = [
-  'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80',
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80",
 ];
 
 /**
@@ -61,12 +77,16 @@ const ListingCardModern = memo<ListingCardModernProps>(
 
     const handlePrevImage = (e: React.MouseEvent) => {
       e.stopPropagation();
-      setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+      setCurrentImageIndex((prev) =>
+        prev === 0 ? images.length - 1 : prev - 1,
+      );
     };
 
     const handleNextImage = (e: React.MouseEvent) => {
       e.stopPropagation();
-      setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+      setCurrentImageIndex((prev) =>
+        prev === images.length - 1 ? 0 : prev + 1,
+      );
     };
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -81,6 +101,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
     };
 
     const formatReviews = (reviews: number) => {
+      if (!reviews) return "0";
       if (reviews >= 1000) {
         return `${(reviews / 1000).toFixed(1)}k`;
       }
@@ -129,12 +150,15 @@ const ListingCardModern = memo<ListingCardModernProps>(
           <div className="absolute top-3 right-3 flex items-center gap-2">
             <button
               onClick={handleFavoriteClick}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${isFavorite
-                ? 'bg-white text-red-500'
-                : 'bg-white/80 hover:bg-white text-gray-600 hover:text-red-500'
-                }`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+                isFavorite
+                  ? "bg-white text-red-500"
+                  : "bg-white/80 hover:bg-white text-gray-600 hover:text-red-500"
+              }`}
             >
-              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              <Heart
+                className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`}
+              />
             </button>
             <button
               onClick={(e) => e.stopPropagation()}
@@ -172,10 +196,11 @@ const ListingCardModern = memo<ListingCardModernProps>(
                     e.stopPropagation();
                     setCurrentImageIndex(index);
                   }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${index === currentImageIndex
-                    ? 'bg-white w-2.5'
-                    : 'bg-white/60 hover:bg-white/80'
-                    }`}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
+                    index === currentImageIndex
+                      ? "bg-white w-2.5"
+                      : "bg-white/60 hover:bg-white/80"
+                  }`}
                 />
               ))}
             </div>
@@ -192,8 +217,12 @@ const ListingCardModern = memo<ListingCardModernProps>(
             {/* Rating */}
             <div className="flex items-center gap-1 flex-shrink-0">
               <Star className="w-4 h-4 text-gray-900 fill-current" />
-              <span className="font-medium text-sm text-gray-900">{item.rating}</span>
-              <span className="text-gray-500 text-sm">({formatReviews(item.reviews)})</span>
+              <span className="font-medium text-sm text-gray-900">
+                {item.rating || 0}
+              </span>
+              <span className="text-gray-500 text-sm">
+                ({formatReviews(item.reviews)})
+              </span>
             </div>
           </div>
 
@@ -217,46 +246,60 @@ const ListingCardModern = memo<ListingCardModernProps>(
 
           {/* Pricing - All 3 Plans Vertical */}
           <div className="flex flex-col gap-1 mb-2">
-            {'gstPlanPrice' in item && item.gstPlanPrice && (
+            {"gstPlanPrice" in item && item.gstPlanPrice && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">GST Plan</span>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-gray-900 block">{item.gstPlanPrice}</span>
+                  <span className="text-sm font-semibold text-gray-900 block">
+                    {item.gstPlanPrice}
+                  </span>
                   {item.gstPlanPriceYearly && (
-                    <span className="text-xs text-gray-500 block">₹{item.gstPlanPriceYearly}/yr</span>
+                    <span className="text-xs text-gray-500 block">
+                      ₹{item.gstPlanPriceYearly}/yr
+                    </span>
                   )}
                 </div>
               </div>
             )}
-            {'mailingPlanPrice' in item && item.mailingPlanPrice && (
+            {"mailingPlanPrice" in item && item.mailingPlanPrice && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Mailing Plan</span>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-gray-900 block">{item.mailingPlanPrice}</span>
+                  <span className="text-sm font-semibold text-gray-900 block">
+                    {item.mailingPlanPrice}
+                  </span>
                   {item.mailingPlanPriceYearly && (
-                    <span className="text-xs text-gray-500 block">₹{item.mailingPlanPriceYearly}/yr</span>
+                    <span className="text-xs text-gray-500 block">
+                      ₹{item.mailingPlanPriceYearly}/yr
+                    </span>
                   )}
                 </div>
               </div>
             )}
-            {'brPlanPrice' in item && item.brPlanPrice && (
+            {"brPlanPrice" in item && item.brPlanPrice && (
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Business Reg</span>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-gray-900 block">{item.brPlanPrice}</span>
+                  <span className="text-sm font-semibold text-gray-900 block">
+                    {item.brPlanPrice}
+                  </span>
                   {item.brPlanPriceYearly && (
-                    <span className="text-xs text-gray-500 block">₹{item.brPlanPriceYearly}/yr</span>
+                    <span className="text-xs text-gray-500 block">
+                      ₹{item.brPlanPriceYearly}/yr
+                    </span>
                   )}
                 </div>
               </div>
             )}
-            {!('gstPlanPrice' in item) && (
+            {!("gstPlanPrice" in item) && (
               <div className="text-right">
                 <span className="text-lg font-bold text-gray-900 block">
                   {item.price}
                 </span>
-                {'priceYearly' in item && item.priceYearly && (
-                  <span className="text-xs text-gray-500 block">₹{item.priceYearly}/yr</span>
+                {"priceYearly" in item && item.priceYearly && (
+                  <span className="text-xs text-gray-500 block">
+                    ₹{item.priceYearly}/yr
+                  </span>
                 )}
               </div>
             )}
@@ -264,7 +307,9 @@ const ListingCardModern = memo<ListingCardModernProps>(
 
           {/* Negotiable Tag */}
           <div className="mb-3">
-            <span className="text-xs text-gray-500 italic">Price negotiable</span>
+            <span className="text-xs text-gray-500 italic">
+              Price negotiable
+            </span>
           </div>
 
           {/* Action Buttons */}
@@ -302,9 +347,9 @@ const ListingCardModern = memo<ListingCardModernProps>(
       prevProps.item._id === nextProps.item._id &&
       prevProps.item.rating === nextProps.item.rating
     );
-  }
+  },
 );
 
-ListingCardModern.displayName = 'ListingCardModern';
+ListingCardModern.displayName = "ListingCardModern";
 
 export default ListingCardModern;
