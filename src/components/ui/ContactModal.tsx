@@ -1,6 +1,7 @@
 // ✅ src/components/ui/ContactModal.tsx
 import React, { useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
+import { X } from "lucide-react";
 
 type Props = {
   isOpen: boolean;
@@ -10,7 +11,7 @@ type Props = {
 export default function ContactModal({ isOpen, onClose }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
 
-  // 🧠 Close modal on ESC key press
+  // Close modal on ESC key press
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -27,149 +28,142 @@ export default function ContactModal({ isOpen, onClose }: Props) {
     };
   }, [isOpen, onClose]);
 
-  // 🚫 If modal not open, don’t render anything
+  // If modal not open, don’t render anything
   if (!isOpen) return null;
 
-  // 🌟 Modal structure with glassmorphism design
   const modal = (
     <div
       ref={ref}
-      className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
       aria-modal="true"
       role="dialog"
+      style={{ fontFamily: '"Inner Tight", system-ui, sans-serif' }}
     >
-      {/* 🌫️ Background overlay */}
+      {/* Background overlay */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* 🧊 Glassmorphic modal card */}
+      {/* Modal card */}
       <div
-        className="
-          relative w-full max-w-2xl 
-          bg-white/10 
-          backdrop-blur-2xl 
-          border border-white/20 
-          rounded-2xl 
-          shadow-2xl 
-          ring-1 ring-white/10 
-          overflow-hidden
-        "
+        className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row z-10 max-h-[90vh] overflow-y-auto"
       >
-        {/* 🏷️ Modal Header */}
-        <div className="p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="text-2xl font-semibold text-white flex items-center gap-3">
-                <span className="text-yellow-400 text-xl">✨</span>
-                Get in Touch
-              </h3>
-              <p className="text-sm text-white/70 mt-1">
-                Fill out the form and we’ll get back to you within 24 hours.
-              </p>
-            </div>
-            {/* ❌ Close button */}
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              className="ml-4 rounded-md p-2 hover:bg-white/10 text-white/80"
-            >
-              ✕
-            </button>
+        {/* Left Column - Contact Info */}
+        <div className="w-full md:w-[45%] p-4 md:p-6 flex flex-col gap-3 bg-white border-b md:border-b-0 md:border-r border-slate-100">
+
+          {/* Support */}
+          <div className="bg-[#F1F3F5] rounded-xl p-4 border border-slate-200">
+            <h4 className="text-[#1F2E26] text-lg font-bold mb-1.5">Support</h4>
+            <p className="text-[#677E73] text-sm leading-relaxed mb-2">
+              Need technical help or facing issues with our platform? Our support team is here 24×7.
+            </p>
+            <p className="text-[#1F2E26] text-sm">
+              <span className="font-bold">Support Mail:</span> <a href="mailto:support@flashspace.co" className="text-[#35503F] underline underline-offset-2">support@flashspace.co</a>
+            </p>
           </div>
 
-          {/* 📝 Form Section */}
-          <form className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Sales */}
+          <div className="bg-[#F1F3F5] rounded-xl p-4 border border-slate-200">
+            <h4 className="text-[#1F2E26] text-lg font-bold mb-1.5">Sales</h4>
+            <p className="text-[#677E73] text-sm leading-relaxed mb-2">
+              Want to explore FlashSpace solutions? Our sales experts will help you find the right plan.
+            </p>
+            <p className="text-[#1F2E26] text-sm mb-1">
+              <span className="font-bold">Sales Mail:</span> <a href="mailto:sales@flashspace.co" className="text-[#35503F] underline underline-offset-2">sales@flashspace.co</a>
+            </p>
+            <p className="text-[#1F2E26] text-sm">
+              <span className="font-bold">Contact:</span> <span className="text-[#1F2E26]">8100888777</span>
+            </p>
+          </div>
+
+          {/* Partnership */}
+          <div className="bg-[#F1F3F5] rounded-xl p-4 border border-slate-200">
+            <h4 className="text-[#1F2E26] text-lg font-bold mb-1.5">Partnership</h4>
+            <p className="text-[#677E73] text-sm leading-relaxed mb-2">
+              Interested in collaborating or becoming a partner? Let's build future-ready solutions.
+            </p>
+            <p className="text-[#1F2E26] text-sm">
+              <span className="font-bold">Partnership Mail:</span> <a href="mailto:partner@flashspace.co" className="text-[#35503F] underline underline-offset-2">partner@flashspace.co</a>
+            </p>
+          </div>
+
+        </div>
+
+        {/* Right Column - Form */}
+        <div className="w-full md:w-[55%] p-4 md:p-6 lg:p-8 relative bg-white flex flex-col justify-center">
+
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 p-1.5 text-gray-500 hover:text-black transition-colors rounded-full hover:bg-gray-100 z-10"
+          >
+            <X className="w-4 h-4" />
+          </button>
+
+          <h3 className="text-2xl font-bold text-[#1F2E26] mb-5 text-center">
+            Get in <span className="text-[#35503F]">Touch</span>
+          </h3>
+
+          <form className="flex flex-col gap-3">
             {/* Full Name */}
             <div>
-              <label className="block text-sm font-medium text-white/80">
-                Full Name *
+              <label className="block text-[13px] font-bold text-[#1F2E26] mb-1">
+                Full Name
               </label>
               <input
-                className="mt-2 w-full rounded-lg border border-white/30 bg-white/10 text-white placeholder-white/50 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                placeholder="Enter your full name"
+                className="w-full rounded-xl border border-slate-200 bg-[#FCFCFC] text-[#1F2E26] placeholder:text-[#677E73] px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
+                placeholder="Your Name"
                 type="text"
                 name="name"
               />
             </div>
 
-            {/* Email */}
+            {/* Phone Number */}
             <div>
-              <label className="block text-sm font-medium text-white/80">
-                Email Address *
-              </label>
-              <input
-                className="mt-2 w-full rounded-lg border border-white/30 bg-white/10 text-white placeholder-white/50 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                placeholder="your@email.com"
-                type="email"
-                name="email"
-              />
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-white/80">
+              <label className="block text-[13px] font-bold text-[#1F2E26] mb-1">
                 Phone Number
               </label>
               <input
-                className="mt-2 w-full rounded-lg border border-white/30 bg-white/10 text-white placeholder-white/50 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                placeholder="+91 98765 43210"
+                className="w-full rounded-xl border border-slate-200 bg-[#FCFCFC] text-[#1F2E26] placeholder:text-[#677E73] px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
+                placeholder="+91 9876543210"
                 type="tel"
                 name="phone"
               />
             </div>
 
-            {/* Company */}
+            {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-white/80">
-                Company Name
+              <label className="block text-[13px] font-bold text-[#1F2E26] mb-1">
+                Email
               </label>
               <input
-                className="mt-2 w-full rounded-lg border border-white/30 bg-white/10 text-white placeholder-white/50 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                placeholder="Your Company"
-                type="text"
-                name="company"
+                className="w-full rounded-xl border border-slate-200 bg-[#FCFCFC] text-[#1F2E26] placeholder:text-[#677E73] px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
+                placeholder="you@example.com"
+                type="email"
+                name="email"
               />
             </div>
 
-            {/* Service Interest */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-white/80">
-                Service Interest
-              </label>
-              <select
-                className="mt-2 w-full rounded-lg border border-white/30 bg-white/10 text-white placeholder-white/50 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              >
-                <option className="bg-black text-white">Select a service</option>
-                <option className="bg-black text-white">AI & Automation</option>
-                <option className="bg-black text-white">Product Development</option>
-                <option className="bg-black text-white">Design</option>
-                <option className="bg-black text-white">Consulting</option>
-              </select>
-            </div>
-
             {/* Message */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-white/80">
+            <div>
+              <label className="block text-[13px] font-bold text-[#1F2E26] mb-1">
                 Message
               </label>
               <textarea
-                className="mt-2 w-full rounded-lg border border-white/30 bg-white/10 text-white placeholder-white/50 px-4 py-3 h-28 resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                placeholder="Tell us about your business needs..."
+                className="w-full rounded-xl border border-slate-200 bg-[#FCFCFC] text-[#1F2E26] placeholder:text-[#677E73] px-3 py-2.5 h-20 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
+                placeholder="How can we help?"
                 name="message"
               />
             </div>
 
             {/* Submit Button */}
-            <div className="md:col-span-2">
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center gap-3 rounded-full bg-yellow-400 text-black font-semibold py-3 shadow-md hover:brightness-95 transition"
-              >
-                <span>🚀</span> Send Message
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="w-full mt-2 rounded-xl bg-[#35503F] hover:bg-[#2A4032] text-[#FEF8C3] font-semibold text-sm py-3 transition-all shadow-sm"
+            >
+              Send Message
+            </button>
           </form>
         </div>
       </div>
