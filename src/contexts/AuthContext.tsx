@@ -10,6 +10,7 @@ interface AuthContextType extends AuthState {
   verifyOTP: (email: string, otp: string) => Promise<void>;
   checkAuthStatus: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateUser: (user: User) => void;
   googleLogin: (idToken: string, role?: string) => Promise<void>;
 }
 
@@ -206,6 +207,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const updateUser = (updatedUser: User) => {
+    setState((prev) => ({
+      ...prev,
+      user: updatedUser,
+    }));
+  };
+
   const googleLogin = async (idToken: string, role?: string) => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
@@ -253,6 +261,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         verifyOTP,
         checkAuthStatus,
         refreshProfile,
+        updateUser,
         googleLogin,
       }}
     >
