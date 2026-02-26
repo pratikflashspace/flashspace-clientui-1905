@@ -218,7 +218,6 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                             </div>
                                             <p className="text-xs text-[#164e4e]/70 dark:text-gray-400 mb-3">Book by the hour or day</p>
                                             {[
-                                                { label: "Meeting Rooms", type: "meeting-room", href: "/Solutions/meetingsroom" },
                                                 { label: "Event Space", type: "training-room", href: "/Solutions/eventspace" },
                                                 { label: "Day Offices", type: "day-office", href: "/Solutions/day-office" },
                                             ].map((item) => (

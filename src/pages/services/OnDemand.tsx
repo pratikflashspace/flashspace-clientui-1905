@@ -1,389 +1,354 @@
-import { Clock, MapPin, Coffee, Wifi, Users2, Presentation, ChevronDown, Building, Phone, Users, Calendar, Video, Monitor, Headphones, CheckCircle, Star } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Building, MapPin, Phone, Users, ChevronDown, ChevronLeft, Grid3X3, List, Presentation } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { cityCenters } from "@/components/Map/locationData.example";
+import Header from "@/components/Header";
+import MapSection from "@/components/services/MapSection";
+import SearchHeader from "@/components/services/SearchHeader";
+import ListingCardModern from "@/components/services/ListingCardModern";
+import ResizableMapLayout from "@/components/services/ResizableMapLayout";
+import { getMeetingRoomsByCity } from "@/services/meetingRoom.service";
+import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+    City,
+    BusinessSolution,
+    MeetingRoomItem,
+    ViewMode,
+    SortBy
+} from "@/types/services";
 
 const OnDemand = () => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [selectedCity, setSelectedCity] = useState<string>("");
+    const [selectedLocation, setSelectedLocation] = useState<string>("");
+    const [viewMode, setViewMode] = useState<ViewMode>("grid");
+    const [sortBy, setSortBy] = useState<SortBy>("popularity");
+    const [selectedArea, setSelectedArea] = useState<string>("all");
+    const [searchCity, setSearchCity] = useState<string>("");
+    const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+    const [isSearchFocused, setIsSearchFocused] = useState<boolean>(false);
+    const [meetingRooms, setOnDemand] = useState<MeetingRoomItem[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
 
-  useEffect(() => {
-    const city = searchParams.get('city') || 'Delhi';
-    const location = searchParams.get('location') || '';
-    setSelectedCity(city);
-    setSelectedLocation(location);
-  }, [searchParams]);
-  const businessSolutions = [
-    {
-      label: "Virtual Office",
-      href: "/services/virtual-office",
-      icon: Building,
-      description: "Professional business address solutions"
-    },
-    {
-      label: "Coworking Space", 
-      href: "/services/coworking-space",
-      icon: Users2,
-      description: "Flexible workspace solutions"
-    },
-    {
-      label: "On Demand",
-      href: "/services/on-demand", 
-      icon: Phone,
-      description: "Meeting rooms & services"
-    },
-    {
-      label: "Event Spaces",
-      href: "/services/event-spaces",
-      icon: MapPin,
-      description: "Premium event venues"
-    }
-  ];
+    // Available cities for search
+    const availableCities: City[] = [
+        { name: "Ahmedabad", key: "ahmedabad" },
+        { name: "Bangalore", key: "bangalore" },
+        { name: "Chandigarh", key: "chandigarh" },
+        { name: "Chennai", key: "chennai" },
+        { name: "Delhi", key: "delhi" },
+        { name: "Gurgaon", key: "gurgaon" },
+        { name: "Hyderabad", key: "hyderabad" },
+        { name: "Jaipur", key: "jaipur" },
+        { name: "Mumbai", key: "mumbai" },
+        { name: "Pune", key: "pune" },
+        { name: "Ranchi", key: "ranchi" },
+    ];
 
-  const handleNavigation = (href: string) => {
-    navigate(href);
-  };
-  const services = [
-    {
-      icon: <Users className="w-6 h-6" />,
-      title: "Meeting Rooms",
-      description: "Professional meeting spaces equipped with modern amenities for productive discussions.",
-      duration: "Hourly/Daily",
-      price: "From ₹199/hour"
-    },
-    {
-      icon: <Video className="w-6 h-6" />,
-      title: "Video Conferencing",
-      description: "State-of-the-art video conferencing facilities for seamless remote collaboration.",
-      duration: "Hourly",
-      price: "From ₹149/hour"
-    },
-    {
-      icon: <Presentation className="w-6 h-6" />,
-      title: "Presentation Rooms",
-      description: "Fully equipped presentation spaces with projectors, screens, and sound systems.",
-      duration: "Hourly/Half-day",
-      price: "From ₹299/hour"
-    },
-    {
-      icon: <Monitor className="w-6 h-6" />,
-      title: "Training Rooms",
-      description: "Spacious training facilities perfect for workshops, seminars, and corporate training.",
-      duration: "Half-day/Full-day",
-      price: "From ₹799/half-day"
-    },
-    {
-      icon: <Headphones className="w-6 h-6" />,
-      title: "Phone Booths",
-      description: "Private soundproof booths for confidential calls and focused work sessions.",
-      duration: "Hourly",
-      price: "From ₹99/hour"
-    },
-    {
-      icon: <Clock className="w-6 h-6" />,
-      title: "Day Offices",
-      description: "Private office spaces available for day use with all essential amenities.",
-      duration: "Daily",
-      price: "From ₹999/day"
-    }
-  ];
+    useEffect(() => {
+        const city = searchParams.get('city') || 'Delhi';
+        const location = searchParams.get('location') || '';
+        setSelectedCity(city);
+        setSelectedLocation(location);
+        setSearchCity(city);
+    }, [searchParams]);
 
-  // Mock data for on-demand services by city
-  const mockOnDemandServices = {
-    delhi: [
-      { id: 1, name: "Executive Conference Room", location: "Connaught Place", price: "₹599/hour", capacity: "12 People", features: ["Video Conferencing", "Whiteboard", "Coffee Service", "WiFi"], type: "Meeting Room" },
-      { id: 2, name: "Premium Training Hall", location: "Gurgaon Cyber City", price: "₹1,299/day", capacity: "50 People", features: ["Projector", "Sound System", "Catering", "Parking"], type: "Training Room" },
-      { id: 3, name: "Private Phone Booth", location: "Nehru Place", price: "₹149/hour", capacity: "1 Person", features: ["Soundproof", "Charging Point", "Comfortable Seating", "Privacy"], type: "Phone Booth" }
-    ],
-    mumbai: [
-      { id: 4, name: "Boardroom Elite", location: "BKC Mumbai", price: "₹899/hour", capacity: "16 People", features: ["Sea View", "Premium Furniture", "Tech Support", "Refreshments"], type: "Meeting Room" },
-      { id: 5, name: "Workshop Arena", location: "Lower Parel", price: "₹1,599/day", capacity: "75 People", features: ["Stage Setup", "AV Equipment", "Catering Options", "Metro Access"], type: "Training Room" },
-      { id: 6, name: "Focus Pod", location: "Andheri East", price: "₹199/hour", capacity: "2 People", features: ["Dual Monitor", "High-Speed Internet", "Quiet Zone", "Ergonomic Design"], type: "Phone Booth" }
-    ],
-    bangalore: [
-      { id: 7, name: "Tech Conference Suite", location: "Koramangala", price: "₹749/hour", capacity: "20 People", features: ["Smart TV", "Wireless Presentation", "Tech Support", "Snacks"], type: "Meeting Room" },
-      { id: 8, name: "Innovation Lab", location: "Whitefield", price: "₹1,199/day", capacity: "40 People", features: ["Creative Setup", "Flexible Furniture", "Ideation Tools", "Coffee Bar"], type: "Training Room" },
-      { id: 9, name: "Call Chamber", location: "Electronic City", price: "₹129/hour", capacity: "1 Person", features: ["Noise Cancellation", "HD Camera", "Professional Lighting", "Adjustable Desk"], type: "Phone Booth" }
-    ],
-    pune: [
-      { id: 10, name: "Executive Boardroom", location: "Hinjewadi", price: "₹649/hour", capacity: "14 People", features: ["Smart Board", "Climate Control", "Premium Seating", "Document Scanner"], type: "Meeting Room" },
-      { id: 11, name: "Learning Center", location: "Koregaon Park", price: "₹999/day", capacity: "35 People", features: ["Interactive Display", "Breakout Areas", "Natural Light", "Garden View"], type: "Training Room" }
-    ]
-  };
+    // Disable Lenis smooth scroll for this specific container
+    useEffect(() => {
+        const scrollContainer = scrollContainerRef.current;
+        if (!scrollContainer) return;
 
-  // Get services for selected city
-  const cityKey = selectedCity.toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
-  const cityServices = mockOnDemandServices[cityKey as keyof typeof mockOnDemandServices] || mockOnDemandServices.delhi;
+        scrollContainer.setAttribute('data-lenis-prevent', 'true');
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="inline-flex items-center gap-2 text-gray-900 hover:text-accent transition-colors group">
-              <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-              Back to Home
-            </Link>
-            
-            {/* Business Solutions Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="text-sm text-gray-700 hover:text-primary transition-colors duration-300 font-medium flex items-center gap-2 border-gray-300"
-                >
-                  On Demand
-                  <ChevronDown className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 shadow-lg">
-                {businessSolutions.map((solution) => (
-                  <DropdownMenuItem 
-                    key={solution.label}
-                    onClick={() => handleNavigation(solution.href)}
-                    className="cursor-pointer p-3 hover:bg-gray-50 transition-colors"
-                  >
-                    <solution.icon className="w-4 h-4 mr-3 text-accent" />
-                    <div className="flex flex-col">
-                      <span className="font-medium text-gray-900">{solution.label}</span>
-                      <span className="text-xs text-gray-500">{solution.description}</span>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </header>
+        const preventLenis = (e: WheelEvent) => {
+            e.stopPropagation();
+        };
 
-      {/* Main Content */}
-      <main className="flex-1 p-8">
-          <div className="max-w-5xl mx-auto">
-            {/* City-specific Header */}
-            {selectedCity && (
-              <div className="bg-primary/5 rounded-lg p-6 mb-8">
-                <div className="flex items-center gap-2 text-primary mb-2">
-                  <MapPin className="w-5 h-5" />
-                  <span className="font-medium">On-demand spaces available in {selectedCity}</span>
-                </div>
-                {selectedLocation && (
-                  <p className="text-gray-600">
-                    Near <span className="font-medium">{selectedLocation}</span>
-                  </p>
-                )}
-              </div>
-            )}
+        scrollContainer.addEventListener('wheel', preventLenis, { passive: false });
 
-            {/* Hero Section */}
-            <div className="text-center mb-16">
-              <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-                Book Spaces <span className="gradient-text-accent">On-Demand</span>
-                {selectedCity && (
-                  <span className="block text-2xl md:text-3xl mt-2 text-primary">
-                    in {selectedCity}
-                  </span>
-                )}
-              </h1>
-              
-              <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
-                Access professional meeting rooms, video conferencing facilities, and workspace solutions 
-                whenever you need them. Book instantly with flexible hourly and daily options.
-              </p>
+        return () => {
+            scrollContainer.removeEventListener('wheel', preventLenis);
+        };
+    }, []);
 
-              <div className="flex justify-center gap-4 mb-8">
-                <Button className="btn-hero px-8 py-4 text-lg font-semibold">
-                  Book Now
-                </Button>
-                <Button variant="outline" className="px-8 py-4 text-lg font-semibold border-gray-300 text-gray-700 hover:bg-gray-50">
-                  View Availability
-                </Button>
-              </div>
-            </div>
+    // Fetch meeting rooms
+    useEffect(() => {
+        const fetchOnDemand = async () => {
+            if (!selectedCity) return;
 
-            {/* Services Grid */}
-            <div className="mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-                Available On-Demand Services
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                {services.map((service, index) => (
-                  <Card key={index} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover-lift border border-gray-200 h-full flex flex-col">
-                    <CardHeader className="text-center pb-4 flex-grow">
-                      <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <span className="text-accent">{service.icon}</span>
-                      </div>
-                      <CardTitle className="text-gray-900 text-xl mb-4 min-h-[3rem] flex items-center justify-center">
-                        {service.title}
-                      </CardTitle>
-                      <div className="flex justify-center items-center gap-4 text-sm mb-4 min-h-[2rem]">
-                        <span className="text-gray-500 font-medium">{service.duration}</span>
-                        <span className="font-bold text-accent text-base">{service.price}</span>
-                      </div>
-                      <CardDescription className="text-gray-600 leading-relaxed text-base min-h-[4rem] flex items-center justify-center px-2">
-                        {service.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="text-center pt-0 pb-6">
-                      <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 font-semibold">
-                        Book Now
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
+            setLoading(true);
+            setError("");
 
-            {/* What is On-Demand Section */}
-            <div className="bg-gradient-to-br from-[#172A3A] to-[#172A3A]/90 rounded-2xl p-8 mb-16 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#EDB003]/10 rounded-full blur-3xl"></div>
-              <div className="relative z-10">
-                <h2 className="text-3xl font-bold text-white mb-6">What are On-Demand Spaces?</h2>
-                <p className="text-gray-200 text-lg mb-6 leading-relaxed">
-                  On-demand workspaces provide instant access to professional meeting rooms, conference facilities,
-                  and private offices when you need them. Book by the hour or day without long-term commitments.
-                </p>
+            try {
+                const data = await getMeetingRoomsByCity(selectedCity);
+                setOnDemand(data);
+            } catch (err: any) {
+                setError(err.message || "Error connecting to server. Please try again later.");
+                setOnDemand([]);
+                console.error("Error fetching meeting rooms:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
-                        <Video className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-white font-semibold mb-2">Video Conferencing</h3>
-                        <p className="text-gray-300 text-sm">State-of-the-art video conferencing facilities with HD cameras, microphones, and seamless connectivity.</p>
-                      </div>
-                    </div>
-                  </div>
+        fetchOnDemand();
+    }, [selectedCity]);
 
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
-                        <Presentation className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-white font-semibold mb-2">Meeting Rooms</h3>
-                        <p className="text-gray-300 text-sm">Professional meeting spaces equipped with projectors, whiteboards, and presentation tools.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
-                        <Headphones className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-white font-semibold mb-2">Private Phone Booths</h3>
-                        <p className="text-gray-300 text-sm">Soundproof pods for confidential calls and focused work sessions without distractions.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-[#EDB003] rounded-full flex items-center justify-center flex-shrink-0">
-                        <Clock className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-white font-semibold mb-2">Flexible Booking</h3>
-                        <p className="text-gray-300 text-sm">Book spaces hourly, daily, or for specific time slots based on your exact needs.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-[#EDB003]/20 backdrop-blur-sm border border-[#EDB003]/30 rounded-lg p-4">
-                  <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                    <Star className="w-5 h-5 text-[#EDB003]" />
-                    Why Choose On-Demand?
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div className="flex items-center gap-2 text-gray-200">
-                      <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
-                      <span>Pay only for what you use</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-200">
-                      <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
-                      <span>Professional spaces instantly</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-200">
-                      <CheckCircle className="w-4 h-4 text-[#EDB003] flex-shrink-0" />
-                      <span>No long-term commitments</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* On-Demand Service Listings */}
-            <div className="mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-                Available Services in {selectedCity}
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {cityServices.map((service) => (
-                  <Card key={service.id} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover-lift border border-gray-200">
-                    <CardHeader>
-                      <div className="flex justify-between items-start mb-2">
-                        <CardTitle className="text-xl text-gray-900 font-semibold">
-                          {service.name}
-                        </CardTitle>
-                        <div className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-medium">
-                          {service.type}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-600 mb-2">
-                        <MapPin className="w-4 h-4" />
-                        <span className="text-sm">{service.location}</span>
-                      </div>
-                      <div className="flex items-center gap-2 mb-3">
-                        <Users className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-600">{service.capacity}</span>
-                      </div>
-                      <div className="text-2xl font-bold text-primary mb-3">
-                        {service.price}
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2 mb-4">
-                        {service.features.map((feature, idx) => (
-                          <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-                            <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
-                            <span>{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex gap-2">
-                        <Button className="flex-1 btn-hero">
-                          Book Now
-                        </Button>
-                        <Button variant="outline" className="flex-1 text-primary border-primary hover:bg-primary/5">
-                          Check Availability
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
+    // Filter cities based on search input
+    const filteredCities: City[] = availableCities.filter(city =>
+        city.name.toLowerCase().includes(searchCity.toLowerCase())
     );
-  };
+
+    const handleCitySearch = (cityName: string): void => {
+        setSearchCity(cityName);
+        setSelectedCity(cityName);
+        setShowSuggestions(false);
+
+        const newSearchParams = new URLSearchParams(searchParams);
+        newSearchParams.set('city', cityName);
+        navigate(`?${newSearchParams.toString()}`, { replace: true });
+    };
+
+    const handleSearchChange = (value: string): void => {
+        setSearchCity(value);
+        setShowSuggestions(true);
+    };
+
+    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        setSearchCity(e.target.value);
+        setShowSuggestions(true);
+    };
+
+    const handleSearchFocus = (): void => {
+        setIsSearchFocused(true);
+        setShowSuggestions(true);
+    };
+
+    const handleSearchBlur = (): void => {
+        setIsSearchFocused(false);
+        setTimeout(() => setShowSuggestions(false), 200);
+    };
+
+    const handleSearchSubmit = (e: React.FormEvent): void => {
+        e.preventDefault();
+        if (searchCity.trim()) {
+            handleCitySearch(searchCity.trim());
+        }
+    };
+
+    const businessSolutions: BusinessSolution[] = [
+        {
+            label: "Virtual Office",
+            href: "/services/virtual-office",
+            icon: Building,
+            description: "Professional business address solutions"
+        },
+        {
+            label: "Coworking Space",
+            href: "/services/coworking-space",
+            icon: Users,
+            description: "Flexible workspace solutions"
+        },
+        {
+            label: "On-Demand",
+            href: "/services/on-demand",
+            icon: Presentation,
+            description: "Book meeting rooms hourly"
+        },
+        {
+            label: "Event Spaces",
+            href: "/services/event-spaces",
+            icon: MapPin,
+            description: "Premium event venues"
+        }
+    ];
+
+    const handleNavigation = (href: string): void => {
+        navigate(href);
+    };
+
+    const handleGetBestPrice = (item: MeetingRoomItem): void => {
+        // Navigate to a dedicated meeting room detail page
+        navigate(`/meeting-room/${item._id}`, { state: { space: item } });
+    };
+
+
+
+    const resolvedCenter = (() => {
+        const cityKeyFromState = selectedCity.trim().toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
+        // Extended mapping for new cities
+        if (["ahmedabad", "amdavad"].includes(cityKeyFromState)) return cityCenters.ahmedabad;
+        if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
+        if (["chandigarh", "zirakpur"].includes(cityKeyFromState)) return { lat: 30.7333, lng: 76.7794 }; // Chandigarh coords
+        if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
+        if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
+        if (["gurgaon", "gurugram"].includes(cityKeyFromState)) return cityCenters.gurgaon;
+        if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
+        if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
+        if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
+        if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
+        if (["ranchi"].includes(cityKeyFromState)) return { lat: 23.3441, lng: 85.3096 }; // Ranchi coords
+
+        return cityCenters.delhi;
+    })();
+
+    const generateRandomCoordinates = (center: { lat: number; lng: number }, index: number) => {
+        const seed = index + 1;
+        const latOffset = ((seed * 17) % 50) / 1000 - 0.025;
+        const lngOffset = ((seed * 23) % 50) / 1000 - 0.025;
+
+        return {
+            lat: center.lat + latOffset,
+            lng: center.lng + lngOffset
+        };
+    };
+
+    const mapMarkers = useMemo(() => {
+        return meetingRooms.map((room, index) => {
+            const imageSrc = room.image || "https://shorturl.at/Fyr6o";
+
+            return {
+                position: room.coordinates || generateRandomCoordinates(resolvedCenter, index),
+                title: room.name,
+                address: room.address,
+                price: room.price,
+                rating: room.rating,
+                reviews: room.reviews,
+                image: imageSrc,
+                features: room.features,
+            };
+        });
+    }, [meetingRooms, resolvedCenter]);
+
+    return (
+        <div className="flex flex-col h-screen bg-white">
+            <div className="flex-shrink-0">
+                <Header />
+            </div>
+
+            <div className="flex overflow-hidden mt-16 md:mt-20" style={{ height: 'calc(100vh - 4rem)' }}>
+                <ResizableMapLayout
+                    defaultListingWidth={50}
+                    mapContent={
+                        <MapSection
+                            key="meeting-room-map"
+                            center={resolvedCenter}
+                            markers={mapMarkers}
+                            zoom={11}
+                            height="100%"
+                        />
+                    }
+                >
+                    <div
+                        ref={scrollContainerRef}
+                        className="w-full h-full overflow-y-auto"
+                        data-lenis-prevent
+                    >
+
+
+
+                        {/* Mobile Back Button */}
+                        <button
+                            onClick={() => navigate('/')}
+                            className="md:hidden flex items-center gap-2 text-sm text-gray-500 mb-4 ml-6 mt-4 hover:text-black transition"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                            Back
+                        </button>
+
+                        {/* Breadcrumb */}
+                        <div className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 ml-6 mt-2 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                            <span>Home</span>
+                            <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
+                            <span>On-Demand</span>
+                            <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
+                            <span className="text-gray-900 font-medium truncate">{selectedCity}</span>
+                        </div>
+
+                        {/* Page Title */}
+                        <h1 className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 ml-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                            On-Demand In {selectedCity}
+                        </h1>
+
+                        <div className="px-4 sm:px-6">
+                            <SearchHeader
+                                searchCity={searchCity}
+                                onSearchChange={handleSearchChange}
+                                onCitySelect={handleCitySearch}
+                                onSearchSubmit={handleSearchSubmit}
+                                onSearchFocus={handleSearchFocus}
+                                onSearchBlur={handleSearchBlur}
+                                isSearchFocused={isSearchFocused}
+                                showSuggestions={showSuggestions}
+                                filteredCities={filteredCities}
+                                currentService="On-Demand"
+                                businessSolutions={businessSolutions}
+                                onServiceNavigation={handleNavigation}
+                            />
+                        </div>
+
+                        <div className="px-4 sm:px-6 py-4 sm:py-6">
+                            {/* Results Header */}
+                            <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                                <p className="text-sm text-gray-600">
+                                    Showing <span className="font-semibold text-gray-900">{meetingRooms.length} result(s)</span> for meeting rooms in {selectedCity}
+                                </p>
+
+
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant={viewMode === "list" ? "default" : "ghost"}
+                                        size="sm"
+                                        onClick={() => setViewMode("list")}
+                                        className="flex items-center gap-1 text-xs sm:text-sm h-8"
+                                    >
+                                        <List className="w-3 h-3 sm:w-4 sm:h-4" />
+                                        <span className="hidden sm:inline">List</span>
+                                    </Button>
+                                    <Button
+                                        variant={viewMode === "grid" ? "default" : "ghost"}
+                                        size="sm"
+                                        onClick={() => setViewMode("grid")}
+                                        className="flex items-center gap-1 text-xs sm:text-sm h-8"
+                                    >
+                                        <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                                        <span className="hidden sm:inline">Grid</span>
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+                                {loading ? (
+                                    <SkeletonCardGrid count={6} />
+                                ) : error ? (
+                                    <div className="col-span-full text-center py-8 sm:py-12">
+                                        <p className="text-sm sm:text-base text-red-600">{error}</p>
+                                    </div>
+                                ) : meetingRooms.length === 0 ? (
+                                    <div className="col-span-full text-center py-8 sm:py-12">
+                                        <p className="text-sm sm:text-base text-gray-600">No meeting rooms found for {selectedCity}</p>
+                                    </div>
+                                ) : meetingRooms.map((room) => (
+                                    <ListingCardModern
+                                        key={room._id}
+                                        item={room}
+                                        onGetBestPrice={() => handleGetBestPrice(room)}
+                                        onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
+                                    />
+                                ))}
+                            </div>
+
+                        </div>
+                    </div>
+                </ResizableMapLayout>
+            </div >
+        </div >
+    );
+};
 
 export default OnDemand;
