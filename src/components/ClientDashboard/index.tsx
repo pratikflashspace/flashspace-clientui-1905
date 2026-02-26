@@ -42,6 +42,8 @@ import Viewdetails from "./Viewdetails";
 import Notifications from "./Notifications"; // Import the new Notifications component
 import ChatSupport from "./ChatSupport"; // Import ChatSupport
 import Documents from "./Documents";
+import MailRecords from "./MailRecords";
+import VisitRecords from "./VisitRecords";
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, section: "main", path: "/dashboard" },
@@ -121,9 +123,9 @@ export default function ClientDashboard() {
       case 1:
         return <MyBookings />;
       case 2:
-        return <div className="p-8 text-center text-gray-500">Mail Records - Coming Soon</div>;
+        return <MailRecords />;
       case 3:
-        return <div className="p-8 text-center text-gray-500">Visit Records - Coming Soon</div>;
+        return <VisitRecords />;
       case 4: // Payments
         return <Billing />; // Using Billing component for Payments for now
       case 5:
@@ -168,9 +170,9 @@ export default function ClientDashboard() {
                     <button
                       onClick={() => handleNavigation(idx)}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                        ? "bg-[#35503F] text-white shadow-sm"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        }`}
+                          ? "bg-[#35503F] text-white shadow-sm"
+                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
                     >
                       <item.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-gray-400"}`} />
                       <span className="flex items-center gap-1">
@@ -201,13 +203,13 @@ export default function ClientDashboard() {
                     <button
                       onClick={() => handleNavigation(actualIndex)}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                        ? isLogout
-                          ? "bg-red-100 text-red-700"
-                          : "bg-[#35503F] text-white shadow-sm"
-                        : isLogout
-                          ? "text-gray-600 hover:bg-red-50 hover:text-red-600"
-                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        }`}
+                          ? isLogout
+                            ? "bg-red-100 text-red-700"
+                            : "bg-[#35503F] text-white shadow-sm"
+                          : isLogout
+                            ? "text-gray-600 hover:bg-red-50 hover:text-red-600"
+                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
                     >
                       <item.icon className={`w-5 h-5 ${isActive ? (isLogout ? "text-red-600" : "text-white") : "text-gray-400"}`} />
                       <span className="flex items-center gap-1">
@@ -265,11 +267,11 @@ export default function ClientDashboard() {
                         <button
                           onClick={() => handleNavigation(idx)}
                           className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-base font-medium ${isActive
-                            ? isLogout
-                              ? "bg-red-100 text-red-700"
-                              : "bg-yellow-400 text-black"
-                            : "text-gray-600 hover:bg-gray-100"
-                            }`}
+                              ? isLogout
+                                ? "bg-red-100 text-red-700"
+                                : "bg-yellow-400 text-black"
+                              : "text-gray-600 hover:bg-gray-100"
+                          }`}
                         >
                           <item.icon className="w-5 h-5" />
                           <span className="flex items-center gap-1">
