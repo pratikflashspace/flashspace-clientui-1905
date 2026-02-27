@@ -42,6 +42,9 @@ import {
   createSpaceDetails,
   SpaceDetailsPayload,
 } from "../Api/spaceDetails.service";
+import { getPartnerProperties } from "@/services/property.service";
+import { Property } from "@/types/services";
+import { MapPin } from "lucide-react";
 
 // Types
 type DocumentStatus = "pending" | "approved" | "rejected";
@@ -141,12 +144,11 @@ export default function KYCVerification() {
   const [kycData, setKycData] = useState<KYCData | null>(null);
 
   // Multi-Level State
-  const [profiles, setProfiles] = useState<KYCData[]>([]);
   const [individualProfile, setIndividualProfile] = useState<KYCData | null>(
     null,
   );
-  const [partnerProfiles, setPartnerProfiles] = useState<KYCData[]>([]);
-  const [businessProfiles, setBusinessProfiles] = useState<KYCData[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loadingProperties, setLoadingProperties] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -260,7 +262,7 @@ export default function KYCVerification() {
         : "My Personal KYC Profile",
       kycType: "individual",
       isPartner: false,
-      overallStatus: backend.overallStatus || "pending",
+      overallStatus: backend.kycStatus || backend.overallStatus || "pending",
       personalInfo: {
         fullName: backend.fullName || fullName || "",
         email: backend.email || email || "",
@@ -294,7 +296,6 @@ export default function KYCVerification() {
       );
       if (mapped) {
         setIndividualProfile(mapped);
-        setProfiles([mapped]);
         setKycData(mapped);
         setProfileId(mapped._id || null);
 
@@ -308,7 +309,6 @@ export default function KYCVerification() {
         });
       } else {
         setIndividualProfile(null);
-        setProfiles([]);
         setKycData(null);
         setProfileId(null);
       }
@@ -321,6 +321,18 @@ export default function KYCVerification() {
       setLoading(false);
     }
   }, [user?.fullName, user?.email]);
+
+  const fetchProperties = useCallback(async () => {
+    setLoadingProperties(true);
+    try {
+      const props = await getPartnerProperties();
+      setProperties(props);
+    } catch (err) {
+      console.error("Failed to fetch partner properties", err);
+    } finally {
+      setLoadingProperties(false);
+    }
+  }, []);
 
   const handleLinkBooking = async (pid: string) => {
     if (!linkBookingId) return;
@@ -339,7 +351,8 @@ export default function KYCVerification() {
     if (initializedRef.current) return;
     initializedRef.current = true;
     fetchKYC();
-  }, [fetchKYC]);
+    fetchProperties();
+  }, [fetchKYC, fetchProperties]);
 
   // When profileId changes, attach the matching dummy profile to kycData
   useEffect(() => {
@@ -348,13 +361,8 @@ export default function KYCVerification() {
       return;
     }
 
-    const all: KYCData[] = [
-      ...(individualProfile ? [individualProfile] : []),
-      ...partnerProfiles,
-      ...businessProfiles,
-    ];
-
-    const found = all.find((p) => p._id === profileId) || null;
+    const found =
+      individualProfile?._id === profileId ? individualProfile : null;
     setKycData(found);
     setIsPartnerMode(!!found?.isPartner);
     if (found?.kycType) {
@@ -375,7 +383,7 @@ export default function KYCVerification() {
     // Sync business info to businessForm
     if (found?.businessInfo) {
       setBusinessForm({
-        profileName: found.businessInfo.profileName || "",
+        profileName: found.profileName || "",
         companyName: found.businessInfo.companyName || "",
         companyType: found.businessInfo.companyType || "",
         gstNumber: found.businessInfo.gstNumber || "",
@@ -385,7 +393,7 @@ export default function KYCVerification() {
         partners: found.businessInfo.partners || [],
       });
     }
-  }, [profileId, individualProfile, partnerProfiles, businessProfiles]);
+  }, [profileId, individualProfile]);
 
   const handleSaveBusinessInfo = async () => {
     setSaving(true);
@@ -405,7 +413,6 @@ export default function KYCVerification() {
       if (mapped) {
         setKycData(mapped);
         setIndividualProfile(mapped);
-        setProfiles([mapped]);
 
         const newId = mapped._id;
         if (newId) {
@@ -480,7 +487,6 @@ export default function KYCVerification() {
       if (mapped) {
         setKycData(mapped);
         setIndividualProfile(mapped);
-        setProfiles([mapped]);
       }
     } catch (err) {
       console.error("Failed to upload KYC document", err);
@@ -818,6 +824,13 @@ export default function KYCVerification() {
     completionPercentage = 100;
   }
 
+  const rejectedDocs =
+    kycData?.documents?.filter((d) => d.status === "rejected") || [];
+  const rejectedDocNames = rejectedDocs.map((rd) => {
+    const docInfo = requiredDocTypes.find((t) => t.type === rd.type);
+    return docInfo?.name || rd.name || rd.type;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <input
@@ -829,6 +842,73 @@ export default function KYCVerification() {
       />
 
       <div className="w-full space-y-6">
+        {/* Informative Note for Partners */}
+        {(!kycData ||
+          (kycData?.overallStatus !== "approved" &&
+            kycData?.overallStatus !== "rejected")) && (
+          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 shadow-sm">
+            <div className="flex gap-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Info className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-blue-900 mb-1">
+                  Complete Your Verification
+                </h3>
+                <p className="text-blue-700/80 text-sm leading-relaxed">
+                  To ensure a smooth onboarding process, please provide accurate
+                  information and clear document uploads. Verification typically
+                  takes 24-48 hours once submitted. You'll be notified via email
+                  once our team reviews your application.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {kycData?.overallStatus === "rejected" && (
+          <div className="bg-red-50 border border-red-100 rounded-2xl p-6 mb-8 shadow-sm animate-in fade-in slide-in-from-top-4">
+            <div className="flex gap-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-red-900 mb-1">
+                  Verification Issues Found
+                </h3>
+                <p className="text-red-700/80 text-sm leading-relaxed mb-4">
+                  Please review the issues highlighted below and update the
+                  necessary documents to proceed with your verification.
+                </p>
+
+                {rejectedDocNames.length > 0 && (
+                  <div className="text-sm text-red-800 bg-red-100/50 p-4 rounded-xl border border-red-100">
+                    <strong className="block mb-2 text-red-900">
+                      Action Required For:
+                    </strong>
+                    <ul className="list-disc pl-5 space-y-1">
+                      {rejectedDocNames.map((name, idx) => (
+                        <li key={idx} className="font-medium">
+                          {name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {profileId && profileId !== "new" && (
+                  <button
+                    onClick={() => setActiveStep("documents")}
+                    className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition-colors flex items-center gap-2"
+                  >
+                    Update Documents <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold font-[Poppins] text-gray-900">
@@ -1053,16 +1133,23 @@ export default function KYCVerification() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {businessProfiles.map((p) => {
-                  const status = getOverallStatusConfig(p.overallStatus);
+                {properties.map((p) => {
+                  const status = getOverallStatusConfig(
+                    p.kycStatus || p.status || "pending",
+                  );
                   return (
                     <div
                       key={p._id}
-                      className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow"
+                      onClick={() =>
+                        navigate(
+                          `/spaceportal/space-management/add?id=${p._id}`,
+                        )
+                      }
+                      className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow cursor-pointer group"
                     >
                       <div className="flex items-start justify-between mb-4">
-                        <div className="p-2 bg-gray-50 rounded-lg">
-                          <Building2 className="w-6 h-6 text-gray-600" />
+                        <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-[#3FA69E]/10 transition-colors">
+                          <Building2 className="w-6 h-6 text-gray-600 group-hover:text-[#3FA69E]" />
                         </div>
                         <span
                           className={`text-xs px-2 py-1 rounded-full text-white ${status.bg}`}
@@ -1071,40 +1158,19 @@ export default function KYCVerification() {
                         </span>
                       </div>
                       <h3 className="font-semibold text-gray-900 truncate mb-1">
-                        {p.profileName}
+                        {p.name}
                       </h3>
-                      <p className="text-xs text-gray-500 mb-4 uppercase tracking-wide">
-                        {p.businessInfo?.companyName || "Business Profile"}
-                      </p>
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-4">
+                        <MapPin className="w-3 h-3" />
+                        <span className="truncate">
+                          {p.area}, {p.city}
+                        </span>
+                      </div>
 
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => {
-                            setProfileId(p._id!);
-                            setSearchParams((params) => {
-                              params.set("profileId", p._id!);
-                              return params;
-                            });
-                            setKycData(p);
-                          }}
-                          className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200"
-                        >
-                          Details
+                        <button className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                          Manage Space
                         </button>
-
-                        {linkBookingId && p.overallStatus === "approved" && (
-                          <button
-                            onClick={() => handleLinkBooking(p._id!)}
-                            disabled={saving}
-                            className="px-3 py-2 bg-[#3FA69E] text-black rounded-lg text-sm font-medium hover:bg-[#3FA69E] disabled:opacity-50 flex items-center gap-1"
-                          >
-                            {saving ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            ) : (
-                              "Select"
-                            )}
-                          </button>
-                        )}
                       </div>
                     </div>
                   );
@@ -1112,7 +1178,7 @@ export default function KYCVerification() {
 
                 <button
                   onClick={() => {
-                    navigate("/space-info-form");
+                    navigate("/spaceportal/space-management/add");
                   }}
                   className="bg-white rounded-xl shadow-sm border-2 border-dashed border-gray-200 p-5 flex flex-col items-center justify-center text-gray-400 hover:border-[#3FA69E] hover:text-[#3FA69E] transition-all group min-h-[160px]"
                 >
@@ -1681,11 +1747,28 @@ export default function KYCVerification() {
                                 </p>
                                 {uploadedDoc?.name && (
                                   <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                                    <FileText className="w-3 h-3" />{" "}
-                                    {uploadedDoc.name} - Uploaded on{" "}
-                                    {new Date(
-                                      uploadedDoc.uploadedAt || "",
-                                    ).toLocaleDateString("en-IN")}
+                                    <FileText className="w-3.5 h-3.5" />
+                                    <span
+                                      className="truncate max-w-[150px] sm:max-w-[250px]"
+                                      title={uploadedDoc.name}
+                                    >
+                                      {uploadedDoc.name}
+                                    </span>
+                                    {uploadedDoc.uploadedAt && (
+                                      <>
+                                        <span className="mx-1">•</span>
+                                        <span>
+                                          Uploaded on{" "}
+                                          {new Date(
+                                            uploadedDoc.uploadedAt,
+                                          ).toLocaleDateString("en-IN", {
+                                            day: "numeric",
+                                            month: "short",
+                                            year: "numeric",
+                                          })}
+                                        </span>
+                                      </>
+                                    )}
                                   </p>
                                 )}
                                 {uploadedDoc?.rejectionReason && (
@@ -2063,7 +2146,7 @@ export default function KYCVerification() {
                                 "KYC Submitted! Our team will review it shortly.",
                                 { id: toastId },
                               );
-                              fetchKYCData();
+                              fetchKYC();
                             }
                           } catch (err: any) {
                             console.error("Failed to submit KYC:", err);

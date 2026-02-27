@@ -15,6 +15,9 @@ import {
   Image as ImageIcon,
   Upload,
   Info,
+  FileType,
+  AlertCircle,
+  ExternalLink,
 } from "lucide-react";
 
 import propertyService from "@/services/property.service";
@@ -27,11 +30,15 @@ import {
   createVirtualOffice,
   updateVirtualOffice,
 } from "@/services/virtualOffice.service";
-import { createMeetingRoom } from "@/services/meetingRoom.service";
+import {
+  createMeetingRoom,
+  updateMeetingRoom,
+} from "@/services/meetingRoom.service";
 import { Property } from "@/types/services";
 
 type Step =
   | "property"
+  | "property_kyc"
   | "selection"
   | "coworking"
   | "virtual"
@@ -114,8 +121,15 @@ export default function AddSpace() {
   const [featureInput, setFeatureInput] = useState("");
   const [selectedAmenity, setSelectedAmenity] = useState("");
 
+  const [propertyDocuments, setPropertyDocuments] = useState<any[]>([]);
+  const [uploadingDoc, setUploadingDoc] = useState<string | null>(null);
+
   const [partnerKycStatus, setPartnerKycStatus] =
     useState<string>("not_started");
+  const [propertyKycStatus, setPropertyKycStatus] =
+    useState<string>("not_started");
+  const [propertyKycRejectionReason, setPropertyKycRejectionReason] =
+    useState<string>("");
   const [policyAccepted, setPolicyAccepted] = useState(false);
 
   useEffect(() => {
@@ -132,6 +146,9 @@ export default function AddSpace() {
             features: prop.features || [],
             images: prop.images || [],
           });
+          setPropertyKycStatus(prop.kycStatus || "not_started");
+          setPropertyKycRejectionReason(prop.kycRejectionReason || "");
+          setPropertyDocuments(prop.documents || []);
 
           // Fetch associated spaces
           const spaces = await propertyService.getPropertySpaces(editId);
@@ -198,12 +215,14 @@ export default function AddSpace() {
                 );
                 if (existing) {
                   existing.count += 1;
+                  existing.ids.push(curr._id);
                 } else {
                   acc.push({
                     type: curr.type,
                     capacity: curr.capacity,
                     pricePerHour: curr.partnerPricePerHour || curr.pricePerHour,
                     count: 1,
+                    ids: [curr._id],
                   });
                 }
                 return acc;
@@ -235,6 +254,49 @@ export default function AddSpace() {
     };
     fetchPartnerKyc();
   }, [editId]);
+
+  useEffect(() => {
+    if (propertyId && currentStep === "property_kyc") {
+      const fetchPropertyDocs = async () => {
+        try {
+          const prop = await propertyService.getPropertyById(propertyId);
+          setPropertyDocuments(prop.documents || []);
+        } catch (err) {
+          console.error("Failed to fetch property documents", err);
+        }
+      };
+      fetchPropertyDocs();
+    }
+  }, [propertyId, currentStep]);
+
+  const handlePropertyDocUpload = async (type: string, file: File) => {
+    if (!propertyId) return;
+    setUploadingDoc(type);
+    try {
+      await propertyService.uploadPropertyDocument(propertyId, type, file);
+      toast.success("Document uploaded successfully");
+      // Refresh documents
+      const prop = await propertyService.getPropertyById(propertyId);
+      setPropertyDocuments(prop.documents || []);
+    } catch (err) {
+      toast.error("Failed to upload document");
+    } finally {
+      setUploadingDoc(null);
+    }
+  };
+
+  const handlePropertyDocDelete = async (type: string) => {
+    if (!propertyId) return;
+    try {
+      await propertyService.deletePropertyDocument(propertyId, type);
+      toast.success("Document removed");
+      // Refresh documents
+      const prop = await propertyService.getPropertyById(propertyId);
+      setPropertyDocuments(prop.documents || []);
+    } catch (err) {
+      toast.error("Failed to remove document");
+    }
+  };
 
   // --- Step 3: Coworking Data ---
   const [coworkingData, setCoworkingData] = useState({
@@ -316,6 +378,9 @@ export default function AddSpace() {
 
   // --- Navigation Helpers ---
   const getNextStep = (current: Step): Step => {
+    if (current === "property") return "property_kyc";
+    if (current === "property_kyc") return "selection";
+
     const sequence: Step[] = ["coworking", "virtual", "meeting"];
     const startIndex =
       current === "selection" ? 0 : sequence.indexOf(current) + 1;
@@ -351,7 +416,7 @@ export default function AddSpace() {
         setPropertyId(resp._id);
         toast.success("Property details saved!");
       }
-      setCurrentStep("selection");
+      setCurrentStep("property_kyc");
     } catch (err) {
       toast.error(
         editId
@@ -389,7 +454,10 @@ export default function AddSpace() {
         ...rest,
         floors: validFloors,
         partnerPricePerMonth: pricePerMonth,
+        finalPricePerMonth: pricePerMonth,
         propertyId,
+        amenities: propertyData.features || [],
+        images: propertyData.images || [],
       } as any;
 
       if ((coworkingData as any)._id) {
@@ -424,9 +492,15 @@ export default function AddSpace() {
       const data = {
         ...virtualData,
         partnerGstPricePerYear: virtualData.finalGstPricePerYear,
+        finalGstPricePerYear: virtualData.finalGstPricePerYear,
         partnerMailingPricePerYear: virtualData.finalMailingPricePerYear,
+        finalMailingPricePerYear: virtualData.finalMailingPricePerYear,
         partnerBrPricePerYear: virtualData.finalBrPricePerYear,
+        finalBrPricePerYear: virtualData.finalBrPricePerYear,
         propertyId,
+        features: propertyData.features || [],
+        amenities: propertyData.features || [],
+        images: propertyData.images || [],
       } as any;
 
       if ((virtualData as any)._id) {
@@ -462,16 +536,31 @@ export default function AddSpace() {
 
     setLoading(true);
     try {
-      // For each room group, create 'count' number of individual rooms
+      // For each room group, handle updates for 'ids' and creates for the remainder (count - ids.length)
       for (const group of meetingData.rooms) {
-        for (let i = 0; i < group.count; i++) {
-          await createMeetingRoom({
-            type: group.type as any,
-            capacity: group.capacity,
-            partnerPricePerHour: group.pricePerHour,
-            operatingHours: coworkingData.operatingHours, // Sync with coworking hours
-            propertyId,
-          } as any);
+        const existingIds = group.ids || [];
+        const totalToCreate = group.count - existingIds.length;
+
+        // Common payload
+        const payload = {
+          type: group.type as any,
+          capacity: group.capacity,
+          partnerPricePerHour: group.pricePerHour,
+          finalPricePerHour: group.pricePerHour,
+          amenities: propertyData.features || [],
+          images: propertyData.images || [],
+          operatingHours: coworkingData.operatingHours,
+          propertyId,
+        };
+
+        // 1. Update existing ones
+        for (const id of existingIds) {
+          await updateMeetingRoom(id, payload as any);
+        }
+
+        // 2. Create new ones for the remainder
+        for (let i = 0; i < totalToCreate; i++) {
+          await createMeetingRoom(payload as any);
         }
       }
 
@@ -486,7 +575,7 @@ export default function AddSpace() {
 
   const handleFinish = () => {
     toast.success("Space creation complete!");
-    navigate("/spaceportal/space-management");
+    navigate(-1);
   };
 
   const submitPropertyForReview = async () => {
@@ -502,7 +591,7 @@ export default function AddSpace() {
         kycStatus: "pending" as any,
       });
       toast.success("Property submitted for admin review!");
-      navigate("/spaceportal/space-management");
+      navigate(-1);
     } catch (err) {
       toast.error("Failed to submit property for review");
     } finally {
@@ -515,6 +604,7 @@ export default function AddSpace() {
   const renderStepper = () => {
     const steps: { id: Step; label: string }[] = [
       { id: "property", label: "Property" },
+      { id: "property_kyc", label: "Property KYC" },
       { id: "selection", label: "Services" },
       { id: "coworking", label: "Coworking" },
       { id: "virtual", label: "Virtual" },
@@ -532,6 +622,7 @@ export default function AddSpace() {
           const isActive = currentStep === step.id;
           const isVisible =
             step.id === "property" ||
+            step.id === "property_kyc" ||
             step.id === "selection" ||
             step.id === "review" ||
             selectedTypes.includes(step.id);
@@ -555,13 +646,30 @@ export default function AddSpace() {
                       ? "bg-[#3FA69E] border-[#3FA69E] text-white"
                       : isActive
                         ? "border-[#3FA69E] text-[#3FA69E] font-bold"
-                        : "border-slate-200 text-slate-400"
+                        : step.id === "property_kyc" &&
+                            propertyKycStatus === "rejected"
+                          ? "border-red-500 text-red-500 bg-red-50 animate-pulse"
+                          : "border-slate-200 text-slate-400"
                   }`}
                 >
-                  {isCompleted ? <CheckCircle2 className="w-6 h-6" /> : idx + 1}
+                  {isCompleted ? (
+                    <CheckCircle2 className="w-6 h-6" />
+                  ) : step.id === "property_kyc" &&
+                    propertyKycStatus === "rejected" ? (
+                    <AlertCircle className="w-6 h-6" />
+                  ) : (
+                    idx + 1
+                  )}
                 </div>
                 <span
-                  className={`text-xs font-semibold whitespace-nowrap ${isActive ? "text-[#3FA69E]" : "text-slate-500"}`}
+                  className={`text-xs font-semibold whitespace-nowrap ${
+                    isActive
+                      ? "text-[#3FA69E]"
+                      : step.id === "property_kyc" &&
+                          propertyKycStatus === "rejected"
+                        ? "text-red-500"
+                        : "text-slate-500"
+                  }`}
                 >
                   {step.label}
                 </span>
@@ -791,6 +899,168 @@ export default function AddSpace() {
     </div>
   );
 
+  const renderPropertyKYCStep = () => {
+    const docTypes = [
+      {
+        id: "ownership_proof",
+        label: "Ownership Proof / Lease Agreement",
+        required: true,
+      },
+      { id: "property_tax", label: "Property Tax Receipt", required: false },
+      {
+        id: "electricity_bill",
+        label: "Electricity Bill (Latest)",
+        required: true,
+      },
+      { id: "fire_safety", label: "Fire Safety Certificate", required: false },
+      { id: "trade_license", label: "Trade License", required: false },
+    ];
+
+    return (
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-4 bg-blue-50 text-blue-700 rounded-2xl border border-blue-100">
+            <Info className="w-5 h-5 flex-shrink-0" />
+            <p className="text-sm font-medium">
+              Please upload clear documents for property verification. This
+              helps in faster approval of your listing.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6">
+            {docTypes.map((docType) => {
+              const doc = propertyDocuments.find((d) => d.type === docType.id);
+              const isUploading = uploadingDoc === docType.id;
+
+              return (
+                <div
+                  key={docType.id}
+                  className={`flex flex-col md:flex-row md:items-center justify-between p-6 rounded-2xl border transition-all group ${
+                    doc?.status === "rejected"
+                      ? "border-red-200 bg-red-50/30"
+                      : "border-slate-200 bg-white hover:border-[#3FA69E]"
+                  }`}
+                >
+                  <div className="flex items-center gap-4 flex-1">
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                        doc?.status === "rejected"
+                          ? "bg-red-100 text-red-600"
+                          : doc
+                            ? "bg-teal-50 text-[#3FA69E]"
+                            : "bg-slate-50 text-slate-400"
+                      } group-hover:scale-110 transition-transform`}
+                    >
+                      {doc?.status === "rejected" ? (
+                        <AlertCircle className="w-6 h-6" />
+                      ) : (
+                        <FileType className="w-6 h-6" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-slate-900">
+                        {docType.label}
+                        {docType.required && (
+                          <span className="text-red-500 ml-1">*</span>
+                        )}
+                      </h4>
+                      <div className="flex flex-col gap-1">
+                        <p className="text-sm text-slate-500">
+                          {doc
+                            ? `Uploaded: ${new Date(doc.uploadedAt as string).toLocaleDateString()}`
+                            : "Not uploaded yet"}
+                        </p>
+                        {doc?.status === "rejected" && (
+                          <p className="text-xs font-bold text-red-600">
+                            Rejection Reason: {doc.rejectionReason}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 mt-4 md:mt-0">
+                    {doc ? (
+                      <>
+                        <a
+                          href={doc.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 px-4 py-2 text-[#3FA69E] bg-teal-50 rounded-xl text-sm font-bold hover:bg-teal-100 transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4" /> View
+                        </a>
+                        <button
+                          onClick={() => handlePropertyDocDelete(docType.id)}
+                          className="p-2 text-red-500 bg-red-50 rounded-xl hover:bg-red-100 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    ) : (
+                      <label className="cursor-pointer relative overflow-hidden">
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handlePropertyDocUpload(docType.id, file);
+                          }}
+                          disabled={isUploading}
+                        />
+                        <div
+                          className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${isUploading ? "bg-slate-100 text-slate-400" : "bg-[#3FA69E] text-white hover:shadow-lg hover:shadow-teal-100"}`}
+                        >
+                          {isUploading ? (
+                            <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4" />
+                          )}
+                          {isUploading ? "Uploading..." : "Upload File"}
+                        </div>
+                      </label>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center pt-8 border-t border-slate-100">
+          <button
+            onClick={() => setCurrentStep("property")}
+            className="flex items-center gap-2 px-6 py-3 text-slate-500 font-semibold hover:text-slate-700 transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            Back to Details
+          </button>
+          <button
+            onClick={() => {
+              // Check for required documents
+              const requiredMissing = docTypes
+                .filter((dt) => dt.required)
+                .some((dt) => !propertyDocuments.some((d) => d.type === dt.id));
+
+              if (requiredMissing) {
+                toast.error(
+                  "Please upload all required documents (marked with *)",
+                );
+                return;
+              }
+              setCurrentStep("selection");
+            }}
+            className="flex items-center gap-2 px-8 py-3 bg-[#3FA69E] text-white rounded-xl font-bold shadow-lg shadow-teal-100 hover:translate-y-[-2px] transition-all"
+          >
+            Continue to Services
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const renderSelectionStep = () => (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="text-center max-w-2xl mx-auto space-y-2">
@@ -871,7 +1141,7 @@ export default function AddSpace() {
 
       <div className="flex justify-between items-center pt-8">
         <button
-          onClick={() => setCurrentStep("property")}
+          onClick={() => setCurrentStep("property_kyc")}
           className="flex items-center gap-2 px-6 py-3 text-slate-500 font-semibold hover:text-slate-700 transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -1091,6 +1361,7 @@ export default function AddSpace() {
                     capacity: 4,
                     pricePerHour: 500,
                     count: 1,
+                    ids: [], // New rooms have no IDs
                   },
                 ],
               })
@@ -1201,19 +1472,24 @@ export default function AddSpace() {
     </div>
   );
 
-  const renderReviewStep = () => (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center max-w-2xl mx-auto space-y-4">
-        <div className="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center mx-auto text-[#3FA69E]">
-          <CheckCircle2 className="w-10 h-10" />
-        </div>
-        <h2 className="text-2xl font-bold text-slate-900">All Set!</h2>
-        <p className="text-slate-500">
-          Your property and service details have been captured successfully.
-        </p>
-      </div>
+  const renderReviewStep = () => {
+    const isPropertyKycApproved = propertyKycStatus === "approved";
+    const isPropertyKycPending = propertyKycStatus === "pending";
+    const isPropertyKycRejected = propertyKycStatus === "rejected";
+    const isPartnerKycApproved = partnerKycStatus === "approved";
 
-      {partnerKycStatus === "approved" ? (
+    return (
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="text-center max-w-2xl mx-auto space-y-4">
+          <div className="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center mx-auto text-[#3FA69E]">
+            <CheckCircle2 className="w-10 h-10" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900">All Set!</h2>
+          <p className="text-slate-500">
+            Your property and service details have been captured successfully.
+          </p>
+        </div>
+
         <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
           <div className="space-y-2">
             <h3 className="text-lg font-bold text-slate-900">Final Review</h3>
@@ -1221,6 +1497,87 @@ export default function AddSpace() {
               Please review all entries before submitting. Once submitted, your
               property will be listed for admin approval.
             </p>
+          </div>
+
+          {!isPartnerKycApproved && (
+            <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-bold text-amber-900">
+                  Partner Identity KYC Not Complete
+                </h4>
+                <p className="text-xs text-amber-700">
+                  Please complete your personal KYC to enable property
+                  submission.
+                </p>
+                <button
+                  onClick={() => navigate("/spaceportal/kyc-verification")}
+                  className="mt-2 text-xs font-bold text-[#3FA69E] hover:underline flex items-center gap-1"
+                >
+                  Complete Personal KYC <ExternalLink className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Property KYC Status Summary */}
+          <div
+            className={`p-6 rounded-2xl border ${
+              isPropertyKycApproved
+                ? "bg-emerald-50 border-emerald-100"
+                : isPropertyKycPending
+                  ? "bg-blue-50 border-blue-100"
+                  : isPropertyKycRejected
+                    ? "bg-red-50 border-red-100"
+                    : "bg-slate-50 border-slate-200"
+            }`}
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  isPropertyKycApproved
+                    ? "bg-emerald-100 text-emerald-600"
+                    : isPropertyKycPending
+                      ? "bg-blue-100 text-blue-600"
+                      : isPropertyKycRejected
+                        ? "bg-red-100 text-red-600"
+                        : "bg-slate-200 text-slate-600"
+                }`}
+              >
+                {isPropertyKycApproved ? (
+                  <CheckCircle2 className="w-6 h-6" />
+                ) : isPropertyKycPending ? (
+                  <Monitor className="w-6 h-6 animate-pulse" />
+                ) : isPropertyKycRejected ? (
+                  <AlertCircle className="w-6 h-6" />
+                ) : (
+                  <FileType className="w-6 h-6" />
+                )}
+              </div>
+              <div>
+                <h4 className="font-bold text-slate-900">
+                  Property Verification:{" "}
+                  <span className="capitalize">
+                    {propertyKycStatus.replace("_", " ")}
+                  </span>
+                </h4>
+                <p className="text-sm text-slate-500">
+                  {isPropertyKycApproved
+                    ? "This property is verified and active."
+                    : isPropertyKycPending
+                      ? "Property details are under review by our admin team."
+                      : isPropertyKycRejected
+                        ? "There are issues with this property submission."
+                        : "This property is currently a draft and has not been submitted."}
+                </p>
+              </div>
+            </div>
+
+            {isPropertyKycRejected && propertyKycRejectionReason && (
+              <div className="mt-3 p-3 bg-white/50 rounded-lg border border-red-100 text-sm text-red-600 font-medium">
+                Rejection Reason: {propertyKycRejectionReason}
+              </div>
+            )}
           </div>
 
           <div className="flex items-start gap-3 p-4 bg-teal-50/50 rounded-2xl border border-teal-100">
@@ -1240,48 +1597,123 @@ export default function AddSpace() {
             </label>
           </div>
 
-          <button
-            onClick={submitPropertyForReview}
-            disabled={!policyAccepted || loading}
-            className="w-full py-4 bg-[#3FA69E] text-white rounded-2xl font-bold shadow-xl shadow-teal-100 disabled:opacity-50 disabled:shadow-none hover:scale-[1.02] transition-all"
-          >
-            {loading ? "Submitting..." : "Submit Property for Admin Review"}
-          </button>
-        </div>
-      ) : (
-        <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 flex flex-col md:flex-row items-center gap-8">
-          <div className="flex-1 space-y-2">
-            <h3 className="font-bold text-slate-900">Complete Personal KYC</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
-              As per regulatory requirements, we need to verify your identity
-              before you can start listing properties and accepting bookings.
-              This usually takes less than 2 minutes.
-            </p>
-          </div>
-          <button
-            onClick={() => navigate("/spaceportal/kyc-verification")}
-            className="px-8 py-4 bg-[#3FA69E] text-white rounded-2xl font-bold shadow-xl shadow-teal-100 whitespace-nowrap hover:scale-105 transition-transform"
-          >
-            Complete KYC Now
-          </button>
-        </div>
-      )}
+          <div className="space-y-3">
+            <button
+              onClick={submitPropertyForReview}
+              disabled={
+                !policyAccepted ||
+                isPropertyKycPending ||
+                !isPartnerKycApproved ||
+                loading
+              }
+              className="w-full py-4 bg-[#3FA69E] text-white rounded-2xl font-bold shadow-xl shadow-teal-100 disabled:opacity-50 disabled:grayscale disabled:shadow-none hover:scale-[1.01] transition-all"
+            >
+              {loading
+                ? "Submitting..."
+                : isPropertyKycRejected
+                  ? "Resubmit Property for Review"
+                  : isPropertyKycPending
+                    ? "Currently Under Review"
+                    : "Submit Property for Admin Review"}
+            </button>
 
-      <div className="flex justify-center pt-4">
-        <button
-          onClick={handleFinish}
-          className="text-slate-400 font-semibold hover:text-slate-600 transition-colors"
-        >
-          I'll do it later, take me to dashboard
-        </button>
+            {isPropertyKycPending && (
+              <p className="text-center text-xs text-blue-600 font-semibold">
+                * Our team is reviewing your property. Changes are locked during
+                review.
+              </p>
+            )}
+
+            {!isPartnerKycApproved && (
+              <p className="text-center text-xs text-amber-600 font-semibold">
+                * Please complete Personal KYC to enable submission.
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex justify-center pt-4">
+          <button
+            onClick={handleFinish}
+            className="text-slate-400 font-semibold hover:text-slate-600 transition-colors"
+          >
+            I'll do it later, take me to dashboard
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  const rejectedDocs = propertyDocuments.filter((d) => d.status === "rejected");
+  const rejectedDocNames = rejectedDocs.map((d) => {
+    const labelMap: any = {
+      ownership_proof: "Ownership Proof / Lease Agreement",
+      property_tax: "Property Tax Receipt",
+      electricity_bill: "Electricity Bill (Latest)",
+      fire_safety: "Fire Safety Certificate",
+      trade_license: "Trade License",
+    };
+    return labelMap[d.type] || d.type;
+  });
 
   return (
     <div className="flex-1 max-w-5xl mx-auto p-4 md:p-8">
+      {propertyKycStatus === "not_started" && (
+        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 shadow-sm">
+          <div className="flex gap-4">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <Info className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-blue-900 mb-1">
+                Complete Property Verification
+              </h3>
+              <p className="text-blue-700/80 text-sm leading-relaxed">
+                To ensure a smooth onboarding process, please provide accurate
+                property information and clear document uploads. Verification
+                typically takes 24-48 hours once submitted.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {propertyKycStatus === "rejected" && (
+        <div className="bg-red-50 border border-red-100 rounded-2xl p-6 mb-8 shadow-sm">
+          <div className="flex gap-4">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-6 h-6 text-red-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-red-900 mb-1">
+                Verification Issues Found
+              </h3>
+              <p className="text-red-700/80 text-sm leading-relaxed mb-4">
+                {propertyKycRejectionReason ||
+                  "Please review the issues highlighted below and update the necessary documents."}
+              </p>
+
+              {rejectedDocNames.length > 0 && (
+                <div className="text-sm text-red-800 bg-red-100/50 p-4 rounded-xl border border-red-100">
+                  <strong className="block mb-2 text-red-900">
+                    Action Required For:
+                  </strong>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {rejectedDocNames.map((name, idx) => (
+                      <li key={idx} className="font-medium">
+                        {name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <button
-        onClick={() => navigate("/spaceportal/space-management")}
+        onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-slate-500 hover:text-slate-700 transition-colors mb-4 group"
       >
         <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
@@ -1303,6 +1735,7 @@ export default function AddSpace() {
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
         {currentStep === "property" && renderPropertyStep()}
+        {currentStep === "property_kyc" && renderPropertyKYCStep()}
         {currentStep === "selection" && renderSelectionStep()}
         {currentStep === "coworking" && renderCoworkingStep()}
         {currentStep === "virtual" && renderVirtualStep()}

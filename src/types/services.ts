@@ -25,6 +25,15 @@ export interface Property {
   };
   images: string[];
   kycStatus: string;
+  kycRejectionReason?: string;
+  documents?: Array<{
+    type: string;
+    name: string;
+    fileUrl?: string;
+    status: "pending" | "approved" | "rejected";
+    rejectionReason?: string;
+    uploadedAt?: string;
+  }>;
   status?: string;
   isActive?: boolean;
   partner: string;
@@ -398,6 +407,7 @@ export interface KYCData {
   linkedBookings?: string[]; // Array of booking IDs
   overallStatus: KYCStatus;
   status?: string; // Add status field to match DashboardData
+  rejectionReason?: string;
   kycType?: KYCType;
   isPartner?: boolean;
   partnerCount?: number;

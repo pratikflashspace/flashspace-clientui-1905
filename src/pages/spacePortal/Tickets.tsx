@@ -27,7 +27,7 @@ export default function Tickets() {
 
   const [statusFilter, setStatusFilter] = useState<TicketStatus | "ALL">("ALL");
   const [priorityFilter, setPriorityFilter] = useState<TicketPriority | "ALL">(
-    "ALL"
+    "ALL",
   );
 
   /**
@@ -46,7 +46,7 @@ export default function Tickets() {
       { label: "Resolved", value: "RESOLVED" },
       { label: "Closed", value: "CLOSED" },
     ],
-    []
+    [],
   );
 
   const priorityOptions = useMemo(
@@ -57,7 +57,7 @@ export default function Tickets() {
       { label: "High", value: "HIGH" },
       { label: "Urgent", value: "URGENT" },
     ],
-    []
+    [],
   );
 
   /**
@@ -190,10 +190,10 @@ function StatusPill({ status }: { status: TicketStatus }) {
     status === "OPEN"
       ? { label: "Open", className: "bg-blue-50 text-blue-700" }
       : status === "IN_PROGRESS"
-      ? { label: "In Progress", className: "bg-amber-50 text-amber-700" }
-      : status === "RESOLVED"
-      ? { label: "Resolved", className: "bg-emerald-50 text-emerald-700" }
-      : { label: "Closed", className: "bg-slate-100 text-slate-700" };
+        ? { label: "In Progress", className: "bg-amber-50 text-amber-700" }
+        : status === "RESOLVED"
+          ? { label: "Resolved", className: "bg-emerald-50 text-emerald-700" }
+          : { label: "Closed", className: "bg-slate-100 text-slate-700" };
 
   return (
     <span
@@ -212,10 +212,10 @@ function PriorityPill({ priority }: { priority: TicketPriority }) {
     priority === "LOW"
       ? { label: "Low", className: "bg-slate-100 text-slate-700" }
       : priority === "MEDIUM"
-      ? { label: "Medium", className: "bg-amber-50 text-amber-700" }
-      : priority === "HIGH"
-      ? { label: "High", className: "bg-rose-50 text-rose-700" }
-      : { label: "Urgent", className: "bg-red-100 text-red-700" };
+        ? { label: "Medium", className: "bg-amber-50 text-amber-700" }
+        : priority === "HIGH"
+          ? { label: "High", className: "bg-rose-50 text-rose-700" }
+          : { label: "Urgent", className: "bg-red-100 text-red-700" };
 
   return (
     <span

@@ -53,7 +53,7 @@ export default function SpacePortalSettings() {
         icon: <Smartphone size={16} />,
       },
     ],
-    []
+    [],
   );
 
   return (

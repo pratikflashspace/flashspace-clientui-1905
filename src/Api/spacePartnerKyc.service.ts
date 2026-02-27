@@ -83,6 +83,7 @@ export type SpaceUserKycResponse = {
   panImageRejectMessage?: string;
   videoKycRejectMessage?: string;
   overallStatus?: "pending" | "approved" | "rejected" | "resubmit";
+  kycStatus?: "pending" | "approved" | "rejected" | "resubmit";
   overallRejectMessage?: string;
   // Business info fields
   companyName?: string;

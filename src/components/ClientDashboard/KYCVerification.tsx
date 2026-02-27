@@ -1153,6 +1153,54 @@ export default function KYCVerification() {
               <ChevronRight className="w-4 h-4 rotate-180" /> Back to profiles
             </button>
 
+            {/* Rejection Alert */}
+            {profileId !== "new" && kycData?.overallStatus === "rejected" && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-red-100 rounded-full flex-shrink-0">
+                    <AlertCircle className="w-6 h-6 text-red-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-red-800 mb-2">
+                      KYC Verification Rejected
+                    </h3>
+                    <p className="text-red-700 font-medium mb-4">
+                      {kycData.rejectionReason ||
+                        "Your KYC verification was rejected. Please review the comments below and re-submit the necessary information."}
+                    </p>
+
+                    {kycData.documents &&
+                      kycData.documents.filter((d) => d.status === "rejected")
+                        .length > 0 && (
+                        <div className="bg-white/60 rounded-lg p-4 text-sm mt-4">
+                          <h4 className="font-semibold text-red-900 mb-2">
+                            Rejected Documents:
+                          </h4>
+                          <ul className="space-y-2">
+                            {kycData.documents
+                              .filter((d) => d.status === "rejected")
+                              .map((doc, idx) => (
+                                <li
+                                  key={idx}
+                                  className="flex gap-2 text-red-800"
+                                >
+                                  <span className="font-medium min-w-[120px]">
+                                    {doc.name}:
+                                  </span>
+                                  <span>
+                                    {doc.rejectionReason ||
+                                      "No specific reason provided."}
+                                  </span>
+                                </li>
+                              ))}
+                          </ul>
+                        </div>
+                      )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {profileId !== "new" && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center justify-between mb-4">

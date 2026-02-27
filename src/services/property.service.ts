@@ -137,6 +137,50 @@ export const deleteProperty = async (id: string): Promise<boolean> => {
   }
 };
 
+export const uploadPropertyDocument = async (
+  propertyId: string,
+  documentType: string,
+  file: File,
+): Promise<any> => {
+  try {
+    const formData = new FormData();
+    formData.append("documentType", documentType);
+    formData.append("file", file);
+
+    const response = await axiosInstance.post(
+      `/property/${propertyId}/upload-document`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error uploading property document:", error);
+    throw error;
+  }
+};
+
+export const deletePropertyDocument = async (
+  propertyId: string,
+  documentType: string,
+): Promise<any> => {
+  try {
+    const response = await axiosInstance.delete(
+      `/property/${propertyId}/delete-document`,
+      {
+        params: { documentType },
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error deleting property document:", error);
+    throw error;
+  }
+};
+
 const propertyService = {
   createProperty,
   updateProperty,
@@ -145,6 +189,8 @@ const propertyService = {
   getParameterProperties: getPartnerProperties,
   getPropertyBookingsForPartner,
   deleteProperty,
+  uploadPropertyDocument,
+  deletePropertyDocument,
 };
 
 export default propertyService;

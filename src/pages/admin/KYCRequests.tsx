@@ -63,6 +63,7 @@ export default function KYCRequests() {
     "list" | "user_partners" | "user_business"
   >("list");
   const [partnerRequests, setPartnerRequests] = useState<any[]>([]);
+  const [allPartnerRequests, setAllPartnerRequests] = useState<any[]>([]);
   const [loadingPartnerRequests, setLoadingPartnerRequests] = useState(false);
   const [businessInfo, setBusinessInfo] = useState<any[]>([]);
   const [loadingBusinessInfo, setLoadingBusinessInfo] = useState(false);
@@ -103,12 +104,30 @@ export default function KYCRequests() {
   };
 
   const stats = React.useMemo(() => {
-    if (activeTab === "partners" || viewMode === "user_partners") {
+    if (activeTab === "partners") {
+      if (viewMode === "user_partners") {
+        return {
+          total: partnerRequests.length,
+          pending: partnerRequests.filter((r) => r.overallStatus === "pending")
+            .length,
+          approved: partnerRequests.filter(
+            (r) => r.overallStatus === "approved",
+          ).length,
+          rejected: partnerRequests.filter(
+            (r) => r.overallStatus === "rejected",
+          ).length,
+        };
+      }
       return {
-        total: partnerRequests.length,
-        pending: partnerRequests.filter((r) => r.status === "pending").length,
-        approved: partnerRequests.filter((r) => r.status === "approved").length,
-        rejected: partnerRequests.filter((r) => r.status === "rejected").length,
+        total: allPartnerRequests.length,
+        pending: allPartnerRequests.filter((r) => r.overallStatus === "pending")
+          .length,
+        approved: allPartnerRequests.filter(
+          (r) => r.overallStatus === "approved",
+        ).length,
+        rejected: allPartnerRequests.filter(
+          (r) => r.overallStatus === "rejected",
+        ).length,
       };
     }
     return {
@@ -117,7 +136,7 @@ export default function KYCRequests() {
       approved: requests.filter((r) => r.overallStatus === "approved").length,
       rejected: requests.filter((r) => r.overallStatus === "rejected").length,
     };
-  }, [requests, partnerRequests, activeTab, viewMode]);
+  }, [requests, partnerRequests, allPartnerRequests, activeTab, viewMode]);
 
   const filteredRequests = requests.filter((request) => {
     const matchesSearch =
@@ -258,19 +277,19 @@ export default function KYCRequests() {
     switch (status.toLowerCase()) {
       case "approved":
         return (
-          <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase tracking-wider border border-green-200">
+          <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase tracking-wider border border-green-200 whitespace-nowrap flex-shrink-0">
             Approved
           </span>
         );
       case "rejected":
         return (
-          <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold uppercase tracking-wider border border-red-200">
+          <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold uppercase tracking-wider border border-red-200 whitespace-nowrap flex-shrink-0">
             Rejected
           </span>
         );
       default:
         return (
-          <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold uppercase tracking-wider border border-yellow-200">
+          <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold uppercase tracking-wider border border-yellow-200 whitespace-nowrap flex-shrink-0">
             Pending
           </span>
         );
@@ -307,6 +326,52 @@ export default function KYCRequests() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 p-6 bg-gray-50/30 min-h-screen">
+      {/* KPI Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          {
+            label: "Pending Review",
+            value: stats.pending,
+            color: "text-yellow-600",
+            bg: "bg-yellow-50/50",
+            border: "border-yellow-100",
+          },
+          {
+            label: "Approved",
+            value: stats.approved,
+            color: "text-green-600",
+            bg: "bg-green-50/50",
+            border: "border-green-100",
+          },
+          {
+            label: "Rejected",
+            value: stats.rejected,
+            color: "text-red-600",
+            bg: "bg-red-50/50",
+            border: "border-red-100",
+          },
+          {
+            label: "Total Requests",
+            value: stats.total,
+            color: "text-gray-900",
+            bg: "bg-gray-50",
+            border: "border-gray-100",
+          },
+        ].map((stat, idx) => (
+          <div
+            key={idx}
+            className={`${stat.bg} ${stat.border} border rounded-3xl p-6 shadow-sm transition-all duration-300 hover:shadow-md`}
+          >
+            <p className="text-sm font-medium text-gray-500 mb-1">
+              {stat.label}
+            </p>
+            <p className={`text-4xl font-extrabold ${stat.color}`}>
+              {stat.value}
+            </p>
+          </div>
+        ))}
+      </div>
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -364,34 +429,6 @@ export default function KYCRequests() {
         </div>
       </div>
 
-      {/* KPI Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
-          <h3 className="text-3xl font-extrabold text-yellow-600">
-            {stats.pending}
-          </h3>
-          <p className="text-gray-500 text-sm">Pending Review</p>
-        </div>
-        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
-          <h3 className="text-3xl font-extrabold text-green-600">
-            {stats.approved}
-          </h3>
-          <p className="text-gray-500 text-sm">Approved</p>
-        </div>
-        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
-          <h3 className="text-3xl font-extrabold text-red-600">
-            {stats.rejected}
-          </h3>
-          <p className="text-gray-500 text-sm">Rejected</p>
-        </div>
-        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100">
-          <h3 className="text-3xl font-extrabold text-gray-900">
-            {stats.total}
-          </h3>
-          <p className="text-gray-500 text-sm">Total Requests</p>
-        </div>
-      </div>
-
       {viewMode === "user_partners" ? (
         <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm p-6">
           {loadingPartnerRequests ? (
@@ -412,12 +449,14 @@ export default function KYCRequests() {
                   key={partner._id}
                   className="bg-gray-50 rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h4 className="font-bold text-gray-900">
+                  <div className="flex justify-between items-start mb-4 gap-3">
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-gray-900 truncate">
                         {partner.fullName}
                       </h4>
-                      <p className="text-sm text-gray-500">{partner.email}</p>
+                      <p className="text-sm text-gray-500 truncate">
+                        {partner.email}
+                      </p>
                     </div>
                     {getStatusBadge(partner.status)}
                   </div>
@@ -456,8 +495,8 @@ export default function KYCRequests() {
                   key={biz._id}
                   className="bg-gray-50 rounded-2xl p-6 border border-gray-100 shadow-sm"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <h4 className="font-bold text-gray-900 text-xl">
+                  <div className="flex justify-between items-start mb-4 gap-3">
+                    <h4 className="font-bold text-gray-900 text-xl truncate min-w-0">
                       {biz.companyName || "N/A"}
                     </h4>
                     {getStatusBadge(biz.status || "pending")}
@@ -551,15 +590,15 @@ export default function KYCRequests() {
                   >
                     <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                       <div className="flex items-center justify-between mb-4 gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
                             {request.user?.fullName?.charAt(0) || "U"}
                           </div>
-                          <div>
-                            <h3 className="font-bold text-gray-900">
+                          <div className="min-w-0">
+                            <h3 className="font-bold text-gray-900 truncate">
                               {request.user?.fullName}
                             </h3>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 truncate">
                               {request.user?.email}
                             </p>
                           </div>
@@ -569,6 +608,25 @@ export default function KYCRequests() {
                     </div>
 
                     <div className="p-6 space-y-4 flex-1">
+                      {request.overallStatus === "approved" && (
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/kyc-requests/${request._id}`)
+                          }
+                          className="w-full bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl p-4 transition-colors text-left"
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="text-sm font-semibold text-green-900">
+                              User Info
+                            </h4>
+                            <User className="w-4 h-4 text-green-600" />
+                          </div>
+                          <p className="text-xs text-green-700">
+                            Check user identity details
+                          </p>
+                        </button>
+                      )}
+
                       {request.personalInfo && (
                         <button
                           onClick={() =>
@@ -613,38 +671,44 @@ export default function KYCRequests() {
                         </button>
                       )}
 
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                          Submitted Documents
-                        </h4>
-                        <div className="space-y-1">
-                          {request.documents?.map((doc, idx) => (
-                            <div
-                              key={idx}
-                              className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-sm"
-                            >
-                              <span className="capitalize">{doc.type}</span>
-                              <button
-                                onClick={() => openDocumentModal(doc, request)}
-                                className="text-blue-600 hover:underline font-medium"
+                      {request.overallStatus !== "approved" && (
+                        <div className="space-y-2">
+                          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Submitted Documents
+                          </h4>
+                          <div className="space-y-1">
+                            {request.documents?.map((doc, idx) => (
+                              <div
+                                key={idx}
+                                className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-sm"
                               >
-                                Verify
-                              </button>
-                            </div>
-                          ))}
+                                <span className="capitalize">{doc.type}</span>
+                                <button
+                                  onClick={() =>
+                                    openDocumentModal(doc, request)
+                                  }
+                                  className="text-blue-600 hover:underline font-medium"
+                                >
+                                  Verify
+                                </button>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
 
                     <div className="p-6 pt-0 mt-auto">
-                      <button
-                        onClick={() =>
-                          navigate(`/admin/kyc-requests/${request._id}`)
-                        }
-                        className="w-full py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-semibold shadow-md"
-                      >
-                        Complete Review
-                      </button>
+                      {request.overallStatus !== "approved" && (
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/kyc-requests/${request._id}`)
+                          }
+                          className="w-full py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-semibold shadow-md"
+                        >
+                          Complete Review
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -667,7 +731,9 @@ export default function KYCRequests() {
                   </p>
                 </div>
               </div>
-              <SpacePartnerKycRequest />
+              <SpacePartnerKycRequest
+                onDataLoaded={(data) => setAllPartnerRequests(data)}
+              />
             </div>
           </TabsContent>
         </Tabs>
@@ -736,13 +802,13 @@ export default function KYCRequests() {
             </div>
             <div className="p-6 bg-gray-50 border-t flex gap-4">
               <button
-                onClick={() => handleDocumentReview("approve")}
+                onClick={() => handleDocumentReview("approved")}
                 className="flex-1 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 shadow-md"
               >
                 Approve Document
               </button>
               <button
-                onClick={() => handleDocumentReview("reject")}
+                onClick={() => handleDocumentReview("rejected")}
                 className="flex-1 py-3 border-2 border-red-100 text-red-600 rounded-xl font-bold hover:bg-red-50"
               >
                 Reject Document

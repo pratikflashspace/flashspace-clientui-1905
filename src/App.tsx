@@ -81,6 +81,8 @@ import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
 import AdminNotifications from "./pages/admin/Notifications";
+import AdminPropertyDetails from "./pages/admin/PropertyDetailsAdmin";
+import PropertyManagement from "./pages/admin/PropertyManagement";
 
 import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
@@ -309,6 +311,14 @@ const App = () => (
                       <Route
                         path="space-details/:id"
                         element={<SpaceDetail />}
+                      />
+                      <Route
+                        path="property-details/:id"
+                        element={<AdminPropertyDetails />}
+                      />
+                      <Route
+                        path="manage-property/:id"
+                        element={<PropertyManagement />}
                       />
                       <Route path="settings" element={<AdminSettings />} />
                       <Route path="clients" element={<Clients />} />

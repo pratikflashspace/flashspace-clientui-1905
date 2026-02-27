@@ -1,20 +1,45 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { adminService, type PartnerKYCData } from "@/services/admin.service";
-import { Search, Handshake, Clock, CheckCircle2, XCircle, AlertCircle, Eye } from "lucide-react";
+import {
+  Search,
+  Handshake,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Eye,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const getStatusBadge = (status: string) => {
-  const config: Record<string, { bg: string; text: string; icon: React.ComponentType<{ className?: string }> }> = {
+  const config: Record<
+    string,
+    {
+      bg: string;
+      text: string;
+      icon: React.ComponentType<{ className?: string }>;
+    }
+  > = {
     pending: { bg: "bg-yellow-100", text: "text-yellow-700", icon: Clock },
-    approved: { bg: "bg-green-100", text: "text-green-700", icon: CheckCircle2 },
+    approved: {
+      bg: "bg-green-100",
+      text: "text-green-700",
+      icon: CheckCircle2,
+    },
     rejected: { bg: "bg-red-100", text: "text-red-700", icon: XCircle },
-    resubmit: { bg: "bg-orange-100", text: "text-orange-700", icon: AlertCircle },
+    resubmit: {
+      bg: "bg-orange-100",
+      text: "text-orange-700",
+      icon: AlertCircle,
+    },
   };
 
   const { bg, text, icon: Icon } = config[status] || config.pending;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${bg} ${text} uppercase`}>
+    <span
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${bg} ${text} uppercase`}
+    >
       <Icon className="w-3 h-3" />
       {status}
     </span>
@@ -68,7 +93,9 @@ export default function KYCPartnerRequests() {
     <div className="space-y-6 animate-in fade-in duration-300">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-[Poppins]">Partner KYC Requests</h1>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-[Poppins]">
+            Partner KYC Requests
+          </h1>
           <p className="text-sm text-gray-500 mt-1">
             Review partner-level KYC snapshots derived from individual profiles.
           </p>
@@ -89,9 +116,13 @@ export default function KYCPartnerRequests() {
         <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Handshake className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-semibold text-gray-900">Partner Snapshots</span>
+            <span className="text-sm font-semibold text-gray-900">
+              Partner Snapshots
+            </span>
           </div>
-          <span className="text-xs text-gray-500">Total: {filtered.length}</span>
+          <span className="text-xs text-gray-500">
+            Total: {filtered.length}
+          </span>
         </div>
 
         {filtered.length === 0 ? (
@@ -113,7 +144,10 @@ export default function KYCPartnerRequests() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filtered.map((rec) => (
-                  <tr key={rec._id} className="hover:bg-gray-50/60 transition-colors">
+                  <tr
+                    key={rec._id}
+                    className="hover:bg-gray-50/60 transition-colors"
+                  >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-xs font-semibold">
@@ -124,14 +158,20 @@ export default function KYCPartnerRequests() {
                             {rec.partnerInfo?.fullName || "Unknown"}
                           </p>
                           {rec.partnerProfileId && (
-                            <p className="text-[11px] text-gray-400">Profile: {rec.partnerProfileId}</p>
+                            <p className="text-[11px] text-gray-400">
+                              Profile: {rec.partnerProfileId}
+                            </p>
                           )}
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-600">
-                      <p className="truncate max-w-[180px]">{rec.partnerInfo?.email || "-"}</p>
-                      <p className="text-gray-400 mt-0.5">{rec.partnerInfo?.phone || ""}</p>
+                      <p className="truncate max-w-[180px]">
+                        {rec.partnerInfo?.email || "-"}
+                      </p>
+                      <p className="text-gray-400 mt-0.5">
+                        {rec.partnerInfo?.phone || ""}
+                      </p>
                     </td>
                     <td className="px-4 py-3">
                       {getStatusBadge(rec.overallStatus || "pending")}
@@ -142,21 +182,29 @@ export default function KYCPartnerRequests() {
                           <div className="w-20 h-1.5 rounded-full bg-gray-100 overflow-hidden">
                             <div
                               className="h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"
-                              style={{ width: `${Math.min(rec.progress, 100)}%` }}
+                              style={{
+                                width: `${Math.min(rec.progress, 100)}%`,
+                              }}
                             />
                           </div>
-                          <span className="text-[11px] text-gray-500">{rec.progress}%</span>
+                          <span className="text-[11px] text-gray-500">
+                            {rec.progress}%
+                          </span>
                         </div>
                       ) : (
                         <span className="text-[11px] text-gray-400">-</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">
-                      {rec.createdAt ? new Date(rec.createdAt).toLocaleDateString() : "-"}
+                      {rec.createdAt
+                        ? new Date(rec.createdAt).toLocaleDateString()
+                        : "-"}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
-                        onClick={() => navigate(`/admin/kyc-partners/${rec._id}`)}
+                        onClick={() =>
+                          navigate(`/admin/kyc-partners/${rec._id}`)
+                        }
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-semibold"
                       >
                         <Eye className="w-3 h-3" />
