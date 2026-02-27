@@ -10,7 +10,7 @@ import {
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
   Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
   LogOut, Lock, Check, Tag, Zap, // [UPDATED] added notification icons
-  UserIcon
+  UserIcon, Trash2
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
 import { useNotifications, NotificationType } from "@/contexts/NotificationContext";
@@ -385,6 +385,7 @@ const StartChatting = () => {
     chatSessions, 
     setChatSessions, 
     startNewChat, 
+    deleteChatSession,
     isLoading, 
     setIsLoading 
   } = useChat();
@@ -1332,42 +1333,56 @@ const StartChatting = () => {
                 const sessionKey = session._id || session.id;
                 const isActive = activeChatId === sessionKey;
                 return (
-                <button
-                  key={sessionKey}
-                  onClick={() => {
-                    // Before switching, save the current chat
-                    if (chatMessages.length > 0) {
-                      if (activeChatId) {
-                        // Update existing session's messages locally AND in MongoDB
-                        const updatedSession = chatSessions.find(s => (s._id || s.id) === activeChatId);
-                        if (updatedSession) {
-                          const updated = { ...updatedSession, messages: chatMessages };
-                          chatService.saveSession(updated).catch(err => console.error('[Chat] Failed to persist', err));
+                  <div key={sessionKey} className={`relative group w-full flex items-center pr-1 rounded-lg transition-colors ${isActive ? 'bg-[#35503F]' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+                    <button
+                      onClick={() => {
+                        // Before switching, save the current chat
+                        if (chatMessages.length > 0) {
+                          if (activeChatId) {
+                            // Update existing session's messages locally AND in MongoDB
+                            const updatedSession = chatSessions.find(s => (s._id || s.id) === activeChatId);
+                            if (updatedSession) {
+                              const updated = { ...updatedSession, messages: chatMessages };
+                              chatService.saveSession(updated).catch(err => console.error('[Chat] Failed to persist', err));
+                            }
+                            setChatSessions(prev => prev.map(s => {
+                              const sKey = s._id || s.id;
+                              return sKey === activeChatId ? { ...s, messages: chatMessages } : s;
+                            }));
+                          } else {
+                            // New unsaved chat — save as a new session
+                            startNewChat(chatMessages);
+                          }
                         }
-                        setChatSessions(prev => prev.map(s => {
-                          const sKey = s._id || s.id;
-                          return sKey === activeChatId ? { ...s, messages: chatMessages } : s;
-                        }));
-                      } else {
-                        // New unsaved chat — save as a new session
-                        startNewChat(chatMessages);
-                      }
-                    }
-                    setChatMessages(session.messages);
-                    setActiveChatId(sessionKey);
-                  }}
-                  className={`w-full text-left px-3 py-2 text-sm transition-colors rounded-lg ${
-                    isActive
-                      ? 'bg-[#35503F] text-white font-semibold'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                  style={isActive ? {} : { color: '#677e73' }}
-                  title={session.title}
-                >
-                  <div className="truncate">{session.title}</div>
-                  <div className={`text-[10px] mt-0.5 ${isActive ? 'opacity-70' : ''}`} style={isActive ? {} : { opacity: 0.55 }}>{session.date}</div>
-                </button>
-              );})
+                        setChatMessages(session.messages);
+                        setActiveChatId(sessionKey);
+                      }}
+                      className={`flex-1 text-left px-3 py-2 text-sm font-${isActive ? 'semibold' : 'normal'}`}
+                      style={{ color: isActive ? 'white' : '#677e73' }}
+                      title={session.title}
+                    >
+                      <div className="truncate">{session.title}</div>
+                      <div className="text-[10px] mt-0.5" style={{ opacity: isActive ? 0.7 : 0.55 }}>{session.date}</div>
+                    </button>
+                    
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        const success = await deleteChatSession(sessionKey);
+                        if (success && isActive) {
+                           setChatMessages([]);
+                           setActiveChatId(null);
+                        }
+                      }}
+                      className={`p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ${
+                        isActive ? 'text-white hover:bg-white/20' : 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-600'
+                      }`}
+                      title="Delete chat"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );})
             )}
           </div>
         </nav>

@@ -25,6 +25,7 @@ interface ChatContextType {
   chatSessions: ChatSession[];
   setChatSessions: React.Dispatch<React.SetStateAction<ChatSession[]>>;
   startNewChat: (messagesToSave?: ChatMessage[]) => void;
+  deleteChatSession: (sessionId: string) => Promise<boolean>;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -127,6 +128,24 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     sessionStorage.removeItem('chat_session_id');
   }, []); // No deps needed — all values read from refs
 
+  const deleteChatSession = useCallback(async (sessionId: string) => {
+    try {
+      if (isAuthenticatedRef.current) {
+        const response = await chatService.deleteSession(sessionId);
+        if (!response.success) {
+          console.error('[ChatContext] Failed to delete session on server:', response.message);
+          return false;
+        }
+      }
+      // Remove from local state
+      setChatSessions(prev => prev.filter(s => (s._id || s.id) !== sessionId));
+      return true;
+    } catch (err) {
+      console.error('[ChatContext] Error deleting session:', err);
+      return false;
+    }
+  }, [setChatSessions]);
+
   return (
     <ChatContext.Provider value={{
       chatMessages,
@@ -134,6 +153,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       chatSessions,
       setChatSessions,
       startNewChat,
+      deleteChatSession,
       isLoading,
       setIsLoading
     }}>
