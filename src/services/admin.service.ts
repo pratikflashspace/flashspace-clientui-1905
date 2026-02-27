@@ -37,11 +37,13 @@ export interface SpaceItem {
 
 export interface UserData {
   _id: string;
+  id?: string;
   fullName: string;
   email: string;
   phoneNumber?: string;
-  role: "user" | "admin" | "support";
+  role: "user" | "super_admin" | "admin" | "affiliate_manager" | "space_partner_manager" | "support" | "partner" | "space_manager" | "sales" | "affiliate";
   status: "active" | "inactive" | "pending";
+  isEmailVerified?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -185,11 +187,12 @@ class AdminService {
     search?: string;
     role?: string;
     status?: string;
+    deleted?: boolean;
     page?: number;
     limit?: number;
-  }): Promise<ApiResponse<{ users: UserData[]; pagination: any }>> {
+  }): Promise<ApiResponse<{ users: UserData[]; stats: any; pagination: any }>> {
     const response = await axiosInstance.get<
-      ApiResponse<{ users: UserData[]; pagination: any }>
+      ApiResponse<{ users: UserData[]; stats: any; pagination: any }>
     >("/api/admin/users", { params });
     return response.data;
   }

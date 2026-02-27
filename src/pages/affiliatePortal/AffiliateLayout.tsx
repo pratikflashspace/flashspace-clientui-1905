@@ -110,7 +110,7 @@ const AffiliateLayout = () => {
                 </header>
 
                 {/* --- Main Content Area --- */}
-                <main id="affiliate-main-content" className="flex-1 overflow-auto relative" data-lenis-prevent>
+                <main id="affiliate-main-content" className="flex-1 overflow-auto relative">
                     {/* <Outlet /> renders the child route (e.g., Dashboard.tsx) here */}
                     <Outlet />
                 </main>

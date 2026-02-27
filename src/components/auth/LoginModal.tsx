@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { LoginForm } from './LoginForm';
 import { Link } from 'react-router-dom';
-import { getLenis } from '@/lib/lenis';
 
 interface LoginModalProps {
     isOpen: boolean;
@@ -13,20 +12,16 @@ interface LoginModalProps {
 
 export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: LoginModalProps) => {
     useEffect(() => {
-        const lenis = getLenis();
         if (isOpen) {
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
-            lenis?.stop();
         } else {
             document.body.style.overflow = '';
             document.documentElement.style.overflow = '';
-            lenis?.start();
         }
         return () => {
             document.body.style.overflow = '';
             document.documentElement.style.overflow = '';
-            lenis?.start();
         };
     }, [isOpen]);
 

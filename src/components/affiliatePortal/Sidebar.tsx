@@ -18,8 +18,10 @@ import {
     ChevronRight,
     X,
     AlertTriangle,
+  LayoutDashboard
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
     isMobileOpen: boolean;
@@ -41,6 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
     const { user } = useAuth();
 
+    const navigate = useNavigate();
     const menuItems = [
         {
             name: "Dashboard",
@@ -248,14 +251,22 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </button>
 
                     <button
-                        onClick={() => setIsMobileOpen(false)}
-                        className="lg:hidden w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-600 hover:text-slate-900 py-2"
+                        onClick={() => navigate('/dashboard')}
+                        className={`
+              flex items-center rounded-xl shadow-sm font-semibold transition-colors bg-teal-50 border border-teal-100 text-teal-700 hover:bg-teal-100
+              ${isDesktopCollapsed ? "justify-center w-full p-3" : "justify-center gap-2 w-full px-4 py-3 text-sm"}
+            `}
                     >
-                        <ChevronLeft size={16} />
-                        <span>Close Menu</span>
+                        <LayoutDashboard size={18} className="text-teal-600" />
+                        {!isDesktopCollapsed && (
+                            <span className="whitespace-nowrap">
+                                User Dashboard
+                            </span>
+                        )}
                     </button>
 
                     <button
+                        onClick={() => navigate('/')}
                         className={`
               flex items-center rounded-xl shadow-sm font-semibold transition-colors bg-white border border-gray-200 text-slate-900 hover:bg-gray-50
               ${isDesktopCollapsed ? "justify-center w-full p-3" : "justify-center gap-2 w-full px-4 py-3 text-sm"}
