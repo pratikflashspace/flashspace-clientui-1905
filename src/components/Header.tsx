@@ -129,7 +129,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
     const handleNavigation = (href: string) => {
         if (href.startsWith("#")) {
             try {
-                smoothScrollTo(href, { offset: -90 });
+                window.scrollTo({ top: 0, behavior: "smooth" });
             } catch {
                 const element = document.querySelector(href);
                 element?.scrollIntoView({ behavior: "smooth", block: "start" });

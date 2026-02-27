@@ -2,18 +2,9 @@ import { createRoot } from "react-dom/client";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import App from "./App.tsx";
 import "./index.css";
-import { getLenis } from "@/lib/lenis.ts";
 import { ContactModalProvider } from "./components/ui/ContactModalContext";
 import { DarkModeProvider } from "./contexts/DarkModeContext.tsx";
 
-// Initialize Lenis once on app bootstrap
-if (typeof window !== "undefined") {
-  try {
-    getLenis();
-  } catch (e) {
-    console.warn("[Lenis] init skipped:", e);
-  }
-}
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -28,7 +19,7 @@ createRoot(document.getElementById("root")!).render(
 
       {/* Wrap up App by dark mode provider */}
       <DarkModeProvider>
-      <App />
+        <App />
       </DarkModeProvider>
     </ContactModalProvider>
   </GoogleOAuthProvider>

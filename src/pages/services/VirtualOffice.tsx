@@ -56,26 +56,6 @@ const VirtualOffice = () => {
     setSearchCity(city);
   }, [searchParams]);
 
-  // Disable Lenis smooth scroll for this specific container
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
-
-    // Add data attribute to tell Lenis to ignore this element
-    scrollContainer.setAttribute('data-lenis-prevent', 'true');
-
-    // Also prevent Lenis from handling wheel events on this container
-    const preventLenis = (e: WheelEvent) => {
-      e.stopPropagation();
-    };
-
-    scrollContainer.addEventListener('wheel', preventLenis, { passive: false });
-
-    return () => {
-      scrollContainer.removeEventListener('wheel', preventLenis);
-    };
-  }, []);
-
   // Fetch virtual offices from API
   useEffect(() => {
     const fetchVirtualOffices = async () => {
@@ -267,7 +247,7 @@ const VirtualOffice = () => {
           <div
             ref={scrollContainerRef}
             className="w-full h-full overflow-y-auto"
-            data-lenis-prevent
+
           >
             <div className="px-4 sm:px-6 py-4 sm:py-6">
               {/* Mobile Back Button */}

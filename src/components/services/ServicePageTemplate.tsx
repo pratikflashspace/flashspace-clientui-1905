@@ -78,24 +78,7 @@ const ServicePageTemplate = () => {
     setSelectedCity(city);
     setSelectedLocation(location);
     setSearchCity(city);
-  }, [searchParams]);
-
-  // Disable Lenis smooth scroll for the scrollable container
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
-
-    scrollContainer.setAttribute('data-lenis-prevent', 'true');
-
-    const preventLenis = (e: WheelEvent) => {
-      e.stopPropagation();
-    };
-
-    scrollContainer.addEventListener('wheel', preventLenis, { passive: false });
-
-    return () => {
-      scrollContainer.removeEventListener('wheel', preventLenis);
-    };
+  }, [searchParams]);;
   }, []);
 
   // Fetch data from API
@@ -262,7 +245,7 @@ const ServicePageTemplate = () => {
         <div
           ref={scrollContainerRef}
           className="w-1/2 overflow-y-auto"
-          data-lenis-prevent
+         
         >
           <div className="px-6 py-6">
             {/* Breadcrumb */}

@@ -927,21 +927,6 @@
   z-index: 1;
 }
 
-/* Disable Lenis inside explicitly prevented regions */
-[data-lenis-prevent],
-[data-lenis-prevent-wheel],
-[data-lenis-prevent-touch] {
-  overscroll-behavior: contain;
-  touch-action: pan-y;
-}
-
-/* Force scrollable containers to respond to mouse wheel */
-[style*="overflow-y: scroll"],
-[style*="overflowY: scroll"] {
-  overscroll-behavior: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-  touch-action: pan-y !important;
-}
 /* Global Animations */
 @keyframes fadeIn {
   from {

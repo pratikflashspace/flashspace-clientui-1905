@@ -70,7 +70,6 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
       <GoogleLogin
         onSuccess={handleGoogleSuccess}
         onError={handleGoogleError}
-        useOneTap
         theme="outline"
         size="large"
         text="signin_with"
