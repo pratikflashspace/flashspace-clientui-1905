@@ -56,6 +56,8 @@ const VirtualOffice = () => {
     setSearchCity(city);
   }, [searchParams]);
 
+
+
   // Fetch virtual offices from API
   useEffect(() => {
     const fetchVirtualOffices = async () => {
@@ -247,7 +249,10 @@ const VirtualOffice = () => {
           <div
             ref={scrollContainerRef}
             className="w-full h-full overflow-y-auto"
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7055e74 (ui and chatting and history)
           >
             <div className="px-4 sm:px-6 py-4 sm:py-6">
               {/* Mobile Back Button */}
@@ -383,7 +388,7 @@ const VirtualOffice = () => {
                     key={office._id}
                     item={office}
                     onGetBestPrice={() => handleGetBestPrice(office._id)}
-                    onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
+                    onToggleFavorite={(itemId) => { /* console.log('Toggle favorite for:', itemId) */ }}
                   />
                 ))}
               </div>

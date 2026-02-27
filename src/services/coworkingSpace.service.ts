@@ -21,7 +21,7 @@ export const getCoworkingSpacesByCity = async (
   city: string,
 ): Promise<CoworkingSpaceItem[]> => {
   try {
-    console.log(`📍 Fetching coworking spaces for city: ${city}`);
+    // console.log(`📍 Fetching coworking spaces for city: ${city}`);
     const response = await axiosInstance.get(
       `/coworkingSpace/getByCity/${city}`,
     );
@@ -33,7 +33,7 @@ export const getCoworkingSpacesByCity = async (
         ? data.data
         : data.data?.spaces || data.data?.offices || [];
 
-      console.log(`✅ Successfully fetched ${spaces.length} coworking spaces`);
+      // console.log(`✅ Successfully fetched ${spaces.length} coworking spaces`);
       return spaces;
     }
 

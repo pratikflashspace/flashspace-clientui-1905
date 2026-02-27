@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { smoothScrollTo } from "@/lib/lenis";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import ModernFlairButton from "@/components/ui/ModernFlairButton";
@@ -128,11 +127,9 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
     const handleNavigation = (href: string) => {
         if (href.startsWith("#")) {
-            try {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-            } catch {
-                const element = document.querySelector(href);
-                element?.scrollIntoView({ behavior: "smooth", block: "start" });
+            const element = document.querySelector(href);
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
             }
         } else {
             navigate(href);

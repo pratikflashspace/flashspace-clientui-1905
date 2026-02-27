@@ -190,7 +190,7 @@ export default function BookingCalendar() {
     if (propertyType === "MEETING_ROOM" && (viewMode === "MONTH_DATES" || viewMode === "YEAR")) {
         // Meeting Room + Day View -> Go forward 1 day
         setCurrentDate(addDays(currentDate, 1));
-        console.log("Meeting Room + Day View -> Go forward 1 day", currentDate);
+        // console.log("Meeting Room + Day View -> Go forward 1 day", currentDate);
         return;
     }
 

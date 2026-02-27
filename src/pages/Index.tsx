@@ -44,7 +44,7 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
       style={{ backgroundColor: bgColor }}
     >
       <Header openLogin={openLogin} openSignup={openSignup} />
-      <main>
+      <main className="relative">
         <HeroSection />
         <SolutionsSection />
         <BusinessExcellenceSection />

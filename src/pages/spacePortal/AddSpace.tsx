@@ -107,7 +107,7 @@ export default function AddSpace() {
       cabins: Number(form.cabins || 0),
     };
 
-    console.log("Payload to send backend:", payload);
+    // console.log("Payload to send backend:", payload);
 
     /**
      * BACKEND API CALL (Future)

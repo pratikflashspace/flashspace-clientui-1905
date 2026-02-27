@@ -34,7 +34,7 @@ export default function ContactModal({ isOpen, onClose }: Props) {
   const modal = (
     <div
       ref={ref}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6"
       aria-modal="true"
       role="dialog"
       style={{ fontFamily: '"Inner Tight", system-ui, sans-serif' }}

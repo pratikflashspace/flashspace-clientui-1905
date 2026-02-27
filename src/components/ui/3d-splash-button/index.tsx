@@ -34,7 +34,9 @@ const Splash3dButton = ({
       .then((decodedAudio) => {
         audioBufferRef.current = decodedAudio;
       })
-      .catch((err) => console.error("Error loading audio", err));
+      .catch((err) => {
+        // console.error("Error loading audio", err);
+      });
   }, []);
 
   function playAudio() {

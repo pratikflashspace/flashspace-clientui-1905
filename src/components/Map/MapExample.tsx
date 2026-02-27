@@ -43,7 +43,7 @@ const MapExample: React.FC = () => {
   ];
 
   const handleMapLoad = (map: google.maps.Map) => {
-    console.log('Map loaded successfully!', map);
+    // console.log('Map loaded successfully!', map);
     
     // You can add custom styling or additional functionality here
     // For example, you could add traffic layer

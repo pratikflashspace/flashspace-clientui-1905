@@ -9,6 +9,7 @@ import { SocketProvider } from "@/contexts/SocketContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import { ChatProvider } from "@/contexts/ChatContext"; // [NEW] Added ChatProvider
 import TeamManagement from "./pages/spacePortal/teamManagement";
 
 import Index from "./pages/Index";
@@ -183,7 +184,8 @@ const App = () => (
           <SocketProvider>
             <DarkModeProvider>
               <NotificationProvider>
-                <ScrollToTop />
+                <ChatProvider>
+                  <ScrollToTop />
                 {/* <MouseFollower/> */}
                 <Routes>
                   {/* Public Routes */}
@@ -402,10 +404,11 @@ const App = () => (
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-              </NotificationProvider>
-            </DarkModeProvider>
-          </SocketProvider>
-        </AuthProvider>
+              </ChatProvider>
+            </NotificationProvider>
+          </DarkModeProvider>
+        </SocketProvider>
+      </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

@@ -494,7 +494,7 @@ export default function SpacePortalLayout() {
             </div>
 
             {/* Page Content */}
-            <main className="mt-4 flex-1 px-3 pb-6 sm:mt-6 sm:px-5 lg:px-8">
+            <main className="relative mt-4 flex-1 px-3 pb-6 sm:mt-6 sm:px-5 lg:px-8">
               <Outlet />
             </main>
 

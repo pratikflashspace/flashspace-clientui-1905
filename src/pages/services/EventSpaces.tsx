@@ -83,6 +83,9 @@ const EventSpaces = () => {
     setSelectedLocation(location);
     setSearchCity(city);
   }, [searchParams]);
+
+
+
   // Filter cities based on search input
   const filteredCities: City[] = availableCities.filter(city =>
     city.name.toLowerCase().includes(searchCity.toLowerCase())
@@ -316,7 +319,10 @@ const EventSpaces = () => {
           <div
             ref={scrollContainerRef}
             className="w-full h-full overflow-y-auto"
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7055e74 (ui and chatting and history)
           >
             <div className="px-6 py-6">
               {/* Breadcrumb */}
