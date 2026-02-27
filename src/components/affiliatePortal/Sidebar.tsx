@@ -20,6 +20,7 @@ import {
     LayoutDashboard,
     AlertTriangle
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import userDashboardService from "@/services/userDashboard.service";
 
@@ -41,6 +42,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     activePage,
     setActivePage,
 }) => {
+    const { user } = useAuth();
+
     const navigate = useNavigate();
     const [kycStatus, setKycStatus] = useState<string>("approved"); // default hidden
 
