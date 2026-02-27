@@ -17,7 +17,9 @@ import {
     ChevronLeft,
     ChevronRight,
     X,
+    AlertTriangle,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarProps {
     isMobileOpen: boolean;
@@ -37,6 +39,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     activePage,
     setActivePage,
 }) => {
+    const { user } = useAuth();
+
     const menuItems = [
         {
             name: "Dashboard",
@@ -206,6 +210,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 >
                                     {item.name}
                                 </span>
+                                {item.name === "KYC Verification" && user && !user.kycVerified && (
+                                    <span
+                                        className={`ml-auto flex items-center gap-1 text-xs font-bold text-red-500 transition-all duration-200 ${isDesktopCollapsed ? "absolute right-2 shadow-md bg-white p-0.5 rounded-full" : ""}`}
+                                        title="KYC Required"
+                                    >
+                                        <AlertTriangle size={14} strokeWidth={2.5} />
+                                        {!isDesktopCollapsed && "KYC"}
+                                    </span>
+                                )}
                             </button>
                         );
                     })}
