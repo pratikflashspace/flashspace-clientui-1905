@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     LayoutGrid,
     Users,
@@ -17,9 +17,11 @@ import {
     ChevronLeft,
     ChevronRight,
     X,
-    LayoutDashboard
+    LayoutDashboard,
+    AlertTriangle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import userDashboardService from "@/services/userDashboard.service";
 
 interface SidebarProps {
     isMobileOpen: boolean;
@@ -40,6 +42,31 @@ const Sidebar: React.FC<SidebarProps> = ({
     setActivePage,
 }) => {
     const navigate = useNavigate();
+    const [kycStatus, setKycStatus] = useState<string>("approved"); // default hidden
+
+    useEffect(() => {
+        const fetchMyKycStatus = async () => {
+            try {
+                const response = await userDashboardService.getKYC();
+                if (response.success && response.data) {
+                    let status = "not_started";
+                    if (Array.isArray(response.data)) {
+                        const indProfile = response.data.find(p => p.kycType === 'individual');
+                        status = indProfile?.overallStatus || "not_started";
+                    } else {
+                        status = (response.data as any).overallStatus || "not_started";
+                    }
+                    setKycStatus(status);
+                } else {
+                    setKycStatus("not_started");
+                }
+            } catch (error) {
+                setKycStatus("not_started");
+            }
+        };
+        fetchMyKycStatus();
+    }, []);
+
     const menuItems = [
         {
             name: "Dashboard",
@@ -209,6 +236,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 >
                                     {item.name}
                                 </span>
+                                {item.name === "KYC Verification" && ["pending", "not_started"].includes(kycStatus) && (
+                                    <span
+                                        className={`ml-auto flex items-center gap-1 text-xs font-bold text-red-500 transition-all duration-200 ${isDesktopCollapsed ? "absolute right-2 shadow-md bg-white p-0.5 rounded-full" : ""}`}
+                                        title="KYC Required"
+                                    >
+                                        <AlertTriangle size={14} strokeWidth={2.5} />
+                                        {!isDesktopCollapsed && "KYC"}
+                                    </span>
+                                )}
                             </button>
                         );
                     })}

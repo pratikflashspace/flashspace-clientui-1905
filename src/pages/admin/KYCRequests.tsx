@@ -55,11 +55,11 @@ interface KYCRequest {
     panNumber?: string;
   };
   overallStatus:
-    | "pending"
-    | "approved"
-    | "rejected"
-    | "resubmit"
-    | "not_started";
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "resubmit"
+  | "not_started";
   documents: KYCDocument[];
   progress?: number;
   createdAt: string;
@@ -1202,7 +1202,7 @@ export default function KYCRequests() {
                               {request.documents?.length || 0})
                             </h4>
                             {request.documents &&
-                            request.documents.length > 0 ? (
+                              request.documents.length > 0 ? (
                               <div className="space-y-2">
                                 {request.documents.map((doc, idx) => (
                                   <div

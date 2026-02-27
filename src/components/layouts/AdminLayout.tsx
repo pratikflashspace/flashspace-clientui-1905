@@ -24,14 +24,49 @@ import {
     Tag,
     Headphones,
     Trophy,
-    Network
+    Network,
+    AlertTriangle
 } from 'lucide-react';
+import { adminService } from '@/services/admin.service';
 
 export default function AdminLayout() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const [pendingKycCount, setPendingKycCount] = useState(0);
+
+    React.useEffect(() => {
+        const fetchPendingKyc = async () => {
+            try {
+                const response = await adminService.getPendingKYC();
+                if (response.success && response.data) {
+                    // Deduplicate by _id in case the backend returns duplicate joins
+                    const uniqueRequests = response.data.filter(
+                        (req: any, index: number, self: any[]) =>
+                            index === self.findIndex((r) => r._id === req._id)
+                    );
+                    const pendingCount = uniqueRequests.filter((req: any) => req.overallStatus === "pending").length;
+                    setPendingKycCount(pendingCount);
+                }
+            } catch (error) {
+                console.error("Failed to fetch pending KYC", error);
+            }
+        };
+
+        if (user?.role && ['admin', 'super_admin', 'partner'].includes(user.role)) {
+            fetchPendingKyc();
+        }
+
+        const handleKycUpdate = () => {
+            if (user?.role && ['admin', 'super_admin', 'partner'].includes(user.role)) {
+                fetchPendingKyc();
+            }
+        };
+
+        window.addEventListener('kycUpdated', handleKycUpdate);
+        return () => window.removeEventListener('kycUpdated', handleKycUpdate);
+    }, [user]);
 
     const handleLogout = async () => {
         await logout();
@@ -107,6 +142,16 @@ export default function AdminLayout() {
                                     ''
                                     }`} />
                                 {isSidebarOpen && <span className="whitespace-nowrap font-medium text-sm">{item.label}</span>}
+
+                                {item.label === "KYC Verification" && pendingKycCount > 0 && (
+                                    <span
+                                        className={`ml-auto flex items-center gap-1 text-xs font-bold text-red-500 transition-all duration-200 ${!isSidebarOpen ? "absolute right-2 shadow-md bg-white p-0.5 rounded-full" : ""}`}
+                                        title={`${pendingKycCount} Pending KYC Requests`}
+                                    >
+                                        <AlertTriangle size={14} strokeWidth={2.5} />
+                                        {isSidebarOpen && "Request"}
+                                    </span>
+                                )}
                             </NavLink>
                         ))}
                     </nav>
@@ -184,6 +229,15 @@ export default function AdminLayout() {
                                     >
                                         <item.icon className="w-5 h-5 flex-shrink-0" />
                                         <span className="font-medium text-sm">{item.label}</span>
+                                        {item.label === "KYC Verification" && pendingKycCount > 0 && (
+                                            <span
+                                                className="ml-auto flex items-center gap-1 text-xs font-bold text-red-500"
+                                                title={`${pendingKycCount} Pending KYC Requests`}
+                                            >
+                                                <AlertTriangle size={14} strokeWidth={2.5} />
+                                                KYC
+                                            </span>
+                                        )}
                                     </NavLink>
                                 ))}
                             </nav>
