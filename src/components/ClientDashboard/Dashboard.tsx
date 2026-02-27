@@ -167,23 +167,6 @@ export default function Dashboard() {
     },
   ];
 
-  const bookingManagement = [
-    {
-      title: "Active Subscriptions",
-      description: "View all your active workspace subscriptions and their status",
-      icon: Package,
-    },
-    {
-      title: "Renewal Alerts",
-      description: "Get timely payment and renewal alerts directly in your dashboard",
-      icon: BellRing,
-    },
-    {
-      title: "Booking History",
-      description: "Complete history of all your past bookings and transactions",
-      icon: History,
-    },
-  ];
 
   return (
     <div className="p-8 max-w-7xl mx-auto min-h-screen">
@@ -234,79 +217,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Booking Management */}
-      <div>
-        <div className="mb-6 flex items-center gap-3">
-          <div className="p-2 bg-gray-100 rounded-lg">
-            <Package className="w-6 h-6 text-gray-700" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 ">Booking Management</h2>
-            <p className="text-gray-500 text-sm">Track and manage all your bookings</p>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {bookingManagement.map((item, idx) => (
-            <div key={idx} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:border-[#35503F]/30 transition-colors cursor-pointer group flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-gray-50 rounded-lg shrink-0">
-                    <item.icon className="w-5 h-5 text-[#35503F]" />
-                  </div>
-                  <h3 className="font-bold text-gray-900">{item.title}</h3>
-                </div>
-                <p className="text-gray-500 text-sm leading-relaxed mb-4">{item.description}</p>
-              </div>
-              <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                {/* <ArrowRight className="w-5 h-5 text-[#35503F]" /> */}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Communication & Records */}
-      <div className="mt-12 mb-8">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="p-2 bg-gray-100 rounded-lg">
-            <MessageSquare className="w-6 h-6 text-gray-700" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 ">Communication & Records</h2>
-            <p className="text-gray-500 text-sm">Stay connected and track all activities</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:border-[#35503F]/30 transition-colors cursor-pointer group flex flex-col justify-between">
-            <div>
-              <h3 className="font-bold text-gray-900 mb-2">Direct Chat with Partner</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">Chat directly with Space Partner to resolve queries (privacy protected)</p>
-            </div>
-
-            <div className="flex justify-end mt-4">
-              <div className="p-2 bg-gray-50 rounded-full group-hover:bg-[#35503F]/10 transition-colors">
-                {/* <MessageSquare className="w-5 h-5 text-[#35503F]" /> */}
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:border-[#35503F]/30 transition-colors cursor-pointer group flex flex-col justify-between">
-            <div>
-              <h3 className="font-bold text-gray-900 mb-2">Mail Records View</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">See all couriers received at your office with dispatch status and details</p>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:border-[#35503F]/30 transition-colors cursor-pointer group flex flex-col justify-between">
-            <div>
-              <h3 className="font-bold text-gray-900 mb-2">Visit Records</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">Track all visits done at the space regarding your registered company</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

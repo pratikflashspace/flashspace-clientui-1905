@@ -93,9 +93,35 @@ const MyBookings: React.FC = () => {
       });
       if (response.success && response.data) {
         setBookings(response.data);
-        if (response.stats) {
-          setBookingStats(response.stats);
+
+        // Only update stats if we are fetching "all" without filters, 
+        // to prevent filtered tab requests from overriding global stats.
+        if (activeTab === "all" && statusFilter === "all") {
+          let stats = response.stats;
+          // Fallback: compute stats from data if API stats are missing or all zeros
+          const isStatsEmpty = !stats || (
+            stats.total === 0 &&
+            stats.active === 0 &&
+            stats.virtualOffice === 0 &&
+            stats.coworking === 0 &&
+            stats.meetingRoom === 0
+          );
+
+          if (isStatsEmpty && response.data.length > 0) {
+            stats = {
+              total: response.data.length,
+              active: response.data.filter((b: any) => b.status === "active").length,
+              virtualOffice: response.data.filter((b: any) => b.type === "VirtualOffice" || b.bookingType === "VirtualOffice").length,
+              coworking: response.data.filter((b: any) => b.type === "CoworkingSpace" || b.bookingType === "CoworkingSpace").length,
+              meetingRoom: response.data.filter((b: any) => b.type === "MeetingRoom" || b.bookingType === "MeetingRoom").length,
+            };
+          }
+
+          if (stats) {
+            setBookingStats(stats);
+          }
         }
+
         if (response.pagination) {
           setTotalCount(response.pagination.total);
         } else {
@@ -385,11 +411,10 @@ const MyBookings: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
-                  activeTab === tab.id
-                    ? "bg-white text-black shadow-md"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all ${activeTab === tab.id
+                  ? "bg-white text-black shadow-md"
+                  : "text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 {tab.icon && <tab.icon className="w-4 h-4" />}
                 {tab.label}
@@ -473,11 +498,10 @@ const MyBookings: React.FC = () => {
                         setStatusFilter(status as typeof statusFilter);
                         setShowFilters(false);
                       }}
-                      className={`w-full text-left px-4 py-2 text-sm rounded-lg hover:bg-gray-50 ${
-                        statusFilter === status
-                          ? "bg-[#35503F]/5 text-[#35503F]"
-                          : "text-gray-600"
-                      }`}
+                      className={`w-full text-left px-4 py-2 text-sm rounded-lg hover:bg-gray-50 ${statusFilter === status
+                        ? "bg-[#35503F]/5 text-[#35503F]"
+                        : "text-gray-600"
+                        }`}
                     >
                       {status.charAt(0).toUpperCase() + status.slice(1)}
                     </button>
@@ -529,21 +553,20 @@ const MyBookings: React.FC = () => {
                         {booking.bookingNumber || "BO-2024-XXX"}
                       </span>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${
-                          booking.type === "VirtualOffice" ||
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${booking.type === "VirtualOffice" ||
                           booking.type === "virtual_office"
-                            ? "bg-gray-50 border-gray-200 text-gray-600"
-                            : booking.type === "MeetingRoom" ||
-                                booking.type === "meeting_room"
-                              ? "bg-purple-50 border-purple-100 text-purple-600"
-                              : "bg-blue-50 border-blue-100 text-blue-600"
-                        }`}
+                          ? "bg-gray-50 border-gray-200 text-gray-600"
+                          : booking.type === "MeetingRoom" ||
+                            booking.type === "meeting_room"
+                            ? "bg-purple-50 border-purple-100 text-purple-600"
+                            : "bg-blue-50 border-blue-100 text-blue-600"
+                          }`}
                       >
                         {booking.type === "VirtualOffice" ||
-                        booking.type === "virtual_office"
+                          booking.type === "virtual_office"
                           ? "Virtual Office"
                           : booking.type === "MeetingRoom" ||
-                              booking.type === "meeting_room"
+                            booking.type === "meeting_room"
                             ? "On Demand"
                             : "Coworking"}
                       </span>
@@ -614,7 +637,7 @@ const MyBookings: React.FC = () => {
                           {booking.status === "pending_kyc" && (
                             <button
                               // onClick={() => navigate(`/dashboard/kyc-verification?linkBookingId=${booking._id}`)}
-                              onClick={()=>navigate('/dashboard/profile')}
+                              onClick={() => navigate('/dashboard/profile')}
                               className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
                             >
                               <ShieldCheck className="w-4 h-4" /> Verify KYC
@@ -654,18 +677,18 @@ const MyBookings: React.FC = () => {
 
                           {(booking.status === "active" ||
                             booking.status === "expired") && (
-                            <button
-                              onClick={() => setReviewModalBooking(booking)}
-                              className="w-full text-left px-3 py-2 text-sm text-[#35503F] hover:bg-[#35503F]/5 rounded-md flex items-center gap-2 font-medium"
-                            >
-                              <Star
-                                className={`w-4 h-4 ${booking.existingReview ? "fill-[#35503F]" : ""}`}
-                              />
-                              {booking.existingReview
-                                ? "Edit Review"
-                                : "Rate Space"}
-                            </button>
-                          )}
+                              <button
+                                onClick={() => setReviewModalBooking(booking)}
+                                className="w-full text-left px-3 py-2 text-sm text-[#35503F] hover:bg-[#35503F]/5 rounded-md flex items-center gap-2 font-medium"
+                              >
+                                <Star
+                                  className={`w-4 h-4 ${booking.existingReview ? "fill-[#35503F]" : ""}`}
+                                />
+                                {booking.existingReview
+                                  ? "Edit Review"
+                                  : "Rate Space"}
+                              </button>
+                            )}
                         </PopoverContent>
                       </Popover>
                     </div>
@@ -698,11 +721,10 @@ const MyBookings: React.FC = () => {
                 </button>
                 <div className="absolute bottom-4 left-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      selectedBooking.type === "virtual_office"
-                        ? "bg-yellow-400 text-black"
-                        : "bg-blue-500 text-white"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${selectedBooking.type === "virtual_office"
+                      ? "bg-yellow-400 text-black"
+                      : "bg-blue-500 text-white"
+                      }`}
                   >
                     {selectedBooking.type === "virtual_office"
                       ? "Virtual Office"
@@ -723,9 +745,8 @@ const MyBookings: React.FC = () => {
                     </p>
                   </div>
                   <span
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${
-                      getStatusConfig(selectedBooking.status).bg
-                    } ${getStatusConfig(selectedBooking.status).text}`}
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${getStatusConfig(selectedBooking.status).bg
+                      } ${getStatusConfig(selectedBooking.status).text}`}
                   >
                     {getStatusConfig(selectedBooking.status).label}
                   </span>
@@ -822,11 +843,10 @@ const MyBookings: React.FC = () => {
                         )
                       }
                       disabled={togglingAutoRenew === selectedBooking._id}
-                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                        selectedBooking.autoRenew
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-200 text-gray-600"
-                      }`}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedBooking.autoRenew
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 text-gray-600"
+                        }`}
                     >
                       {togglingAutoRenew === selectedBooking._id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
