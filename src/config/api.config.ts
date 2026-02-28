@@ -67,6 +67,8 @@ export const API_ENDPOINTS = {
   // User Dashboard
   USER: {
     DASHBOARD: "/api/user/dashboard",
+    MAIL: "/api/user/mail",
+    VISIT: "/api/user/visit",
     // Bookings
     BOOKINGS: "/api/user/bookings",
     BOOKING_BY_ID: (id: string) => `/api/user/bookings/${id}`,
@@ -111,19 +113,17 @@ export const API_ENDPOINTS = {
 
   AFFILIATE: {
     LEADS: "/api/affiliate/leads",
-
     QUOTATIONS: "/api/affiliate/quotations",
-
     QUOTATIONS_RECENT: "/api/affiliate/quotations/recent",
-
     QUOTATIONS_STATS: "/api/affiliate/quotations/stats",
-
     SUPPORT_TICKETS: "/api/affiliate/support/tickets",
-
     LEADERBOARD: "/api/affiliate/leaderboard",
-
     DASHBOARD_STATS: "/api/affiliate/dashboard/stats",
-
     DASHBOARD_INSIGHTS: "/api/affiliate/dashboard/insights",
+    COUPON_GENERATE: "/api/coupons/affiliate/generate",
+    MY_COUPON: "/api/coupons/affiliate/my-coupon",
+    AVAILABLE_SPACES: "/api/affiliate/spaces",
+    INVOICES: "/api/affiliate/invoices",
+    INVOICE_BY_ID: (id: string) => `/api/affiliate/invoices/${id}`,
   },
 };

@@ -1,4 +1,5 @@
 // Common types for all services
+import { Review } from "./review";
 export interface City {
   name: string;
   key: string;
@@ -311,7 +312,10 @@ export type BookingType =
   | "virtual_office"
   | "coworking_space"
   | "seat_booking"
-  | "meeting_room";
+  | "meeting_room"
+  | "VirtualOffice"
+  | "CoworkingSpace"
+  | "MeetingRoom";
 export type BookingStatus =
   | "pending_payment"
   | "pending_kyc"
@@ -352,6 +356,7 @@ export interface Booking {
   daysRemaining?: number;
   autoRenew?: boolean;
   features?: string[];
+  existingReview?: Review | null;
   createdAt: string;
 }
 
@@ -432,6 +437,19 @@ export interface Invoice {
   dueDate?: string;
   paidAt?: string;
   createdAt: string;
+  user?: {
+    _id?: string;
+    name?: string;
+    fullName?: string;
+    email?: string;
+    phoneNumber?: string;
+  };
+  lineItems?: Array<{
+    description: string;
+    quantity: number;
+    rate: number;
+    amount: number;
+  }>;
 }
 
 export interface InvoicesSummary {
@@ -457,7 +475,7 @@ export type TicketStatus =
   | "waiting_customer";
 
 export interface TicketMessage {
-  sender: "user" | "support" | "admin";
+  sender: "user" | "support" | "admin" | "affiliate";
   senderName?: string;
   message: string;
   attachments?: string[];
@@ -491,6 +509,32 @@ export interface SupportTicket {
   closedAt?: string;
 }
 
+export interface MailRecord {
+  _id: string;
+  mailId: string;
+  client: string;
+  sender: string;
+  type: string;
+  space: string;
+  received: string;
+  status: "Pending Action" | "Forwarded" | "Collected";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VisitRecord {
+  _id: string;
+  visitId: string;
+  client: string;
+  visitor: string;
+  purpose: string;
+  space: string;
+  date: string;
+  status: "Pending" | "Completed";
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CreditHistoryItem {
   amount: number;
   source: string;
@@ -518,6 +562,13 @@ export interface ApiResponse<T = any> {
   success: boolean;
   message?: string;
   data?: T;
+  stats?: {
+    total: number;
+    active: number;
+    virtualOffice: number;
+    coworking: number;
+    meetingRoom: number;
+  };
   pagination?: PaginationInfo;
   error?: string;
 }

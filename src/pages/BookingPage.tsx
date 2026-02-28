@@ -32,6 +32,7 @@ import { VirtualOfficeItem } from "@/types/services";
 import { getVirtualOfficePricing, PlanDetails } from "@/utils/priceUtils";
 import { BookingPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { useAuth } from "@/contexts/AuthContext";
+import hotToast from "react-hot-toast";
 import { useToast } from "@/hooks/use-toast";
 import { validateCoupon, markCouponUsed } from "@/services/coupon.service";
 import {
@@ -61,8 +62,10 @@ const BookingPage = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
 
+  const isDirect = searchParams.get("direct") === "true";
+
   // WIZARD STATE
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(isDirect ? 4 : 1);
   const [animating, setAnimating] = useState(false);
 
   // DATA STATE
@@ -310,7 +313,9 @@ const BookingPage = () => {
         description: "Please login to apply coupons",
         variant: "destructive",
       });
-      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}`);
+      navigate(
+        `/login?redirect=/booking/${id}?plan=${planKeyId}${isDirect ? "&direct=true" : ""}`,
+      );
       return;
     }
     setCouponLoading(true);
@@ -430,7 +435,7 @@ const BookingPage = () => {
   const computedEndDate = (() => {
     const start = new Date(selectedStartDate);
     const end = new Date(start);
-    end.setMonth(end.getMonth() + selectedTenure * 12);
+    end.setMonth(end.getMonth() + (isCoworking ? 1 : selectedTenure * 12));
     return end.toISOString().split("T")[0];
   })();
 
@@ -451,7 +456,9 @@ const BookingPage = () => {
         description: "Please login to continue with your booking",
         variant: "destructive",
       });
-      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}`);
+      navigate(
+        `/login?redirect=/booking/${id}?plan=${planKeyId}${isDirect ? "&direct=true" : ""}`,
+      );
       return;
     }
     if (!spaceDetails || !selectedPlanDetails) return;
@@ -502,6 +509,8 @@ const BookingPage = () => {
               razorpay_signature: response.razorpay_signature,
             });
 
+            hotToast.success("Payment Successful! 🎉");
+
             // Confirm booking if holdId exists
             const holdId = searchParams.get("holdId");
             if (holdId) {
@@ -527,10 +536,6 @@ const BookingPage = () => {
               }
             }
 
-            toast({
-              title: "Payment Successful! 🎉",
-              description: "Your booking has been confirmed",
-            });
             if (appliedCoupon) {
               try {
                 await markCouponUsed(appliedCoupon.code);
@@ -538,6 +543,11 @@ const BookingPage = () => {
                 console.error("Failed to mark coupon used", err);
               }
             }
+
+            toast({
+              title: "Payment Successful! 🎉",
+              description: "Your booking has been confirmed",
+            });
             navigate(
               `/payment/success?orderId=${response.razorpay_order_id}&paymentId=${response.razorpay_payment_id}`,
             );
@@ -594,7 +604,9 @@ const BookingPage = () => {
         description: "Please login to continue",
         variant: "destructive",
       });
-      navigate(`/login?redirect=/booking/${id}?plan=${planKeyId}`);
+      navigate(
+        `/login?redirect=/booking/${id}?plan=${planKeyId}${isDirect ? "&direct=true" : ""}`,
+      );
       return;
     }
     if (!spaceDetails || !selectedPlanDetails) return;
@@ -633,6 +645,8 @@ const BookingPage = () => {
       });
       const result = await simulatePayment(orderData.orderId);
 
+      hotToast.success("Payment Simulated! 🎉");
+
       // Confirm booking if holdId exists
       const holdId = searchParams.get("holdId");
       if (holdId) {
@@ -650,10 +664,6 @@ const BookingPage = () => {
         }
       }
 
-      toast({
-        title: "Payment Simulated! 🎉",
-        description: "Mock booking has been created successfully",
-      });
       if (appliedCoupon) {
         try {
           await markCouponUsed(appliedCoupon.code);
@@ -661,6 +671,11 @@ const BookingPage = () => {
           console.error("Failed to mark coupon used", err);
         }
       }
+
+      toast({
+        title: "Payment Simulated! 🎉",
+        description: "Mock booking has been created successfully",
+      });
       navigate(
         `/payment/success?orderId=${orderData.orderId}&paymentId=${result.paymentId}`,
       );
@@ -761,26 +776,27 @@ const BookingPage = () => {
           )}
 
           {/* ========== STEPPER ========== */}
-          <div className="mb-10">
-            <div className="flex items-center justify-between relative">
-              <div className="absolute top-6 left-0 right-0 h-0.5 bg-gray-200 -z-0" />
-              <div
-                className="absolute top-6 left-0 h-0.5 bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-700 ease-out -z-0"
-                style={{
-                  width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%`,
-                }}
-              />
-              {STEPS.map((step) => {
-                const isCompleted = currentStep > step.id;
-                const isActive = currentStep === step.id;
-                const Icon = step.icon;
-                return (
-                  <div
-                    key={step.id}
-                    className="flex flex-col items-center relative z-10"
-                  >
+          {!isDirect && (
+            <div className="mb-10">
+              <div className="flex items-center justify-between relative">
+                <div className="absolute top-6 left-0 right-0 h-0.5 bg-gray-200 -z-0" />
+                <div
+                  className="absolute top-6 left-0 h-0.5 bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-700 ease-out -z-0"
+                  style={{
+                    width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%`,
+                  }}
+                />
+                {STEPS.map((step) => {
+                  const isCompleted = currentStep > step.id;
+                  const isActive = currentStep === step.id;
+                  const Icon = step.icon;
+                  return (
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ease-out shadow-sm border-2
+                      key={step.id}
+                      className="flex flex-col items-center relative z-10"
+                    >
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ease-out shadow-sm border-2
                       ${
                         isCompleted
                           ? "bg-gradient-to-br from-teal-500 to-emerald-400 border-teal-400 text-white shadow-teal-200 shadow-md"
@@ -788,24 +804,25 @@ const BookingPage = () => {
                             ? "bg-white border-teal-500 text-teal-600 shadow-teal-100 shadow-lg scale-110 ring-4 ring-teal-50"
                             : "bg-white border-gray-200 text-gray-400"
                       }`}
-                    >
-                      {isCompleted ? (
-                        <Check className="w-5 h-5" strokeWidth={3} />
-                      ) : (
-                        <Icon className="w-5 h-5" />
-                      )}
-                    </div>
-                    <span
-                      className={`mt-2.5 text-xs font-semibold tracking-wide transition-colors duration-300
+                      >
+                        {isCompleted ? (
+                          <Check className="w-5 h-5" strokeWidth={3} />
+                        ) : (
+                          <Icon className="w-5 h-5" />
+                        )}
+                      </div>
+                      <span
+                        className={`mt-2.5 text-xs font-semibold tracking-wide transition-colors duration-300
                       ${isActive ? "text-teal-700" : isCompleted ? "text-teal-500" : "text-gray-400"}`}
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-                );
-              })}
+                      >
+                        {step.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* ========== STEP CONTENT ========== */}
           <div
@@ -981,11 +998,11 @@ const BookingPage = () => {
                             key={key}
                             onClick={() => setSelectedPlanKey(key)}
                             className={`relative p-5 rounded-2xl cursor-pointer transition-all duration-300 border-2
-                              ${
-                                isSelected
-                                  ? "border-teal-500 bg-gradient-to-br from-teal-50 to-emerald-50 shadow-lg shadow-teal-100/50 scale-[1.02]"
-                                  : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
-                              }`}
+                               ${
+                                 isSelected
+                                   ? "border-teal-500 bg-gradient-to-br from-teal-50 to-emerald-50 shadow-lg shadow-teal-100/50 scale-[1.02]"
+                                   : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
+                               }`}
                           >
                             {isSelected && (
                               <div className="absolute -top-2.5 -right-2.5 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center shadow-md">
@@ -1054,11 +1071,11 @@ const BookingPage = () => {
                             setSelectedTenure(option.years as 1 | 2 | 3)
                           }
                           className={`relative border-2 rounded-2xl p-5 cursor-pointer transition-all duration-300
-                            ${
-                              selectedTenure === option.years
-                                ? "border-teal-500 bg-teal-50 shadow-lg scale-[1.02]"
-                                : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
-                            }`}
+                             ${
+                               selectedTenure === option.years
+                                 ? "border-teal-500 bg-teal-50 shadow-lg scale-[1.02]"
+                                 : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
+                             }`}
                         >
                           {option.popular && (
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-teal-500 to-emerald-400 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md">
@@ -1497,11 +1514,17 @@ const BookingPage = () => {
           {/* ========== NAVIGATION BUTTONS ========== */}
           <div className="flex justify-between items-center mt-8">
             <button
-              onClick={currentStep === 1 ? () => navigate(-1) : goBack}
+              onClick={
+                currentStep === 1 || (isDirect && currentStep === 4)
+                  ? () => navigate(-1)
+                  : goBack
+              }
               className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all text-sm shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
-              {currentStep === 1 ? "Cancel" : "Back"}
+              {currentStep === 1 || (isDirect && currentStep === 4)
+                ? "Cancel"
+                : "Back"}
             </button>
 
             {currentStep < 4 && (
@@ -1509,11 +1532,11 @@ const BookingPage = () => {
                 onClick={goNext}
                 disabled={!canProceed()}
                 className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-md
-                  ${
-                    canProceed()
-                      ? "bg-gradient-to-r from-teal-600 to-emerald-500 text-white hover:from-teal-700 hover:to-emerald-600 shadow-teal-200/50 hover:shadow-lg"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
-                  }`}
+                   ${
+                     canProceed()
+                       ? "bg-gradient-to-r from-teal-600 to-emerald-500 text-white hover:from-teal-700 hover:to-emerald-600 shadow-teal-200/50 hover:shadow-lg"
+                       : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+                   }`}
               >
                 Continue <ArrowRight className="w-4 h-4" />
               </button>

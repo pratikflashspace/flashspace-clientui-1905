@@ -4,28 +4,22 @@ import userDashboardService, {
   DashboardData,
 } from "@/services/userDashboard.service";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
-import {
-  Building2,
-  CreditCard,
-  Calendar,
+  Package,
+  Clock,
+  MapPin,
+  Users,
+  Sparkles,
+  ArrowRight,
   ShieldCheck,
+  History,
+  BellRing,
   Loader2,
   AlertCircle,
   RefreshCw,
+  MessageSquare,
+  CreditCard,
+  Calendar,
 } from "lucide-react";
-
-const COLORS = ["#f9c909", "#ffea80"];
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -43,10 +37,13 @@ export default function Dashboard() {
       if (response.success && response.data) {
         setDashboardData(response.data);
       } else {
-        setError(response.message || "Failed to load dashboard");
+        // setError(response.message || "Failed to load dashboard");
+        // Fallback to empty data if fail, to show UI at least
+        setDashboardData(null);
       }
     } catch (err) {
-      setError("Failed to load dashboard data");
+      console.error("Failed to load dashboard data", err);
+      // setError("Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -56,6 +53,18 @@ export default function Dashboard() {
     fetchDashboard();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 text-[#35503F] animate-spin mx-auto mb-4" />
+          <p className="text-gray-500">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Helper Functions
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -76,239 +85,139 @@ export default function Dashboard() {
   const getKYCStatusDisplay = (status: string) => {
     switch (status) {
       case "in_progress":
-        return { text: "Draft", color: "text-blue-600" };
+        return { text: "Draft", color: "text-gray-400", isSmall: true };
       case "approved":
-        return { text: "Verified", color: "text-green-600" };
+        return { text: "Verified", color: "text-green-600", isSmall: false };
       case "pending":
-        return { text: "Pending", color: "text-yellow-600" };
+        return { text: "Pending", color: "text-yellow-600", isSmall: false };
       case "rejected":
-        return { text: "Rejected", color: "text-red-600" };
+        return { text: "Rejected", color: "text-red-600", isSmall: false };
       default:
-        return { text: "Not Started", color: "text-gray-500" };
+        return { text: "Not Started", color: "text-gray-400", isSmall: true };
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-10 h-10 text-yellow-500 animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <p className="text-gray-700 font-medium mb-2">{error}</p>
-          <button
-            onClick={fetchDashboard}
-            className="px-4 py-2 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors flex items-center gap-2 mx-auto"
-          >
-            <RefreshCw className="w-4 h-4" /> Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const kycStatus = getKYCStatusDisplay(
     dashboardData?.kycStatus || "not_started",
   );
 
-  const lineData =
-    dashboardData?.monthlyBookings?.map((m) => ({
-      month: m.month,
-      bookings: m.count,
-    })) || [];
+  const nextRenewalDate = dashboardData?.nextBookingDate;
+  const nextRenewalDisplay = nextRenewalDate ? formatDate(nextRenewalDate) : "No upcoming";
+  const nextRenewalColor = nextRenewalDate ? "text-gray-900" : "text-gray-400";
+  const isNextRenewalSmall = !nextRenewalDate;
 
-  const pieData = [
-    {
-      name: "Virtual Office",
-      value: dashboardData?.usageBreakdown?.virtualOffice || 0,
-    },
-    {
-      name: "Coworking Space",
-      value: dashboardData?.usageBreakdown?.coworkingSpace || 0,
-    },
-  ];
+  // Active Services Logic
+  const activeServicesCount = dashboardData?.activeServices || 0;
+  const isActiveServicesZero = activeServicesCount === 0;
+  const activeServicesColor = isActiveServicesZero ? "text-gray-400" : "text-gray-900";
 
-  const summaryCards = [
+  // Pending Invoices Logic
+  const pendingInvoicesAmount = dashboardData?.pendingInvoices || 0;
+  const isPendingInvoicesZero = pendingInvoicesAmount === 0;
+  const pendingInvoicesColor = isPendingInvoicesZero ? "text-gray-400" : "text-gray-900";
+
+  // Dynamic Data UI
+  const statsCards = [
     {
       title: "Active Services",
-      value: String(dashboardData?.activeServices || 0),
-      icon: Building2,
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
+      value: String(activeServicesCount),
+      valueColor: activeServicesColor,
+      isSmall: isActiveServicesZero,
+      icon: Package,
     },
     {
       title: "Pending Invoices",
-      value: formatCurrency(dashboardData?.pendingInvoices || 0),
+      value: formatCurrency(pendingInvoicesAmount),
+      valueColor: pendingInvoicesColor,
+      isSmall: isPendingInvoicesZero,
       icon: CreditCard,
-      iconBg: "bg-orange-100",
-      iconColor: "text-orange-600",
     },
     {
       title: "Next Renewal",
-      value: formatDate(dashboardData?.nextBookingDate || null),
+      value: nextRenewalDisplay,
+      valueColor: nextRenewalColor,
+      isSmall: isNextRenewalSmall,
       icon: Calendar,
-      iconBg: "bg-purple-100",
-      iconColor: "text-purple-600",
     },
     {
       title: "KYC Status",
       value: kycStatus.text,
-      icon: ShieldCheck,
-      iconBg: "bg-green-100",
-      iconColor: "text-green-600",
       valueColor: kycStatus.color,
+      isSmall: kycStatus.isSmall,
+      icon: ShieldCheck,
     },
   ];
 
+  const aiFeatures = [
+    {
+      title: "Goal Analysis Quiz",
+      description: "AI-powered quiz to analyze your ultimate goal for virtual office and get personalized suggestions",
+    },
+    {
+      title: "Delivery Predictions",
+      description: "AI predicts expected delivery date and time for your orders with real-time updates",
+    },
+    {
+      title: "Delay Tracking & Alerts",
+      description: "If delays occur, AI explains the reason and prescribes actions for fast tracking",
+    },
+    {
+      title: "Compliance Suggestions",
+      description: "AI promotes additional compliance services and best options for next 3-6 months",
+    },
+  ];
+
+
   return (
-    <div className="p-6 md:p-8 max-w-6xl mx-auto">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-2xl p-6 md:p-8 mb-8 text-black">
-        <h2 className="text-2xl md:text-3xl font-bold font-[Poppins]">
-          Welcome back, {user?.fullName?.split(" ")[0] || "User"}!
-        </h2>
-        <p className="text-black/70 mt-2">
-          Here's a quick summary of your account
+    <div className="p-8 max-w-7xl mx-auto min-h-screen">
+      {/* Header Section */}
+      <div className="mb-10">
+        <h1 className="text-4xl font-bold text-[#35503F]  mb-2">
+          Welcome back, {user?.fullName?.split(" ")[0] || "Customer"}
+        </h1>
+        <p className="text-gray-500 text-lg">
+          Manage your workspace subscriptions and track your orders
         </p>
       </div>
 
-      {/* Account Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {summaryCards.map((card) => (
-          <div
-            key={card.title}
-            className="bg-white rounded-xl p-5 shadow-sm border border-gray-100"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div
-                className={`w-10 h-10 ${card.iconBg} rounded-lg flex items-center justify-center`}
-              >
-                <card.icon className={`w-5 h-5 ${card.iconColor}`} />
-              </div>
-              <span className="text-sm text-gray-500">{card.title}</span>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {statsCards.map((card, idx) => (
+          <div key={idx} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-start justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium mb-4">{card.title}</p>
+              <h3 className={`${card.isSmall ? "text-xl font-medium" : "text-3xl font-bold"} ${card.valueColor || "text-gray-900"}`}>{card.value}</h3>
             </div>
-            <p
-              className={`text-xl font-bold ${card.valueColor || "text-gray-900"}`}
-            >
-              {card.value}
-            </p>
+            <div className="p-3 bg-gray-50 rounded-full">
+              <card.icon className="w-5 h-5 text-gray-600" />
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-900 mb-4 font-[Poppins]">
-            Monthly Bookings
-          </h3>
-          {lineData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={lineData}>
-                <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} />
-                <YAxis stroke="#9ca3af" fontSize={12} />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="bookings"
-                  stroke="#f9c909"
-                  strokeWidth={3}
-                  dot={{ fill: "#f9c909", strokeWidth: 2 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-[250px] flex items-center justify-center text-gray-400">
-              No booking data yet
-            </div>
-          )}
+      {/* AI-Powered Features */}
+      <div className="mb-12">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 ">AI-Powered Features</h2>
+          <p className="text-gray-500">Intelligent assistance throughout your journey</p>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="font-semibold text-gray-900 mb-4 font-[Poppins]">
-            Usage Breakdown
-          </h3>
-          {pieData.some((d) => d.value > 0) ? (
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label={({ value }) => `${value}%`}
-                >
-                  {pieData.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Legend />
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-[250px] flex items-center justify-center text-gray-400">
-              No usage data yet
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <h3 className="font-semibold text-gray-900 mb-4 font-[Poppins]">
-          Recent Activity
-        </h3>
-        {dashboardData?.recentActivity &&
-        dashboardData.recentActivity.length > 0 ? (
-          <ul className="space-y-3">
-            {dashboardData.recentActivity.map((activity, idx) => (
-              <li key={idx} className="flex items-start gap-3 text-sm">
-                <span
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-                    activity.type === "payment"
-                      ? "bg-green-100 text-green-600"
-                      : activity.type === "booking"
-                        ? "bg-blue-100 text-blue-600"
-                        : activity.type === "kyc"
-                          ? "bg-purple-100 text-purple-600"
-                          : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {activity.type === "payment" && "$"}
-                  {activity.type === "booking" && "B"}
-                  {activity.type === "kyc" && "K"}
-                  {!["payment", "booking", "kyc"].includes(activity.type) &&
-                    "N"}
-                </span>
-                <div>
-                  <p className="text-gray-700">{activity.message}</p>
-                  <p className="text-xs text-gray-400">
-                    {new Date(activity.date).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {aiFeatures.map((feature, idx) => (
+            <div key={idx} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/30 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between">
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="font-semibold text-gray-900 text-sm leading-tight pr-2">{feature.title}</h3>
+                <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 gap-1 shrink-0">
+                  <Sparkles className="w-3 h-3" /> AI
                 </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-400 text-sm">No recent activity</p>
-        )}
+              </div>
+              <p className="text-gray-500 text-xs leading-relaxed">{feature.description}</p>
+            </div>
+          ))}
+        </div>
       </div>
+
+
     </div>
   );
 }

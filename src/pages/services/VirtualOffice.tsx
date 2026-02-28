@@ -183,12 +183,6 @@ const VirtualOffice = () => {
       description: "Meeting rooms & services",
     },
     {
-      label: "Meeting Rooms",
-      href: "/services/meeting-rooms",
-      icon: Presentation,
-      description: "Book meeting rooms hourly",
-    },
-    {
       label: "Event Spaces",
       href: "/services/event-spaces",
       icon: MapPin,
@@ -321,7 +315,6 @@ const VirtualOffice = () => {
           <div
             ref={scrollContainerRef}
             className="w-full h-full overflow-y-auto"
-            data-lenis-prevent
           >
             <div className="px-4 sm:px-6 py-4 sm:py-6">
               {/* Mobile Back Button */}

@@ -12,7 +12,11 @@ import {
     Printer,
     Share2,
     X,
+    Loader2
 } from "lucide-react";
+import { affiliatePortalService, AffiliateInvoice } from "@/services/affiliatePortal.service";
+import { format } from "date-fns";
+import { generateInvoicePDF } from "@/utils/pdfGenerator";
 
 // --- Types ---
 interface InvoiceItem {
@@ -22,127 +26,11 @@ interface InvoiceItem {
     total: number;
 }
 
-interface Invoice {
-    id: string;
-    client: string;
-    clientAddress: string[];
-    clientGstin: string;
-    amount: number;
-    commission: number;
-    date: string;
-    dueDate: string;
-    status: "Paid" | "Pending" | "Overdue";
-    items: InvoiceItem[];
-}
+// Reuse the type from service but keep it here for local ease if needed, 
+// or just import and use AffiliateInvoice.
+export type { AffiliateInvoice as LocalInvoice };
 
-// --- Mock Data (Expanded to match Image) ---
-const INVOICE_DATA: Invoice[] = [
-    {
-        id: "INV-2024-001",
-        client: "TechStart Solutions",
-        clientAddress: ["456 Tech Park, Sector 5", "Noida, UP 201301"],
-        clientGstin: "09AABCT5678F1ZK",
-        amount: 15000,
-        commission: 1500,
-        date: "Jan 15, 2024",
-        dueDate: "Feb 15, 2024",
-        status: "Paid",
-        items: [
-            {
-                desc: "Virtual Office Premium - Monthly",
-                qty: 1,
-                rate: 12000,
-                total: 12000,
-            },
-            {
-                desc: "GST Registration Support",
-                qty: 1,
-                rate: 2000,
-                total: 2000,
-            },
-            { desc: "Mail Handling Fee", qty: 1, rate: 1000, total: 1000 },
-        ],
-    },
-    {
-        id: "INV-2024-002",
-        client: "Creative Hub Co",
-        clientAddress: ["789 Design Ave", "Bangalore, KA 560001"],
-        clientGstin: "29ABCDE1234F1Z5",
-        amount: 28000,
-        commission: 2800,
-        date: "Jan 18, 2024",
-        dueDate: "Feb 18, 2024",
-        status: "Paid",
-        items: [
-            {
-                desc: "Dedicated Desk - Monthly",
-                qty: 2,
-                rate: 14000,
-                total: 28000,
-            },
-        ],
-    },
-    {
-        id: "INV-2024-003",
-        client: "DataFlow Analytics",
-        clientAddress: ["101 Data Drive", "Hyderabad, TS 500081"],
-        clientGstin: "36XYZZZ9876F1Z9",
-        amount: 45000,
-        commission: 4500,
-        date: "Jan 22, 2024",
-        dueDate: "Feb 22, 2024",
-        status: "Pending",
-        items: [
-            {
-                desc: "Private Cabin (4 Seater)",
-                qty: 1,
-                rate: 45000,
-                total: 45000,
-            },
-        ],
-    },
-    {
-        id: "INV-2024-004",
-        client: "GreenTech Innovations",
-        clientAddress: ["Eco Park, Unit 4", "Pune, MH 411057"],
-        clientGstin: "27PQRS5678F1Z2",
-        amount: 32000,
-        commission: 3200,
-        date: "Jan 25, 2024",
-        dueDate: "Feb 25, 2024",
-        status: "Pending",
-        items: [
-            {
-                desc: "Virtual Office Premium",
-                qty: 2,
-                rate: 12000,
-                total: 24000,
-            },
-            {
-                desc: "Conference Room Credits",
-                qty: 8,
-                rate: 1000,
-                total: 8000,
-            },
-        ],
-    },
-    {
-        id: "INV-2024-005",
-        client: "StartupNest",
-        clientAddress: ["Incubation Cell", "Mumbai, MH 400001"],
-        clientGstin: "27AAAAA0000A1Z5",
-        amount: 18500,
-        commission: 1850,
-        date: "Jan 28, 2024",
-        dueDate: "Feb 28, 2024",
-        status: "Overdue",
-        items: [
-            { desc: "Hot Desk - Monthly", qty: 3, rate: 5000, total: 15000 },
-            { desc: "Locker Facility", qty: 3, rate: 500, total: 1500 },
-            { desc: "Mail Handling", qty: 2, rate: 1000, total: 2000 },
-        ],
-    },
-];
+// INVOICE_DATA Removed - Fetching real data now
 
 // --- Utilities ---
 const formatCurrency = (val: number) =>
@@ -154,27 +42,30 @@ const formatCurrency = (val: number) =>
 
 // --- Sub-Components ---
 const StatusBadge = ({ status }: { status: string }) => {
-    const styles = {
-        Paid: "bg-green-100 text-green-700 border-green-200",
-        Pending: "bg-amber-100 text-amber-700 border-amber-200",
-        Overdue: "bg-red-100 text-red-700 border-red-200",
+    const styles: Record<string, string> = {
+        paid: "bg-green-100 text-green-700 border-green-200",
+        pending: "bg-amber-100 text-amber-700 border-amber-200",
+        overdue: "bg-red-100 text-red-700 border-red-200",
+        cancelled: "bg-gray-100 text-gray-700 border-gray-200",
     };
+    const displayStatus = status.charAt(0).toUpperCase() + status.slice(1);
     return (
         <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
-                styles[status as keyof typeof styles] ||
+            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${styles[status.toLowerCase()] ||
                 "bg-gray-100 text-gray-600"
-            }`}
+                }`}
         >
-            {status}
+            {displayStatus}
         </span>
     );
 };
 
 // --- Main Invoice View Component (The "Paper" design) ---
-const InvoicePaper = ({ data }: { data: Invoice }) => {
+const InvoicePaper = ({ data }: { data: AffiliateInvoice }) => {
     const subtotal = data.amount;
     const tax = subtotal * 0.09; // Mock 9% CGST + 9% SGST breakdown
+    const formattedDate = format(new Date(data.date), "MMM dd, yyyy");
+    const formattedDueDate = data.date ? format(new Date(new Date(data.date).getTime() + 30 * 24 * 60 * 60 * 1000), "MMM dd, yyyy") : "N/A";
 
     return (
         <div className="bg-white p-8 max-w-3xl mx-auto text-slate-800 font-sans print-container h-full">
@@ -196,19 +87,19 @@ const InvoicePaper = ({ data }: { data: Invoice }) => {
                 <div className="text-right">
                     <div className="flex flex-col items-end gap-1">
                         <h2 className="text-lg font-bold text-slate-900">
-                            Invoice {data.id}
+                            Invoice {data.invoiceNumber}
                         </h2>
                         <StatusBadge status={data.status} />
                     </div>
                     <div className="mt-4 text-xs text-right space-y-1">
                         <div className="flex justify-between gap-4">
                             <span className="text-gray-500">Invoice Date</span>
-                            <span className="font-semibold">{data.date}</span>
+                            <span className="font-semibold">{formattedDate}</span>
                         </div>
                         <div className="flex justify-between gap-4">
                             <span className="text-gray-500">Due Date</span>
                             <span className="font-semibold">
-                                {data.dueDate}
+                                {formattedDueDate}
                             </span>
                         </div>
                     </div>
@@ -333,39 +224,54 @@ const InvoicePaper = ({ data }: { data: Invoice }) => {
 // --- Main Page Component ---
 const Invoices = () => {
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(
+    const [invoices, setInvoices] = useState<AffiliateInvoice[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedInvoice, setSelectedInvoice] = useState<AffiliateInvoice | null>(
         null,
     );
-    const [printInvoiceData, setPrintInvoiceData] = useState<Invoice | null>(
+    const [printInvoiceData, setPrintInvoiceData] = useState<AffiliateInvoice | null>(
         null,
     );
     const [showFilter, setShowFilter] = useState(false);
     const [statusFilter, setStatusFilter] = useState<string[]>([]);
 
+    useEffect(() => {
+        const fetchInvoices = async () => {
+            try {
+                setLoading(true);
+                const response = await affiliatePortalService.getInvoices();
+                if (response.success && response.data) {
+                    setInvoices(response.data.invoices);
+                }
+            } catch (error) {
+                console.error("Failed to fetch invoices:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchInvoices();
+    }, []);
+
     // Filter Logic
-    const filteredData = INVOICE_DATA.filter((item) => {
+    const filteredData = invoices.filter((item) => {
         const query = searchQuery.toLowerCase();
         const matchesSearch =
             item.client.toLowerCase().includes(query) ||
-            item.id.toLowerCase().includes(query);
+            item.invoiceNumber.toLowerCase().includes(query);
 
         const matchesStatus =
-            statusFilter.length === 0 || statusFilter.includes(item.status);
+            statusFilter.length === 0 || statusFilter.includes(item.status.toLowerCase());
 
         return matchesSearch && matchesStatus;
     });
 
-    // Print Handler
-    const handlePrint = (invoice: Invoice) => {
-        // 1. Set the specific invoice to be printed into a hidden state/view
-        setPrintInvoiceData(invoice);
-        // 2. Wait for state update then trigger print
-        setTimeout(() => {
-            window.print();
-            // 3. Clear print data after printing to return to normal view if needed
-            // (Optional, but keeping it ensures normal render isn't affected)
-            setPrintInvoiceData(null);
-        }, 100);
+    // Print / Download Handler
+    const handleDownload = async (invoice: AffiliateInvoice) => {
+        try {
+            await generateInvoicePDF(invoice, "download");
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+        }
     };
 
     return (
@@ -382,7 +288,7 @@ const Invoices = () => {
             {/* --- NORMAL SCREEN CONTENT (Hidden during print via CSS) --- */}
             <div className="w-full space-y-8 no-print animate-slide-up">
                 {/* Header */}
-{/* Header Removed */}
+                {/* Header Removed */}
 
                 {/* Toolbar */}
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
@@ -405,11 +311,10 @@ const Invoices = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setShowFilter(!showFilter)}
-                                className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold transition ${
-                                    statusFilter.length > 0
-                                        ? "bg-[#5aa39c]/10 text-[#5aa39c] border-[#5aa39c]"
-                                        : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
-                                }`}
+                                className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold transition ${statusFilter.length > 0
+                                    ? "bg-[#5aa39c]/10 text-[#5aa39c] border-[#5aa39c]"
+                                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                    }`}
                             >
                                 <Filter size={16} /> Filter{" "}
                                 {statusFilter.length > 0 &&
@@ -421,7 +326,7 @@ const Invoices = () => {
                                     <p className="text-xs font-bold text-gray-400 uppercase mb-2">
                                         Status
                                     </p>
-                                    {["Paid", "Pending", "Overdue"].map(
+                                    {["paid", "pending", "overdue", "cancelled"].map(
                                         (status) => (
                                             <label
                                                 key={status}
@@ -439,19 +344,19 @@ const Invoices = () => {
                                                                     status,
                                                                 )
                                                                     ? prev.filter(
-                                                                          (s) =>
-                                                                              s !==
-                                                                              status,
-                                                                      )
+                                                                        (s) =>
+                                                                            s !==
+                                                                            status,
+                                                                    )
                                                                     : [
-                                                                          ...prev,
-                                                                          status,
-                                                                      ],
+                                                                        ...prev,
+                                                                        status,
+                                                                    ],
                                                         )
                                                     }
                                                     className="rounded text-[#5aa39c] focus:ring-[#5aa39c]"
                                                 />
-                                                {status}
+                                                {status.charAt(0).toUpperCase() + status.slice(1)}
                                             </label>
                                         ),
                                     )}
@@ -466,97 +371,104 @@ const Invoices = () => {
                 </div>
 
                 {/* Table */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-gray-50/50 border-b border-gray-100">
-                                    {[
-                                        "Invoice ID",
-                                        "Client",
-                                        "Amount",
-                                        "Commission",
-                                        "Date",
-                                        "Status",
-                                        "Actions",
-                                    ].map((h) => (
-                                        <th
-                                            key={h}
-                                            className="px-6 py-4 text-xs font-bold text-gray-500 uppercase whitespace-nowrap"
-                                        >
-                                            {h}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {filteredData.length > 0 ? (
-                                    filteredData.map((inv) => (
-                                        <tr
-                                            key={inv.id}
-                                            className="group hover:bg-[#fafafa] transition-colors"
-                                        >
-                                            <td className="px-6 py-4 text-sm font-medium text-slate-900 whitespace-nowrap font-mono">
-                                                {inv.id}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
-                                                {inv.client}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm font-bold text-slate-900">
-                                                {formatCurrency(inv.amount)}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm font-bold text-[#5aa39c]">
-                                                {formatCurrency(inv.commission)}
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-gray-500">
-                                                {inv.date}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <StatusBadge
-                                                    status={inv.status}
-                                                />
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    <button
-                                                        onClick={() =>
-                                                            setSelectedInvoice(
-                                                                inv,
-                                                            )
-                                                        }
-                                                        className="p-2 bg-[#5aa39c]/10 text-[#5aa39c] hover:bg-[#5aa39c] hover:text-white rounded-lg transition-all"
-                                                        title="View Details"
-                                                    >
-                                                        <Eye size={16} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            handlePrint(inv)
-                                                        }
-                                                        className="p-2 bg-white border border-gray-200 text-gray-500 hover:text-slate-900 hover:bg-gray-50 rounded-lg transition-all"
-                                                        title="Download/Print PDF"
-                                                    >
-                                                        <Download size={16} />
-                                                    </button>
-                                                </div>
+                        {loading ? (
+                            <div className="flex flex-col items-center justify-center py-24 gap-3">
+                                <Loader2 className="w-10 h-10 text-[#5aa39c] animate-spin" />
+                                <p className="text-gray-500 font-medium">Loading invoices...</p>
+                            </div>
+                        ) : (
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50/50 border-b border-gray-100">
+                                        {[
+                                            "Invoice ID",
+                                            "Client",
+                                            "Amount",
+                                            "Commission",
+                                            "Date",
+                                            "Status",
+                                            "Actions",
+                                        ].map((h) => (
+                                            <th
+                                                key={h}
+                                                className="px-6 py-4 text-xs font-bold text-gray-500 uppercase whitespace-nowrap"
+                                            >
+                                                {h}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {filteredData.length > 0 ? (
+                                        filteredData.map((inv) => (
+                                            <tr
+                                                key={inv._id}
+                                                className="group hover:bg-[#fafafa] transition-colors"
+                                            >
+                                                <td className="px-6 py-4 text-sm font-medium text-slate-900 whitespace-nowrap font-mono">
+                                                    {inv.invoiceNumber}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
+                                                    {inv.client}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm font-bold text-slate-900">
+                                                    {formatCurrency(inv.amount)}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm font-bold text-[#5aa39c]">
+                                                    {formatCurrency(inv.commission)}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-gray-500">
+                                                    {format(new Date(inv.date), "MMM dd, yyyy")}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <StatusBadge
+                                                        status={inv.status}
+                                                    />
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() =>
+                                                                setSelectedInvoice(
+                                                                    inv,
+                                                                )
+                                                            }
+                                                            className="p-2 bg-[#5aa39c]/10 text-[#5aa39c] hover:bg-[#5aa39c] hover:text-white rounded-lg transition-all"
+                                                            title="View Details"
+                                                        >
+                                                            <Eye size={16} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDownload(inv)
+                                                            }
+                                                            className="p-2 bg-white border border-gray-200 text-gray-500 hover:text-slate-900 hover:bg-gray-50 rounded-lg transition-all"
+                                                            title="Download/Print PDF"
+                                                        >
+                                                            <Download size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td
+                                                colSpan={7}
+                                                className="px-6 py-12 text-center text-gray-400"
+                                            >
+                                                <p>
+                                                    No invoices found matching
+                                                    criteria.
+                                                </p>
                                             </td>
                                         </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td
-                                            colSpan={7}
-                                            className="px-6 py-12 text-center text-gray-400"
-                                        >
-                                            <p>
-                                                No invoices found matching
-                                                criteria.
-                                            </p>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                    )}
+                                </tbody>
+                            </table>
+                        )}
                     </div>
                 </div>
             </div>
@@ -570,7 +482,7 @@ const Invoices = () => {
                         <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white sticky top-0 z-10">
                             <div className="flex items-center gap-3">
                                 <h2 className="font-bold text-lg text-slate-800">
-                                    {selectedInvoice.id}
+                                    {selectedInvoice.invoiceNumber}
                                 </h2>
                                 <StatusBadge status={selectedInvoice.status} />
                             </div>
@@ -595,13 +507,13 @@ const Invoices = () => {
                             </button>
                             <div className="flex gap-3">
                                 <button
-                                    onClick={() => handlePrint(selectedInvoice)}
+                                    onClick={() => handleDownload(selectedInvoice)}
                                     className="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 transition text-gray-700"
                                 >
                                     <Printer size={16} /> Print
                                 </button>
                                 <button
-                                    onClick={() => handlePrint(selectedInvoice)}
+                                    onClick={() => handleDownload(selectedInvoice)}
                                     className="flex items-center gap-2 px-4 py-2 bg-[#5aa39c] text-white rounded-lg text-sm font-medium hover:bg-[#4a8b85] shadow-sm hover:shadow transition"
                                 >
                                     <Download size={16} /> Download PDF

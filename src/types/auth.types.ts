@@ -6,13 +6,34 @@ export interface User {
   email: string;
   fullName: string;
   phoneNumber?: string;
-  role: 'user' | 'admin' | 'vendor' | 'partner' | 'space_manager' | 'sales' | 'affiliate';
+  role: 'user' | 'super_admin' | 'admin' | 'vendor' | 'partner' | 'space_manager' | 'sales' | 'affiliate_manager' | 'space_partner_manager' | 'support' | 'affiliate';
   isEmailVerified: boolean;
+  kycVerified?: boolean;
   profilePicture?: string;
-  authProvider?: 'local' | 'google';
+  authProvider?: "local" | "google";
+  isTwoFactorEnabled?: boolean;
   lastLogin?: string;
   createdAt?: string; // ADDED: For Profile.tsx
   updatedAt?: string;
+  preferences?: {
+    language: string;
+    currency: string;
+    defaultCity: string;
+    timeZone: string;
+    darkMode: boolean;
+    compactView: boolean;
+  };
+  notifications?: {
+    email: boolean;
+    push: boolean;
+    promotional: boolean;
+    reminders: boolean;
+    loginAlerts: boolean;
+  };
+  securityPreferences?: {
+    sessionManagement: boolean;
+    dataSharing: boolean;
+  };
 }
 
 export interface AuthTokens {
@@ -26,7 +47,7 @@ export interface SignupRequest {
   confirmPassword: string;
   fullName: string;
   phoneNumber?: string;
-  role?: 'user' | 'partner';
+  role?: 'user' | 'partner' | 'affiliate';
 }
 
 export interface LoginRequest {

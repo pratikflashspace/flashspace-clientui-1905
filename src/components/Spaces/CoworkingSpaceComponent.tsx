@@ -212,10 +212,9 @@ const CoworkingSpaceComponent = () => {
     if (spaceDetails.availability?.toLowerCase() === "unavailable") return;
 
     // Navigate to booking page with params
-    // Here we send deskCount and date to the new Book Seats page
     const dateStr = selectedDate.toISOString();
     navigate(
-      `/book-seats/${spaceDetails._id}?desks=${deskCount}&date=${dateStr}&type=coworking`,
+      `/booking/${spaceDetails._id}?desks=${deskCount}&date=${dateStr}&type=coworking&direct=true`,
     );
   };
 
@@ -600,12 +599,6 @@ const CoworkingSpaceComponent = () => {
                         </button>
                       </div>
 
-                      {/* Calendar Grid */}
-                      {/* <div className="grid grid-cols-7 gap-0.5 mb-1">
-                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                          <div key={day} className="text-center text-[10px] font-semibold text-gray-500 py-0.5">{day}</div>
-                        ))}
-                      </div> */}
                       <div className="grid grid-cols-7 gap-0.5">
                         {(() => {
                           const year = currentMonth.getFullYear();

@@ -20,7 +20,17 @@ export const PartnerRoute: React.FC = () => {
     }
 
     if (user.role !== 'partner') {
-        return <Navigate to="/dashboard" replace />;
+        switch (user.role) {
+            case 'super_admin':
+            case 'admin':
+                return <Navigate to="/admin" replace />;
+            case 'affiliate':
+                return <Navigate to="/affiliate-portal" replace />;
+            case 'user':
+                return <Navigate to="/dashboard" replace />;
+            default:
+                return <Navigate to="/" replace />;
+        }
     }
 
     return <Outlet />;

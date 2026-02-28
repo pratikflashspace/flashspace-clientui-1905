@@ -2,6 +2,7 @@ import React from "react";
 import {
     LayoutGrid,
     Users,
+    Users2,
     LineChart,
     Wallet,
     FileText,
@@ -11,10 +12,16 @@ import {
     Trophy,
     MessageSquare,
     Home,
+    Shield,
+    Bell,
     ChevronLeft,
     ChevronRight,
     X,
+    AlertTriangle,
+  LayoutDashboard
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
     isMobileOpen: boolean;
@@ -34,6 +41,9 @@ const Sidebar: React.FC<SidebarProps> = ({
     activePage,
     setActivePage,
 }) => {
+    const { user } = useAuth();
+
+    const navigate = useNavigate();
     const menuItems = [
         {
             name: "Dashboard",
@@ -42,10 +52,10 @@ const Sidebar: React.FC<SidebarProps> = ({
             path: "/affiliate-portal/affiliate-dashboard",
         },
         {
-            name: "Booking Management",
-            icon: Users,
+            name: "Client Management",
+            icon: Users2,
             section: "main",
-            path: "/affiliate-portal/booking-management",
+            path: "/affiliate-portal/client-management",
         },
         {
             name: "Revenue Dashboard",
@@ -94,6 +104,18 @@ const Sidebar: React.FC<SidebarProps> = ({
             icon: MessageSquare,
             section: "main",
             path: "/affiliate-portal/support",
+        },
+        {
+            name: "KYC Verification",
+            icon: Shield,
+            section: "main",
+            path: "/affiliate-portal/kyc",
+        },
+        {
+            name: "Notifications",
+            icon: Bell,
+            section: "main",
+            path: "/affiliate-portal/notifications",
         },
     ];
 
@@ -175,11 +197,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 className={`
                   flex items-center transition-all duration-200 rounded-lg group relative
                   ${isDesktopCollapsed ? "justify-center w-full py-3 px-0" : "justify-start w-full px-4 py-3 gap-3"}
-                  ${
-                      isActive
-                          ? "bg-[#5aa39c] text-white shadow-sm"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-slate-900"
-                  }
+                  ${isActive
+                                        ? "bg-[#5aa39c] text-white shadow-sm"
+                                        : "text-gray-600 hover:bg-gray-50 hover:text-slate-900"
+                                    }
                 `}
                             >
                                 <Icon
@@ -192,6 +213,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 >
                                     {item.name}
                                 </span>
+                                {item.name === "KYC Verification" && user && !user.kycVerified && (
+                                    <span
+                                        className={`ml-auto flex items-center gap-1 text-xs font-bold text-red-500 transition-all duration-200 ${isDesktopCollapsed ? "absolute right-2 shadow-md bg-white p-0.5 rounded-full" : ""}`}
+                                        title="KYC Required"
+                                    >
+                                        <AlertTriangle size={14} strokeWidth={2.5} />
+                                        {!isDesktopCollapsed && "KYC"}
+                                    </span>
+                                )}
                             </button>
                         );
                     })}
@@ -221,14 +251,22 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </button>
 
                     <button
-                        onClick={() => setIsMobileOpen(false)}
-                        className="lg:hidden w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-600 hover:text-slate-900 py-2"
+                        onClick={() => navigate('/dashboard')}
+                        className={`
+              flex items-center rounded-xl shadow-sm font-semibold transition-colors bg-teal-50 border border-teal-100 text-teal-700 hover:bg-teal-100
+              ${isDesktopCollapsed ? "justify-center w-full p-3" : "justify-center gap-2 w-full px-4 py-3 text-sm"}
+            `}
                     >
-                        <ChevronLeft size={16} />
-                        <span>Close Menu</span>
+                        <LayoutDashboard size={18} className="text-teal-600" />
+                        {!isDesktopCollapsed && (
+                            <span className="whitespace-nowrap">
+                                User Dashboard
+                            </span>
+                        )}
                     </button>
 
                     <button
+                        onClick={() => navigate('/')}
                         className={`
               flex items-center rounded-xl shadow-sm font-semibold transition-colors bg-white border border-gray-200 text-slate-900 hover:bg-gray-50
               ${isDesktopCollapsed ? "justify-center w-full p-3" : "justify-center gap-2 w-full px-4 py-3 text-sm"}

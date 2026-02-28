@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { ReviewService } from "@/services/review.service";
+import ReviewService from "@/services/review.service";
 
 import NpsCard from "./NpsCard";
 import AverageRatingCard from "./AverageRatingCard";

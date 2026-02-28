@@ -17,7 +17,7 @@ import ListYourSpace from "./pages/ListYourSpace";
 import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 import VirtualOffice from "./pages/services/VirtualOffice";
-import MeetingRooms from "./pages/services/MeetingRooms";
+
 import CoworkingSpace from "./pages/services/CoworkingSpace";
 import OnDemand from "./pages/services/OnDemand";
 import EventSpaces from "./pages/services/EventSpaces";
@@ -58,10 +58,12 @@ import MeetingRoomSpaceComponent from "./components/Spaces/MeetingRoomSpaceCompo
 import CoworkingSpaceComponent from "./components/Spaces/CoworkingSpaceComponent";
 import BookingPage from "./pages/BookingPage";
 import BookSeatsPage from "./pages/BookSeatsPage";
+import CompleteBookingPage from "./pages/CompleteBookingPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentFailedPage from "./pages/PaymentFailedPage";
 import AdminDashboard from "./pages/admin/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
+import AdminTeamManagement from "./pages/admin/TeamManagement";
 import Coupons from "./pages/admin/Coupons";
 import KYCRequests from "./pages/admin/KYCRequests";
 import KYCDetail from "./pages/admin/KYCDetail";
@@ -88,6 +90,7 @@ import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
 import SupportChat from "./pages/admin/SupportChat";
 import Leaderboard from "./pages/admin/Leaderboard";
+import AdminAffiliateManagement from "./pages/admin/AdminAffiliateManagement";
 
 `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     `;
 // --- Space Partner Portal Pages ---
@@ -118,10 +121,9 @@ import { AffiliateRoute } from "./components/auth/AffiliateRoute";
 import AffiliateDashboard from "./pages/affiliatePortal/Dashboard";
 
 import BookingManagement from "./pages/affiliatePortal/BookingManagement";
-
 import DashboardRevenue from "./pages/affiliatePortal/RevenueDashboard";
 
-import AffiliateInvoices from "./pages/affiliatePortal/Invoices";
+import AffiliateInvoices from "./pages/affiliatePortal/AffiliateInvoices";
 
 import Payouts from "./pages/affiliatePortal/Payouts";
 
@@ -137,6 +139,9 @@ import LeaderBoard from "./pages/affiliatePortal/LeaderBoard";
 
 import Support from "./pages/affiliatePortal/Support";
 import KycVerification from "./components/Spaces/KycVerification";
+import AffiliateKYC from "./pages/affiliatePortal/KYC";
+import AffiliateNotifications from "./pages/affiliatePortal/Notifications";
+import AffiliateClientManagement from "./pages/affiliatePortal/AffiliateClientManagement";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -225,10 +230,7 @@ const App = () => (
                     path="/Solutions/business-setup"
                     element={<BusinessSetupSolution />}
                   />
-                  <Route
-                    path="/services/meeting-rooms"
-                    element={<MeetingRooms />}
-                  />
+
                   <Route
                     path="/Solutions/meetingsroom"
                     element={<MeetingsRoom />}
@@ -251,6 +253,10 @@ const App = () => (
                   />
                   <Route path="/book-seats/:id" element={<BookSeatsPage />} />
                   <Route path="/booking/:id" element={<BookingPage />} />
+                  <Route
+                    path="/booking/:id/complete"
+                    element={<CompleteBookingPage />}
+                  />
 
                   {/* Payment Routes */}
                   <Route
@@ -297,6 +303,7 @@ const App = () => (
                     <Route path="/admin" element={<AdminLayout />}>
                       <Route index element={<AdminDashboard />} />
                       <Route path="users" element={<UserManagement />} />
+                      <Route path="team" element={<AdminTeamManagement />} />
                       <Route path="kyc-requests" element={<KYCRequests />} />
                       <Route path="kyc-requests/:id" element={<KYCDetail />} />
                       <Route
@@ -341,6 +348,10 @@ const App = () => (
                         element={<AdminNotifications />}
                       />
                       <Route path="leads" element={<LeadManagement />} />
+                      <Route
+                        path="affiliates"
+                        element={<AdminAffiliateManagement />}
+                      />
                       <Route path="*" element={<AdminDashboard />} />
                     </Route>
                   </Route>
@@ -452,6 +463,15 @@ const App = () => (
                       />
                       <Route path="leaderboard" element={<LeaderBoard />} />
                       <Route path="support" element={<Support />} />
+                      <Route path="kyc" element={<AffiliateKYC />} />
+                      <Route
+                        path="notifications"
+                        element={<AffiliateNotifications />}
+                      />
+                      <Route
+                        path="client-management"
+                        element={<AffiliateClientManagement />}
+                      />
                     </Route>
                   </Route>
 

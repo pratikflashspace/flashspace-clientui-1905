@@ -142,7 +142,7 @@ export default function AdminDashboard() {
     },
     {
       title: "Open Tickets",
-      value: "47",
+      value: stats?.openTickets?.toLocaleString() || "47",
       change: "8% from last month",
       trend: "down",
       icon: Ticket,

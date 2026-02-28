@@ -15,6 +15,7 @@ const AffiliateLayout = () => {
     // Helper: Determine active sidebar item based on current URL
     const getActivePageFromUrl = () => {
         const path = location.pathname;
+        if (path.includes("client-management")) return "Client Management";
         if (path.includes("booking-management")) return "Booking Management";
         if (path.includes("revenue-dashboard")) return "Revenue Dashboard";
         if (path.includes("payouts")) return "Payouts";
@@ -26,6 +27,8 @@ const AffiliateLayout = () => {
         if (path.includes("marketing-tools")) return "Marketing Tools";
         if (path.includes("leaderboard")) return "Leaderboard";
         if (path.includes("support")) return "Support";
+        if (path.includes("kyc")) return "KYC Verification";
+        if (path.includes("notifications")) return "Notifications";
         return "Dashboard"; // Default
     };
 
@@ -36,6 +39,9 @@ const AffiliateLayout = () => {
         switch (pageName) {
             case "Dashboard":
                 navigate("/affiliate-portal/affiliate-dashboard");
+                break;
+            case "Client Management":
+                navigate("/affiliate-portal/client-management");
                 break;
             case "Booking Management":
                 navigate("/affiliate-portal/booking-management");
@@ -63,6 +69,12 @@ const AffiliateLayout = () => {
                 break;
             case "Support":
                 navigate("/affiliate-portal/support");
+                break;
+            case "KYC Verification":
+                navigate("/affiliate-portal/kyc");
+                break;
+            case "Notifications":
+                navigate("/affiliate-portal/notifications");
                 break;
             default:
                 navigate("/affiliate-portal/dashboard");
@@ -98,7 +110,7 @@ const AffiliateLayout = () => {
                 </header>
 
                 {/* --- Main Content Area --- */}
-                <main id="affiliate-main-content" className="flex-1 overflow-auto relative" data-lenis-prevent>
+                <main id="affiliate-main-content" className="flex-1 overflow-auto relative">
                     {/* <Outlet /> renders the child route (e.g., Dashboard.tsx) here */}
                     <Outlet />
                 </main>

@@ -25,7 +25,7 @@ import { SpaceDetailSkeleton } from "@/components/ui/skeleton-loaders";
 import ImageGalleryModal from "../ui/ImageGalleryModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { createPaymentOrder, verifyPayment } from "@/services/payment.service";
-import { toast } from "sonner";
+import hotToast from "react-hot-toast";
 
 // Default photos for spaces that don't have images
 const DEFAULT_PHOTOS = [
@@ -129,8 +129,8 @@ const MeetingRoomSpaceComponent = () => {
 
   const handleBookNow = async () => {
     if (!user) {
-      toast.error("Please login to book a meeting room");
-      navigate("/login");
+      hotToast.error("Please login to book a meeting room");
+      navigate(`/login?redirect=${location.pathname}`);
       return;
     }
 
@@ -145,7 +145,7 @@ const MeetingRoomSpaceComponent = () => {
         userId: user.id || (user as any)._id,
         userEmail: user.email,
         userName: user.fullName || "User",
-        userPhone: user.phoneNumber || "9876543210",
+        userPhone: (user as any).phoneNumber || "9876543210",
         spaceId: spaceDetails._id,
         spaceName: spaceDetails.name,
         planName: `${hours} Hour Meeting Room Booking`,
@@ -159,7 +159,9 @@ const MeetingRoomSpaceComponent = () => {
       });
 
       // 2. Simulate Payment Success (as per request/reference)
-      // console.log("Simulating Payment Success for", order);
+      // For meeting rooms, we often use simulation or direct Razorpay.
+      // If we want actual Razorpay, we'd call openRazorpayCheckout.
+      // But based on the merged code, it seems simulation/test was intended for this component.
       await new Promise((r) => setTimeout(r, 1500));
 
       await verifyPayment({
@@ -169,11 +171,11 @@ const MeetingRoomSpaceComponent = () => {
         devMode: true,
       });
 
-      toast.success("Booking Successful! Credits Earned!");
+      hotToast.success("Booking Successful! Credits Earned! 🎉");
       // navigate('/bookings'); // Optional: redirect to bookings
     } catch (error: any) {
       console.error(error);
-      toast.error(error.message || "Booking failed");
+      hotToast.error(error.message || "Booking failed");
     } finally {
       setIsProcessing(false);
     }

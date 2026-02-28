@@ -2,8 +2,8 @@
 import axiosInstance from '@/lib/axios';
 import { Coupon, CreateCouponDTO, ValidateCouponResponse } from '@/types/coupon.types';
 
-// Use /api prefix as axiosInstance base URL is likely the root (http://localhost:5000)
-const COUPON_BASE = '/api/coupon';
+// Use /api/coupons (plural) — matches the backend route: mainRoutes.use("/coupons", couponRoutes)
+const COUPON_BASE = '/api/coupons';
 
 export const createCoupon = async (data: CreateCouponDTO): Promise<Coupon> => {
     const response = await axiosInstance.post<{ success: boolean, data: Coupon }>(`${COUPON_BASE}/create`, data);

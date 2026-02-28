@@ -39,6 +39,8 @@ export interface CreateOrderPayload {
     | "seat_booking";
   startDate?: string; // ISO date string for booking start
   holdId?: string;
+  couponCode?: string; // Coupon code applied by user (for affiliate attribution)
+  affiliateId?: string; // Affiliate user ID (resolved from coupon)
 }
 
 export interface CreateOrderResponse {

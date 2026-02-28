@@ -27,6 +27,7 @@ import { useDarkMode } from "@/contexts/DarkModeContext";
 import GetInTouch from "@/pages/GetInTouch";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { SignupModal } from "@/components/auth/SignupModal";
+import { PartnerChoiceModal } from "@/components/auth/PartnerChoiceModal";
 import { NotificationBell } from "@/components/NotificationBell";
 
 // ✅ Country Data
@@ -107,7 +108,7 @@ const Header = ({
 }: HeaderProps): ReactNode => {
   const { darkMode, toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
-  const location = useLocation(); // Add checks for current route
+  const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -125,6 +126,10 @@ const Header = ({
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
   const [isSignupOpen, setIsSignupOpen] = useState(openSignup);
+  const [isPartnerChoiceOpen, setIsPartnerChoiceOpen] = useState(false);
+  const [signupRole, setSignupRole] = useState<
+    "user" | "partner" | "affiliate"
+  >("user");
 
   // Ref helpers for closing modals with redirection
   const closeLogin = () => {
@@ -206,6 +211,12 @@ const Header = ({
     setIsMenuOpen(false);
   };
 
+  const openPartnerSignup = (role: "partner" | "affiliate") => {
+    setSignupRole(role);
+    setIsPartnerChoiceOpen(false);
+    setIsSignupOpen(true);
+  };
+
   return (
     <>
       <header
@@ -216,411 +227,390 @@ const Header = ({
             : "bg-transparent",
         )}
       >
-        <div className="w-full px-4 py-3">
-          <div className="flex items-center">
-            {/* Menu Button */}
-            <button
-              className="p-2 rounded-md hover:bg-black/5 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-black/20 flex-shrink-0 -ml-2"
-              aria-label="Open menu"
-              aria-expanded={isMenuOpen}
-              aria-controls="flashspace-fullmenu"
-              onClick={() => setIsMenuOpen(true)}
-            >
-              <CiMenuFries className="h-6 w-6 text-black dark:text-white" />
-            </button>
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
+          {/* Logo */}
+          <div
+            className="text-xl font-bold tracking-tight cursor-pointer w-60 flex-shrink-0 ml-2"
+            onClick={() => handleNavigation("/")}
+          >
+            <img
+              src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
+              alt="FlashSpace Logo"
+              className="h-8 w-auto dark:invert"
+            />
+          </div>
 
-            {/* Logo */}
-            <div
-              className="text-xl font-bold tracking-tight cursor-pointer w-60 flex-shrink-0 ml-2"
-              onClick={() => handleNavigation("/")}
-            >
-              <img
-                src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
-                alt="FlashSpace Logo"
-                className="h-8 w-auto dark:invert"
-              />
-            </div>
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center justify-center space-x-8 mx-8 flex-1">
+            {/* === Get Workspaces Dropdown === */}
+            <div ref={solutionsRef} className="relative">
+              <button
+                className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-gray-300 dark:hover:text-white" : "text-[#164e4e] dark:text-gray-100 dark:hover:text-white"}`}
+                onMouseEnter={() => setIsSolutionsOpen(true)}
+                onClick={() => setIsSolutionsOpen(false)}
+              >
+                <span className="relative">Get Workspaces</span>
+                <ChevronDown
+                  className={`w-4 h-4 text-[#164e4e]/70 transition-transform duration-300 group-hover:text-[#D96832] ${isSolutionsOpen ? "rotate-180" : ""}`}
+                />
+              </button>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center justify-center space-x-8 mx-8 flex-1">
-              {/* === Get Workspaces Dropdown === */}
-              <div ref={solutionsRef} className="relative">
-                <button
-                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${scrolled || forceWhiteBackground ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-gray-100 dark:hover:text-white"}`}
-                  onMouseEnter={() => setIsSolutionsOpen(true)}
-                  onClick={() => setIsSolutionsOpen(false)}
-                >
-                  <span className="relative">Get Workspaces</span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-[#164e4e]/70 transition-transform duration-300 group-hover:text-[#D96832] ${isSolutionsOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                {/* Dropdown Menu */}
-                <div
-                  className={`absolute left-1/2 top-full w-[600px] bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-lg shadow-xl z-50 mt-2 transition-all duration-300 ${
-                    isSolutionsOpen
-                      ? "opacity-100 pointer-events-auto translate-y-0"
-                      : "opacity-0 pointer-events-none -translate-y-2"
-                  }`}
-                  style={{
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  <div
-                    className="p-4 grid grid-cols-2 gap-4"
-                    onMouseLeave={() => setIsSolutionsOpen(false)}
-                  >
-                    <div className="border border-gray-100 dark:border-white/10 rounded-lg p-4 bg-[#f8faf9] dark:bg-white/5">
-                      <div
-                        className="flex items-center gap-2 mb-1 cursor-pointer"
+              {/* Dropdown Menu */}
+              <div
+                className={`absolute left-1/2 top-full w-[600px] bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-lg shadow-xl z-50 mt-2 transition-all duration-300 ${
+                  isSolutionsOpen
+                    ? "opacity-100 pointer-events-auto translate-y-0"
+                    : "opacity-0 pointer-events-none -translate-y-2"
+                }`}
+                style={{
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                  transform: "translateX(-50%)",
+                }}
+                onMouseLeave={() => setIsSolutionsOpen(false)}
+              >
+                <div className="p-4 grid grid-cols-2 gap-4">
+                  <div className="border border-gray-100 dark:border-white/10 rounded-lg p-4 bg-[#f8faf9] dark:bg-white/5">
+                    <div
+                      className="flex items-center gap-2 mb-1 cursor-pointer"
+                      onClick={() => {
+                        handleNavigation("/Solutions/on-demand");
+                        setIsSolutionsOpen(false);
+                      }}
+                    >
+                      <Zap className="w-4 h-4 text-[#D96832]" />
+                      <h4 className="text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-colors dark:text-gray-100">
+                        On-Demand
+                      </h4>
+                    </div>
+                    <p className="text-xs text-[#164e4e]/70 dark:text-gray-400 mb-3">
+                      Book by the hour or day
+                    </p>
+                    {[
+                      {
+                        label: "Meeting Rooms",
+                        type: "meeting-room",
+                        href: "/Solutions/meetingsroom",
+                      },
+                      {
+                        label: "Event Space",
+                        type: "training-room",
+                        href: "/Solutions/eventspace",
+                      },
+                      {
+                        label: "Day Offices",
+                        type: "day-office",
+                        href: "/Solutions/day-office",
+                      },
+                    ].map((item) => (
+                      <button
+                        key={item.type}
+                        className="w-full flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-white dark:hover:bg-gray-800 text-[#164e4e] dark:text-gray-200 transition-colors shadow-sm mb-2"
                         onClick={() => {
-                          handleNavigation("/Solutions/on-demand");
+                          handleNavigation(item.href);
                           setIsSolutionsOpen(false);
                         }}
                       >
-                        <Zap className="w-4 h-4 text-[#D96832]" />
-                        <h4 className="text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-colors dark:text-gray-100">
-                          On-Demand
-                        </h4>
-                      </div>
-                      <p className="text-xs text-[#164e4e]/70 dark:text-gray-400 mb-3">
-                        Book by the hour or day
-                      </p>
-                      {[
-                        {
-                          label: "Meeting Rooms",
-                          type: "meeting-room",
-                          href: "/Solutions/meetingsroom",
-                        },
-                        {
-                          label: "Event Space",
-                          type: "training-room",
-                          href: "/Solutions/eventspace",
-                        },
-                        {
-                          label: "Day Offices",
-                          type: "day-office",
-                          href: "/Solutions/day-office",
-                        },
-                      ].map((item) => (
-                        <button
-                          key={item.type}
-                          className="flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-white dark:hover:bg-gray-800 text-[#164e4e] dark:text-gray-200 transition-colors shadow-sm mb-2"
-                          onClick={() => {
-                            handleNavigation(item.href);
-                            setIsSolutionsOpen(false);
-                          }}
-                        >
-                          {item.label}
-                          <ArrowRight className="w-4 h-4 text-[#164e4e]/40" />
-                        </button>
-                      ))}
-                    </div>
+                        {item.label}
+                        <ArrowRight className="w-4 h-4 text-[#164e4e]/40" />
+                      </button>
+                    ))}
+                  </div>
 
-                    <div className="grid gap-3">
-                      {[
-                        {
-                          icon: Building2,
-                          title: "Virtual Office",
-                          desc: "Business address, mail handling, call forwarding",
-                          href: "/Solutions/virtual-office",
-                        },
-                        {
-                          icon: Users,
-                          title: "Coworking Space",
-                          desc: "Flexible desks, private cabins, team suites",
-                          href: "/Solutions/coworking-space",
-                        },
-                        {
-                          icon: FileText,
-                          title: "Business Setup",
-                          desc: "Company registration, GST, compliance",
-                          href: "/Solutions/business-setup",
-                        },
-                      ].map(({ icon: Icon, title, desc, href }) => (
-                        <div
-                          key={title}
-                          className="flex items-start gap-3 p-4 rounded-lg border border-transparent hover:border-gray-100 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 cursor-pointer transition-all"
-                          onClick={() => {
-                            handleNavigation(href);
-                            setIsSolutionsOpen(false);
-                          }}
-                        >
-                          <Icon className="w-5 h-5 text-[#D96832] mt-0.5" />
-                          <div>
-                            <h5 className="text-sm font-bold text-[#164e4e] dark:text-gray-100">
-                              {title}
-                            </h5>
-                            <p className="text-xs text-[#164e4e]/70 dark:text-gray-400 mt-1">
-                              {desc}
-                            </p>
-                          </div>
+                  <div className="grid gap-3">
+                    {[
+                      {
+                        icon: Building2,
+                        title: "Virtual Office",
+                        desc: "Business address, mail handling, call forwarding",
+                        href: "/Solutions/virtual-office",
+                      },
+                      {
+                        icon: Users,
+                        title: "Coworking Space",
+                        desc: "Flexible desks, private cabins, team suites",
+                        href: "/Solutions/coworking-space",
+                      },
+                      {
+                        icon: FileText,
+                        title: "Business Setup",
+                        desc: "Company registration, GST, compliance",
+                        href: "/Solutions/business-setup",
+                      },
+                    ].map(({ icon: Icon, title, desc, href }) => (
+                      <div
+                        key={title}
+                        className="flex items-start gap-3 p-4 rounded-lg border border-transparent hover:border-gray-100 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 cursor-pointer transition-all"
+                        onClick={() => {
+                          handleNavigation(href);
+                          setIsSolutionsOpen(false);
+                        }}
+                      >
+                        <Icon className="w-5 h-5 text-[#D96832] mt-0.5" />
+                        <div>
+                          <h5 className="text-sm font-bold text-[#164e4e] dark:text-gray-100">
+                            {title}
+                          </h5>
+                          <p className="text-xs text-[#164e4e]/70 dark:text-gray-400 mt-1">
+                            {desc}
+                          </p>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Partner with Us */}
+            {/* Partner with Us */}
+            <button
+              onClick={() => handleNavigation("/partner")}
+              className={`group relative px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-gray-300 dark:hover:text-white" : "text-[#164e4e] dark:text-gray-100 dark:hover:text-white"}`}
+            >
+              <span className="relative">Partner with Us</span>
+            </button>
+
+            {/* === More Dropdown === */}
+            <div ref={moreRef} className="relative">
               <button
-                onClick={() => handleNavigation("/partner")}
-                className={`group relative px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${scrolled || forceWhiteBackground ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-gray-100 dark:hover:text-white"}`}
+                className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-gray-300 dark:hover:text-white" : "text-[#164e4e] dark:text-gray-100 dark:hover:text-white"}`}
+                onMouseEnter={() => setIsMoreOpen(true)}
+                onClick={() => setIsMoreOpen(false)}
               >
-                <span className="relative">Partner with Us</span>
+                <span className="relative">More</span>
+                <ChevronDown
+                  className={`w-4 h-4 text-[#164e4e]/70 transition-transform duration-300 group-hover:text-[#D96832] ${isMoreOpen ? "rotate-180" : ""}`}
+                />
               </button>
 
-              {/* === More Dropdown === */}
-              <div ref={moreRef} className="relative">
-                <button
-                  className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${scrolled || forceWhiteBackground ? "dark:text-gray-300 dark:hover:text-white" : "dark:text-gray-100 dark:hover:text-white"}`}
-                  onMouseEnter={() => setIsMoreOpen(true)}
-                  onClick={() => setIsMoreOpen(false)}
+              {isMoreOpen && (
+                <ul
+                  onMouseLeave={() => setIsMoreOpen(false)}
+                  className="absolute bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50"
                 >
-                  <span className="relative">More</span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-[#164e4e]/70 transition-transform duration-300 group-hover:text-[#D96832] ${isMoreOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+                  {[
+                    { label: "About Us", href: "/about" },
+                    { label: "Career", href: "/career" },
+                    { label: "Blog", href: "/blog" },
+                  ].map((item) => (
+                    <li key={item.label}>
+                      <button
+                        className="w-full text-left px-4 py-2 text-sm font-medium text-[#164e4e] hover:bg-gray-50 hover:text-[#D96832] dark:hover:bg-gray-800 dark:text-gray-200 transition-colors"
+                        onClick={() => {
+                          handleNavigation(item.href);
+                          setIsMoreOpen(false);
+                        }}
+                      >
+                        {item.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </nav>
 
-                {isMoreOpen && (
-                  <ul
-                    onMouseLeave={() => setIsMoreOpen(false)}
-                    className="absolute bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50"
-                  >
-                    {[
-                      { label: "About Us", href: "/about" },
-                      { label: "Career", href: "/career" },
-                      { label: "Blog", href: "/blog" },
-                    ].map((item) => (
-                      <li key={item.label}>
-                        <button
-                          className="w-full text-left px-4 py-2 text-sm font-medium text-[#164e4e] hover:bg-gray-50 hover:text-[#D96832] dark:hover:bg-gray-800 dark:text-gray-200 transition-colors"
-                          onClick={() => {
-                            handleNavigation(item.href);
-                            setIsMoreOpen(false);
-                          }}
-                        >
-                          {item.label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+          {/* Right Buttons */}
+          <div className="flex items-center space-x-4 ml-auto">
+            {/* Country Dropdown */}
+            <div ref={countryRef} className="hidden lg:block relative">
+              <button
+                className="flex items-center px-3 py-2 rounded-full border border-gray-200 dark:border-white/10 text-[#164e4e] dark:text-white gap-2 focus:outline-none bg-white dark:bg-black/50 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm transition-all duration-300"
+                onClick={() => setCountryDropdownOpen((prev) => !prev)}
+              >
+                <img
+                  src={selectedCountry.flag}
+                  alt={selectedCountry.code}
+                  className="h-5 w-5 rounded-full object-cover ring-1 ring-gray-100"
+                />
+                <span className="text-sm font-medium">
+                  {selectedCountry.code}
+                </span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-[#164e4e]/70 transition-transform duration-300 ${countryDropdownOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+              {countryDropdownOpen && (
+                <ul className="absolute right-0 top-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 min-w-[110px] py-1">
+                  {countries.map((country) => (
+                    <li key={country.code}>
+                      <button
+                        className="flex items-center w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-800 gap-2 text-sm text-[#164e4e] dark:text-gray-200 transition-colors"
+                        onClick={() => {
+                          setSelectedCountry(country);
+                          setCountryDropdownOpen(false);
+                        }}
+                      >
+                        <img
+                          src={country.flag}
+                          alt={country.code}
+                          className="h-5 w-5 rounded-full"
+                        />
+                        <span>{country.code}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className="hidden lg:flex items-center justify-center p-2 rounded-full border border-gray-200 dark:border-white/10 text-[#164e4e] dark:text-gray-300 bg-white dark:bg-black/50 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm transition-all duration-300"
+              aria-label="Toggle Dark Mode"
+            >
+              {darkMode ? (
+                <Sun className="w-5 h-5 text-yellow-400" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
+
+            <ModernFlairButton
+              onClick={() => setIsContactOpen(true)}
+              className="hidden lg:inline-flex group px-6 py-2.5 bg-[#D96832] text-white text-sm font-bold rounded-full transition-all duration-300 hover:shadow-lg hover:bg-[#c25626] border border-white/10 active:scale-95 overflow-hidden"
+              flairColor="rgba(255, 255, 255, 0.2)"
+            >
+              <span className="relative flex items-center gap-2">
+                Get in Touch
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </ModernFlairButton>
+
+            {/* Notification Bell */}
+            {isAuthenticated && (
+              <div className="hidden lg:block">
+                <NotificationBell />
               </div>
-            </nav>
+            )}
 
-            {/* Right Buttons */}
-            <div className="flex items-center space-x-4 ml-auto">
-              {/* ===== Country Dropdown Button (flag + code only, no bold) ===== */}
-              <div ref={countryRef} className="hidden lg:block relative">
+            {/* User Menu / Login */}
+            {isAuthenticated ? (
+              <div ref={userMenuRef} className="relative hidden lg:block">
                 <button
-                  className="flex items-center px-3 py-2 rounded-full border border-gray-200 dark:border-white/10 text-[#164e4e] dark:text-white gap-2 focus:outline-none bg-white dark:bg-black/50 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm transition-all duration-300"
-                  onClick={() => setCountryDropdownOpen((prev) => !prev)}
-                  aria-haspopup="listbox"
-                  aria-expanded={countryDropdownOpen}
+                  onClick={() => setIsUserMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 border border-gray-200 bg-white"
                 >
-                  <img
-                    src={selectedCountry.flag}
-                    alt={selectedCountry.code}
-                    className="h-5 w-5 rounded-full object-cover ring-1 ring-gray-100"
-                  />
-                  <span className="text-sm font-medium">
-                    {selectedCountry.code}
+                  <div className="w-8 h-8 rounded-full bg-[#164e4e] flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                    {user?.fullName?.charAt(0).toUpperCase() || "U"}
+                  </div>
+                  <span className="text-sm font-medium text-[#164e4e] max-w-[120px] truncate">
+                    {user?.fullName || "User"}
                   </span>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-[#164e4e]/70 transition-transform duration-300 ${countryDropdownOpen ? "rotate-180" : ""}`}
+                    className={cn(
+                      "h-4 w-4 text-[#164e4e]/70 transition-transform duration-200",
+                      isUserMenuOpen && "rotate-180",
+                    )}
                   />
                 </button>
-                {countryDropdownOpen && (
-                  <ul
-                    className="absolute left-0 top-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 min-w-[110px] py-1"
-                    role="listbox"
-                  >
-                    {countries.map((country) => (
-                      <li key={country.code}>
-                        <button
-                          className={`flex items-center w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-800 gap-2 text-sm text-[#164e4e] dark:text-gray-200 transition-colors`}
-                          onClick={() => {
-                            setSelectedCountry(country);
-                            setCountryDropdownOpen(false);
-                          }}
-                          role="option"
-                          aria-selected={selectedCountry.code === country.code}
+
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {user?.fullName}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user?.email}
+                      </p>
+                      <div className="mt-1.5 flex flex-wrap gap-1">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${user?.role === "partner" || user?.role === "affiliate" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"}`}
                         >
-                          <img
-                            src={country.flag}
-                            alt={country.code}
-                            className="h-5 w-5 rounded-full"
-                          />
-                          <span>{country.code}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              {/* ===== End Country Dropdown Button ===== */}
-
-              {/* Dark Mode Toggle */}
-              <button
-                onClick={toggleDarkMode}
-                className="hidden lg:flex items-center justify-center p-2 rounded-full border border-gray-200 dark:border-white/10 text-[#164e4e] dark:text-gray-300 bg-white dark:bg-black/50 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm transition-all duration-300"
-                aria-label="Toggle Dark Mode"
-              >
-                {darkMode ? (
-                  <Sun className="w-5 h-5 text-yellow-400" />
-                ) : (
-                  <Moon className="w-5 h-5" />
-                )}
-              </button>
-
-              <ModernFlairButton
-                onClick={() => setIsContactOpen(true)}
-                className="hidden lg:inline-flex group px-6 py-2.5 bg-[#D96832] text-white text-sm font-bold rounded-full transition-all duration-300 hover:shadow-lg hover:bg-[#c25626] border border-white/10 active:scale-95 overflow-hidden"
-                flairColor="rgba(255, 255, 255, 0.2)"
-              >
-                <span className="relative flex items-center gap-2">
-                  Get in Touch
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </span>
-              </ModernFlairButton>
-
-              {/* Notification Bell */}
-              {isAuthenticated && (
-                <div className="hidden lg:block">
-                  <NotificationBell />
-                </div>
-              )}
-
-              {/* User Authentication - Profile Dropdown or Login */}
-              {isAuthenticated ? (
-                <div ref={userMenuRef} className="relative hidden lg:block">
-                  <button
-                    onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 border border-gray-200 bg-white"
-                  >
-                    {/* User Avatar */}
-                    <div className="w-8 h-8 rounded-full bg-[#164e4e] flex items-center justify-center text-white font-semibold text-sm shadow-md">
-                      {user?.fullName?.charAt(0).toUpperCase() || "U"}
-                    </div>
-                    {/* User Name */}
-                    <span className="text-sm font-medium text-[#164e4e] max-w-[120px] truncate">
-                      {user?.fullName || "User"}
-                    </span>
-                    {/* Dropdown Icon */}
-                    <ChevronDown
-                      className={cn(
-                        "h-4 w-4 text-[#164e4e]/70 transition-transform duration-200",
-                        isUserMenuOpen && "rotate-180",
-                      )}
-                    />
-                  </button>
-
-                  {/* Dropdown Menu */}
-                  {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                      {/* User Info Header */}
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-semibold text-gray-900 truncate">
-                          {user?.fullName}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {user?.email}
-                        </p>
-                        <div className="mt-1.5 flex flex-wrap gap-1">
-                          <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${user?.role === "partner" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"}`}
-                          >
-                            {user?.role}
-                          </span>
-                        </div>
+                          {user?.role}
+                        </span>
                       </div>
+                    </div>
 
-                      {/* Menu Items */}
-                      <div className="py-1">
-                        {/* Admin Dashboard Button */}
-                        {user?.role === "admin" && (
-                          <button
-                            onClick={() => {
-                              navigate("/admin");
-                              setIsUserMenuOpen(false);
-                            }}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-50 hover:text-purple-800 transition-colors duration-150"
-                          >
-                            <LayoutDashboard className="h-4 w-4" />
-                            <span className="">Admin Dashboard</span>
-                          </button>
-                        )}
-
-                        {/* Partner Portal Button */}
-                        {user?.role === "partner" && (
-                          <button
-                            onClick={() => {
-                              navigate("/spaceportal");
-                              setIsUserMenuOpen(false);
-                            }}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-50 hover:text-amber-800 transition-colors duration-150"
-                          >
-                            <Building2 className="h-4 w-4" />
-                            <span className="">Your Space Portal</span>
-                          </button>
-                        )}
-
+                    <div className="py-1">
+                      {user?.role === "admin" && (
                         <button
                           onClick={() => {
-                            handleNavigation("/dashboard");
+                            navigate("/admin");
                             setIsUserMenuOpen(false);
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-50 hover:text-purple-800 transition-colors duration-150"
                         >
                           <LayoutDashboard className="h-4 w-4" />
-                          <span className="font-medium">Dashboard</span>
+                          <span>Admin Dashboard</span>
                         </button>
+                      )}
 
+                      {(user?.role === "partner" ||
+                        user?.role === "affiliate") && (
                         <button
                           onClick={() => {
-                            handleNavigation("/dashboard/profile");
+                            navigate(
+                              user?.role === "partner"
+                                ? "/spaceportal"
+                                : "/affiliate-portal",
+                            );
                             setIsUserMenuOpen(false);
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-50 hover:text-amber-800 transition-colors duration-150"
                         >
-                          <UserIcon className="h-4 w-4" />
-                          <span className="font-medium">My Profile</span>
+                          <Building2 className="h-4 w-4" />
+                          <span>
+                            {user?.role === "partner"
+                              ? "Your Space Portal"
+                              : "Affiliate Portal"}
+                          </span>
                         </button>
+                      )}
 
-                        <button
-                          onClick={() => {
-                            handleNavigation("/settings");
-                            setIsUserMenuOpen(false);
-                          }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
-                        >
-                          <Settings className="h-4 w-4" />
-                          <span className="font-medium">Settings</span>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => {
+                          handleNavigation("/dashboard");
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        <span className="font-medium">Dashboard</span>
+                      </button>
 
-                      {/* Logout Section */}
-                      <div className="border-t border-gray-100 pt-1">
-                        <button
-                          onClick={async () => {
-                            await logout();
-                            setIsUserMenuOpen(false);
-                            handleNavigation("/");
-                          }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
-                        >
-                          <LogOut className="h-4 w-4" />
-                          <span className="font-medium">Logout</span>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => {
+                          handleNavigation("/dashboard/profile");
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+                      >
+                        <UserIcon className="h-4 w-4" />
+                        <span className="font-medium">My Profile</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          handleNavigation("/settings");
+                          setIsUserMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
+                      >
+                        <Settings className="h-4 w-4" />
+                        <span className="font-medium">Settings</span>
+                      </button>
                     </div>
-                  )}
-                </div>
-              ) : (
+
+                    <div className="border-t border-gray-100 pt-1">
+                      <button
+                        onClick={async () => {
+                          await logout();
+                          setIsUserMenuOpen(false);
+                          handleNavigation("/");
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span className="font-medium">Logout</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
                 <ModernFlairButton
                   onClick={() => navigate("/login")}
                   className="hidden lg:inline-flex group px-6 py-2.5 bg-white text-[#164e4e] text-sm font-bold rounded-full border border-[#164e4e]/20 transition-all duration-300 hover:bg-[#164e4e] hover:text-white hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
@@ -631,27 +621,44 @@ const Header = ({
                     Log in
                   </span>
                 </ModernFlairButton>
-              )}
-            </div>
-          </div>
 
-          {/* SidebarMenu */}
-          <SidebarMenu
-            isOpen={isMenuOpen}
-            onClose={() => setIsMenuOpen(false)}
-            onOpenLogin={() => navigate("/login")}
-          />
+                <ModernFlairButton
+                  onClick={() => setIsPartnerChoiceOpen(true)}
+                  className="hidden lg:inline-flex group px-6 py-2.5 bg-[#EDB003] text-white text-sm font-bold rounded-full transition-all duration-300 hover:shadow-lg hover:bg-[#d99f03] border border-white/10 active:scale-95"
+                  flairColor="rgba(255, 255, 255, 0.2)"
+                >
+                  <span className="flex items-center gap-2">
+                    <Building2 className="w-3.5 h-3.5" />
+                    Become a Partner
+                  </span>
+                </ModernFlairButton>
+              </div>
+            )}
+
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="lg:hidden p-2 text-[#164e4e] dark:text-white"
+            >
+              <CiMenuFries className="h-6 w-6" />
+            </button>
+          </div>
         </div>
       </header>
 
+      {/* Mobile Sidebar Menu */}
+      <SidebarMenu
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        onOpenLogin={() => setIsLoginOpen(true)}
+      />
+
       {/* === Contact Popup === */}
       {isContactOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all">
-          {/* ... (existing contact popup content) ... */}
-          <div className="flex flex-col md:flex-row gap-10 w-[95%] max-w-5xl items-start justify-center">
-            {/* ====== LEFT SIDE CARDS ====== */}
-            <div className="flex flex-col gap-5 w-full md:w-[45%]">
-              {/* Card 1 - Support */}
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all p-4">
+          <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl items-stretch justify-center">
+            {/* LEFT SIDE CARDS */}
+            <div className="flex flex-col gap-4 w-full md:w-[45%]">
               <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
                 <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   Support
@@ -671,7 +678,6 @@ const Header = ({
                   </a>
                 </p>
               </div>
-              {/* Card 2 - Sales */}
               <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
                 <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   Sales
@@ -694,7 +700,6 @@ const Header = ({
                   <strong>Contact:</strong> 8100888777
                 </p>
               </div>
-              {/* Card 3 - Partnership */}
               <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
                 <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                   Partnership
@@ -707,7 +712,7 @@ const Header = ({
                 <p className="text-sm text-gray-600 mt-2">
                   <strong>Partnership Mail:</strong>&nbsp;
                   <a
-                    href="mailto:partner@flashspace.co "
+                    href="mailto:partner@flashspace.co"
                     className="text-blue-600 hover:underline"
                   >
                     partner@flashspace.co
@@ -715,15 +720,16 @@ const Header = ({
                 </p>
               </div>
             </div>
-            {/* ====== RIGHT SIDE FORM ====== */}
-            <div className="bg-white rounded-2xl shadow-2xl w-full md:w-[45%] p-8 relative animate-fade-in">
+
+            {/* RIGHT SIDE FORM */}
+            <div className="bg-white rounded-2xl shadow-2xl w-full md:w-[45%] p-8 relative animate-fade-in flex flex-col justify-center">
               <button
                 onClick={() => setIsContactOpen(false)}
-                className="absolute top-3 right-3 p-2 text-gray-500 hover:text-black transition"
+                className="absolute top-4 right-4 p-2 text-gray-500 hover:text-black transition"
               >
                 <X className="w-5 h-5" />
               </button>
-              <h2 className="text-xl font-bold mb-4 text-center">
+              <h2 className="text-xl font-bold mb-6 text-center">
                 <span className="text-black">Get in </span>
                 <span className="text-yellow-500">Touch</span>
               </h2>
@@ -740,7 +746,7 @@ const Header = ({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Phone Number{" "}
+                    Phone Number
                   </label>
                   <input
                     type="tel"
@@ -780,11 +786,18 @@ const Header = ({
         </div>
       )}
 
-      {/* === Login Modal === */}
+      {/* Modals */}
       <LoginModal isOpen={isLoginOpen} onClose={closeLogin} />
-
-      {/* === Signup Modal === */}
-      <SignupModal isOpen={isSignupOpen} onClose={closeSignup} />
+      <SignupModal
+        isOpen={isSignupOpen}
+        onClose={closeSignup}
+        initialRole={signupRole}
+      />
+      <PartnerChoiceModal
+        isOpen={isPartnerChoiceOpen}
+        onClose={() => setIsPartnerChoiceOpen(false)}
+        onSelect={openPartnerSignup}
+      />
     </>
   );
 };

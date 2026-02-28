@@ -25,13 +25,16 @@ export const getCoworkingSpacesByCity = async (
     const response = await axiosInstance.get(
       `/coworkingSpace/getByCity/${city}`,
     );
-    const data = response.data as ApiResponse<CoworkingSpaceItem[]>;
+    const data = response.data as ApiResponse<any>;
 
     if (response.status === 200 && data.success) {
-      console.log(
-        `✅ Successfully fetched ${data.data.length} coworking spaces`,
-      );
-      return data.data;
+      // Handle both flat array and paginated object responses
+      const spaces = Array.isArray(data.data)
+        ? data.data
+        : data.data?.spaces || data.data?.offices || [];
+
+      console.log(`✅ Successfully fetched ${spaces.length} coworking spaces`);
+      return spaces;
     }
 
     throw new Error(data.message || "Failed to fetch coworking spaces");
@@ -54,10 +57,14 @@ export const getAllCoworkingSpaces = async (): Promise<
 > => {
   try {
     const response = await axiosInstance.get("/coworkingSpace/getAll");
-    const data = response.data as ApiResponse<CoworkingSpaceItem[]>;
+    const data = response.data as ApiResponse<any>;
 
     if (response.status === 200 && data.success) {
-      return data.data;
+      // Handle both flat array and paginated object responses
+      const spaces = Array.isArray(data.data)
+        ? data.data
+        : data.data?.spaces || data.data?.offices || [];
+      return spaces;
     }
 
     throw new Error(data.message || "Failed to fetch coworking spaces");

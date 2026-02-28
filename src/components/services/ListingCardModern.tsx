@@ -119,6 +119,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
     };
 
     const formatReviews = (reviews: number) => {
+      if (!reviews) return "0";
       if (reviews >= 1000) {
         return `${(reviews / 1000).toFixed(1)}k`;
       }

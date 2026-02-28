@@ -25,7 +25,7 @@ export const getVirtualOfficesByCity = async (
     const response = await axiosInstance.get(
       `/virtualOffice/getByCity/${city}`,
     );
-    const data = response.data as ApiResponse<VirtualOfficeItem[]>;
+    const data = response.data as ApiResponse<any>;
 
     if ([200, 201].includes(response.status) && data.success) {
       // Backend returns either an array directly or a paginated object { offices: [], total: 0, ... }
@@ -57,7 +57,7 @@ export const getVirtualOfficesByCity = async (
 export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
   try {
     const response = await axiosInstance.get("/virtualOffice/getAll");
-    const data = response.data as ApiResponse<VirtualOfficeItem[]>;
+    const data = response.data as ApiResponse<any>;
 
     if ([200, 201].includes(response.status) && data.success) {
       const offices = Array.isArray(data.data)

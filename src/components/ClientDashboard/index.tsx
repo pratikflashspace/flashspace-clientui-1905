@@ -4,7 +4,8 @@ import {
   LayoutDashboard,
   Calendar,
   CreditCard,
-  Headphones,
+  ShieldCheck,
+  Headphones, // Keep for fallback or remove if unused
   LogOut,
   User,
   Building2,
@@ -13,9 +14,15 @@ import {
   Mail,
   Users,
   FileText,
+  CalendarCheck, // For Visit Records
+  MessageSquare, // For Chat Support
+  HelpCircle, // For Help Center
+  Home, // For Back to Home
+  AlertCircle,
 } from "lucide-react";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect as useEffectReact, useState as useStateReact } from "react";
 
 // Remove this type definition if useAuth already provides the correct user type
 // type User = {
@@ -27,81 +34,53 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import MyBookings from "./MyBookings";
 import Billing from "./Billing";
-
+import KYCVerification from "./KYCVerification";
 import Support from "./Support";
 import Logout from "./Logout";
 import Profile from "./Profile";
 import Viewdetails from "./Viewdetails";
 import Notifications from "./Notifications"; // Import the new Notifications component
+import ChatSupport from "./ChatSupport"; // Import ChatSupport
+import Documents from "./Documents";
+import MailRecords from "./MailRecords";
+import VisitRecords from "./VisitRecords";
 
 const menuItems = [
-  {
-    name: "Dashboard",
-    icon: LayoutDashboard,
-    section: "main",
-    path: "/dashboard",
-  },
-  {
-    name: "My Bookings",
-    icon: Calendar,
-    section: "main",
-    path: "/dashboard/my-bookings",
-  },
-  {
-    name: "Notifications",
-    icon: Bell,
-    section: "main",
-    path: "/dashboard/notifications",
-  },
-  {
-    name: "Billing",
-    icon: CreditCard,
-    section: "main",
-    path: "/dashboard/billing",
-  },
-
-  {
-    name: "Mail Records",
-    icon: Mail,
-    section: "main",
-    path: "/dashboard/mail-records",
-  },
-  {
-    name: "Visit Records",
-    icon: Users,
-    section: "main",
-    path: "/dashboard/visit-records",
-  },
-  {
-    name: "Documents",
-    icon: FileText,
-    section: "main",
-    path: "/dashboard/documents",
-  },
-  {
-    name: "Support",
-    icon: Headphones,
-    section: "main",
-    path: "/dashboard/support",
-  },
-  {
-    name: "Profile",
-    icon: User,
-    section: "account",
-    path: "/dashboard/profile",
-  },
-  {
-    name: "Logout",
-    icon: LogOut,
-    section: "account",
-    path: "/dashboard/logout",
-  },
+  { name: "Dashboard", icon: LayoutDashboard, section: "main", path: "/dashboard" },
+  { name: "My Bookings", icon: Calendar, section: "main", path: "/dashboard/my-bookings" },
+  { name: "Mail Records", icon: Mail, section: "main", path: "/dashboard/mail-records" },
+  { name: "Visit Records", icon: CalendarCheck, section: "main", path: "/dashboard/visit-records" },
+  { name: "Payments", icon: CreditCard, section: "main", path: "/dashboard/payments" },
+  { name: "Documents", icon: FileText, section: "main", path: "/dashboard/documents" },
+  { name: "Chat Support", icon: MessageSquare, section: "main", path: "/dashboard/support" },
+  { name: "Notifications", icon: Bell, section: "main", path: "/dashboard/notifications" },
+  { name: "Help Center", icon: HelpCircle, section: "main", path: "/dashboard/help" },
+  { name: "Profile & KYC", icon: User, section: "account", path: "/dashboard/profile" },
+  { name: "Logout", icon: LogOut, section: "account", path: "/dashboard/logout" },
 ];
 
 export default function ClientDashboard() {
   const [showFooter, setShowFooter] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user } = useAuth();
+  const [kycStatus, setKycStatus] = useStateReact<string | null>(null);
+
+  // Fetch KYC status for indicator
+  useEffectReact(() => {
+    async function fetchKycStatus() {
+      try {
+        const res = await import("@/services/userDashboard.service");
+        const kycResponse = await res.default.getKYC();
+        if (kycResponse.success && kycResponse.data) {
+          const kyc = Array.isArray(kycResponse.data) ? kycResponse.data[0] : kycResponse.data;
+          setKycStatus(kyc?.overallStatus || null);
+        }
+      } catch (e) {
+        setKycStatus(null);
+      }
+    }
+    fetchKycStatus();
+  }, []);
   const location = useLocation();
   const navigate = useNavigate();
   const showFooterRef = useRef(false);
@@ -144,32 +123,22 @@ export default function ClientDashboard() {
       case 1:
         return <MyBookings />;
       case 2:
-        return <Notifications />; // Notifications page
+        return <MailRecords />;
       case 3:
-        return <Billing />;
-      case 4:
-        return (
-          <div className="p-8 text-center text-gray-500">
-            Mail Records - Coming Soon
-          </div>
-        );
+        return <VisitRecords />;
+      case 4: // Payments
+        return <Billing />; // Using Billing component for Payments for now
       case 5:
-        return (
-          <div className="p-8 text-center text-gray-500">
-            Visit Records - Coming Soon
-          </div>
-        );
-      case 6:
-        return (
-          <div className="p-8 text-center text-gray-500">
-            Documents - Coming Soon
-          </div>
-        );
-      case 7:
+        return <Documents />;
+      case 6: // Chat Support
+        return <ChatSupport />;
+      case 7: // Notifications
+        return <Notifications />;
+      case 8: // Help Center
         return <Support />;
-      case 8:
-        return <Profile />;
       case 9:
+        return <Profile />;
+      case 10:
         return <Logout />;
       case 100: // Special case for View Details
         return <Viewdetails />;
@@ -179,9 +148,7 @@ export default function ClientDashboard() {
   }, [activeIndex]);
 
   const mainMenuItems = menuItems.filter((item) => item.section === "main");
-  const accountMenuItems = menuItems.filter(
-    (item) => item.section === "account",
-  );
+  const accountMenuItems = menuItems.filter((item) => item.section === "account");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -190,46 +157,33 @@ export default function ClientDashboard() {
       <div className="flex pt-16">
         {/* Sidebar */}
         <aside className="hidden lg:block w-72 min-h-[calc(100vh-64px)] bg-white border-r border-gray-200 p-6 sticky top-16">
-          {/* User Info */}
-          <div className="mb-8 p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-lg">
-                {user?.fullName?.charAt(0) || "U"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 truncate">
-                  {user?.fullName || "User"}
-                </p>
-                <p className="text-sm text-gray-500 truncate">
-                  {user?.email || "user@email.com"}
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* User Info removed from here */}
 
           {/* Main Navigation */}
-          <nav>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
-              Main Menu
-            </p>
+          <nav className="flex-1 overflow-y-auto">
             <ul className="space-y-1">
               {mainMenuItems.map((item, idx) => {
                 const isActive = activeIndex === idx;
+                const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
                 return (
                   <li key={item.name}>
                     <button
                       onClick={() => handleNavigation(idx)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                        isActive
-                          ? "bg-yellow-400 text-black shadow-sm"
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
+                          ? "bg-[#35503F] text-white shadow-sm"
                           : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                       }`}
                     >
-                      <item.icon
-                        className={`w-5 h-5 ${isActive ? "text-black" : "text-gray-400"}`}
-                      />
-                      <span>{item.name}</span>
-                      {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
+                      <item.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-gray-400"}`} />
+                      <span className="flex items-center gap-1">
+                        {item.name}
+                        {showKycDot && (
+                          <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
+                            <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
+                            <span className="text-red-600 font-bold">KYC</span>
+                          </span>
+                        )}
+                      </span>
                     </button>
                   </li>
                 );
@@ -237,34 +191,36 @@ export default function ClientDashboard() {
             </ul>
 
             {/* Account Section */}
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-8 mb-3 px-3">
-              Account
-            </p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-8 mb-3 px-3">Account</p>
             <ul className="space-y-1">
               {accountMenuItems.map((item) => {
-                const actualIndex = menuItems.findIndex(
-                  (m) => m.name === item.name,
-                );
+                const actualIndex = menuItems.findIndex((m) => m.name === item.name);
                 const isActive = activeIndex === actualIndex;
                 const isLogout = item.name === "Logout";
+                const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
                 return (
                   <li key={item.name}>
                     <button
                       onClick={() => handleNavigation(actualIndex)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                        isActive
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
                           ? isLogout
                             ? "bg-red-100 text-red-700"
-                            : "bg-yellow-400 text-black shadow-sm"
+                            : "bg-[#35503F] text-white shadow-sm"
                           : isLogout
                             ? "text-gray-600 hover:bg-red-50 hover:text-red-600"
                             : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                       }`}
                     >
-                      <item.icon
-                        className={`w-5 h-5 ${isActive ? (isLogout ? "text-red-600" : "text-black") : "text-gray-400"}`}
-                      />
-                      <span>{item.name}</span>
+                      <item.icon className={`w-5 h-5 ${isActive ? (isLogout ? "text-red-600" : "text-white") : "text-gray-400"}`} />
+                      <span className="flex items-center gap-1">
+                        {item.name}
+                        {showKycDot && (
+                          <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
+                            <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
+                            <span className="text-red-600 font-bold">KYC</span>
+                          </span>
+                        )}
+                      </span>
                     </button>
                   </li>
                 );
@@ -272,19 +228,45 @@ export default function ClientDashboard() {
             </ul>
           </nav>
 
-          {/* Promo Card */}
-          <div className="mt-8 p-4 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl text-white">
-            <Building2 className="w-8 h-8 text-yellow-400 mb-3" />
-            <p className="font-semibold mb-1">Need a new space?</p>
-            <p className="text-sm text-gray-300 mb-3">
-              Explore our virtual office locations across India.
-            </p>
-            <a
-              href="/spaces"
-              className="inline-block px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-300 transition-colors"
+          {/* Back to Home Button & Portal Links */}
+          <div className="mt-auto pt-4 border-t border-gray-100 space-y-2">
+            {user?.role && ['super_admin', 'admin', 'sales', 'support', 'affiliate_manager', 'space_partner_manager'].includes(user.role) && (
+              <button
+                onClick={() => navigate('/admin')}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-50 border border-purple-100 rounded-xl text-sm font-semibold text-purple-700 hover:bg-purple-100 transition-all shadow-sm shadow-purple-900/5 group"
+              >
+                <ShieldCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span>Admin Portal</span>
+              </button>
+            )}
+
+            {user?.role === 'partner' && (
+              <button
+                onClick={() => navigate('/spaceportal')}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-50 border border-orange-100 rounded-xl text-sm font-semibold text-orange-700 hover:bg-orange-100 transition-all shadow-sm shadow-orange-900/5 group"
+              >
+                <Building2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span>Partner Portal</span>
+              </button>
+            )}
+
+            {user?.role === 'affiliate' && (
+              <button
+                onClick={() => navigate('/affiliate-portal')}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-50 border border-cyan-100 rounded-xl text-sm font-semibold text-cyan-700 hover:bg-cyan-100 transition-all shadow-sm shadow-cyan-900/5 group"
+              >
+                <Users className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <span>Affiliate Portal</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => navigate('/')}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
             >
-              Browse Spaces
-            </a>
+              <Home className="w-4 h-4" />
+              <span>Back to Home</span>
+            </button>
           </div>
         </aside>
 
@@ -298,10 +280,7 @@ export default function ClientDashboard() {
 
         {/* Mobile Menu Overlay */}
         {isMobileMenuOpen && (
-          <div
-            className="lg:hidden fixed inset-0 z-40 bg-black/50"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
+          <div className="lg:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setIsMobileMenuOpen(false)}>
             <div
               className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
@@ -312,12 +291,12 @@ export default function ClientDashboard() {
                   {menuItems.map((item, idx) => {
                     const isActive = activeIndex === idx;
                     const isLogout = item.name === "Logout";
+                    const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
                     return (
                       <li key={item.name}>
                         <button
                           onClick={() => handleNavigation(idx)}
-                          className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-base font-medium ${
-                            isActive
+                          className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-base font-medium ${isActive
                               ? isLogout
                                 ? "bg-red-100 text-red-700"
                                 : "bg-yellow-400 text-black"
@@ -325,7 +304,15 @@ export default function ClientDashboard() {
                           }`}
                         >
                           <item.icon className="w-5 h-5" />
-                          <span>{item.name}</span>
+                          <span className="flex items-center gap-1">
+                            {item.name}
+                            {showKycDot && (
+                              <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
+                                <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
+                                <span className="text-red-600 font-bold">KYC</span>
+                              </span>
+                            )}
+                          </span>
                         </button>
                       </li>
                     );
@@ -337,7 +324,9 @@ export default function ClientDashboard() {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 min-h-[calc(100vh-64px)]">{mainContent}</main>
+        <main className="flex-1 min-w-0 overflow-x-hidden min-h-[calc(100vh-64px)]">
+          {mainContent}
+        </main>
       </div>
 
       {showFooter && <Footer />}

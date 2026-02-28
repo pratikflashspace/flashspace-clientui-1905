@@ -279,12 +279,12 @@ export default function Support() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold font-[Poppins] text-gray-900">
-            Help & <span className="text-yellow-500">Support</span>
+        <div className="mb-8 pl-1">
+          <h1 className="text-2xl md:text-3xl font-bold  text-gray-900">
+            Help & <span className="text-[#35503F]">Support</span>
           </h1>
           <p className="text-gray-500 mt-2">Get help with your virtual office and coworking services</p>
         </div>
@@ -295,14 +295,14 @@ export default function Support() {
             <a
               key={idx}
               href={option.action}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-yellow-300 transition-all group"
+              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#35503F]/30 transition-all group"
             >
               <div className={`w-12 h-12 rounded-xl ${option.color} flex items-center justify-center mb-4`}>
                 <option.icon className="w-6 h-6" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">{option.title}</h3>
               <p className="text-sm text-gray-500 mb-2">{option.description}</p>
-              <p className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700 flex items-center gap-1">
+              <p className="text-sm font-medium text-[#35503F] group-hover:text-[#35503F]/80 flex items-center gap-1">
                 {option.value}
                 <ExternalLink className="w-3 h-3" />
               </p>
@@ -322,7 +322,7 @@ export default function Support() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                  ? "bg-yellow-400 text-black"
+                  ? "bg-[#35503F] text-white"
                   : "text-gray-600 hover:bg-gray-100"
                   }`}
               >
@@ -338,7 +338,7 @@ export default function Support() {
           <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-yellow-500" /> Frequently Asked Questions
+                <HelpCircle className="w-5 h-5 text-[#35503F]" /> Frequently Asked Questions
               </h2>
 
               {faqs.map((category, catIdx) => (
@@ -414,7 +414,7 @@ export default function Support() {
                   {selectedTicket.messages?.map((msg, idx) => (
                     <div
                       key={idx}
-                      className={`p-4 rounded-lg ${msg.sender === "user" ? "bg-yellow-50 ml-8" : "bg-gray-50 mr-8"}`}
+                      className={`p-4 rounded-lg ${msg.sender === "user" ? "bg-[#35503F]/10 ml-8" : "bg-gray-50 mr-8"}`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-gray-900">
@@ -438,12 +438,12 @@ export default function Support() {
                         onChange={(e) => setReplyMessage(e.target.value)}
                         placeholder="Type your reply..."
                         rows={3}
-                        className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                       />
                       <button
                         onClick={handleReply}
                         disabled={submitting || !replyMessage.trim()}
-                        className="px-6 py-2.5 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50 self-end"
+                        className="px-6 py-2.5 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors disabled:opacity-50 self-end"
                       >
                         {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                       </button>
@@ -471,7 +471,7 @@ export default function Support() {
                   <h2 className="text-lg font-semibold text-gray-900">Support Tickets</h2>
                   <button
                     onClick={() => setShowNewTicket(true)}
-                    className="px-4 py-2 bg-yellow-400 text-black rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors"
+                    className="px-4 py-2 bg-[#35503F] text-white rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
                   >
                     + New Ticket
                   </button>
@@ -497,7 +497,7 @@ export default function Support() {
                               required
                               value={formData.subject}
                               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                               placeholder="Brief description of your issue"
                             />
                           </div>
@@ -507,7 +507,7 @@ export default function Support() {
                               required
                               value={formData.category}
                               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                             >
                               <option value="">Select Category</option>
                               <option value="virtual_office">Virtual Office</option>
@@ -527,7 +527,7 @@ export default function Support() {
                             rows={4}
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                             placeholder="Please provide detailed information about your issue..."
                           />
                           {formData.description.length > 0 && formData.description.length < 10 && (
@@ -538,7 +538,7 @@ export default function Support() {
                           <button
                             type="submit"
                             disabled={submitting || formData.description.length < 10}
-                            className="px-6 py-2.5 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-2.5 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Submit Ticket"}
                           </button>
@@ -559,7 +559,7 @@ export default function Support() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                   {loading ? (
                     <div className="text-center py-12">
-                      <Loader2 className="w-8 h-8 text-yellow-500 animate-spin mx-auto mb-3" />
+                      <Loader2 className="w-8 h-8 text-[#35503F] animate-spin mx-auto mb-3" />
                       <p className="text-gray-500">Loading tickets...</p>
                     </div>
                   ) : tickets.length === 0 ? (
@@ -589,7 +589,7 @@ export default function Support() {
                               </div>
                               <button
                                 onClick={() => viewTicketDetails(ticket._id)}
-                                className="px-4 py-2 text-sm font-medium text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 rounded-lg transition-colors"
+                                className="px-4 py-2 text-sm font-medium text-[#35503F] hover:text-[#35503F] hover:bg-[#35503F]/10 rounded-lg transition-colors"
                               >
                                 View Details
                               </button>
@@ -625,7 +625,7 @@ export default function Support() {
                     <input
                       type="text"
                       required
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                       placeholder="Enter your name"
                     />
                   </div>
@@ -634,7 +634,7 @@ export default function Support() {
                     <input
                       type="email"
                       required
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                       placeholder="Enter your email"
                     />
                   </div>
@@ -643,7 +643,7 @@ export default function Support() {
                   <label className="block text-sm text-gray-600 mb-1">Phone Number</label>
                   <input
                     type="tel"
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                     placeholder="+91 XXXXX XXXXX"
                   />
                 </div>
@@ -652,7 +652,7 @@ export default function Support() {
                   <input
                     type="text"
                     required
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                     placeholder="What is this regarding?"
                   />
                 </div>
@@ -661,13 +661,13 @@ export default function Support() {
                   <textarea
                     required
                     rows={5}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                     placeholder="Tell us more about your inquiry..."
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-3 bg-yellow-400 text-black rounded-xl font-semibold hover:bg-yellow-500 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-[#35503F] text-white rounded-xl font-semibold hover:bg-[#35503F]/90 transition-colors flex items-center justify-center gap-2"
                 >
                   <Send className="w-5 h-5" /> Send Message
                 </button>

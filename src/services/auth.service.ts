@@ -38,10 +38,10 @@ class AuthService {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGIN, data);
       const result = response.data as AuthResponse<LoginResponse>;
-      
+
       // Tokens are automatically stored in HttpOnly cookies by the server
       // No need to manually store tokens - more secure!
-      
+
       return result;
     } catch (error: any) {
       return {
@@ -58,10 +58,10 @@ class AuthService {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.VERIFY_OTP, data);
       const result = response.data as AuthResponse<VerifyOTPResponse>;
-      
+
       // Tokens are automatically stored in HttpOnly cookies by the server
       // No need to manually store tokens - more secure!
-      
+
       return result;
     } catch (error: any) {
       return {
@@ -137,10 +137,10 @@ class AuthService {
   async logout(): Promise<AuthResponse> {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGOUT);
-      
+
       // Cookies are cleared by the server
       // No need to manually clear tokens
-      
+
       return response.data as AuthResponse;
     } catch (error: any) {
       return {
@@ -156,10 +156,10 @@ class AuthService {
   async logoutAll(): Promise<AuthResponse> {
     try {
       const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGOUT_ALL);
-      
+
       // Cookies are cleared by the server
       // No need to manually clear tokens
-      
+
       return response.data as AuthResponse;
     } catch (error: any) {
       return {
@@ -195,7 +195,28 @@ class AuthService {
     } catch (error: any) {
       return {
         success: false,
-        message: error.response?.data?.message || error.message || 'Failed to get profile',
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to get profile",
+      } as AuthResponse<User>;
+    }
+  }
+
+  /**
+   * Update user profile settings
+   */
+  async updateProfile(data: Partial<User>): Promise<AuthResponse<User>> {
+    try {
+      const response = await axiosInstance.patch("/auth/profile", data);
+      return response.data as AuthResponse<User>;
+    } catch (error: any) {
+      return {
+        success: false,
+        message:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to update profile",
       } as AuthResponse<User>;
     }
   }
@@ -218,14 +239,14 @@ class AuthService {
   /**
    * Google OAuth - Authenticate with Google ID token
    */
-  async googleLogin(idToken: string): Promise<AuthResponse<LoginResponse>> {
+  async googleLogin(idToken: string, role?: string): Promise<AuthResponse<LoginResponse>> {
     try {
-      const response = await axiosInstance.post(API_ENDPOINTS.AUTH.GOOGLE, { idToken });
+      const response = await axiosInstance.post(API_ENDPOINTS.AUTH.GOOGLE, { idToken, role });
       const result = response.data as AuthResponse<LoginResponse>;
-      
+
       // Tokens are automatically stored in HttpOnly cookies by the server
       // No need to manually store tokens - more secure!
-      
+
       return result;
     } catch (error: any) {
       return {

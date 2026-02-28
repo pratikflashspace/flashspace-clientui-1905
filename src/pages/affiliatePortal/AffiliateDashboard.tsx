@@ -13,8 +13,10 @@ import {
     Lightbulb,
     ArrowUpRight,
     Loader2,
+    BadgePercent,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "@/lib/axios";
 
 // --- Types & Data ---
 
@@ -153,6 +155,24 @@ const Dashboard = () => {
     const [isLoadingInsight, setIsLoadingInsight] = useState(false);
     const navigate = useNavigate();
 
+    // ── Dynamic stat state ────────────────────────────────────────────────
+    const [totalCommission, setTotalCommission] = useState<number | null>(null);
+    const [totalClients, setTotalClients] = useState<number | null>(null);
+
+    useEffect(() => {
+        axiosInstance
+            .get<{ success: boolean; data: { stats: { totalCommission: number; totalClients: number } } }>(
+                "/api/affiliate/clients"
+            )
+            .then((res) => {
+                if (res.data.success) {
+                    setTotalCommission(res.data.data.stats.totalCommission);
+                    setTotalClients(res.data.data.stats.totalClients);
+                }
+            })
+            .catch(() => {/* silently ignore — stats stay null (shown as —) */ });
+    }, []);
+
     // Handle opening the modal
     const handleInsightClick = (id: InsightType) => {
         setSelectedInsight(id);
@@ -175,27 +195,29 @@ const Dashboard = () => {
         return () => clearTimeout(timer);
     }, [selectedInsight, isLoadingInsight]);
 
-    // -- Data Definitions --
+    // 3 stat cards: Total Earnings (dynamic), Total Clients (dynamic), Pending Payout (static)
+    const formatCurrency = (v: number) =>
+        new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(v);
+
     const stats = [
         {
-            label: "Total Referrals",
-            value: "89",
-            trend: "15% from last month",
-            icon: Share2,
+            label: "Total Earnings",
+            value: totalCommission !== null ? formatCurrency(totalCommission) : "—",
+            trend: "Commission @ 15% of paid amount",
+            icon: BadgePercent,
         },
         {
-            label: "Converted Clients",
-            value: "34",
-            trend: "22% from last month",
+            label: "Total Clients",
+            value: totalClients !== null ? String(totalClients) : "—",
+            trend: "Bookings via your coupon code",
             icon: Users,
         },
         {
-            label: "Total Earnings",
-            value: "₹2.8L",
-            trend: "18% from last month",
-            icon: TrendingUp,
+            label: "Pending Payout",
+            value: "₹0",
+            trend: null,
+            icon: Wallet,
         },
-        { label: "Pending Payout", value: "₹45K", trend: null, icon: Wallet },
     ];
 
     const sections = [
@@ -298,7 +320,7 @@ const Dashboard = () => {
         <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans animate-fade-in relative">
             <div className="w-full space-y-10">
                 {/* 1. Page Header */}
-{/* Header Removed */}
+                {/* Header Removed */}
 
                 {/* 2. Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -362,8 +384,8 @@ const Dashboard = () => {
                         />
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {section.cards.map((card, idx) => (
-                                <div 
-                                    key={idx} 
+                                <div
+                                    key={idx}
                                     onClick={() => {
                                         // Use the path directly from the card object
                                         if (card.path) {

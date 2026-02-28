@@ -17,23 +17,50 @@ import {
   Youtube,
   Send,
   Globe,
-  Heart
+  Heart,
 } from "lucide-react";
-import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-animation";
+import {
+  useScrollAnimation,
+  getAnimationClasses,
+} from "@/hooks/use-scroll-animation";
 import { Link, useNavigate } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const isVisible = useScrollAnimation('footer');
+  const isVisible = useScrollAnimation("footer");
   const navigate = useNavigate();
 
   const services = [
-    { name: "Virtual Office", icon: <Building className="w-4 h-4" />, href: "/services/virtual-office" },
-    { name: "Coworking Space", icon: <Briefcase className="w-4 h-4" />, href: "/services/coworking-space" },
-    { name: "Meeting Rooms", icon: <Users className="w-4 h-4" />, href: "/services/meeting-rooms" },
-    { name: "Event Spaces", icon: <Globe className="w-4 h-4" />, href: "/services/event-spaces" },
-    { name: "Business Setup", icon: <FileText className="w-4 h-4" />, href: "/services/business-setup" },
-    { name: "On-Demand", icon: <Clock className="w-4 h-4" />, href: "/services/on-demand" },
+    {
+      name: "Virtual Office",
+      icon: <Building className="w-4 h-4" />,
+      href: "/services/virtual-office",
+    },
+    {
+      name: "Coworking Space",
+      icon: <Briefcase className="w-4 h-4" />,
+      href: "/services/coworking-space",
+    },
+    {
+      name: "Meeting Rooms",
+      icon: <Users className="w-4 h-4" />,
+      href: "/services/on-demand",
+    },
+    {
+      name: "Event Spaces",
+      icon: <Globe className="w-4 h-4" />,
+      href: "/services/event-spaces",
+    },
+    {
+      name: "Business Setup",
+      icon: <FileText className="w-4 h-4" />,
+      href: "/services/business-setup",
+    },
+    {
+      name: "On-Demand",
+      icon: <Clock className="w-4 h-4" />,
+      href: "/services/on-demand",
+    },
   ];
 
   const quickLinks = [
@@ -47,21 +74,56 @@ const Footer = () => {
 
   const support = [
     { name: "Help Center", href: "/help", icon: <Users className="w-4 h-4" /> },
-    { name: "Contact Us", href: "/get-in-touch", icon: <Phone className="w-4 h-4" /> },
-    { name: "Privacy Policy", href: "/privacy", icon: <Shield className="w-4 h-4" /> },
-    { name: "Terms of Service", href: "/terms", icon: <FileText className="w-4 h-4" /> },
+    {
+      name: "Contact Us",
+      href: "/get-in-touch",
+      icon: <Phone className="w-4 h-4" />,
+    },
+    {
+      name: "Privacy Policy",
+      href: "/privacy",
+      icon: <Shield className="w-4 h-4" />,
+    },
+    {
+      name: "Terms of Service",
+      href: "/terms",
+      icon: <FileText className="w-4 h-4" />,
+    },
   ];
 
   const socialLinks = [
-    { name: "Facebook", icon: <Facebook className="w-5 h-5" />, href: "https://facebook.com" },
-    { name: "Twitter", icon: <Twitter className="w-5 h-5" />, href: "https://twitter.com" },
-    { name: "LinkedIn", icon: <Linkedin className="w-5 h-5" />, href: "https://linkedin.com" },
-    { name: "Instagram", icon: <Instagram className="w-5 h-5" />, href: "https://instagram.com" },
-    { name: "YouTube", icon: <Youtube className="w-5 h-5" />, href: "https://youtube.com" },
+    {
+      name: "Facebook",
+      icon: <Facebook className="w-5 h-5" />,
+      href: "https://facebook.com",
+    },
+    {
+      name: "Twitter",
+      icon: <Twitter className="w-5 h-5" />,
+      href: "https://twitter.com",
+    },
+    {
+      name: "LinkedIn",
+      icon: <Linkedin className="w-5 h-5" />,
+      href: "https://linkedin.com",
+    },
+    {
+      name: "Instagram",
+      icon: <Instagram className="w-5 h-5" />,
+      href: "https://instagram.com",
+    },
+    {
+      name: "YouTube",
+      icon: <Youtube className="w-5 h-5" />,
+      href: "https://youtube.com",
+    },
   ];
 
   return (
-    <footer id="footer" className="relative bg-white dark:bg-[#0a0a0a] border-t border-gray-200 dark:border-white/10 transition-colors duration-300 overflow-hidden">
+    <footer
+      id="footer"
+      className="relative bg-white dark:bg-[#0a0a0a] border-t border-gray-200 dark:border-white/10 transition-colors duration-300 overflow-hidden"
+    >
       {/* Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#EDB003] to-transparent opacity-50"></div>
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#EDB003]/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -70,9 +132,12 @@ const Footer = () => {
       <div className="container mx-auto px-6 relative z-10">
         {/* Main Footer Content */}
         <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10">
-
           {/* Company Info - Spans 4 columns */}
-          <div className={`lg:col-span-4 space-y-8 ${getAnimationClasses(isVisible, 'slideUp', 0)}`}>
+          <div
+            {...getAnimationClasses(isVisible, "slideUp", 0)}
+            className={`lg:col-span-4 space-y-8 ${getAnimationClasses(isVisible, "slideUp", 0).className}`}
+            style={getAnimationClasses(isVisible, "slideUp", 0).style}
+          >
             <div className="flex flex-col items-start gap-4">
               <Link to="/" className="inline-block">
                 <img
@@ -82,21 +147,29 @@ const Footer = () => {
                 />
               </Link>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-base">
-                Empowering businesses across India with premium virtual office solutions,
-                flexible workspaces, and growth-focused support. Join the future of work with FlashSpace.
+                Empowering businesses across India with premium virtual office
+                solutions, flexible workspaces, and growth-focused support. Join
+                the future of work with FlashSpace.
               </p>
             </div>
 
             {/* Newsletter Signup */}
             <div className="bg-gray-50 dark:bg-[#151515] p-6 rounded-2xl border border-gray-100 dark:border-white/5">
-              <h4 className="font-bold text-gray-900 dark:text-white mb-2">Subscribe to our newsletter</h4>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Get the latest updates towards your inbox.</p>
+              <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+                Subscribe to our newsletter
+              </h4>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                Get the latest updates towards your inbox.
+              </p>
               <div className="flex gap-2">
                 <Input
                   placeholder="Email address"
                   className="bg-white dark:bg-black/50 border-gray-200 dark:border-white/10 focus:border-[#EDB003] text-sm dark:text-white transition-all"
                 />
-                <Button size="icon" className="bg-[#EDB003] hover:bg-[#d69f03] text-black shrink-0 transition-colors">
+                <Button
+                  size="icon"
+                  className="bg-[#EDB003] hover:bg-[#d69f03] text-black shrink-0 transition-colors"
+                >
                   <Send className="w-4 h-4" />
                 </Button>
               </div>
@@ -123,7 +196,11 @@ const Footer = () => {
           <div className="hidden lg:block lg:col-span-1"></div>
 
           {/* Solutions Column */}
-          <div className={`lg:col-span-3 md:col-span-1 ${getAnimationClasses(isVisible, 'slideUp', 100)}`}>
+          <div
+            {...getAnimationClasses(isVisible, "slideUp", 100)}
+            className={`lg:col-span-3 md:col-span-1 ${getAnimationClasses(isVisible, "slideUp", 100).className}`}
+            style={getAnimationClasses(isVisible, "slideUp", 100).style}
+          >
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 relative inline-block">
               Our Solutions
               <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-[#EDB003] rounded-full"></span>
@@ -146,7 +223,11 @@ const Footer = () => {
           </div>
 
           {/* Quick Links & Support Column */}
-          <div className={`lg:col-span-2 md:col-span-1 ${getAnimationClasses(isVisible, 'slideUp', 200)}`}>
+          <div
+            {...getAnimationClasses(isVisible, "slideUp", 200)}
+            className={`lg:col-span-2 md:col-span-1 ${getAnimationClasses(isVisible, "slideUp", 200).className}`}
+            style={getAnimationClasses(isVisible, "slideUp", 200).style}
+          >
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 relative inline-block">
               Company
               <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-[#EDB003] rounded-full"></span>
@@ -184,7 +265,11 @@ const Footer = () => {
           </div>
 
           {/* Contact Info Column */}
-          <div className={`lg:col-span-2 md:col-span-1 ${getAnimationClasses(isVisible, 'slideUp', 300)}`}>
+          <div
+            {...getAnimationClasses(isVisible, "slideUp", 300)}
+            className={`lg:col-span-2 md:col-span-1 ${getAnimationClasses(isVisible, "slideUp", 300).className}`}
+            style={getAnimationClasses(isVisible, "slideUp", 300).style}
+          >
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 relative inline-block">
               Get in Touch
               <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-[#EDB003] rounded-full"></span>
@@ -195,9 +280,13 @@ const Footer = () => {
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">Head Office</h4>
+                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">
+                    Head Office
+                  </h4>
                   <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed mt-1">
-                    123, Tech Park, Cyber City,<br />Gurugram, India 122002
+                    123, Tech Park, Cyber City,
+                    <br />
+                    Gurugram, India 122002
                   </p>
                 </div>
               </li>
@@ -206,9 +295,13 @@ const Footer = () => {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">Phone</h4>
+                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">
+                    Phone
+                  </h4>
                   <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed mt-1">
-                    +91 123 456 7890<br />Mon-Sat, 9AM-7PM
+                    +91 123 456 7890
+                    <br />
+                    Mon-Sat, 9AM-7PM
                   </p>
                 </div>
               </li>
@@ -217,9 +310,13 @@ const Footer = () => {
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">Email</h4>
+                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">
+                    Email
+                  </h4>
                   <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed mt-1">
-                    support@flashspace.com<br />sales@flashspace.com
+                    support@flashspace.com
+                    <br />
+                    sales@flashspace.com
                   </p>
                 </div>
               </li>
@@ -228,7 +325,11 @@ const Footer = () => {
         </div>
 
         {/* Bottom Footer */}
-        <div className={`py-8 border-t border-gray-200 dark:border-white/10 ${getAnimationClasses(isVisible, 'fadeIn', 400)}`}>
+        <div
+          {...getAnimationClasses(isVisible, "fadeIn", 400)}
+          className={`py-8 border-t border-gray-200 dark:border-white/10 ${getAnimationClasses(isVisible, "fadeIn", 400).className}`}
+          style={getAnimationClasses(isVisible, "fadeIn", 400).style}
+        >
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Copyright */}
             <div className="text-center md:text-left">

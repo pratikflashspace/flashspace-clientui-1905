@@ -21,7 +21,17 @@ export const AffiliateRoute: React.FC = () => {
     // Check for affiliate role
     if (user.role !== 'affiliate') {
         // Redirect unauthorized users to their appropriate dashboard or home
-        return <Navigate to="/dashboard" replace />;
+        switch (user.role) {
+            case 'super_admin':
+            case 'admin':
+                return <Navigate to="/admin" replace />;
+            case 'partner':
+                return <Navigate to="/spaceportal" replace />;
+            case 'user':
+                return <Navigate to="/dashboard" replace />;
+            default:
+                return <Navigate to="/" replace />;
+        }
     }
 
     return <Outlet />;

@@ -77,7 +77,7 @@ export default function ActiveRequests() {
     const loadRequests = async () => {
       setIsLoading(true);
       try {
-        const response = await fetchPartnerActiveRequests();
+        const response: any = await fetchPartnerActiveRequests();
         if (response?.success) {
           setRequests(response.data);
         } else {

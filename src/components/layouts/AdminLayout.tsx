@@ -15,6 +15,7 @@ import {
     Search,
     BookOpen,
     Briefcase,
+    Shield,
     ChevronLeft,
     Home,
     LineChart,
@@ -22,7 +23,8 @@ import {
     Ticket,
     Tag,
     Headphones,
-    Trophy
+    Trophy,
+    Network
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -37,20 +39,21 @@ export default function AdminLayout() {
     };
 
     const allNavItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['admin', 'partner', 'space_manager', 'sales'] },
-        { icon: LineChart, label: 'Booking Analysis', path: '/admin/booking-analysis', roles: ['admin', 'sales', 'partner'] },
-        { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['admin', 'sales'] },
-        { icon: Headphones, label: 'Support Chats', path: '/admin/support', roles: ['admin', 'sales'] },
-        { icon: Bell, label: 'Notifications', path: '/admin/notifications', roles: ['admin', 'sales'] },
-        { icon: Trophy, label: 'Leaderboard', path: '/admin/leaderboard', roles: ['admin', 'sales'] },
-        { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['admin', 'sales'] },
-        { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['admin', 'sales'] },
-        { icon: Briefcase, label: 'Clients', path: '/admin/clients', roles: ['admin', 'sales'] },
-        { icon: Tag, label: 'Coupons & Vouchers', path: '/admin/coupons', roles: ['admin', 'sales'] },
-        { icon: Users, label: 'User Management', path: '/admin/users', roles: ['admin'] },
-        { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['admin', 'partner', 'space_manager'] },
-        { icon: Building2, label: 'Space Management', path: '/admin/spaces', roles: ['admin', 'partner', 'space_manager'] },
-        { icon: Settings, label: 'Settings', path: '/admin/settings', roles: ['admin', 'partner'] },
+        { icon: LayoutDashboard, label: 'Dashboard', path: '/admin', roles: ['admin', 'super_admin', 'partner', 'space_partner_manager', 'sales', 'support', 'affiliate_manager'] },
+        { icon: LineChart, label: 'Booking Analysis', path: '/admin/booking-analysis', roles: ['admin', 'super_admin', 'sales', 'partner', 'space_partner_manager'] },
+        { icon: Target, label: 'Lead Management', path: '/admin/leads', roles: ['admin', 'super_admin', 'sales'] },
+        { icon: Headphones, label: 'Support Chats', path: '/admin/support', roles: ['admin', 'super_admin', 'support'] },
+        { icon: Bell, label: 'Notifications', path: '/admin/notifications', roles: ['admin', 'super_admin', 'sales', 'support', 'affiliate_manager', 'space_partner_manager', 'partner'] },
+        { icon: Trophy, label: 'Leaderboard', path: '/admin/leaderboard', roles: ['admin', 'super_admin', 'sales', 'support'] },
+        { icon: Ticket, label: 'Ticket System', path: '/admin/tickets', roles: ['admin', 'super_admin', 'support'] },
+        { icon: BookOpen, label: 'Learning Hub', path: '/admin/learning-hub', roles: ['admin', 'super_admin', 'sales', 'support', 'partner'] },
+        { icon: Briefcase, label: 'Clients', path: '/admin/clients', roles: ['admin', 'super_admin', 'sales', 'support'] },
+        { icon: Network, label: 'Affiliate Management', path: '/admin/affiliates', roles: ['admin', 'super_admin', 'affiliate_manager'] },
+        { icon: Tag, label: 'Coupons & Vouchers', path: '/admin/coupons', roles: ['admin', 'super_admin', 'sales'] },
+        { icon: Users, label: 'User Management', path: '/admin/users', roles: ['admin', 'super_admin'] },
+        { icon: FileCheck, label: 'KYC Verification', path: '/admin/kyc-requests', roles: ['admin', 'super_admin', 'partner'] },
+        { icon: Building2, label: 'Space Management', path: '/admin/spaces', roles: ['admin', 'super_admin', 'partner', 'space_partner_manager'] },
+        { icon: Settings, label: 'Settings', path: '/admin/settings', roles: ['admin', 'super_admin', 'partner', 'space_partner_manager', 'sales', 'support', 'affiliate_manager'] },
     ];
 
     const navItems = allNavItems.filter(item => user?.role && item.roles.includes(user.role));
@@ -82,36 +85,41 @@ export default function AdminLayout() {
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
-                    {navItems.map((item) => (
-                        <NavLink
-                            key={item.path}
-                            to={item.path}
-                            end={item.path === '/admin'}
-                            className={({ isActive }) =>
-                                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                    ? 'bg-teal-600 text-white shadow-md shadow-teal-200'
-                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium'
-                                }`
-                            }
-                        >
-                            <item.icon className={`w-5 h-5 flex-shrink-0 transition-colors ${
-                                // Active styles handled by parent class
-                                ''
-                                }`} />
-                            {isSidebarOpen && <span className="whitespace-nowrap font-medium text-sm">{item.label}</span>}
-                        </NavLink>
-                    ))}
-                </nav>
+                <div
+                    className="flex-1 min-h-0 w-full overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-300"
+
+                >
+                    <nav className="px-4 space-y-2 pb-4">
+                        {navItems.map((item) => (
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                end={item.path === '/admin'}
+                                className={({ isActive }) =>
+                                    `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                                        ? 'bg-teal-600 text-white shadow-md shadow-teal-200'
+                                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium'
+                                    }`
+                                }
+                            >
+                                <item.icon className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                                    // Active styles handled by parent class
+                                    ''
+                                    }`} />
+                                {isSidebarOpen && <span className="whitespace-nowrap font-medium text-sm">{item.label}</span>}
+                            </NavLink>
+                        ))}
+                    </nav>
+                </div>
 
                 {/* Bottom Actions */}
                 <div className="p-4 mt-auto border-t border-gray-100 space-y-2">
                     <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-gray-500 hover:bg-gray-50 transition-colors ${!isSidebarOpen ? 'justify-center' : ''}`}
+                        onClick={() => navigate('/dashboard')}
+                        className={`flex items-center gap-3 px-4 py-2.5 w-full bg-teal-50 rounded-xl text-teal-700 hover:bg-teal-100 transition-colors ${!isSidebarOpen ? 'justify-center' : ''}`}
                     >
-                        <ChevronLeft className={`w-5 h-5 transition-transform ${!isSidebarOpen ? 'rotate-180' : ''}`} />
-                        {isSidebarOpen && <span className="font-medium text-sm">Collapse</span>}
+                        <LayoutDashboard className="w-5 h-5 text-teal-600" />
+                        {isSidebarOpen && <span className="font-semibold text-sm">User Dashboard</span>}
                     </button>
 
                     <button
@@ -122,15 +130,13 @@ export default function AdminLayout() {
                         {isSidebarOpen && <span className="font-medium text-sm">Back to Home</span>}
                     </button>
 
-                    {/* Logout - Hidden in collapsed or moved? Keeping it accessible. */}
-                    {/* <button
-                        onClick={handleLogout}
-                        className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-red-500 hover:bg-red-50 transition-colors ${!isSidebarOpen ? 'justify-center' : ''
-                            }`}
+                    <button
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                        className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-gray-400 hover:bg-gray-50 transition-colors ${!isSidebarOpen ? 'justify-center' : ''}`}
                     >
-                        <LogOut className="w-5 h-5" />
-                        {isSidebarOpen && <span className="font-medium text-sm">Logout</span>}
-                    </button> */}
+                        <ChevronLeft className={`w-5 h-5 transition-transform ${!isSidebarOpen ? 'rotate-180' : ''}`} />
+                        {isSidebarOpen && <span className="font-medium text-xs uppercase tracking-wider">Collapse</span>}
+                    </button>
                 </div>
             </aside>
 
@@ -158,28 +164,40 @@ export default function AdminLayout() {
                         </div>
 
                         {/* Nav Links */}
-                        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                            {navItems.map((item) => (
-                                <NavLink
-                                    key={item.path}
-                                    to={item.path}
-                                    onClick={() => setIsMobileOpen(false)}
-                                    end={item.path === '/admin'}
-                                    className={({ isActive }) =>
-                                        `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${isActive
-                                            ? 'bg-teal-600 text-white shadow-md shadow-teal-200'
-                                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium'
-                                        }`
-                                    }
-                                >
-                                    <item.icon className="w-5 h-5 flex-shrink-0" />
-                                    <span className="font-medium text-sm">{item.label}</span>
-                                </NavLink>
-                            ))}
-                        </nav>
+                        <div
+                            className="flex-1 min-h-0 w-full overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-300"
+
+                        >
+                            <nav className="px-4 py-6 space-y-2 pb-8">
+                                {navItems.map((item) => (
+                                    <NavLink
+                                        key={item.path}
+                                        to={item.path}
+                                        onClick={() => setIsMobileOpen(false)}
+                                        end={item.path === '/admin'}
+                                        className={({ isActive }) =>
+                                            `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${isActive
+                                                ? 'bg-teal-600 text-white shadow-md shadow-teal-200'
+                                                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium'
+                                            }`
+                                        }
+                                    >
+                                        <item.icon className="w-5 h-5 flex-shrink-0" />
+                                        <span className="font-medium text-sm">{item.label}</span>
+                                    </NavLink>
+                                ))}
+                            </nav>
+                        </div>
 
                         {/* Bottom */}
                         <div className="p-4 border-t border-gray-100 space-y-2">
+                            <button
+                                onClick={() => navigate('/dashboard')}
+                                className="flex items-center gap-3 px-4 py-3 w-full bg-teal-50 rounded-xl text-teal-700 hover:bg-teal-100 transition-colors"
+                            >
+                                <LayoutDashboard className="w-5 h-5 text-teal-600" />
+                                <span className="font-semibold text-sm">User Dashboard</span>
+                            </button>
                             <button
                                 onClick={() => navigate('/')}
                                 className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-gray-500 hover:bg-gray-50 transition-colors"
