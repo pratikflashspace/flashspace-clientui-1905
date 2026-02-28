@@ -8,7 +8,7 @@ const TestimonialsSection = () => {
   const companies = [
     { name: "Adda247", logo: "/Logo/Adda247.png", needsInvert: false },
     { name: "Study IQ", logo: "/Logo/StudyIQ.png", needsInvert: false },
-    { name: "Flipkart", logo: "https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Logo.png", needsInvert: false },
+    // { name: "Flipkart", logo: "https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Logo.png", needsInvert: false },
     { name: "Truly Madly", logo: "https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp", needsInvert: false },
     { name: "Stage OTT", logo: "/Logo/Stage2.png", needsInvert: false },
     { name: "LUV Films", logo: "/Logo/luv.png", needsInvert: false },

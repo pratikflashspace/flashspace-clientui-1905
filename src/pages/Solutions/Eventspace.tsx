@@ -401,7 +401,7 @@ const EventSpacePage: React.FC = () => {
                     <img src="/Logo/StudyIQ.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="StudyIQ" />
                     <img src="/Logo/Stage2.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="Stage2" />
                     <img src="/Logo/luv.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="luv" />
-                    <img src="/Logo/flipkart.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="flipkart" />
+                    {/* <img src="/Logo/flipkart.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="flipkart" /> */}
                     <img src="/Logo/Adda247.png" className="h-14 w-24 object-contain border-2 border-gray-300 opacity-80 transition-transform duration-300 hover:scale-125 hover:shadow-lg rounded-md" alt="Adda247" />
                   </div>
                   <ul className="space-y-4 font-poppins text-gray-700">

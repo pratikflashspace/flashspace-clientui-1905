@@ -862,7 +862,7 @@ const VirtualOffice = () => {
                                 {/* First set of logos */}
                                 <div className="flex items-center justify-around min-w-full gap-16 px-8">
                                     <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-white/90 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
-                                        <img src="/Logo/flipkart.png" alt="Flipkart" className="w-full h-full object-contain" />
+                                        {/* <img src="/Logo/flipkart.png" alt="Flipkart" className="w-full h-full object-contain" /> */}
                                     </div>
                                     <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
                                         <img src="/Logo/trulymadly.png" alt="TrulyMadly" className="w-full h-full object-contain" />
@@ -883,7 +883,7 @@ const VirtualOffice = () => {
                                 {/* Duplicate set for seamless loop */}
                                 <div className="flex items-center justify-around min-w-full gap-16 px-8">
                                     <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
-                                        <img src="/Logo/flipkart.png" alt="Flipkart" className="w-full h-full object-contain" />
+                                        {/* <img src="/Logo/flipkart.png" alt="Flipkart" className="w-full h-full object-contain" /> */}
                                     </div>
                                     <div className="flex items-center justify-center w-[420px] h-28 bg-white dark:bg-black/50 rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl p-2">
                                         <img src="/Logo/trulymadly.png" alt="TrulyMadly" className="w-full h-full object-contain" />
