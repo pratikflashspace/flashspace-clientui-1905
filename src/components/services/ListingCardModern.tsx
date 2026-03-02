@@ -21,23 +21,23 @@ export type ListingItem =
   | CoworkingSpaceItem
   | MeetingRoomItem
   | {
-      _id: string;
-      name: string;
-      address: string;
-      area: string;
-      price: string;
-      originalPrice?: string;
-      rating: number;
-      reviews: number;
-      image?: string;
-      features: string[];
-      popular?: boolean;
-      availability?: string;
-      coordinates?: {
-        lat: number;
-        lng: number;
-      };
+    _id: string;
+    name: string;
+    address: string;
+    area: string;
+    price: string;
+    originalPrice?: string;
+    rating: number;
+    reviews: number;
+    image?: string;
+    features: string[];
+    popular?: boolean;
+    availability?: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
     };
+  };
 
 interface ListingCardModernProps {
   item: ListingItem;
@@ -150,11 +150,10 @@ const ListingCardModern = memo<ListingCardModernProps>(
           <div className="absolute top-3 right-3 flex items-center gap-2">
             <button
               onClick={handleFavoriteClick}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
-                isFavorite
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${isFavorite
                   ? "bg-white text-red-500"
                   : "bg-white/80 hover:bg-white text-gray-600 hover:text-red-500"
-              }`}
+                }`}
             >
               <Heart
                 className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`}
@@ -196,11 +195,10 @@ const ListingCardModern = memo<ListingCardModernProps>(
                     e.stopPropagation();
                     setCurrentImageIndex(index);
                   }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
-                    index === currentImageIndex
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${index === currentImageIndex
                       ? "bg-white w-2.5"
                       : "bg-white/60 hover:bg-white/80"
-                  }`}
+                    }`}
                 />
               ))}
             </div>
@@ -234,7 +232,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
 
           {/* Features Tags */}
           <div className="flex flex-wrap gap-1.5 mb-3">
-            {item.features.slice(0, 2).map((feature, idx) => (
+            {item.features?.slice(0, 2).map((feature, idx) => (
               <span
                 key={idx}
                 className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md"
