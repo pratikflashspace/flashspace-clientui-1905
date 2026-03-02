@@ -1,5 +1,5 @@
-import React from "react";
-import { Share2, Download } from "lucide-react";
+import React, { useState } from "react";
+import { Share2, Download, Eye, X, MapPin, Calendar, Building2, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -51,6 +51,8 @@ const QuotationCard = ({
     date,
     status,
 }: QuotationCardProps) => {
+    const [showPreview, setShowPreview] = useState(false);
+
     const statusStyles = {
         Sent: "bg-orange-50 text-orange-600 border-orange-100",
         Viewed: "bg-blue-50 text-blue-600 border-blue-100",
@@ -337,61 +339,140 @@ const QuotationCard = ({
     };
 
     return (
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative transition-all hover:border-[#5bb09c]/30">
-            {/* Top Row: ID and Status Badge */}
-            <div className="flex justify-between items-start mb-3">
-                <span className="text-[11px] font-bold text-[#5bb09c] uppercase tracking-wider">
-                    {id}
-                </span>
-                <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusStyles[status]}`}
-                >
-                    {status}
-                </span>
-            </div>
+        <>
+            {/* Preview Modal */}
+            {showPreview && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPreview(false)} />
+                    <div className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                            <div>
+                                <p className="text-[11px] font-bold text-[#5bb09c] uppercase tracking-wider mb-1">{id}</p>
+                                <h3 className="text-lg font-bold text-gray-900">{clientName}</h3>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${statusStyles[status]}`}>{status}</span>
+                                <button onClick={() => setShowPreview(false)} className="p-2 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
 
-            {/* Info Section */}
-            <div className="mb-4">
-                <h4 className="font-bold text-gray-900 text-base mb-1">
-                    {clientName}
-                </h4>
-                <p className="text-xs text-gray-500 font-medium leading-relaxed">
-                    {spaceDetails}
-                    <br />
-                    {location}
-                </p>
-            </div>
+                        {/* Modal Body */}
+                        <div className="p-6 space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-gray-50 rounded-2xl p-4 flex items-start gap-3">
+                                    <div className="p-2 bg-[#5bb09c]/10 rounded-xl text-[#5bb09c] mt-0.5"><Building2 className="w-4 h-4" /></div>
+                                    <div>
+                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1">Space</p>
+                                        <p className="text-sm font-semibold text-gray-800">{spaceDetails}</p>
+                                    </div>
+                                </div>
+                                <div className="bg-gray-50 rounded-2xl p-4 flex items-start gap-3">
+                                    <div className="p-2 bg-[#5bb09c]/10 rounded-xl text-[#5bb09c] mt-0.5"><MapPin className="w-4 h-4" /></div>
+                                    <div>
+                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1">Location</p>
+                                        <p className="text-sm font-semibold text-gray-800">{location}</p>
+                                    </div>
+                                </div>
+                                <div className="bg-gray-50 rounded-2xl p-4 flex items-start gap-3">
+                                    <div className="p-2 bg-[#5bb09c]/10 rounded-xl text-[#5bb09c] mt-0.5"><Calendar className="w-4 h-4" /></div>
+                                    <div>
+                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1">Date</p>
+                                        <p className="text-sm font-semibold text-gray-800">{date}</p>
+                                    </div>
+                                </div>
+                                <div className="bg-gradient-to-br from-[#5bb09c]/10 to-[#5bb09c]/5 rounded-2xl p-4 flex items-start gap-3">
+                                    <div className="p-2 bg-[#5bb09c]/20 rounded-xl text-[#5bb09c] mt-0.5"><DollarSign className="w-4 h-4" /></div>
+                                    <div>
+                                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1">Total Price</p>
+                                        <p className="text-lg font-black text-gray-900">{price}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-            {/* Bottom Row: Price, Date, and Actions */}
-            <div className="flex justify-between items-center pt-3 border-t border-gray-50">
-                <div className="flex items-baseline gap-2">
-                    <span className="text-base font-bold text-gray-900">
-                        {price}
+                        {/* Modal Footer */}
+                        <div className="flex gap-3 p-6 pt-0">
+                            <Button onClick={() => setShowPreview(false)} variant="outline" className="flex-1 h-11 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50">
+                                Close
+                            </Button>
+                            <Button onClick={handleDownloadPDF} className="flex-1 h-11 rounded-xl bg-[#5bb09c] hover:bg-[#4a9b89] text-white gap-2">
+                                <Download className="w-4 h-4" /> Download PDF
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative transition-all hover:border-[#5bb09c]/30">
+                {/* Top Row: ID and Status Badge */}
+                <div className="flex justify-between items-start mb-3">
+                    <span className="text-[11px] font-bold text-[#5bb09c] uppercase tracking-wider">
+                        {id}
                     </span>
-                    <span className="text-[10px] text-gray-400 font-medium">
-                        {date}
+                    <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusStyles[status]}`}
+                    >
+                        {status}
                     </span>
                 </div>
 
-                <div className="flex gap-1">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
-                    >
-                        <Share2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
-                        onClick={handleDownloadPDF}
-                    >
-                        <Download className="w-4 h-4" />
-                    </Button>
+                {/* Info Section */}
+                <div className="mb-4">
+                    <h4 className="font-bold text-gray-900 text-base mb-1">
+                        {clientName}
+                    </h4>
+                    <p className="text-xs text-gray-500 font-medium leading-relaxed">
+                        {spaceDetails}
+                        <br />
+                        {location}
+                    </p>
+                </div>
+
+                {/* Bottom Row: Price, Date, and Actions */}
+                <div className="flex justify-between items-center pt-3 border-t border-gray-50">
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-base font-bold text-gray-900">
+                            {price}
+                        </span>
+                        <span className="text-[10px] text-gray-400 font-medium">
+                            {date}
+                        </span>
+                    </div>
+
+                    <div className="flex gap-1">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Preview"
+                            className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
+                            onClick={() => setShowPreview(true)}
+                        >
+                            <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Share"
+                            className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
+                        >
+                            <Share2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Download PDF"
+                            className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
+                            onClick={handleDownloadPDF}
+                        >
+                            <Download className="w-4 h-4" />
+                        </Button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
