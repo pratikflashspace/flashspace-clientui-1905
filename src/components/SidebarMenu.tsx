@@ -112,7 +112,7 @@ const UpdatesPopup = ({
             <p className="text-xs text-[#677E73] mt-0.5">{unreadCount} unread</p>
           </div>
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => markAllAsRead()}
               className="flex items-center gap-1.5 text-xs font-medium text-[#1F2E26] hover:text-[#35503F] transition-colors"
             >
@@ -134,11 +134,10 @@ const UpdatesPopup = ({
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                activeFilter === filter
+              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${activeFilter === filter
                   ? "bg-[#35503F] text-white shadow-sm"
                   : "bg-white text-[#677E73] border border-slate-100 hover:border-slate-300"
-              }`}
+                }`}
             >
               {filter}
             </button>
@@ -154,9 +153,8 @@ const UpdatesPopup = ({
                 <div
                   key={notif._id}
                   onClick={() => !notif.read && markAsRead(notif._id)}
-                  className={`group flex gap-4 p-4 rounded-2xl transition-all border border-transparent hover:border-slate-100 cursor-pointer ${
-                    !notif.read ? "bg-[#F1F3F5] dark:bg-white/5" : "bg-white dark:bg-transparent"
-                  }`}
+                  className={`group flex gap-4 p-4 rounded-2xl transition-all border border-transparent hover:border-slate-100 cursor-pointer ${!notif.read ? "bg-[#F1F3F5] dark:bg-white/5" : "bg-white dark:bg-transparent"
+                    }`}
                 >
                   {/* Icon Container */}
                   <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white dark:bg-white/10 flex items-center justify-center shadow-sm border border-slate-50">
@@ -192,7 +190,7 @@ const UpdatesPopup = ({
               </div>
               <h3 className="text-sm font-bold text-[#1F2E26] dark:text-white mb-1">No updates found</h3>
               <p className="text-xs text-[#677E73]">
-                {activeFilter === "All" 
+                {activeFilter === "All"
                   ? "You're all caught up! Check back later for new notifications."
                   : `No ${activeFilter.toLowerCase()} updates at the moment.`}
               </p>
@@ -344,10 +342,6 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
         {/* Menu items */}
         <div
           className="flex-1 overflow-y-auto pb-32 flex flex-col overscroll-contain touch-pan-y min-h-0"
-<<<<<<< HEAD
-
-=======
->>>>>>> 7055e74 (ui and chatting and history)
         >
           <div className="p-5 space-y-2 text-sm tracking-wide flex-1">
             <nav className="space-y-2">

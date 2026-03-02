@@ -249,10 +249,6 @@ const VirtualOffice = () => {
           <div
             ref={scrollContainerRef}
             className="w-full h-full overflow-y-auto"
-<<<<<<< HEAD
-
-=======
->>>>>>> 7055e74 (ui and chatting and history)
           >
             <div className="px-4 sm:px-6 py-4 sm:py-6">
               {/* Mobile Back Button */}
@@ -396,8 +392,8 @@ const VirtualOffice = () => {
             </div>
           </div>
         </ResizableMapLayout>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 
