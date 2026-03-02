@@ -78,8 +78,9 @@ const ServicePageTemplate = () => {
     setSelectedCity(city);
     setSelectedLocation(location);
     setSearchCity(city);
-  }, [searchParams]);;
-  }, []);
+  }, [searchParams]);
+
+
 
   // Fetch data from API
   useEffect(() => {
@@ -245,7 +246,6 @@ const ServicePageTemplate = () => {
         <div
           ref={scrollContainerRef}
           className="w-1/2 overflow-y-auto"
-         
         >
           <div className="px-6 py-6">
             {/* Breadcrumb */}
@@ -326,8 +326,8 @@ const ServicePageTemplate = () => {
                 <ListingCardModern
                   key={item._id}
                   item={item}
-                  onGetBestPrice={(itemId) => console.log('Get best price for:', itemId)}
-                  onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
+                  onGetBestPrice={(itemId) => { /* console.log('Get best price for:', itemId) */ }}
+                  onToggleFavorite={(itemId) => { /* console.log('Toggle favorite for:', itemId) */ }}
                 />
               ))}
             </div>

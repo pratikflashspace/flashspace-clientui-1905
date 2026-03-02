@@ -14,13 +14,20 @@ import {
   LayoutDashboard,
   LogOut,
   Building,
+  Building2,
   MapPin,
   Zap,
-  ChevronDown
+  ChevronDown,
+  Check,
+  Tag,
+  Gift,
+  ChevronRight,
+  Coffee
 } from "lucide-react";
 
-import { smoothScrollTo } from "@/lib/lenis";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications, NotificationType } from "@/contexts/NotificationContext";
+import { formatDistanceToNow } from 'date-fns';
 
 interface SidebarMenuProps {
   isOpen: boolean;
@@ -30,7 +37,7 @@ interface SidebarMenuProps {
 
 const MENU_WIDTH_OPEN = 300;
 const MENU_WIDTH_ICON = 68;
-const UPDATES_WIDTH = 520;
+const UPDATES_WIDTH = 420;
 
 // ------------------------------------------------
 // UpdatesPopup component (no blur / no overlay)
@@ -44,11 +51,51 @@ const UpdatesPopup = ({
   menuWidth: number;
   onCloseBoth: () => void;
 }) => {
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const [activeFilter, setActiveFilter] = useState("All");
+
   if (!open) return null;
+
+  const filters = ["All", "Unread", "Read", "Bookings", "Invoice", "KYC"];
+
+  const getNotificationIcon = (type: string, metadata?: any) => {
+    // Prioritise metadata type for more accurate icons
+    const metaType = metadata?.type;
+    if (metaType === 'booking_confirmation') return Building2;
+    if (metaType === 'invoice_generated') return FileText;
+    if (metaType === 'partner' || metaType === 'business') return Users;
+    switch (type) {
+      case NotificationType.SUCCESS:
+        return Building2;
+      case NotificationType.MEETING_BOOKED:
+        return Building2;
+      case NotificationType.TICKET_UPDATE:
+        return MessageCircle;
+      case NotificationType.INFO:
+        return Tag;
+      case NotificationType.WARNING:
+        return Zap;
+      case NotificationType.ERROR:
+        return X;
+      default:
+        return Bell;
+    }
+  };
+
+  const filteredNotifications = notifications.filter(n => {
+    if (activeFilter === "All") return true;
+    if (activeFilter === "Unread") return !n.read;
+    if (activeFilter === "Read") return n.read;
+    if (activeFilter === "Bookings") return n.metadata?.type === 'booking_confirmation' || n.type === NotificationType.MEETING_BOOKED;
+    if (activeFilter === "Invoice") return n.metadata?.type === 'invoice_generated';
+    if (activeFilter === "KYC") return n.metadata?.type === 'partner' || n.metadata?.type === 'business';
+    return true;
+  });
 
   return createPortal(
     <div
-      className={`fixed top-0 left-0 z-[9999] h-screen transition-transform duration-400 ease-[cubic-bezier(.7,.22,.26,.98)] ${open ? "translate-x-0" : "translate-x-[120%]"
+      onClick={(e) => e.stopPropagation()}
+      className={`fixed top-0 left-0 z-[13000] h-screen transition-transform duration-400 ease-[cubic-bezier(.7,.22,.26,.98)] ${open ? "translate-x-0" : "translate-x-[120%]"
         }`}
       style={{
         width: UPDATES_WIDTH,
@@ -56,44 +103,99 @@ const UpdatesPopup = ({
       }}
     >
       <div
-        className="w-full h-full overflow-y-auto flex flex-col relative bg-white dark:bg-[#0a0a0a] border-l border-neutral-200 dark:border-white/10 shadow-2xl rounded-r-[22px] rounded-l-none text-black dark:text-white p-8"
+        className="w-full h-full overflow-y-auto flex flex-col relative bg-[#F8F9FA] dark:bg-[#0a0a0a] border-l border-neutral-200 dark:border-white/10 shadow-2xl rounded-r-[22px] rounded-l-none text-black dark:text-white p-6 md:p-8"
       >
         {/* Header */}
-        <div className="flex justify-between items-center gap-3">
-          <h2 className="text-2xl font-bold mb-5 mt-2 tracking-wide text-[#222] dark:text-white">
-            Update & <span className="text-[#FFCC00]">Notification</span>
-          </h2>
-          <button
-            onClick={onCloseBoth}
-            aria-label="Close updates"
-            className="bg-transparent border-none cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5 text-black dark:text-white" />
-          </button>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-[#1F2E26] dark:text-white">Updates</h2>
+            <p className="text-xs text-[#677E73] mt-0.5">{unreadCount} unread</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => markAllAsRead()}
+              className="flex items-center gap-1.5 text-xs font-medium text-[#1F2E26] hover:text-[#35503F] transition-colors"
+            >
+              <Check className="w-3.5 h-3.5" />
+              Read all
+            </button>
+            <button
+              onClick={onCloseBoth}
+              className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5 text-[#1F2E26] dark:text-white" />
+            </button>
+          </div>
         </div>
 
-        {/* Updates Content */}
-        <div className="flex flex-col gap-5">
-          <div className="bg-[#f6f7ff] dark:bg-[#1a1a2e] rounded-[14px] p-[18px]">
-            <strong className="text-black dark:text-white">Site Launched!</strong>
-            <p className="mt-[10px] m-0 text-[#506] dark:text-[#a080ff]">
-              We have deployed the first AI-enabled business workspace platform. 🎉
-            </p>
-          </div>
+        {/* Filters */}
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+          {filters.map((filter) => (
+            <button
+              key={filter}
+              onClick={() => setActiveFilter(filter)}
+              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${activeFilter === filter
+                  ? "bg-[#35503F] text-white shadow-sm"
+                  : "bg-white text-[#677E73] border border-slate-100 hover:border-slate-300"
+                }`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
 
-          <div className="bg-[#f0fff6] dark:bg-[#1a2e22] rounded-[14px] p-[18px]">
-            <strong className="text-black dark:text-white">New Feature: Flash Tribe</strong>
-            <p className="mt-[10px] m-0 text-[#265] dark:text-[#50e090]">
-              Now connect with fellow workspace members and grow your professional network.
-            </p>
-          </div>
+        {/* Notification List */}
+        <div className="flex-1 flex flex-col gap-3 min-h-0">
+          {filteredNotifications.length > 0 ? (
+            filteredNotifications.map((notif) => {
+              const Icon = getNotificationIcon(notif.type, notif.metadata);
+              return (
+                <div
+                  key={notif._id}
+                  onClick={() => !notif.read && markAsRead(notif._id)}
+                  className={`group flex gap-4 p-4 rounded-2xl transition-all border border-transparent hover:border-slate-100 cursor-pointer ${!notif.read ? "bg-[#F1F3F5] dark:bg-white/5" : "bg-white dark:bg-transparent"
+                    }`}
+                >
+                  {/* Icon Container */}
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white dark:bg-white/10 flex items-center justify-center shadow-sm border border-slate-50">
+                    <Icon className="w-4 h-4 text-[#677E73]" />
+                  </div>
 
-          <div className="bg-[#fff8f0] dark:bg-[#2e241a] rounded-[14px] p-[18px]">
-            <strong className="text-black dark:text-white">Maintenance Notice</strong>
-            <p className="mt-[10px] m-0 text-[#a64] dark:text-[#ffa060]">
-              There’s scheduled maintenance on Nov 3rd, 2AM to 3AM IST.
-            </p>
-          </div>
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start gap-2">
+                      <h3 className="text-sm font-bold text-[#1F2E26] leading-tight mb-1">
+                        {notif.title}
+                      </h3>
+                      {!notif.read && (
+                        <div className="w-2 h-2 rounded-full bg-[#35503F] mt-1.5 flex-shrink-0" />
+                      )}
+                    </div>
+                    <p className="text-[13px] text-[#677E73] leading-relaxed mb-2 line-clamp-2">
+                      {notif.message}
+                    </p>
+                    <div className="flex items-center justify-between mt-auto">
+                      <span className="text-[11px] text-slate-400">
+                        {notif.createdAt ? formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true }) : ''}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center py-12 px-4">
+              <div className="w-16 h-16 bg-white dark:bg-white/5 rounded-full flex items-center justify-center mb-4 shadow-sm">
+                <Bell className="w-8 h-8 text-slate-300" />
+              </div>
+              <h3 className="text-sm font-bold text-[#1F2E26] dark:text-white mb-1">No updates found</h3>
+              <p className="text-xs text-[#677E73]">
+                {activeFilter === "All"
+                  ? "You're all caught up! Check back later for new notifications."
+                  : `No ${activeFilter.toLowerCase()} updates at the moment.`}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>,
@@ -153,13 +255,9 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
       return;
     }
     if (href.startsWith("#")) {
-      try {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } catch {
-        document.querySelector(href)?.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
+      const el = document.querySelector(href);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
       }
     } else {
       navigate(href);
@@ -184,7 +282,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
     };
   }, [isOpen, showUpdates]);
 
-  const menuWidth = showUpdates ? MENU_WIDTH_ICON : MENU_WIDTH_OPEN;
+  const menuWidth = showUpdates ? 0 : MENU_WIDTH_OPEN;
   const hideLogoFooter = showUpdates;
   const iconOnly = showUpdates;
 
@@ -214,11 +312,12 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
       <div
         className="relative z-20 h-full bg-white dark:bg-[#0a0a0a] text-black dark:text-white border-r border-neutral-200 dark:border-white/10 shadow-xl transform transition-transform duration-300 ease-out overflow-hidden font-geist flex flex-col"
         style={{
-          width: `${menuWidth}px`,
-          minWidth: `${menuWidth}px`,
-          maxWidth: `${menuWidth}px`,
+          width: showUpdates ? 0 : `${MENU_WIDTH_OPEN}px`,
+          minWidth: showUpdates ? 0 : `${MENU_WIDTH_OPEN}px`,
+          maxWidth: showUpdates ? 0 : `${MENU_WIDTH_OPEN}px`,
+          opacity: showUpdates ? 0 : 1,
           transition:
-            "width 0.36s cubic-bezier(.7,.22,.26,.98), min-width 0.36s cubic-bezier(.7,.22,.26,.98), max-width 0.36s cubic-bezier(.7,.22,.26,.98)"
+            "width 0.36s cubic-bezier(.7,.22,.26,.98), min-width 0.36s cubic-bezier(.7,.22,.26,.98), max-width 0.36s cubic-bezier(.7,.22,.26,.98), opacity 0.2s ease"
         }}
       >
         {/* Header */}
@@ -243,7 +342,6 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
         {/* Menu items */}
         <div
           className="flex-1 overflow-y-auto pb-32 flex flex-col overscroll-contain touch-pan-y min-h-0"
-
         >
           <div className="p-5 space-y-2 text-sm tracking-wide flex-1">
             <nav className="space-y-2">

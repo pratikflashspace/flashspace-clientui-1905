@@ -224,7 +224,7 @@ export default function KYCRequests() {
     setLoading(true);
     try {
       const response = await adminService.getPendingKYC();
-      console.log("KYC Response:", response);
+      // console.log("KYC Response:", response);
       if (response.success && response.data) {
         // Deduplicate by _id
         const uniqueRequests = response.data.filter(
@@ -243,14 +243,14 @@ export default function KYCRequests() {
 
   const fetchPartnerKYCRequests = async (userId?: string) => {
     setLoadingPartnerRequests(true);
-    console.log("Fetching partner requests for userId:", userId);
+    // console.log("Fetching partner requests for userId:", userId);
     try {
       const params: any = { limit: 100 };
       const idToFetch = userId || selectedUserForPartners?.id;
       if (idToFetch) {
         params.userId = idToFetch;
       }
-      console.log("API params:", params);
+      // console.log("API params:", params);
       const response = await adminService.getAllPartnerKYC(params);
       if (response.success && response.data) {
         setPartnerRequests(response.data.partners || []);
@@ -264,7 +264,7 @@ export default function KYCRequests() {
   };
 
   const handleViewUserPartners = (userId: string, userName: string) => {
-    console.log("View Partners clicked:", { userId, userName });
+    // console.log("View Partners clicked:", { userId, userName });
     if (!userId) {
       console.error("No userId provided to handleViewUserPartners");
       toast.error("Cannot view partners: User ID missing");
@@ -333,7 +333,7 @@ export default function KYCRequests() {
   };
 
   const handleViewBusinessInfo = (userId: string, userName: string) => {
-    console.log("View Business Info clicked:", { userId, userName });
+    // console.log("View Business Info clicked:", { userId, userName });
     if (!userId) {
       console.error("No userId provided to handleViewBusinessInfo");
       return;
@@ -807,10 +807,10 @@ export default function KYCRequests() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log(
-                              "Navigating to business detail:",
-                              profile._id,
-                            );
+                            // console.log(
+                            //   "Navigating to business detail:",
+                            //   profile._id,
+                            // );
                             navigate(
                               `/admin/kyc-requests/${profile._id}?type=businessinfo`,
                             );
@@ -878,7 +878,7 @@ export default function KYCRequests() {
               return (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {profiles.map((profile: any, index: number) => {
-                    console.log("Rendering profile:", profile);
+                    // console.log("Rendering profile:", profile);
                     return (
                       <div
                         key={profile._id || index}
@@ -962,10 +962,10 @@ export default function KYCRequests() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log(
-                                "Navigating to business detail:",
-                                profile._id,
-                              );
+                              // console.log(
+                              //   "Navigating to business detail:",
+                              //   profile._id,
+                              // );
                               navigate(
                                 `/admin/kyc-requests/${profile._id}?type=business`,
                               );
@@ -1654,11 +1654,11 @@ export default function KYCRequests() {
                         controls
                         controlsList="nodownload"
                         className="max-w-full max-h-96 mx-auto rounded-lg shadow-md"
-                        onLoadStart={() => console.log("Video loading started")}
-                        onLoadedMetadata={() =>
-                          console.log("Video metadata loaded")
-                        }
-                        onCanPlay={() => console.log("Video can play")}
+                        onLoadStart={() => { /* console.log("Video loading started") */ }}
+                        onLoadedMetadata={() => {
+                          /* console.log("Video metadata loaded") */
+                        }}
+                        onCanPlay={() => { /* console.log("Video can play") */ }}
                         onError={(e) => {
                           console.error("Video load error:", e);
                           console.error("Video URL:", selectedDocument.fileUrl);

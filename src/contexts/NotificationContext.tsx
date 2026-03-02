@@ -49,10 +49,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (!user) return;
 
         // Debug user object to see why _id is undefined
-        console.log("Current User Object:", user);
+        // console.log("Current User Object:", user);
         // Fallback for ID if _id is missing
         const userId = user._id || user.id;
-        console.log("Fetching notifications for user ID:", userId);
+        // console.log("Fetching notifications for user ID:", userId);
 
         const baseUrl = API_CONFIG.BASE_URL; // Use config with fallback
 
@@ -69,7 +69,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             }
 
             const data = await res.json();
-            console.log("Notification API Response:", data);
+            // console.log("Notification API Response:", data);
 
             if (data.success) {
                 setNotifications(data.data);

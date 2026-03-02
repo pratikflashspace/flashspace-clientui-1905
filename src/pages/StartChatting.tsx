@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
+import chatService from '@/services/chat.service';
 import { useDarkMode } from '@/contexts/DarkModeContext';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from "@/lib/utils";
 import {
   Send, Speech, Volume2, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
-  Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, Search, Heart, FolderKanban,
+  Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, MessageCircle, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
   Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
-  LogOut, Lock, // [NEW] Added icons
-  UserIcon
+  LogOut, Lock, Check, Tag, Zap, // [UPDATED] added notification icons
+  UserIcon, Trash2
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
+import { useNotifications, NotificationType } from "@/contexts/NotificationContext";
+import { formatDistanceToNow } from 'date-fns';
 import Splash3dButton from '@/components/ui/3d-splash-button';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +29,7 @@ import { getCoworkingSpacesByCity } from '@/services/coworkingSpace.service';
 import { cityCenters } from '@/components/Map/locationData.example';
 import { LoginModal } from '@/components/auth/LoginModal'; // [NEW]
 import { SignupModal } from '@/components/auth/SignupModal'; // [NEW]
+import ContactModal from '@/components/ui/ContactModal'; // [NEW]
 import { API_CONFIG } from '@/config/api.config'; // [NEW] Import API Config
 
 // [NEW] Custom Text Formatter to handle bold text, URLs, Images, and PDFs
@@ -171,16 +175,12 @@ interface ContactForm {
   email: string;
 }
 
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  isTyping?: boolean; // [NEW] Flag to trigger typing effect
-}
+// ChatMessage now comes from ChatContext
+import { useChat } from "@/contexts/ChatContext";
 
 // n8n Webhook Configuration
-const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://your-n8n-instance.com/webhook/chatbot';
+// Use proxy in development to avoid CORS issues
+const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || '/api/webhook/b8d3444c-ca76-4796-a0b7-a8c0b9c320c2';
 
 interface SidebarMenuItem {
   label: string;
@@ -191,7 +191,7 @@ interface SidebarMenuItem {
 
 // [NEW] Constants for the popup
 const SIDEBAR_WIDTH_ICON = 80; // Your sidebar is 80px (w-20)
-const UPDATES_WIDTH = 520;
+const UPDATES_WIDTH = 420;
 
 // [NEW] Copied the UpdatesPopup component from your other file
 // ------------------------------------------------
@@ -206,68 +206,152 @@ const UpdatesPopup = ({
   menuWidth: number;
   onCloseBoth: () => void;
 }) => {
-  // [MODIFIED] Removed "if (!open) return null" to allow animation
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  if (!open) return null;
+
+  const filters = ["All", "Unread", "Read", "Bookings", "Invoice", "KYC"];
+
+  const getNotificationIcon = (type: string, metadata?: any) => {
+    const metaType = metadata?.type;
+    if (metaType === 'booking_confirmation') return Building2;
+    if (metaType === 'invoice_generated') return FileText;
+    if (metaType === 'partner' || metaType === 'business') return Users;
+    switch (type) {
+      case NotificationType.SUCCESS:
+        return Building2;
+      case NotificationType.MEETING_BOOKED:
+        return Building2;
+      case NotificationType.TICKET_UPDATE:
+        return MessageCircle;
+      case NotificationType.INFO:
+        return Tag;
+      case NotificationType.WARNING:
+        return Zap;
+      case NotificationType.ERROR:
+        return X;
+      default:
+        return Bell;
+    }
+  };
+
+  const filteredNotifications = notifications.filter(n => {
+    if (activeFilter === "All") return true;
+    if (activeFilter === "Unread") return !n.read;
+    if (activeFilter === "Read") return n.read;
+    if (activeFilter === "Bookings") return n.metadata?.type === 'booking_confirmation' || n.type === NotificationType.MEETING_BOOKED;
+    if (activeFilter === "Invoice") return n.metadata?.type === 'invoice_generated';
+    if (activeFilter === "KYC") return n.metadata?.type === 'partner' || n.metadata?.type === 'business';
+    return true;
+  });
 
   return createPortal(
     <div
+      onClick={(e) => e.stopPropagation()}
+      className={`fixed top-0 left-0 z-[13000] h-screen transition-transform duration-400 ease-[cubic-bezier(.7,.22,.26,.98)] ${open ? "translate-x-0" : "translate-x-[120%]"
+        }`}
       style={{
-        position: "fixed",
-        top: 0,
-        left: menuWidth, // This will be 80px
         width: UPDATES_WIDTH,
-        height: "100vh",
-        // [MODIFIED] Lower Z-index than sidebar (Sidebar is z-[60])
-        zIndex: 50,
-        // [MODIFIED] Slide logic: 0 is visible, -100% hides it to the left (under sidebar)
-        transform: open ? "translateX(0)" : "translateX(-100%)",
-        // [MODIFIED] Add opacity for smoother fade
-        opacity: open ? 1 : 0,
-        // [MODIFIED] Pointer events ensures you can't click it when hidden
-        pointerEvents: open ? "auto" : "none",
-        transition: "transform 0.4s cubic-bezier(.25,.8,.25,1), opacity 0.3s ease-in-out",
-        // [MODIFIED] Shadow to give depth when sliding out
-        boxShadow: "10px 0 30px rgba(0,0,0,0.1)"
+        left: menuWidth,
       }}
     >
       <div
-        className="bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 rounded-r-[22px] shadow-[0_8px_32px_rgba(0,0,0,0.15)] p-7 w-full h-full overflow-y-auto flex flex-col relative"
+        className="w-full h-full overflow-y-auto flex flex-col relative bg-[#F8F9FA] dark:bg-[#0a0a0a] border-l border-neutral-200 dark:border-white/10 shadow-2xl rounded-r-[22px] rounded-l-none text-black dark:text-white p-6 md:p-8"
       >
         {/* Header */}
-        <div className="flex justify-between items-center gap-3">
-          <h2 className="text-2xl font-bold mb-[18px] text-gray-900 dark:text-white mt-2.5 tracking-wide">
-            Update & <span className="text-[#FFCC00]">Notification</span>
-          </h2>
-          <button
-            onClick={onCloseBoth}
-            aria-label="Close updates"
-            className="bg-transparent border-none cursor-pointer p-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-          >
-            <X className="w-[18px] h-[18px]" />
-          </button>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-[#1F2E26] dark:text-white">Updates</h2>
+            <p className="text-xs text-[#677E73] mt-0.5">{unreadCount} unread</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => markAllAsRead()}
+              className="flex items-center gap-1.5 text-xs font-medium text-[#1F2E26] hover:text-[#35503F] transition-colors"
+            >
+              <Check className="w-3.5 h-3.5" />
+              Read all
+            </button>
+            <button
+              onClick={onCloseBoth}
+              className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5 text-[#1F2E26] dark:text-white" />
+            </button>
+          </div>
         </div>
 
-        {/* Updates Content */}
-        <div className="flex flex-col gap-[1.3rem]">
-          <div className="bg-[#f6f7ff] dark:bg-indigo-950/30 rounded-[14px] p-[18px]">
-            <strong className="text-gray-900 dark:text-gray-100">Site Launched!</strong>
-            <p className="m-[10px_0_0_0] text-[#506] dark:text-indigo-300">
-              We have deployed the first AI-enabled business workspace platform. 🎉
-            </p>
-          </div>
+        {/* Filters */}
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+          {filters.map((filter) => (
+            <button
+              key={filter}
+              onClick={() => setActiveFilter(filter)}
+              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                activeFilter === filter
+                  ? "bg-[#35503F] text-white shadow-sm"
+                  : "bg-white text-[#677E73] border border-slate-100 dark:border-white/10 dark:bg-transparent dark:hover:border-white/20 hover:border-slate-300"
+              }`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
 
-          <div className="bg-[#f0fff6] dark:bg-green-950/30 rounded-[14px] p-[18px]">
-            <strong className="text-gray-900 dark:text-gray-100">New Feature: Flash Tribe</strong>
-            <p className="m-[10px_0_0_0] text-[#265] dark:text-emerald-300">
-              Now connect with fellow workspace members and grow your professional network.
-            </p>
-          </div>
+        {/* Notification List */}
+        <div className="flex-1 flex flex-col gap-3 min-h-0">
+          {filteredNotifications.length > 0 ? (
+            filteredNotifications.map((notif) => {
+              const Icon = getNotificationIcon(notif.type, notif.metadata);
+              return (
+                <div
+                  key={notif._id}
+                  onClick={() => !notif.read && markAsRead(notif._id)}
+                  className={`group flex gap-4 p-4 rounded-2xl transition-all border border-transparent hover:border-slate-100 dark:hover:border-white/10 cursor-pointer ${
+                    !notif.read ? "bg-[#F1F3F5] dark:bg-white/5" : "bg-white dark:bg-transparent"
+                  }`}
+                >
+                  {/* Icon Container */}
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white dark:bg-white/10 flex items-center justify-center shadow-sm border border-slate-50 dark:border-white/5">
+                    <Icon className="w-4 h-4 text-[#677E73]" />
+                  </div>
 
-          <div className="bg-[#fff8f0] dark:bg-orange-950/30 rounded-[14px] p-[18px]">
-            <strong className="text-gray-900 dark:text-gray-100">Maintenance Notice</strong>
-            <p className="m-[10px_0_0_0] text-[#a64] dark:text-orange-300">
-              There’s scheduled maintenance on Nov 3rd, 2AM to 3AM IST.
-            </p>
-          </div>
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start gap-2">
+                      <h3 className="text-sm font-bold text-[#1F2E26] dark:text-white leading-tight mb-1">
+                        {notif.title}
+                      </h3>
+                      {!notif.read && (
+                        <div className="w-2 h-2 rounded-full bg-[#35503F] mt-1.5 flex-shrink-0" />
+                      )}
+                    </div>
+                    <p className="text-[13px] text-[#677E73] dark:text-gray-400 leading-relaxed mb-2 line-clamp-2">
+                      {notif.message}
+                    </p>
+                    <div className="flex items-center justify-between mt-auto">
+                      <span className="text-[11px] text-slate-400 dark:text-gray-500">
+                        {notif.createdAt ? formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true }) : ''}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center py-12 px-4">
+              <div className="w-16 h-16 bg-white dark:bg-white/5 rounded-full flex items-center justify-center mb-4 shadow-sm">
+                <Bell className="w-8 h-8 text-slate-300 dark:text-gray-500" />
+              </div>
+              <h3 className="text-sm font-bold text-[#1F2E26] dark:text-white mb-1">No updates found</h3>
+              <p className="text-xs text-[#677E73] dark:text-gray-400">
+                {activeFilter === "All" 
+                  ? "You're all caught up! Check back later for new notifications."
+                  : `No ${activeFilter.toLowerCase()} updates at the moment.`}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>,
@@ -275,108 +359,197 @@ const UpdatesPopup = ({
   );
 };
 // ------------------------------------------------
-// End of UpdatesPopup
-// ------------------------------------------------
-const ChatHistorySidebar = ({
-  open,
-  width,
-  onClose,
-  onSelectChat
-}: {
-  open: boolean;
-  width: number;
-  onClose: () => void;
-  onSelectChat: (chatId: string) => void;
-}) => {
-  // Mock Data for History
-  const historyData = [
-    { id: '1', title: 'Start a Startup in Bangalore', date: 'Today' },
-    { id: '2', title: 'Coworking in Indiranagar', date: 'Yesterday' },
-    { id: '3', title: 'Virtual Office Registration', date: 'Last Week' },
-    { id: '4', title: 'Meeting Room Requirements', date: 'Last Week' },
-  ];
 
-  return createPortal(
-    <div
-      className={`fixed top-0 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col`}
-      style={{
-        left: width, // 80px from left
-        width: '320px', // Fixed width for history
-        transform: open ? 'translateX(0)' : 'translateX(-100%)',
-        // Opacity transition for smoother effect
-        opacity: open ? 1 : 0,
-        pointerEvents: open ? 'auto' : 'none',
-      }}
-    >
-      <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-          <History className="w-5 h-5 text-indigo-500" />
-          History
-        </h2>
-        <button
-          onClick={onClose}
-          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-        >
-          <X className="w-5 h-5 text-gray-500" />
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-2">
-        {historyData.map((chat) => (
-          <div
-            key={chat.id}
-            onClick={() => onSelectChat(chat.id)}
-            className="group p-3 mb-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-all border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
-          >
-            <div className="text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
-              {chat.title}
-            </div>
-            <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              {chat.date}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="p-4 border-t border-gray-100 dark:border-gray-800">
-        <Button
-          variant="outline"
-          className="w-full justify-start text-gray-600 dark:text-gray-300"
-          onClick={() => {
-            onSelectChat('new');
-          }}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Chat
-        </Button>
-      </div>
-    </div>,
-    document.body
-  );
-};
-
-// ------------------------------------------------
-// End of UpdatesPopup & ChatHistorySidebar
-// ------------------------------------------------
 
 const StartChatting = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [message, setMessage] = useState('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeChatId, setActiveChatId] = useState<string | null>(() => sessionStorage.getItem('flashspace_activeChatId'));
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // [NEW] User menu state
-  const [showUpdates, setShowUpdates] = useState(false); // [NEW] State for the popup
-  const [showHistory, setShowHistory] = useState(false); // [NEW] State for history sidebar
+  const [showUpdates, setShowUpdates] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false); // [NEW] Contact form state
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: '',
     phone: '',
     email: ''
   });
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  
+  // [NEW] Use Global Chat State
+  const { 
+    chatMessages, 
+    setChatMessages, 
+    chatSessions, 
+    setChatSessions, 
+    startNewChat, 
+    deleteChatSession,
+    isLoading, 
+    setIsLoading 
+  } = useChat();
+  // Persist activeChatId to sessionStorage
+  useEffect(() => {
+    if (activeChatId) {
+      sessionStorage.setItem('flashspace_activeChatId', activeChatId);
+    } else {
+      sessionStorage.removeItem('flashspace_activeChatId');
+    }
+  }, [activeChatId]);
+
+  // Clear activeChatId on logout
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setActiveChatId(null);
+    }
+  }, [isAuthenticated]);
+
+  // [NEW] Auto-save chat on unmount
+  const chatMessagesRef = useRef(chatMessages);
+  useEffect(() => {
+    chatMessagesRef.current = chatMessages;
+  }, [chatMessages]);
+
+  const startNewChatRef = useRef(startNewChat);
+  useEffect(() => {
+    startNewChatRef.current = startNewChat;
+  }, [startNewChat]);
+
+  const activeChatIdRef = useRef(activeChatId);
+  useEffect(() => {
+    activeChatIdRef.current = activeChatId;
+  }, [activeChatId]);
+
+  useEffect(() => {
+    // Handle SPA navigation (React unmount)
+    return () => {
+      if (chatMessagesRef.current.length > 0) {
+        if (activeChatIdRef.current) {
+          setChatSessions(prev => prev.map(s => {
+            const sKey = s._id || s.id;
+            if (sKey === activeChatIdRef.current) {
+              const updated = { ...s, messages: chatMessagesRef.current };
+              chatService.saveSession(updated).catch(err => console.error('[Chat] Failed to persist updated session', err));
+              return updated;
+            }
+            return s;
+          }));
+        } else {
+          // Unsaved new chat - fire and forget save on unmount
+          const firstUserMsg = chatMessagesRef.current.find(m => m.role === 'user');
+          const title = firstUserMsg 
+            ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '') 
+            : 'Chat session';
+          
+          const sessionData = {
+            id: Date.now().toString(),
+            title,
+            messages: chatMessagesRef.current,
+            date: 'Today',
+          };
+          
+          setChatSessions(prev => [sessionData, ...prev]);
+          if (isAuthenticated) {
+             chatService.saveSession(sessionData).catch(err => console.error('[Chat] Failed to persist new session on unmount', err));
+          }
+        }
+      }
+    };
+  }, [isAuthenticated, setChatSessions]);
+
+  // Auto-save to MongoDB whenever chatMessages change (debounced)
+  useEffect(() => {
+    // Only auto-save when there are at least 2 messages (user + assistant response)
+    if (chatMessages.length < 2 || !isAuthenticated) return;
+
+    const timer = setTimeout(() => {
+      const firstUserMsg = chatMessages.find(m => m.role === 'user');
+      const title = firstUserMsg 
+        ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '') 
+        : 'Chat session';
+      
+      const sessionData = {
+        id: activeChatId || Date.now().toString(),
+        title,
+        messages: chatMessages,
+        date: 'Today',
+      };
+
+      chatService.saveSession(sessionData).then(res => {
+        if (res.success && res.data && !activeChatId) {
+          // New chat — set activeChatId to the MongoDB _id so future saves update instead of duplicate
+          const newId = res.data._id || res.data.id;
+          setActiveChatId(newId);
+          // Also add to sidebar sessions
+          setChatSessions(prev => {
+            // Avoid duplicates
+            if (prev.some(s => (s._id || s.id) === newId)) return prev;
+            return [{ ...sessionData, _id: newId }, ...prev];
+          });
+        }
+        console.log('[Chat] Auto-saved to MongoDB');
+      }).catch(err => {
+        console.error('[Chat] Auto-save failed', err);
+      });
+    }, 2000); // 2s debounce
+
+    return () => clearTimeout(timer);
+  }, [chatMessages, activeChatId, isAuthenticated]);
+
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Unified New Chat Handler
+  const handleNewChat = () => {
+    if (chatMessages.length > 0) {
+      if (!activeChatId) {
+        // Unsaved chat - manually save it before clearing
+        const firstUserMsg = chatMessages.find(m => m.role === 'user');
+        const title = firstUserMsg 
+          ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '') 
+          : 'Chat session';
+        
+        const tempId = Date.now().toString();
+        const sessionData = {
+          id: tempId,
+          title,
+          messages: chatMessages,
+          date: 'Today',
+        };
+        
+        // Optimistically add to sidebar
+        setChatSessions(prev => [sessionData, ...prev]);
+        
+        if (isAuthenticated) {
+          chatService.saveSession(sessionData).then(res => {
+            if (res.success && res.data) {
+                const newId = res.data._id || res.data.id;
+                setChatSessions(prev => prev.map(s => s.id === tempId ? { ...sessionData, _id: newId } : s));
+            }
+          });
+        }
+      } else {
+        // Existing chat - ensure latest messages are saved
+        setChatSessions(prev => prev.map(s => {
+          const sKey = s._id || s.id;
+          if (sKey === activeChatId) {
+            const updated = { ...s, messages: chatMessages };
+            if (isAuthenticated) {
+               chatService.saveSession(updated).catch(e => console.error(e));
+            }
+            return updated;
+          }
+          return s;
+        }));
+      }
+    }
+    
+    startNewChat();
+    setActiveChatId(null);
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
+  };
 
   // [NEW] Map Integration State
   const [showMap, setShowMap] = useState(false);
@@ -545,7 +718,7 @@ const StartChatting = () => {
     { label: 'Your Bookings', icon: Calendar, onClick: () => handleNavigation('/bookings') },
     { label: 'Flash Tribe', icon: Users, onClick: () => handleNavigation('/community') },
     { label: 'Updates', icon: Bell, onClick: () => setShowUpdates(prev => !prev) }, // [NEW] Wire up the button
-    { label: 'Settings', icon: Settings, onClick: () => console.log('Settings clicked') },
+    { label: 'Settings', icon: Settings, onClick: () => { /* console.log('Settings clicked') */ } },
   ];
 
   // [NEW] Close popup function
@@ -557,7 +730,7 @@ const StartChatting = () => {
 
   // [NEW] Handle history selection
   const handleHistorySelect = (chatId: string) => {
-    console.log("Selected chat:", chatId);
+    // console.log("Selected chat:", chatId);
     setShowHistory(false); // Slide back inside instantly
     // Logic to load chat would go here
     if (chatId === 'new') {
@@ -572,7 +745,7 @@ const StartChatting = () => {
       if (e.key === "Escape") closeBoth();
     };
     // Only block body scroll if the popup is open
-    if (showUpdates || showHistory) {
+    if (showUpdates) {
       document.addEventListener("keydown", esc);
       document.body.style.overflow = "hidden";
     } else {
@@ -586,27 +759,10 @@ const StartChatting = () => {
       // Always clean up to unset, the other effect for isSidebarOpen will handle it
       document.body.style.overflow = "unset";
     };
-  }, [showUpdates, showHistory, isSidebarOpen]); // [NEW] Added isSidebarOpen as dependency
+  }, [showUpdates, isSidebarOpen]);
 
-  // Pause Lenis globally while this page is mounted to keep native wheel behavior snappy
-  useEffect(() => {
-    let lenis: any;
-    try {
-      // prefer existing instance if present
-      // @ts-ignore
-      lenis = (window as any).__lenis ?? getLenis();
-      lenis?.stop?.();
-    } catch {
-      // ignore if lenis not available
-    }
-    return () => {
-      try {
-        lenis?.start?.();
-      } catch {
-        // ignore
-      }
-    };
-  }, []);
+
+
 
   // [NEW] Function to handle typing completion
   const handleTypingComplete = (id: string) => {
@@ -750,7 +906,7 @@ const StartChatting = () => {
       }
 
       const data = await response.json();
-      console.log('n8n response:', data); // Debug log
+      // console.log('n8n response:', data); // Debug log
 
       // Try multiple possible response formats from n8n
       let aiResponseText = '';
@@ -812,7 +968,7 @@ const StartChatting = () => {
   }, [chatMessages]);
 
   const handleContactSubmit = () => {
-    console.log('Contact form submitted:', contactForm);
+    // console.log('Contact form submitted:', contactForm);
     setContactForm({ name: '', phone: '', email: '' });
   };
 
@@ -832,16 +988,9 @@ const StartChatting = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0B1120] dark:text-gray-100 flex flex-col overflow-x-hidden font-grotesk">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50 lg:left-20">
+      <header className={`fixed top-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50 transition-all duration-300 ${isSidebarOpen ? 'left-[260px]' : 'left-[60px]'}`}>
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 -ml-2 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
-            >
-              <MenuIcon className="w-6 h-6" />
-            </button>
             {/* Mobile Back Button */}
             <button
               onClick={() => navigate(-1)}
@@ -857,6 +1006,99 @@ const StartChatting = () => {
               onClick={() => handleNavigation('/')}
             />
           </div>
+
+          {/* Desktop Nav Links */}
+          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center">
+            {/* Solutions / Get Workspaces */}
+            <div className="relative group">
+              <button
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] dark:text-gray-200 hover:text-[#D96832] hover:bg-[#164e4e]/5 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
+              >
+                Get Workspaces
+                <ChevronDown className="w-4 h-4 opacity-70 group-hover:rotate-180 transition-transform duration-200" />
+              </button>
+              {/* Dropdown */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[520px] bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl z-[200] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 -translate-y-1 group-hover:translate-y-0">
+                <div className="p-4 grid grid-cols-2 gap-3">
+                  <div className="border border-gray-100 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-800">
+                    <div
+                      className="flex items-center gap-2 mb-1 cursor-pointer hover:text-[#D96832] transition-colors"
+                      onClick={() => handleNavigation('/Solutions/on-demand')}
+                    >
+                      <Zap className="w-4 h-4 text-[#D96832]" />
+                      <h4 className="text-sm font-bold text-[#164e4e] dark:text-gray-100">On-Demand</h4>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2">Book by the hour or day</p>
+                    {[
+                      { label: 'Event Space', href: '/Solutions/eventspace' },
+                      { label: 'Day Offices', href: '/Solutions/day-office' },
+                    ].map(item => (
+                      <button
+                        key={item.href}
+                        onClick={() => handleNavigation(item.href)}
+                        className="flex items-center justify-between w-full text-sm px-3 py-1.5 rounded-md hover:bg-white dark:hover:bg-gray-700 text-[#164e4e] dark:text-gray-200 transition-colors mb-1"
+                      >
+                        {item.label}
+                        <ArrowRight className="w-3 h-3 opacity-40" />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="grid gap-2">
+                    {[
+                      { icon: Building2, title: 'Virtual Office', desc: 'Business address, mail handling', href: '/Solutions/virtual-office' },
+                      { icon: Users, title: 'Coworking Space', desc: 'Flexible desks, private cabins', href: '/Solutions/coworking-space' },
+                      { icon: FileText, title: 'Business Setup', desc: 'Company registration, GST', href: '/Solutions/business-setup' },
+                    ].map(({ icon: Icon, title, desc, href }) => (
+                      <div
+                        key={title}
+                        onClick={() => handleNavigation(href)}
+                        className="flex items-start gap-3 p-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-white dark:hover:bg-gray-800 cursor-pointer transition-all"
+                      >
+                        <Icon className="w-4 h-4 text-[#D96832] mt-0.5" />
+                        <div>
+                          <p className="text-sm font-bold text-[#164e4e] dark:text-gray-100">{title}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Partner with Us */}
+            <button
+              onClick={() => handleNavigation('/partner')}
+              className="px-3 py-2 text-sm font-bold text-[#164e4e] dark:text-gray-200 hover:text-[#D96832] hover:bg-[#164e4e]/5 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
+            >
+              Partner with Us
+            </button>
+
+            {/* More Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] dark:text-gray-200 hover:text-[#D96832] hover:bg-[#164e4e]/5 dark:hover:bg-gray-800 rounded-lg transition-all duration-200">
+                More
+                <ChevronDown className="w-4 h-4 opacity-70 group-hover:rotate-180 transition-transform duration-200" />
+              </button>
+              <ul className="absolute left-0 top-full mt-2 w-40 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-lg shadow-lg z-[200] py-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200">
+                {[
+                  { label: 'About Us', href: '/about' },
+                  { label: 'Career', href: '/career' },
+                  { label: 'Blog', href: '/blog' },
+                ].map(item => (
+                  <li key={item.label}>
+                    <button
+                      onClick={() => handleNavigation(item.href)}
+                      className="w-full text-left px-4 py-2 text-sm font-medium text-[#164e4e] dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#D96832] transition-colors"
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </nav>
+
           <div className="flex items-center gap-3">
             {/* Dark Mode Toggle */}
             <button
@@ -874,7 +1116,7 @@ const StartChatting = () => {
 
             {/* Get in Touch Button */}
             <Splash3dButton
-              onClick={() => handleNavigation('/get-in-touch')}
+              onClick={() => setIsContactModalOpen(true)}
               className="hidden sm:inline-flex relative px-6 py-2.5 text-base rounded-lg font-bold bg-black dark:bg-gray-800 text-white dark:text-white border border-black dark:border-gray-700 shadow-[0_2px_8px_0_rgba(0,0,0,0.10)] hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.13)] active:translate-y-1 transition-all duration-150 before:content-[''] before:absolute before:inset-0 before:rounded-lg before:pointer-events-none"
             >
               Get in Touch
@@ -885,7 +1127,7 @@ const StartChatting = () => {
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 border border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-500/10"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 border border-gray-200 dark:border-gray-700 bg-emerald-50 dark:bg-emerald-500/10"
                 >
                   {/* User Avatar */}
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-md">
@@ -984,12 +1226,10 @@ const StartChatting = () => {
         </div>
       </header>
 
-      {/* [NEW] Transparent Overlay for Updates/History Popup */}
-      {/* This sits below the popup (z-9999) but above the page content */}
-      {(showUpdates || showHistory) && (
+      {showUpdates && (
         <div
-          onClick={closeBoth}
-          className="fixed inset-0 z-[45]"
+          onClick={() => setShowUpdates(false)}
+          className="fixed inset-0 z-[12000]"
           style={{ background: "transparent" }}
         />
       )}
@@ -997,17 +1237,10 @@ const StartChatting = () => {
       {/* [NEW] Render the Updates Popup */}
       <UpdatesPopup
         open={showUpdates}
-        menuWidth={SIDEBAR_WIDTH_ICON}
+        menuWidth={0}
         onCloseBoth={closeBoth}
       />
 
-      {/* [NEW] Render Chat History Sidebar */}
-      <ChatHistorySidebar
-        open={showHistory}
-        width={SIDEBAR_WIDTH_ICON}
-        onClose={() => setShowHistory(false)}
-        onSelectChat={handleHistorySelect}
-      />
 
       {/* Backdrop Overlay (for mobile sidebar) */}
       {isSidebarOpen && (
@@ -1016,351 +1249,214 @@ const StartChatting = () => {
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
+      {/* Mini Sidebar — visible when full sidebar is collapsed */}
+      {!isSidebarOpen && (
+        <div className="fixed top-0 left-0 h-screen w-[60px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[60] flex flex-col items-center pt-4 gap-4">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            title="Open sidebar"
+            style={{ color: '#677e73' }}
+          >
+            <MenuIcon className="w-5 h-5" />
+          </button>
+          <button
+            onClick={handleNewChat}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            title="New chat"
+            style={{ color: '#677e73' }}
+          >
+            <MessageSquare className="w-5 h-5" />
+          </button>
+        </div>
+      )}
 
-      {/* Fixed Left Sidebar - Always Visible on Desktop */}
-      {/* [MODIFIED] Increased z-index to z-[60] so it sits ON TOP of the Updates Popup (z-50) */}
+      {/* Fixed Left Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-screen w-20 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden lg:translate-x-0 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          }`}
+        className={`fixed top-0 left-0 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ width: '260px' }}
       >
-        {/* Logo Section */}
-        <div className="h-16 flex items-center justify-center flex-shrink-0">
-          <img
-            src="https://res.cloudinary.com/diwna43hl/image/upload/v1759650866/FlashSpace_Favicon_sv6yhh.png"
-            alt="FlashSpace Icon"
-            className="h-10 w-10"
-          />
+        {/* New Chat + Collapse button row */}
+        <div className="h-16 flex items-center justify-between px-4 flex-shrink-0">
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+            title="Collapse sidebar"
+            style={{ color: '#677e73' }}
+          >
+            ☰
+          </button>
         </div>
 
-        {/* Sidebar Menu Items */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-          <ul className="space-y-1">
-            {/* [NEW] Note: The onClick for 'Updates' is now handled by the array definition above */}
-            {sidebarMenuItems.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <li key={index}>
-                  <button
-                    onClick={() => {
-                      item.onClick?.();
-
-                      // [NEW] Only close mobile sidebar if it's *not* the updates button
-                      if (item.label !== 'Updates' && window.innerWidth < 1024) {
-                        setIsSidebarOpen(false);
-                      }
-                    }}
-                    className="w-full flex items-center justify-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg transition-all duration-200 group"
-                    title={item.label}
-                  >
-                    <Icon className="w-6 h-6 text-gray-700 dark:text-gray-200 group-hover:text-black dark:group-hover:text-white group-hover:fill-[#EDB003] group-hover:scale-125 transition-all duration-200" strokeWidth={2} />
-                  </button>
-                </li>
-              );
-            })}
-
-            {/* [CHANGE] Added Popover for 'More' button */}
-            <li>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    className="w-full flex items-center justify-center px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg transition-all duration-200 group"
-                    title="More"
-                  >
-                    <MoreHorizontal className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-black dark:group-hover:text-white group-hover:fill-[#EDB003] group-hover:scale-125 transition-all duration-200" strokeWidth={2} />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-48" side="right" align="start" sideOffset={10}>
-                  <div className="flex flex-col space-y-1 p-1">
-                    <button
-                      onClick={() => handleNavigation('/about')}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                    >
-                      About Us
-                    </button>
-                    <button
-                      onClick={() => handleNavigation('/career')}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                    >
-                      Career
-                    </button>
-                    <button
-                      onClick={() => handleNavigation('/blog')}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                    >
-                      Blog
-                    </button>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </li>
-          </ul>
-        </nav>
-
-        {/* Bottom Section - Profile & Footer */}
-        <div className="border-t border-gray-100 dark:border-gray-800 p-4 flex-shrink-0 space-y-3">
-          {/* Profile Button */}
+        {/* Main Nav */}
+        <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
           <button
-            onClick={() => handleNavigation('/about')}
-            className="w-full flex items-center justify-center py-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
-            title="Profile"
+            onClick={handleNewChat}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+            style={{ color: '#677e73' }}
           >
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#EDB003] to-[#f5c242] flex items-center justify-center text-white font-semibold">
-              <User className="w-5 h-5" />
-            </div>
+            <MessageSquare className="w-4 h-4 flex-shrink-0" />
+            New Chat
+          </button>
+          <button
+            onClick={() => handleNavigation('/solutions/on-demand')}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+            style={{ color: '#677e73' }}
+          >
+            <Briefcase className="w-4 h-4 flex-shrink-0" />
+            Workspaces
+          </button>
+          <button
+            onClick={() => setShowUpdates(prev => !prev)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+            style={{ color: '#677e73' }}
+          >
+            <Bell className="w-4 h-4 flex-shrink-0" />
+            Notifications
+          </button>
+          <button
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+            style={{ color: '#677e73' }}
+          >
+            <Settings className="w-4 h-4 flex-shrink-0" />
+            Settings
           </button>
 
-          {/* Footer */}
-          <p className="text-[10px] text-gray-400 text-center">
-            © 2025
-          </p>
+          {/* Recent Section */}
+          <div className="pt-4 pb-1">
+            <p className="text-[10px] font-semibold tracking-widest uppercase px-3 mb-1" style={{ color: '#677e73', opacity: 0.6 }}>RECENT</p>
+            {chatSessions.length === 0 ? (
+              <p className="px-3 py-2 text-xs italic" style={{ color: '#677e73', opacity: 0.5 }}>No past chats yet</p>
+            ) : (
+              chatSessions.map((session) => {
+                const sessionKey = session._id || session.id;
+                const isActive = activeChatId === sessionKey;
+                return (
+                  <div key={sessionKey} className={`relative group w-full flex items-center pr-1 rounded-lg transition-colors ${isActive ? 'bg-[#35503F]' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+                    <button
+                      onClick={() => {
+                        // Before switching, save the current chat
+                        if (chatMessages.length > 0) {
+                          if (activeChatId) {
+                            // Update existing session's messages locally AND in MongoDB
+                            const updatedSession = chatSessions.find(s => (s._id || s.id) === activeChatId);
+                            if (updatedSession) {
+                              const updated = { ...updatedSession, messages: chatMessages };
+                              chatService.saveSession(updated).catch(err => console.error('[Chat] Failed to persist', err));
+                            }
+                            setChatSessions(prev => prev.map(s => {
+                              const sKey = s._id || s.id;
+                              return sKey === activeChatId ? { ...s, messages: chatMessages } : s;
+                            }));
+                          } else {
+                            // New unsaved chat — save as a new session
+                            startNewChat(chatMessages);
+                          }
+                        }
+                        setChatMessages(session.messages);
+                        setActiveChatId(sessionKey);
+                      }}
+                      className={`flex-1 text-left px-3 py-2 text-sm font-${isActive ? 'semibold' : 'normal'}`}
+                      style={{ color: isActive ? 'white' : '#677e73' }}
+                      title={session.title}
+                    >
+                      <div className="truncate">{session.title}</div>
+                      <div className="text-[10px] mt-0.5" style={{ opacity: isActive ? 0.7 : 0.55 }}>{session.date}</div>
+                    </button>
+                    
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        const success = await deleteChatSession(sessionKey);
+                        if (success && isActive) {
+                           setChatMessages([]);
+                           setActiveChatId(null);
+                        }
+                      }}
+                      className={`p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ${
+                        isActive ? 'text-white hover:bg-white/20' : 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-600'
+                      }`}
+                      title="Delete chat"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );})
+            )}
+          </div>
+        </nav>
+
+        {/* Bottom — Home */}
+        <div className="border-t border-gray-200 dark:border-gray-700 p-3">
+          <button
+            onClick={() => handleNavigation('/')}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+            style={{ color: '#677e73' }}
+          >
+            <Home className="w-4 h-4 flex-shrink-0" />
+            Home
+          </button>
         </div>
       </div>
 
-      {/* Main Content - Adjusted for sidebar */}
-      <div className="flex-1 lg:ml-20 pt-16 flex flex-col lg:flex-row shadow-2xl z-40 relative">
+      {/* Main Content - Adjusted for wider sidebar */}
+      <div className={`flex-1 pt-16 flex flex-col lg:flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? 'ml-[260px]' : 'ml-[60px]'}`}>
         <div className="w-full h-[calc(100dvh-4rem)] bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col">
-          <ResizableMapLayout
-            defaultListingWidth={65}
-            showFloatingButton={showMap}
-            mapContent={
-              /* Right Panel - Sidebar - Scrollable Vertically */
-              <div
-                className={`w-full h-full bg-white dark:bg-[#0F172A] flex flex-col relative transition-all duration-300 ${showMap ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden p-6 scrollbar-yellow'
-                  }`}
-                style={{
-                  WebkitOverflowScrolling: 'touch',
-                  overscrollBehavior: 'contain',
-                  touchAction: 'pan-y'
-                }}
-               
-               
-               
-              >
-                {showMap ? (
-                  // Full Height Map View (Mindtrip Style)
-                  <div
-                    className="w-full h-full relative flex flex-col bg-white dark:bg-gray-900"
-                    style={{
-                      animation: 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) both'
-                    }}
-                  >
-                    <style>{`
-                      @keyframes slideInRight {
-                        0% { opacity: 0; transform: translateX(50px); }
-                        100% { opacity: 1; transform: translateX(0); }
-                      }
-                    `}</style>
-                    <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                      <button
-                        onClick={() => setShowMap(false)}
-                        className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md text-gray-800 dark:text-gray-100 px-3 py-2 rounded-lg shadow-sm hover:shadow-md border border-gray-200 dark:border-gray-700 text-sm font-medium flex items-center gap-2 transition-all"
-                      >
-                        <ArrowRight className="w-4 h-4 rotate-180" />
-                        <span>Back</span>
-                      </button>
-                      <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md px-3 py-2 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        {mapTitle}
-                      </div>
-                    </div>
-                    <div className="flex-1 w-full h-full">
-                      {isMapLoading ? (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#EDB003]"></div>
-                        </div>
-                      ) : (
-                        <MapSection
-                          center={mapCenter}
-                          markers={mapMarkers}
-                          zoom={11}
-                          height="100%"
-                        />
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-6 max-w-xl mx-auto min-h-full">
-                    {/* Popular Spaces Section */}
-                    <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 shadow-lg border border-slate-100 dark:border-white/5">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-[#EDB003]" />
-                          <h3 className="text-base font-bold text-gray-900 dark:text-white" >Popular Spaces in {selectedCity}</h3>
-                        </div>
-                        <button className="text-xs font-medium text-[#EDB003] hover:text-[#d69f03] flex items-center gap-1 transition-colors">
-                          View Map
-                          <ExternalLink className="w-3 h-3" />
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {popularSpaces.map((space, index) => (
-                          <div
-                            key={index}
-                            className="bg-white dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800 hover:border-[#EFAD1A]/50 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 group hover:shadow-xl hover:shadow-[#EFAD1A]/5 hover:-translate-y-1"
-                          >
-                            <div className="h-32 relative overflow-hidden">
-                              {space.image && (
-                                <img
-                                  src={space.image}
-                                  alt={space.name}
-                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-                                />
-                              )}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
-                              <div className="absolute top-2 right-2">
-                                <span className="inline-block text-[10px] px-2.5 py-1 bg-white/20 backdrop-blur-md text-white border border-white/20 rounded-full font-bold tracking-wide">
-                                  {space.type}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="p-4 relative">
-                              <div className="absolute -top-3 right-3 w-8 h-8 rounded-full bg-[#EFAD1A] flex items-center justify-center text-white shadow-lg scale-0 group-hover:scale-100 transition-transform duration-300">
-                                <ArrowRight className="w-4 h-4 -rotate-45" />
-                              </div>
-                              <div className="text-sm font-bold text-slate-900 dark:text-white mb-1 line-clamp-1 group-hover:text-[#EFAD1A] transition-colors">{space.name}</div>
-                              <div className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 flex items-center gap-1.5">
-                                <MapPin className="w-3 h-3 text-slate-400" />
-                                {space.location}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+          {/* Chat Interface - Full Width */}
+          <div className="w-full h-full flex flex-col bg-white dark:bg-[#0B1120] relative">
 
-                    {/* Get Started Section - Premium Card */}
-                    <div className="relative overflow-hidden rounded-2xl p-6 group">
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#EFAD1A] to-[#F59E0B] opacity-10 dark:opacity-20 group-hover:opacity-15 transition-opacity"></div>
-                      <div className="absolute inset-0 border border-[#EFAD1A]/20 rounded-2xl"></div>
-
-                      {/* Decorative blobs */}
-                      <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#EFAD1A]/20 rounded-full blur-2xl"></div>
-                      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#EFAD1A]/10 rounded-full blur-2xl"></div>
-
-                      <div className="relative z-10">
-                        <div className="flex items-start justify-between mb-4">
-                          <h3 className="text-lg font-bold text-slate-900 dark:text-white font-grotesk">Find Your Perfect <br /> Workspace</h3>
-                          <div className="w-12 h-12 rounded-2xl bg-white dark:bg-[#0F172A] shadow-lg flex items-center justify-center text-[#EFAD1A] rotate-3 group-hover:rotate-12 transition-transform duration-300">
-                            <Sparkles className="w-6 h-6" />
-                          </div>
-                        </div>
-
-                        <p className="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed font-medium">
-                          Take our AI-powered quiz to discover workspaces tailored to your specific needs in seconds.
-                        </p>
-
-                        <button className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold py-3.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 group/btn">
-                          Take Workspace Quiz
-                          <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Get Inspired Section */}
-                    <div className="bg-white dark:bg-[#1E293B] rounded-2xl p-5 shadow-lg border border-slate-100 dark:border-white/5">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-base font-bold text-gray-900 dark:text-white" >Get Inspired</h3>
-                        <button className="text-xs font-medium text-[#EDB003] hover:text-[#d69f03] transition-colors">
-                          See all
-                        </button>
-                      </div>
-                      <div className="space-y-4">
-                        {inspirationCards.map((card, index) => (
-                          <div
-                            key={index}
-                            className="flex gap-4 p-4 bg-white dark:bg-[#0F172A] hover:bg-slate-50 dark:hover:bg-[#1E293B] rounded-2xl cursor-pointer transition-all duration-300 group border border-slate-100 dark:border-slate-800 hover:border-[#EFAD1A]/30 hover:shadow-md"
-                          >
-                            <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 relative">
-                              <img
-                                src={card.image}
-                                alt={card.title}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0 flex flex-col justify-center">
-                              <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1.5 line-clamp-1 group-hover:text-[#EFAD1A] transition-colors font-grotesk" >
-                                {card.title}
-                              </h4>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed font-medium" >
-                                {card.description}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                  </div>
-                )}
-              </div>
-            }
-          >
-            {/* Left Panel - Chat Interface - 60-65% - Scrollable Chat Area */}
-            <div className="w-full h-full flex flex-col bg-slate-50 dark:bg-[#0B1120] relative border-r border-slate-200 dark:border-slate-800">
-
-              {/* Chat Content */}
-              <div
-                ref={chatContainerRef}
-                className="flex-1 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth"
-                style={{
-                  height: '100%'
-                }}
-                tabIndex={0}
-                role="region"
-                aria-label="Chat messages"
-               
-               
-               
-              >
+            {/* Chat Content */}
+            <div
+              ref={chatContainerRef}
+              className="flex-1 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth"
+              style={{ height: '100%' }}
+              tabIndex={0}
+              role="region"
+              aria-label="Chat messages"
+            >
                 {chatMessages.length === 0 ? (
-                  // Empty State
-                  <div className="flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto">
-                    <div className="relative mb-8 group">
-                      <div className="absolute inset-0 bg-[#EFAD1A]/30 rounded-full blur-3xl group-hover:blur-3xl transition-all duration-500 opacity-50"></div>
-                      <div className="w-24 h-24 bg-white dark:bg-[#1E293B] rounded-[2rem] flex items-center justify-center shadow-2xl border border-white/50 dark:border-white/10 relative z-10 group-hover:-translate-y-2 transition-transform duration-500">
-                        <Building2 className="w-10 h-10 text-[#EFAD1A]" />
-                      </div>
-                    </div>
+                 // Clean Welcome State (matching screenshot)
+                 <div className="flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto px-6">
+                   <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
+                     How can we help your business?
+                   </h2>
+                   <p className="text-gray-500 dark:text-gray-400 mb-12 max-w-md text-base leading-relaxed">
+                     Ask about coworking spaces, virtual offices, compliance, or compare plans instantly.
+                   </p>
 
-                    <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight font-grotesk">
-                      How can we help your business?
-                    </h2>
-                    <p className="text-slate-500 dark:text-slate-400 mb-12 max-w-lg text-lg leading-relaxed font-normal">
-                      Ask about coworking spaces, virtual offices, compliance, or compare plans instantly.
-                    </p>
+                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+                     <button
+                       onClick={() => handleQuickAction('Find coworking spaces in Delhi NCR region')}
+                       className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
+                     >
+                       <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Find coworking spaces</div>
+                       <div className="text-xs text-gray-400">in Delhi NCR region</div>
+                     </button>
+                     <button
+                       onClick={() => handleQuickAction('Help me with GST Registration complete registration process')}
+                       className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
+                     >
+                       <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">GST Registration</div>
+                       <div className="text-xs text-gray-400">Complete registration</div>
+                     </button>
+                     <button
+                       onClick={() => handleQuickAction('Compare workspace plans and find the best deal')}
+                       className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
+                     >
+                       <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Compare plans</div>
+                       <div className="text-xs text-gray-400">Find the best deal</div>
+                     </button>
+                     <button
+                       onClick={() => handleQuickAction('Check business compliance requirements')}
+                       className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
+                     >
+                       <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Business compliance</div>
+                       <div className="text-xs text-gray-400">Check requirements</div>
+                     </button>
+                   </div>
+                 </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-4">
-                      {/* Suggestions buttons */}
-                      <button
-                        onClick={() => handleQuickAction('Find coworking spaces in Delhi NCR region')}
-                        className="text-left p-6 bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-xl hover:bg-white dark:hover:bg-[#1E293B] shadow-sm hover:shadow-xl hover:shadow-[#EFAD1A]/10 border border-slate-200 dark:border-white/5 hover:border-[#EFAD1A]/50 rounded-[1.5rem] transition-all duration-300 group"
-                      >
-                        <div className="text-base font-bold text-slate-800 dark:text-white group-hover:text-[#EFAD1A] transition-colors mb-1 font-grotesk">Find coworking spaces</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 font-medium group-hover:text-slate-600 dark:group-hover:text-slate-300">in Delhi NCR region</div>
-                      </button>
-                      <button
-                        onClick={() => handleQuickAction('Help me with GST Registration complete registration process')}
-                        className="text-left p-6 bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-xl hover:bg-white dark:hover:bg-[#1E293B] shadow-sm hover:shadow-xl hover:shadow-[#EFAD1A]/10 border border-slate-200 dark:border-white/5 hover:border-[#EFAD1A]/50 rounded-[1.5rem] transition-all duration-300 group"
-                      >
-                        <div className="text-base font-bold text-slate-800 dark:text-white group-hover:text-[#EFAD1A] transition-colors mb-1 font-grotesk">GST Registration</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 font-medium group-hover:text-slate-600 dark:group-hover:text-slate-300">Complete registration</div>
-                      </button>
-                      <button
-                        onClick={() => handleQuickAction('Compare workspace plans and find the best deal')}
-                        className="text-left p-6 bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-xl hover:bg-white dark:hover:bg-[#1E293B] shadow-sm hover:shadow-xl hover:shadow-[#EFAD1A]/10 border border-slate-200 dark:border-white/5 hover:border-[#EFAD1A]/50 rounded-[1.5rem] transition-all duration-300 group"
-                      >
-                        <div className="text-base font-bold text-slate-800 dark:text-white group-hover:text-[#EFAD1A] transition-colors mb-1 font-grotesk">Compare plans</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 font-medium group-hover:text-slate-600 dark:group-hover:text-slate-300">Find the best deal</div>
-                      </button>
-                      <button
-                        onClick={() => handleQuickAction('Check business compliance requirements')}
-                        className="text-left p-6 bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-xl hover:bg-white dark:hover:bg-[#1E293B] shadow-sm hover:shadow-xl hover:shadow-[#EFAD1A]/10 border border-slate-200 dark:border-white/5 hover:border-[#EFAD1A]/50 rounded-[1.5rem] transition-all duration-300 group"
-                      >
-                        <div className="text-base font-bold text-slate-800 dark:text-white group-hover:text-[#EFAD1A] transition-colors mb-1 font-grotesk">Business compliance</div>
-                        <div className="text-sm text-slate-500 dark:text-slate-400 font-medium group-hover:text-slate-600 dark:group-hover:text-slate-300">Check requirements</div>
-                      </button>
-                    </div>
-                  </div>
                 ) : (
                   // Chat Messages
                   <div className="space-y-6 max-w-5xl mx-auto pb-4 w-full">
@@ -1371,8 +1467,8 @@ const StartChatting = () => {
                       >
                         {/* Avatar */}
                         <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${msg.role === 'user'
-                          ? 'bg-gradient-to-br from-[#EDB003] to-[#F59E0B] border-[#EDB003] text-white'
-                          : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-[#EDB003]'
+                          ? 'bg-gradient-to-br from-[#35503F] to-[#3d6b4f] border-[#35503F] text-white'
+                          : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-[#35503F]'
                           }`}>
                           {msg.role === 'user' ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
                         </div>
@@ -1380,7 +1476,7 @@ const StartChatting = () => {
                         {/* Message Bubble */}
                         <div
                           className={`max-w-[85%] sm:max-w-[85%] px-6 py-4 shadow-sm ${msg.role === 'user'
-                            ? 'bg-gradient-to-br from-[#EDB003] to-[#f59e0b] text-white rounded-2xl rounded-tr-sm'
+                            ? 'bg-gradient-to-br from-[#35503F] to-[#3d6b4f] text-white rounded-2xl rounded-tr-sm'
                             : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-sm'
                             }`}
                         >
@@ -1404,7 +1500,7 @@ const StartChatting = () => {
                         {msg.role === 'assistant' && !msg.isTyping && (
                           <button
                             onClick={() => handleSpeak(msg.content)}
-                            className="opacity-60 hover:opacity-100 transition-opacity duration-200 p-2 h-fit self-start mt-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-[#EDB003]"
+                            className="opacity-60 hover:opacity-100 transition-opacity duration-200 p-2 h-fit self-start mt-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-[#35503F]"
                             title="Read Aloud"
                             aria-label="Read message aloud"
                           >
@@ -1417,68 +1513,67 @@ const StartChatting = () => {
                     {/* Loading Indicator */}
                     {isLoading && (
                       <div className="flex gap-4">
-                        <div className="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center text-[#EDB003] shadow-sm flex-shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center text-[#35503F] shadow-sm flex-shrink-0">
                           <Building2 className="w-5 h-5" />
                         </div>
                         <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-6 py-4 shadow-sm flex items-center gap-2">
-                          <span className="w-2 h-2 bg-[#EDB003] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                          <span className="w-2 h-2 bg-[#EDB003] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                          <span className="w-2 h-2 bg-[#EDB003] rounded-full animate-bounce"></span>
+                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce"></span>
                         </div>
                       </div>
                     )}
                   </div>
                 )}
-              </div>
+            </div>
 
-              {/* Chat Input Floating Card */}
-              <div className="p-4 sm:p-6 bg-transparent pt-20 relative z-20">
-                <div className="max-w-4xl mx-auto relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-[#EFAD1A]/20 to-amber-400/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                  <div className="relative bg-white dark:bg-[#1E293B] shadow-2xl shadow-slate-200/50 dark:shadow-black/50 rounded-[1.25rem] border border-slate-100 dark:border-white/5 flex items-center p-2 pr-2 gap-2 transition-all group-focus-within:border-[#EFAD1A]/50">
-                    <button className="p-3 text-slate-400 dark:text-slate-400 hover:text-[#EFAD1A] hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl transition-colors">
-                      <Plus className="w-5 h-5" />
-                    </button>
-                    <input
-                      type="text"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                      placeholder="Type a message..."
-                      className="flex-1 bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 placeholder-gray-400 text-[16px] font-medium h-full py-2 min-w-0"
-                    />
-                    <button
-                      onClick={toggleVoiceInput}
-                      className={`p-3 rounded-xl transition-all ${isListening
-                        ? 'text-red-500 bg-red-50 hover:bg-red-100 animate-pulse'
-                        : 'text-gray-400 dark:text-gray-300 hover:text-[#EDB003] hover:bg-yellow-50 dark:hover:bg-gray-800'
-                        }`}
-                      title={isListening ? "Stop listening" : "Start voice input"}
-                    >
-                      <Mic className={`w-5 h-5 ${isListening ? 'fill-current' : ''}`} />
-                    </button>
-                    <button
-                      onClick={handleSendMessage}
-                      className="p-3 bg-black dark:bg-white text-white dark:text-black rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none"
-                      disabled={!message.trim() || isLoading}
-                    >
-                      <Send className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <p className="text-[10px] text-center text-gray-400 mt-3 font-medium">
-                    FlashSpace AI can make mistakes. Please verify important details.
-                  </p>
+            {/* Chat Input */}
+            <div className="p-4 sm:p-6 bg-transparent relative z-20">
+              <div className="max-w-4xl mx-auto relative group">
+                <div className="relative bg-white dark:bg-[#1E293B] shadow-lg rounded-[1.25rem] border border-gray-200 dark:border-white/5 flex items-center p-2 pr-2 gap-2 transition-all focus-within:border-gray-300 dark:focus-within:border-white/10">
+                  <button className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
+                    <Plus className="w-5 h-5" />
+                  </button>
+                  <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                    placeholder="Type a message..."
+                    className="flex-1 bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 placeholder-gray-400 text-[16px] font-medium h-full py-2 min-w-0"
+                  />
+                  <button
+                    onClick={toggleVoiceInput}
+                    className={`p-3 rounded-xl transition-all ${isListening
+                      ? 'text-red-500 bg-red-50 hover:bg-red-100 animate-pulse'
+                      : 'text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                    title={isListening ? "Stop listening" : "Start voice input"}
+                  >
+                    <Mic className={`w-5 h-5 ${isListening ? 'fill-current' : ''}`} />
+                  </button>
+                  <button
+                    onClick={handleSendMessage}
+                    className="p-3 bg-[#35503F] text-white rounded-xl shadow-sm hover:bg-[#2d4435] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!message.trim() || isLoading}
+                  >
+                    <Send className="w-5 h-5" />
+                  </button>
                 </div>
+                <p className="text-[10px] text-center text-gray-400 mt-3 font-medium">
+                  Flashspace AI can make mistakes. Please verify important details.
+                </p>
               </div>
             </div>
-          </ResizableMapLayout>
+          </div>
         </div>
       </div>
+
       {/* Limit Reached Popup */}
       {isLimitPopupOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all animate-in fade-in duration-200">
@@ -1490,7 +1585,7 @@ const StartChatting = () => {
             >
               <X className="w-5 h-5" />
             </button>
-            <div className="w-16 h-16 bg-yellow-50 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4 text-[#EDB003]">
+            <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center mx-auto mb-4 text-[#35503F]">
               <Lock className="w-7 h-7" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -1529,6 +1624,10 @@ const StartChatting = () => {
           setIsSignupOpen(false);
           setIsLoginOpen(true);
         }}
+      />
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
       />
     </div>
   );

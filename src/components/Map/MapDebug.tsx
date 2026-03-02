@@ -42,8 +42,8 @@ const MapDebug: React.FC = () => {
         <button 
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           onClick={() => {
-            console.log('All environment variables:', import.meta.env);
-            console.log('Google Maps API Key:', import.meta.env.VITE_GOOGLE_API_KEY);
+            // console.log('All environment variables:', import.meta.env);
+            // console.log('Google Maps API Key:', import.meta.env.VITE_GOOGLE_API_KEY);
           }}
         >
           Log Environment Variables

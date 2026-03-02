@@ -92,7 +92,7 @@ export default function UserManagement() {
             try {
                 const response = await adminService.deleteUser(user.id, isTrashView);
 
-                console.log("Delete user response:", response);
+                // console.log("Delete user response:", response);
 
                 if (response.success) {
                     toast.success(response.message || (isTrashView ? "User restored successfully" : "User moved to trash"));

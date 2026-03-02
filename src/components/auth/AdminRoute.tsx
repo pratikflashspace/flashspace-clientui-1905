@@ -15,7 +15,7 @@ export const AdminRoute: React.FC = () => {
     }
 
     // Check if user is authenticated and has admin role
-    console.log('AdminRoute Check:', { isAuthenticated, user, role: user?.role });
+    // console.log('AdminRoute Check:', { isAuthenticated, user, role: user?.role });
 
     if (!isAuthenticated || !user) {
         console.warn('AdminRoute: Not authenticated or no user');
@@ -30,6 +30,6 @@ export const AdminRoute: React.FC = () => {
         return <Navigate to="/dashboard" replace />;
     }
 
-    console.log('AdminRoute: Access granted');
+    // console.log('AdminRoute: Access granted');
     return <Outlet />;
 };

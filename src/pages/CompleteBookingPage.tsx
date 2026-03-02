@@ -289,7 +289,7 @@ const CompleteBookingPage = () => {
         <div className="min-h-screen flex flex-col bg-white">
             <Header />
 
-            <main className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8">
+            <main className="relative flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8">
                 {/* Back */}
                 <button
                     onClick={() => navigate(-1)}

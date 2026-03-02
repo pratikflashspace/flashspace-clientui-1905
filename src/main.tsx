@@ -3,8 +3,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import App from "./App.tsx";
 import "./index.css";
 import { ContactModalProvider } from "./components/ui/ContactModalContext";
-import { DarkModeProvider } from "./contexts/DarkModeContext.tsx";
-
+import { DarkModeProvider } from "./contexts/DarkModeContext";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
