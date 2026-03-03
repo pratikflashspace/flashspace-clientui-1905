@@ -1,805 +1,364 @@
-import { useState, useEffect, useRef, ReactNode } from "react";
+﻿import { useState, useEffect, useRef, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { smoothScrollTo } from "@/lib/lenis";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import ModernFlairButton from "@/components/ui/ModernFlairButton";
+// import ModernFlairButton from "@/components/ui/ModernFlairButton";
 import {
-  Phone,
-  Building2,
-  Users,
-  Zap,
-  FileText,
-  ArrowRight,
-  LayoutDashboard,
-  LogOut,
-  User as UserIcon,
-  Settings,
-  ChevronDown,
-  X,
-  Sun,
-  Moon,
+    Menu,
+    Phone,
+    Building2,
+    Users,
+    Zap,
+    FileText,
+    ArrowRight,
+    LayoutDashboard,
+    LogOut,
+    User as UserIcon,
+    Settings,
+    ChevronDown,
+    X,
+    Sun,
+    Moon
 } from "lucide-react";
-import { CiMenuFries } from "react-icons/ci";
 import SidebarMenu from "@/components/SidebarMenu";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDarkMode } from "@/contexts/DarkModeContext";
-import GetInTouch from "@/pages/GetInTouch";
 import { LoginModal } from "@/components/auth/LoginModal";
 import { SignupModal } from "@/components/auth/SignupModal";
 import { PartnerChoiceModal } from "@/components/auth/PartnerChoiceModal";
 import { NotificationBell } from "@/components/NotificationBell";
+import { GetInTouchModal } from "@/components/modals/GetInTouchModal";
 
-// ✅ Country Data
 const countries = [
-  {
-    code: "IND",
-    name: "India",
-    flag: "https://flagdownload.com/wp-content/uploads/Flag_of_India_Flat_Round-128x128.png",
-  },
-  {
-    code: "USA",
-    name: "United States",
-    flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_States_Flat_Round-128x128.png",
-  },
-  {
-    code: "UK",
-    name: "United Kingdom",
-    flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Kingdom_Flat_Round-128x128.png",
-  },
-  {
-    code: "UAE",
-    name: "United Arab Emirates",
-    flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Arab_Emirates_Flat_Round-128x128.png",
-  },
-  {
-    code: "CAN",
-    name: "Canada",
-    flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Canada_Flat_Round-128x128.png",
-  },
-  {
-    code: "AUS",
-    name: "Australia",
-    flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Australia_Flat_Round-128x128.png",
-  },
-  {
-    code: "GER",
-    name: "Germany",
-    flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Germany_Flat_Round-128x128.png",
-  },
-  {
-    code: "FRA",
-    name: "France",
-    flag: "https://flagdownload.com/wp-content/uploads/Flag_of_France_Flat_Round-128x128.png",
-  },
-  {
-    code: "JPN",
-    name: "Japan",
-    flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Japan_Flat_Round-128x128.png",
-  },
-  {
-    code: "SGP",
-    name: "Singapore",
-    flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Singapore_Flat_Round-128x128.png",
-  },
-];
-
-const menuItems = [
-  { label: "Home", ariaLabel: "Go to home page", link: "/" },
-  { label: "About", ariaLabel: "Learn about us", link: "/about" },
-  { label: "Services", ariaLabel: "View our services", link: "/services" },
-  { label: "Contact", ariaLabel: "Get in touch", link: "/contact" },
+    { code: "IND", name: "India", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_India_Flat_Round-128x128.png" },
+    { code: "USA", name: "United States", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_States_Flat_Round-128x128.png" },
+    { code: "UK", name: "United Kingdom", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Kingdom_Flat_Round-128x128.png" },
+    { code: "UAE", name: "United Arab Emirates", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Arab_Emirates_Flat_Round-128x128.png" },
+    { code: "CAN", name: "Canada", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Canada_Flat_Round-128x128.png" },
+    { code: "AUS", name: "Australia", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Australia_Flat_Round-128x128.png" },
+    { code: "GER", name: "Germany", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Germany_Flat_Round-128x128.png" },
+    { code: "FRA", name: "France", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_France_Flat_Round-128x128.png" },
+    { code: "JPN", name: "Japan", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Japan_Flat_Round-128x128.png" },
+    { code: "SGP", name: "Singapore", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Singapore_Flat_Round-128x128.png" },
 ];
 
 interface HeaderProps {
-  forceWhiteBackground?: boolean;
-  lightText?: boolean;
-  loginBlack?: boolean;
-  openLogin?: boolean;
-  openSignup?: boolean;
+    forceWhiteBackground?: boolean;
+    lightText?: boolean;
+    loginBlack?: boolean;
+    openLogin?: boolean;
+    openSignup?: boolean;
 }
 
-const Header = ({
-  forceWhiteBackground = false,
-  lightText = false,
-  loginBlack = false,
-  openLogin = false,
-  openSignup = false,
-}: HeaderProps): ReactNode => {
-  const { darkMode, toggleDarkMode } = useDarkMode();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { isAuthenticated, user, logout } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = false, openLogin = false, openSignup = false }: HeaderProps): ReactNode => {
+    const { darkMode, toggleDarkMode } = useDarkMode();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { isAuthenticated, user, logout } = useAuth();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
 
-  // Dropdowns
-  const [isSolutionsOpen, setIsSolutionsOpen] = useState(false);
-  const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    // Dropdowns
+    const [isSolutionsOpen, setIsSolutionsOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  // Country drill dropdown
-  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+    // Country drill dropdown
+    const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+    const [selectedCountry, setSelectedCountry] = useState(countries[0]);
 
-  // Popup contact form
-  const [isContactOpen, setIsContactOpen] = useState(false);
-  const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
-  const [isSignupOpen, setIsSignupOpen] = useState(openSignup);
-  const [isPartnerChoiceOpen, setIsPartnerChoiceOpen] = useState(false);
-  const [signupRole, setSignupRole] = useState<
-    "user" | "partner" | "affiliate"
-  >("user");
+    // Popup contact form
+    const [isContactOpen, setIsContactOpen] = useState(false);
+    const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
+    const [isSignupOpen, setIsSignupOpen] = useState(openSignup);
+    const [isPartnerChoiceOpen, setIsPartnerChoiceOpen] = useState(false);
+    const [signupRole, setSignupRole] = useState<'user' | 'partner' | 'affiliate'>('user');
 
-  // Ref helpers for closing modals with redirection
-  const closeLogin = () => {
-    setIsLoginOpen(false);
-    if (location.pathname === "/login") {
-      navigate("/");
-    }
-  };
+    const solutionsRef = useRef<HTMLDivElement>(null);
+    const countryRef = useRef<HTMLDivElement>(null);
+    const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const closeSignup = () => {
-    setIsSignupOpen(false);
-    if (location.pathname === "/signup") {
-      navigate("/");
-    }
-  };
+    useEffect(() => {
+        const onScroll = () => {
+            setScrolled(window.scrollY > 10);
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
 
-  // Sync props to state
-  useEffect(() => {
-    setIsLoginOpen(openLogin);
-  }, [openLogin]);
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (solutionsRef.current && !solutionsRef.current.contains(event.target as Node)) {
+                setIsSolutionsOpen(false);
+            }
+            if (countryRef.current && !countryRef.current.contains(event.target as Node)) {
+                setCountryDropdownOpen(false);
+            }
+            if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+                setIsUserMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
-  useEffect(() => {
-    setIsSignupOpen(openSignup);
-  }, [openSignup]);
+    useEffect(() => {
+        setIsLoginOpen(openLogin);
+    }, [openLogin]);
 
-  const solutionsRef = useRef<HTMLDivElement>(null);
-  const moreRef = useRef<HTMLDivElement>(null);
-  const countryRef = useRef<HTMLDivElement>(null);
-  const userMenuRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        setIsSignupOpen(openSignup);
+    }, [openSignup]);
 
-  useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 10);
+    const handleNavigation = (href: string) => {
+        if (href.startsWith("#")) {
+            const element = document.querySelector(href);
+            element?.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+            navigate(href);
+        }
+        setIsMenuOpen(false);
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        solutionsRef.current &&
-        !solutionsRef.current.contains(event.target as Node)
-      ) {
-        setIsSolutionsOpen(false);
-      }
-      if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
-        setIsMoreOpen(false);
-      }
-      if (
-        countryRef.current &&
-        !countryRef.current.contains(event.target as Node)
-      ) {
-        setCountryDropdownOpen(false);
-      }
-      if (
-        userMenuRef.current &&
-        !userMenuRef.current.contains(event.target as Node)
-      ) {
-        setIsUserMenuOpen(false);
-      }
+    const openPartnerSignup = (role: 'partner' | 'affiliate') => {
+        setSignupRole(role);
+        setIsPartnerChoiceOpen(false);
+        setIsSignupOpen(true);
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
-  const handleNavigation = (href: string) => {
-    if (href.startsWith("#")) {
-      try {
-        smoothScrollTo(href, { offset: -90 });
-      } catch {
-        const element = document.querySelector(href);
-        element?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    } else {
-      navigate(href);
-    }
-    setIsMenuOpen(false);
-  };
-
-  const openPartnerSignup = (role: "partner" | "affiliate") => {
-    setSignupRole(role);
-    setIsPartnerChoiceOpen(false);
-    setIsSignupOpen(true);
-  };
-
-  return (
-    <>
-      <header
-        className={cn(
-          "fixed top-0 w-full z-[100] transition-all duration-300 text-md",
-          scrolled || forceWhiteBackground
-            ? "bg-white dark:bg-[#0a0a0a] border-b border-border dark:border-white/10 shadow-sm"
-            : "bg-transparent",
-        )}
-      >
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
-          {/* Logo */}
-          <div
-            className="text-xl font-bold tracking-tight cursor-pointer w-60 flex-shrink-0 ml-2"
-            onClick={() => handleNavigation("/")}
-          >
-            <img
-              src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
-              alt="FlashSpace Logo"
-              className="h-8 w-auto dark:invert"
-            />
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center justify-center space-x-8 mx-8 flex-1">
-            {/* === Get Workspaces Dropdown === */}
-            <div ref={solutionsRef} className="relative">
-              <button
-                className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-gray-300 dark:hover:text-white" : "text-[#164e4e] dark:text-gray-100 dark:hover:text-white"}`}
-                onMouseEnter={() => setIsSolutionsOpen(true)}
-                onClick={() => setIsSolutionsOpen(false)}
-              >
-                <span className="relative">Get Workspaces</span>
-                <ChevronDown
-                  className={`w-4 h-4 text-[#164e4e]/70 transition-transform duration-300 group-hover:text-[#D96832] ${isSolutionsOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {/* Dropdown Menu */}
-              <div
-                className={`absolute left-1/2 top-full w-[600px] bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-lg shadow-xl z-50 mt-2 transition-all duration-300 ${
-                  isSolutionsOpen
-                    ? "opacity-100 pointer-events-auto translate-y-0"
-                    : "opacity-0 pointer-events-none -translate-y-2"
-                }`}
-                style={{
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-                  transform: "translateX(-50%)",
-                }}
-                onMouseLeave={() => setIsSolutionsOpen(false)}
-              >
-                <div className="p-4 grid grid-cols-2 gap-4">
-                  <div className="border border-gray-100 dark:border-white/10 rounded-lg p-4 bg-[#f8faf9] dark:bg-white/5">
-                    <div
-                      className="flex items-center gap-2 mb-1 cursor-pointer"
-                      onClick={() => {
-                        handleNavigation("/Solutions/on-demand");
-                        setIsSolutionsOpen(false);
-                      }}
-                    >
-                      <Zap className="w-4 h-4 text-[#D96832]" />
-                      <h4 className="text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-colors dark:text-gray-100">
-                        On-Demand
-                      </h4>
-                    </div>
-                    <p className="text-xs text-[#164e4e]/70 dark:text-gray-400 mb-3">
-                      Book by the hour or day
-                    </p>
-                    {[
-                      {
-                        label: "Meeting Rooms",
-                        type: "meeting-room",
-                        href: "/Solutions/meetingsroom",
-                      },
-                      {
-                        label: "Event Space",
-                        type: "training-room",
-                        href: "/Solutions/eventspace",
-                      },
-                      {
-                        label: "Day Offices",
-                        type: "day-office",
-                        href: "/Solutions/day-office",
-                      },
-                    ].map((item) => (
-                      <button
-                        key={item.type}
-                        className="w-full flex items-center justify-between text-left text-sm px-3 py-2 rounded-md hover:bg-white dark:hover:bg-gray-800 text-[#164e4e] dark:text-gray-200 transition-colors shadow-sm mb-2"
-                        onClick={() => {
-                          handleNavigation(item.href);
-                          setIsSolutionsOpen(false);
-                        }}
-                      >
-                        {item.label}
-                        <ArrowRight className="w-4 h-4 text-[#164e4e]/40" />
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="grid gap-3">
-                    {[
-                      {
-                        icon: Building2,
-                        title: "Virtual Office",
-                        desc: "Business address, mail handling, call forwarding",
-                        href: "/Solutions/virtual-office",
-                      },
-                      {
-                        icon: Users,
-                        title: "Coworking Space",
-                        desc: "Flexible desks, private cabins, team suites",
-                        href: "/Solutions/coworking-space",
-                      },
-                      {
-                        icon: FileText,
-                        title: "Business Setup",
-                        desc: "Company registration, GST, compliance",
-                        href: "/Solutions/business-setup",
-                      },
-                    ].map(({ icon: Icon, title, desc, href }) => (
-                      <div
-                        key={title}
-                        className="flex items-start gap-3 p-4 rounded-lg border border-transparent hover:border-gray-100 hover:shadow-md hover:bg-white dark:hover:bg-gray-800 cursor-pointer transition-all"
-                        onClick={() => {
-                          handleNavigation(href);
-                          setIsSolutionsOpen(false);
-                        }}
-                      >
-                        <Icon className="w-5 h-5 text-[#D96832] mt-0.5" />
-                        <div>
-                          <h5 className="text-sm font-bold text-[#164e4e] dark:text-gray-100">
-                            {title}
-                          </h5>
-                          <p className="text-xs text-[#164e4e]/70 dark:text-gray-400 mt-1">
-                            {desc}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Partner with Us */}
-            <button
-              onClick={() => handleNavigation("/partner")}
-              className={`group relative px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-gray-300 dark:hover:text-white" : "text-[#164e4e] dark:text-gray-100 dark:hover:text-white"}`}
-            >
-              <span className="relative">Partner with Us</span>
-            </button>
-
-            {/* === More Dropdown === */}
-            <div ref={moreRef} className="relative">
-              <button
-                className={`group flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] hover:text-[#D96832] transition-all duration-300 hover:bg-[#164e4e]/5 dark:hover:bg-blue-900/30 rounded-lg ${scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-gray-300 dark:hover:text-white" : "text-[#164e4e] dark:text-gray-100 dark:hover:text-white"}`}
-                onMouseEnter={() => setIsMoreOpen(true)}
-                onClick={() => setIsMoreOpen(false)}
-              >
-                <span className="relative">More</span>
-                <ChevronDown
-                  className={`w-4 h-4 text-[#164e4e]/70 transition-transform duration-300 group-hover:text-[#D96832] ${isMoreOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {isMoreOpen && (
-                <ul
-                  onMouseLeave={() => setIsMoreOpen(false)}
-                  className="absolute bg-white dark:bg-[#0a0a0a] border border-gray-100 dark:border-white/10 rounded-md shadow-lg mt-2 w-40 py-2 z-50"
-                >
-                  {[
-                    { label: "About Us", href: "/about" },
-                    { label: "Career", href: "/career" },
-                    { label: "Blog", href: "/blog" },
-                  ].map((item) => (
-                    <li key={item.label}>
-                      <button
-                        className="w-full text-left px-4 py-2 text-sm font-medium text-[#164e4e] hover:bg-gray-50 hover:text-[#D96832] dark:hover:bg-gray-800 dark:text-gray-200 transition-colors"
-                        onClick={() => {
-                          handleNavigation(item.href);
-                          setIsMoreOpen(false);
-                        }}
-                      >
-                        {item.label}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </nav>
-
-          {/* Right Buttons */}
-          <div className="flex items-center space-x-4 ml-auto">
-            {/* Country Dropdown */}
-            <div ref={countryRef} className="hidden lg:block relative">
-              <button
-                className="flex items-center px-3 py-2 rounded-full border border-gray-200 dark:border-white/10 text-[#164e4e] dark:text-white gap-2 focus:outline-none bg-white dark:bg-black/50 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm transition-all duration-300"
-                onClick={() => setCountryDropdownOpen((prev) => !prev)}
-              >
-                <img
-                  src={selectedCountry.flag}
-                  alt={selectedCountry.code}
-                  className="h-5 w-5 rounded-full object-cover ring-1 ring-gray-100"
-                />
-                <span className="text-sm font-medium">
-                  {selectedCountry.code}
-                </span>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-[#164e4e]/70 transition-transform duration-300 ${countryDropdownOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-              {countryDropdownOpen && (
-                <ul className="absolute right-0 top-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 min-w-[110px] py-1">
-                  {countries.map((country) => (
-                    <li key={country.code}>
-                      <button
-                        className="flex items-center w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-800 gap-2 text-sm text-[#164e4e] dark:text-gray-200 transition-colors"
-                        onClick={() => {
-                          setSelectedCountry(country);
-                          setCountryDropdownOpen(false);
-                        }}
-                      >
-                        <img
-                          src={country.flag}
-                          alt={country.code}
-                          className="h-5 w-5 rounded-full"
-                        />
-                        <span>{country.code}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            {/* Dark Mode Toggle */}
-            <button
-              onClick={toggleDarkMode}
-              className="hidden lg:flex items-center justify-center p-2 rounded-full border border-gray-200 dark:border-white/10 text-[#164e4e] dark:text-gray-300 bg-white dark:bg-black/50 hover:bg-white dark:hover:bg-white/10 hover:shadow-sm transition-all duration-300"
-              aria-label="Toggle Dark Mode"
-            >
-              {darkMode ? (
-                <Sun className="w-5 h-5 text-yellow-400" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
-
-            <ModernFlairButton
-              onClick={() => setIsContactOpen(true)}
-              className="hidden lg:inline-flex group px-6 py-2.5 bg-[#D96832] text-white text-sm font-bold rounded-full transition-all duration-300 hover:shadow-lg hover:bg-[#c25626] border border-white/10 active:scale-95 overflow-hidden"
-              flairColor="rgba(255, 255, 255, 0.2)"
-            >
-              <span className="relative flex items-center gap-2">
-                Get in Touch
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </span>
-            </ModernFlairButton>
-
-            {/* Notification Bell */}
-            {isAuthenticated && (
-              <div className="hidden lg:block">
-                <NotificationBell />
-              </div>
-            )}
-
-            {/* User Menu / Login */}
-            {isAuthenticated ? (
-              <div ref={userMenuRef} className="relative hidden lg:block">
-                <button
-                  onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 border border-gray-200 bg-white"
-                >
-                  <div className="w-8 h-8 rounded-full bg-[#164e4e] flex items-center justify-center text-white font-semibold text-sm shadow-md">
-                    {user?.fullName?.charAt(0).toUpperCase() || "U"}
-                  </div>
-                  <span className="text-sm font-medium text-[#164e4e] max-w-[120px] truncate">
-                    {user?.fullName || "User"}
-                  </span>
-                  <ChevronDown
-                    className={cn(
-                      "h-4 w-4 text-[#164e4e]/70 transition-transform duration-200",
-                      isUserMenuOpen && "rotate-180",
-                    )}
-                  />
-                </button>
-
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="px-4 py-3 border-b border-gray-100">
-                      <p className="text-sm font-semibold text-gray-900 truncate">
-                        {user?.fullName}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {user?.email}
-                      </p>
-                      <div className="mt-1.5 flex flex-wrap gap-1">
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${user?.role === "partner" || user?.role === "affiliate" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"}`}
-                        >
-                          {user?.role}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="py-1">
-                      {user?.role === "admin" && (
-                        <button
-                          onClick={() => {
-                            navigate("/admin");
-                            setIsUserMenuOpen(false);
-                          }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-50 hover:text-purple-800 transition-colors duration-150"
-                        >
-                          <LayoutDashboard className="h-4 w-4" />
-                          <span>Admin Dashboard</span>
-                        </button>
-                      )}
-
-                      {(user?.role === "partner" ||
-                        user?.role === "affiliate") && (
-                        <button
-                          onClick={() => {
-                            navigate(
-                              user?.role === "partner"
-                                ? "/spaceportal"
-                                : "/affiliate-portal",
-                            );
-                            setIsUserMenuOpen(false);
-                          }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-50 hover:text-amber-800 transition-colors duration-150"
-                        >
-                          <Building2 className="h-4 w-4" />
-                          <span>
-                            {user?.role === "partner"
-                              ? "Your Space Portal"
-                              : "Affiliate Portal"}
-                          </span>
-                        </button>
-                      )}
-
-                      <button
-                        onClick={() => {
-                          handleNavigation("/dashboard");
-                          setIsUserMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
-                      >
-                        <LayoutDashboard className="h-4 w-4" />
-                        <span className="font-medium">Dashboard</span>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          handleNavigation("/dashboard/profile");
-                          setIsUserMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
-                      >
-                        <UserIcon className="h-4 w-4" />
-                        <span className="font-medium">My Profile</span>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          handleNavigation("/settings");
-                          setIsUserMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150"
-                      >
-                        <Settings className="h-4 w-4" />
-                        <span className="font-medium">Settings</span>
-                      </button>
-                    </div>
-
-                    <div className="border-t border-gray-100 pt-1">
-                      <button
-                        onClick={async () => {
-                          await logout();
-                          setIsUserMenuOpen(false);
-                          handleNavigation("/");
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        <span className="font-medium">Logout</span>
-                      </button>
-                    </div>
-                  </div>
+    return (
+        <>
+            <header
+                className={cn(
+                    "fixed top-0 w-full z-[100] transition-all duration-300",
+                    scrolled || forceWhiteBackground
+                        ? "bg-white dark:bg-[#0a0a0a] border-b border-border dark:border-white/10 shadow-sm py-2"
+                        : "bg-transparent py-2"
                 )}
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <ModernFlairButton
-                  onClick={() => navigate("/login")}
-                  className="hidden lg:inline-flex group px-6 py-2.5 bg-white text-[#164e4e] text-sm font-bold rounded-full border border-[#164e4e]/20 transition-all duration-300 hover:bg-[#164e4e] hover:text-white hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
-                  flairColor="rgba(255, 255, 255, 0.1)"
-                >
-                  <span className="flex items-center gap-2">
-                    <UserIcon className="w-3.5 h-3.5" />
-                    Log in
-                  </span>
-                </ModernFlairButton>
-
-                <ModernFlairButton
-                  onClick={() => setIsPartnerChoiceOpen(true)}
-                  className="hidden lg:inline-flex group px-6 py-2.5 bg-[#EDB003] text-white text-sm font-bold rounded-full transition-all duration-300 hover:shadow-lg hover:bg-[#d99f03] border border-white/10 active:scale-95"
-                  flairColor="rgba(255, 255, 255, 0.2)"
-                >
-                  <span className="flex items-center gap-2">
-                    <Building2 className="w-3.5 h-3.5" />
-                    Become a Partner
-                  </span>
-                </ModernFlairButton>
-              </div>
-            )}
-
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setIsMenuOpen(true)}
-              className="lg:hidden p-2 text-[#164e4e] dark:text-white"
             >
-              <CiMenuFries className="h-6 w-6" />
-            </button>
-          </div>
-        </div>
-      </header>
+                <div className="w-full px-4 md:px-10">
+                    <div className="flex items-center justify-between h-14 md:h-16">
+                        {/* LEFT: Hamburger + Logo */}
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => setIsMenuOpen(true)}
+                                className="p-2 -ml-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 rounded-lg"
+                                aria-label="Open menu"
+                            >
+                                <Menu className="w-6 h-6 dark:text-white" />
+                            </button>
+                            <div
+                                className="cursor-pointer"
+                                onClick={() => handleNavigation("/")}
+                            >
+                                <img
+                                    src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
+                                    alt="FlashSpace Logo"
+                                    className="h-5 md:h-8 w-auto dark:invert"
+                                />
+                            </div>
+                        </div>
 
-      {/* Mobile Sidebar Menu */}
-      <SidebarMenu
-        isOpen={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
-        onOpenLogin={() => setIsLoginOpen(true)}
-      />
+                        {/* CENTER: Navigation Links */}
+                        <nav className="hidden lg:flex items-center gap-8">
+                            {/* Get Workspace Dropdown */}
+                            <div ref={solutionsRef} className="relative">
+                                <button
+                                    onMouseEnter={() => setIsSolutionsOpen(true)}
+                                    className={cn(
+                                        "flex items-center gap-1.5 text-sm font-bold transition-colors py-2",
+                                        scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white",
+                                        "hover:text-[#D96832]"
+                                    )}
+                                >
+                                    Get Workspace
+                                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isSolutionsOpen && "rotate-180")} />
+                                </button>
 
-      {/* === Contact Popup === */}
-      {isContactOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all p-4">
-          <div className="flex flex-col md:flex-row gap-8 w-full max-w-5xl items-stretch justify-center">
-            {/* LEFT SIDE CARDS */}
-            <div className="flex flex-col gap-4 w-full md:w-[45%]">
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  Support
-                </h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  Need technical help or facing issues with our platform? Our
-                  support team is here 24×7 to assist you with queries and
-                  troubleshooting.
-                </p>
-                <p className="text-sm text-gray-600 mt-2">
-                  <strong>Support Mail:</strong>&nbsp;
-                  <a
-                    href="mailto:support@flashspace.co"
-                    className="text-blue-600 hover:underline"
-                  >
-                    support@flashspace.co
-                  </a>
-                </p>
-              </div>
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  Sales
-                </h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  Want to explore FlashSpace solutions for your business? Our
-                  sales experts will help you find the right plan and growth
-                  strategy.
-                </p>
-                <p className="text-sm text-gray-600 mt-2">
-                  <strong>Sales Mail:</strong>&nbsp;
-                  <a
-                    href="mailto:sales@flashspace.co"
-                    className="text-blue-600 hover:underline"
-                  >
-                    sales@flashspace.co
-                  </a>
-                </p>
-                <p className="text-sm text-gray-600">
-                  <strong>Contact:</strong> 8100888777
-                </p>
-              </div>
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-5 hover:shadow-xl transition">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                  Partnership
-                </h3>
-                <p className="text-sm text-gray-600 mt-2">
-                  Interested in collaborating or becoming a FlashSpace partner?
-                  Let’s innovate together and build future-ready digital
-                  solutions.
-                </p>
-                <p className="text-sm text-gray-600 mt-2">
-                  <strong>Partnership Mail:</strong>&nbsp;
-                  <a
-                    href="mailto:partner@flashspace.co"
-                    className="text-blue-600 hover:underline"
-                  >
-                    partner@flashspace.co
-                  </a>
-                </p>
-              </div>
-            </div>
+                                <div
+                                    className={cn(
+                                        "absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[600px] bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-2xl shadow-2xl p-6 z-50 transition-all duration-300",
+                                        isSolutionsOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
+                                    )}
+                                    onMouseLeave={() => setIsSolutionsOpen(false)}
+                                >
+                                    <div className="grid grid-cols-2 gap-6">
+                                        {/* On-Demand Section */}
+                                        <div className="bg-[#f8faf9] dark:bg-white/5 rounded-xl p-5 border border-border/50">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Zap className="w-4 h-4 text-[#D96832]" />
+                                                <h4 className="text-sm font-bold text-[#164e4e] dark:text-white">On-Demand</h4>
+                                            </div>
+                                            <p className="text-xs text-[#164e4e]/60 dark:text-gray-400 mb-4">Book by the hour or day</p>
+                                            <div className="space-y-2">
+                                                <button
+                                                    onClick={() => handleNavigation("/Solutions/eventspace")}
+                                                    className="w-full flex items-center justify-between text-sm px-4 py-3 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-all text-[#164e4e] dark:text-white"
+                                                >
+                                                    Event Space
+                                                    <ArrowRight className="w-4 h-4 opacity-40" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleNavigation("/Solutions/day-office")}
+                                                    className="w-full flex items-center justify-between text-sm px-4 py-3 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-all text-[#164e4e] dark:text-white"
+                                                >
+                                                    Day Offices
+                                                    <ArrowRight className="w-4 h-4 opacity-40" />
+                                                </button>
+                                            </div>
+                                        </div>
 
-            {/* RIGHT SIDE FORM */}
-            <div className="bg-white rounded-2xl shadow-2xl w-full md:w-[45%] p-8 relative animate-fade-in flex flex-col justify-center">
-              <button
-                onClick={() => setIsContactOpen(false)}
-                className="absolute top-4 right-4 p-2 text-gray-500 hover:text-black transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              <h2 className="text-xl font-bold mb-6 text-center">
-                <span className="text-black">Get in </span>
-                <span className="text-yellow-500">Touch</span>
-              </h2>
-              <form className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
-                    placeholder="Your Name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
-                    placeholder="+91 9876543210"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
-                    placeholder="you@example.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Message
-                  </label>
-                  <textarea
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-black"
-                    placeholder="How can we help?"
-                    rows={4}
-                  ></textarea>
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-yellow-500 text-black py-2 rounded-md font-semibold hover:bg-yellow-400 transition"
-                >
-                  Send Message
-                </Button>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+                                        {/* Solutions List */}
+                                        <div className="space-y-1">
+                                            {[
+                                                { icon: Building2, title: "Virtual Office", desc: "Business address & mail", href: "/Solutions/virtual-office" },
+                                                { icon: Users, title: "Coworking Space", desc: "Flexible desk solutions", href: "/Solutions/coworking-space" },
+                                                { icon: FileText, title: "Business Setup", desc: "GST & registration support", href: "/Solutions/business-setup" },
+                                            ].map((item) => (
+                                                <button
+                                                    key={item.title}
+                                                    onClick={() => handleNavigation(item.href)}
+                                                    className="w-full text-left p-3 rounded-xl hover:bg-[#D96832]/5 group transition-colors"
+                                                >
+                                                    <div className="flex items-start gap-3">
+                                                        <item.icon className="w-5 h-5 text-[#D96832] mt-0.5" />
+                                                        <div>
+                                                            <h5 className="text-sm font-bold text-[#164e4e] dark:text-white group-hover:text-[#D96832] transition-colors">{item.title}</h5>
+                                                            <p className="text-xs text-[#164e4e]/60 dark:text-gray-400">{item.desc}</p>
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-      {/* Modals */}
-      <LoginModal isOpen={isLoginOpen} onClose={closeLogin} />
-      <SignupModal
-        isOpen={isSignupOpen}
-        onClose={closeSignup}
-        initialRole={signupRole}
-      />
-      <PartnerChoiceModal
-        isOpen={isPartnerChoiceOpen}
-        onClose={() => setIsPartnerChoiceOpen(false)}
-        onSelect={openPartnerSignup}
-      />
-    </>
-  );
+                            <button
+                                onClick={() => handleNavigation("/partner")}
+                                className={cn(
+                                    "text-sm font-bold transition-colors",
+                                    scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white",
+                                    "hover:text-[#D96832]"
+                                )}
+                            >
+                                Partner with Us
+                            </button>
+                            <button
+                                onClick={() => handleNavigation("/about")}
+                                className={cn(
+                                    "text-sm font-bold transition-colors",
+                                    scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white",
+                                    "hover:text-[#D96832]"
+                                )}
+                            >
+                                About Us
+                            </button>
+                        </nav>
+
+                        {/* RIGHT: Actions */}
+                        <div className="flex items-center gap-3">
+                            {/* Country Selector */}
+                            <div ref={countryRef} className="hidden xl:block relative">
+                                <button
+                                    className="flex items-center px-3 py-2 rounded-full border border-gray-200 dark:border-white/10 text-[#164e4e] dark:text-white gap-2 bg-white dark:bg-black/50 hover:bg-white dark:hover:bg-white/10 transition-all"
+                                    onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
+                                >
+                                    <img src={selectedCountry.flag} alt={selectedCountry.code} className="h-5 w-5 rounded-full object-cover" />
+                                    <span className="text-sm font-medium">{selectedCountry.code}</span>
+                                    <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", countryDropdownOpen && "rotate-180")} />
+                                </button>
+                                {countryDropdownOpen && (
+                                    <ul className="absolute right-0 top-full mt-2 bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-xl shadow-2xl py-2 z-50 min-w-[120px]">
+                                        {countries.map((country) => (
+                                            <button
+                                                key={country.code}
+                                                className="flex items-center w-full px-4 py-2 hover:bg-black/5 dark:hover:bg-white/5 gap-3 text-sm text-[#164e4e] dark:text-gray-200 transition-colors"
+                                                onClick={() => { setSelectedCountry(country); setCountryDropdownOpen(false); }}
+                                            >
+                                                <img src={country.flag} alt={country.code} className="h-4 w-4 rounded-full" />
+                                                <span>{country.code}</span>
+                                            </button>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+
+                            {/* Notification Bell */}
+                            {isAuthenticated && (
+                                <div className="hidden lg:block">
+                                    <NotificationBell />
+                                </div>
+                            )}
+
+                            {/* User Authentication */}
+                            {isAuthenticated ? (
+                                <div ref={userMenuRef} className="relative">
+                                    <button
+                                        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                                        className="flex items-center gap-2 group"
+                                    >
+                                        <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#164e4e] text-white flex items-center justify-center font-bold text-sm shadow-sm group-hover:shadow-md transition-all">
+                                            {user?.fullName?.charAt(0).toUpperCase() || 'U'}
+                                        </div>
+                                        <ChevronDown className={cn("w-4 h-4 text-[#164e4e]/60 transition-transform", isUserMenuOpen && "rotate-180")} />
+                                    </button>
+
+                                    {isUserMenuOpen && (
+                                        <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-2xl shadow-2xl py-3 z-50 overflow-hidden">
+                                            <div className="px-5 py-3 border-b border-border/50 dark:border-white/10 mb-2">
+                                                <p className="text-sm font-bold text-[#164e4e] dark:text-white truncate">{user?.fullName}</p>
+                                                <p className="text-xs text-[#164e4e]/60 dark:text-gray-400 truncate">{user?.email}</p>
+                                            </div>
+                                            <div className="px-2 space-y-1">
+                                                <button onClick={() => { navigate("/dashboard"); setIsUserMenuOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#164e4e] dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors">
+                                                    <LayoutDashboard className="w-4 h-4" /> Dashboard
+                                                </button>
+                                                <button onClick={() => { navigate("/settings"); setIsUserMenuOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#164e4e] dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors">
+                                                    <Settings className="w-4 h-4" /> Settings
+                                                </button>
+                                                <hr className="my-2 border-border/50 dark:border-white/10" />
+                                                <button onClick={async () => { await logout(); setIsUserMenuOpen(false); navigate("/"); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                                    <LogOut className="w-4 h-4" /> Logout
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setIsLoginOpen(true)}
+                                    className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all mr-2"
+                                >
+                                    Sign in
+                                </button>
+                            )}
+
+                            <div
+                                onClick={() => setIsContactOpen(true)}
+                                className="inline-flex group px-6 py-2.5 bg-[#2D3F33] text-[#FDE68A] text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
+
+                            >
+                                <span className="relative">
+                                    Get in Touch
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <SidebarMenu
+                    isOpen={isMenuOpen}
+                    onClose={() => setIsMenuOpen(false)}
+                    onOpenLogin={() => setIsLoginOpen(true)}
+                />
+            </header>
+
+            <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+            <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} initialRole={signupRole} />
+            <PartnerChoiceModal isOpen={isPartnerChoiceOpen} onClose={() => setIsPartnerChoiceOpen(false)} onSelect={openPartnerSignup} />
+            <GetInTouchModal open={isContactOpen} onClose={() => setIsContactOpen(false)} />
+        </>
+    );
 };
 
 export default Header;

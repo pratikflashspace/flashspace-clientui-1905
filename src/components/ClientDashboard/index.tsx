@@ -324,7 +324,7 @@ export default function ClientDashboard() {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 min-w-0 overflow-x-hidden min-h-[calc(100vh-64px)]">
+        <main className="relative flex-1 min-w-0 overflow-x-hidden min-h-[calc(100vh-64px)]">
           {mainContent}
         </main>
       </div>

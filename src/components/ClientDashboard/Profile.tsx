@@ -291,7 +291,7 @@ const Profile: React.FC = () => {
 
                   {/* Name and ID */}
                   <div className="text-center sm:text-left flex-1">
-                    <h1 className="text-2xl font-bold text-gray-900 ">
+                    <h1 className="text-2xl font-bold text-white ">
                       Welcome back, {user?.fullName?.split(" ")[0] || "User"}!
                       👋
                     </h1>

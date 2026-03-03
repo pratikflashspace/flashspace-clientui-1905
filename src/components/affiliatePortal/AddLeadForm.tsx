@@ -17,7 +17,7 @@ const AddLeadForm = ({ onCancel }: AddLeadFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('New Lead Data:', formData);
+    // console.log('New Lead Data:', formData);
     // Logic for API calls can be placed here
     if (onCancel) onCancel();
   };

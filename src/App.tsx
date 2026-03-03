@@ -9,6 +9,7 @@ import { SocketProvider } from "@/contexts/SocketContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import { ChatProvider } from "@/contexts/ChatContext"; // [NEW] Added ChatProvider
 import TeamManagement from "./pages/spacePortal/teamManagement";
 
 import Index from "./pages/Index";
@@ -47,6 +48,8 @@ import Settings from "./pages/Settings";
 import CityListing from "./pages/CityListing";
 import AboutUs from "./pages/AboutUs";
 import Blog, { SinglePostPage } from "./pages/Blog";
+import HelpCenter from "./pages/help/HelpCenter";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 // --- Client Dashboard Pages ---
 import ClientDashboard from "./components/ClientDashboard";
@@ -85,6 +88,7 @@ import TicketSystem from "./pages/admin/TicketSystem";
 import AdminNotifications from "./pages/admin/Notifications";
 import AdminPropertyDetails from "./pages/admin/PropertyDetailsAdmin";
 import PropertyManagement from "./pages/admin/PropertyManagement";
+import AdminInvoices from "./pages/admin/Invoices";
 
 import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
@@ -192,291 +196,334 @@ const App = () => (
           <SocketProvider>
             <DarkModeProvider>
               <NotificationProvider>
-                <ScrollToTop />
-                <Routes>
-                  {/* Public Routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/services" element={<Services />} />
-                  <Route
-                    path="/services/virtual-office"
-                    element={<VirtualOffice />}
-                  />
-                  <Route
-                    path="/services/coworking-space"
-                    element={<CoworkingSpace />}
-                  />
-                  <Route path="/services/on-demand" element={<OnDemand />} />
-                  <Route
-                    path="/services/event-spaces"
-                    element={<EventSpaces />}
-                  />
-                  <Route
-                    path="/services/business-setup"
-                    element={<BusinessSetup />}
-                  />
-                  <Route
-                    path="/Solutions/virtual-office"
-                    element={<VirtualOfficeSolution />}
-                  />
-                  <Route
-                    path="/Solutions/coworking-space"
-                    element={<CoworkingSpaceSolution />}
-                  />
-                  <Route
-                    path="/Solutions/on-demand"
-                    element={<OnDemandSolution />}
-                  />
-                  <Route
-                    path="/Solutions/business-setup"
-                    element={<BusinessSetupSolution />}
-                  />
-
-                  <Route
-                    path="/Solutions/meetingsroom"
-                    element={<MeetingsRoom />}
-                  />
-                  <Route path="/Solutions/day-office" element={<Dayoffice />} />
-                  <Route
-                    path="/Solutions/eventspace"
-                    element={<EventSpacePage />}
-                  />
-
-                  {/* Spaces*/}
-                  <Route path="/space/:id" element={<SpaceComponent />} />
-                  <Route
-                    path="/coworking-space/:id"
-                    element={<CoworkingSpaceComponent />}
-                  />
-                  <Route
-                    path="/meeting-room/:id"
-                    element={<MeetingRoomSpaceComponent />}
-                  />
-                  <Route path="/book-seats/:id" element={<BookSeatsPage />} />
-                  <Route path="/booking/:id" element={<BookingPage />} />
-                  <Route
-                    path="/booking/:id/complete"
-                    element={<CompleteBookingPage />}
-                  />
-
-                  {/* Payment Routes */}
-                  <Route
-                    path="/payment/success"
-                    element={<PaymentSuccessPage />}
-                  />
-                  <Route
-                    path="/payment/failed"
-                    element={<PaymentFailedPage />}
-                  />
-
-                  <Route path="/city-listing" element={<CityListing />} />
-                  <Route path="/career" element={<Career />} />
-                  <Route path="/about" element={<AboutUs />} />
-                  <Route path="/blog" element={<Blog />} />
-                  <Route path="/blog/:id" element={<SinglePostPage />} />
-
-                  {/* Auth Routes */}
-                  <Route path="/login" element={<Index openLogin={true} />} />
-                  <Route path="/signup" element={<Index openSignup={true} />} />
-                  <Route path="/verify-otp" element={<VerifyOTP />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-
-                  <Route path="/list-your-space" element={<ListYourSpace />} />
-                  <Route path="/partner" element={<PartnerWithUs />} />
-                  <Route path="/coming-soon" element={<ComingSoon />} />
-                  <Route path="/start-chatting" element={<StartChatting />} />
-
-                  {/* Protected Routes */}
-                  <Route element={<ProtectedRoute />}>
+                <ChatProvider>
+                  <ScrollToTop />
+                  {/* <MouseFollower/> */}
+                  <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<Index />} />
+                    <Route path="/services" element={<Services />} />
                     <Route
-                      path="/bookings"
-                      element={<Navigate to="/dashboard/my-bookings" replace />}
+                      path="/services/virtual-office"
+                      element={<VirtualOffice />}
                     />
-                    <Route path="/community" element={<Community />} />
-                    <Route path="/settings" element={<Settings />} />
-
-                    {/* Client Dashboard Routes - Protected */}
-                    <Route path="/dashboard/*" element={<ClientDashboard />} />
-                  </Route>
-
-                  {/* Admin Routes - Protected (RBAC) */}
-                  <Route element={<AdminRoute />}>
-                    <Route path="/admin" element={<AdminLayout />}>
-                      <Route index element={<AdminDashboard />} />
-                      <Route path="users" element={<UserManagement />} />
-                      <Route path="team" element={<AdminTeamManagement />} />
-                      <Route path="kyc-requests" element={<KYCRequests />} />
-                      <Route path="kyc-requests/:id" element={<KYCDetail />} />
-                      <Route
-                        path="kyc-partners"
-                        element={<KYCPartnerRequests />}
-                      />
-                      <Route
-                        path="kyc-partners/:id"
-                        element={<SpacePartnerKycDetails />}
-                      />
-                      <Route path="spaces" element={<SpaceManagement />} />
-                      <Route
-                        path="space-details/:id"
-                        element={<SpaceDetail />}
-                      />
-                      <Route
-                        path="property-details/:id"
-                        element={<AdminPropertyDetails />}
-                      />
-                      <Route
-                        path="manage-property/:id"
-                        element={<PropertyManagement />}
-                      />
-                      <Route path="settings" element={<AdminSettings />} />
-                      <Route path="clients" element={<Clients />} />
-                      <Route path="clients/:id" element={<ClientDetails />} />
-                      <Route path="coupons" element={<Coupons />} />
-                      <Route path="learning-hub" element={<LearningHub />} />
-                      <Route
-                        path="booking-analysis"
-                        element={<SalesAnalytics />}
-                      />
-                      <Route path="leaderboard" element={<Leaderboard />} />
-                      <Route path="support" element={<SupportChat />} />
-                      <Route
-                        path="revenue-dashboard"
-                        element={<RevenueDashboard />}
-                      />
-                      <Route path="tickets" element={<TicketSystem />} />
-                      <Route
-                        path="notifications"
-                        element={<AdminNotifications />}
-                      />
-                      <Route path="leads" element={<LeadManagement />} />
-                      <Route
-                        path="affiliates"
-                        element={<AdminAffiliateManagement />}
-                      />
-                      <Route path="*" element={<AdminDashboard />} />
-                    </Route>
-                  </Route>
-
-                  {/* Space Partner Portal Routes */}
-                  <Route element={<PartnerRoute />}>
-                    <Route path="/spaceportal" element={<SpacePortalLayout />}>
-                      <Route
-                        index
-                        element={<Navigate to="dashboard" replace />}
-                      />
-                      <Route path="dashboard" element={<Dashboard />} />
-
-                      <Route path="clients" element={<SpacePortalClients />} />
-                      <Route
-                        path="clients/:clientId"
-                        element={<SpacePortalClientDetails />}
-                      />
-                      <Route
-                        path="client-enquiries"
-                        element={<ClientEnquiries />}
-                      />
-                      <Route path="notifications" element={<Notifications />} />
-                      <Route path="profile" element={<SpacePortalProfile />} />
-                      <Route
-                        path="settings"
-                        element={<SpacePortalSettings />}
-                      />
-                      <Route path="invoices-payments" element={<Invoices />} />
-                      <Route path="booking-calendar" element={<Calendar />} />
-                      <Route
-                        path="active-requests"
-                        element={<ActiveRequests />}
-                      />
-                      <Route
-                        path="booking-analytics"
-                        element={<BookingAnalytics />}
-                      />
-                      <Route
-                        path="kyc-verification"
-                        element={<KycVerification />}
-                      />
-
-                      <Route path="space-management" element={<Spaces />} />
-                      <Route
-                        path="space-management/add"
-                        element={<AddSpace />}
-                      />
-                      <Route
-                        path="space-management/:id"
-                        element={<PropertyDetails />}
-                      />
-                      <Route
-                        path="team-management"
-                        element={<TeamManagement />}
-                      />
-                      <Route path="tickets" element={<Tickets />} />
-
-                      <Route
-                        path="feedback-nps"
-                        element={<SpacePortalFeedbackNPS />}
-                      />
-                      <Route
-                        path="tasks"
-                        element={<SpacePortalTicketAndTasks />}
-                      />
-                      <Route path="mail-visits" element={<MailAndVisits />} />
-                    </Route>
-                  </Route>
-
-                  {/* Affiliate Portal Routes */}
-                  <Route element={<AffiliateRoute />}>
                     <Route
-                      path="/affiliate-portal"
-                      element={<AffiliateLayout />}
-                    >
+                      path="/services/coworking-space"
+                      element={<CoworkingSpace />}
+                    />
+                    <Route path="/services/on-demand" element={<OnDemand />} />
+                    <Route
+                      path="/services/event-spaces"
+                      element={<EventSpaces />}
+                    />
+                    <Route
+                      path="/services/business-setup"
+                      element={<BusinessSetup />}
+                    />
+                    <Route
+                      path="/Solutions/virtual-office"
+                      element={<VirtualOfficeSolution />}
+                    />
+                    <Route
+                      path="/Solutions/coworking-space"
+                      element={<CoworkingSpaceSolution />}
+                    />
+                    <Route
+                      path="/Solutions/on-demand"
+                      element={<OnDemandSolution />}
+                    />
+                    <Route
+                      path="/Solutions/business-setup"
+                      element={<BusinessSetupSolution />}
+                    />
+
+                    <Route
+                      path="/Solutions/meetingsroom"
+                      element={<MeetingsRoom />}
+                    />
+                    <Route
+                      path="/Solutions/day-office"
+                      element={<Dayoffice />}
+                    />
+                    <Route
+                      path="/Solutions/eventspace"
+                      element={<EventSpacePage />}
+                    />
+
+                    {/* Spaces*/}
+                    <Route path="/space/:id" element={<SpaceComponent />} />
+                    <Route
+                      path="/coworking-space/:id"
+                      element={<CoworkingSpaceComponent />}
+                    />
+                    <Route
+                      path="/meeting-room/:id"
+                      element={<MeetingRoomSpaceComponent />}
+                    />
+                    <Route path="/book-seats/:id" element={<BookSeatsPage />} />
+                    <Route path="/booking/:id" element={<BookingPage />} />
+                    <Route
+                      path="/booking/:id/complete"
+                      element={<CompleteBookingPage />}
+                    />
+
+                    {/* Payment Routes */}
+                    <Route
+                      path="/payment/success"
+                      element={<PaymentSuccessPage />}
+                    />
+                    <Route
+                      path="/payment/failed"
+                      element={<PaymentFailedPage />}
+                    />
+
+                    <Route path="/city-listing" element={<CityListing />} />
+                    <Route path="/career" element={<Career />} />
+                    <Route path="/about" element={<AboutUs />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:id" element={<SinglePostPage />} />
+                    <Route path="/help" element={<HelpCenter />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+
+                    {/* Auth Routes */}
+                    <Route path="/login" element={<Index openLogin={true} />} />
+                    <Route
+                      path="/signup"
+                      element={<Index openSignup={true} />}
+                    />
+                    <Route path="/verify-otp" element={<VerifyOTP />} />
+                    <Route
+                      path="/forgot-password"
+                      element={<ForgotPassword />}
+                    />
+
+                    <Route
+                      path="/list-your-space"
+                      element={<ListYourSpace />}
+                    />
+                    <Route path="/partner" element={<PartnerWithUs />} />
+                    <Route path="/coming-soon" element={<ComingSoon />} />
+                    <Route path="/start-chatting" element={<StartChatting />} />
+
+                    {/* Protected Routes */}
+                    <Route element={<ProtectedRoute />}>
                       <Route
-                        index
-                        element={<Navigate to="affiliate-dashboard" replace />}
+                        path="/bookings"
+                        element={
+                          <Navigate to="/dashboard/my-bookings" replace />
+                        }
                       />
+                      <Route path="/community" element={<Community />} />
+                      <Route path="/settings" element={<Settings />} />
+
+                      {/* Client Dashboard Routes - Protected */}
                       <Route
-                        path="affiliate-dashboard"
-                        element={<AffiliateDashboard />}
-                      />
-                      <Route
-                        path="booking-management"
-                        element={<BookingManagement />}
-                      />
-                      <Route
-                        path="revenue-dashboard"
-                        element={<DashboardRevenue />}
-                      />
-                      <Route
-                        path="affiliate-invoices"
-                        element={<AffiliateInvoices />}
-                      />
-                      <Route path="payouts" element={<Payouts />} />
-                      <Route
-                        path="lead-management"
-                        element={<LeadManagementAffiliate />}
-                      />
-                      <Route
-                        path="quotation-generator"
-                        element={<QuotationGenerator />}
-                      />
-                      <Route
-                        path="marketing-tools"
-                        element={<MarketingTools />}
-                      />
-                      <Route path="leaderboard" element={<LeaderBoard />} />
-                      <Route path="support" element={<Support />} />
-                      <Route path="kyc" element={<AffiliateKYC />} />
-                      <Route
-                        path="notifications"
-                        element={<AffiliateNotifications />}
-                      />
-                      <Route
-                        path="client-management"
-                        element={<AffiliateClientManagement />}
+                        path="/dashboard/*"
+                        element={<ClientDashboard />}
                       />
                     </Route>
-                  </Route>
 
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
+                    {/* Admin Routes - Protected (RBAC) */}
+                    <Route element={<AdminRoute />}>
+                      <Route path="/admin" element={<AdminLayout />}>
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="users" element={<UserManagement />} />
+                        <Route path="team" element={<AdminTeamManagement />} />
+                        <Route path="kyc-requests" element={<KYCRequests />} />
+                        <Route
+                          path="kyc-requests/:id"
+                          element={<KYCDetail />}
+                        />
+                        <Route
+                          path="kyc-partners"
+                          element={<KYCPartnerRequests />}
+                        />
+                        <Route
+                          path="kyc-partners/:id"
+                          element={<SpacePartnerKycDetails />}
+                        />
+                        <Route path="spaces" element={<SpaceManagement />} />
+                        <Route
+                          path="space-details/:id"
+                          element={<SpaceDetail />}
+                        />
+                        <Route
+                          path="property-details/:id"
+                          element={<AdminPropertyDetails />}
+                        />
+                        <Route
+                          path="manage-property/:id"
+                          element={<PropertyManagement />}
+                        />
+                        <Route path="settings" element={<AdminSettings />} />
+                        <Route path="clients" element={<Clients />} />
+                        <Route path="clients/:id" element={<ClientDetails />} />
+                        <Route path="coupons" element={<Coupons />} />
+                        <Route path="learning-hub" element={<LearningHub />} />
+                        <Route
+                          path="booking-analysis"
+                          element={<SalesAnalytics />}
+                        />
+                        <Route path="leaderboard" element={<Leaderboard />} />
+                        <Route path="support" element={<SupportChat />} />
+                        <Route
+                          path="revenue-dashboard"
+                          element={<RevenueDashboard />}
+                        />
+                        <Route path="tickets" element={<TicketSystem />} />
+                        <Route
+                          path="notifications"
+                          element={<AdminNotifications />}
+                        />
+                        <Route path="invoices" element={<AdminInvoices />} />
+                        <Route path="leads" element={<LeadManagement />} />
+                        <Route
+                          path="affiliates"
+                          element={<AdminAffiliateManagement />}
+                        />
+                        <Route path="*" element={<AdminDashboard />} />
+                      </Route>
+                    </Route>
+
+                    {/* Space Partner Portal Routes */}
+                    <Route element={<PartnerRoute />}>
+                      <Route
+                        path="/spaceportal"
+                        element={<SpacePortalLayout />}
+                      >
+                        <Route
+                          index
+                          element={<Navigate to="dashboard" replace />}
+                        />
+                        <Route path="dashboard" element={<Dashboard />} />
+
+                        <Route
+                          path="clients"
+                          element={<SpacePortalClients />}
+                        />
+                        <Route
+                          path="clients/:clientId"
+                          element={<SpacePortalClientDetails />}
+                        />
+                        <Route
+                          path="client-enquiries"
+                          element={<ClientEnquiries />}
+                        />
+                        <Route
+                          path="notifications"
+                          element={<Notifications />}
+                        />
+                        <Route
+                          path="profile"
+                          element={<SpacePortalProfile />}
+                        />
+                        <Route
+                          path="settings"
+                          element={<SpacePortalSettings />}
+                        />
+                        <Route
+                          path="invoices-payments"
+                          element={<Invoices />}
+                        />
+                        <Route path="booking-calendar" element={<Calendar />} />
+                        <Route
+                          path="active-requests"
+                          element={<ActiveRequests />}
+                        />
+                        <Route
+                          path="booking-analytics"
+                          element={<BookingAnalytics />}
+                        />
+                        <Route
+                          path="kyc-verification"
+                          element={<KycVerification />}
+                        />
+
+                        <Route path="space-management" element={<Spaces />} />
+                        <Route
+                          path="space-management/add"
+                          element={<AddSpace />}
+                        />
+                        <Route
+                          path="space-management/:id"
+                          element={<PropertyDetails />}
+                        />
+                        <Route
+                          path="team-management"
+                          element={<TeamManagement />}
+                        />
+                        <Route path="tickets" element={<Tickets />} />
+
+                        <Route
+                          path="feedback-nps"
+                          element={<SpacePortalFeedbackNPS />}
+                        />
+                        <Route
+                          path="tasks"
+                          element={<SpacePortalTicketAndTasks />}
+                        />
+                        <Route path="mail-visits" element={<MailAndVisits />} />
+                      </Route>
+                    </Route>
+
+                    {/* Affiliate Portal Routes */}
+                    <Route element={<AffiliateRoute />}>
+                      <Route
+                        path="/affiliate-portal"
+                        element={<AffiliateLayout />}
+                      >
+                        <Route
+                          index
+                          element={
+                            <Navigate to="affiliate-dashboard" replace />
+                          }
+                        />
+                        <Route
+                          path="affiliate-dashboard"
+                          element={<AffiliateDashboard />}
+                        />
+                        <Route
+                          path="booking-management"
+                          element={<BookingManagement />}
+                        />
+                        <Route
+                          path="revenue-dashboard"
+                          element={<DashboardRevenue />}
+                        />
+                        <Route
+                          path="affiliate-invoices"
+                          element={<AffiliateInvoices />}
+                        />
+                        <Route path="payouts" element={<Payouts />} />
+                        <Route
+                          path="lead-management"
+                          element={<LeadManagementAffiliate />}
+                        />
+                        <Route
+                          path="quotation-generator"
+                          element={<QuotationGenerator />}
+                        />
+                        <Route
+                          path="marketing-tools"
+                          element={<MarketingTools />}
+                        />
+                        <Route path="leaderboard" element={<LeaderBoard />} />
+                        <Route path="support" element={<Support />} />
+                        <Route path="kyc" element={<AffiliateKYC />} />
+                        <Route
+                          path="notifications"
+                          element={<AffiliateNotifications />}
+                        />
+                        <Route
+                          path="client-management"
+                          element={<AffiliateClientManagement />}
+                        />
+                      </Route>
+                    </Route>
+
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </ChatProvider>
               </NotificationProvider>
             </DarkModeProvider>
           </SocketProvider>

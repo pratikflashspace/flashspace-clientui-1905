@@ -366,7 +366,7 @@ const MeetingRoomsPage: React.FC = () => {
       const SIMULATE_SUCCESS = true;
 
       if (SIMULATE_SUCCESS) {
-        console.log("Simulating Payment Success...");
+        // console.log("Simulating Payment Success...");
 
         // Simulate slight delay for realism
         await new Promise(r => setTimeout(r, 1500));

@@ -23,7 +23,7 @@ export default function MeetingDayView({ currentDate, meetings }: MeetingDayView
   const startHour = 10;
   const endHour = 18; // 6 PM
   const endMinute = 30;
-  console.log("MeetingDayView currentDate", currentDate);
+  // console.log("MeetingDayView currentDate", currentDate);
   for (let h = startHour; h <= endHour; h++) {
     timeSlots.push(`${h.toString().padStart(2, "0")}:00`);
     if (h < endHour || (h === endHour && endMinute === 30)) {

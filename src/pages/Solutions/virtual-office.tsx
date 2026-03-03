@@ -1051,7 +1051,7 @@ const VirtualOffice = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="py-20 bg-gradient-to-br from-[#172A3A] via-[#172A3A] to-[#2a4a5a] relative overflow-hidden">
+            <section id="sales-contact" className="py-20 bg-gradient-to-br from-[#172A3A] via-[#172A3A] to-[#2a4a5a] relative overflow-hidden">
                 {/* Animated Background */}
                 <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-0 left-0 w-96 h-96 bg-[#EDB003] rounded-full blur-3xl animate-pulse"></div>
@@ -1097,4 +1097,3 @@ const VirtualOffice = () => {
 };
 
 export default VirtualOffice;
-

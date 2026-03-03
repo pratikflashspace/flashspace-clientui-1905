@@ -697,7 +697,7 @@ const BookingPage = () => {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
-        <main className="flex-grow bg-white pt-20">
+        <main className="relative flex-grow bg-white pt-20">
           <BookingPageSkeleton />
         </main>
         <Footer />
@@ -709,7 +709,7 @@ const BookingPage = () => {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
-        <main className="flex-grow bg-gray-50 pt-20 flex items-center justify-center">
+        <main className="relative flex-grow bg-gray-50 pt-20 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-500 text-xl mb-4">
               {error || "Plan details not found"}
@@ -734,7 +734,7 @@ const BookingPage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30">
       <Header />
-      <main className="flex-grow pt-24 pb-16 px-4">
+      <main className="relative flex-grow pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Back */}
           <button

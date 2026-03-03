@@ -465,9 +465,9 @@ const VirtualOffice = () => {
                       key={office._id}
                       item={office}
                       onGetBestPrice={() => handleGetBestPrice(office._id)}
-                      onToggleFavorite={(itemId) =>
-                        console.log("Toggle favorite for:", itemId)
-                      }
+                      onToggleFavorite={(itemId) => {
+                        /* console.log('Toggle favorite for:', itemId) */
+                      }}
                     />
                   ))
                 )}

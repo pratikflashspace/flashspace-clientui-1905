@@ -1,5 +1,5 @@
-import React from "react";
-import { Share2, Download } from "lucide-react";
+import React, { useState } from "react";
+import { Share2, Download, Eye, X, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -51,6 +51,8 @@ const QuotationCard = ({
     date,
     status,
 }: QuotationCardProps) => {
+    const [showPreview, setShowPreview] = useState(false);
+
     const statusStyles = {
         Sent: "bg-orange-50 text-orange-600 border-orange-100",
         Viewed: "bg-blue-50 text-blue-600 border-blue-100",
@@ -337,61 +339,233 @@ const QuotationCard = ({
     };
 
     return (
-        <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative transition-all hover:border-[#5bb09c]/30">
-            {/* Top Row: ID and Status Badge */}
-            <div className="flex justify-between items-start mb-3">
-                <span className="text-[11px] font-bold text-[#5bb09c] uppercase tracking-wider">
-                    {id}
-                </span>
-                <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusStyles[status]}`}
-                >
-                    {status}
-                </span>
-            </div>
+        <>
+            {/* ===== INVOICE-PAPER STYLE PREVIEW MODAL ===== */}
+            {showPreview && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                    {/* Modal Container - matches AffiliateInvoices exactly */}
+                    <div className="bg-white w-full max-w-3xl max-h-[85vh] rounded-2xl shadow-2xl flex flex-col relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
-            {/* Info Section */}
-            <div className="mb-4">
-                <h4 className="font-bold text-gray-900 text-base mb-1">
-                    {clientName}
-                </h4>
-                <p className="text-xs text-gray-500 font-medium leading-relaxed">
-                    {spaceDetails}
-                    <br />
-                    {location}
-                </p>
-            </div>
+                        {/* Sticky Header */}
+                        <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white sticky top-0 z-10 flex-shrink-0">
+                            <div className="flex items-center gap-3">
+                                <h2 className="font-bold text-lg text-slate-800">{id}</h2>
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusStyles[status]}`}>{status}</span>
+                            </div>
+                            <button onClick={() => setShowPreview(false)} className="p-2 hover:bg-gray-100 rounded-full transition">
+                                <X className="w-5 h-5 text-gray-500" />
+                            </button>
+                        </div>
 
-            {/* Bottom Row: Price, Date, and Actions */}
-            <div className="flex justify-between items-center pt-3 border-t border-gray-50">
-                <div className="flex items-baseline gap-2">
-                    <span className="text-base font-bold text-gray-900">
-                        {price}
+                        {/* Scrollable Body — the "Paper" */}
+                        <div className="overflow-y-auto flex-1 bg-white">
+                            <div className="bg-white p-8 max-w-3xl mx-auto text-slate-800 font-sans">
+
+                                {/* Header Row */}
+                                <div className="flex justify-between items-start mb-8">
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-[#5bb09c] mb-1">FlashSpace</h1>
+                                        <p className="text-sm text-gray-500 font-medium">Virtual Office Solutions</p>
+                                        <div className="mt-3 text-xs text-gray-500 leading-relaxed">
+                                            <p>123 Business Hub, Connaught Place</p>
+                                            <p>New Delhi, Delhi 110001</p>
+                                            <p>GSTIN: 07AABCT1234F1ZH</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="flex flex-col items-end gap-1">
+                                            <h2 className="text-lg font-bold text-slate-900">Quotation</h2>
+                                            <span className="text-sm font-mono text-[#5bb09c] font-bold">{id}</span>
+                                        </div>
+                                        <div className="mt-4 text-xs text-right space-y-1">
+                                            <div className="flex justify-between gap-6">
+                                                <span className="text-gray-500">Issue Date</span>
+                                                <span className="font-semibold">{date}</span>
+                                            </div>
+                                            <div className="flex justify-between gap-6">
+                                                <span className="text-gray-500">Valid Until</span>
+                                                <span className="font-semibold">30 Days</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Bill To */}
+                                <div className="mb-8">
+                                    <p className="text-xs font-bold text-gray-500 uppercase mb-2">Prepared For</p>
+                                    <div className="text-sm text-slate-900">
+                                        <p className="font-bold text-base">{clientName}</p>
+                                        <p className="text-gray-500 mt-0.5">{location}</p>
+                                    </div>
+                                </div>
+
+                                {/* Line Items Table */}
+                                <div className="mb-8">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="bg-gray-50 border-b border-gray-100">
+                                                <th className="text-left py-3 px-3 font-semibold text-gray-600">Description</th>
+                                                <th className="text-center py-3 px-3 font-semibold text-gray-600">Qty</th>
+                                                <th className="text-right py-3 px-3 font-semibold text-gray-600">Rate</th>
+                                                <th className="text-right py-3 px-3 font-semibold text-gray-600">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            <tr>
+                                                <td className="py-3 px-3">
+                                                    <p className="font-medium">{spaceDetails}</p>
+                                                    <p className="text-xs text-gray-400 mt-0.5">{location}</p>
+                                                </td>
+                                                <td className="py-3 px-3 text-center">1</td>
+                                                <td className="py-3 px-3 text-right">{price}</td>
+                                                <td className="py-3 px-3 text-right font-medium">{price}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Totals & Notes */}
+                                <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+                                    {/* Notes / Terms */}
+                                    <div className="flex-1 bg-gray-50 p-4 rounded-lg text-xs space-y-2">
+                                        <p className="font-bold text-gray-700 mb-1">Payment Details</p>
+                                        <div className="flex gap-2">
+                                            <span className="text-gray-500 w-16">Bank:</span>
+                                            <span className="font-medium">HDFC Bank</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span className="text-gray-500 w-16">Account:</span>
+                                            <span className="font-medium">50200025626726</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span className="text-gray-500 w-16">IFSC:</span>
+                                            <span className="font-medium">HDFC0004399</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span className="text-gray-500 w-16">UPI:</span>
+                                            <span className="font-medium">stirringmindsbank@upi</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Calculations */}
+                                    <div className="w-full md:w-64 space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-500">Subtotal</span>
+                                            <span>{price}</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs text-gray-500">
+                                            <span>CGST (9%)</span>
+                                            <span>Included</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs text-gray-500">
+                                            <span>SGST (9%)</span>
+                                            <span>Included</span>
+                                        </div>
+                                        <div className="border-t border-gray-200 my-2 pt-2 flex justify-between font-bold text-slate-900 text-lg">
+                                            <span>Total</span>
+                                            <span className="text-[#5bb09c]">{price}</span>
+                                        </div>
+                                        <div className="mt-2 bg-[#5bb09c]/10 p-3 rounded-lg flex justify-between items-center border border-[#5bb09c]/20">
+                                            <span className="text-xs font-bold text-[#5bb09c]">Valid For</span>
+                                            <span className="text-sm font-bold text-[#5bb09c]">30 Days</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        {/* Sticky Footer */}
+                        <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center sticky bottom-0 z-10 flex-shrink-0">
+                            <button className="flex items-center gap-2 text-gray-500 text-sm hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
+                                <Share2 className="w-4 h-4" /> Share
+                            </button>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={handleDownloadPDF}
+                                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 transition text-gray-700"
+                                >
+                                    <Printer className="w-4 h-4" /> Print
+                                </button>
+                                <button
+                                    onClick={handleDownloadPDF}
+                                    className="flex items-center gap-2 px-4 py-2 bg-[#5bb09c] text-white rounded-lg text-sm font-medium hover:bg-[#4a9b89] shadow-sm hover:shadow transition"
+                                >
+                                    <Download className="w-4 h-4" /> Download PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative transition-all hover:border-[#5bb09c]/30">
+                {/* Top Row: ID and Status Badge */}
+                <div className="flex justify-between items-start mb-3">
+                    <span className="text-[11px] font-bold text-[#5bb09c] uppercase tracking-wider">
+                        {id}
                     </span>
-                    <span className="text-[10px] text-gray-400 font-medium">
-                        {date}
+                    <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusStyles[status]}`}
+                    >
+                        {status}
                     </span>
                 </div>
 
-                <div className="flex gap-1">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
-                    >
-                        <Share2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
-                        onClick={handleDownloadPDF}
-                    >
-                        <Download className="w-4 h-4" />
-                    </Button>
+                {/* Info Section */}
+                <div className="mb-4">
+                    <h4 className="font-bold text-gray-900 text-base mb-1">
+                        {clientName}
+                    </h4>
+                    <p className="text-xs text-gray-500 font-medium leading-relaxed">
+                        {spaceDetails}
+                        <br />
+                        {location}
+                    </p>
+                </div>
+
+                {/* Bottom Row: Price, Date, and Actions */}
+                <div className="flex justify-between items-center pt-3 border-t border-gray-50">
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-base font-bold text-gray-900">
+                            {price}
+                        </span>
+                        <span className="text-[10px] text-gray-400 font-medium">
+                            {date}
+                        </span>
+                    </div>
+
+                    <div className="flex gap-1">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Preview"
+                            className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
+                            onClick={() => setShowPreview(true)}
+                        >
+                            <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Share"
+                            className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
+                        >
+                            <Share2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Download PDF"
+                            className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
+                            onClick={handleDownloadPDF}
+                        >
+                            <Download className="w-4 h-4" />
+                        </Button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

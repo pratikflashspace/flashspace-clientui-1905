@@ -37,7 +37,8 @@ export const initLenis = () => {
 /**
  * Gets the global Lenis instance
  */
-export const getLenis = () => lenis;
+export const getLenis = () =>
+  lenis || (typeof window !== "undefined" ? (window as any).__lenis : null);
 
 /**
  * Smoothly scrolls to a target element or position
@@ -46,7 +47,8 @@ export const smoothScrollTo = (
   target: string | number | HTMLElement,
   options = {},
 ) => {
-  if (!lenis) {
+  const instance = getLenis();
+  if (!instance) {
     // Fallback to native smooth scroll if Lenis is not initialized
     if (typeof target === "string") {
       const element = document.querySelector(target);
@@ -59,7 +61,7 @@ export const smoothScrollTo = (
     return;
   }
 
-  lenis.scrollTo(target, {
+  instance.scrollTo(target, {
     offset: 0,
     immediate: false,
     duration: 1.2,

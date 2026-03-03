@@ -41,7 +41,17 @@ export interface UserData {
   fullName: string;
   email: string;
   phoneNumber?: string;
-  role: "user" | "super_admin" | "admin" | "affiliate_manager" | "space_partner_manager" | "support" | "partner" | "space_manager" | "sales" | "affiliate";
+  role:
+    | "user"
+    | "super_admin"
+    | "admin"
+    | "affiliate_manager"
+    | "space_partner_manager"
+    | "support"
+    | "partner"
+    | "space_manager"
+    | "sales"
+    | "affiliate";
   status: "active" | "inactive" | "pending";
   isEmailVerified?: boolean;
   createdAt: string;
@@ -64,11 +74,11 @@ export interface BookingData {
   };
   type: "virtual_office" | "coworking_space";
   status:
-  | "pending_payment"
-  | "pending_kyc"
-  | "active"
-  | "expired"
-  | "cancelled";
+    | "pending_payment"
+    | "pending_kyc"
+    | "active"
+    | "expired"
+    | "cancelled";
   plan: {
     name: string;
     price: number;
@@ -108,11 +118,11 @@ export interface KYCData {
     partners?: string[];
   };
   overallStatus:
-  | "not_started"
-  | "pending"
-  | "approved"
-  | "rejected"
-  | "resubmit";
+    | "not_started"
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "resubmit";
   documents: Array<{
     type: string;
     name: string;
@@ -696,6 +706,21 @@ class AdminService {
     const response = await axiosInstance.get<ApiResponse<any>>(
       `/api/admin/kyc/business-info/${id}`,
     );
+    return response.data;
+  }
+
+  async getAllInvoices(params?: {
+    page?: number;
+    limit?: number;
+    type?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+  }): Promise<ApiResponse<{ invoices: any[]; pagination: any }>> {
+    const response = await axiosInstance.get<
+      ApiResponse<{ invoices: any[]; pagination: any }>
+    >("/api/admin/invoices", { params });
     return response.data;
   }
 }
