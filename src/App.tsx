@@ -21,7 +21,7 @@ import VirtualOffice from "./pages/services/VirtualOffice";
 
 import CoworkingSpace from "./pages/services/CoworkingSpace";
 import OnDemand from "./pages/services/OnDemand";
-import EventSpaces from "./pages/services/EventSpaces";
+import GetWorkspaces from "./pages/services/GetWorkspaces";
 import BusinessSetup from "./pages/services/BusinessSetup";
 import StartChatting from "./pages/StartChatting";
 import VirtualOfficeSolution from "./pages/Solutions/virtual-office";
@@ -56,9 +56,7 @@ import ClientDashboard from "./components/ClientDashboard";
 import ScrollToTop from "./components/ScrollToTop";
 
 //-----------spaces---------
-import SpaceComponent from "./components/Spaces/SpaceComponent";
-import MeetingRoomSpaceComponent from "./components/Spaces/MeetingRoomSpaceComponent";
-import CoworkingSpaceComponent from "./components/Spaces/CoworkingSpaceComponent";
+import WorkspaceDetail from "./pages/WorkspaceDetail";
 import BookingPage from "./pages/BookingPage";
 import CompleteBookingPage from "./pages/CompleteBookingPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
@@ -198,16 +196,19 @@ const App = () => (
 
                   <Route
                     path="/services/virtual-office"
-                    element={<VirtualOffice />}
+                    element={<GetWorkspaces />}
                   />
                   <Route
                     path="/services/coworking-space"
-                    element={<CoworkingSpace />}
+                    element={<GetWorkspaces />}
                   />
-                  <Route path="/services/on-demand" element={<OnDemand />} />
+                  <Route
+                    path="/services/on-demand"
+                    element={<GetWorkspaces />}
+                  />
                   <Route
                     path="/services/event-spaces"
-                    element={<EventSpaces />}
+                    element={<GetWorkspaces />}
                   />
                   <Route
                     path="/services/business-setup"
@@ -241,14 +242,17 @@ const App = () => (
                   />
 
                   {/* Spaces*/}
-                  <Route path="/space/:id" element={<SpaceComponent />} />
+                  <Route
+                    path="/space/:id"
+                    element={<WorkspaceDetail type="virtual-office" />}
+                  />
                   <Route
                     path="/coworking-space/:id"
-                    element={<CoworkingSpaceComponent />}
+                    element={<WorkspaceDetail type="coworking" />}
                   />
                   <Route
                     path="/meeting-room/:id"
-                    element={<MeetingRoomSpaceComponent />}
+                    element={<WorkspaceDetail type="on-demand" />}
                   />
                   <Route path="/booking/:id" element={<BookingPage />} />
                   <Route
