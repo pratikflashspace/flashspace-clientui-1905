@@ -81,6 +81,7 @@ import SalesAnalytics from "./pages/admin/SalesAnalytics";
 import LeadManagement from "./pages/admin/LeadManagement";
 import TicketSystem from "./pages/admin/TicketSystem";
 import AdminNotifications from "./pages/admin/Notifications";
+import AdminInvoices from "./pages/admin/Invoices";
 
 import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
@@ -323,6 +324,7 @@ const App = () => (
                         path="notifications"
                         element={<AdminNotifications />}
                       />
+                      <Route path="invoices" element={<AdminInvoices />} />
                       <Route path="leads" element={<LeadManagement />} />
                       <Route
                         path="affiliates"

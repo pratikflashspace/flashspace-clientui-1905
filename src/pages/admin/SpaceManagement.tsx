@@ -133,10 +133,11 @@ export default function SpaceManagement() {
     .sort();
 
   const filteredSpaces = spaces.filter((space) => {
+    const searchLower = (searchTerm || "").toLowerCase();
     const matchesSearch =
-      space.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      space.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      space.area.toLowerCase().includes(searchTerm.toLowerCase());
+      (space.name || "").toLowerCase().includes(searchLower) ||
+      (space.city || "").toLowerCase().includes(searchLower) ||
+      (space.area || "").toLowerCase().includes(searchLower);
 
     const matchesType = typeFilter === "all" || space.type === typeFilter;
     const matchesCity = cityFilter === "all" || space.city === cityFilter;
@@ -326,7 +327,7 @@ export default function SpaceManagement() {
               <div className="p-6 flex-1 flex flex-col">
                 {/* Features */}
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {space.features.slice(0, 3).map((feature, i) => (
+                  {(space.features || []).slice(0, 3).map((feature, i) => (
                     <span
                       key={i}
                       className="px-2.5 py-1 bg-gray-50 text-xs font-medium text-gray-600 rounded-md border border-gray-100"
@@ -334,9 +335,9 @@ export default function SpaceManagement() {
                       {feature}
                     </span>
                   ))}
-                  {space.features.length > 3 && (
+                  {(space.features || []).length > 3 && (
                     <span className="px-2.5 py-1 bg-gray-50 text-xs font-medium text-gray-400 rounded-md border border-gray-100">
-                      +{space.features.length - 3}
+                      +{(space.features || []).length - 3}
                     </span>
                   )}
                 </div>
