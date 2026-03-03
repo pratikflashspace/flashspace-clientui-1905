@@ -21,7 +21,7 @@ export const getVirtualOfficesByCity = async (
   city: string,
 ): Promise<VirtualOfficeItem[]> => {
   try {
-    console.log(`📍 Fetching virtual offices for city: ${city}`);
+    // console.log(`📍 Fetching virtual offices for city: ${city}`);
     const response = await axiosInstance.get(
       `/virtualOffice/getByCity/${city}`,
     );
@@ -33,7 +33,7 @@ export const getVirtualOfficesByCity = async (
         ? data.data
         : data.data?.offices || [];
 
-      console.log(`✅ Successfully fetched ${offices.length} virtual offices`);
+      // console.log(`✅ Successfully fetched ${offices.length} virtual offices`);
       return offices;
     }
 

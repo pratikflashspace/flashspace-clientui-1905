@@ -58,23 +58,7 @@ const OnDemand = () => {
         setSearchCity(city);
     }, [searchParams]);
 
-    // Disable Lenis smooth scroll for this specific container
-    useEffect(() => {
-        const scrollContainer = scrollContainerRef.current;
-        if (!scrollContainer) return;
 
-        scrollContainer.setAttribute('data-lenis-prevent', 'true');
-
-        const preventLenis = (e: WheelEvent) => {
-            e.stopPropagation();
-        };
-
-        scrollContainer.addEventListener('wheel', preventLenis, { passive: false });
-
-        return () => {
-            scrollContainer.removeEventListener('wheel', preventLenis);
-        };
-    }, []);
 
     // Fetch meeting rooms
     useEffect(() => {
@@ -247,7 +231,6 @@ const OnDemand = () => {
                     <div
                         ref={scrollContainerRef}
                         className="w-full h-full overflow-y-auto"
-                        data-lenis-prevent
                     >
 
 
@@ -338,7 +321,7 @@ const OnDemand = () => {
                                         key={room._id}
                                         item={room}
                                         onGetBestPrice={() => handleGetBestPrice(room)}
-                                        onToggleFavorite={(itemId) => console.log('Toggle favorite for:', itemId)}
+                                        onToggleFavorite={(itemId) => { /* console.log('Toggle favorite for:', itemId) */ }}
                                     />
                                 ))}
                             </div>

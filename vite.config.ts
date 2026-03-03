@@ -13,6 +13,13 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    proxy: {
+      '/api/webhook': {
+        target: 'https://n8n.srv906242.hstgr.cloud/webhook',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/webhook/, '')
+      }
+    }
   },
   optimizeDeps: {
     include: ['maplibre-gl'],

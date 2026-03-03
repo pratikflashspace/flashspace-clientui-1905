@@ -155,7 +155,7 @@ const MeetingRoomSpaceComponent = () => {
         return (
             <div className="flex flex-col min-h-screen">
                 <Header />
-                <main className="flex-grow pt-20"><SpaceDetailSkeleton /></main>
+                <main className="relative flex-grow pt-20"><SpaceDetailSkeleton /></main>
             </div>
         );
     }
@@ -164,7 +164,7 @@ const MeetingRoomSpaceComponent = () => {
         return (
             <div className="flex flex-col min-h-screen">
                 <Header />
-                <main className="flex-grow pt-20 flex items-center justify-center">
+                <main className="relative flex-grow pt-20 flex items-center justify-center">
                     <div className="text-center">
                         <p className="text-red-500 text-xl font-bold">{error}</p>
                         <button onClick={() => navigate(-1)} className="mt-4 px-4 py-2 bg-yellow-400 rounded">Go Back</button>
@@ -181,7 +181,7 @@ const MeetingRoomSpaceComponent = () => {
     return (
         <div className="flex flex-col min-h-screen font-poppins">
             <Header />
-            <main className="flex-grow bg-white pt-20">
+            <main className="relative flex-grow bg-white pt-20">
                 <div className="max-w-7xl mx-auto px-4 py-10">
 
                     {/* Header */}

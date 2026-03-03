@@ -9,7 +9,7 @@ import axios from 'axios';
 const RAW_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_BASE_URL = RAW_BASE_URL.endsWith('/api') ? RAW_BASE_URL : `${RAW_BASE_URL.replace(/\/$/, '')}/api`;
 
-console.log('🌍 API Base URL:', API_BASE_URL);
+// console.log('🌍 API Base URL:', API_BASE_URL);
 
 // Create axios instance with default configuration
 const axiosInstance = axios.create({
@@ -24,7 +24,7 @@ const axiosInstance = axios.create({
 // Add request interceptor for logging (optional)
 axiosInstance.interceptors.request.use(
   (config) => {
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    // console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
     return config;
   },
   (error) => {

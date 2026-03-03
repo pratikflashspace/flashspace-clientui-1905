@@ -14,7 +14,7 @@ const NewTicketForm = ({ onCancel }: NewTicketFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('New Ticket Data:', formData);
+    // console.log('New Ticket Data:', formData);
     // Logic for API calls can be placed here
     if (onCancel) onCancel();
   };

@@ -151,7 +151,7 @@ export default function KYCVerification() {
             setKycType("individual");
           }
         } catch (e) {
-          console.log("Not a partner ID either");
+          // console.log("Not a partner ID either");
         }
       }
 
@@ -1702,11 +1702,11 @@ export default function KYCVerification() {
                               <div className="flex gap-2 justify-center">
                                 <button
                                   onClick={() => {
-                                    console.log("Video document:", videoDoc);
-                                    console.log(
-                                      "Video fileUrl:",
-                                      videoDoc.fileUrl,
-                                    );
+                                    // console.log("Video document:", videoDoc);
+                                    // console.log(
+                                    //   "Video fileUrl:",
+                                    //   videoDoc.fileUrl,
+                                    // );
                                     if (videoDoc.fileUrl) {
                                       setPreviewDoc({
                                         url: videoDoc.fileUrl,
@@ -2210,9 +2210,9 @@ export default function KYCVerification() {
                             ? previewDoc.url
                             : `${API_CONFIG.BASE_URL}${previewDoc.url}`;
 
-                          console.log("Preview Doc:", previewDoc);
-                          console.log("Full URL:", fullUrl);
-                          console.log("MIME Type:", previewDoc.mimeType);
+                          // console.log("Preview Doc:", previewDoc);
+                          // console.log("Full URL:", fullUrl);
+                          // console.log("MIME Type:", previewDoc.mimeType);
 
                           if (previewDoc.mimeType === "application/pdf") {
                             return (

@@ -150,18 +150,18 @@ export default function TicketSystem() {
     // Admin Feed Listener (Global)
     useEffect(() => {
         if (!socket) {
-            console.log("Socket not available for admin feed");
+            // console.log("Socket not available for admin feed");
             return;
         }
 
-        console.log("Emitting join_admin_feed");
+        // console.log("Emitting join_admin_feed");
         socket.emit('join_admin_feed');
 
         const handleNewTicket = (ticket: any) => {
-            console.log("Received new_ticket_created event!", ticket);
+            // console.log("Received new_ticket_created event!", ticket);
             try {
                 playNotificationSound();
-                console.log("Sound played");
+                // console.log("Sound played");
             } catch (e) {
                 console.error("Error playing sound:", e);
             }

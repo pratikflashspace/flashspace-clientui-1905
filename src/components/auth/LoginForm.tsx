@@ -87,10 +87,10 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" style={{ fontFamily: 'Poppins' }}>
+    <form onSubmit={handleSubmit} className="space-y-5" style={{ fontFamily: '"Inner Tight", system-ui, sans-serif' }}>
       {/* Email Field */}
       <div className="space-y-2">
-        <label htmlFor="email" className="block text-sm font-semibold text-[#586A7E]">
+        <label htmlFor="email" className="block text-sm font-bold text-[#1F2E26]">
           Email Address
         </label>
         <div className="relative">
@@ -105,14 +105,14 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
             value={formData.email}
             onChange={handleChange}
             disabled={isLoading}
-            className="w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/20 focus:border-[#4DA1FF] placeholder:text-slate-400 text-[#172A3A]"
+            className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/20 focus:border-[#4DA1FF] placeholder:text-slate-400 text-[#172A3A]"
           />
         </div>
       </div>
 
       {/* Password Field */}
       <div className="space-y-2">
-        <label htmlFor="password" className="block text-sm font-semibold text-[#586A7E]">
+        <label htmlFor="password" className="block text-sm font-bold text-[#1F2E26]">
           Password
         </label>
         <div className="relative">
@@ -127,7 +127,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
             value={formData.password}
             onChange={handleChange}
             disabled={isLoading}
-            className="w-full pl-12 pr-12 py-3.5 border border-slate-200 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/20 focus:border-[#4DA1FF] placeholder:text-slate-400 text-[#172A3A]"
+            className="w-full pl-12 pr-12 py-3 border border-slate-200 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/20 focus:border-[#4DA1FF] placeholder:text-slate-400 text-[#172A3A]"
           />
           <button
             type="button"
@@ -148,11 +148,11 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
             onChange={(e) => setRememberMe(e.target.checked)}
             className="w-4 h-4 rounded border-slate-300 text-[#4DA1FF] focus:ring-[#4DA1FF]/20"
           />
-          <span className="text-sm text-[#586A7E]">Remember me</span>
+          <span className="text-sm font-medium text-[#172A3A]">Remember me</span>
         </label>
         <Link
           to="/forgot-password"
-          className="text-sm font-semibold text-[#EDB003] hover:text-[#d99f03] transition-colors duration-200"
+          className="text-sm font-medium text-[#172A3A] hover:text-black transition-colors duration-200"
         >
           Forgot Password?
         </Link>
@@ -161,7 +161,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       {/* Submit Button */}
       <Button
         type="submit"
-        className="w-full bg-[#EDB003] hover:bg-[#d99f03] text-white font-bold py-3.5 rounded-xl shadow-md transition-all duration-200 hover:shadow-lg text-base border-0"
+        className="w-full bg-[#FEF8C3] hover:bg-[#FDF4A6] text-[#172A3A] font-semibold py-3 rounded-xl transition-all duration-200 text-[15px] border-0"
         disabled={isLoading}
       >
         {isLoading ? (
@@ -172,7 +172,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
         ) : (
           <div className="flex items-center justify-center gap-2">
             <span>Sign In</span>
-            <ArrowRight className="h-5 w-5" />
+            <ArrowRight className="h-4 w-4" />
           </div>
         )}
       </Button>
