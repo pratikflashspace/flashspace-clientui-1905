@@ -207,15 +207,19 @@ const App = () => (
 
                     <Route path="/" element={<Index />} />
                     <Route path="/services" element={<Services />} />
+
                     <Route
                       path="/services/virtual-office"
-                      element={<VirtualOffice />}
+                      element={<GetWorkspaces />}
                     />
                     <Route
                       path="/services/coworking-space"
-                      element={<CoworkingSpace />}
+                      element={<GetWorkspaces />}
                     />
-                    <Route path="/services/on-demand" element={<OnDemand />} />
+                    <Route
+                      path="/services/on-demand"
+                      element={<GetWorkspaces />}
+                    />
                     <Route
                       path="/services/event-spaces"
                       element={<EventSpaces />}
@@ -224,7 +228,6 @@ const App = () => (
                       path="/services/business-setup"
                       element={<BusinessSetup />}
                     />
-
                     <Route
                       path="/Solutions/virtual-office"
                       element={<VirtualOfficeSolution />}
@@ -241,6 +244,7 @@ const App = () => (
                       path="/Solutions/business-setup"
                       element={<BusinessSetupSolution />}
                     />
+
                     <Route
                       path="/Solutions/meetingsroom"
                       element={<MeetingsRoom />}
@@ -254,20 +258,20 @@ const App = () => (
                       element={<EventSpacePage />}
                     />
 
-                    {/* Space Detail Routes */}
-                    <Route path="/space/:id" element={<SpaceComponent />} />
+                    {/* Spaces*/}
+                    <Route
+                      path="/space/:id"
+                      element={<WorkspaceDetail type="virtual-office" />}
+                    />
                     <Route
                       path="/coworking-space/:id"
-                      element={<CoworkingSpaceComponent />}
+                      element={<WorkspaceDetail type="coworking" />}
                     />
                     <Route
                       path="/meeting-room/:id"
-                      element={<MeetingRoomSpaceComponent />}
+                      element={<WorkspaceDetail type="on-demand" />}
                     />
-
-                    {/* Booking Routes */}
                     <Route path="/booking/:id" element={<BookingPage />} />
-                    <Route path="/book-seats/:id" element={<BookSeatsPage />} />
                     <Route
                       path="/booking/:id/complete"
                       element={<CompleteBookingPage />}
@@ -283,7 +287,6 @@ const App = () => (
                       element={<PaymentFailedPage />}
                     />
 
-                    {/* Information Pages */}
                     <Route path="/city-listing" element={<CityListing />} />
                     <Route path="/career" element={<Career />} />
                     <Route path="/about" element={<AboutUs />} />
@@ -304,7 +307,6 @@ const App = () => (
                       element={<ForgotPassword />}
                     />
 
-                    {/* Partnership Routes */}
                     <Route
                       path="/list-your-space"
                       element={<ListYourSpace />}
@@ -313,23 +315,20 @@ const App = () => (
                     <Route path="/coming-soon" element={<ComingSoon />} />
                     <Route path="/start-chatting" element={<StartChatting />} />
 
-                    {/* User Protected Routes */}
+                    {/* Protected Routes */}
                     <Route element={<ProtectedRoute />}>
-                      <Route
-                        path="/bookings"
-                        element={
-                          <Navigate to="/dashboard/my-bookings" replace />
-                        }
-                      />
+                      <Route path="/bookings" element={<Bookings />} />
                       <Route path="/community" element={<Community />} />
                       <Route path="/settings" element={<Settings />} />
+
+                      {/* Client Dashboard Routes - Protected */}
                       <Route
                         path="/dashboard/*"
                         element={<ClientDashboard />}
                       />
                     </Route>
 
-                    {/* Admin Protected Routes */}
+                    {/* Admin Routes - Protected (RBAC) */}
                     <Route element={<AdminRoute />}>
                       <Route path="/admin" element={<AdminLayout />}>
                         <Route index element={<AdminDashboard />} />

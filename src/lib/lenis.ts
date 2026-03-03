@@ -69,3 +69,24 @@ export const smoothScrollTo = (
     ...options,
   });
 };
+
+/**
+ * Runtime tweak of base Lenis options
+ */
+export function updateLenisOptions(options: any) {
+  const instance = getLenis();
+  if (instance) {
+    Object.assign(instance.options, options);
+  }
+}
+
+/**
+ * Handy preset easings
+ */
+export const Easings = {
+  easeOutExpo: (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+  easeInOutQuad: (t: number) =>
+    t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2,
+  easeOutCubic: (t: number) => 1 - Math.pow(1 - t, 3),
+  linear: (t: number) => t,
+};
