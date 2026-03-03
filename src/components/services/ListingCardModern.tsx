@@ -234,7 +234,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
 
           {/* Features Tags */}
           <div className="flex flex-wrap gap-1.5 mb-3">
-            {item.features.slice(0, 2).map((feature, idx) => (
+            {item.features?.slice(0, 2).map((feature, idx) => (
               <span
                 key={idx}
                 className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md"
