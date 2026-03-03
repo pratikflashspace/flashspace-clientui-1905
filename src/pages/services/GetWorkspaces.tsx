@@ -1,0 +1,942 @@
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate, useLocation } from "react-router-dom";
+import Header from "@/components/Header";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Search,
+  Star,
+  MapPin,
+  List,
+  LayoutGrid,
+  ChevronRight,
+  ChevronLeft,
+  Bookmark,
+  ShoppingCart,
+  Phone,
+  Flame,
+  Map,
+} from "lucide-react";
+import MapLibreMap from "@/components/Map/MapLibreMap";
+import { getVirtualOfficesByCity } from "@/services/virtualOffice.service";
+import { getCoworkingSpacesByCity } from "@/services/coworkingSpace.service";
+import { getMeetingRoomsByCity } from "@/services/meetingRoom.service";
+import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
+
+// Static placeholders for fallback/missing data
+// import connaughtPlace1 from "@/assets/connaught-place-1.png";
+
+type ViewMode = "list" | "grid";
+
+// Make it match the shape they provided
+interface UnifiedWorkspace {
+  id: string;
+  name: string;
+  location: string;
+  address: string;
+  rating: number;
+  reviews: number;
+  tags: string[];
+  plans: { label: string; price: string }[];
+  image: string;
+  images: string[];
+  popular: boolean;
+  available: boolean;
+  negotiable: boolean;
+  lat: number;
+  lng: number;
+}
+
+const getValidImage = (img: string | undefined, defaultImg: string) => {
+  if (
+    !img ||
+    img.startsWith("url") ||
+    img.trim() === "img1.jpg" ||
+    img.trim() === "url1.jpg"
+  )
+    return defaultImg;
+  return img;
+};
+
+const WorkspaceCard = ({
+  ws,
+  view,
+  type,
+}: {
+  ws: UnifiedWorkspace;
+  view: ViewMode;
+  type: string;
+}) => {
+  const { toast } = useToast();
+  const [liked, setLiked] = useState(false);
+  const [carted, setCarted] = useState(false);
+  const [imgIndex, setImgIndex] = useState(0);
+  const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const handleNavigate = () => {
+    if (type === "virtual-office") navigate(`/space/${ws.id}`);
+    else if (type === "coworking") navigate(`/coworking-space/${ws.id}`);
+    else navigate(`/meeting-room/${ws.id}`);
+  };
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const next = !liked;
+    setLiked(next);
+    toast({
+      title: next ? "Saved to your wishlist" : "Removed from wishlist",
+      description: next
+        ? `${ws.location} has been saved.`
+        : `${ws.location} has been removed.`,
+    });
+  };
+
+  const handleCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const next = !carted;
+    setCarted(next);
+    toast({
+      title: next ? "Added to cart" : "Removed from cart",
+      description: next
+        ? `${ws.location} has been added to your cart.`
+        : `${ws.location} has been removed from your cart.`,
+    });
+  };
+
+  const rawImages = ws.images && ws.images.length > 0 ? ws.images : [ws.image];
+  const images = rawImages.map((img) =>
+    getValidImage(
+      img,
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
+    ),
+  );
+
+  const prevImg = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setImgIndex((i) => (i - 1 + images.length) % images.length);
+  };
+  const nextImg = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setImgIndex((i) => (i + 1) % images.length);
+  };
+
+  if (view === "list") {
+    return (
+      <div
+        onClick={handleNavigate}
+        className="flex gap-4 cursor-pointer group bg-card rounded-2xl border border-border/60 p-4 shadow-soft hover:shadow-soft-lg transition-all duration-200"
+      >
+        {/* Image — fixed size, never shrinks */}
+        <div className="relative w-36 h-auto min-h-[120px] flex-shrink-0 rounded-xl overflow-hidden self-stretch">
+          <img
+            src={images[imgIndex]}
+            alt={ws.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          {ws.popular && (
+            <span className="absolute top-2 left-2 flex items-center gap-1 text-[10px] font-normal px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground shadow-sm">
+              <Flame className="w-2.5 h-2.5" /> Popular
+            </span>
+          )}
+          <span
+            className={`absolute bottom-2 left-2 text-[10px] font-normal px-2 py-0.5 rounded-full backdrop-blur-sm text-white shadow-sm ${ws.available ? "bg-black/50" : "bg-black/60"}`}
+          >
+            {ws.available ? "Available Now" : "Fully Booked"}
+          </span>
+        </div>
+
+        {/* Content — all stacked vertically */}
+        <div className="flex-1 min-w-0 flex flex-col gap-2">
+          {/* Name + Rating + Actions */}
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px]">
+              {ws.location || ws.name}
+            </h3>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={handleSave}
+                className="w-7 h-7 rounded-full bg-muted/60 flex items-center justify-center hover:bg-muted transition-all duration-200"
+              >
+                <Bookmark
+                  className={`w-3.5 h-3.5 transition-all duration-200 ${liked ? "fill-primary text-primary scale-110" : "text-foreground/60"}`}
+                />
+              </button>
+              <button
+                onClick={handleCart}
+                className="w-7 h-7 rounded-full bg-muted/60 flex items-center justify-center hover:bg-muted transition-all duration-200"
+              >
+                <ShoppingCart
+                  className={`w-3.5 h-3.5 transition-all duration-200 ${carted ? "fill-primary text-primary scale-110" : "text-foreground/60"}`}
+                />
+              </button>
+              <div className="flex items-center gap-1 bg-muted/60 rounded-full px-2 py-0.5">
+                <Star className="w-3 h-3 fill-gold text-gold" />
+                <span className="text-xs font-semibold text-foreground">
+                  {ws.rating}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  ({ws.reviews})
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-1.5">
+            {ws.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-[11px] px-2.5 py-0.5 rounded-full border border-border/70 text-muted-foreground bg-muted/40"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {/* Divider */}
+          <div className="h-px bg-border/50 mt-1" />
+
+          {/* Pricing */}
+          <div className="space-y-1">
+            {ws.plans.slice(0, 2).map((plan) => (
+              <div key={plan.label} className="flex items-center gap-3">
+                <span className="text-[11px] text-muted-foreground w-24 flex-shrink-0">
+                  {plan.label}
+                </span>
+                <span className="text-xs font-normal text-foreground">
+                  {plan.price}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* CTAs — always on their own row */}
+          <div className="flex gap-2 mt-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNavigate();
+              }}
+              className="py-2 px-4 text-xs font-medium rounded-lg bg-[#2d5843] text-white hover:bg-[#204030] transition-all duration-200 whitespace-nowrap"
+            >
+              Get Best Price
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMeetingModalOpen(true);
+              }}
+              className="py-2 px-3 text-xs font-medium rounded-lg border border-border text-foreground hover:bg-muted transition-all duration-200 flex items-center gap-1 whitespace-nowrap"
+            >
+              <Phone className="w-3 h-3" /> Contact Sales
+            </button>
+          </div>
+        </div>
+        <MeetingBookingModal
+          isOpen={isMeetingModalOpen}
+          onClose={() => setIsMeetingModalOpen(false)}
+          item={{ name: ws.name, address: ws.address }}
+        />
+      </div>
+    );
+  }
+
+  // Grid view
+  return (
+    <div
+      onClick={handleNavigate}
+      className="cursor-pointer group bg-card rounded-2xl border border-border/60 shadow-soft hover:shadow-soft-lg transition-all duration-200 overflow-hidden flex flex-col"
+    >
+      {/* Image Section */}
+      <div className="relative h-52 overflow-hidden">
+        <img
+          src={images[imgIndex]}
+          alt={ws.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+
+        {/* Popular badge */}
+        {ws.popular && (
+          <span className="absolute top-3 left-3 flex items-center gap-1 text-[10px] font-normal px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground shadow-sm">
+            <Flame className="w-2.5 h-2.5" /> Popular
+          </span>
+        )}
+
+        {/* Action buttons */}
+        <div className="absolute top-3 right-3 flex items-center gap-1.5">
+          <button
+            onClick={handleSave}
+            className="w-8 h-8 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white hover:scale-110 transition-all duration-200"
+          >
+            <Bookmark
+              className={`w-3.5 h-3.5 transition-all duration-200 ${liked ? "fill-primary text-primary scale-110" : "text-foreground/60"}`}
+            />
+          </button>
+          <button
+            onClick={handleCart}
+            className="w-8 h-8 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white hover:scale-110 transition-all duration-200"
+          >
+            <ShoppingCart
+              className={`w-3.5 h-3.5 transition-all duration-200 ${carted ? "fill-primary text-primary scale-110" : "text-foreground/60"}`}
+            />
+          </button>
+        </div>
+
+        {/* Availability + image nav arrows */}
+        <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+          <span
+            className={`text-[10px] font-normal px-3 py-1 rounded-full backdrop-blur-sm text-white shadow-sm ${ws.available ? "bg-black/50" : "bg-black/60"}`}
+          >
+            {ws.available ? "Available Now" : "Fully Booked"}
+          </span>
+          {images.length > 1 && (
+            <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <button
+                onClick={prevImg}
+                className="w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-all"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 text-foreground/70" />
+              </button>
+              <button
+                onClick={nextImg}
+                className="w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-all"
+              >
+                <ChevronRight className="w-3.5 h-3.5 text-foreground/70" />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Card Body */}
+      <div className="p-4 flex flex-col flex-1">
+        {/* Name + Rating */}
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate">
+            {ws.location || ws.name}
+          </h3>
+          <div className="flex items-center gap-1 flex-shrink-0 bg-muted/60 rounded-full px-2 py-0.5">
+            <Star className="w-3 h-3 fill-gold text-gold" />
+            <span className="text-xs font-semibold text-foreground">
+              {ws.rating}
+            </span>
+            <span className="text-[11px] text-muted-foreground">
+              ({ws.reviews})
+            </span>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-1.5 mt-2 min-h-[26px]">
+          {ws.tags.map((tag) => (
+            <span
+              key={tag}
+              className="text-[11px] px-2.5 py-0.5 rounded-full border border-border/70 text-muted-foreground bg-muted/40 hover:bg-muted/80 transition-colors"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div className="h-px bg-border/60 mt-2 mb-2" />
+
+        {/* Plan rows — grows to push CTA down */}
+        <div className="space-y-2 flex-1">
+          {ws.plans.map((plan) => (
+            <div key={plan.label} className="flex items-center justify-between">
+              <span className="text-[11px] text-muted-foreground">
+                {plan.label}
+              </span>
+              <span className="text-[13px] font-normal text-foreground">
+                {plan.price}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA Buttons — always at bottom */}
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNavigate();
+            }}
+            className="flex-1 py-2.5 text-xs font-medium rounded-lg bg-[#2d5843] text-white hover:bg-[#204030] transition-all duration-200"
+          >
+            Get Best Price
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMeetingModalOpen(true);
+            }}
+            className="flex-1 py-2.5 text-xs font-medium rounded-lg border border-border text-foreground hover:bg-muted transition-all duration-200 flex items-center justify-center gap-1.5"
+          >
+            <Phone className="w-3 h-3" /> Contact Sales
+          </button>
+        </div>
+      </div>
+      <MeetingBookingModal
+        isOpen={isMeetingModalOpen}
+        onClose={() => setIsMeetingModalOpen(false)}
+        item={{ name: ws.name, address: ws.address }}
+      />
+    </div>
+  );
+};
+
+const GetWorkspaces = () => {
+  const [searchCity, setSearchCity] = useState("Delhi");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const getInitialType = () => {
+    if (location.pathname.includes("coworking")) return "coworking";
+    if (
+      location.pathname.includes("on-demand") ||
+      location.pathname.includes("onDemand")
+    )
+      return "on-demand";
+    return "virtual-office";
+  };
+  const [activeCity, setActiveCity] = useState("Delhi");
+  const [workspaceType, setWorkspaceType] = useState(getInitialType());
+
+  // Sync workspaceType with URL changes (e.g., back/forward navigation)
+  useEffect(() => {
+    const currentType = getInitialType();
+    if (workspaceType !== currentType) {
+      setWorkspaceType(currentType);
+    }
+  }, [location.pathname]);
+
+  const handleWorkspaceTypeChange = (value: string) => {
+    setWorkspaceType(value);
+    if (value === "coworking") navigate("/services/coworking-space");
+    else if (value === "on-demand") navigate("/services/on-demand");
+    else navigate("/services/virtual-office");
+  };
+  const [searchLocation, setSearchLocation] = useState("");
+  const [pricingFilter, setPricingFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("popular");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [showMap, setShowMap] = useState(false);
+  const [mapCollapsed, setMapCollapsed] = useState(false);
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
+
+  const [workspaces, setWorkspaces] = useState<UnifiedWorkspace[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      setLoading(true);
+      try {
+        let fetchedData: any[] = [];
+        if (workspaceType === "virtual-office") {
+          fetchedData = await getVirtualOfficesByCity(activeCity);
+          setWorkspaces(
+            fetchedData.map((vo) => ({
+              id: vo._id || "",
+              name: vo.name || "Virtual Office",
+              location: vo.name || vo.area || "City Center", // the mockup uses the name as location if name is like 'Stirring Minds'
+              address: vo.address || "",
+              rating: vo.rating || 4.5, // Mock fallback for looks
+              reviews: vo.reviews || 0,
+              tags: vo.features?.length
+                ? vo.features.slice(0, 3)
+                : ["Virtual Office", "Premium Address"],
+              plans: [
+                ...(vo.gstPlanPrice
+                  ? [{ label: "GST Plan", price: vo.gstPlanPrice }]
+                  : []),
+                ...(vo.mailingPlanPrice
+                  ? [{ label: "Mailing Plan", price: vo.mailingPlanPrice }]
+                  : []),
+                ...(vo.brPlanPrice
+                  ? [{ label: "Business Reg", price: vo.brPlanPrice }]
+                  : []),
+              ],
+              image: vo.image || "",
+              images: vo.images || [vo.image],
+              popular: vo.popular || false,
+              available: vo.availability === "Available Now",
+              negotiable: true,
+              lat: vo.location?.coordinates?.[1] || 28.6139,
+              lng: vo.location?.coordinates?.[0] || 77.209,
+            })),
+          );
+        } else if (workspaceType === "coworking") {
+          fetchedData = await getCoworkingSpacesByCity(activeCity);
+          setWorkspaces(
+            fetchedData.map((cw) => ({
+              id: cw._id || "",
+              name: cw.name || "Coworking Space",
+              location: cw.name || cw.area || "Workspace Hub",
+              address: cw.address || "",
+              rating: cw.rating || 4.8,
+              reviews: cw.reviews || 0,
+              tags: cw.features?.length
+                ? cw.features.slice(0, 3)
+                : ["High-Speed WiFi", "24/7 Access"],
+              plans: [
+                ...(cw.price ? [{ label: "Basic Plan", price: cw.price }] : []),
+              ],
+              image: cw.image || "",
+              images: cw.images || [cw.image],
+              popular: cw.popular || false,
+              available: true,
+              negotiable: true,
+              lat: cw.location?.coordinates?.[1] || 28.6139,
+              lng: cw.location?.coordinates?.[0] || 77.209,
+            })),
+          );
+        } else if (workspaceType === "on-demand") {
+          fetchedData = await getMeetingRoomsByCity(activeCity);
+          setWorkspaces(
+            fetchedData.map((mr) => ({
+              id: mr._id || "",
+              name: mr.name || "Meeting Room",
+              location: mr.name || mr.area || "Conference Center",
+              address: mr.address || "",
+              rating: mr.rating || 4.2,
+              reviews: mr.reviews || 0,
+              tags: mr.features?.length
+                ? mr.features.slice(0, 3)
+                : ["Projector", "Whiteboard"],
+              plans: [
+                ...(mr.price
+                  ? [{ label: "Hourly Plan", price: mr.price }]
+                  : []),
+              ],
+              image: mr.image || "",
+              images: mr.images || [mr.image],
+              popular: mr.popular || false,
+              available: true,
+              negotiable: false,
+              lat: mr.location?.coordinates?.[1] || 28.6139,
+              lng: mr.location?.coordinates?.[0] || 77.209,
+            })),
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching workspaces:", error);
+        setWorkspaces([]); // Fallback
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkspaces();
+  }, [workspaceType, activeCity]);
+
+  // Client-side filtering logic
+  const filteredWorkspaces = workspaces.filter((ws) => {
+    const matchesSearch =
+      ws.address.toLowerCase().includes(searchLocation.toLowerCase()) ||
+      ws.location.toLowerCase().includes(searchLocation.toLowerCase()) ||
+      ws.name.toLowerCase().includes(searchLocation.toLowerCase());
+    return matchesSearch;
+  });
+
+  const typeLabel: Record<string, string> = {
+    "virtual-office": "Virtual Office",
+    coworking: "Coworking Space",
+    "on-demand": "On Demand",
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+
+      {/* Full-width top section: Breadcrumb + Filters */}
+      <div className="mt-20 bg-background border-b border-border/60">
+        <div className="px-4 sm:px-6 lg:px-8 py-4">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
+            <a href="/" className="hover:text-foreground transition-colors">
+              Home
+            </a>
+            <ChevronRight className="w-3 h-3" />
+            <span className="hover:text-foreground transition-colors cursor-pointer">
+              {typeLabel[workspaceType]}
+            </span>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-foreground font-medium">{activeCity}</span>
+          </nav>
+
+          {/* Filter bar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 bg-muted/40 border border-border/60 rounded-2xl p-2.5 sm:p-3 relative z-[40]">
+            {/* Product */}
+            <div className="sm:w-[180px]">
+              <Select
+                value={workspaceType}
+                onValueChange={handleWorkspaceTypeChange}
+              >
+                <SelectTrigger
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${
+                    workspaceType !== "virtual-office"
+                      ? "bg-muted/50 border-border text-foreground"
+                      : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
+                  }`}
+                >
+                  <SelectValue placeholder="Product" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="virtual-office">Virtual Office</SelectItem>
+                  <SelectItem value="coworking">Coworking Space</SelectItem>
+                  <SelectItem value="on-demand">On Demand</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Divider */}
+            <div className="hidden sm:block w-px h-8 bg-border/60 flex-shrink-0" />
+
+            {/* City */}
+            <div className="relative sm:w-[160px]">
+              <div className="flex items-center bg-card border border-border/60 rounded-xl h-10 overflow-visible transition-all duration-200">
+                <Input
+                  value={searchCity}
+                  onChange={(e) => {
+                    setSearchCity(e.target.value);
+                    setShowCitySuggestions(true);
+                  }}
+                  onFocus={() => setShowCitySuggestions(true)}
+                  className="border-0 shadow-none h-full text-sm font-medium text-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none bg-transparent px-3 placeholder:text-muted-foreground/40 min-w-0 flex-1"
+                  placeholder="City..."
+                />
+                <button
+                  onClick={() => {
+                    setActiveCity(searchCity);
+                    setShowCitySuggestions(false);
+                  }}
+                  className="flex-shrink-0 w-8 h-8 flex items-center justify-center active:scale-95 transition-all rounded-[10px] mr-1 bg-muted/60 hover:bg-muted"
+                >
+                  <Search
+                    className="w-3.5 h-3.5 text-foreground"
+                    strokeWidth={2}
+                  />
+                </button>
+              </div>
+              {showCitySuggestions &&
+                searchCity.length > 0 &&
+                (() => {
+                  const allCities = [
+                    "Delhi",
+                    "Mumbai",
+                    "Bangalore",
+                    "Hyderabad",
+                    "Chennai",
+                    "Pune",
+                    "Kolkata",
+                    "Ahmedabad",
+                    "Noida",
+                    "Gurgaon",
+                    "Jaipur",
+                    "Lucknow",
+                    "Chandigarh",
+                    "Indore",
+                    "Kochi",
+                  ];
+                  const filtered = allCities.filter((c) =>
+                    c.toLowerCase().includes(searchCity.toLowerCase()),
+                  );
+                  if (filtered.length === 0) return null;
+                  return (
+                    <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-lg z-[9999] max-h-48 overflow-y-auto">
+                      {filtered.map((city) => (
+                        <button
+                          key={city}
+                          onClick={() => {
+                            setSearchCity(city);
+                            setActiveCity(city);
+                            setShowCitySuggestions(false);
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-muted/60 transition-colors first:rounded-t-xl last:rounded-b-xl"
+                        >
+                          {city}
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })()}
+            </div>
+
+            {/* Search Location */}
+            <div className="relative flex-1 min-w-[140px]">
+              <div className="flex items-center bg-card border border-border/60 rounded-xl h-10 overflow-hidden transition-all duration-200">
+                <MapPin className="w-4 h-4 text-muted-foreground ml-3 flex-shrink-0" />
+                <Input
+                  value={searchLocation}
+                  onChange={(e) => setSearchLocation(e.target.value)}
+                  className="border-0 shadow-none h-full text-sm font-medium text-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none bg-transparent px-3 placeholder:text-muted-foreground/40 min-w-0 flex-1"
+                  placeholder="Search location..."
+                />
+              </div>
+            </div>
+
+            {/* Pricing */}
+            <div className="sm:w-[160px]">
+              <Select value={pricingFilter} onValueChange={setPricingFilter}>
+                <SelectTrigger
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${
+                    pricingFilter !== "all"
+                      ? "bg-muted/50 border-border text-foreground"
+                      : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
+                  }`}
+                >
+                  <SelectValue placeholder="Pricing" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Pricing</SelectItem>
+                  <SelectItem value="low">Under ₹500/mo</SelectItem>
+                  <SelectItem value="mid">₹500 – ₹1,000/mo</SelectItem>
+                  <SelectItem value="high">Above ₹1,000/mo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Sort by */}
+            <div className="sm:w-[150px]">
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${
+                    sortBy !== "popular"
+                      ? "bg-muted/50 border-border text-foreground"
+                      : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
+                  }`}
+                >
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="popular">Sort by</SelectItem>
+                  <SelectItem value="rating">Highest Rated</SelectItem>
+                  <SelectItem value="price-low">Price: Low to High</SelectItem>
+                  <SelectItem value="price-high">Price: High to Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop: split view — listings left, map right */}
+      <div className="hidden lg:flex flex-1 h-[calc(100vh-13rem)] relative">
+        {/* Left: Listings */}
+        <div
+          className={`overflow-y-auto bg-muted/20 transition-all duration-300 ease-in-out relative ${mapCollapsed ? "w-full" : "w-[58%] border-r border-border/40"}`}
+        >
+          <div className="px-5 py-5 sm:px-8">
+            {/* Results text + view toggle */}
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-muted-foreground">
+                Showing{" "}
+                <span className="font-semibold text-foreground">
+                  {filteredWorkspaces.length} result(s)
+                </span>{" "}
+                for {typeLabel[workspaceType].toLowerCase()} in{" "}
+                <span className="font-medium text-foreground">
+                  {activeCity}
+                </span>
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${
+                      viewMode === "list"
+                        ? "bg-card text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${
+                      viewMode === "grid"
+                        ? "bg-card text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+            {loading ? (
+              <div className="py-16 text-center text-muted-foreground">
+                <p className="text-base font-medium animate-pulse">
+                  Loading spaces...
+                </p>
+              </div>
+            ) : (
+              <div
+                className={
+                  viewMode === "grid"
+                    ? `grid gap-5 pb-8 ${mapCollapsed ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3"}`
+                    : "flex flex-col gap-4 pb-8"
+                }
+              >
+                {filteredWorkspaces.length > 0 ? (
+                  filteredWorkspaces.map((ws) => (
+                    <WorkspaceCard
+                      key={ws.id}
+                      ws={ws}
+                      view={viewMode}
+                      type={workspaceType}
+                    />
+                  ))
+                ) : (
+                  <div className="col-span-3 py-16 text-center text-muted-foreground">
+                    <p className="text-base font-medium">
+                      No spaces found in "{activeCity}"
+                    </p>
+                    <p className="text-sm mt-1">
+                      Try searching a different city.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right: Map */}
+        <div
+          className={`transition-all duration-300 ease-in-out relative ${mapCollapsed ? "w-0 overflow-hidden opacity-0" : "w-[42%] opacity-100"}`}
+        >
+          <div className="sticky top-20 h-[calc(100vh-5.5rem)] m-2 sm:m-4 rounded-xl overflow-hidden shadow-sm border border-border/30">
+            {/* Map toggle — fixed on the map */}
+            <button
+              onClick={() => setMapCollapsed(!mapCollapsed)}
+              className="absolute top-4 left-4 z-20 w-9 h-9 rounded-full border border-border bg-card shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 cursor-pointer"
+              aria-label="Hide map"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            <MapLibreMap
+              center={{
+                lat: filteredWorkspaces[0]?.lat || 28.6139,
+                lng: filteredWorkspaces[0]?.lng || 77.209,
+              }}
+              markers={filteredWorkspaces.map((ws) => ({
+                id: ws.id,
+                position: { lat: ws.lat, lng: ws.lng },
+                title: ws.location || ws.name,
+                image: ws.images?.[0] || ws.image,
+                price: ws.plans?.[0]?.price,
+                rating: ws.rating,
+                address: ws.address,
+              }))}
+              height="100%"
+              mapStyle="retro"
+            />
+          </div>
+        </div>
+
+        {/* Floating map button — fixed top-right, below filter bar */}
+        {mapCollapsed && (
+          <button
+            onClick={() => setMapCollapsed(false)}
+            className="fixed top-[184px] right-8 z-30 w-10 h-10 rounded-full border border-border bg-card shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 cursor-pointer"
+            aria-label="Show map"
+          >
+            <Map className="w-4.5 h-4.5" />
+          </button>
+        )}
+      </div>
+
+      {/* Mobile: full-width listings + expandable map */}
+      <div className="lg:hidden flex-1 relative">
+        <div className="px-4 py-3">
+          {loading ? (
+            <div className="py-16 text-center text-muted-foreground">
+              <p className="text-base font-medium animate-pulse">
+                Loading spaces...
+              </p>
+            </div>
+          ) : (
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 min-[500px]:grid-cols-2 gap-4 pb-8"
+                  : "flex flex-col gap-3 pb-8"
+              }
+            >
+              {filteredWorkspaces.length > 0 ? (
+                filteredWorkspaces.map((ws) => (
+                  <WorkspaceCard
+                    key={ws.id}
+                    ws={ws}
+                    view={viewMode}
+                    type={workspaceType}
+                  />
+                ))
+              ) : (
+                <div className="col-span-2 py-16 text-center text-muted-foreground">
+                  <p className="text-base font-medium">
+                    No spaces found in "{activeCity}"
+                  </p>
+                  <p className="text-sm mt-1">
+                    Try searching a different city.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Expand Map floating button */}
+        <button
+          onClick={() => setShowMap(!showMap)}
+          className="fixed bottom-4 right-4 z-40 flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-card border border-border shadow-soft-lg text-xs font-medium text-foreground hover:bg-muted transition-all"
+        >
+          <MapPin className="w-3.5 h-3.5" />
+          {showMap ? "Hide Map" : "Expand Map"}
+        </button>
+
+        {showMap && (
+          <div className="fixed inset-0 z-30 mt-16 bg-background">
+            <button
+              onClick={() => setShowMap(false)}
+              className="absolute top-3 left-3 z-40 flex items-center gap-1 px-3 py-2 rounded-full bg-card border border-border shadow-md text-xs font-medium text-foreground"
+            >
+              <ChevronRight className="w-3.5 h-3.5 rotate-180" /> Back to list
+            </button>
+            <MapLibreMap
+              center={{
+                lat: filteredWorkspaces[0]?.lat || 28.6139,
+                lng: filteredWorkspaces[0]?.lng || 77.209,
+              }}
+              markers={filteredWorkspaces.map((ws) => ({
+                id: ws.id,
+                position: { lat: ws.lat, lng: ws.lng },
+                title: ws.location || ws.name,
+                image: ws.images?.[0] || ws.image,
+                price: ws.plans?.[0]?.price,
+                rating: ws.rating,
+                address: ws.address,
+              }))}
+              height="100%"
+              mapStyle="retro"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default GetWorkspaces;

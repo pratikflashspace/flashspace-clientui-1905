@@ -335,7 +335,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
                             <div
                                 onClick={() => setIsContactOpen(true)}
-                                className="inline-flex group px-6 py-2.5 bg-[#2D3F33] text-[#FDE68A] text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
+                                className="inline-flex group px-6 py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
 
                             >
                                 <span className="relative">

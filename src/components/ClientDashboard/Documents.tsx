@@ -14,11 +14,24 @@ export default function Documents() {
     const [isLoading, setIsLoading] = useState(false);
     const [isGenerating, setIsGenerating] = useState<string | null>(null);
     const [isPreviewing, setIsPreviewing] = useState<string | null>(null);
-    const [previewDocument, setPreviewDocument] = useState<{ title: string; url: string; type: 'pdf' | 'image' } | null>(null);
+    const [previewDocument, setPreviewDocument] = useState<{ title: string; url: string; type: string } | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
 
-    const isPdf = (url: string) => url.toLowerCase().includes('.pdf') || url.startsWith('blob:');
+    const isPdf = (url: string) => {
+        const lowerUrl = url.split('?')[0].toLowerCase();
+        return lowerUrl.endsWith('.pdf') || (url.startsWith('blob:') && !isVideo(url));
+    };
+
+    // const isVideo = (url: string) => {
+    //     const lowerUrl = url.split('?')[0].toLowerCase();
+    //     return ['.mp4', '.webm', '.ogg', '.mov', '.mkv', '.avi', '.mp3', '.m4v'].some(ext => lowerUrl.endsWith(ext));
+    // };
+
+    const isVideo = (url: string) => {
+        const lowerUrl = url.split('?')[0].toLowerCase();
+        return ['.mp4', '.webm', '.ogg', '.mov', '.mkv', '.avi', '.mp3', '.m4v'].some(ext => lowerUrl.endsWith(ext));
+    };
 
     const filteredInvoices = invoices.filter(invoice => {
         const matchesSearch = invoice.invoiceNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -353,13 +366,17 @@ export default function Documents() {
                                                     {doc.fileUrl ? (
                                                         <button
                                                             onClick={() => {
-                                                                const fullUrl = doc.fileUrl!.startsWith("http") || doc.fileUrl!.startsWith("blob:")
-                                                                    ? doc.fileUrl!
-                                                                    : `${API_CONFIG.BASE_URL}${doc.fileUrl!}`;
+                                                                let normalizedUrl = doc.fileUrl!.replace(/\\/g, '/');
+                                                                let fullUrl = normalizedUrl;
+                                                                if (!normalizedUrl.startsWith("http") && !normalizedUrl.startsWith("blob:")) {
+                                                                    const baseUrl = API_CONFIG.BASE_URL.replace(/\/$/, '');
+                                                                    const path = normalizedUrl.startsWith('/') ? normalizedUrl : `/${normalizedUrl}`;
+                                                                    fullUrl = `${baseUrl}${path}`;
+                                                                }
                                                                 setPreviewDocument({
                                                                     title: doc.name,
                                                                     url: fullUrl,
-                                                                    type: isPdf(doc.fileUrl!) ? 'pdf' : 'image'
+                                                                    type: isPdf(normalizedUrl) ? 'pdf' : isVideo(normalizedUrl) ? 'video' : 'image'
                                                                 });
                                                             }}
                                                             className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
@@ -383,7 +400,7 @@ export default function Documents() {
 
             {/* Document Preview Modal */}
             {previewDocument && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm mt-24">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                             <h3 className="text-lg font-semibold text-gray-900">{previewDocument.title}</h3>
@@ -401,6 +418,15 @@ export default function Documents() {
                                     className="w-full h-full rounded-xl border border-gray-200 shadow-sm"
                                     title="Document Preview"
                                 />
+                            ) : previewDocument.type === 'video' ? (
+                                <div className="w-full h-full flex items-center justify-center bg-black rounded-xl border border-gray-200 shadow-sm overflow-hidden p-4">
+                                    <video
+                                        src={previewDocument.url}
+                                        controls
+                                        autoPlay
+                                        className="max-w-full max-h-full object-contain"
+                                    />
+                                </div>
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden p-4">
                                     <img

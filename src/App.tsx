@@ -9,7 +9,7 @@ import { SocketProvider } from "@/contexts/SocketContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
-import { ChatProvider } from "@/contexts/ChatContext"; // [NEW] Added ChatProvider
+import { ChatProvider } from "@/contexts/ChatContext";
 import TeamManagement from "./pages/spacePortal/teamManagement";
 
 import Index from "./pages/Index";
@@ -21,6 +21,7 @@ import VirtualOffice from "./pages/services/VirtualOffice";
 
 import CoworkingSpace from "./pages/services/CoworkingSpace";
 import OnDemand from "./pages/services/OnDemand";
+import GetWorkspaces from "./pages/services/GetWorkspaces";
 import EventSpaces from "./pages/services/EventSpaces";
 import BusinessSetup from "./pages/services/BusinessSetup";
 import StartChatting from "./pages/StartChatting";
@@ -56,9 +57,7 @@ import ClientDashboard from "./components/ClientDashboard";
 import ScrollToTop from "./components/ScrollToTop";
 
 //-----------spaces---------
-import SpaceComponent from "./components/Spaces/SpaceComponent";
-import MeetingRoomSpaceComponent from "./components/Spaces/MeetingRoomSpaceComponent";
-import CoworkingSpaceComponent from "./components/Spaces/CoworkingSpaceComponent";
+import WorkspaceDetail from "./pages/WorkspaceDetail";
 import BookingPage from "./pages/BookingPage";
 import BookSeatsPage from "./pages/BookSeatsPage";
 import CompleteBookingPage from "./pages/CompleteBookingPage";
@@ -96,7 +95,6 @@ import SupportChat from "./pages/admin/SupportChat";
 import Leaderboard from "./pages/admin/Leaderboard";
 import AdminAffiliateManagement from "./pages/admin/AdminAffiliateManagement";
 
-`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     `;
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
 import SpacePortalClientDetails from "@/pages/spacePortal/ClientsDetails";
@@ -146,6 +144,11 @@ import KycVerification from "./components/Spaces/KycVerification";
 import AffiliateKYC from "./pages/affiliatePortal/KYC";
 import AffiliateNotifications from "./pages/affiliatePortal/Notifications";
 import AffiliateClientManagement from "./pages/affiliatePortal/AffiliateClientManagement";
+
+// Space Components
+import SpaceComponent from "./components/Spaces/SpaceComponent";
+import CoworkingSpaceComponent from "./components/Spaces/CoworkingSpaceComponent";
+import MeetingRoomSpaceComponent from "./components/Spaces/MeetingRoomSpaceComponent";
 
 // --- React Query setup ---
 const queryClient = new QueryClient();
@@ -201,6 +204,7 @@ const App = () => (
                   {/* <MouseFollower/> */}
                   <Routes>
                     {/* Public Routes */}
+
                     <Route path="/" element={<Index />} />
                     <Route path="/services" element={<Services />} />
                     <Route
@@ -220,6 +224,7 @@ const App = () => (
                       path="/services/business-setup"
                       element={<BusinessSetup />}
                     />
+
                     <Route
                       path="/Solutions/virtual-office"
                       element={<VirtualOfficeSolution />}
@@ -236,7 +241,6 @@ const App = () => (
                       path="/Solutions/business-setup"
                       element={<BusinessSetupSolution />}
                     />
-
                     <Route
                       path="/Solutions/meetingsroom"
                       element={<MeetingsRoom />}
@@ -250,7 +254,7 @@ const App = () => (
                       element={<EventSpacePage />}
                     />
 
-                    {/* Spaces*/}
+                    {/* Space Detail Routes */}
                     <Route path="/space/:id" element={<SpaceComponent />} />
                     <Route
                       path="/coworking-space/:id"
@@ -260,8 +264,10 @@ const App = () => (
                       path="/meeting-room/:id"
                       element={<MeetingRoomSpaceComponent />}
                     />
-                    <Route path="/book-seats/:id" element={<BookSeatsPage />} />
+
+                    {/* Booking Routes */}
                     <Route path="/booking/:id" element={<BookingPage />} />
+                    <Route path="/book-seats/:id" element={<BookSeatsPage />} />
                     <Route
                       path="/booking/:id/complete"
                       element={<CompleteBookingPage />}
@@ -277,6 +283,7 @@ const App = () => (
                       element={<PaymentFailedPage />}
                     />
 
+                    {/* Information Pages */}
                     <Route path="/city-listing" element={<CityListing />} />
                     <Route path="/career" element={<Career />} />
                     <Route path="/about" element={<AboutUs />} />
@@ -297,6 +304,7 @@ const App = () => (
                       element={<ForgotPassword />}
                     />
 
+                    {/* Partnership Routes */}
                     <Route
                       path="/list-your-space"
                       element={<ListYourSpace />}
@@ -305,7 +313,7 @@ const App = () => (
                     <Route path="/coming-soon" element={<ComingSoon />} />
                     <Route path="/start-chatting" element={<StartChatting />} />
 
-                    {/* Protected Routes */}
+                    {/* User Protected Routes */}
                     <Route element={<ProtectedRoute />}>
                       <Route
                         path="/bookings"
@@ -315,15 +323,13 @@ const App = () => (
                       />
                       <Route path="/community" element={<Community />} />
                       <Route path="/settings" element={<Settings />} />
-
-                      {/* Client Dashboard Routes - Protected */}
                       <Route
                         path="/dashboard/*"
                         element={<ClientDashboard />}
                       />
                     </Route>
 
-                    {/* Admin Routes - Protected (RBAC) */}
+                    {/* Admin Protected Routes */}
                     <Route element={<AdminRoute />}>
                       <Route path="/admin" element={<AdminLayout />}>
                         <Route index element={<AdminDashboard />} />
@@ -385,7 +391,7 @@ const App = () => (
                       </Route>
                     </Route>
 
-                    {/* Space Partner Portal Routes */}
+                    {/* Space Partner Protected Routes */}
                     <Route element={<PartnerRoute />}>
                       <Route
                         path="/spaceportal"
@@ -396,7 +402,6 @@ const App = () => (
                           element={<Navigate to="dashboard" replace />}
                         />
                         <Route path="dashboard" element={<Dashboard />} />
-
                         <Route
                           path="clients"
                           element={<SpacePortalClients />}
@@ -438,7 +443,6 @@ const App = () => (
                           path="kyc-verification"
                           element={<KycVerification />}
                         />
-
                         <Route path="space-management" element={<Spaces />} />
                         <Route
                           path="space-management/add"
@@ -453,7 +457,6 @@ const App = () => (
                           element={<TeamManagement />}
                         />
                         <Route path="tickets" element={<Tickets />} />
-
                         <Route
                           path="feedback-nps"
                           element={<SpacePortalFeedbackNPS />}
@@ -466,7 +469,7 @@ const App = () => (
                       </Route>
                     </Route>
 
-                    {/* Affiliate Portal Routes */}
+                    {/* Affiliate Protected Routes */}
                     <Route element={<AffiliateRoute />}>
                       <Route
                         path="/affiliate-portal"
@@ -521,6 +524,7 @@ const App = () => (
                       </Route>
                     </Route>
 
+                    {/* 404 Route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </ChatProvider>

@@ -33,8 +33,30 @@ export const getCoworkingSpacesByCity = async (
         ? data.data
         : data.data?.spaces || data.data?.offices || [];
 
-      // console.log(`✅ Successfully fetched ${spaces.length} coworking spaces`);
-      return spaces;
+      console.log(`✅ Successfully fetched ${spaces.length} coworking spaces`);
+
+      // Map backend data to frontend expectations
+      return spaces.map((s: any) => {
+        // Find the lowest monthly price in inventory
+        const monthlyPrices =
+          s.inventory
+            ?.filter((i: any) => i.pricePerMonth)
+            .map((i: any) => i.pricePerMonth) || [];
+
+        const minPrice =
+          monthlyPrices.length > 0 ? Math.min(...monthlyPrices) : 0;
+
+        return {
+          ...s,
+          features: s.amenities || [],
+          price: minPrice
+            ? `₹${minPrice.toLocaleString()}/mo`
+            : "Price on request",
+          image: s.images?.[0] || "",
+          rating: s.avgRating || 0,
+          reviews: s.totalReviews || 0,
+        };
+      });
     }
 
     throw new Error(data.message || "Failed to fetch coworking spaces");
@@ -64,7 +86,27 @@ export const getAllCoworkingSpaces = async (): Promise<
       const spaces = Array.isArray(data.data)
         ? data.data
         : data.data?.spaces || data.data?.offices || [];
-      return spaces;
+
+      return spaces.map((s: any) => {
+        const monthlyPrices =
+          s.inventory
+            ?.filter((i: any) => i.pricePerMonth)
+            .map((i: any) => i.pricePerMonth) || [];
+
+        const minPrice =
+          monthlyPrices.length > 0 ? Math.min(...monthlyPrices) : 0;
+
+        return {
+          ...s,
+          features: s.amenities || [],
+          price: minPrice
+            ? `₹${minPrice.toLocaleString()}/mo`
+            : "Price on request",
+          image: s.images?.[0] || "",
+          rating: s.avgRating || 0,
+          reviews: s.totalReviews || 0,
+        };
+      });
     }
 
     throw new Error(data.message || "Failed to fetch coworking spaces");
@@ -87,7 +129,25 @@ export const getCoworkingSpaceById = async (
     const data = response.data as ApiResponse<CoworkingSpaceItem>;
 
     if (response.status === 200 && data.success) {
-      return data.data;
+      const s = data.data;
+      const monthlyPrices =
+        (s as any).inventory
+          ?.filter((i: any) => i.pricePerMonth)
+          .map((i: any) => i.pricePerMonth) || [];
+
+      const minPrice =
+        monthlyPrices.length > 0 ? Math.min(...monthlyPrices) : 0;
+
+      return {
+        ...s,
+        features: (s as any).amenities || [],
+        price: minPrice
+          ? `₹${minPrice.toLocaleString()}/mo`
+          : "Price on request",
+        image: (s as any).images?.[0] || "",
+        rating: (s as any).avgRating || 0,
+        reviews: (s as any).totalReviews || 0,
+      };
     }
 
     throw new Error(data.message || "Failed to fetch coworking space");

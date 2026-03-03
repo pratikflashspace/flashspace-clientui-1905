@@ -33,8 +33,25 @@ export const getVirtualOfficesByCity = async (
         ? data.data
         : (data.data as any).offices;
 
-      // console.log(`✅ Successfully fetched ${offices.length} virtual offices`);
-      return offices;
+      console.log(`✅ Successfully fetched ${offices.length} virtual offices`);
+
+      // Map backend data to frontend expectations
+      return offices.map((o: any) => ({
+        ...o,
+        features: o.features || [],
+        gstPlanPrice: o.gstPlanPricePerYear
+          ? `₹${o.gstPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        mailingPlanPrice: o.mailingPlanPricePerYear
+          ? `₹${o.mailingPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        brPlanPrice: o.brPlanPricePerYear
+          ? `₹${o.brPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        image: o.images?.[0] || "",
+        rating: o.avgRating || 0,
+        reviews: o.totalReviews || 0,
+      }));
     }
 
     throw new Error(data.message || "Failed to fetch virtual offices");
@@ -60,8 +77,24 @@ export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
     if ([200, 201].includes(response.status) && data.success) {
       const offices = Array.isArray(data.data)
         ? data.data
-        : (data.data as any).offices;
-      return offices || [];
+        : data.data?.offices || [];
+
+      return offices.map((o: any) => ({
+        ...o,
+        features: o.features || [],
+        gstPlanPrice: o.gstPlanPricePerYear
+          ? `₹${o.gstPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        mailingPlanPrice: o.mailingPlanPricePerYear
+          ? `₹${o.mailingPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        brPlanPrice: o.brPlanPricePerYear
+          ? `₹${o.brPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        image: o.images?.[0] || "",
+        rating: o.avgRating || 0,
+        reviews: o.totalReviews || 0,
+      }));
     }
 
     throw new Error(data.message || "Failed to fetch virtual offices");
@@ -84,7 +117,23 @@ export const getVirtualOfficeById = async (
     const data = response.data as ApiResponse<VirtualOfficeItem>;
 
     if ([200, 201].includes(response.status) && data.success) {
-      return data.data;
+      const o = data.data;
+      return {
+        ...o,
+        features: o.features || [],
+        gstPlanPrice: (o as any).gstPlanPricePerYear
+          ? `₹${(o as any).gstPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        mailingPlanPrice: (o as any).mailingPlanPricePerYear
+          ? `₹${(o as any).mailingPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        brPlanPrice: (o as any).brPlanPricePerYear
+          ? `₹${(o as any).brPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        image: o.image || (o as any).images?.[0] || "",
+        rating: o.rating || (o as any).avgRating || 0,
+        reviews: o.reviews || (o as any).totalReviews || 0,
+      };
     }
 
     throw new Error(data.message || "Failed to fetch virtual office");
