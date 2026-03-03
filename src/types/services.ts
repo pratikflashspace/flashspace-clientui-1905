@@ -150,12 +150,15 @@ export interface CoworkingSpaceItem {
 
   rating: number;
   reviews: number;
+  avgRating?: number;
+  totalReviews?: number;
 
   type: string;
   features: string[];
   availability: string;
   popular: boolean;
   image?: string;
+  images?: string[];
   coordinates?: {
     lat: number;
     lng: number;
@@ -202,6 +205,7 @@ export interface MeetingRoomItem {
   availability: string;
   popular: boolean;
   image?: string;
+  images?: string[];
   coordinates?: {
     lat: number;
     lng: number;
