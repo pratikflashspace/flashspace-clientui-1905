@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import ListingCardModern from "@/components/services/ListingCardModern";
-import { getAllCoworkingSpaces } from "@/services/coworkingSpace.service";
-import { CoworkingSpaceItem } from "@/types/services";
+import { getAllVirtualOffices } from "@/services/virtualOffice.service";
+import { VirtualOfficeItem } from "@/types/services";
 
 // Using local high-quality assets from the public folder
 const spaceHsr = "/card-koramangala.jpg";
@@ -58,15 +58,21 @@ const CARDS_PER_PAGE = 3;
 export const PlanLocationsShowcase = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [slideIndex, setSlideIndex] = useState(0);
-    const [dynamicSpaces, setDynamicSpaces] = useState<CoworkingSpaceItem[]>([]);
+    const [dynamicSpaces, setDynamicSpaces] = useState<VirtualOfficeItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchSpaces = async () => {
             setIsLoading(true);
             try {
-                const spaces = await getAllCoworkingSpaces();
-                setDynamicSpaces(spaces.slice(0, 3));
+                const offices = await getAllVirtualOffices();
+                // Sort by popular first, then rating
+                const sortedOffices = [...offices].sort((a, b) => {
+                    if (a.popular && !b.popular) return -1;
+                    if (!a.popular && b.popular) return 1;
+                    return (b.rating || 0) - (a.rating || 0);
+                });
+                setDynamicSpaces(sortedOffices.slice(0, 3));
             } catch (error) {
                 console.error("Error fetching workspaces for showcase:", error);
             } finally {
@@ -177,16 +183,16 @@ export const PlanLocationsShowcase = () => {
                             </div>
                         ) : (
                             visibleCards.map((loc, i) => {
-                                // If it's a dynamic CoworkingSpaceItem, use ListingCardModern
+                                // If it's a dynamic VirtualOfficeItem, use ListingCardModern
                                 if (active.name === "Popular Spaces" && dynamicSpaces.length > 0) {
                                     return (
                                         <motion.div
-                                            key={(loc as CoworkingSpaceItem)._id || loc.name}
+                                            key={(loc as VirtualOfficeItem)._id || loc.name}
                                             initial={{ opacity: 0, y: 24 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: i * 0.08, duration: 0.5 }}
                                         >
-                                            <ListingCardModern item={loc as CoworkingSpaceItem} />
+                                            <ListingCardModern item={loc as VirtualOfficeItem} />
                                         </motion.div>
                                     );
                                 }

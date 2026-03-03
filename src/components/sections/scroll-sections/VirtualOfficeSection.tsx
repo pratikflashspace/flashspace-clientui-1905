@@ -5,7 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Using high-quality placeholder as requested
-const featureVirtualOffice = "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2000&q=80";
+const featureVirtualOffice = "/virtual-office-illustrated.jpg";
 
 export const VirtualOfficeSection = () => {
     return (

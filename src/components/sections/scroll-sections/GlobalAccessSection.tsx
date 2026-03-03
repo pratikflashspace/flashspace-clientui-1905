@@ -5,8 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Using high-quality placeholder as requested
-const featureGlobalAccess = "https://images.unsplash.com/photo-1535957998253-26ae1ef29506?auto=format&fit=crop&w=2000&q=80";
-
+const featureGlobalAccess = "/feature-global-access.jpg"
 export const GlobalAccessSection = () => {
     return (
         <section id="global-access" className="py-12 lg:py-16 border-t border-border/50">
