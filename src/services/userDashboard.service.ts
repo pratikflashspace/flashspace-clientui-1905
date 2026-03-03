@@ -525,6 +525,40 @@ class UserDashboardService {
       };
     }
   }
+
+  async getPartnerClients(): Promise<ApiResponse<any[]>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any[]>>(
+        API_ENDPOINTS.USER.PARTNER_CLIENTS,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch clients";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  async getPartnerClientDetails(id: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        API_ENDPOINTS.USER.PARTNER_CLIENT_DETAILS(id),
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch client details";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
 }
 
 export const userDashboardService = new UserDashboardService();

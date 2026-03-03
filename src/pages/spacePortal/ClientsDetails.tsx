@@ -1,10 +1,18 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { CLIENT_DETAILS } from "@/data/spacePortal/clientDetail";
+import type { ClientDetails } from "@/types/spacePortal/clientDetails";
 
-import { ArrowLeft, Download, FileText, ShieldCheck, Mail } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  FileText,
+  ShieldCheck,
+  Mail,
+  Loader2,
+} from "lucide-react";
 import { toast } from "sonner";
+import { userDashboardService } from "@/services/userDashboard.service";
 
 import {
   Dialog,
@@ -31,15 +39,39 @@ export default function ClientDetails() {
   const { clientId } = useParams(); // must match route param
   const navigate = useNavigate();
 
+  const [client, setClient] = useState<ClientDetails | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isDocsOpen, setIsDocsOpen] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState<{
+    url: string;
+    type: string;
+    label: string;
+  } | null>(null);
 
   /**
-   * Find client from mock array.
-   * Backend version will directly fetch by clientId.
+   * Fetch client details from backend
    */
-  const client = useMemo(() => {
-    if (!clientId) return null;
-    return CLIENT_DETAILS.find((c) => c.id === clientId) || null;
+  useEffect(() => {
+    const fetchClientDetails = async () => {
+      if (!clientId) return;
+      try {
+        setLoading(true);
+        const response =
+          await userDashboardService.getPartnerClientDetails(clientId);
+        if (response.success && response.data) {
+          setClient(response.data);
+        } else {
+          toast.error(response.message || "Failed to load client details");
+        }
+      } catch (error) {
+        console.error("Failed to fetch client details:", error);
+        toast.error("An error occurred while fetching client details");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClientDetails();
   }, [clientId]);
 
   /**
@@ -53,6 +85,36 @@ export default function ClientDetails() {
     }
     window.open(url, "_blank", "noopener,noreferrer");
   };
+
+  /**
+   * Opens the in-page document viewer.
+   */
+  const handleViewDoc = (
+    url: string | undefined,
+    type: string,
+    label: string,
+  ) => {
+    if (!url || url === "#") {
+      toast.error(`${label} is not available yet.`);
+      return;
+    }
+    setViewingDoc({ url, type, label });
+    setViewerOpen(true);
+  };
+
+  /**
+   * If loading
+   */
+  if (loading) {
+    return (
+      <div className="flex h-[60vh] flex-col items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-[#3FA69E]" />
+        <p className="mt-4 text-slate-500 font-medium">
+          Loading client details...
+        </p>
+      </div>
+    );
+  }
 
   /**
    * If client not found show fallback UI.
@@ -127,7 +189,7 @@ export default function ClientDetails() {
 
             <a
               href={`mailto:${client.email}?subject=Flashspace%20Partnership&body=Hi%20${encodeURIComponent(
-                client.contactName
+                client.contactName,
               )},%0A%0A`}
               className="flex items-center justify-center gap-2 rounded-xl bg-[#3FA69E] px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
             >
@@ -355,7 +417,11 @@ export default function ClientDetails() {
                   <button
                     type="button"
                     onClick={() =>
-                      handleOpenLink(doc.fileUrl, `${doc.type} document`)
+                      handleViewDoc(
+                        doc.fileUrl,
+                        doc.type,
+                        `${doc.type} document`,
+                      )
                     }
                     className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
                   >
@@ -374,6 +440,58 @@ export default function ClientDetails() {
                 </div>
               </div>
             ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Document Viewer Modal */}
+      <Dialog open={viewerOpen} onOpenChange={setViewerOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-xl flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-slate-900">
+              {viewingDoc?.label || "Document Preview"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="mt-4 flex-1 flex items-center justify-center bg-slate-50 rounded-xl overflow-hidden min-h-[50vh]">
+            {viewingDoc?.url ? (
+              viewingDoc.type.toLowerCase().includes("video") ? (
+                <video
+                  src={viewingDoc.url}
+                  controls
+                  autoPlay
+                  className="max-h-[70vh] w-auto h-auto"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <img
+                  src={viewingDoc.url}
+                  alt={viewingDoc.label}
+                  className="max-h-[70vh] w-auto h-auto object-contain"
+                />
+              )
+            ) : (
+              <p className="text-slate-500">No preview available</p>
+            )}
+          </div>
+
+          <div className="mt-6 flex justify-end gap-3">
+            <button
+              onClick={() =>
+                handleOpenLink(viewingDoc?.url, viewingDoc?.label || "Document")
+              }
+              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <Download size={16} />
+              Open in New Tab
+            </button>
+            <button
+              onClick={() => setViewerOpen(false)}
+              className="rounded-xl bg-[#3FA69E] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+            >
+              Close
+            </button>
           </div>
         </DialogContent>
       </Dialog>
@@ -421,15 +539,11 @@ function InfoRow({ label, value }: { label: string; value: string }) {
  * Generic Badge Component
  * Used to remove repeated badge code.
  */
-function Badge({
-  label,
-  className,
-}: {
-  label: string;
-  className: string;
-}) {
+function Badge({ label, className }: { label: string; className: string }) {
   return (
-    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${className}`}>
+    <span
+      className={`inline-flex items-center justify-center rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap ${className}`}
+    >
       {label}
     </span>
   );
@@ -441,10 +555,16 @@ function Badge({
 function ClientStatusBadge({ status }: { status: string }) {
   const config =
     status === "ACTIVE"
-      ? { className: "bg-emerald-50 text-emerald-700", label: `Status: ${status}` }
+      ? {
+          className: "bg-emerald-50 text-emerald-700",
+          label: `Status: ${status}`,
+        }
       : status === "EXPIRING_SOON"
-      ? { className: "bg-amber-50 text-amber-700", label: `Status: ${status}` }
-      : { className: "bg-rose-50 text-rose-700", label: `Status: ${status}` };
+        ? {
+            className: "bg-amber-50 text-amber-700",
+            label: `Status: ${status}`,
+          }
+        : { className: "bg-rose-50 text-rose-700", label: `Status: ${status}` };
 
   return <Badge label={config.label} className={config.className} />;
 }
@@ -469,8 +589,8 @@ function BookingStatusBadge({ status }: { status: string }) {
     status === "CONFIRMED"
       ? { className: "bg-emerald-50 text-emerald-700", label: status }
       : status === "PENDING"
-      ? { className: "bg-amber-50 text-amber-700", label: status }
-      : { className: "bg-rose-50 text-rose-700", label: status };
+        ? { className: "bg-amber-50 text-amber-700", label: status }
+        : { className: "bg-rose-50 text-rose-700", label: status };
 
   return <Badge label={config.label} className={config.className} />;
 }
@@ -483,8 +603,8 @@ function InvoiceStatusBadge({ status }: { status: string }) {
     status === "PAID"
       ? { className: "bg-emerald-50 text-emerald-700", label: status }
       : status === "PENDING"
-      ? { className: "bg-amber-50 text-amber-700", label: status }
-      : { className: "bg-rose-50 text-rose-700", label: status };
+        ? { className: "bg-amber-50 text-amber-700", label: status }
+        : { className: "bg-rose-50 text-rose-700", label: status };
 
   return <Badge label={config.label} className={config.className} />;
 }

@@ -12,6 +12,36 @@ export interface BusinessSolution {
   description: string;
 }
 
+export interface Property {
+  _id: string;
+  id?: string;
+  name: string;
+  address: string;
+  city: string;
+  area: string;
+  features: string[];
+  location?: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+  images: string[];
+  kycStatus: string;
+  kycRejectionReason?: string;
+  documents?: Array<{
+    type: string;
+    name: string;
+    fileUrl?: string;
+    status: "pending" | "approved" | "rejected";
+    rejectionReason?: string;
+    uploadedAt?: string;
+  }>;
+  status?: string;
+  isActive?: boolean;
+  partner: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Virtual Office specific types
 export interface VirtualOfficeItem {
   _id: string;
@@ -21,23 +51,45 @@ export interface VirtualOfficeItem {
   area: string;
   price: string;
   originalPrice: string;
-  gstPlanPrice: string;
+
+  // Updated fields from Backend
+  finalGstPricePerYear?: number;
+  finalMailingPricePerYear?: number;
+  finalBrPricePerYear?: number;
+
+  // Legacy fields (managed as optional for backward compatibility)
+  gstPlanPricePerYear?: number;
+  mailingPlanPricePerYear?: number;
+  brPlanPricePerYear?: number;
+  gstPlanPrice?: string;
   gstPlanPriceYearly?: string;
-  mailingPlanPrice: string;
+  mailingPlanPrice?: string;
   mailingPlanPriceYearly?: string;
-  brPlanPrice: string;
+  brPlanPrice?: string;
   brPlanPriceYearly?: string;
   priceYearly?: string;
-  rating: number;
-  reviews: number;
+
+  // Updated from Backend
+  avgRating: number;
+  totalReviews: number;
+  rating?: number; // legacy
+  reviews?: number; // legacy
+
   features: string[];
   availability: string;
   popular: boolean;
-  image?: string;
+  image?: string; // legacy
+  images: string[];
+
+  location?: {
+    type: string;
+    coordinates: number[];
+  };
   coordinates?: {
     lat: number;
     lng: number;
   };
+
   isDeleted?: boolean;
   isActive?: boolean;
   createdAt?: string;
@@ -90,13 +142,23 @@ export interface CoworkingSpaceItem {
   price: string;
   priceYearly?: string;
   originalPrice: string;
+
+  // Updated from Backend
+  partnerPricePerMonth?: number;
+  adminMarkupPerMonth?: number;
+  finalPricePerMonth?: number;
+
   rating: number;
   reviews: number;
+  avgRating?: number;
+  totalReviews?: number;
+
   type: string;
   features: string[];
   availability: string;
   popular: boolean;
   image?: string;
+  images?: string[];
   coordinates?: {
     lat: number;
     lng: number;
@@ -123,13 +185,27 @@ export interface MeetingRoomItem {
   area: string;
   price: string; // e.g., "₹1,000/hour"
   originalPrice?: string;
+
+  // Updated from Backend
+  partnerPricePerHour?: number;
+  adminMarkupPerHour?: number;
+  finalPricePerHour?: number;
+
+  partnerPricePerDay?: number;
+  adminMarkupPerDay?: number;
+  finalPricePerDay?: number;
+
+  avgRating?: number;
+  totalReviews?: number;
   rating: number;
   reviews: number;
+
   type: string; // e.g. "Meeting Room", "Conference Room", "Cabin"
   features: string[];
   availability: string;
   popular: boolean;
   image?: string;
+  images?: string[];
   coordinates?: {
     lat: number;
     lng: number;
@@ -239,6 +315,7 @@ export interface SpaceSnapshot {
 export type BookingType =
   | "virtual_office"
   | "coworking_space"
+  | "seat_booking"
   | "meeting_room"
   | "VirtualOffice"
   | "CoworkingSpace"
@@ -292,7 +369,8 @@ export type KYCStatus =
   | "pending"
   | "approved"
   | "rejected"
-  | "resubmit";
+  | "resubmit"
+  | "verified";
 export type KYCType = "individual" | "business";
 export type DocumentStatus = "pending" | "approved" | "rejected";
 
@@ -338,6 +416,7 @@ export interface KYCData {
   linkedBookings?: string[]; // Array of booking IDs
   overallStatus: KYCStatus;
   status?: string; // Add status field to match DashboardData
+  rejectionReason?: string;
   kycType?: KYCType;
   isPartner?: boolean;
   partnerCount?: number;

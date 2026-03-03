@@ -5,20 +5,24 @@ const Services = () => {
   const services = [
     {
       title: "VIRTUAL OFFICE",
-      description: "Professional business address with mail handling, call forwarding, and meeting room access when needed."
+      description:
+        "Professional business address with mail handling, call forwarding, and meeting room access when needed.",
     },
     {
       title: "COWORKING SPACE",
-      description: "Flexible shared workspace with high-speed internet, modern amenities, and networking opportunities."
+      description:
+        "Flexible shared workspace with high-speed internet, modern amenities, and networking opportunities.",
     },
     {
       title: "ON DEMAND",
-      description: "Book meeting rooms, conference facilities, and workspace on hourly or daily basis as per your requirements."
+      description:
+        "Book meeting rooms, conference facilities, and workspace on hourly or daily basis as per your requirements.",
     },
     {
       title: "EVENT SPACES",
-      description: "Premium venues for corporate events, seminars, workshops, and business gatherings of all sizes."
-    }
+      description:
+        "Premium venues for corporate events, seminars, workshops, and business gatherings of all sizes.",
+    },
   ];
 
   return (

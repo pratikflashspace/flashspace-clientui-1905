@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import userDashboardService, {
@@ -2061,21 +2061,21 @@ export default function KYCVerification() {
                             submitting:
                             {!isPersonalInfoSaved() && (
                               <span className="block">
-                                • Personal Information
+                                ΓÇó Personal Information
                               </span>
                             )}
                             {kycType === "business" &&
                               !isBusinessInfoSaved() && (
                                 <span className="block">
-                                  • Business Information
+                                  ΓÇó Business Information
                                 </span>
                               )}
                             {!isPartnerMode && !isVideoKYCComplete() && (
-                              <span className="block">• Video KYC</span>
+                              <span className="block">ΓÇó Video KYC</span>
                             )}
                             {!areAllRequiredDocsUploaded() && (
                               <span className="block">
-                                • Upload all required documents
+                                ΓÇó Upload all required documents
                               </span>
                             )}
                           </span>

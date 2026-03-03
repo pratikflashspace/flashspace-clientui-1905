@@ -18,12 +18,15 @@ import {
   Building2,
   Sparkles,
   Users,
-  Phone
+  Phone,
 } from "lucide-react";
 import { useState } from "react";
-import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-animation";
+import {
+  useScrollAnimation,
+  getAnimationClasses,
+} from "@/hooks/use-scroll-animation";
 
-import { SALES_FAQS } from '@/pages/admin/learning-hub/learning-hub-data';
+import { SALES_FAQS } from "@/pages/admin/learning-hub/learning-hub-data";
 
 interface FAQSectionProps {
   faqs?: Array<{
@@ -36,7 +39,7 @@ interface FAQSectionProps {
 
 const FAQSection = ({ faqs = SALES_FAQS }: FAQSectionProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const isVisible = useScrollAnimation('faq');
+  const isVisible = useScrollAnimation("faq");
 
   const categories = [
     { key: "all", label: "All Questions", icon: HelpCircle },
@@ -47,39 +50,68 @@ const FAQSection = ({ faqs = SALES_FAQS }: FAQSectionProps) => {
     { key: "security", label: "Security", icon: Shield },
     { key: "pricing", label: "Pricing", icon: DollarSign },
     { key: "setup", label: "Setup", icon: Zap },
-    { key: "facilities", label: "Facilities", icon: Building2 }
+    { key: "facilities", label: "Facilities", icon: Building2 },
   ];
 
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const filteredFaqs = faqs.filter(faq => {
-    const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredFaqs = faqs.filter((faq) => {
+    const matchesSearch =
+      faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
       faq.answer.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || faq.category === selectedCategory;
+    const matchesCategory =
+      selectedCategory === "all" || faq.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   return (
-    <section id="faq" className="py-20 px-4 relative overflow-hidden bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300">
-
+    <section
+      id="faq"
+      className="py-20 px-4 relative overflow-hidden bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300"
+    >
       <div className="container mx-auto max-w-5xl relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${getAnimationClasses(isVisible, 'fadeInUp', 0)}`} style={{ fontFamily: 'Poppins' }}>
-            <span className="text-[#172A3A] dark:text-white">Everything You Need to Know</span>
+          <h2
+            {...getAnimationClasses(isVisible, "fadeInUp", 0)}
+            className={`text-3xl md:text-4xl font-bold mb-6 ${getAnimationClasses(isVisible, "fadeInUp", 0).className}`}
+            style={{
+              ...getAnimationClasses(isVisible, "fadeInUp", 0).style,
+              fontFamily: "Poppins",
+            }}
+          >
+            <span className="text-[#172A3A] dark:text-white">
+              Everything You Need to Know
+            </span>
             <br />
             <span className="text-[#0D9488]">Frequently Asked Questions</span>
           </h2>
-          <div className={`flex items-center justify-center gap-2 text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto ${getAnimationClasses(isVisible, 'fadeInUp', 200)}`}>
-            <span>Get instant answers to the most common questions about our virtual office solutions and services.</span>
+          <div
+            {...getAnimationClasses(isVisible, "fadeInUp", 200)}
+            className={`flex items-center justify-center gap-2 text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto ${getAnimationClasses(isVisible, "fadeInUp", 200).className}`}
+            style={getAnimationClasses(isVisible, "fadeInUp", 200).style}
+          >
+            <span>
+              Get instant answers to the most common questions about our virtual
+              office solutions and services.
+            </span>
             <Sparkles className="w-6 h-6 text-[#0D9488] animate-pulse" />
           </div>
         </div>
 
         {/* Search and Filter */}
-        <Card className={`bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 mb-12 shadow-md hover:shadow-xl transition-all duration-300 ${getAnimationClasses(isVisible, 'fadeInUp', 300)}`}>
+        <Card
+          {...getAnimationClasses(isVisible, "fadeInUp", 300)}
+          className={`bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 mb-12 shadow-md hover:shadow-xl transition-all duration-300 ${getAnimationClasses(isVisible, "fadeInUp", 300).className}`}
+          style={getAnimationClasses(isVisible, "fadeInUp", 300).style}
+        >
           <CardHeader className="pb-4">
-            <CardTitle className="text-center text-[#172A3A] dark:text-white text-2xl" style={{ fontFamily: 'Poppins' }}>Find Your Answer</CardTitle>
+            <CardTitle
+              className="text-center text-[#172A3A] dark:text-white text-2xl"
+              style={{ fontFamily: "Poppins" }}
+            >
+              Find Your Answer
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
             {/* Search Bar */}
@@ -102,9 +134,10 @@ const FAQSection = ({ faqs = SALES_FAQS }: FAQSectionProps) => {
                     onClick={() => setSelectedCategory(category.key)}
                     className={`
                       group px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 justify-center
-                      ${selectedCategory === category.key
-                        ? 'bg-[#0D9488] text-white shadow-lg transform scale-105'
-                        : 'bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-[#0D9488] dark:hover:border-[#0D9488] hover:text-[#172A3A] dark:hover:text-white hover:scale-105'
+                      ${
+                        selectedCategory === category.key
+                          ? "bg-[#0D9488] text-white shadow-lg transform scale-105"
+                          : "bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-[#0D9488] dark:hover:border-[#0D9488] hover:text-[#172A3A] dark:hover:text-white hover:scale-105"
                       }
                     `}
                   >
@@ -118,7 +151,11 @@ const FAQSection = ({ faqs = SALES_FAQS }: FAQSectionProps) => {
         </Card>
 
         {/* FAQ Accordion */}
-        <Card className={`bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 shadow-md hover:shadow-xl transition-all duration-300 ${getAnimationClasses(isVisible, 'fadeInUp', 500)}`}>
+        <Card
+          {...getAnimationClasses(isVisible, "fadeInUp", 500)}
+          className={`bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 shadow-md hover:shadow-xl transition-all duration-300 ${getAnimationClasses(isVisible, "fadeInUp", 500).className}`}
+          style={getAnimationClasses(isVisible, "fadeInUp", 500).style}
+        >
           <CardContent className="p-0">
             {filteredFaqs.length > 0 ? (
               <Accordion type="single" collapsible className="w-full">
@@ -146,9 +183,15 @@ const FAQSection = ({ faqs = SALES_FAQS }: FAQSectionProps) => {
                 <div className="w-20 h-20 bg-gradient-to-r from-[#172A3A]/15 to-[#0D9488]/15 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Search className="w-10 h-10 text-[#172A3A]" />
                 </div>
-                <h3 className="text-lg font-semibold mb-4 text-[#172A3A]" style={{ fontFamily: 'Poppins' }}>No results found</h3>
+                <h3
+                  className="text-lg font-semibold mb-4 text-[#172A3A]"
+                  style={{ fontFamily: "Poppins" }}
+                >
+                  No results found
+                </h3>
                 <p className="text-gray-600 text-base">
-                  Try adjusting your search terms or browse different categories.
+                  Try adjusting your search terms or browse different
+                  categories.
                 </p>
               </div>
             )}

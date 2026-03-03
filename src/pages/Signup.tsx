@@ -1,7 +1,7 @@
-import { SignupForm } from '@/components/auth/SignupForm';
-import { Link, Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { SignupForm } from "@/components/auth/SignupForm";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
 
 const Signup = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -21,7 +21,10 @@ const Signup = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center px-4 py-12" style={{ fontFamily: 'Poppins' }}>
+    <div
+      className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center px-4 py-12"
+      style={{ fontFamily: "Poppins" }}
+    >
       <div className="w-full max-w-lg">
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
@@ -46,8 +49,11 @@ const Signup = () => {
           {/* Footer Links */}
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600">
-              Already have an account?{' '}
-              <Link to="/login" className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200"
+              >
                 Sign in
               </Link>
             </p>

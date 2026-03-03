@@ -1,6 +1,11 @@
 import axiosInstance from "./api.service";
 import { MeetingRoomItem, ApiResponse } from "@/types/services";
 
+/**
+ * Get meeting rooms by city
+ * @param city - City name
+ * @returns Array of meeting rooms in that city
+ */
 export const getMeetingRoomsByCity = async (
   city: string,
 ): Promise<MeetingRoomItem[]> => {
@@ -32,6 +37,10 @@ export const getMeetingRoomsByCity = async (
   }
 };
 
+/**
+ * Get all meeting rooms
+ * @returns Array of all meeting rooms
+ */
 export const getAllMeetingRooms = async (): Promise<MeetingRoomItem[]> => {
   try {
     const response = await axiosInstance.get("/meetingRoom/getAll");
@@ -61,6 +70,11 @@ export const getAllMeetingRooms = async (): Promise<MeetingRoomItem[]> => {
   }
 };
 
+/**
+ * Get meeting room by ID
+ * @param id - Meeting room ID
+ * @returns Meeting room details
+ */
 export const getMeetingRoomById = async (
   id: string,
 ): Promise<MeetingRoomItem | undefined> => {
@@ -79,11 +93,61 @@ export const getMeetingRoomById = async (
             ? `₹${(r as any).pricePerHour.toLocaleString()}/hr`
             : ""),
         image: r.image || (r as any).images?.[0] || "",
+        rating: r.rating || (r as any).avgRating || 0,
+        reviews: r.reviews || (r as any).totalReviews || 0,
       };
     }
     return undefined;
   } catch (error) {
     console.error("Error fetching meeting room by id:", error);
     return undefined;
+  }
+};
+
+/**
+ * Create a new meeting room
+ * @param data - Meeting room data
+ * @returns Created meeting room
+ */
+export const createMeetingRoom = async (
+  data: Partial<MeetingRoomItem>,
+): Promise<MeetingRoomItem> => {
+  try {
+    const response = await axiosInstance.post("/meetingRoom/create", data);
+    const responseData = response.data as ApiResponse<MeetingRoomItem>;
+
+    if ([200, 201].includes(response.status) && responseData.success) {
+      return responseData.data;
+    }
+
+    throw new Error(responseData.message || "Failed to create meeting room");
+  } catch (error: any) {
+    console.error("Error creating meeting room:", error);
+    throw error;
+  }
+};
+
+/**
+ * Update a meeting room
+ * @param id - Meeting room ID
+ * @param data - Updated meeting room data
+ * @returns Updated meeting room
+ */
+export const updateMeetingRoom = async (
+  id: string,
+  data: Partial<MeetingRoomItem>,
+): Promise<MeetingRoomItem> => {
+  try {
+    const response = await axiosInstance.put(`/meetingRoom/update/${id}`, data);
+    const responseData = response.data as ApiResponse<MeetingRoomItem>;
+
+    if ([200, 201].includes(response.status) && responseData.success) {
+      return responseData.data;
+    }
+
+    throw new Error(responseData.message || "Failed to update meeting room");
+  } catch (error: any) {
+    console.error("Error updating meeting room:", error);
+    throw error;
   }
 };

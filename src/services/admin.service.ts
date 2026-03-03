@@ -135,6 +135,33 @@ export interface KYCData {
   partnerCount?: number;
 }
 
+export interface PartnerKYCData {
+  _id: string;
+  partnerProfileId?: string;
+  partnerInfo: {
+    fullName: string;
+    email: string;
+    phone: string;
+    panNumber: string;
+    aadhaarNumber: string;
+    verified: boolean;
+  };
+  overallStatus: "pending" | "approved" | "rejected" | string;
+  progress?: number;
+  isDeleted?: boolean;
+  documents?: Array<{
+    _id?: string;
+    type: string;
+    name?: string;
+    fileUrl?: string;
+    status?: string;
+    uploadedAt?: string;
+    verifiedAt?: string;
+  }>;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 // Admin ticket types for TicketSystem
 export interface AdminTicketData {
   _id: string;
@@ -207,9 +234,21 @@ class AdminService {
     return response.data;
   }
 
-  async getPendingKYC(): Promise<ApiResponse<KYCData[]>> {
+  async getPendingKYC(
+    includeApproved: boolean = false,
+  ): Promise<ApiResponse<KYCData[]>> {
     const response = await axiosInstance.get<ApiResponse<KYCData[]>>(
       "/api/admin/kyc/pending",
+      {
+        params: includeApproved ? { includeApproved: true } : undefined,
+      },
+    );
+    return response.data;
+  }
+
+  async getKYCById(kycId: string): Promise<ApiResponse<KYCData>> {
+    const response = await axiosInstance.get<ApiResponse<KYCData>>(
+      `/api/admin/kyc/${kycId}`,
     );
     return response.data;
   }
@@ -270,8 +309,8 @@ class AdminService {
     docId: string,
     action: "approve" | "reject",
     rejectionReason?: string,
-  ): Promise<ApiResponse<void>> {
-    const response = await axiosInstance.put<ApiResponse<void>>(
+  ): Promise<ApiResponse<KYCData>> {
+    const response = await axiosInstance.put<ApiResponse<KYCData>>(
       `/api/admin/kyc/${kycId}/document/${docId}/review`,
       {
         action,
@@ -521,6 +560,24 @@ class AdminService {
       {
         assigneeId,
       },
+    );
+    return response.data;
+  }
+
+  async getPartnerKYCList(params?: {
+    userId?: string;
+    profileId?: string;
+  }): Promise<ApiResponse<PartnerKYCData[]>> {
+    const response = await axiosInstance.get<ApiResponse<PartnerKYCData[]>>(
+      "/api/admin/kyc/partners",
+      { params },
+    );
+    return response.data;
+  }
+
+  async getPartnerKYCById(id: string): Promise<ApiResponse<PartnerKYCData>> {
+    const response = await axiosInstance.get<ApiResponse<PartnerKYCData>>(
+      `/api/admin/kyc/partners/${id}`,
     );
     return response.data;
   }

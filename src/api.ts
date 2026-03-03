@@ -7,6 +7,8 @@ export const API = {
   domain: BASE,
 
   endPoints: {
+    // KYC Business Info
+    upsertSpaceUserKycBusinessInfo: "/api/spacePartner/kyc/business-info",
     //ContactForm 
     createForm: "/api/contactForm/createContactForm",
     getAllContactForm: "/api/contactForm/getAllContactForm",

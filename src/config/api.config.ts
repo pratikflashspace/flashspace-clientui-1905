@@ -86,9 +86,17 @@ export const API_ENDPOINTS = {
     MY_TICKETS: "/api/tickets/my-tickets",
     TICKET_BY_ID: (id: string) => `/api/tickets/${id}`,
     TICKET_REPLY: (id: string) => `/api/tickets/${id}/reply`,
+    // Seat Bookings
+    SEAT_BOOKING_HOLD: "/api/seat-bookings/hold",
+    SEAT_BOOKING_CONFIRM: (id: string) => `/api/seat-bookings/confirm/${id}`,
+    SEAT_BOOKING_AVAILABILITY: (id: string, start: string, end: string) =>
+      `/api/seat-bookings/availability/${id}?start=${start}&end=${end}`,
     // Credits
     CREDITS: "/api/user/credits",
     REDEEM_REWARD: "/api/user/credits/redeem",
+    // Partner
+    PARTNER_CLIENTS: "/api/user/partner/clients",
+    PARTNER_CLIENT_DETAILS: (id: string) => `/api/user/partner/clients/${id}`,
   },
 
   // Admin endpoints
