@@ -91,8 +91,7 @@ const ProductTraining = ({ articles }: { articles: any[] }) => {
                     <div className={`h-3 w-full shrink-0 ${selectedArticle?.color || 'bg-blue-500'}`} />
 
                     <div
-                        className="flex-1 overflow-y-auto p-6 pt-4 overscroll-contain scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
-                       
+                        className="relative flex-1 overflow-y-auto p-6 pt-4 overscroll-contain scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
                     >
                         <DialogHeader className="mb-6">
                             <div className="flex items-center justify-between mb-2">

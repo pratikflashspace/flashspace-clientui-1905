@@ -108,7 +108,7 @@ const CoworkingSpaceComponent = () => {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
-        <main className="flex-grow bg-white pt-20">
+        <main className="relative flex-grow bg-white pt-20">
           <SpaceDetailSkeleton />
         </main>
         <Footer />
@@ -121,7 +121,7 @@ const CoworkingSpaceComponent = () => {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
-        <main className="flex-grow bg-white pt-20 flex items-center justify-center">
+        <main className="relative flex-grow bg-white pt-20 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-500 text-xl mb-4">😕 {error || "Space not found"}</p>
             <button
@@ -145,7 +145,7 @@ const CoworkingSpaceComponent = () => {
       <Header />
 
       {/* 2. Main Content Area */}
-      <main className="flex-grow bg-white pt-20">
+      <main className="relative flex-grow bg-white pt-20">
         <div className="max-w-7xl mx-auto px-4 py-10 font-poppins text-gray-800">
 
           {/* --- HEADER SECTION --- */}

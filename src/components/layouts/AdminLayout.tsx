@@ -311,7 +311,7 @@ export default function AdminLayout() {
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 px-8 md:px-12 py-6">
+                <main className="relative flex-1 px-8 md:px-12 py-6">
                     <div className="max-w-7xl mx-auto">
                         <Outlet />
                     </div>

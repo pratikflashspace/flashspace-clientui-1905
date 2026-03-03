@@ -33,9 +33,9 @@ export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: L
             <div className="absolute inset-0 touch-none" onClick={onClose} />
 
             <div
-                className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl p-8 md:p-12 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh] overscroll-contain"
+                className="relative w-full max-w-[440px] mx-4 bg-white rounded-2xl shadow-xl p-8 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh] overscroll-contain"
                 onClick={(e) => e.stopPropagation()}
-                style={{ fontFamily: 'Poppins' }}
+                style={{ fontFamily: '"Inner Tight", system-ui, sans-serif' }}
             >
                 <button
                     onClick={onClose}
@@ -45,16 +45,16 @@ export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: L
                 </button>
 
                 {/* Content of the Login Card */}
-                <div className="text-center mb-8">
+                <div className="text-center mb-6">
                     <img
                         src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
                         alt="FlashSpace Logo"
-                        className="w-60 mx-auto mb-4"
+                        className="w-40 mx-auto mb-4"
                     />
-                    <h2 className="text-xl font-bold text-[#172A3A] mb-2">
+                    <h2 className="text-2xl font-bold text-[#1F2E26] mb-1.5">
                         Welcome Back
                     </h2>
-                    <p className="text-slate-600 text-base font-medium">
+                    <p className="text-[#677E73] text-sm font-medium">
                         Sign in to access your virtual office
                     </p>
                 </div>
@@ -62,7 +62,7 @@ export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: L
                 <LoginForm onSuccess={onLoginSuccess} />
 
                 <div className="mt-6 text-center">
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-[#677E73]">
                         Don't have an account?{' '}
                         {onSignupClick ? (
                             <button
@@ -70,7 +70,7 @@ export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: L
                                     onClose();
                                     onSignupClick();
                                 }}
-                                className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200"
+                                className="font-bold text-[#35503F] hover:text-[#1F2E26] transition-colors duration-200"
                             >
                                 Sign up for free
                             </button>
@@ -78,7 +78,7 @@ export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: L
                             <Link
                                 to="/signup"
                                 onClick={onClose}
-                                className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200"
+                                className="font-bold text-[#35503F] hover:text-[#1F2E26] transition-colors duration-200"
                             >
                                 Sign up for free
                             </Link>
@@ -89,3 +89,4 @@ export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: L
         </div>
     );
 };
+

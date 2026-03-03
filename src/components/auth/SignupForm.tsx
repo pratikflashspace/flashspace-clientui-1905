@@ -40,7 +40,7 @@ export const SignupForm = ({ initialRole = 'user' }: { initialRole?: 'user' | 'p
       return;
     }
     // Simulate sending OTP
-    console.log('Sending OTP to', formData.phoneNumber);
+    // console.log('Sending OTP to', formData.phoneNumber);
     toast.success('OTP sent successfully: 123456'); // [NEW] Show OTP in toast
     // Move to next step
     setStep(2);
