@@ -1,3 +1,12 @@
+import axios, { isAxiosError } from "axios";
+import { API } from "@/api";
+
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  message?: string;
+  data: T;
+}
+
 export type UpsertSpaceUserKycBusinessInfoPayload = {
   companyName?: string;
   companyType?: string;
@@ -12,7 +21,7 @@ export const upsertSpaceUserKycBusinessInfo = async (
   payload: UpsertSpaceUserKycBusinessInfoPayload,
 ): Promise<SpaceUserKycResponse> => {
   try {
-    const response = await axios.put(
+    const response = await axios.put<ApiResponse<SpaceUserKycResponse>>(
       `${API.domain}/api/spacePartner/kyc/business-info`,
       payload,
       { withCredentials: true },
@@ -28,7 +37,7 @@ export const upsertSpaceUserKycBusinessInfo = async (
   } catch (error: unknown) {
     console.error("Error saving space user KYC business info:", error);
 
-    const message = axios.isAxiosError(error)
+    const message = isAxiosError(error)
       ? error.response?.data?.message ||
         error.message ||
         "Failed to save KYC business information"
@@ -44,7 +53,7 @@ export const getAllSpacePartnerKyc = async (): Promise<
   SpaceUserKycResponse[]
 > => {
   try {
-    const response = await axios.get(
+    const response = await axios.get<ApiResponse<SpaceUserKycResponse[]>>(
       `${API.domain}/api/admin/spacePartner/kyc`,
       {
         withCredentials: true,
@@ -61,8 +70,6 @@ export const getAllSpacePartnerKyc = async (): Promise<
     throw error;
   }
 };
-import axios from "axios";
-import { API } from "@/api";
 
 export type SpaceUserKycResponse = {
   _id: string;
@@ -100,9 +107,12 @@ export type SpaceUserKycResponse = {
 export const getMySpaceUserKyc =
   async (): Promise<SpaceUserKycResponse | null> => {
     try {
-      const response = await axios.get(`${API.domain}/api/spacePartner/kyc`, {
-        withCredentials: true,
-      });
+      const response = await axios.get<ApiResponse<SpaceUserKycResponse>>(
+        `${API.domain}/api/spacePartner/kyc`,
+        {
+          withCredentials: true,
+        },
+      );
 
       if (response.status === 200 && response.data.success) {
         const userId = response.data.data?.userId;
@@ -113,12 +123,12 @@ export const getMySpaceUserKyc =
 
       throw new Error(response.data?.message || "Failed to fetch KYC details");
     } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
+      if (isAxiosError(error) && error.response?.status === 404) {
         return null;
       }
       console.error("Error fetching space user KYC:", error);
 
-      const message = axios.isAxiosError(error)
+      const message = isAxiosError(error)
         ? error.response?.data?.message ||
           error.message ||
           "Failed to fetch KYC details"
@@ -132,7 +142,7 @@ export const getMySpaceUserKyc =
 
 export const submitSpaceUserKyc = async (): Promise<SpaceUserKycResponse> => {
   try {
-    const response = await axios.post(
+    const response = await axios.post<ApiResponse<SpaceUserKycResponse>>(
       `${API.domain}/api/spacePartner/kyc/submit`,
       {},
       { withCredentials: true },
@@ -146,7 +156,7 @@ export const submitSpaceUserKyc = async (): Promise<SpaceUserKycResponse> => {
   } catch (error: unknown) {
     console.error("Error submitting space user KYC:", error);
 
-    const message = axios.isAxiosError(error)
+    const message = isAxiosError(error)
       ? error.response?.data?.message || error.message || "Failed to submit KYC"
       : error instanceof Error
         ? error.message
@@ -169,7 +179,7 @@ export const upsertSpaceUserKyc = async (
   payload: UpsertSpaceUserKycPayload,
 ): Promise<SpaceUserKycResponse> => {
   try {
-    const response = await axios.put(
+    const response = await axios.put<ApiResponse<SpaceUserKycResponse>>(
       `${API.domain}/api/spacePartner/kyc`,
       payload,
       { withCredentials: true },
@@ -183,7 +193,7 @@ export const upsertSpaceUserKyc = async (
   } catch (error: unknown) {
     console.error("Error saving space user KYC:", error);
 
-    const message = axios.isAxiosError(error)
+    const message = isAxiosError(error)
       ? error.response?.data?.message ||
         error.message ||
         "Failed to save KYC information"
@@ -209,7 +219,7 @@ export const uploadSpaceUserKycFile = async (
     formData.append("documentType", documentType);
     formData.append("file", file);
 
-    const response = await axios.post(
+    const response = await axios.post<ApiResponse<SpaceUserKycResponse>>(
       `${API.domain}/api/spacePartner/kyc/upload`,
       formData,
       {
@@ -228,7 +238,7 @@ export const uploadSpaceUserKycFile = async (
   } catch (error: unknown) {
     console.error("Error uploading space user KYC document:", error);
 
-    const message = axios.isAxiosError(error)
+    const message = isAxiosError(error)
       ? error.response?.data?.message ||
         error.message ||
         "Failed to upload KYC document"

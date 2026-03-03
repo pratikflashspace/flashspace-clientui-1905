@@ -1,20 +1,23 @@
 import axios from "axios";
 import { API } from "@/api";
-import { SpaceUserKycResponse } from "./spacePartnerKyc.service";
+import { SpaceUserKycResponse, ApiResponse } from "./spacePartnerKyc.service";
 
 export type KycDecisionStatus = "pending" | "approved" | "rejected";
-export type SpaceUserKycDocumentType = "aadhaar_image" | "pan_image" | "video_kyc";
+export type SpaceUserKycDocumentType =
+  | "aadhaar_image"
+  | "pan_image"
+  | "video_kyc";
 
 export const reviewSpaceUserKycDocument = async (
   userId: string,
   documentType: SpaceUserKycDocumentType,
   status: KycDecisionStatus,
-  rejectMessage?: string
+  rejectMessage?: string,
 ): Promise<SpaceUserKycResponse> => {
-  const response = await axios.put(
+  const response = await axios.put<ApiResponse<SpaceUserKycResponse>>(
     `${API.domain}/api/admin/spacePartner/kyc/document/review`,
     { userId, documentType, status, rejectMessage },
-    { withCredentials: true }
+    { withCredentials: true },
   );
   if (response.status === 200 && response.data.success) {
     return response.data.data;
@@ -25,12 +28,12 @@ export const reviewSpaceUserKycDocument = async (
 export const reviewSpaceUserKycOverall = async (
   userId: string,
   status: KycDecisionStatus,
-  rejectMessage?: string
+  rejectMessage?: string,
 ): Promise<SpaceUserKycResponse> => {
-  const response = await axios.put(
+  const response = await axios.put<ApiResponse<SpaceUserKycResponse>>(
     `${API.domain}/api/admin/spacePartner/kyc/overall/review`,
     { userId, status, rejectMessage },
-    { withCredentials: true }
+    { withCredentials: true },
   );
   if (response.status === 200 && response.data.success) {
     return response.data.data;
