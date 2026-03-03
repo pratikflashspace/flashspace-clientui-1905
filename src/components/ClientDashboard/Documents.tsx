@@ -23,10 +23,6 @@ export default function Documents() {
         return lowerUrl.endsWith('.pdf') || (url.startsWith('blob:') && !isVideo(url));
     };
 
-    // const isVideo = (url: string) => {
-    //     const lowerUrl = url.split('?')[0].toLowerCase();
-    //     return ['.mp4', '.webm', '.ogg', '.mov', '.mkv', '.avi', '.mp3', '.m4v'].some(ext => lowerUrl.endsWith(ext));
-    // };
 
     const isVideo = (url: string) => {
         const lowerUrl = url.split('?')[0].toLowerCase();
@@ -369,14 +365,25 @@ export default function Documents() {
                                                                 let normalizedUrl = doc.fileUrl!.replace(/\\/g, '/');
                                                                 let fullUrl = normalizedUrl;
                                                                 if (!normalizedUrl.startsWith("http") && !normalizedUrl.startsWith("blob:")) {
-                                                                    const baseUrl = API_CONFIG.BASE_URL.replace(/\/$/, '');
+                                                                    let baseUrl = API_CONFIG.BASE_URL.replace(/\/$/, '');
+                                                                    // Fix static file requests failing on live servers that append /api
+                                                                    if (baseUrl.endsWith('/api')) {
+                                                                        baseUrl = baseUrl.slice(0, -4);
+                                                                    }
                                                                     const path = normalizedUrl.startsWith('/') ? normalizedUrl : `/${normalizedUrl}`;
                                                                     fullUrl = `${baseUrl}${path}`;
                                                                 }
+                                                                const docType = isPdf(normalizedUrl) ? 'pdf' : isVideo(normalizedUrl) ? 'video' : 'image';
+                                                                console.log(`[Document Preview] Details:
+- Name: ${doc.name}
+- Original Path: ${normalizedUrl}
+- Final Viewer URL: ${fullUrl}
+- Deduced Type: ${docType} (Is Video? ${docType === 'video'})`);
+
                                                                 setPreviewDocument({
                                                                     title: doc.name,
                                                                     url: fullUrl,
-                                                                    type: isPdf(normalizedUrl) ? 'pdf' : isVideo(normalizedUrl) ? 'video' : 'image'
+                                                                    type: docType
                                                                 });
                                                             }}
                                                             className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
@@ -421,11 +428,16 @@ export default function Documents() {
                             ) : previewDocument.type === 'video' ? (
                                 <div className="w-full h-full flex items-center justify-center bg-black rounded-xl border border-gray-200 shadow-sm overflow-hidden p-4">
                                     <video
-                                        src={previewDocument.url}
                                         controls
                                         autoPlay
+                                        playsInline
                                         className="max-w-full max-h-full object-contain"
-                                    />
+                                        key={previewDocument.url}
+                                    >
+                                        <source src={previewDocument.url} type="video/mp4" />
+                                        <source src={previewDocument.url} />
+                                        Your browser does not support the video tag.
+                                    </video>
                                 </div>
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden p-4">
