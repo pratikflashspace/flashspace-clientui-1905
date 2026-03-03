@@ -33,8 +33,25 @@ export const getVirtualOfficesByCity = async (
         ? data.data
         : (data.data as any).offices;
 
-      // console.log(`✅ Successfully fetched ${offices.length} virtual offices`);
-      return offices;
+      console.log(`✅ Successfully fetched ${offices.length} virtual offices`);
+
+      // Map backend data to frontend expectations
+      return offices.map((o: any) => ({
+        ...o,
+        features: o.features || [],
+        gstPlanPrice: o.gstPlanPricePerYear
+          ? `₹${o.gstPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        mailingPlanPrice: o.mailingPlanPricePerYear
+          ? `₹${o.mailingPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        brPlanPrice: o.brPlanPricePerYear
+          ? `₹${o.brPlanPricePerYear.toLocaleString()}/yr`
+          : "",
+        image: o.images?.[0] || "",
+        rating: o.avgRating || 0,
+        reviews: o.totalReviews || 0,
+      }));
     }
 
     throw new Error(data.message || "Failed to fetch virtual offices");
