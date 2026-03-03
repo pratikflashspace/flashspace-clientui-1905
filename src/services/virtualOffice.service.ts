@@ -21,7 +21,7 @@ export const getVirtualOfficesByCity = async (
   city: string,
 ): Promise<VirtualOfficeItem[]> => {
   try {
-    console.log(`📍 Fetching virtual offices for city: ${city}`);
+    // console.log(`📍 Fetching virtual offices for city: ${city}`);
     const response = await axiosInstance.get(
       `/virtualOffice/getByCity/${city}`,
     );

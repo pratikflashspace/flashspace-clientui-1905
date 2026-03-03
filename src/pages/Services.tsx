@@ -24,7 +24,7 @@ const Services = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
       <Header forceWhiteBackground />
-      <main className="pt-20 pb-16 px-4">
+      <main className="relative pt-20 pb-16 px-4">
         <div className="container mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white text-center mb-4">
             Complete Business Ecosystem at Your Fingertips

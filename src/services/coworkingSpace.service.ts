@@ -21,7 +21,7 @@ export const getCoworkingSpacesByCity = async (
   city: string,
 ): Promise<CoworkingSpaceItem[]> => {
   try {
-    console.log(`📍 Fetching coworking spaces for city: ${city}`);
+    // console.log(`📍 Fetching coworking spaces for city: ${city}`);
     const response = await axiosInstance.get(
       `/coworkingSpace/getByCity/${city}`,
     );
