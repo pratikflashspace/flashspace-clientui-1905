@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -29,6 +29,7 @@ import { getVirtualOfficesByCity } from "@/services/virtualOffice.service";
 import { getCoworkingSpacesByCity } from "@/services/coworkingSpace.service";
 import { getMeetingRoomsByCity } from "@/services/meetingRoom.service";
 import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
+import { ListingItem } from "@/components/services/ListingCardModern";
 
 // Static placeholders for fallback/missing data
 // import connaughtPlace1 from "@/assets/connaught-place-1.png";
@@ -59,11 +60,15 @@ const getValidImage = (img: string | undefined, defaultImg: string) => {
     !img ||
     img.startsWith("url") ||
     img.trim() === "img1.jpg" ||
-    img.trim() === "url1.jpg"
+    img.trim() === "url1.jpg" ||
+    img.includes("shorturl.at") ||
+    img.includes("tinyurl.com")
   )
     return defaultImg;
   return img;
 };
+
+const DEFAULT_WORKSPACE_IMAGE = "/hero-illustrated.jpg";
 
 const WorkspaceCard = ({
   ws,
@@ -114,9 +119,25 @@ const WorkspaceCard = ({
   const images = rawImages.map((img) =>
     getValidImage(
       img,
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
+      DEFAULT_WORKSPACE_IMAGE,
     ),
   );
+
+  const bookingItem: ListingItem = {
+    _id: ws.id,
+    name: ws.name,
+    address: ws.address,
+    area: ws.location || ws.address,
+    price: ws.plans?.[0]?.price || "Price on request",
+    rating: ws.rating,
+    reviews: ws.reviews,
+    features: ws.tags || [],
+    image: ws.image,
+    images: ws.images,
+    popular: ws.popular,
+    availability: ws.available ? "Available Now" : "Fully Booked",
+    coordinates: { lat: ws.lat, lng: ws.lng },
+  };
 
   const prevImg = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -138,6 +159,9 @@ const WorkspaceCard = ({
           <img
             src={images[imgIndex]}
             alt={ws.name}
+            onError={(e) => {
+              e.currentTarget.src = DEFAULT_WORKSPACE_IMAGE;
+            }}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
 
@@ -244,7 +268,7 @@ const WorkspaceCard = ({
         <MeetingBookingModal
           isOpen={isMeetingModalOpen}
           onClose={() => setIsMeetingModalOpen(false)}
-          item={{ name: ws.name, address: ws.address }}
+          item={bookingItem}
         />
       </div>
     );
@@ -261,6 +285,9 @@ const WorkspaceCard = ({
         <img
           src={images[imgIndex]}
           alt={ws.name}
+          onError={(e) => {
+            e.currentTarget.src = DEFAULT_WORKSPACE_IMAGE;
+          }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
 
@@ -391,7 +418,7 @@ const WorkspaceCard = ({
       <MeetingBookingModal
         isOpen={isMeetingModalOpen}
         onClose={() => setIsMeetingModalOpen(false)}
-        item={{ name: ws.name, address: ws.address }}
+        item={bookingItem}
       />
     </div>
   );
@@ -446,7 +473,7 @@ const GetWorkspaces = () => {
   };
   const [searchLocation, setSearchLocation] = useState("");
   const [pricingFilter, setPricingFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("popular");
+  const [sortBy, setSortBy] = useState("rating");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [showMap, setShowMap] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(false);
@@ -468,8 +495,8 @@ const GetWorkspaces = () => {
               name: vo.name || "Virtual Office",
               location: vo.name || vo.area || "City Center", // the mockup uses the name as location if name is like 'Stirring Minds'
               address: vo.address || "",
-              rating: vo.rating || 4.5, // Mock fallback for looks
-              reviews: vo.reviews || 0,
+              rating: Number(vo.rating ?? 0),
+              reviews: Number(vo.reviews ?? 0),
               tags: vo.features?.length
                 ? vo.features.slice(0, 3)
                 : ["Virtual Office", "Premium Address"],
@@ -484,13 +511,18 @@ const GetWorkspaces = () => {
                   ? [{ label: "Business Reg", price: vo.brPlanPrice }]
                   : []),
               ],
-              image: vo.image || "",
-              images: vo.images || [vo.image],
+              image: vo.image || "/hero-illustrated.jpg",
+              images:
+                Array.isArray(vo.images) && vo.images.length > 0
+                  ? vo.images
+                  : vo.image
+                    ? [vo.image]
+                    : ["/hero-illustrated.jpg"],
               popular: vo.popular || false,
               available: vo.availability === "Available Now",
               negotiable: true,
-              lat: vo.location?.coordinates?.[1] || 28.6139,
-              lng: vo.location?.coordinates?.[0] || 77.209,
+              lat: vo.coordinates?.lat ?? vo.location?.coordinates?.[1] ?? 28.6139,
+              lng: vo.coordinates?.lng ?? vo.location?.coordinates?.[0] ?? 77.209,
             })),
           );
         } else if (workspaceType === "coworking") {
@@ -501,21 +533,26 @@ const GetWorkspaces = () => {
               name: cw.name || "Coworking Space",
               location: cw.name || cw.area || "Workspace Hub",
               address: cw.address || "",
-              rating: cw.rating || 4.8,
-              reviews: cw.reviews || 0,
+              rating: Number(cw.rating ?? 0),
+              reviews: Number(cw.reviews ?? 0),
               tags: cw.features?.length
                 ? cw.features.slice(0, 3)
                 : ["High-Speed WiFi", "24/7 Access"],
               plans: [
                 ...(cw.price ? [{ label: "Basic Plan", price: cw.price }] : []),
               ],
-              image: cw.image || "",
-              images: cw.images || [cw.image],
+              image: cw.image || "/hero-illustrated.jpg",
+              images:
+                Array.isArray(cw.images) && cw.images.length > 0
+                  ? cw.images
+                  : cw.image
+                    ? [cw.image]
+                    : ["/hero-illustrated.jpg"],
               popular: cw.popular || false,
               available: true,
               negotiable: true,
-              lat: cw.location?.coordinates?.[1] || 28.6139,
-              lng: cw.location?.coordinates?.[0] || 77.209,
+              lat: cw.coordinates?.lat ?? cw.location?.coordinates?.[1] ?? 28.6139,
+              lng: cw.coordinates?.lng ?? cw.location?.coordinates?.[0] ?? 77.209,
             })),
           );
         } else if (workspaceType === "on-demand") {
@@ -526,8 +563,8 @@ const GetWorkspaces = () => {
               name: mr.name || "Meeting Room",
               location: mr.name || mr.area || "Conference Center",
               address: mr.address || "",
-              rating: mr.rating || 4.2,
-              reviews: mr.reviews || 0,
+              rating: Number(mr.rating ?? 0),
+              reviews: Number(mr.reviews ?? 0),
               tags: mr.features?.length
                 ? mr.features.slice(0, 3)
                 : ["Projector", "Whiteboard"],
@@ -536,13 +573,18 @@ const GetWorkspaces = () => {
                   ? [{ label: "Hourly Plan", price: mr.price }]
                   : []),
               ],
-              image: mr.image || "",
-              images: mr.images || [mr.image],
+              image: mr.image || "/hero-illustrated.jpg",
+              images:
+                Array.isArray(mr.images) && mr.images.length > 0
+                  ? mr.images
+                  : mr.image
+                    ? [mr.image]
+                    : ["/hero-illustrated.jpg"],
               popular: mr.popular || false,
               available: true,
               negotiable: false,
-              lat: mr.location?.coordinates?.[1] || 28.6139,
-              lng: mr.location?.coordinates?.[0] || 77.209,
+              lat: mr.coordinates?.lat ?? mr.location?.coordinates?.[1] ?? 28.6139,
+              lng: mr.coordinates?.lng ?? mr.location?.coordinates?.[0] ?? 77.209,
             })),
           );
         }
@@ -565,6 +607,40 @@ const GetWorkspaces = () => {
       ws.name.toLowerCase().includes(searchLocation.toLowerCase());
     return matchesSearch;
   });
+
+  const sortedWorkspaces = useMemo(() => {
+    const list = [...filteredWorkspaces];
+
+    const extractNumericPrice = (value?: string) => {
+      if (!value) return Number.POSITIVE_INFINITY;
+      const numeric = Number(String(value).replace(/[^0-9.]/g, ""));
+      return Number.isFinite(numeric) && numeric > 0
+        ? numeric
+        : Number.POSITIVE_INFINITY;
+    };
+
+    if (sortBy === "rating") {
+      return list.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    }
+
+    if (sortBy === "price-low") {
+      return list.sort(
+        (a, b) =>
+          extractNumericPrice(a.plans?.[0]?.price) -
+          extractNumericPrice(b.plans?.[0]?.price),
+      );
+    }
+
+    if (sortBy === "price-high") {
+      return list.sort(
+        (a, b) =>
+          extractNumericPrice(b.plans?.[0]?.price) -
+          extractNumericPrice(a.plans?.[0]?.price),
+      );
+    }
+
+    return list.sort((a, b) => Number(b.popular) - Number(a.popular));
+  }, [filteredWorkspaces, sortBy]);
 
   const typeLabel: Record<string, string> = {
     "virtual-office": "Virtual Office",
@@ -726,7 +802,8 @@ const GetWorkspaces = () => {
             <div className="sm:w-[150px]">
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${sortBy !== "popular"
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${
+                    sortBy !== "rating"
                       ? "bg-muted/50 border-border text-foreground"
                       : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
                     }`}
@@ -734,8 +811,8 @@ const GetWorkspaces = () => {
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="popular">Sort by</SelectItem>
                   <SelectItem value="rating">Highest Rated</SelectItem>
+                  <SelectItem value="popular">Most Popular</SelectItem>
                   <SelectItem value="price-low">Price: Low to High</SelectItem>
                   <SelectItem value="price-high">Price: High to Low</SelectItem>
                 </SelectContent>
@@ -757,7 +834,7 @@ const GetWorkspaces = () => {
               <p className="text-sm text-muted-foreground">
                 Showing{" "}
                 <span className="font-semibold text-foreground">
-                  {filteredWorkspaces.length} result(s)
+                  {sortedWorkspaces.length} result(s)
                 </span>{" "}
                 for {typeLabel[workspaceType].toLowerCase()} in{" "}
                 <span className="font-medium text-foreground">
@@ -801,8 +878,8 @@ const GetWorkspaces = () => {
                     : "flex flex-col gap-4 pb-8"
                 }
               >
-                {filteredWorkspaces.length > 0 ? (
-                  filteredWorkspaces.map((ws) => (
+                {sortedWorkspaces.length > 0 ? (
+                  sortedWorkspaces.map((ws) => (
                     <WorkspaceCard
                       key={ws.id}
                       ws={ws}
@@ -840,10 +917,10 @@ const GetWorkspaces = () => {
             </button>
             <MapLibreMap
               center={{
-                lat: filteredWorkspaces[0]?.lat || 28.6139,
-                lng: filteredWorkspaces[0]?.lng || 77.209,
+                lat: sortedWorkspaces[0]?.lat || workspaces[0]?.lat || 28.6139,
+                lng: sortedWorkspaces[0]?.lng || workspaces[0]?.lng || 77.209,
               }}
-              markers={filteredWorkspaces.map((ws) => ({
+              markers={sortedWorkspaces.map((ws) => ({
                 id: ws.id,
                 position: { lat: ws.lat, lng: ws.lng },
                 title: ws.location || ws.name,
@@ -887,8 +964,8 @@ const GetWorkspaces = () => {
                   : "flex flex-col gap-3 pb-8"
               }
             >
-              {filteredWorkspaces.length > 0 ? (
-                filteredWorkspaces.map((ws) => (
+              {sortedWorkspaces.length > 0 ? (
+                sortedWorkspaces.map((ws) => (
                   <WorkspaceCard
                     key={ws.id}
                     ws={ws}
@@ -929,10 +1006,10 @@ const GetWorkspaces = () => {
             </button>
             <MapLibreMap
               center={{
-                lat: filteredWorkspaces[0]?.lat || 28.6139,
-                lng: filteredWorkspaces[0]?.lng || 77.209,
+                lat: sortedWorkspaces[0]?.lat || workspaces[0]?.lat || 28.6139,
+                lng: sortedWorkspaces[0]?.lng || workspaces[0]?.lng || 77.209,
               }}
-              markers={filteredWorkspaces.map((ws) => ({
+              markers={sortedWorkspaces.map((ws) => ({
                 id: ws.id,
                 position: { lat: ws.lat, lng: ws.lng },
                 title: ws.location || ws.name,

@@ -233,7 +233,15 @@ const App = () => (
                       element={<VirtualOfficeSolution />}
                     />
                     <Route
+                      path="/solutions/virtual-office"
+                      element={<VirtualOfficeSolution />}
+                    />
+                    <Route
                       path="/Solutions/coworking-space"
+                      element={<CoworkingSpaceSolution />}
+                    />
+                    <Route
+                      path="/solutions/coworking-space"
                       element={<CoworkingSpaceSolution />}
                     />
                     <Route
@@ -241,7 +249,15 @@ const App = () => (
                       element={<OnDemandSolution />}
                     />
                     <Route
+                      path="/solutions/on-demand"
+                      element={<OnDemandSolution />}
+                    />
+                    <Route
                       path="/Solutions/business-setup"
+                      element={<BusinessSetupSolution />}
+                    />
+                    <Route
+                      path="/solutions/business-setup"
                       element={<BusinessSetupSolution />}
                     />
 
@@ -250,11 +266,23 @@ const App = () => (
                       element={<MeetingsRoom />}
                     />
                     <Route
+                      path="/solutions/meeting-rooms"
+                      element={<MeetingsRoom />}
+                    />
+                    <Route
                       path="/Solutions/day-office"
                       element={<Dayoffice />}
                     />
                     <Route
+                      path="/solutions/day-passes"
+                      element={<Dayoffice />}
+                    />
+                    <Route
                       path="/Solutions/eventspace"
+                      element={<EventSpacePage />}
+                    />
+                    <Route
+                      path="/solutions/eventspace"
                       element={<EventSpacePage />}
                     />
 

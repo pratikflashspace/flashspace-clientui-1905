@@ -695,9 +695,9 @@ const BookingPage = () => {
   // ============ LOADING / ERROR STATES ============
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-background text-foreground">
         <Header />
-        <main className="relative flex-grow bg-white pt-20">
+        <main className="relative flex-grow bg-background pt-20">
           <BookingPageSkeleton />
         </main>
         <Footer />
@@ -707,16 +707,16 @@ const BookingPage = () => {
 
   if (error || !spaceDetails || !selectedPlanDetails) {
     return (
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen bg-background text-foreground">
         <Header />
-        <main className="relative flex-grow bg-gray-50 pt-20 flex items-center justify-center">
+        <main className="relative flex-grow bg-background pt-20 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-500 text-xl mb-4">
               {error || "Plan details not found"}
             </p>
             <Button
               onClick={() => navigate(-1)}
-              className="bg-teal-600 hover:bg-teal-700 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               Go Back
             </Button>
@@ -732,14 +732,14 @@ const BookingPage = () => {
     "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80";
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30">
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Header />
       <main className="relative flex-grow pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Back */}
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 mb-6 transition-colors group"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Back to space details
@@ -779,9 +779,9 @@ const BookingPage = () => {
           {!isDirect && (
             <div className="mb-10">
               <div className="flex items-center justify-between relative">
-                <div className="absolute top-6 left-0 right-0 h-0.5 bg-gray-200 -z-0" />
+                <div className="absolute top-6 left-0 right-0 h-0.5 bg-border -z-0" />
                 <div
-                  className="absolute top-6 left-0 h-0.5 bg-gradient-to-r from-teal-500 to-emerald-400 transition-all duration-700 ease-out -z-0"
+                  className="absolute top-6 left-0 h-0.5 bg-primary transition-all duration-700 ease-out -z-0"
                   style={{
                     width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%`,
                   }}
@@ -799,10 +799,10 @@ const BookingPage = () => {
                         className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ease-out shadow-sm border-2
                       ${
                         isCompleted
-                          ? "bg-gradient-to-br from-teal-500 to-emerald-400 border-teal-400 text-white shadow-teal-200 shadow-md"
+                          ? "bg-primary border-primary text-primary-foreground shadow-md"
                           : isActive
-                            ? "bg-white border-teal-500 text-teal-600 shadow-teal-100 shadow-lg scale-110 ring-4 ring-teal-50"
-                            : "bg-white border-gray-200 text-gray-400"
+                            ? "bg-card border-primary text-primary shadow-lg scale-110 ring-4 ring-primary/15"
+                            : "bg-card border-border text-muted-foreground"
                       }`}
                       >
                         {isCompleted ? (
@@ -813,7 +813,7 @@ const BookingPage = () => {
                       </div>
                       <span
                         className={`mt-2.5 text-xs font-semibold tracking-wide transition-colors duration-300
-                      ${isActive ? "text-teal-700" : isCompleted ? "text-teal-500" : "text-gray-400"}`}
+                      ${isActive ? "text-primary" : isCompleted ? "text-primary/80" : "text-muted-foreground"}`}
                       >
                         {step.label}
                       </span>
@@ -830,16 +830,16 @@ const BookingPage = () => {
           >
             {/* ====== STEP 1: USER DETAILS ====== */}
             {currentStep === 1 && (
-              <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 p-8 md:p-10">
+              <div className="bg-card rounded-3xl border border-border shadow-xl p-8 md:p-10">
                 <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
-                    <User className="w-5 h-5 text-teal-600" />
+                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+                    <User className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
+                    <h2 className="text-2xl font-bold text-foreground">
                       Confirm Your Details
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       We'll use these details for your booking
                     </p>
                   </div>
