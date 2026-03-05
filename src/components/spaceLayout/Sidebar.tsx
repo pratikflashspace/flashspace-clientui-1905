@@ -5,6 +5,8 @@ import {
   Ticket,
   Building2,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function SidebarItem({
   icon,
@@ -17,11 +19,10 @@ function SidebarItem({
 }) {
   return (
     <button
-      className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${
-        active
+      className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${active
           ? "bg-emerald-600 text-white shadow-sm"
           : "text-slate-600 hover:bg-slate-100"
-      }`}
+        }`}
     >
       <span className={`${active ? "text-white" : "text-slate-500"}`}>
         {icon}
@@ -32,6 +33,14 @@ function SidebarItem({
 }
 
 export default function Sidebar() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
   return (
     <aside className="h-screen w-72 border-r border-slate-200 bg-white px-4 py-6">
       <div className="mb-6">
@@ -55,7 +64,10 @@ export default function Sidebar() {
       </div>
 
       <div className="mt-auto pt-10 text-sm text-slate-500">
-        <button className="mt-4 w-full rounded-xl border border-slate-200 px-4 py-3 hover:bg-slate-50">
+        <button
+          onClick={handleLogout}
+          className="mt-4 w-full rounded-xl border border-slate-200 px-4 py-3 hover:bg-slate-50 transition-colors"
+        >
           Logout
         </button>
       </div>
