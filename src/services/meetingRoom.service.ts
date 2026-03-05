@@ -151,3 +151,33 @@ export const updateMeetingRoom = async (
     throw error;
   }
 };
+
+/**
+ * Bulk save mapping rooms
+ * @param propertyId - Property ID
+ * @param rooms - Array of meeting rooms
+ * @returns Saved meeting rooms
+ */
+export const bulkSaveMeetingRooms = async (
+  propertyId: string,
+  rooms: Partial<MeetingRoomItem>[],
+): Promise<MeetingRoomItem[]> => {
+  try {
+    const response = await axiosInstance.post("/meetingRoom/bulk-save", {
+      propertyId,
+      rooms,
+    });
+    const responseData = response.data as ApiResponse<MeetingRoomItem[]>;
+
+    if ([200, 201].includes(response.status) && responseData.success) {
+      return responseData.data || [];
+    }
+
+    throw new Error(
+      responseData.message || "Failed to bulk save meeting rooms",
+    );
+  } catch (error: any) {
+    console.error("Error bulk saving meeting rooms:", error);
+    throw error;
+  }
+};

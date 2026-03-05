@@ -105,6 +105,18 @@ export const fetchPartnerActiveRequests = async () => {
 };
 
 /**
+ * Fetch analytics data for the Space Portal dashboard.
+ */
+export const fetchBookingAnalytics = async () => {
+  try {
+    const response = await axiosInstance.get("/user/partner/analytics");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
  * --- documented API methods ---
  */
 

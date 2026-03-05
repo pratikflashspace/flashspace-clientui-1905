@@ -211,6 +211,7 @@ export interface MeetingRoomItem {
     lng: number;
   };
   capacity?: string;
+  count?: number;
   isDeleted?: boolean;
   isActive?: boolean;
   createdAt?: string;

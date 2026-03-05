@@ -174,7 +174,7 @@ export default function PropertyDetails() {
       <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-4">
         <StatCard
           title="Total Revenue"
-          value={`₹${bookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0).toLocaleString("en-IN")}`}
+          value={`₹${bookings.reduce((sum, b) => sum + (b.plan?.finalPrice || b.plan?.price || 0), 0).toLocaleString("en-IN")}`}
           icon={<TrendingUp size={22} />}
           trend="up"
           trendLabel="Property Life"
@@ -193,7 +193,7 @@ export default function PropertyDetails() {
         />
         <StatCard
           title="Avg. Booking"
-          value={`₹${bookings.length > 0 ? Math.round(bookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0) / bookings.length).toLocaleString("en-IN") : 0}`}
+          value={`₹${bookings.length > 0 ? Math.round(bookings.reduce((sum, b) => sum + (b.plan?.finalPrice || b.plan?.price || 0), 0) / bookings.length).toLocaleString("en-IN") : 0}`}
           icon={<Users size={22} />}
         />
       </div>
@@ -217,7 +217,7 @@ export default function PropertyDetails() {
                       name: new Date(b.createdAt).toLocaleDateString("en-US", {
                         month: "short",
                       }),
-                      revenue: b.totalAmount || 0,
+                      revenue: b.plan?.finalPrice || b.plan?.price || 0,
                     }))
                     .reverse()
                 }
@@ -491,9 +491,9 @@ export default function PropertyDetails() {
                     priceJsx = (
                       <p className="text-base font-bold text-[#3FA69E]">
                         ₹
-                        {space.pricePerMonth ||
-                          space.pricePerDay ||
-                          space.price ||
+                        {space.finalPricePerMonth ||
+                          space.partnerPricePerMonth ||
+                          space.pricePerMonth ||
                           0}
                         <span className="text-xs font-normal text-slate-400">
                           {" "}
@@ -594,7 +594,7 @@ export default function PropertyDetails() {
                         <button
                           onClick={() =>
                             navigate(
-                              `/spaceportal/${activeTab}-management/${space._id || space.id}`,
+                              `/spaceportal/space-management/add?id=${property._id}&step=${activeTab}`,
                             )
                           }
                           className="rounded-lg bg-white px-4 py-2 border border-slate-200 text-sm font-bold text-[#3FA69E] hover:bg-slate-50 transition-colors shadow-sm"
@@ -669,7 +669,12 @@ export default function PropertyDetails() {
                         </span>
                       </td>
                       <td className="px-6 py-4 font-bold text-slate-900">
-                        ₹{(booking.totalAmount || 0).toLocaleString("en-IN")}
+                        ₹
+                        {(
+                          booking.plan?.finalPrice ||
+                          booking.plan?.price ||
+                          0
+                        ).toLocaleString("en-IN")}
                       </td>
                       <td className="px-6 py-4">
                         <span

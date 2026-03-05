@@ -18,7 +18,6 @@ import {
   FileType,
   AlertCircle,
   ExternalLink,
-  X as CloseIcon,
 } from "lucide-react";
 
 import propertyService from "@/services/property.service";
@@ -34,7 +33,6 @@ import {
 import {
   createMeetingRoom,
   updateMeetingRoom,
-  bulkSaveMeetingRooms,
 } from "@/services/meetingRoom.service";
 import { Property } from "@/types/services";
 
@@ -106,7 +104,6 @@ export default function AddSpace() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("id");
-  const initialStep = searchParams.get("step") as Step;
   const [currentStep, setCurrentStep] = useState<Step>("property");
   const [propertyId, setPropertyId] = useState<string | null>(editId);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -121,10 +118,6 @@ export default function AddSpace() {
     features: [] as string[],
     images: [] as string[],
   });
-  const [pendingImages, setPendingImages] = useState<
-    { file: File; preview: string }[]
-  >([]);
-  const [uploadingImages, setUploadingImages] = useState(false);
   const [featureInput, setFeatureInput] = useState("");
   const [selectedAmenity, setSelectedAmenity] = useState("");
 
@@ -138,112 +131,115 @@ export default function AddSpace() {
   const [propertyKycRejectionReason, setPropertyKycRejectionReason] =
     useState<string>("");
   const [policyAccepted, setPolicyAccepted] = useState(false);
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
-
-  const clearError = (field: string) => {
-    if (errors[field]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
 
   useEffect(() => {
-    if (initialStep) {
-      setCurrentStep(initialStep);
-    }
-  }, [initialStep]);
-
-  useEffect(() => {
-    const loadPropertyData = async (targetId: string) => {
-      setLoading(true);
-      try {
-        const prop = await propertyService.getPropertyById(targetId);
-        setPropertyData({
-          name: prop.name || "",
-          address: prop.address || "",
-          city: prop.city || "",
-          area: prop.area || "",
-          features: prop.features || [],
-          images: prop.images || [],
-        });
-        setPropertyKycStatus(prop.kycStatus || "not_started");
-        setPropertyKycRejectionReason(prop.kycRejectionReason || "");
-        setPropertyDocuments(prop.documents || []);
-
-        // Fetch associated spaces
-        const spaces = await propertyService.getPropertySpaces(targetId);
-        const types: string[] = [];
-
-        if (spaces.coworkingSpaces && spaces.coworkingSpaces.length > 0) {
-          const coworking = spaces.coworkingSpaces[0];
-          types.push("coworking");
-
-          // Normalize floors/tables to include numberOfSeats
-          const normalizedFloors = (coworking.floors || []).map(
-            (floor: any) => ({
-              ...floor,
-              tables: (floor.tables || []).map((table: any) => ({
-                ...table,
-                numberOfSeats: table.seats?.length || table.numberOfSeats || 1,
-              })),
-            }),
-          );
-
-          setCoworkingData((prev) => ({
-            ...prev,
-            ...coworking,
-            floors:
-              normalizedFloors.length > 0 ? normalizedFloors : prev.floors,
-            pricePerMonth:
-              coworking.partnerPricePerMonth || coworking.pricePerMonth || 0,
-          }));
-        }
-
-        if (spaces.virtualOffices && spaces.virtualOffices.length > 0) {
-          const virtual = spaces.virtualOffices[0];
-          types.push("virtual");
-          setVirtualData((prev) => ({
-            ...prev,
-            ...virtual,
-            finalGstPricePerYear:
-              virtual.partnerGstPricePerYear ||
-              virtual.finalGstPricePerYear ||
-              0,
-            finalMailingPricePerYear:
-              virtual.partnerMailingPricePerYear ||
-              virtual.finalMailingPricePerYear ||
-              0,
-            finalBrPricePerYear:
-              virtual.partnerBrPricePerYear || virtual.finalBrPricePerYear || 0,
-          }));
-        }
-
-        if (spaces.meetingRooms && spaces.meetingRooms.length > 0) {
-          types.push("meeting");
-          // Initialize rooms, using count from database if present, else default 1
-          const normalizedRooms = spaces.meetingRooms.map((curr: any) => ({
-            type: curr.type,
-            capacity: curr.capacity,
-            count: curr.count || 1,
-            pricePerHour: curr.partnerPricePerHour || curr.pricePerHour,
-            ids: [curr._id], // Still keeping track if needed
-          }));
-          setMeetingData({ rooms: normalizedRooms });
-        }
-
-        setSelectedTypes(types);
-      } catch (err) {
-        toast.error("Failed to load property data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (editId) {
-      loadPropertyData(editId);
+      const loadProperty = async () => {
+        setLoading(true);
+        try {
+          const prop = await propertyService.getPropertyById(editId);
+          setPropertyData({
+            name: prop.name || "",
+            address: prop.address || "",
+            city: prop.city || "",
+            area: prop.area || "",
+            features: prop.features || [],
+            images: prop.images || [],
+          });
+          setPropertyKycStatus(prop.kycStatus || "not_started");
+          setPropertyKycRejectionReason(prop.kycRejectionReason || "");
+          setPropertyDocuments(prop.documents || []);
+
+          // Fetch associated spaces
+          const spaces = await propertyService.getPropertySpaces(editId);
+          const types: string[] = [];
+
+          if (spaces.coworkingSpaces && spaces.coworkingSpaces.length > 0) {
+            const coworking = spaces.coworkingSpaces[0];
+            types.push("coworking");
+
+            // Normalize floors/tables to include numberOfSeats
+            const normalizedFloors = (coworking.floors || []).map(
+              (floor: any) => ({
+                ...floor,
+                tables: (floor.tables || []).map((table: any) => ({
+                  ...table,
+                  numberOfSeats:
+                    table.seats?.length || table.numberOfSeats || 1,
+                })),
+              }),
+            );
+
+            setCoworkingData((prev) => ({
+              ...prev,
+              ...coworking,
+              floors:
+                normalizedFloors.length > 0 ? normalizedFloors : prev.floors,
+              pricePerMonth:
+                coworking.partnerPricePerMonth || coworking.pricePerMonth || 0,
+            }));
+          }
+
+          if (spaces.virtualOffices && spaces.virtualOffices.length > 0) {
+            const virtual = spaces.virtualOffices[0];
+            types.push("virtual");
+            setVirtualData((prev) => ({
+              ...prev,
+              ...virtual,
+              finalGstPricePerYear:
+                virtual.partnerGstPricePerYear ||
+                virtual.finalGstPricePerYear ||
+                0,
+              finalMailingPricePerYear:
+                virtual.partnerMailingPricePerYear ||
+                virtual.finalMailingPricePerYear ||
+                0,
+              finalBrPricePerYear:
+                virtual.partnerBrPricePerYear ||
+                virtual.finalBrPricePerYear ||
+                0,
+            }));
+          }
+
+          if (spaces.meetingRooms && spaces.meetingRooms.length > 0) {
+            types.push("meeting");
+            // Group meeting rooms by type/capacity/price for display
+            const grouped = spaces.meetingRooms.reduce(
+              (acc: any[], curr: any) => {
+                const existing = acc.find(
+                  (r) =>
+                    r.type === curr.type &&
+                    r.capacity === curr.capacity &&
+                    r.pricePerHour ===
+                      (curr.partnerPricePerHour || curr.pricePerHour),
+                );
+                if (existing) {
+                  existing.count += 1;
+                  existing.ids.push(curr._id);
+                } else {
+                  acc.push({
+                    type: curr.type,
+                    capacity: curr.capacity,
+                    pricePerHour: curr.partnerPricePerHour || curr.pricePerHour,
+                    count: 1,
+                    ids: [curr._id],
+                  });
+                }
+                return acc;
+              },
+              [],
+            );
+            setMeetingData({ rooms: grouped });
+          }
+
+          setSelectedTypes(types);
+        } catch (err) {
+          toast.error("Failed to load property data for editing");
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadProperty();
     }
 
     const fetchPartnerKyc = async () => {
@@ -331,10 +327,9 @@ export default function AddSpace() {
     rooms: [
       {
         type: "meeting_room",
-        capacity: 0,
-        pricePerHour: 0,
-        count: 0,
-        ids: [] as string[],
+        capacity: 4,
+        pricePerHour: 500,
+        count: 1,
       },
     ],
   });
@@ -381,56 +376,6 @@ export default function AddSpace() {
     }));
   };
 
-  const handleRemoveImage = (index: number) => {
-    const imageUrl = propertyData.images[index];
-    if (imageUrl.startsWith("blob:")) {
-      setPendingImages((prev) => prev.filter((p) => p.preview !== imageUrl));
-      URL.revokeObjectURL(imageUrl);
-    }
-    setPropertyData((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleImageFileSelection = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    if (propertyId) {
-      setUploadingImages(true);
-      try {
-        for (const file of files) {
-          const resp = await propertyService.uploadPropertyImage(
-            propertyId,
-            file,
-          );
-          setPropertyData((prev) => ({
-            ...prev,
-            images: [...prev.images, resp.data.url],
-          }));
-        }
-        toast.success("Images uploaded successfully");
-      } catch (err) {
-        toast.error("Failed to upload images");
-      } finally {
-        setUploadingImages(false);
-      }
-    } else {
-      const newPending = files.map((file) => ({
-        file,
-        preview: URL.createObjectURL(file),
-      }));
-      setPendingImages((prev) => [...prev, ...newPending]);
-      setPropertyData((prev) => ({
-        ...prev,
-        images: [...prev.images, ...newPending.map((p) => p.preview)],
-      }));
-    }
-  };
-
   // --- Navigation Helpers ---
   const getNextStep = (current: Step): Step => {
     if (current === "property") return "property_kyc";
@@ -449,61 +394,26 @@ export default function AddSpace() {
   };
 
   const saveProperty = async () => {
-    const newErrors: Record<string, boolean> = {};
-    if (!propertyData.name) newErrors.name = true;
-    if (!propertyData.address) newErrors.address = true;
-    if (!propertyData.city) newErrors.city = true;
-    if (!propertyData.area) newErrors.area = true;
-    if (propertyData.features.length === 0) newErrors.features = true;
-    if (propertyData.images.length === 0) newErrors.images = true;
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      toast.error("Please fill all required fields");
+    if (
+      !propertyData.name ||
+      !propertyData.address ||
+      !propertyData.city ||
+      !propertyData.area ||
+      propertyData.features.length === 0 ||
+      propertyData.images.length === 0
+    ) {
+      toast.error("Please fill all details, including amenities and images");
       return;
     }
 
     setLoading(true);
     try {
-      let currentPropertyId = propertyId;
       if (editId) {
-        const cleanImages = propertyData.images.filter(
-          (img) => !img.startsWith("blob:"),
-        );
-        await propertyService.updateProperty(editId, {
-          ...propertyData,
-          images: cleanImages,
-        });
+        await propertyService.updateProperty(editId, propertyData);
         toast.success("Property updated!");
       } else {
-        const cleanData = {
-          ...propertyData,
-          images: propertyData.images.filter((img) => !img.startsWith("blob:")),
-        };
-        const resp = await propertyService.createProperty(cleanData);
-        currentPropertyId = resp._id;
-        setPropertyId(currentPropertyId);
-
-        // Upload any pending images
-        if (pendingImages.length > 0) {
-          const uploadedUrls: string[] = [];
-          for (const item of pendingImages) {
-            const resp = await propertyService.uploadPropertyImage(
-              currentPropertyId,
-              item.file,
-            );
-            uploadedUrls.push(resp.data.url);
-            URL.revokeObjectURL(item.preview);
-          }
-          setPendingImages([]);
-          setPropertyData((prev) => ({
-            ...prev,
-            images: [
-              ...prev.images.filter((img) => !img.startsWith("blob:")),
-              ...uploadedUrls,
-            ],
-          }));
-        }
+        const resp = await propertyService.createProperty(propertyData);
+        setPropertyId(resp._id);
         toast.success("Property details saved!");
       }
       setCurrentStep("property_kyc");
@@ -521,28 +431,19 @@ export default function AddSpace() {
   const saveCoworking = async () => {
     if (!propertyId) return;
 
-    const newErrors: Record<string, boolean> = {};
     const validFloors = coworkingData.floors.filter((f) => f.tables.length > 0);
 
     if (validFloors.length === 0) {
-      newErrors.floors = true;
+      toast.error("At least one floor with at least one table is required");
+      return;
     }
 
-    const hasIncompleteTables = validFloors.some((f, fIdx) =>
-      f.tables.some((t, tIdx) => {
-        if (!t.numberOfSeats || t.numberOfSeats <= 0) {
-          newErrors[`floor_${fIdx}_table_${tIdx}`] = true;
-          return true;
-        }
-        return false;
-      }),
+    const hasIncompleteTables = validFloors.some((f) =>
+      f.tables.some((t) => !t.numberOfSeats || t.numberOfSeats <= 0),
     );
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      toast.error(
-        "Please ensure all floors have tables and valid seating capacities",
-      );
+    if (hasIncompleteTables) {
+      toast.error("All tables must have a valid seating capacity");
       return;
     }
 
@@ -562,10 +463,7 @@ export default function AddSpace() {
       if ((coworkingData as any)._id) {
         await updateCoworkingSpace((coworkingData as any)._id, data);
       } else {
-        const resp = await createCoworkingSpace(data);
-        if (resp.success && resp.data?._id) {
-          setCoworkingData((prev) => ({ ...prev, _id: resp.data._id }));
-        }
+        await createCoworkingSpace(data);
       }
 
       toast.success("Coworking space details saved!");
@@ -580,13 +478,11 @@ export default function AddSpace() {
   const saveVirtual = async () => {
     if (!propertyId) return;
 
-    const newErrors: Record<string, boolean> = {};
-    if (!virtualData.finalGstPricePerYear) newErrors.gstPrice = true;
-    if (!virtualData.finalMailingPricePerYear) newErrors.mailingPrice = true;
-    if (!virtualData.finalBrPricePerYear) newErrors.brPrice = true;
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    if (
+      !virtualData.finalGstPricePerYear ||
+      !virtualData.finalMailingPricePerYear ||
+      !virtualData.finalBrPricePerYear
+    ) {
       toast.error("All three Virtual Office plans are mandatory");
       return;
     }
@@ -610,10 +506,7 @@ export default function AddSpace() {
       if ((virtualData as any)._id) {
         await updateVirtualOffice((virtualData as any)._id, data);
       } else {
-        const resp = await createVirtualOffice(data);
-        if (resp.success && resp.data?._id) {
-          setVirtualData((prev) => ({ ...prev, _id: resp.data._id }));
-        }
+        await createVirtualOffice(data);
       }
 
       toast.success("Virtual office details saved!");
@@ -628,37 +521,48 @@ export default function AddSpace() {
   const saveMeeting = async () => {
     if (!propertyId) return;
 
-    const newErrors: Record<string, boolean> = {};
     if (meetingData.rooms.length === 0) {
-      newErrors.meetingRooms = true;
+      toast.error("At least one On-Demand room is required");
+      return;
     }
 
-    meetingData.rooms.forEach((r, idx) => {
-      if (!r.capacity || !r.pricePerHour || !r.count) {
-        newErrors[`meeting_room_${idx}`] = true;
-      }
-    });
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    const hasIncompleteRooms = meetingData.rooms.some(
+      (r) => !r.capacity || !r.pricePerHour || !r.count,
+    );
+    if (hasIncompleteRooms) {
       toast.error("Please fill all details for each room");
       return;
     }
 
     setLoading(true);
     try {
-      const allRoomsPayload = meetingData.rooms.map((room) => ({
-        _id: room.ids && room.ids.length > 0 ? room.ids[0] : undefined,
-        type: room.type,
-        capacity: room.capacity.toString(),
-        count: room.count,
-        pricePerHour: room.pricePerHour,
-        amenities: propertyData.features || [],
-        images: propertyData.images || [],
-        operatingHours: coworkingData.operatingHours,
-      }));
+      // For each room group, handle updates for 'ids' and creates for the remainder (count - ids.length)
+      for (const group of meetingData.rooms) {
+        const existingIds = group.ids || [];
+        const totalToCreate = group.count - existingIds.length;
 
-      await bulkSaveMeetingRooms(propertyId, allRoomsPayload);
+        // Common payload
+        const payload = {
+          type: group.type as any,
+          capacity: group.capacity,
+          partnerPricePerHour: group.pricePerHour,
+          finalPricePerHour: group.pricePerHour,
+          amenities: propertyData.features || [],
+          images: propertyData.images || [],
+          operatingHours: coworkingData.operatingHours,
+          propertyId,
+        };
+
+        // 1. Update existing ones
+        for (const id of existingIds) {
+          await updateMeetingRoom(id, payload as any);
+        }
+
+        // 2. Create new ones for the remainder
+        for (let i = 0; i < totalToCreate; i++) {
+          await createMeetingRoom(payload as any);
+        }
+      }
 
       toast.success("On-Demand details saved successfully!");
       setCurrentStep(getNextStep("meeting"));
@@ -789,41 +693,20 @@ export default function AddSpace() {
           label="Property Name *"
           placeholder="e.g. Flashspace Hub BKC"
           value={propertyData.name}
-          onChange={(e: any) => {
-            setPropertyData({ ...propertyData, name: e.target.value });
-            clearError("name");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value.trim()) {
-              setErrors((prev) => ({ ...prev, name: true }));
-            }
-          }}
-          error={errors.name}
+          onChange={(e) =>
+            setPropertyData({ ...propertyData, name: e.target.value })
+          }
         />
         <div className="space-y-2">
-          <label
-            className={`text-xs font-bold uppercase tracking-wider ${
-              errors.city ? "text-red-500" : "text-slate-500"
-            }`}
-          >
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
             City *
           </label>
           <select
-            className={`w-full h-12 rounded-xl border ${
-              errors.city
-                ? "border-red-500 bg-red-50/30 ring-1 ring-red-500"
-                : "border-slate-200 bg-white"
-            } px-4 text-sm font-semibold text-slate-700 shadow-sm focus:border-[#3FA69E] focus:ring-1 focus:ring-[#3FA69E] focus:outline-none transition-all outline-none`}
+            className="w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm focus:border-[#3FA69E] focus:ring-1 focus:ring-[#3FA69E] focus:outline-none transition-all"
             value={propertyData.city}
-            onChange={(e) => {
-              setPropertyData({ ...propertyData, city: e.target.value });
-              clearError("city");
-            }}
-            onBlur={(e) => {
-              if (!e.target.value) {
-                setErrors((prev) => ({ ...prev, city: true }));
-              }
-            }}
+            onChange={(e) =>
+              setPropertyData({ ...propertyData, city: e.target.value })
+            }
           >
             <option value="">Select a City</option>
             {INDIAN_CITIES.map((city) => (
@@ -837,40 +720,22 @@ export default function AddSpace() {
           label="Area *"
           placeholder="Bandra Kurla Complex"
           value={propertyData.area}
-          onChange={(e: any) => {
-            setPropertyData({ ...propertyData, area: e.target.value });
-            clearError("area");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value.trim()) {
-              setErrors((prev) => ({ ...prev, area: true }));
-            }
-          }}
-          error={errors.area}
+          onChange={(e) =>
+            setPropertyData({ ...propertyData, area: e.target.value })
+          }
         />
         <InputField
           label="Full Address *"
           placeholder="Plot No. C-XXXX, G Block..."
           value={propertyData.address}
-          onChange={(e: any) => {
-            setPropertyData({ ...propertyData, address: e.target.value });
-            clearError("address");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value.trim()) {
-              setErrors((prev) => ({ ...prev, address: true }));
-            }
-          }}
-          error={errors.address}
+          onChange={(e) =>
+            setPropertyData({ ...propertyData, address: e.target.value })
+          }
         />
       </div>
 
       <div className="space-y-3">
-        <label
-          className={`text-sm font-semibold ${
-            errors.features ? "text-red-500" : "text-slate-700"
-          }`}
-        >
+        <label className="text-sm font-semibold text-slate-700">
           Property Features (Amenities) *
         </label>
         <div className="flex flex-col gap-3">
@@ -915,7 +780,6 @@ export default function AddSpace() {
                   }));
                   setFeatureInput("");
                   setSelectedAmenity("");
-                  clearError("features");
                 }
               }}
               className="px-4 bg-[#3FA69E] text-white rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center shrink-0"
@@ -943,7 +807,6 @@ export default function AddSpace() {
                     }));
                     setFeatureInput("");
                     setSelectedAmenity("");
-                    clearError("features");
                   }
                 }
               }}
@@ -962,7 +825,7 @@ export default function AddSpace() {
                 onClick={() => removeFeature(f)}
                 className="hover:text-red-500 transition-colors"
               >
-                <CloseIcon className="w-3 h-3" />
+                <X className="w-3 h-3" />
               </button>
             </span>
           ))}
@@ -973,39 +836,31 @@ export default function AddSpace() {
         <label className="text-sm font-semibold text-slate-700">
           Property Images *
         </label>
-        <div className="flex items-center justify-center w-full">
-          <label
-            htmlFor="image-upload"
-            className={`flex flex-col items-center justify-center w-full h-32 border-2 ${
-              errors.images ? "border-red-500" : "border-slate-300"
-            } border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors`}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            id="imgInput"
+            className="flex-1 h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm focus:border-[#3FA69E] focus:outline-none"
+            placeholder="Paste image URL here"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              const input = document.getElementById(
+                "imgInput",
+              ) as HTMLInputElement;
+              if (input.value) {
+                setPropertyData((prev) => ({
+                  ...prev,
+                  images: [...prev.images, input.value],
+                }));
+                input.value = "";
+              }
+            }}
+            className="px-4 bg-[#3FA69E] text-white rounded-xl hover:opacity-90"
           >
-            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              {uploadingImages ? (
-                <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mb-2" />
-              ) : (
-                <Upload className="w-8 h-8 text-slate-400 mb-2" />
-              )}
-              <p className="text-sm text-slate-500 font-medium">
-                {uploadingImages
-                  ? "Uploading..."
-                  : "Click to upload property images"}
-              </p>
-              <p className="text-xs text-slate-400">PNG, JPG or JPEG</p>
-            </div>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              className="hidden"
-              id="image-upload"
-              onChange={(e) => {
-                handleImageFileSelection(e);
-                clearError("images");
-              }}
-              disabled={uploadingImages}
-            />
-          </label>
+            Add
+          </button>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
           {propertyData.images.map((img, i) => (
@@ -1013,17 +868,15 @@ export default function AddSpace() {
               key={i}
               className="relative aspect-video rounded-xl overflow-hidden group shadow-sm"
             >
-              <img
-                src={
-                  img.startsWith("/")
-                    ? `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${img}`
-                    : img
-                }
-                className="w-full h-full object-cover"
-              />
+              <img src={img} className="w-full h-full object-cover" />
               <button
                 type="button"
-                onClick={() => handleRemoveImage(i)}
+                onClick={() =>
+                  setPropertyData((prev) => ({
+                    ...prev,
+                    images: prev.images.filter((_, idx) => idx !== i),
+                  }))
+                }
                 className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <Trash2 className="w-3 h-3" />
@@ -1323,23 +1176,15 @@ export default function AddSpace() {
           </div>
         </div>
         <InputField
-          label="Price per Month (Partner Price)"
+          label="Price Per Month Per Desk (Γé╣) *"
           type="number"
-          placeholder="e.g. 5000"
           value={coworkingData.pricePerMonth}
-          onChange={(e: any) => {
+          onChange={(e: any) =>
             setCoworkingData({
               ...coworkingData,
-              pricePerMonth: Number(e.target.value),
-            });
-            clearError("pricePerMonth");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value || Number(e.target.value) <= 0) {
-              setErrors((prev) => ({ ...prev, pricePerMonth: true }));
-            }
-          }}
-          error={errors.pricePerMonth}
+              pricePerMonth: parseInt(e.target.value),
+            })
+          }
         />
       </div>
 
@@ -1383,11 +1228,7 @@ export default function AddSpace() {
               {floor.tables.map((table, tIdx) => (
                 <div
                   key={tIdx}
-                  className={`bg-white p-4 rounded-xl border ${
-                    errors[`floor_${fIdx}_table_${tIdx}`]
-                      ? "border-red-500 ring-1 ring-red-500"
-                      : "border-slate-200"
-                  } shadow-sm space-y-3`}
+                  className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-500 uppercase">
@@ -1396,11 +1237,7 @@ export default function AddSpace() {
                     <input
                       type="number"
                       min="1"
-                      className={`w-16 h-8 text-xs font-bold ${
-                        errors[`floor_${fIdx}_table_${tIdx}`]
-                          ? "text-red-600 border-red-300 ring-1 ring-red-500"
-                          : "text-[#3FA69E] border-slate-200"
-                      } border rounded-lg px-2 focus:outline-none focus:border-[#3FA69E]`}
+                      className="w-16 h-8 text-xs font-bold text-[#3FA69E] border border-slate-200 rounded-lg px-2 focus:outline-none focus:border-[#3FA69E]"
                       value={table.numberOfSeats || 1}
                       onChange={(e) => {
                         const val = parseInt(e.target.value) || 1;
@@ -1410,15 +1247,6 @@ export default function AddSpace() {
                           ...coworkingData,
                           floors: newFloors,
                         });
-                        clearError(`floor_${fIdx}_table_${tIdx}`);
-                      }}
-                      onBlur={(e) => {
-                        if (!e.target.value || parseInt(e.target.value) <= 0) {
-                          setErrors((prev) => ({
-                            ...prev,
-                            [`floor_${fIdx}_table_${tIdx}`]: true,
-                          }));
-                        }
                       }}
                     />
                   </div>
@@ -1456,58 +1284,37 @@ export default function AddSpace() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <InputField
-          label="GST Plan Price (₹/Yr) *"
+          label="GST Plan Price (Γé╣/Yr) *"
           type="number"
           value={virtualData.finalGstPricePerYear}
-          onChange={(e: any) => {
+          onChange={(e: any) =>
             setVirtualData({
               ...virtualData,
-              finalGstPricePerYear: Number(e.target.value),
-            });
-            clearError("gstPrice");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value || Number(e.target.value) <= 0) {
-              setErrors((prev) => ({ ...prev, gstPrice: true }));
-            }
-          }}
-          error={errors.gstPrice}
+              finalGstPricePerYear: parseInt(e.target.value),
+            })
+          }
         />
         <InputField
-          label="Mailing Plan Price (₹/Yr) *"
+          label="Mailing Plan Price (Γé╣/Yr) *"
           type="number"
           value={virtualData.finalMailingPricePerYear}
-          onChange={(e: any) => {
+          onChange={(e: any) =>
             setVirtualData({
               ...virtualData,
-              finalMailingPricePerYear: Number(e.target.value),
-            });
-            clearError("mailingPrice");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value || Number(e.target.value) <= 0) {
-              setErrors((prev) => ({ ...prev, mailingPrice: true }));
-            }
-          }}
-          error={errors.mailingPrice}
+              finalMailingPricePerYear: parseInt(e.target.value),
+            })
+          }
         />
         <InputField
-          label="BR Plan Price (₹/Yr) *"
+          label="BR Plan Price (Γé╣/Yr) *"
           type="number"
           value={virtualData.finalBrPricePerYear}
-          onChange={(e: any) => {
+          onChange={(e: any) =>
             setVirtualData({
               ...virtualData,
-              finalBrPricePerYear: Number(e.target.value),
-            });
-            clearError("brPrice");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value || Number(e.target.value) <= 0) {
-              setErrors((prev) => ({ ...prev, brPrice: true }));
-            }
-          }}
-          error={errors.brPrice}
+              finalBrPricePerYear: parseInt(e.target.value),
+            })
+          }
         />
       </div>
 
@@ -1551,9 +1358,9 @@ export default function AddSpace() {
                   ...meetingData.rooms,
                   {
                     type: "meeting_room",
-                    capacity: 0,
-                    pricePerHour: 0,
-                    count: 0,
+                    capacity: 4,
+                    pricePerHour: 500,
+                    count: 1,
                     ids: [], // New rooms have no IDs
                   },
                 ],
@@ -1569,20 +1376,16 @@ export default function AddSpace() {
           {meetingData.rooms.map((room, idx) => (
             <div
               key={idx}
-              className={`p-6 rounded-2xl border ${
-                errors[`meeting_room_${idx}`]
-                  ? "border-red-500 ring-1 ring-red-500"
-                  : "border-slate-200"
-              } bg-slate-50 space-y-4 relative group`}
+              className="p-6 rounded-2xl border border-slate-200 bg-slate-50 space-y-4 relative group"
             >
               <button
-                onClick={() => {
-                  const newRooms = [...meetingData.rooms];
-                  newRooms.splice(idx, 1);
-                  setMeetingData({ rooms: newRooms });
-                  clearError(`meeting_room_${idx}`);
-                }}
-                className="absolute top-4 right-4 text-red-500 opacity-100 p-2 rounded-lg transition-colors"
+                onClick={() =>
+                  setMeetingData({
+                    ...meetingData,
+                    rooms: meetingData.rooms.filter((_, i) => i !== idx),
+                  })
+                }
+                className="absolute top-4 right-4 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-500"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -1591,23 +1394,18 @@ export default function AddSpace() {
                   Room Type
                 </label>
                 <select
-                  className={`w-full h-12 rounded-xl border ${
-                    errors[`meeting_room_${idx}`] && !room.capacity
-                      ? "border-red-500"
-                      : "border-slate-200"
-                  } bg-white px-4 text-sm focus:outline-none focus:border-[#3FA69E] transition-colors`}
+                  className="w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm focus:outline-none focus:border-[#3FA69E] transition-colors"
                   value={room.type}
-                  onChange={(e) => {
+                  onChange={(e: any) => {
                     const newRooms = [...meetingData.rooms];
                     newRooms[idx].type = e.target.value;
-                    setMeetingData({ rooms: newRooms });
-                    clearError(`meeting_room_${idx}`);
+                    setMeetingData({ ...meetingData, rooms: newRooms });
                   }}
                 >
                   <option value="meeting_room">Meeting Room</option>
-                  <option value="conference_room">Conference Room</option>
                   <option value="board_room">Board Room</option>
-                  <option value="other">Training Room / Other</option>
+                  <option value="conference_room">Conference Room</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
               <div className="grid grid-cols-3 gap-4">
@@ -1617,39 +1415,19 @@ export default function AddSpace() {
                   value={room.capacity}
                   onChange={(e: any) => {
                     const newRooms = [...meetingData.rooms];
-                    newRooms[idx].capacity = Number(e.target.value);
-                    setMeetingData({ rooms: newRooms });
-                    clearError(`meeting_room_${idx}`);
+                    newRooms[idx].capacity = parseInt(e.target.value);
+                    setMeetingData({ ...meetingData, rooms: newRooms });
                   }}
-                  onBlur={(e: any) => {
-                    if (!e.target.value || Number(e.target.value) <= 0) {
-                      setErrors((prev) => ({
-                        ...prev,
-                        [`meeting_room_${idx}`]: true,
-                      }));
-                    }
-                  }}
-                  error={errors[`meeting_room_${idx}`] && !room.capacity}
                 />
                 <InputField
-                  label="Price/Hr (₹)"
+                  label="Price/Hr (Γé╣)"
                   type="number"
                   value={room.pricePerHour}
                   onChange={(e: any) => {
                     const newRooms = [...meetingData.rooms];
-                    newRooms[idx].pricePerHour = Number(e.target.value);
-                    setMeetingData({ rooms: newRooms });
-                    clearError(`meeting_room_${idx}`);
+                    newRooms[idx].pricePerHour = parseInt(e.target.value);
+                    setMeetingData({ ...meetingData, rooms: newRooms });
                   }}
-                  onBlur={(e: any) => {
-                    if (!e.target.value || Number(e.target.value) <= 0) {
-                      setErrors((prev) => ({
-                        ...prev,
-                        [`meeting_room_${idx}`]: true,
-                      }));
-                    }
-                  }}
-                  error={errors[`meeting_room_${idx}`] && !room.pricePerHour}
                 />
                 <InputField
                   label="Count"
@@ -1657,19 +1435,9 @@ export default function AddSpace() {
                   value={room.count}
                   onChange={(e: any) => {
                     const newRooms = [...meetingData.rooms];
-                    newRooms[idx].count = Number(e.target.value);
-                    setMeetingData({ rooms: newRooms });
-                    clearError(`meeting_room_${idx}`);
+                    newRooms[idx].count = parseInt(e.target.value);
+                    setMeetingData({ ...meetingData, rooms: newRooms });
                   }}
-                  onBlur={(e: any) => {
-                    if (!e.target.value || Number(e.target.value) <= 0) {
-                      setErrors((prev) => ({
-                        ...prev,
-                        [`meeting_room_${idx}`]: true,
-                      }));
-                    }
-                  }}
-                  error={errors[`meeting_room_${idx}`] && !room.count}
                 />
               </div>
             </div>
@@ -1983,31 +1751,40 @@ function InputField({
   placeholder,
   value,
   onChange,
-  onBlur,
   type = "text",
-  error,
 }: any) {
   return (
     <div className="space-y-2">
-      <label
-        className={`text-xs font-bold uppercase tracking-wider ${
-          error ? "text-red-500" : "text-slate-500"
-        }`}
-      >
+      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
         {label}
       </label>
       <input
         type={type}
-        className={`w-full h-12 rounded-xl border ${
-          error
-            ? "border-red-500 bg-red-50/30 ring-1 ring-red-500"
-            : "border-slate-200 bg-white"
-        } px-4 text-sm font-semibold text-slate-700 shadow-sm focus:border-[#3FA69E] focus:ring-1 focus:ring-[#3FA69E] focus:outline-none transition-all`}
+        className="w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm focus:border-[#3FA69E] focus:ring-1 focus:ring-[#3FA69E] focus:outline-none transition-all"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        onBlur={onBlur}
       />
     </div>
+  );
+}
+
+function X({ className }: any) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
   );
 }
