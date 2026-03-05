@@ -128,8 +128,8 @@ const UpdatesPopup = ({
               key={filter}
               onClick={() => setActiveFilter(filter)}
               className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${activeFilter === filter
-                  ? "bg-[#35503F] text-white shadow-sm"
-                  : "bg-white text-[#677E73] border border-slate-100 hover:border-slate-300"
+                ? "bg-[#35503F] text-white shadow-sm"
+                : "bg-white text-[#677E73] border border-slate-100 hover:border-slate-300"
                 }`}
             >
               {filter}
@@ -215,12 +215,6 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
 
   const middle = [
     { label: "Your Bookings", href: "/dashboard/my-bookings", icon: Calendar },
-  ];
-
-  const onDemandShortcuts = [
-    { label: "On Demand", href: "/solutions/on-demand", icon: Zap },
-    { label: "Day Passes", href: "/solutions/day-passes", icon: Calendar },
-    { label: "Meeting Rooms", href: "/solutions/meeting-rooms", icon: Users },
   ];
 
   const footer = [
@@ -391,21 +385,6 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
                 <Building className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
                 {!iconOnly && <span>Get Workspaces</span>}
               </button>
-
-              {!iconOnly && (
-                <div className="pl-3 mt-1 space-y-1">
-                  {onDemandShortcuts.map((item) => (
-                    <button
-                      key={item.label}
-                      onClick={() => handleNavigation(item.href, item.label)}
-                      className="group w-full flex items-center gap-2 text-left py-1.5 px-2 rounded-lg text-[13px] font-medium text-[#5b6b66] dark:text-slate-300 hover:text-[#2D3F33] dark:hover:text-[#FDE68A] hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300"
-                    >
-                      <item.icon className="w-4 h-4 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
-                      <span>{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
 
               {/* <div className="h-px bg-neutral-300 my-3" /> */}
 
