@@ -1,10 +1,15 @@
 import type { Config } from "tailwindcss";
-import animatePlugin from 'tailwindcss-animate';
-import scrollbarHidePlugin from 'tailwind-scrollbar-hide';
+import animatePlugin from "tailwindcss-animate";
+import scrollbarHidePlugin from "tailwind-scrollbar-hide";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -52,14 +57,21 @@ export default {
           foreground: "hsl(var(--card-foreground))",
           hover: "hsl(var(--card-hover))",
         },
+        gold: "hsl(var(--gold))",
       },
       fontFamily: {
         // Use Inter for everything
-        header: ['Inter', 'sans-serif'],
-        content: ['Inter', 'sans-serif'],
-        sans: ['Inter', 'sans-serif'],
-        grotesk: ['Inter', 'sans-serif'],
-        mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        header: ["Inter", "sans-serif"],
+        content: ["Inter", "sans-serif"],
+        sans: ["Inter", "sans-serif"],
+        grotesk: ["Inter", "sans-serif"],
+        mono: [
+          "Geist Mono",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "monospace",
+        ],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -83,49 +95,49 @@ export default {
             height: "0",
           },
         },
-        "float": {
+        float: {
           "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-20px)" }
+          "50%": { transform: "translateY(-20px)" },
         },
         "pulse-glow": {
           "0%, 100%": {
             boxShadow: "0 0 0 0 hsl(var(--primary-glow) / 0.7)",
-            transform: "translate(-50%, -50%) scale(1)"
+            transform: "translate(-50%, -50%) scale(1)",
           },
           "50%": {
             boxShadow: "0 0 0 20px hsl(var(--primary-glow) / 0)",
-            transform: "translate(-50%, -50%) scale(1.1)"
-          }
+            transform: "translate(-50%, -50%) scale(1.1)",
+          },
         },
         "scroll-logos": {
           "0%": { transform: "translateX(0)" },
-          "100%": { transform: "translateX(-50%)" }
+          "100%": { transform: "translateX(-50%)" },
         },
         "fade-in-up": {
           from: {
             opacity: "0",
-            transform: "translateY(30px)"
+            transform: "translateY(30px)",
           },
           to: {
             opacity: "1",
-            transform: "translateY(0)"
-          }
+            transform: "translateY(0)",
+          },
         },
         "slide-in-cascade": {
           from: {
             opacity: "0",
-            transform: "translateX(100px) rotateY(45deg)"
+            transform: "translateX(100px) rotateY(45deg)",
           },
           to: {
             opacity: "1",
-            transform: "translateX(0) rotateY(0deg)"
-          }
-        }
+            transform: "translateX(0) rotateY(0deg)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "float": "float 6s ease-in-out infinite",
+        float: "float 6s ease-in-out infinite",
         "pulse-glow": "pulse-glow 2s infinite",
         "scroll-logos": "scroll-logos 15s linear infinite",
         "fade-in-up": "fade-in-up 0.6s ease-out",
