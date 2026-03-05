@@ -1114,20 +1114,6 @@ export default function KYCVerification() {
                     required
                   />
                 </div>
-                <div className="flex bg-gray-100 p-1 rounded-lg self-end h-min">
-                  <button
-                    onClick={() => setKycType("individual")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${kycType === "individual" ? "bg-white text-black shadow-sm" : "text-gray-500"}`}
-                  >
-                    <User className="w-4 h-4" /> Individual
-                  </button>
-                  <button
-                    onClick={() => setKycType("business")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${kycType === "business" ? "bg-white text-black shadow-sm" : "text-gray-500"}`}
-                  >
-                    <Building2 className="w-4 h-4" /> Business
-                  </button>
-                </div>
               </div>
             </div>
           )}
@@ -2259,6 +2245,6 @@ export default function KYCVerification() {
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 }
