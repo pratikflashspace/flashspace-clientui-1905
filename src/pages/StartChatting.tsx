@@ -738,12 +738,12 @@ const StartChatting = () => {
   const sidebarMenuItems: SidebarMenuItem[] = [
     { label: 'Start Chatting', icon: MessageSquare, onClick: () => handleNavigation('/start-chatting') },
     { label: 'History', icon: History, onClick: () => setShowHistory(prev => !prev) }, // [NEW] History toggle
-    { label: 'Get Workspace', icon: Building2, onClick: () => handleNavigation('/solutions/on-demand') },
+    { label: 'Get Workspace', icon: Building2, onClick: () => handleNavigation('/solutions/virtual-office') },
     { label: 'Business Setup', icon: Briefcase, onClick: () => handleNavigation('/solutions/business-setup') },
     { label: 'Your Bookings', icon: Calendar, onClick: () => handleNavigation('/bookings') },
     { label: 'Flash Tribe', icon: Users, onClick: () => handleNavigation('/community') },
     { label: 'Updates', icon: Bell, onClick: () => setShowUpdates(prev => !prev) }, // [NEW] Wire up the button
-    { label: 'Settings', icon: Settings, onClick: () => { /* console.log('Settings clicked') */ } },
+    { label: 'Settings', icon: Settings, onClick: () => handleNavigation('/settings') },
   ];
 
   // [NEW] Close popup function
@@ -1303,7 +1303,7 @@ const StartChatting = () => {
             New Chat
           </button>
           <button
-            onClick={() => handleNavigation('/solutions/on-demand')}
+            onClick={() => handleNavigation('/solutions/virtual-office')}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
             style={{ color: '#677e73' }}
           >
@@ -1319,6 +1319,7 @@ const StartChatting = () => {
             Notifications
           </button>
           <button
+            onClick={() => handleNavigation('/settings')}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
             style={{ color: '#677e73' }}
           >
