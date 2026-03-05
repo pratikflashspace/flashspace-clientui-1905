@@ -26,7 +26,9 @@ const isBadImageUrl = (url?: string) => {
 };
 
 const pickBestImage = (item: any) => {
-  const firstArrayImage = Array.isArray(item.images) ? item.images.find((img: string) => !isBadImageUrl(img)) : undefined;
+  const firstArrayImage = Array.isArray(item.images)
+    ? item.images.find((img: string) => !isBadImageUrl(img))
+    : undefined;
   if (firstArrayImage) return firstArrayImage;
   if (!isBadImageUrl(item.image)) return item.image;
   return "/hero-illustrated.jpg";
@@ -260,5 +262,24 @@ export const deleteVirtualOffice = async (id: string): Promise<boolean> => {
   } catch (error: any) {
     console.error("Error deleting virtual office:", error);
     throw error;
+  }
+};
+
+/**
+ * Get all cities that have at least one active workspace (Virtual Office, Coworking, or Meeting Room).
+ */
+export const getAvailableCities = async (): Promise<string[]> => {
+  try {
+    const response = await axiosInstance.get<ApiResponse<string[]>>(
+      "/property/available-cities",
+    );
+    const data = response.data;
+    if (data.success && Array.isArray(data.data)) {
+      return data.data.sort();
+    }
+    return [];
+  } catch (error: any) {
+    console.error("Error fetching available cities:", error);
+    return [];
   }
 };

@@ -129,24 +129,22 @@ export const getMeetingRoomById = async (
     const data = response.data as ApiResponse<MeetingRoomItem>;
 
     if (response.status === 200 && data.success && data.data) {
-      const r = data.data;
+      const r = data.data as any;
       return {
         ...r,
-        features: r.features || (r as any).amenities || [],
-        price:
-          r.price ||
-          ((r as any).pricePerHour
-            ? `₹${(r as any).pricePerHour.toLocaleString()}/hr`
-            : ""),
+        features: r.features || r.amenities || [],
+        price: r.finalPricePerHour
+          ? `₹${Number(r.finalPricePerHour).toLocaleString()}/hr`
+          : "Price on request",
         image: pickBestImage(r),
         images:
-          Array.isArray((r as any).images) && (r as any).images.length > 0
-            ? (r as any).images.filter((img: string) => !isBadImageUrl(img))
-            : !isBadImageUrl((r as any).image)
-              ? [(r as any).image]
+          Array.isArray(r.images) && r.images.length > 0
+            ? r.images.filter((img: string) => !isBadImageUrl(img))
+            : !isBadImageUrl(r.image)
+              ? [r.image]
               : ["/hero-illustrated.jpg"],
-        rating: toNumber(r.rating) || toNumber((r as any).avgRating),
-        reviews: toNumber(r.reviews) || toNumber((r as any).totalReviews),
+        rating: toNumber(r.rating) || toNumber(r.avgRating),
+        reviews: toNumber(r.reviews) || toNumber(r.totalReviews),
       };
     }
     return undefined;

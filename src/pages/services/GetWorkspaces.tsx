@@ -25,7 +25,10 @@ import {
   Map,
 } from "lucide-react";
 import MapLibreMap from "@/components/Map/MapLibreMap";
-import { getVirtualOfficesByCity } from "@/services/virtualOffice.service";
+import {
+  getVirtualOfficesByCity,
+  getAvailableCities,
+} from "@/services/virtualOffice.service";
 import { getCoworkingSpacesByCity } from "@/services/coworkingSpace.service";
 import { getMeetingRoomsByCity } from "@/services/meetingRoom.service";
 import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
@@ -117,10 +120,7 @@ const WorkspaceCard = ({
 
   const rawImages = ws.images && ws.images.length > 0 ? ws.images : [ws.image];
   const images = rawImages.map((img) =>
-    getValidImage(
-      img,
-      DEFAULT_WORKSPACE_IMAGE,
-    ),
+    getValidImage(img, DEFAULT_WORKSPACE_IMAGE),
   );
 
   const bookingItem: ListingItem = {
@@ -250,7 +250,7 @@ const WorkspaceCard = ({
                 e.stopPropagation();
                 handleNavigate();
               }}
-              className="py-2 px-4 text-xs font-medium rounded-lg bg-[#2d5843] text-white hover:bg-[#204030] transition-all duration-200 whitespace-nowrap"
+              className="py-2 px-4 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 whitespace-nowrap"
             >
               Get Best Price
             </button>
@@ -400,7 +400,7 @@ const WorkspaceCard = ({
               e.stopPropagation();
               handleNavigate();
             }}
-            className="flex-1 py-2.5 text-xs font-medium rounded-lg bg-[#2d5843] text-white hover:bg-[#204030] transition-all duration-200"
+            className="flex-1 py-2.5 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
           >
             Get Best Price
           </button>
@@ -430,7 +430,6 @@ const GetWorkspaces = () => {
   const searchParams = new URLSearchParams(location.search);
   const initialCity = searchParams.get("city") || "Delhi";
 
-  const [searchCity, setSearchCity] = useState(initialCity);
   const getInitialType = () => {
     if (location.pathname.includes("coworking")) return "coworking";
     if (
@@ -443,13 +442,11 @@ const GetWorkspaces = () => {
   const [activeCity, setActiveCity] = useState(initialCity);
   const [workspaceType, setWorkspaceType] = useState(getInitialType());
 
-  // Sync state with URL changes
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const city = params.get("city") || "Delhi";
     if (city !== activeCity) {
       setActiveCity(city);
-      setSearchCity(city);
     }
   }, [location.search]);
 
@@ -467,7 +464,8 @@ const GetWorkspaces = () => {
     const currentCity = params.get("city") || activeCity;
     const searchStr = `?city=${encodeURIComponent(currentCity)}`;
 
-    if (value === "coworking") navigate(`/services/coworking-space${searchStr}`);
+    if (value === "coworking")
+      navigate(`/services/coworking-space${searchStr}`);
     else if (value === "on-demand") navigate(`/services/on-demand${searchStr}`);
     else navigate(`/services/virtual-office${searchStr}`);
   };
@@ -477,10 +475,19 @@ const GetWorkspaces = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [showMap, setShowMap] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(false);
-  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
+  const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [citiesLoading, setCitiesLoading] = useState(true);
 
   const [workspaces, setWorkspaces] = useState<UnifiedWorkspace[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Fetch available cities once on mount
+  useEffect(() => {
+    getAvailableCities().then((cities) => {
+      setAvailableCities(cities);
+      setCitiesLoading(false);
+    });
+  }, []);
 
   useEffect(() => {
     const fetchWorkspaces = async () => {
@@ -521,8 +528,10 @@ const GetWorkspaces = () => {
               popular: vo.popular || false,
               available: vo.availability === "Available Now",
               negotiable: true,
-              lat: vo.coordinates?.lat ?? vo.location?.coordinates?.[1] ?? 28.6139,
-              lng: vo.coordinates?.lng ?? vo.location?.coordinates?.[0] ?? 77.209,
+              lat:
+                vo.coordinates?.lat ?? vo.location?.coordinates?.[1] ?? 28.6139,
+              lng:
+                vo.coordinates?.lng ?? vo.location?.coordinates?.[0] ?? 77.209,
             })),
           );
         } else if (workspaceType === "coworking") {
@@ -551,8 +560,10 @@ const GetWorkspaces = () => {
               popular: cw.popular || false,
               available: true,
               negotiable: true,
-              lat: cw.coordinates?.lat ?? cw.location?.coordinates?.[1] ?? 28.6139,
-              lng: cw.coordinates?.lng ?? cw.location?.coordinates?.[0] ?? 77.209,
+              lat:
+                cw.coordinates?.lat ?? cw.location?.coordinates?.[1] ?? 28.6139,
+              lng:
+                cw.coordinates?.lng ?? cw.location?.coordinates?.[0] ?? 77.209,
             })),
           );
         } else if (workspaceType === "on-demand") {
@@ -583,8 +594,10 @@ const GetWorkspaces = () => {
               popular: mr.popular || false,
               available: true,
               negotiable: false,
-              lat: mr.coordinates?.lat ?? mr.location?.coordinates?.[1] ?? 28.6139,
-              lng: mr.coordinates?.lng ?? mr.location?.coordinates?.[0] ?? 77.209,
+              lat:
+                mr.coordinates?.lat ?? mr.location?.coordinates?.[1] ?? 28.6139,
+              lng:
+                mr.coordinates?.lng ?? mr.location?.coordinates?.[0] ?? 77.209,
             })),
           );
         }
@@ -601,11 +614,37 @@ const GetWorkspaces = () => {
 
   // Client-side filtering logic
   const filteredWorkspaces = workspaces.filter((ws) => {
+    // Location search filter
     const matchesSearch =
+      !searchLocation ||
       ws.address.toLowerCase().includes(searchLocation.toLowerCase()) ||
       ws.location.toLowerCase().includes(searchLocation.toLowerCase()) ||
       ws.name.toLowerCase().includes(searchLocation.toLowerCase());
-    return matchesSearch;
+
+    // Price filter
+    let matchesPrice = true;
+    if (pricingFilter !== "all") {
+      const rawPrice = ws.plans?.[0]?.price;
+      const numericPrice = rawPrice
+        ? Number(String(rawPrice).replace(/[^0-9.]/g, ""))
+        : null;
+
+      if (
+        numericPrice !== null &&
+        Number.isFinite(numericPrice) &&
+        numericPrice > 0
+      ) {
+        if (pricingFilter === "low") matchesPrice = numericPrice < 5000;
+        else if (pricingFilter === "mid")
+          matchesPrice = numericPrice >= 5000 && numericPrice <= 15000;
+        else if (pricingFilter === "high") matchesPrice = numericPrice > 15000;
+      } else {
+        // If price is unknown, hide it when a filter is active
+        matchesPrice = false;
+      }
+    }
+
+    return matchesSearch && matchesPrice;
   });
 
   const sortedWorkspaces = useMemo(() => {
@@ -677,10 +716,11 @@ const GetWorkspaces = () => {
                 onValueChange={handleWorkspaceTypeChange}
               >
                 <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${workspaceType !== "virtual-office"
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${
+                    workspaceType !== "virtual-office"
                       ? "bg-muted/50 border-border text-foreground"
                       : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
-                    }`}
+                  }`}
                 >
                   <SelectValue placeholder="Product" />
                 </SelectTrigger>
@@ -695,74 +735,33 @@ const GetWorkspaces = () => {
             {/* Divider */}
             <div className="hidden sm:block w-px h-8 bg-border/60 flex-shrink-0" />
 
-            {/* City */}
-            <div className="relative sm:w-[160px]">
-              <div className="flex items-center bg-card border border-border/60 rounded-xl h-10 overflow-visible transition-all duration-200">
-                <Input
-                  value={searchCity}
-                  onChange={(e) => {
-                    setSearchCity(e.target.value);
-                    setShowCitySuggestions(true);
-                  }}
-                  onFocus={() => setShowCitySuggestions(true)}
-                  className="border-0 shadow-none h-full text-sm font-medium text-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none bg-transparent px-3 placeholder:text-muted-foreground/40 min-w-0 flex-1"
-                  placeholder="City..."
-                />
-                <button
-                  onClick={() => {
-                    setActiveCity(searchCity);
-                    setShowCitySuggestions(false);
-                  }}
-                  className="flex-shrink-0 w-8 h-8 flex items-center justify-center active:scale-95 transition-all rounded-[10px] mr-1 bg-muted/60 hover:bg-muted"
-                >
-                  <Search
-                    className="w-3.5 h-3.5 text-foreground"
-                    strokeWidth={2}
+            {/* City — dynamic dropdown */}
+            <div className="sm:w-[160px]">
+              <Select
+                value={activeCity}
+                onValueChange={(city) => setActiveCity(city)}
+                disabled={citiesLoading}
+              >
+                <SelectTrigger className="border border-border/60 shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 bg-card hover:border-border hover:shadow-sm text-foreground">
+                  <MapPin className="w-3.5 h-3.5 text-muted-foreground mr-1.5 flex-shrink-0" />
+                  <SelectValue
+                    placeholder={citiesLoading ? "Loading..." : "Select city"}
                   />
-                </button>
-              </div>
-              {showCitySuggestions &&
-                searchCity.length > 0 &&
-                (() => {
-                  const allCities = [
-                    "Delhi",
-                    "Mumbai",
-                    "Bangalore",
-                    "Hyderabad",
-                    "Chennai",
-                    "Pune",
-                    "Kolkata",
-                    "Ahmedabad",
-                    "Noida",
-                    "Gurgaon",
-                    "Jaipur",
-                    "Lucknow",
-                    "Chandigarh",
-                    "Indore",
-                    "Kochi",
-                  ];
-                  const filtered = allCities.filter((c) =>
-                    c.toLowerCase().includes(searchCity.toLowerCase()),
-                  );
-                  if (filtered.length === 0) return null;
-                  return (
-                    <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-lg z-[9999] max-h-48 overflow-y-auto">
-                      {filtered.map((city) => (
-                        <button
-                          key={city}
-                          onClick={() => {
-                            setSearchCity(city);
-                            setActiveCity(city);
-                            setShowCitySuggestions(false);
-                          }}
-                          className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-muted/60 transition-colors first:rounded-t-xl last:rounded-b-xl"
-                        >
-                          {city}
-                        </button>
-                      ))}
+                </SelectTrigger>
+                <SelectContent className="max-h-64 overflow-y-auto">
+                  {availableCities.length > 0 ? (
+                    availableCities.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="px-4 py-3 text-sm text-muted-foreground">
+                      No cities available
                     </div>
-                  );
-                })()}
+                  )}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Search Location */}
@@ -782,18 +781,19 @@ const GetWorkspaces = () => {
             <div className="sm:w-[160px]">
               <Select value={pricingFilter} onValueChange={setPricingFilter}>
                 <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${pricingFilter !== "all"
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${
+                    pricingFilter !== "all"
                       ? "bg-muted/50 border-border text-foreground"
                       : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
-                    }`}
+                  }`}
                 >
                   <SelectValue placeholder="Pricing" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Pricing</SelectItem>
-                  <SelectItem value="low">Under ₹500/mo</SelectItem>
-                  <SelectItem value="mid">₹500 – ₹1,000/mo</SelectItem>
-                  <SelectItem value="high">Above ₹1,000/mo</SelectItem>
+                  <SelectItem value="low">Under ₹5,000</SelectItem>
+                  <SelectItem value="mid">₹5,000 – ₹15,000</SelectItem>
+                  <SelectItem value="high">Above ₹15,000</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -806,7 +806,7 @@ const GetWorkspaces = () => {
                     sortBy !== "rating"
                       ? "bg-muted/50 border-border text-foreground"
                       : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
-                    }`}
+                  }`}
                 >
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
@@ -845,19 +845,21 @@ const GetWorkspaces = () => {
                 <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${viewMode === "list"
+                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${
+                      viewMode === "list"
                         ? "bg-card text-foreground shadow-sm"
                         : "text-muted-foreground hover:text-foreground"
-                      }`}
+                    }`}
                   >
                     <List className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${viewMode === "grid"
+                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${
+                      viewMode === "grid"
                         ? "bg-card text-foreground shadow-sm"
                         : "text-muted-foreground hover:text-foreground"
-                      }`}
+                    }`}
                   >
                     <LayoutGrid className="w-4 h-4" />
                   </button>
@@ -874,7 +876,7 @@ const GetWorkspaces = () => {
               <div
                 className={
                   viewMode === "grid"
-                    ? `grid gap-5 pb-8 ${mapCollapsed ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3"}`
+                    ? `grid gap-4 pb-8 ${mapCollapsed ? "grid-cols-1 min-[700px]:grid-cols-2 min-[1100px]:grid-cols-3 min-[1500px]:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
                     : "flex flex-col gap-4 pb-8"
                 }
               >
