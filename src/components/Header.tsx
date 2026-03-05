@@ -136,77 +136,56 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
                         {/* CENTER: Navigation Links */}
                         <nav className="hidden lg:flex items-center gap-8">
-                            {/* Get Workspace Dropdown */}
+                            {/* Solutions Dropdown */}
                             <div ref={solutionsRef} className="relative">
                                 <button
                                     onMouseEnter={() => setIsSolutionsOpen(true)}
                                     className={cn(
                                         "flex items-center gap-1.5 text-sm font-medium transition-colors py-2",
                                         scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white",
-                                        "hover:text-[#D96832]"
+                                        "hover:text-[#2D3F33] dark:hover:text-[#FDE68A]"
                                     )}
                                 >
-                                    Get Workspace
+                                    Solutions
                                     <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isSolutionsOpen && "rotate-180")} />
                                 </button>
 
                                 <div
                                     className={cn(
-                                        "absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[600px] bg-white dark:bg-[#0a0a0a] border border-[#2D3F33]/15 dark:border-white/10 rounded-2xl shadow-2xl p-6 z-50 transition-all duration-300",
+                                        "absolute left-0 top-full mt-2 w-56 bg-white dark:bg-[#0a0a0a] border border-[#2D3F33]/15 dark:border-white/10 rounded-2xl shadow-2xl py-2 z-50 transition-all duration-300",
                                         isSolutionsOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
                                     )}
                                     onMouseLeave={() => setIsSolutionsOpen(false)}
                                 >
-                                    <div className="grid grid-cols-2 gap-6">
-                                        {/* On-Demand Section */}
-                                        <div className="bg-[#2D3F33]/5 dark:bg-white/5 rounded-xl p-5 border border-[#2D3F33]/15 dark:border-white/10">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Zap className="w-4 h-4 text-[#2D3F33] dark:text-[#FDE68A]" />
-                                                <h4 className="text-sm font-medium text-[#164e4e] dark:text-white">On-Demand</h4>
-                                            </div>
-                                            <p className="text-xs text-[#164e4e]/60 dark:text-gray-400 mb-4">Book by the hour or day</p>
-                                            <div className="space-y-2">
-                                                <button
-                                                    onClick={() => handleNavigation("/solutions/day-passes")}
-                                                    className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-white dark:bg-white/10 border border-[#2D3F33]/10 dark:border-white/10 text-[#164e4e] dark:text-white hover:bg-[#2D3F33]/10 dark:hover:bg-white/15 transition-colors"
-                                                >
-                                                    Day Passes
-                                                </button>
-                                                <button
-                                                    onClick={() => handleNavigation("/solutions/meeting-rooms")}
-                                                    className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium bg-white dark:bg-white/10 border border-[#2D3F33]/10 dark:border-white/10 text-[#164e4e] dark:text-white hover:bg-[#2D3F33]/10 dark:hover:bg-white/15 transition-colors"
-                                                >
-                                                    Meeting Rooms
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Solutions List */}
-                                        <div className="space-y-1">
-                                            {[
-                                                { icon: Building2, title: "Virtual Office", desc: "Business address & mail", href: "/solutions/virtual-office" },
-                                                { icon: Users, title: "Coworking Space", desc: "Flexible desk solutions", href: "/solutions/coworking-space" },
-                                                { icon: FileText, title: "Business Setup", desc: "GST & registration support", href: "/solutions/business-setup" },
-                                            ].map((item) => (
-                                                <button
-                                                    key={item.title}
-                                                    onClick={() => handleNavigation(item.href)}
-                                                    className="w-full text-left p-3 rounded-xl hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 group transition-colors"
-                                                >
-                                                    <div className="flex items-start gap-3">
-                                                        <item.icon className="w-5 h-5 text-[#2D3F33] dark:text-[#FDE68A] mt-0.5" />
-                                                        <div>
-                                                            <h5 className="text-sm font-medium text-[#164e4e] dark:text-white group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors">{item.title}</h5>
-                                                            <p className="text-xs text-[#164e4e]/60 dark:text-gray-400">{item.desc}</p>
-                                                        </div>
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
+                                    {[
+                                        { title: "Virtual Office", href: "/solutions/virtual-office" },
+                                        { title: "Coworking Space", href: "/solutions/coworking-space" },
+                                        { title: "Business Setup", href: "/solutions/business-setup" },
+                                    ].map((item) => (
+                                        <button
+                                            key={item.title}
+                                            onClick={() => handleNavigation(item.href)}
+                                            className="w-full text-left px-4 py-2.5 text-sm font-medium text-[#164e4e] dark:text-white hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 transition-colors"
+                                        >
+                                            {item.title}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
 
+                            {/* Workspaces */}
+                            <button
+                                onClick={() => handleNavigation("/services/virtual-office")}
+                                className={cn(
+                                    "text-sm font-medium transition-colors",
+                                    scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white",
+                                    "hover:text-[#D96832]"
+                                )}
+                            >
+                                Workspaces
+                            </button>
+
+                            {/* Partner with Us */}
                             <button
                                 onClick={() => handleNavigation("/partner")}
                                 className={cn(
@@ -216,16 +195,6 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 )}
                             >
                                 Partner with Us
-                            </button>
-                            <button
-                                onClick={() => handleNavigation("/about")}
-                                className={cn(
-                                    "text-sm font-medium transition-colors",
-                                    scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white",
-                                    "hover:text-[#D96832]"
-                                )}
-                            >
-                                About Us
                             </button>
                         </nav>
 

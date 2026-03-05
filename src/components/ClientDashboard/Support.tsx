@@ -370,7 +370,7 @@ export default function Support() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                  ? "bg-[#35503F] text-white"
+                  ? "bg-[#35503F] text-[#FEF8C3]"
                   : "text-gray-600 hover:bg-gray-100"
                   }`}
               >
@@ -491,7 +491,7 @@ export default function Support() {
                       <button
                         onClick={handleReply}
                         disabled={submitting || !replyMessage.trim()}
-                        className="px-6 py-2.5 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors disabled:opacity-50 self-end"
+                        className="px-6 py-2.5 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors disabled:opacity-50 self-end"
                       >
                         {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                       </button>
@@ -519,7 +519,7 @@ export default function Support() {
                   <h2 className="text-lg font-semibold text-gray-900">Support Tickets</h2>
                   <button
                     onClick={() => setShowNewTicket(true)}
-                    className="px-4 py-2 bg-[#35503F] text-white rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
+                    className="px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
                   >
                     + New Ticket
                   </button>
@@ -586,7 +586,7 @@ export default function Support() {
                           <button
                             type="submit"
                             disabled={submitting || formData.description.length < 10}
-                            className="px-6 py-2.5 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-2.5 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Submit Ticket"}
                           </button>
@@ -726,7 +726,7 @@ export default function Support() {
                 <button
                   type="submit"
                   disabled={contactSubmitting}
-                  className="w-full py-3 bg-[#35503F] text-white rounded-xl font-semibold hover:bg-[#35503F]/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-[#35503F] text-[#FEF8C3] rounded-xl font-semibold hover:bg-[#35503F]/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {contactSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                   {contactSubmitting ? "Sending..." : "Send Message"}

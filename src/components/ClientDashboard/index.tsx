@@ -1,23 +1,21 @@
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
   LayoutDashboard,
   Calendar,
   CreditCard,
   ShieldCheck,
-  Headphones, // Keep for fallback or remove if unused
-  LogOut,
   User,
   Building2,
   ChevronRight,
+  ChevronLeft,
   Bell,
   Mail,
   Users,
   FileText,
-  CalendarCheck, // For Visit Records
-  MessageSquare, // For Chat Support
-  HelpCircle, // For Help Center
-  Home, // For Back to Home
+  CalendarCheck,
+  MessageSquare,
+  HelpCircle,
+  Home,
   AlertCircle,
 } from "lucide-react";
 import { useEffect, useState, useMemo, useRef } from "react";
@@ -55,13 +53,13 @@ const menuItems = [
   { name: "Chat Support", icon: MessageSquare, section: "main", path: "/dashboard/support" },
   { name: "Notifications", icon: Bell, section: "main", path: "/dashboard/notifications" },
   { name: "Help Center", icon: HelpCircle, section: "main", path: "/dashboard/help" },
-  { name: "Profile & KYC", icon: User, section: "account", path: "/dashboard/profile" },
-  { name: "Logout", icon: LogOut, section: "account", path: "/dashboard/logout" },
+  { name: "Profile & KYC", icon: User, section: "main", path: "/dashboard/profile" },
 ];
 
 export default function ClientDashboard() {
   const [showFooter, setShowFooter] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { user } = useAuth();
   const [kycStatus, setKycStatus] = useStateReact<string | null>(null);
 
@@ -147,17 +145,27 @@ export default function ClientDashboard() {
     }
   }, [activeIndex]);
 
-  const mainMenuItems = menuItems.filter((item) => item.section === "main");
-  const accountMenuItems = menuItems.filter((item) => item.section === "account");
+  const mainMenuItems = menuItems; // All menu items in single list now
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
 
-      <div className="flex pt-16">
+      <div className="flex">
         {/* Sidebar */}
-        <aside className="hidden lg:block w-72 min-h-[calc(100vh-64px)] bg-white border-r border-gray-200 p-6 sticky top-16">
-          {/* User Info removed from here */}
+        <aside className={`hidden lg:flex flex-col min-h-screen bg-white border-r border-gray-200 sticky top-0 transition-all duration-200 ${isSidebarCollapsed ? "w-[72px] px-2 py-6" : "w-72 p-6"}`}>
+
+          {/* Logo */}
+          <div
+            className={`flex items-center gap-2 mb-6 cursor-pointer ${isSidebarCollapsed ? "justify-center" : ""}`}
+            onClick={() => navigate("/")}
+            title="Back to Home"
+          >
+            <img
+              src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
+              alt="FlashSpace Logo"
+              className={`w-auto object-contain ${isSidebarCollapsed ? "h-7" : "h-8"}`}
+            />
+          </div>
 
           {/* Main Navigation */}
           <nav className="flex-1 overflow-y-auto">
@@ -169,58 +177,25 @@ export default function ClientDashboard() {
                   <li key={item.name}>
                     <button
                       onClick={() => handleNavigation(idx)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                          ? "bg-[#35503F] text-white shadow-sm"
+                      title={isSidebarCollapsed ? item.name : undefined}
+                      className={`w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${isSidebarCollapsed ? "justify-center px-2 py-3" : "px-4 py-3"
+                        } ${isActive
+                          ? "bg-[#35503F] text-[#FEF8C3] shadow-sm"
                           : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                      }`}
+                        }`}
                     >
-                      <item.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-gray-400"}`} />
-                      <span className="flex items-center gap-1">
-                        {item.name}
-                        {showKycDot && (
-                          <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
-                            <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
-                            <span className="text-red-600 font-bold">KYC</span>
-                          </span>
-                        )}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-
-            {/* Account Section */}
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-8 mb-3 px-3">Account</p>
-            <ul className="space-y-1">
-              {accountMenuItems.map((item) => {
-                const actualIndex = menuItems.findIndex((m) => m.name === item.name);
-                const isActive = activeIndex === actualIndex;
-                const isLogout = item.name === "Logout";
-                const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
-                return (
-                  <li key={item.name}>
-                    <button
-                      onClick={() => handleNavigation(actualIndex)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                          ? isLogout
-                            ? "bg-red-100 text-red-700"
-                            : "bg-[#35503F] text-white shadow-sm"
-                          : isLogout
-                            ? "text-gray-600 hover:bg-red-50 hover:text-red-600"
-                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                      }`}
-                    >
-                      <item.icon className={`w-5 h-5 ${isActive ? (isLogout ? "text-red-600" : "text-white") : "text-gray-400"}`} />
-                      <span className="flex items-center gap-1">
-                        {item.name}
-                        {showKycDot && (
-                          <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
-                            <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
-                            <span className="text-red-600 font-bold">KYC</span>
-                          </span>
-                        )}
-                      </span>
+                      <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#FEF8C3]" : "text-gray-400"}`} />
+                      {!isSidebarCollapsed && (
+                        <span className="flex items-center gap-1">
+                          {item.name}
+                          {showKycDot && (
+                            <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
+                              <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
+                              <span className="text-red-600 font-bold">KYC</span>
+                            </span>
+                          )}
+                        </span>
+                      )}
                     </button>
                   </li>
                 );
@@ -228,45 +203,69 @@ export default function ClientDashboard() {
             </ul>
           </nav>
 
-          {/* Back to Home Button & Portal Links */}
+          {/* Bottom Actions */}
           <div className="mt-auto pt-4 border-t border-gray-100 space-y-2">
-            {user?.role && ['super_admin', 'admin', 'sales', 'support', 'affiliate_manager', 'space_partner_manager'].includes(user.role) && (
-              <button
-                onClick={() => navigate('/admin')}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-50 border border-purple-100 rounded-xl text-sm font-semibold text-purple-700 hover:bg-purple-100 transition-all shadow-sm shadow-purple-900/5 group"
-              >
-                <ShieldCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                <span>Admin Portal</span>
-              </button>
-            )}
-
-            {user?.role === 'partner' && (
-              <button
-                onClick={() => navigate('/spaceportal')}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-50 border border-orange-100 rounded-xl text-sm font-semibold text-orange-700 hover:bg-orange-100 transition-all shadow-sm shadow-orange-900/5 group"
-              >
-                <Building2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                <span>Partner Portal</span>
-              </button>
-            )}
-
-            {user?.role === 'affiliate' && (
-              <button
-                onClick={() => navigate('/affiliate-portal')}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-50 border border-cyan-100 rounded-xl text-sm font-semibold text-cyan-700 hover:bg-cyan-100 transition-all shadow-sm shadow-cyan-900/5 group"
-              >
-                <Users className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                <span>Affiliate Portal</span>
-              </button>
-            )}
-
+            {/* Collapse Toggle */}
             <button
-              onClick={() => navigate('/')}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
+              onClick={() => setIsSidebarCollapsed(prev => !prev)}
+              title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-[#fef8c3] transition-all ${isSidebarCollapsed ? "justify-center" : ""
+                }`}
             >
-              <Home className="w-4 h-4" />
-              <span>Back to Home</span>
+              {isSidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+              {!isSidebarCollapsed && <span>Collapse</span>}
             </button>
+
+            {!isSidebarCollapsed ? (
+              <>
+                {user?.role && ['super_admin', 'admin', 'sales', 'support', 'affiliate_manager', 'space_partner_manager'].includes(user.role) && (
+                  <button
+                    onClick={() => navigate('/admin')}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-50 border border-purple-100 rounded-xl text-sm font-semibold text-purple-700 hover:bg-purple-100 transition-all shadow-sm shadow-purple-900/5 group"
+                  >
+                    <ShieldCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span>Admin Portal</span>
+                  </button>
+                )}
+
+                {user?.role === 'partner' && (
+                  <button
+                    onClick={() => navigate('/spaceportal')}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-50 border border-orange-100 rounded-xl text-sm font-semibold text-orange-700 hover:bg-orange-100 transition-all shadow-sm shadow-orange-900/5 group"
+                  >
+                    <Building2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span>Partner Portal</span>
+                  </button>
+                )}
+
+                {user?.role === 'affiliate' && (
+                  <button
+                    onClick={() => navigate('/affiliate-portal')}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-50 border border-cyan-100 rounded-xl text-sm font-semibold text-cyan-700 hover:bg-cyan-100 transition-all shadow-sm shadow-cyan-900/5 group"
+                  >
+                    <Users className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span>Affiliate Portal</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
+                >
+                  <Home className="w-4 h-4" />
+                  <span>Back to Home</span>
+                </button>
+              </>
+            ) : (
+              /* Collapsed: show only Back to Home icon */
+              <button
+                onClick={() => navigate('/')}
+                title="Back to Home"
+                className="w-full flex items-center justify-center px-2 py-3 rounded-xl text-gray-500 hover:bg-gray-100 transition-all"
+              >
+                <Home className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </aside>
 
@@ -297,11 +296,11 @@ export default function ClientDashboard() {
                         <button
                           onClick={() => handleNavigation(idx)}
                           className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-base font-medium ${isActive
-                              ? isLogout
-                                ? "bg-red-100 text-red-700"
-                                : "bg-yellow-400 text-black"
-                              : "text-gray-600 hover:bg-gray-100"
-                          }`}
+                            ? isLogout
+                              ? "bg-red-100 text-red-700"
+                              : "bg-yellow-400 text-black"
+                            : "text-gray-600 hover:bg-gray-100"
+                            }`}
                         >
                           <item.icon className="w-5 h-5" />
                           <span className="flex items-center gap-1">
@@ -324,7 +323,7 @@ export default function ClientDashboard() {
         )}
 
         {/* Main Content */}
-        <main className="relative flex-1 min-w-0 overflow-x-hidden min-h-[calc(100vh-64px)]">
+        <main className="relative flex-1 min-w-0 overflow-x-hidden min-h-screen">
           {mainContent}
         </main>
       </div>

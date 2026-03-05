@@ -309,7 +309,7 @@ const Profile: React.FC = () => {
                     {!isEditing ? (
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-[#35503F] text-white rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
                       >
                         <Edit3 className="w-4 h-4" /> Edit Profile
                       </button>
@@ -349,7 +349,7 @@ const Profile: React.FC = () => {
                     onClick={() => setActiveTab(tab.id as typeof activeTab)}
                     className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                       activeTab === tab.id
-                        ? "bg-[#35503F] text-white"
+                        ? "bg-[#35503F] text-[#FEF8C3]"
                         : "text-gray-600 hover:bg-gray-100"
                     }`}
                   >

@@ -754,7 +754,7 @@ export default function KYCVerification() {
           <div className="flex gap-2 justify-center">
             <button
               onClick={fetchKYC}
-              className="px-4 py-2 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2"
             >
               <RefreshCw className="w-4 h-4" /> Try Again
             </button>
@@ -852,7 +852,7 @@ export default function KYCVerification() {
                   }}
                   className={`px-6 py-3 rounded-full font-medium transition-all flex items-center gap-2 shadow-sm ${isPersonalVerified
                     ? "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-                    : "bg-[#35503F] text-white hover:bg-[#35503F]/90"
+                    : "bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90"
                     }`}
                 >
                   {isPersonalVerified ? (
@@ -1135,7 +1135,7 @@ export default function KYCVerification() {
                       }}
                       disabled={!isAccessible}
                       className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors relative ${activeStep === step.id
-                        ? "bg-[#35503F] text-white"
+                        ? "bg-[#35503F] text-[#FEF8C3]"
                         : isAccessible
                           ? "text-gray-600 hover:bg-gray-100 cursor-pointer"
                           : "text-gray-300 cursor-not-allowed opacity-50 bg-gray-50"
@@ -1169,7 +1169,7 @@ export default function KYCVerification() {
                 <button
                   onClick={handleSaveBusinessInfo}
                   disabled={saving || !businessForm.profileName}
-                  className="w-full py-3 bg-[#35503F] text-white rounded-lg font-bold hover:bg-[#35503F]/90 transition-colors disabled:opacity-50"
+                  className="w-full py-3 bg-[#35503F] text-[#FEF8C3] rounded-lg font-bold hover:bg-[#35503F]/90 transition-colors disabled:opacity-50"
                 >
                   {saving ? (
                     <Loader2 className="w-5 h-5 animate-spin mx-auto" />
@@ -1357,7 +1357,7 @@ export default function KYCVerification() {
                         !personalForm.pan ||
                         (isPartnerMode && !personalForm.fullName)
                       }
-                      className="px-6 py-2 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+                      className="px-6 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2 disabled:opacity-50"
                     >
                       {saving ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -1580,7 +1580,7 @@ export default function KYCVerification() {
                         !businessForm.gstNumber ||
                         !businessForm.registeredAddress
                       }
-                      className="px-6 py-2 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+                      className="px-6 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2 disabled:opacity-50"
                     >
                       {saving ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -1713,7 +1713,7 @@ export default function KYCVerification() {
                                   onClick={() =>
                                     triggerFileUpload("video_kyc")
                                   }
-                                  className="px-4 py-2 bg-[#35503F] text-white rounded-lg text-sm font-medium hover:bg-[#35503F]/90 flex items-center gap-2"
+                                  className="px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg text-sm font-medium hover:bg-[#35503F]/90 flex items-center gap-2"
                                 >
                                   <RefreshCw className="w-4 h-4" /> Replace
                                 </button>
@@ -1739,7 +1739,7 @@ export default function KYCVerification() {
                             <button
                               onClick={() => triggerFileUpload("video_kyc")}
                               disabled={isUploading}
-                              className="px-6 py-2.5 bg-[#35503F] text-white rounded-xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md flex items-center gap-2 mx-auto disabled:opacity-50"
+                              className="px-6 py-2.5 bg-[#35503F] text-[#FEF8C3] rounded-xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md flex items-center gap-2 mx-auto disabled:opacity-50"
                             >
                               {isUploading ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -1762,7 +1762,7 @@ export default function KYCVerification() {
                   <div className="pt-6 border-t border-gray-100 flex justify-end">
                     <button
                       onClick={() => setActiveStep("documents")}
-                      className="px-8 py-3 bg-[#35503F] text-white rounded-xl font-bold hover:bg-[#35503F]/90 transition-all flex items-center gap-2 shadow-md"
+                      className="px-8 py-3 bg-[#35503F] text-[#FEF8C3] rounded-xl font-bold hover:bg-[#35503F]/90 transition-all flex items-center gap-2 shadow-md"
                     >
                       Continue to Documents{" "}
                       <ChevronRight className="w-5 h-5" />
@@ -1859,7 +1859,7 @@ export default function KYCVerification() {
                                       triggerFileUpload(docType.type)
                                     }
                                     disabled={isUploading || !!deleting}
-                                    className={`flex items-center gap-1.5 px-3 py-2 ${uploadedDoc ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-[#35503F] text-white hover:bg-[#35503F]/90"} rounded-lg text-sm font-medium transition-colors disabled:opacity-50`}
+                                    className={`flex items-center gap-1.5 px-3 py-2 ${uploadedDoc ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90"} rounded-lg text-sm font-medium transition-colors disabled:opacity-50`}
                                   >
                                     {isUploading ? (
                                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -1908,7 +1908,7 @@ export default function KYCVerification() {
                   <div className="mt-6 flex justify-end">
                     <button
                       onClick={() => setActiveStep("review")}
-                      className="px-6 py-2 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2"
+                      className="px-6 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2"
                     >
                       Proceed to Review <ChevronRight className="w-4 h-4" />
                     </button>
@@ -2154,7 +2154,7 @@ export default function KYCVerification() {
                         kycData?.overallStatus !== "pending" &&
                         !isConfirmed)
                     }
-                    className="w-full py-3 bg-[#35503F] text-white rounded-xl font-semibold hover:bg-[#35503F]/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-3 bg-[#35503F] text-[#FEF8C3] rounded-xl font-semibold hover:bg-[#35503F]/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? (
                       <>
