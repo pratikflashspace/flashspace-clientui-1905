@@ -32,8 +32,13 @@ export interface CreateOrderPayload {
   totalAmount: number;
   discountPercent: number;
   discountAmount: number;
-  paymentType?: "virtual_office" | "coworking_space" | "meeting_room";
+  paymentType?:
+    | "virtual_office"
+    | "coworking_space"
+    | "meeting_room"
+    | "seat_booking";
   startDate?: string; // ISO date string for booking start
+  holdId?: string;
   couponCode?: string; // Coupon code applied by user (for affiliate attribution)
   affiliateId?: string; // Affiliate user ID (resolved from coupon)
 }
@@ -67,12 +72,14 @@ export interface PaymentVerificationResponse {
 /**
  * Create a Razorpay order
  */
-export const createPaymentOrder = async (payload: CreateOrderPayload): Promise<CreateOrderResponse> => {
+export const createPaymentOrder = async (
+  payload: CreateOrderPayload,
+): Promise<CreateOrderResponse> => {
   try {
     const response = await axios.post<APIResponse<CreateOrderResponse>>(
       `${API.domain}/api/payment/create-order`,
       payload,
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     if (response.data.success) {
@@ -83,7 +90,11 @@ export const createPaymentOrder = async (payload: CreateOrderPayload): Promise<C
   } catch (error: any) {
     console.error("Error creating payment order:", error);
     // Propagate specific error message if available
-    const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || "Failed to create order";
+    const errorMessage =
+      error.response?.data?.error ||
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to create order";
     throw new Error(errorMessage);
   }
 };
@@ -91,12 +102,14 @@ export const createPaymentOrder = async (payload: CreateOrderPayload): Promise<C
 /**
  * Verify payment after Razorpay callback
  */
-export const verifyPayment = async (payload: VerifyPaymentPayload): Promise<PaymentVerificationResponse> => {
+export const verifyPayment = async (
+  payload: VerifyPaymentPayload,
+): Promise<PaymentVerificationResponse> => {
   try {
     const response = await axios.post<APIResponse<PaymentVerificationResponse>>(
       `${API.domain}/api/payment/verify`,
       payload,
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     if (response.data.success) {
@@ -106,14 +119,22 @@ export const verifyPayment = async (payload: VerifyPaymentPayload): Promise<Paym
     throw new Error(response.data.message || "Payment verification failed");
   } catch (error: any) {
     console.error("Error verifying payment:", error);
-    throw new Error(error.response?.data?.message || error.message || "Payment verification failed");
+    throw new Error(
+      error.response?.data?.message ||
+        error.message ||
+        "Payment verification failed",
+    );
   }
 };
 
 /**
  * Report payment failure
  */
-export const reportPaymentFailure = async (orderId: string, errorCode: string, errorDescription: string) => {
+export const reportPaymentFailure = async (
+  orderId: string,
+  errorCode: string,
+  errorDescription: string,
+) => {
   try {
     await axios.post(
       `${API.domain}/api/payment/failed`,
@@ -122,7 +143,7 @@ export const reportPaymentFailure = async (orderId: string, errorCode: string, e
         error_code: errorCode,
         error_description: errorDescription,
       },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   } catch (error) {
     console.error("Error reporting payment failure:", error);
@@ -133,7 +154,9 @@ export const reportPaymentFailure = async (orderId: string, errorCode: string, e
  * Simulate payment success (Development Only)
  * Uses the existing /verify endpoint with devMode: true
  */
-export const simulatePayment = async (orderId: string): Promise<PaymentVerificationResponse> => {
+export const simulatePayment = async (
+  orderId: string,
+): Promise<PaymentVerificationResponse> => {
   try {
     const response = await axios.post<APIResponse<PaymentVerificationResponse>>(
       `${API.domain}/api/payment/verify`,
@@ -143,7 +166,7 @@ export const simulatePayment = async (orderId: string): Promise<PaymentVerificat
         razorpay_signature: "simulated_signature",
         devMode: true,
       },
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     if (response.data.success) {
@@ -153,7 +176,11 @@ export const simulatePayment = async (orderId: string): Promise<PaymentVerificat
     throw new Error(response.data.message || "Payment simulation failed");
   } catch (error: any) {
     console.error("Error simulating payment:", error);
-    throw new Error(error.response?.data?.message || error.message || "Payment simulation failed");
+    throw new Error(
+      error.response?.data?.message ||
+        error.message ||
+        "Payment simulation failed",
+    );
   }
 };
 
@@ -164,7 +191,7 @@ export const getPaymentStatus = async (orderId: string) => {
   try {
     const response = await axios.get<APIResponse<any>>(
       `${API.domain}/api/payment/status/${orderId}`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     if (response.data.success) {
@@ -185,7 +212,7 @@ export const getUserPayments = async (userId: string, page = 1, limit = 10) => {
   try {
     const response = await axios.get<APIResponse<any>>(
       `${API.domain}/api/payment/user/${userId}?page=${page}&limit=${limit}`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     if (response.data.success) {
@@ -232,15 +259,29 @@ export interface RazorpayCheckoutOptions {
   userPhone?: string;
   spaceName: string;
   planName: string;
-  onSuccess: (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => void;
-  onFailure: (error: { code: string; description: string; source: string; step: string; reason: string }) => void;
+  onSuccess: (response: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }) => void;
+  onFailure: (error: {
+    code: string;
+    description: string;
+    source: string;
+    step: string;
+    reason: string;
+  }) => void;
   onDismiss: () => void;
 }
 
-export const openRazorpayCheckout = async (options: RazorpayCheckoutOptions): Promise<void> => {
+export const openRazorpayCheckout = async (
+  options: RazorpayCheckoutOptions,
+): Promise<void> => {
   const scriptLoaded = await loadRazorpayScript();
   if (!scriptLoaded) {
-    throw new Error("Failed to load Razorpay SDK. Please check your internet connection.");
+    throw new Error(
+      "Failed to load Razorpay SDK. Please check your internet connection.",
+    );
   }
 
   const razorpayOptions = {

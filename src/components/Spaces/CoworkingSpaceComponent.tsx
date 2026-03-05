@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, Wifi, Coffee, Printer, Monitor, Shield, Calendar, ChevronLeft, ChevronRight, ArrowLeft, Users, Clock } from 'lucide-react';
 import Header from "@/components/Header";
@@ -123,7 +123,7 @@ const CoworkingSpaceComponent = () => {
         <Header />
         <main className="relative flex-grow bg-white pt-20 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-red-500 text-xl mb-4">😕 {error || "Space not found"}</p>
+            <p className="text-red-500 text-xl mb-4">≡ƒÿò {error || "Space not found"}</p>
             <button
               onClick={() => navigate(-1)}
               className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition"
@@ -164,7 +164,7 @@ const CoworkingSpaceComponent = () => {
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className="text-2xl md:text-3xl font-bold font-geist leading-tight">{spaceDetails.name}</h1>
                   {spaceDetails.popular && (
-                    <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap">🔥 Popular</span>
+                    <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap">≡ƒöÑ Popular</span>
                   )}
                 </div>
 
@@ -175,7 +175,7 @@ const CoworkingSpaceComponent = () => {
                     <span className="text-gray-400">({spaceDetails.reviews} reviews)</span>
                   </div>
 
-                  <span className="hidden sm:inline text-gray-300">•</span>
+                  <span className="hidden sm:inline text-gray-300">ΓÇó</span>
 
                   <div className="flex items-center gap-1.5 align-middle">
                     <MapPin className="w-4 h-4 flex-shrink-0 text-gray-500" />
@@ -184,7 +184,7 @@ const CoworkingSpaceComponent = () => {
 
                   {spaceDetails.type && (
                     <>
-                      <span className="hidden sm:inline text-gray-300">•</span>
+                      <span className="hidden sm:inline text-gray-300">ΓÇó</span>
                       <span className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full">
                         {spaceDetails.type}
                       </span>
@@ -256,7 +256,7 @@ const CoworkingSpaceComponent = () => {
                   {spaceDetails.availability && (
                     <span className={`block mt-2 font-medium ${spaceDetails.availability === 'Unavailable' ? 'text-red-500' : 'text-green-600'
                       }`}>
-                      {spaceDetails.availability === 'Unavailable' ? '✕ Unavailable' : `✓ ${spaceDetails.availability}`}
+                      {spaceDetails.availability === 'Unavailable' ? 'Γ£ò Unavailable' : `Γ£ô ${spaceDetails.availability}`}
                     </span>
                   )}
                 </p>
@@ -297,14 +297,14 @@ const CoworkingSpaceComponent = () => {
                 {/* Price Display */}
                 <div className="flex justify-between items-end mb-6">
                   <div>
-                    <span className="text-3xl font-bold">₹{getTotalPrice()}</span>
+                    <span className="text-3xl font-bold">Γé╣{getTotalPrice()}</span>
                     <span className="text-gray-500 text-lg"> / month</span>
                     {deskCount > 1 && (
                       <p className="text-sm text-gray-400">for {deskCount} desks</p>
                     )}
                   </div>
                   <div className="flex items-center gap-1 text-sm">
-                    <span>⭐</span>
+                    <span>Γ¡É</span>
                     <span className="font-semibold">{spaceDetails.rating}</span>
                   </div>
                 </div>
@@ -312,7 +312,7 @@ const CoworkingSpaceComponent = () => {
                 {/* Per Desk Price Tag */}
                 <div className="bg-gray-50 rounded-lg p-3 mb-6 text-center">
                   <span className="text-sm text-gray-600">Starting at </span>
-                  <span className="font-bold text-lg">₹{getMonthlyPrice()}</span>
+                  <span className="font-bold text-lg">Γé╣{getMonthlyPrice()}</span>
                   <span className="text-sm text-gray-600"> /desk/month</span>
                 </div>
 
@@ -419,12 +419,12 @@ const CoworkingSpaceComponent = () => {
                 {/* Price Breakdown */}
                 <div className="border-t pt-4 mb-4 space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">₹{getMonthlyPrice()} × {deskCount} desk{deskCount > 1 ? 's' : ''}</span>
-                    <span>₹{getTotalPrice()}</span>
+                    <span className="text-gray-600">Γé╣{getMonthlyPrice()} ├ù {deskCount} desk{deskCount > 1 ? 's' : ''}</span>
+                    <span>Γé╣{getTotalPrice()}</span>
                   </div>
                   <div className="flex justify-between font-bold text-base pt-2 border-t">
                     <span>Total</span>
-                    <span>₹{getTotalPrice()}/month</span>
+                    <span>Γé╣{getTotalPrice()}/month</span>
                   </div>
                 </div>
 

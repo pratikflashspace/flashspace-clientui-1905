@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, Wifi, Coffee, Printer, Monitor, Shield, ArrowLeft, ChevronLeft, ChevronRight, Users, MessageCircle, CheckCircle2, Clock } from 'lucide-react';
 import Header from "@/components/Header";
@@ -175,7 +175,7 @@ const SpaceComponent = () => {
                 </div>
 
                 {/* Separator dot - hidden on small mobile if needed, but useful */}
-                <span className="hidden sm:inline text-gray-300">•</span>
+                <span className="hidden sm:inline text-gray-300">ΓÇó</span>
 
                 {/* Address */}
                 <div className="flex items-start sm:items-center gap-1.5 max-w-xl">
@@ -380,11 +380,11 @@ const SpaceComponent = () => {
             <div className="sticky top-24 border dark:border-white/10 rounded-xl shadow-xl dark:shadow-none p-6 bg-white dark:bg-[#1f1f1f] z-10 transition-colors duration-300">
               <div className="flex justify-between items-end mb-6">
                 <div>
-                  <span className="text-2xl font-bold text-black dark:text-white">₹{getPrice()}</span>
+                  <span className="text-2xl font-bold text-black dark:text-white">Γé╣{getPrice()}</span>
                   <span className="text-gray-500 dark:text-gray-400"> / year</span>
                 </div>
                 <div className="flex items-center gap-1 text-sm dark:text-gray-300">
-                  <span>⭐</span>
+                  <span>Γ¡É</span>
                   <span className="font-semibold">{spaceDetails.rating}</span>
                 </div>
               </div>
@@ -399,7 +399,7 @@ const SpaceComponent = () => {
                   >
                     <div className="flex justify-between items-center text-black dark:text-white">
                       <span className="font-semibold">{plan.name}</span>
-                      <span className="font-bold">₹{plan.yearlyPrice}/year</span>
+                      <span className="font-bold">Γé╣{plan.yearlyPrice}/year</span>
                     </div>
                     <ul className="mt-2 text-xs text-gray-500 dark:text-gray-400 list-disc pl-4">
                       {plan.features.map((f, i) => <li key={i}>{f}</li>)}

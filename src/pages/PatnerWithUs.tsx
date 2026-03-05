@@ -125,7 +125,7 @@ const PartnerWithUs = () => {
       console.error("Partnership submission error:", error);
       toast.error(
         error.message ||
-          "Failed to submit partnership request. Please try again.",
+        "Failed to submit partnership request. Please try again.",
       );
     } finally {
       setIsSubmitting(false);
@@ -385,25 +385,25 @@ const PartnerWithUs = () => {
         </section>
 
         {/* Partner Form Section - Column Layout matching image */}
-        <section className="py-24 lg:py-32 illustrated-bg" id="partner-form">
+        <section className="py-24 lg:py-32 organic-bg" id="partner-form">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="grid lg:grid-cols-[1fr,1.2fr] gap-16 lg:gap-24 items-start">
               {/* Left Column */}
               <motion.div
-                initial={{ opacity: 0, x: -40 }}
+                initial={{ opacity: 1, x: 10 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                <h2 className="text-4xl lg:text-5xl font-bold text-[#1A1A1A] tracking-tight mb-6">
+                <h2 className="text-5xl lg:text-7xl font-bold text-[#1a2d1d] tracking-tight mb-6">
                   List your space today
                 </h2>
-                <p className="text-slate-500 text-lg mb-12">
-                  Fill in your details and our partnership team will get in
-                  touch within 24 hours.
+                <p className="text-[#334d3d] text-xl lg:text-2xl leading-relaxed mb-12">
+                  Fill in your details and our partnership team will get in touch
+                  within 24 hours.
                 </p>
 
-                <div className="space-y-6 mb-12">
+                <div className="space-y-6 mb-16">
                   {[
                     "Zero listing fees — we only earn when you do",
                     "Full control over pricing and availability",
@@ -416,12 +416,12 @@ const PartnerWithUs = () => {
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
-                      className="flex items-center gap-4"
+                      className="flex items-center gap-5"
                     >
-                      <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center shrink-0">
-                        <CheckCircle2 className="w-4 h-4 text-[#334d3d]" />
+                      <div className="w-7 h-7 rounded-full border-[#1a2d1d]/30 border flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-4 h-4 text-[#1a2d1d]" />
                       </div>
-                      <span className="text-slate-700 font-medium">
+                      <span className="text-lg text-[#1a2d1d] font-medium">
                         {point}
                       </span>
                     </motion.div>
@@ -443,12 +443,12 @@ const PartnerWithUs = () => {
                   ].map((s) => (
                     <div
                       key={s.label}
-                      className="bg-yellow-50 rounded-2xl p-8 text-center"
+                      className="bg-[#FEFCE8] rounded-[2rem] p-8 text-center flex flex-col justify-center items-center shadow-sm"
                     >
-                      <div className="text-3xl font-bold text-[#1A1A1A] mb-1">
+                      <div className="text-3xl font-bold text-[#334d3d] mb-1">
                         {s.value}
                       </div>
-                      <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">
+                      <div className="text-sm text-[#334d3d] font-medium leading-tight">
                         {s.label}
                       </div>
                     </div>
@@ -458,22 +458,22 @@ const PartnerWithUs = () => {
 
               {/* Right Column - Form Container */}
               <motion.div
-                initial={{ opacity: 0, y: 60, scale: 0.95 }}
+                initial={{ opacity: 1, y: 20, scale: 1 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="glass-card border border-border rounded-3xl p-8 lg:p-12 shadow-sm relative overflow-hidden"
+                className="bg-white border border-black/20 rounded-[2.5rem] p-8 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden"
               >
                 {/* Subtle Form Background Glow */}
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#334d3d]/[0.03] blur-[60px] rounded-full pointer-events-none" />
+                {/* <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#334d3d]/[0.03] blur-[60px] rounded-full pointer-events-none" /> */}
 
                 <form
                   onSubmit={handleSubmit}
-                  className="space-y-6 relative z-10"
+                  className="space-y-6 relative z-10  "
                 >
                   <div className="grid sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">
+                    <div className="space-y-2.5">
+                      <label className="text-base font-semibold text-[#1A1A1A]">
                         Your Name
                       </label>
                       <Input
@@ -483,11 +483,11 @@ const PartnerWithUs = () => {
                         }
                         placeholder="John Doe"
                         required
-                        className="h-12 bg-slate-50/50 border-none rounded-xl focus:ring-1 focus:ring-slate-200"
+                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">
+                    <div className="space-y-2.5">
+                      <label className="text-base font-semibold text-[#1A1A1A]">
                         Email
                       </label>
                       <Input
@@ -498,14 +498,14 @@ const PartnerWithUs = () => {
                         }
                         placeholder="john@workspace.com"
                         required
-                        className="h-12 bg-slate-50/50 border-none rounded-xl focus:ring-1 focus:ring-slate-200"
+                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
                       />
                     </div>
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">
+                    <div className="space-y-2.5">
+                      <label className="text-base font-semibold text-[#1A1A1A]">
                         Phone
                       </label>
                       <Input
@@ -516,11 +516,11 @@ const PartnerWithUs = () => {
                         }
                         placeholder="+91 98765 43210"
                         required
-                        className="h-12 bg-slate-50/50 border-none rounded-xl focus:ring-1 focus:ring-slate-200"
+                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">
+                    <div className="space-y-2.5">
+                      <label className="text-base font-semibold text-[#1A1A1A]">
                         Space Name
                       </label>
                       <Input
@@ -533,13 +533,13 @@ const PartnerWithUs = () => {
                         }
                         placeholder="Your Workspace Name"
                         required
-                        className="h-12 bg-slate-50/50 border-none rounded-xl focus:ring-1 focus:ring-slate-200"
+                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">
+                  <div className="space-y-2.5">
+                    <label className="text-base font-semibold text-[#1A1A1A]">
                       City
                     </label>
                     <Input
@@ -549,12 +549,12 @@ const PartnerWithUs = () => {
                       }
                       placeholder="e.g. Delhi, Mumbai, Bangalore"
                       required
-                      className="h-12 bg-slate-50/50 border-none rounded-xl focus:ring-1 focus:ring-slate-200"
+                      className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">
+                  <div className="space-y-2.5">
+                    <label className="text-base font-semibold text-[#1A1A1A]">
                       Message (optional)
                     </label>
                     <Textarea
@@ -564,16 +564,22 @@ const PartnerWithUs = () => {
                       }
                       placeholder="Tell us about your space..."
                       rows={5}
-                      className="bg-slate-50/50 border-none rounded-xl focus:ring-1 focus:ring-slate-200 p-4"
+                      className="bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all p-4 placeholder:text-slate-400"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-[#334d3d] text-white hover:bg-[#26392d] h-14 rounded-2xl font-semibold shadow-lg transition-all duration-300"
+                    className="w-full bg-[#334d3d] text-[#FDE68A] hover:bg-[#26392d] h-16 rounded-2xl font-bold text-lg shadow-xl shadow-[#334d3d]/20 transition-all duration-300 flex items-center justify-center gap-2"
                   >
-                    {isSubmitting ? "Submitting..." : "Submit Application →"}
+                    {isSubmitting ? (
+                      "Submitting..."
+                    ) : (
+                      <>
+                        Submit Application <ArrowRight className="w-5 h-5" />
+                      </>
+                    )}
                   </Button>
                 </form>
               </motion.div>

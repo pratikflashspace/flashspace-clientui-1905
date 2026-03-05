@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import {
@@ -10,19 +10,12 @@ import {
   Users,
   Bell,
   Settings as SettingsIcon,
-  MoreHorizontal,
-  LayoutDashboard,
-  LogOut,
   Building,
   Building2,
   MapPin,
   Zap,
-  ChevronDown,
   Check,
   Tag,
-  Gift,
-  ChevronRight,
-  Coffee
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -212,25 +205,22 @@ const UpdatesPopup = ({
 
 const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
   const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const menuScrollRef = useRef<HTMLDivElement>(null);
   const [showUpdates, setShowUpdates] = useState(false);
-  const [isWorkspacesOpen, setIsWorkspacesOpen] = useState(false);
-
-  const solutions = [
-    { label: "Virtual Office", href: "/services/virtual-office", icon: Building },
-    { label: "Coworking Space", href: "/services/coworking-space", icon: Briefcase },
-    { label: "On Demand", href: "/services/on-demand", icon: Zap },
-    { label: "Event Spaces", href: "/services/event-spaces", icon: MapPin },
-  ];
 
   const primaryTop = [
     { label: "Start Chatting", href: "/start-chatting", icon: MessageCircle },
-    { label: "Business Setup", href: "/Solutions/business-setup", icon: FileText }
   ];
 
   const middle = [
     { label: "Your Bookings", href: "/dashboard/my-bookings", icon: Calendar },
-    { label: "Flash Tribe", href: "/community", icon: Users }
+  ];
+
+  const onDemandShortcuts = [
+    { label: "On Demand", href: "/solutions/on-demand", icon: Zap },
+    { label: "Day Passes", href: "/solutions/day-passes", icon: Calendar },
+    { label: "Meeting Rooms", href: "/solutions/meeting-rooms", icon: Users },
   ];
 
   const footer = [
@@ -241,6 +231,27 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
 
   useEffect(() => {
     if (!isOpen && showUpdates) setShowUpdates(false);
+  }, [isOpen, showUpdates]);
+
+  useEffect(() => {
+    if (!isOpen || showUpdates) return;
+
+    const onWheel = (event: WheelEvent) => {
+      const container = menuScrollRef.current;
+      if (!container) return;
+
+      const target = event.target as Node;
+      const isInsideSidebar = container.contains(target);
+
+      if (isInsideSidebar) {
+        container.scrollTop += event.deltaY;
+      }
+
+      event.preventDefault();
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
   }, [isOpen, showUpdates]);
 
   // Close both Sidebar & Updates
@@ -263,6 +274,13 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
       navigate(href);
     }
     onClose();
+  };
+
+  const handleSidebarWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+    const container = menuScrollRef.current;
+    if (!container) return;
+    event.preventDefault();
+    container.scrollBy({ top: event.deltaY, behavior: "auto" });
   };
 
   // ESC closes both
@@ -295,12 +313,12 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
       className={`fixed inset-0 z-[12000] overflow-hidden transition-opacity duration-300 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
     >
-      {/* Overlay click closes both, NO blur or dark background */}
+      {/* Overlay click closes both */}
       <div
         onClick={closeBoth}
         className="absolute inset-0"
         style={{
-          background: "transparent",
+          background: "rgba(0,0,0,0.25)",
           cursor: "pointer"
         }}
       />
@@ -310,8 +328,10 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
 
       {/* Sidebar */}
       <div
-        className="relative z-20 h-full bg-white dark:bg-[#0a0a0a] text-black dark:text-white border-r border-neutral-200 dark:border-white/10 shadow-xl transform transition-transform duration-300 ease-out overflow-hidden font-geist flex flex-col"
+        className="relative z-20 h-full bg-[#f3f4f3] dark:bg-[#0f0f0f] text-black dark:text-white border-r border-neutral-200 dark:border-white/10 shadow-2xl transform transition-transform duration-300 ease-out overflow-hidden flex flex-col"
         style={{
+          fontFamily: "'Inter Tight', sans-serif",
+          fontWeight: 500,
           width: showUpdates ? 0 : `${MENU_WIDTH_OPEN}px`,
           minWidth: showUpdates ? 0 : `${MENU_WIDTH_OPEN}px`,
           maxWidth: showUpdates ? 0 : `${MENU_WIDTH_OPEN}px`,
@@ -322,7 +342,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
       >
         {/* Header */}
         {!hideLogoFooter && (
-          <div className="flex items-center justify-between p-5 border-b border-neutral-200 dark:border-white/10" style={{ minHeight: 64 }}>
+          <div className="flex items-center justify-between p-5 border-b border-neutral-200/80 dark:border-white/10" style={{ minHeight: 64 }}>
             <img
               src="/Logo/Flashspace Logo.png"
               alt="FlashSpace Logo"
@@ -341,7 +361,9 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
 
         {/* Menu items */}
         <div
-          className="flex-1 overflow-y-auto pb-32 flex flex-col overscroll-contain touch-pan-y min-h-0"
+          ref={menuScrollRef}
+          onWheel={handleSidebarWheel}
+          className="flex-1 overflow-y-auto pb-32 flex flex-col overscroll-contain touch-pan-y min-h-0 scroll-smooth"
         >
           <div className="p-5 space-y-2 text-sm tracking-wide flex-1">
             <nav className="space-y-2">
@@ -351,9 +373,9 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
                   key={item.label}
                   onClick={() => handleNavigation(item.href, item.label)}
                   className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
-                    } py-2 px-2 text-[13px] font-medium text-black dark:text-white hover:text-yellow-600 dark:hover:text-[#EDB003] rounded hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 font-poppins`}
+                    } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FDE68A] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
                 >
-                  <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-yellow-600 dark:group-hover:text-[#EDB003] transition-colors duration-300" />
+                  <item.icon className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
                   {!iconOnly && <span>{item.label}</span>}
                 </button>
               ))}
@@ -364,13 +386,28 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
               <button
                 onClick={() => handleNavigation("/services/virtual-office", "Get Workspaces")}
                 className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
-                  } py-2 px-2 text-[13px] font-medium text-black dark:text-white hover:text-yellow-600 dark:hover:text-[#EDB003] rounded hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 font-poppins`}
+                  } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FDE68A] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
               >
-                <Building className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-yellow-600 dark:group-hover:text-[#EDB003] transition-colors duration-300" />
+                <Building className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
                 {!iconOnly && <span>Get Workspaces</span>}
               </button>
 
-              <div className="h-px bg-neutral-300 my-3" />
+              {!iconOnly && (
+                <div className="pl-3 mt-1 space-y-1">
+                  {onDemandShortcuts.map((item) => (
+                    <button
+                      key={item.label}
+                      onClick={() => handleNavigation(item.href, item.label)}
+                      className="group w-full flex items-center gap-2 text-left py-1.5 px-2 rounded-lg text-[13px] font-medium text-[#5b6b66] dark:text-slate-300 hover:text-[#2D3F33] dark:hover:text-[#FDE68A] hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300"
+                    >
+                      <item.icon className="w-4 h-4 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* <div className="h-px bg-neutral-300 my-3" /> */}
 
               {/* Middle Items */}
               {middle.map((item) => (
@@ -378,9 +415,9 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
                   key={item.label}
                   onClick={() => handleNavigation(item.href, item.label)}
                   className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
-                    } py-2 px-2 text-[13px] font-medium text-black dark:text-white hover:text-yellow-600 dark:hover:text-[#EDB003] rounded hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 font-poppins`}
+                    } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FDE68A] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
                 >
-                  <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-yellow-600 dark:group-hover:text-[#EDB003] transition-colors duration-300" />
+                  <item.icon className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
                   {!iconOnly && <span>{item.label}</span>}
                 </button>
               ))}
@@ -393,9 +430,9 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
                   key={item.label}
                   onClick={() => handleNavigation(item.href, item.label)}
                   className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
-                    } py-2 px-2 text-[13px] font-medium text-black dark:text-white hover:text-yellow-600 dark:hover:text-[#EDB003] rounded hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 font-poppins`}
+                    } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FDE68A] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
                 >
-                  <item.icon className="w-5 h-5 text-gray-600 dark:text-gray-400 group-hover:text-yellow-600 dark:group-hover:text-[#EDB003] transition-colors duration-300" />
+                  <item.icon className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
                   {!iconOnly && <span>{item.label}</span>}
                 </button>
               ))}
@@ -405,119 +442,14 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
             {!hideLogoFooter && (
               <>
                 {/* User Profile Section - Only for Authenticated Users */}
-                {isAuthenticated ? (
-                  <div className="mb-4">
-                    {/* User Profile Card */}
-                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800 shadow-sm">
-                      <div className="flex items-center gap-3 mb-3">
-                        {/* Avatar */}
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
-                          {user?.fullName?.charAt(0).toUpperCase() || 'U'}
-                        </div>
-                        {/* User Info */}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate font-poppins">
-                            {user?.fullName || 'User Account'}
-                          </p>
-                          <p className="text-xs text-gray-600 dark:text-gray-400 truncate font-geist">
-                            {user?.email || 'user@example.com'}
-                          </p>
-                          <div className="mt-1">
-                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${user?.role === 'partner' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'}`}>
-                              {user?.role}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="space-y-2">
-                        {user?.role === 'admin' && (
-                          <button
-                            onClick={() => handleNavigation("/admin")}
-                            className="w-full rounded-lg bg-purple-600 text-white font-semibold py-2.5 text-sm hover:bg-purple-700 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm font-poppins"
-                          >
-                            <LayoutDashboard className="w-4 h-4" />
-                            Admin Dashboard
-                          </button>
-                        )}
-
-                        {(user?.role === 'partner' || user?.role === 'affiliate') && (
-                          <button
-                            onClick={() => handleNavigation(user?.role === 'partner' ? "/spaceportal" : "/affiliate-portal")}
-                            className="w-full rounded-lg bg-amber-500 text-white font-semibold py-2.5 text-sm hover:bg-amber-600 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm font-poppins"
-                          >
-                            <Building className="w-4 h-4" />
-                            {user?.role === 'partner' ? "Your Space Portal" : "Affiliate Portal"}
-                          </button>
-                        )}
-
-                        <button
-                          onClick={() => handleNavigation("/dashboard")}
-                          className="w-full rounded-lg bg-teal-600 text-white font-semibold py-2.5 text-sm hover:bg-teal-700 active:scale-[0.98] transition flex items-center justify-center gap-2 shadow-sm font-poppins"
-                        >
-                          <LayoutDashboard className="w-4 h-4" />
-                          User Dashboard
-                        </button>
-
-                        <button
-                          onClick={async () => {
-                            await logout();
-                            closeBoth();
-                            navigate("/");
-                          }}
-                          className="w-full rounded-lg border-2 border-red-200 text-red-600 font-semibold py-2.5 text-sm hover:bg-red-600 hover:text-white hover:border-red-600 active:scale-[0.98] transition flex items-center justify-center gap-2 font-poppins"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          Logout
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  // Not Authenticated - Show Logo and Login
-                  <>
-                    <div className="flex items-center justify-center py-4">
-                      <div className="w-20 h-20 rounded-full border-2 border-gray-300 dark:border-white/10 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden bg-white dark:bg-black/20 flex items-center justify-center">
-                        <img
-                          src="/Logo/FlashSpace Favicon.png"
-                          alt="FlashSpace Favicon"
-                          className="w-full h-full object-contain p-2"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-3 pt-2">
-                      <button
-                        onClick={() => handleNavigation("#contact")}
-                        className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition font-poppins"
-                      >
-                        Get Consultation
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          onOpenLogin();
-                          closeBoth();
-                        }}
-                        className="w-full rounded-md border border-neutral-600 dark:border-white/30 text-black dark:text-white py-2 text-sm hover:bg-yellow-400 hover:text-black dark:hover:bg-[#EDB003] dark:hover:text-black active:scale-[0.98] transition font-poppins font-semibold"
-                      >
-                        Log in
-                      </button>
-                    </div>
-                  </>
-                )}
-
-                {/* Get Consultation Button - Always Show for Authenticated Users */}
-                {isAuthenticated && (
-                  <div className="mt-3">
-                    <button
-                      onClick={() => handleNavigation("#contact")}
-                      className="w-full rounded-md bg-yellow-400 text-black font-semibold py-2 text-sm hover:bg-yellow-300 active:scale-[0.98] transition font-poppins"
-                    >
-                      Get Consultation
-                    </button>
-                  </div>
-                )}
+                <div className="mt-3">
+                  <button
+                    onClick={() => handleNavigation("#contact")}
+                    className="w-full rounded-[20px] bg-[#e8e2ad] text-[#253734] font-medium py-3 text-[15px] hover:bg-[#e2da99] active:scale-[0.98] transition shadow-sm"
+                  >
+                    Get Consultation
+                  </button>
+                </div>
               </>
             )}
           </div>

@@ -10,6 +10,7 @@ import {
   Building2,
   Star,
   Mail,
+  ShieldCheck,
 } from "lucide-react";
 
 export const sidebarConfig = [
@@ -43,6 +44,13 @@ export const sidebarConfig = [
     path: "/spaceportal/active-requests",
 
     icon: FileText,
+  },
+  {
+    label: "KYC Verification",
+
+    path: "/spaceportal/kyc-verification",
+
+    icon: ShieldCheck,
   },
 
   {
@@ -97,8 +105,6 @@ export const sidebarConfig = [
     icon: Ticket,
   },
 
-
-
   {
     label: "Space Management",
 
@@ -114,6 +120,4 @@ export const sidebarConfig = [
 
     icon: Users,
   },
-
-
 ];

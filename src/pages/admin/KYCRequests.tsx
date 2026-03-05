@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { adminService } from "@/services/admin.service";
 import {
   Search,
@@ -55,11 +55,11 @@ interface KYCRequest {
     panNumber?: string;
   };
   overallStatus:
-  | "pending"
-  | "approved"
-  | "rejected"
-  | "resubmit"
-  | "not_started";
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "resubmit"
+    | "not_started";
   documents: KYCDocument[];
   progress?: number;
   createdAt: string;
@@ -838,151 +838,6 @@ export default function KYCRequests() {
             )}
           </div>
         </div>
-      ) : viewMode === "user_business" ? (
-        /* Business Info View */
-        <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-100 flex items-center gap-4">
-            <button
-              onClick={handleBackToRequests}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
-            </button>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">
-                Business Profiles
-              </h2>
-              <p className="text-gray-500 text-sm">
-                Managing business profiles for {selectedUserForBusiness?.name}
-              </p>
-            </div>
-          </div>
-
-          <div className="p-6">
-            {(() => {
-              const profiles = Array.isArray(businessInfo)
-                ? businessInfo
-                : [businessInfo];
-
-              if (profiles.length === 0) {
-                return (
-                  <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                    <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500 font-medium">
-                      No business profiles found.
-                    </p>
-                  </div>
-                );
-              }
-
-              return (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {profiles.map((profile: any, index: number) => {
-                    // console.log("Rendering profile:", profile);
-                    return (
-                      <div
-                        key={profile._id || index}
-                        className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col"
-                      >
-                        {/* Card Header */}
-                        <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-white flex justify-between items-start">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
-                              <Building2 className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <h4 className="font-bold text-gray-900 line-clamp-1">
-                                {profile.companyName || "N/A"}
-                              </h4>
-                              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-                                {profile.profileName || "Business Profile"}
-                              </p>
-                            </div>
-                          </div>
-                          {getStatusBadge(profile.status || "pending")}
-                        </div>
-
-                        {/* Card Body */}
-                        <div className="p-5 space-y-4 flex-1">
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                              <span className="text-xs font-medium text-gray-500 uppercase">
-                                GST Number
-                              </span>
-                              <span className="text-sm font-medium text-gray-900 font-mono">
-                                {profile.gstNumber || "N/A"}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                              <span className="text-xs font-medium text-gray-500 uppercase">
-                                PAN Number
-                              </span>
-                              <span className="text-sm font-medium text-gray-900 font-mono">
-                                {profile.panNumber || "N/A"}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                              <span className="text-xs font-medium text-gray-500 uppercase">
-                                CIN Number
-                              </span>
-                              <span className="text-sm font-medium text-gray-900 font-mono">
-                                {profile.cinNumber || "N/A"}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-xs font-medium text-gray-500 uppercase block mb-1">
-                                Company Type
-                              </span>
-                              <span className="text-sm font-medium text-gray-900">
-                                {profile.companyType || "N/A"}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-xs font-medium text-gray-500 uppercase block mb-1">
-                                Registered Address
-                              </span>
-                              <span
-                                className="text-sm text-gray-700 block line-clamp-2"
-                                title={profile.registeredAddress}
-                              >
-                                {profile.registeredAddress || "N/A"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card Footer */}
-                        <div className="p-4 bg-gray-50 border-t border-gray-100 mt-auto flex items-center justify-between">
-                          <div className="text-xs text-gray-400">
-                            Updated:{" "}
-                            {new Date(
-                              profile.updatedAt || Date.now(),
-                            ).toLocaleDateString()}
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // console.log(
-                              //   "Navigating to business detail:",
-                              //   profile._id,
-                              // );
-                              navigate(
-                                `/admin/kyc-requests/${profile._id}?type=business`,
-                              );
-                            }}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700"
-                          >
-                            View Details
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
-          </div>
-        </div>
       ) : (
         /* Main Tab View */
         <div className="space-y-6">
@@ -1202,7 +1057,7 @@ export default function KYCRequests() {
                               {request.documents?.length || 0})
                             </h4>
                             {request.documents &&
-                              request.documents.length > 0 ? (
+                            request.documents.length > 0 ? (
                               <div className="space-y-2">
                                 {request.documents.map((doc, idx) => (
                                   <div
@@ -1327,7 +1182,7 @@ export default function KYCRequests() {
                               </p>
                               {request.phone && (
                                 <p className="text-xs text-blue-600 font-medium truncate mt-0.5">
-                                  📞 {request.phone}
+                                  ≡ƒô₧ {request.phone}
                                 </p>
                               )}
                             </div>
@@ -1654,11 +1509,15 @@ export default function KYCRequests() {
                         controls
                         controlsList="nodownload"
                         className="max-w-full max-h-96 mx-auto rounded-lg shadow-md"
-                        onLoadStart={() => { /* console.log("Video loading started") */ }}
+                        onLoadStart={() => {
+                          /* console.log("Video loading started") */
+                        }}
                         onLoadedMetadata={() => {
                           /* console.log("Video metadata loaded") */
                         }}
-                        onCanPlay={() => { /* console.log("Video can play") */ }}
+                        onCanPlay={() => {
+                          /* console.log("Video can play") */
+                        }}
                         onError={(e) => {
                           console.error("Video load error:", e);
                           console.error("Video URL:", selectedDocument.fileUrl);

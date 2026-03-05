@@ -74,3 +74,4 @@ export default function Sidebar() {
     </aside>
   );
 }
+export { default } from "@/components/SpacePartner/sidebar/Sidebar";

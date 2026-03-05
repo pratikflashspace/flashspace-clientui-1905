@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -104,7 +104,7 @@ export const SinglePostPage = () => {
               Post not found
             </h1>
             <Link to="/blog" className="text-primary hover:underline">
-              ← Back to Blog
+              ΓåÉ Back to Blog
             </Link>
           </div>
         </main>
@@ -136,7 +136,7 @@ export const SinglePostPage = () => {
                 <span className="text-white/80 text-xs sm:text-sm">
                   {post.date}
                 </span>
-                <span className="text-white/60 text-xs sm:text-sm">•</span>
+                <span className="text-white/60 text-xs sm:text-sm">ΓÇó</span>
                 <span className="text-white/80 text-xs sm:text-sm">
                   {post.readTime}
                 </span>
@@ -199,7 +199,7 @@ export const SinglePostPage = () => {
                           {p.title}
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {p.author} • {p.date}
+                          {p.author} ΓÇó {p.date}
                         </p>
                       </Link>
                     ))}
@@ -529,7 +529,7 @@ const Blog = () => {
                     >
                       {featuredPost.category}
                     </span>
-                    <span className="text-muted-foreground">•</span>
+                    <span className="text-muted-foreground">ΓÇó</span>
                     <span className="text-muted-foreground">
                       {featuredPost.date}
                     </span>
@@ -612,7 +612,7 @@ const Blog = () => {
                           className="text-sm font-medium hover:underline"
                           style={{ color: "hsl(var(--chart-4))" }}
                         >
-                          Read →
+                          Read ΓåÆ
                         </Link>
                       </div>
                     </div>
