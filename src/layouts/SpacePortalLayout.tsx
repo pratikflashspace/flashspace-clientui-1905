@@ -162,7 +162,7 @@ export default function SpacePortalLayout() {
   const makeTitle = (lead: string, highlight?: string) =>
     highlight ? (
       <>
-        {lead} <span className="text-[#3FA69E]">{highlight}</span>
+        {lead} <span className="text-[#2D3F33] dark:text-[#FDE68A]">{highlight}</span>
       </>
     ) : (
       lead

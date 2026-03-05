@@ -12,6 +12,36 @@ interface ApiResponse<T> {
   message?: string;
 }
 
+const isBadImageUrl = (url?: string) => {
+  if (!url) return true;
+  const value = String(url).trim().toLowerCase();
+  return (
+    value.length === 0 ||
+    value.startsWith("url") ||
+    value === "img1.jpg" ||
+    value === "url1.jpg" ||
+    value.includes("shorturl.at") ||
+    value.includes("tinyurl.com")
+  );
+};
+
+const pickBestImage = (item: any) => {
+  const firstArrayImage = Array.isArray(item.images) ? item.images.find((img: string) => !isBadImageUrl(img)) : undefined;
+  if (firstArrayImage) return firstArrayImage;
+  if (!isBadImageUrl(item.image)) return item.image;
+  return "/hero-illustrated.jpg";
+};
+
+const toNumber = (value: any) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : 0;
+};
+
+const formatYearPrice = (value: any) => {
+  const amount = toNumber(value);
+  return amount > 0 ? `₹${amount.toLocaleString()}/yr` : "";
+};
+
 /**
  * Get virtual offices by city
  * @param city - City name
@@ -38,19 +68,36 @@ export const getVirtualOfficesByCity = async (
       // Map backend data to frontend expectations
       return offices.map((o: any) => ({
         ...o,
+        coordinates:
+          o.coordinates ||
+          (Array.isArray(o.location?.coordinates) &&
+          o.location.coordinates.length === 2
+            ? {
+                lat: o.location.coordinates[1],
+                lng: o.location.coordinates[0],
+              }
+            : undefined),
         features: o.features || [],
-        gstPlanPrice: o.gstPlanPricePerYear
-          ? `₹${o.gstPlanPricePerYear.toLocaleString()}/yr`
-          : "",
-        mailingPlanPrice: o.mailingPlanPricePerYear
-          ? `₹${o.mailingPlanPricePerYear.toLocaleString()}/yr`
-          : "",
-        brPlanPrice: o.brPlanPricePerYear
-          ? `₹${o.brPlanPricePerYear.toLocaleString()}/yr`
-          : "",
-        image: o.images?.[0] || "",
-        rating: o.avgRating || 0,
-        reviews: o.totalReviews || 0,
+        gstPlanPrice:
+          o.gstPlanPrice ||
+          formatYearPrice(o.gstPlanPricePerYear || o.finalGstPricePerYear),
+        mailingPlanPrice:
+          o.mailingPlanPrice ||
+          formatYearPrice(
+            o.mailingPlanPricePerYear || o.finalMailingPricePerYear,
+          ),
+        brPlanPrice:
+          o.brPlanPrice ||
+          formatYearPrice(o.brPlanPricePerYear || o.finalBrPricePerYear),
+        image: pickBestImage(o),
+        images:
+          Array.isArray(o.images) && o.images.length > 0
+            ? o.images.filter((img: string) => !isBadImageUrl(img))
+            : !isBadImageUrl(o.image)
+              ? [o.image]
+              : ["/hero-illustrated.jpg"],
+        rating: toNumber(o.rating) || toNumber(o.avgRating),
+        reviews: toNumber(o.reviews) || toNumber(o.totalReviews),
       }));
     }
 
@@ -81,19 +128,36 @@ export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
 
       return offices.map((o: any) => ({
         ...o,
+        coordinates:
+          o.coordinates ||
+          (Array.isArray(o.location?.coordinates) &&
+          o.location.coordinates.length === 2
+            ? {
+                lat: o.location.coordinates[1],
+                lng: o.location.coordinates[0],
+              }
+            : undefined),
         features: o.features || [],
-        gstPlanPrice: o.gstPlanPricePerYear
-          ? `₹${o.gstPlanPricePerYear.toLocaleString()}/yr`
-          : "",
-        mailingPlanPrice: o.mailingPlanPricePerYear
-          ? `₹${o.mailingPlanPricePerYear.toLocaleString()}/yr`
-          : "",
-        brPlanPrice: o.brPlanPricePerYear
-          ? `₹${o.brPlanPricePerYear.toLocaleString()}/yr`
-          : "",
-        image: o.images?.[0] || "",
-        rating: o.avgRating || 0,
-        reviews: o.totalReviews || 0,
+        gstPlanPrice:
+          o.gstPlanPrice ||
+          formatYearPrice(o.gstPlanPricePerYear || o.finalGstPricePerYear),
+        mailingPlanPrice:
+          o.mailingPlanPrice ||
+          formatYearPrice(
+            o.mailingPlanPricePerYear || o.finalMailingPricePerYear,
+          ),
+        brPlanPrice:
+          o.brPlanPrice ||
+          formatYearPrice(o.brPlanPricePerYear || o.finalBrPricePerYear),
+        image: pickBestImage(o),
+        images:
+          Array.isArray(o.images) && o.images.length > 0
+            ? o.images.filter((img: string) => !isBadImageUrl(img))
+            : !isBadImageUrl(o.image)
+              ? [o.image]
+              : ["/hero-illustrated.jpg"],
+        rating: toNumber(o.rating) || toNumber(o.avgRating),
+        reviews: toNumber(o.reviews) || toNumber(o.totalReviews),
       }));
     }
 

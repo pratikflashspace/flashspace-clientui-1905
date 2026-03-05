@@ -1,6 +1,38 @@
 import axiosInstance from "./api.service";
 import { MeetingRoomItem, ApiResponse } from "@/types/services";
 
+const isBadImageUrl = (url?: string) => {
+  if (!url) return true;
+  const value = String(url).trim().toLowerCase();
+  return (
+    value.length === 0 ||
+    value.startsWith("url") ||
+    value === "img1.jpg" ||
+    value === "url1.jpg" ||
+    value.includes("shorturl.at") ||
+    value.includes("tinyurl.com")
+  );
+};
+
+const pickBestImage = (item: any) => {
+  const firstArrayImage = Array.isArray(item.images)
+    ? item.images.find((img: string) => !isBadImageUrl(img))
+    : undefined;
+  if (firstArrayImage) return firstArrayImage;
+  if (!isBadImageUrl(item.image)) return item.image;
+  return "/hero-illustrated.jpg";
+};
+
+const toNumber = (value: any) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : 0;
+};
+
+const formatHourPrice = (value: any) => {
+  const amount = toNumber(value);
+  return amount > 0 ? `₹${amount.toLocaleString()}/hr` : "";
+};
+
 /**
  * Get meeting rooms by city
  * @param city - City name
@@ -21,12 +53,19 @@ export const getMeetingRoomsByCity = async (
       return rooms.map((r: any) => ({
         ...r,
         features: r.amenities || [],
-        price: r.pricePerHour
-          ? `₹${r.pricePerHour.toLocaleString()}/hr`
-          : "Price on request",
-        image: r.images?.[0] || "",
-        rating: r.avgRating || 0,
-        reviews: r.totalReviews || 0,
+        price:
+          r.price ||
+          formatHourPrice(r.pricePerHour || r.finalPricePerHour) ||
+          "Price on request",
+        image: pickBestImage(r),
+        images:
+          Array.isArray(r.images) && r.images.length > 0
+            ? r.images.filter((img: string) => !isBadImageUrl(img))
+            : !isBadImageUrl(r.image)
+              ? [r.image]
+              : ["/hero-illustrated.jpg"],
+        rating: toNumber(r.rating) || toNumber(r.avgRating),
+        reviews: toNumber(r.reviews) || toNumber(r.totalReviews),
       }));
     }
 
@@ -54,12 +93,19 @@ export const getAllMeetingRooms = async (): Promise<MeetingRoomItem[]> => {
       return rooms.map((r: any) => ({
         ...r,
         features: r.amenities || [],
-        price: r.pricePerHour
-          ? `₹${r.pricePerHour.toLocaleString()}/hr`
-          : "Price on request",
-        image: r.images?.[0] || "",
-        rating: r.avgRating || 0,
-        reviews: r.totalReviews || 0,
+        price:
+          r.price ||
+          formatHourPrice(r.pricePerHour || r.finalPricePerHour) ||
+          "Price on request",
+        image: pickBestImage(r),
+        images:
+          Array.isArray(r.images) && r.images.length > 0
+            ? r.images.filter((img: string) => !isBadImageUrl(img))
+            : !isBadImageUrl(r.image)
+              ? [r.image]
+              : ["/hero-illustrated.jpg"],
+        rating: toNumber(r.rating) || toNumber(r.avgRating),
+        reviews: toNumber(r.reviews) || toNumber(r.totalReviews),
       }));
     }
 
@@ -92,9 +138,15 @@ export const getMeetingRoomById = async (
           ((r as any).pricePerHour
             ? `₹${(r as any).pricePerHour.toLocaleString()}/hr`
             : ""),
-        image: r.image || (r as any).images?.[0] || "",
-        rating: r.rating || (r as any).avgRating || 0,
-        reviews: r.reviews || (r as any).totalReviews || 0,
+        image: pickBestImage(r),
+        images:
+          Array.isArray((r as any).images) && (r as any).images.length > 0
+            ? (r as any).images.filter((img: string) => !isBadImageUrl(img))
+            : !isBadImageUrl((r as any).image)
+              ? [(r as any).image]
+              : ["/hero-illustrated.jpg"],
+        rating: toNumber(r.rating) || toNumber((r as any).avgRating),
+        reviews: toNumber(r.reviews) || toNumber((r as any).totalReviews),
       };
     }
     return undefined;

@@ -67,7 +67,7 @@ function IconButton({
       type="button"
       onClick={onClick}
       aria-label={ariaLabel}
-      className="group relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-md shadow-slate-200/40 transition-all duration-300 hover:scale-105 hover:border-[#3FA69E]/30 hover:bg-gradient-to-br hover:from-[#3FA69E]/5 hover:to-[#3FA69E]/10 hover:shadow-lg hover:shadow-[#3FA69E]/20 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3FA69E]/40 focus-visible:ring-offset-2 sm:h-10 sm:w-10"
+      className="group relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-[#2D3F33]/20 dark:border-white/10 bg-white dark:bg-[#101010] shadow-sm transition-all duration-300 hover:scale-105 hover:border-[#2D3F33]/40 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2D3F33]/30 focus-visible:ring-offset-2 sm:h-10 sm:w-10"
     >
       {children}
     </button>
@@ -86,12 +86,12 @@ function NotificationButton({
       type="button"
       onClick={onClick}
       aria-label="Open notifications"
-      className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3FA69E]/40 focus-visible:ring-offset-2 sm:h-10 sm:w-10"
+      className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D3F33]/20 dark:border-white/10 bg-white dark:bg-[#101010] text-[#164e4e] dark:text-white shadow-sm transition-colors hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2D3F33]/30 focus-visible:ring-offset-2 sm:h-10 sm:w-10"
     >
       <Bell className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
 
       {unreadCount > 0 ? (
-        <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-[#3FA69E] px-1 text-[9px] font-bold text-white shadow-sm sm:h-5 sm:min-w-[1.25rem] sm:px-1.5 sm:text-[10px]">
+        <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-[#2D3F33] px-1 text-[9px] font-bold text-[#FDE68A] shadow-sm sm:h-5 sm:min-w-[1.25rem] sm:px-1.5 sm:text-[10px]">
           {unreadCount > 9 ? "9+" : unreadCount}
         </span>
       ) : null}
@@ -122,9 +122,9 @@ function ProfileMenu({
         <button
           type="button"
           aria-label="Open profile menu"
-          className="group flex items-center gap-2 overflow-hidden rounded-xl border border-slate-200/80 bg-white px-2.5 py-1.5 shadow-md shadow-slate-200/40 transition-all duration-300 hover:scale-105 hover:border-[#3FA69E]/30 hover:bg-gradient-to-br hover:from-[#3FA69E]/5 hover:to-[#3FA69E]/10 hover:shadow-lg hover:shadow-[#3FA69E]/20 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3FA69E]/40 focus-visible:ring-offset-2 sm:gap-3 sm:px-3 sm:py-2"
+          className="group flex items-center gap-2 overflow-hidden rounded-xl border border-[#2D3F33]/20 dark:border-white/10 bg-white dark:bg-[#101010] px-2.5 py-1.5 shadow-sm transition-all duration-300 hover:scale-105 hover:border-[#2D3F33]/40 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2D3F33]/30 focus-visible:ring-offset-2 sm:gap-3 sm:px-3 sm:py-2"
         >
-          <div className="relative h-8 w-8 overflow-hidden rounded-full bg-gradient-to-br from-[#3FA69E] via-[#3FA69E] to-[#359089] shadow-md shadow-[#3FA69E]/30 ring-2 ring-white/50 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-[#3FA69E]/40 sm:h-9 sm:w-9">
+          <div className="relative h-8 w-8 overflow-hidden rounded-full bg-gradient-to-br from-[#2D3F33] via-[#2D3F33] to-[#3a5445] shadow-md ring-2 ring-white/50 transition-all duration-300 group-hover:scale-110 sm:h-9 sm:w-9">
             <div className="flex h-full w-full items-center justify-center text-xs font-bold text-white sm:text-sm">
               {initial}
             </div>
@@ -132,18 +132,18 @@ function ProfileMenu({
 
           {showName ? (
             <div className="hidden text-left md:block">
-              <p className="text-sm font-semibold text-slate-900">{name}</p>
-              <p className="text-xs font-medium text-slate-500">{role}</p>
+              <p className="text-sm font-semibold text-[#164e4e] dark:text-white">{name}</p>
+              <p className="text-xs font-medium text-[#164e4e]/70 dark:text-gray-400">{role}</p>
             </div>
           ) : null}
 
-          <ChevronDown className="h-3.5 w-3.5 text-slate-500 transition-transform duration-300 group-hover:translate-y-0.5 group-hover:text-[#3FA69E] sm:h-4 sm:w-4" />
+          <ChevronDown className="h-3.5 w-3.5 text-[#164e4e]/70 dark:text-gray-400 transition-transform duration-300 group-hover:translate-y-0.5 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] sm:h-4 sm:w-4" />
         </button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
         align="end"
-        className="w-56 overflow-hidden rounded-xl border border-slate-200/80 bg-white/95 shadow-xl shadow-slate-200/50 backdrop-blur-md"
+        className="w-56 overflow-hidden rounded-xl border border-[#2D3F33]/15 dark:border-white/10 bg-white/95 dark:bg-[#101010]/95 shadow-xl backdrop-blur-md"
       >
         <DropdownMenuItem
           onSelect={onProfile}
@@ -290,7 +290,7 @@ export default function Topbar({
   };
 
  return (
-  <header className="flex flex-col gap-3 rounded-2xl border border-slate-200/60 bg-gradient-to-br from-white via-white to-slate-50/30 px-3 py-3 shadow-lg shadow-slate-200/50 backdrop-blur-sm sm:px-6 sm:py-4">
+  <header className="flex flex-col gap-3 rounded-2xl border border-[#2D3F33]/10 dark:border-white/10 bg-white dark:bg-[#0f0f0f] px-3 py-3 shadow-sm backdrop-blur-sm sm:px-6 sm:py-4" style={{ fontFamily: "'Inter Tight', sans-serif", fontWeight: 500 }}>
     {/* TOP ROW */}
     <div className="flex w-full items-center justify-between gap-3">
       {/* LEFT SIDE */}
@@ -299,19 +299,19 @@ export default function Topbar({
         {onMenuClick ? (
           <div className="shrink-0 lg:hidden">
             <IconButton onClick={onMenuClick} ariaLabel="Open sidebar">
-              <Menu className="h-4 w-4 text-slate-600 transition-transform duration-300 group-hover:scale-110 sm:h-[17px] sm:w-[17px]" />
+              <Menu className="h-4 w-4 text-[#164e4e] dark:text-gray-100 transition-transform duration-300 group-hover:scale-110 sm:h-[17px] sm:w-[17px]" />
             </IconButton>
           </div>
         ) : null}
 
         {/* Title */}
         <div className="min-w-0 flex-1 overflow-hidden">
-          <h2 className="truncate text-sm font-semibold text-slate-900 sm:text-xl">
+          <h2 className="truncate text-sm font-semibold text-[#164e4e] dark:text-white sm:text-xl">
             {title}
           </h2>
 
           {subtitle ? (
-            <p className="mt-0.5 hidden truncate text-[11px] font-medium text-slate-500/90 sm:block sm:text-sm">
+            <p className="mt-0.5 hidden truncate text-[11px] font-medium text-[#164e4e]/70 dark:text-gray-400 sm:block sm:text-sm">
               {subtitle}
             </p>
           ) : null}
@@ -319,8 +319,8 @@ export default function Topbar({
 
         {/* Search (Tablet + Desktop) */}
         {showSearch ? (
-          <div className="hidden w-[320px] items-center gap-2 overflow-hidden rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white px-4 py-2.5 shadow-md shadow-slate-200/40 transition-all duration-300 focus-within:border-[#3FA69E]/50 focus-within:shadow-lg focus-within:shadow-[#3FA69E]/20 lg:flex">
-            <Search size={18} className="text-slate-500" />
+          <div className="hidden w-[320px] items-center gap-2 overflow-hidden rounded-xl border border-[#2D3F33]/20 dark:border-white/10 bg-[#2D3F33]/5 dark:bg-white/5 px-4 py-2.5 shadow-sm transition-all duration-300 focus-within:border-[#2D3F33]/40 lg:flex">
+            <Search size={18} className="text-[#164e4e]/70 dark:text-gray-300" />
 
             <input
               type="text"
@@ -332,7 +332,7 @@ export default function Topbar({
                 }
               }}
               placeholder={searchPlaceholder}
-              className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm font-medium text-[#164e4e] dark:text-white outline-none placeholder:text-[#164e4e]/50 dark:placeholder:text-gray-400"
             />
           </div>
         ) : null}
@@ -350,7 +350,7 @@ export default function Topbar({
               {isMobileSearchOpen ? (
                 <X className="h-4 w-4 text-slate-600 transition-transform duration-300 group-hover:rotate-90" />
               ) : (
-                <Search className="h-4 w-4 text-slate-600 transition-transform duration-300 group-hover:scale-110" />
+                <Search className="h-4 w-4 text-[#164e4e] dark:text-gray-100 transition-transform duration-300 group-hover:scale-110" />
               )}
             </IconButton>
           </div>
@@ -398,8 +398,8 @@ export default function Topbar({
 
     {/* MOBILE SEARCH DROPDOWN */}
     {showSearch && isMobileSearchOpen ? (
-      <div className="flex w-full animate-in fade-in slide-in-from-top-2 items-center gap-3 overflow-hidden rounded-xl border border-slate-200/80 bg-gradient-to-br from-slate-50 to-white px-4 py-3 shadow-lg shadow-slate-200/50 transition-all duration-300 focus-within:border-[#3FA69E]/50 focus-within:shadow-xl focus-within:shadow-[#3FA69E]/30 lg:hidden">
-        <Search className="h-4 w-4 text-slate-500" />
+      <div className="flex w-full animate-in fade-in slide-in-from-top-2 items-center gap-3 overflow-hidden rounded-xl border border-[#2D3F33]/20 dark:border-white/10 bg-[#2D3F33]/5 dark:bg-white/5 px-4 py-3 shadow-sm transition-all duration-300 focus-within:border-[#2D3F33]/40 lg:hidden">
+        <Search className="h-4 w-4 text-[#164e4e]/70 dark:text-gray-300" />
 
         <input
           ref={mobileSearchRef}
@@ -411,7 +411,7 @@ export default function Topbar({
             if (e.key === "Escape") setIsMobileSearchOpen(false);
           }}
           placeholder={searchPlaceholder}
-          className="w-full bg-transparent text-sm font-medium text-slate-700 outline-none placeholder:text-slate-400"
+          className="w-full bg-transparent text-sm font-medium text-[#164e4e] dark:text-white outline-none placeholder:text-[#164e4e]/50 dark:placeholder:text-gray-400"
         />
       </div>
     ) : null}
