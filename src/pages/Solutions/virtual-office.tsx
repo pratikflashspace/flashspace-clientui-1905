@@ -1,7 +1,7 @@
 import { Building, MapPin, Mail, Phone, FileText, CheckCircle, Star, Users, Award, ChevronDown, Search, ArrowRight, Sparkles, Monitor, Settings, Download, Package, Target, Briefcase, Zap, Globe2, PhoneCall, Shield, Check, X, Headphones, Clock, Wallet, Trophy, Rocket, Scale } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,7 +11,16 @@ import { DraggableCardContainer, DraggableCardBody } from "@/components/ui/dragg
 
 const VirtualOffice = () => {
     const navigate = useNavigate();
-    const [selectedCity, setSelectedCity] = useState("Delhi");
+    const [searchParams] = useSearchParams();
+    const [selectedCity, setSelectedCity] = useState(searchParams.get("city") || "Delhi");
+
+    // Sync from params when they change
+    useEffect(() => {
+        const city = searchParams.get("city");
+        if (city && city !== selectedCity) {
+            setSelectedCity(city);
+        }
+    }, [searchParams]);
     const [isLocationOpen, setIsLocationOpen] = useState(false);
     const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 

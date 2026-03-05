@@ -33,13 +33,18 @@ const VirtualOffice = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [selectedCity, setSelectedCity] = useState<string>("");
-  const [selectedLocation, setSelectedLocation] = useState<string>("");
+
+  // Initialize state from URL params to ensure first render is correct
+  const initialCity = searchParams.get("city") || "Delhi";
+  const initialLocation = searchParams.get("location") || "";
+
+  const [selectedCity, setSelectedCity] = useState<string>(initialCity);
+  const [selectedLocation, setSelectedLocation] = useState<string>(initialLocation);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [sortBy, setSortBy] = useState<SortBy>("popularity");
   const [selectedArea, setSelectedArea] = useState<string>("all");
   const [selectedServices, setSelectedServices] = useState<string>("all");
-  const [searchCity, setSearchCity] = useState<string>("");
+  const [searchCity, setSearchCity] = useState<string>(initialCity);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [isSearchFocused, setIsSearchFocused] = useState<boolean>(false);
   const [virtualOffices, setVirtualOffices] = useState<VirtualOfficeItem[]>([]);
