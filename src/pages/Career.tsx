@@ -88,7 +88,7 @@ const openRoles = [
 
 const Careers = () => {
   return (
-    <div className="min-h-screen bg-gray-50 font-[Poppins]">
+    <div className="min-h-screen bg-gray-50 font-['Inter_Tight',system-ui,sans-serif]">
       <Header />
       <main>
         {/* Hero */}
@@ -100,19 +100,19 @@ const Careers = () => {
               transition={{ duration: 0.6 }}
               className="max-w-3xl mx-auto text-center"
             >
-              <h1 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6 leading-[1.1] text-gray-900">
+              <h1 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6 leading-[1.1] text-[#1F2E26]">
                 Shape Your Career at FlashSpace
               </h1>
-              <p className="text-lg lg:text-xl text-gray-500 max-w-2xl mx-auto mb-8">
+              <p className="text-lg lg:text-xl text-[#677E73] max-w-2xl mx-auto mb-8">
                 We're a small, ambitious team reimagining how India works. If
                 you love solving hard problems and shipping fast, you'll fit
                 right in.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="bg-black text-white hover:bg-gray-800 font-medium px-8 h-12 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-base">
+                <button className="bg-[#35503F] text-[#FEF8C3] hover:bg-[#2a4033] font-medium px-8 h-12 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-base">
                   View Open Roles <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
-                <button className="font-semibold px-8 h-12 rounded-xl border border-gray-200 text-gray-900 hover:bg-gray-50 transition-colors flex items-center justify-center text-base">
+                <button className="font-semibold px-8 h-12 rounded-xl border border-[#35503F] text-[#35503F] hover:bg-[#35503F]/5 transition-colors flex items-center justify-center text-base">
                   Our Culture
                 </button>
               </div>
@@ -129,10 +129,10 @@ const Careers = () => {
               viewport={{ once: true }}
               className="mb-12"
             >
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-3">
+              <h2 className="text-3xl lg:text-4xl font-bold text-[#1F2E26] tracking-tight mb-3">
                 Why work with us?
               </h2>
-              <p className="text-gray-500 text-lg max-w-2xl">
+              <p className="text-[#677E73] text-lg max-w-2xl">
                 We believe great work happens when people have autonomy,
                 purpose, and the right tools.
               </p>
@@ -153,10 +153,10 @@ const Careers = () => {
                     <div className="w-10 h-10 rounded-xl bg-yellow-100 flex items-center justify-center mb-4">
                       <Icon className="w-5 h-5 text-yellow-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    <h3 className="text-lg font-bold text-[#1F2E26] mb-1">
                       {perk.title}
                     </h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-[#677E73] leading-relaxed">
                       {perk.desc}
                     </p>
                   </motion.div>
@@ -175,10 +175,10 @@ const Careers = () => {
               viewport={{ once: true }}
               className="mb-10"
             >
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-3">
+              <h2 className="text-3xl lg:text-4xl font-bold text-[#1F2E26] tracking-tight mb-3">
                 Open positions
               </h2>
-              <p className="text-gray-500 text-lg">
+              <p className="text-[#677E73] text-lg">
                 {openRoles.length} roles across{" "}
                 {new Set(openRoles.map((r) => r.department)).size} teams
               </p>
@@ -195,10 +195,10 @@ const Careers = () => {
                   className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-white border border-gray-100 rounded-xl hover:shadow-md transition-shadow group cursor-pointer"
                 >
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-yellow-500 transition-colors">
+                    <h3 className="text-base font-bold text-[#1F2E26] mb-1 transition-colors">
                       {role.title}
                     </h3>
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-[#677E73]">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5" /> {role.location}
                       </span>
@@ -208,10 +208,10 @@ const Careers = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
+                    <span className="inline-flex items-center rounded-md bg-[#FEF8C3] px-2 py-1 text-xs font-medium text-[#677E73] ring-1 ring-inset ring-gray-500/10">
                       {role.department}
                     </span>
-                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-yellow-500 group-hover:translate-x-1 transition-all shrink-0" />
+                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:translate-x-1 transition-all shrink-0" />
                   </div>
                 </motion.div>
               ))}
@@ -227,14 +227,14 @@ const Careers = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
+              <h2 className="text-2xl lg:text-3xl font-bold text-[#1F2E26] mb-3">
                 Don't see your role?
               </h2>
-              <p className="text-gray-500 mb-6 max-w-lg mx-auto">
+              <p className="text-[#677E73] mb-6 max-w-lg mx-auto">
                 We're always looking for talented people. Send us your resume
                 and we'll keep you in mind.
               </p>
-              <button className="bg-black text-white hover:bg-gray-800 h-12 px-8 rounded-xl font-medium inline-flex items-center justify-center transition-colors">
+              <button className="bg-[#35503F] text-[#FEF8C3] hover:bg-[#2a4033] h-12 px-8 rounded-xl font-medium inline-flex items-center justify-center transition-colors">
                 Send Your Resume <ArrowRight className="w-4 h-4 ml-2" />
               </button>
             </motion.div>
