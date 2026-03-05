@@ -266,7 +266,7 @@ const UpdatesPopup = ({
             <p className="text-xs text-[#677E73] mt-0.5">{unreadCount} unread</p>
           </div>
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => markAllAsRead()}
               className="flex items-center gap-1.5 text-xs font-medium text-[#1F2E26] hover:text-[#35503F] transition-colors"
             >
@@ -288,11 +288,10 @@ const UpdatesPopup = ({
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                activeFilter === filter
-                  ? "bg-[#35503F] text-white shadow-sm"
-                  : "bg-white text-[#677E73] border border-slate-100 dark:border-white/10 dark:bg-transparent dark:hover:border-white/20 hover:border-slate-300"
-              }`}
+              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${activeFilter === filter
+                ? "bg-[#35503F] text-white shadow-sm"
+                : "bg-white text-[#677E73] border border-slate-100 dark:border-white/10 dark:bg-transparent dark:hover:border-white/20 hover:border-slate-300"
+                }`}
             >
               {filter}
             </button>
@@ -308,9 +307,8 @@ const UpdatesPopup = ({
                 <div
                   key={notif._id}
                   onClick={() => !notif.read && markAsRead(notif._id)}
-                  className={`group flex gap-4 p-4 rounded-2xl transition-all border border-transparent hover:border-slate-100 dark:hover:border-white/10 cursor-pointer ${
-                    !notif.read ? "bg-[#F1F3F5] dark:bg-white/5" : "bg-white dark:bg-transparent"
-                  }`}
+                  className={`group flex gap-4 p-4 rounded-2xl transition-all border border-transparent hover:border-slate-100 dark:hover:border-white/10 cursor-pointer ${!notif.read ? "bg-[#F1F3F5] dark:bg-white/5" : "bg-white dark:bg-transparent"
+                    }`}
                 >
                   {/* Icon Container */}
                   <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white dark:bg-white/10 flex items-center justify-center shadow-sm border border-slate-50 dark:border-white/5">
@@ -346,7 +344,7 @@ const UpdatesPopup = ({
               </div>
               <h3 className="text-sm font-bold text-[#1F2E26] dark:text-white mb-1">No updates found</h3>
               <p className="text-xs text-[#677E73] dark:text-gray-400">
-                {activeFilter === "All" 
+                {activeFilter === "All"
                   ? "You're all caught up! Check back later for new notifications."
                   : `No ${activeFilter.toLowerCase()} updates at the moment.`}
               </p>
@@ -371,23 +369,50 @@ const StartChatting = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // [NEW] User menu state
   const [showUpdates, setShowUpdates] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false); // [NEW] Contact form state
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const countries = [
+    { code: "IND", name: "India", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_India_Flat_Round-128x128.png" },
+    { code: "USA", name: "United States", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_States_Flat_Round-128x128.png" },
+    { code: "UK", name: "United Kingdom", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Kingdom_Flat_Round-128x128.png" },
+    { code: "UAE", name: "United Arab Emirates", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Arab_Emirates_Flat_Round-128x128.png" },
+    { code: "CAN", name: "Canada", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Canada_Flat_Round-128x128.png" },
+    { code: "AUS", name: "Australia", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Australia_Flat_Round-128x128.png" },
+    { code: "GER", name: "Germany", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Germany_Flat_Round-128x128.png" },
+    { code: "FRA", name: "France", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_France_Flat_Round-128x128.png" },
+    { code: "JPN", name: "Japan", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Japan_Flat_Round-128x128.png" },
+    { code: "SGP", name: "Singapore", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Singapore_Flat_Round-128x128.png" },
+  ];
+  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
+  const countryRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
+
+  // Close country dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (countryRef.current && !countryRef.current.contains(event.target as Node)) {
+        setCountryDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: '',
     phone: '',
     email: ''
   });
-  
+
   // [NEW] Use Global Chat State
-  const { 
-    chatMessages, 
-    setChatMessages, 
-    chatSessions, 
-    setChatSessions, 
-    startNewChat, 
+  const {
+    chatMessages,
+    setChatMessages,
+    chatSessions,
+    setChatSessions,
+    startNewChat,
     deleteChatSession,
-    isLoading, 
-    setIsLoading 
+    isLoading,
+    setIsLoading
   } = useChat();
   // Persist activeChatId to sessionStorage
   useEffect(() => {
@@ -438,20 +463,20 @@ const StartChatting = () => {
         } else {
           // Unsaved new chat - fire and forget save on unmount
           const firstUserMsg = chatMessagesRef.current.find(m => m.role === 'user');
-          const title = firstUserMsg 
-            ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '') 
+          const title = firstUserMsg
+            ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '')
             : 'Chat session';
-          
+
           const sessionData = {
             id: Date.now().toString(),
             title,
             messages: chatMessagesRef.current,
             date: 'Today',
           };
-          
+
           setChatSessions(prev => [sessionData, ...prev]);
           if (isAuthenticated) {
-             chatService.saveSession(sessionData).catch(err => console.error('[Chat] Failed to persist new session on unmount', err));
+            chatService.saveSession(sessionData).catch(err => console.error('[Chat] Failed to persist new session on unmount', err));
           }
         }
       }
@@ -465,10 +490,10 @@ const StartChatting = () => {
 
     const timer = setTimeout(() => {
       const firstUserMsg = chatMessages.find(m => m.role === 'user');
-      const title = firstUserMsg 
-        ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '') 
+      const title = firstUserMsg
+        ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '')
         : 'Chat session';
-      
+
       const sessionData = {
         id: activeChatId || Date.now().toString(),
         title,
@@ -505,10 +530,10 @@ const StartChatting = () => {
       if (!activeChatId) {
         // Unsaved chat - manually save it before clearing
         const firstUserMsg = chatMessages.find(m => m.role === 'user');
-        const title = firstUserMsg 
-          ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '') 
+        const title = firstUserMsg
+          ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '')
           : 'Chat session';
-        
+
         const tempId = Date.now().toString();
         const sessionData = {
           id: tempId,
@@ -516,15 +541,15 @@ const StartChatting = () => {
           messages: chatMessages,
           date: 'Today',
         };
-        
+
         // Optimistically add to sidebar
         setChatSessions(prev => [sessionData, ...prev]);
-        
+
         if (isAuthenticated) {
           chatService.saveSession(sessionData).then(res => {
             if (res.success && res.data) {
-                const newId = res.data._id || res.data.id;
-                setChatSessions(prev => prev.map(s => s.id === tempId ? { ...sessionData, _id: newId } : s));
+              const newId = res.data._id || res.data.id;
+              setChatSessions(prev => prev.map(s => s.id === tempId ? { ...sessionData, _id: newId } : s));
             }
           });
         }
@@ -535,7 +560,7 @@ const StartChatting = () => {
           if (sKey === activeChatId) {
             const updated = { ...s, messages: chatMessages };
             if (isAuthenticated) {
-               chatService.saveSession(updated).catch(e => console.error(e));
+              chatService.saveSession(updated).catch(e => console.error(e));
             }
             return updated;
           }
@@ -543,7 +568,7 @@ const StartChatting = () => {
         }));
       }
     }
-    
+
     startNewChat();
     setActiveChatId(null);
     if (window.innerWidth < 1024) {
@@ -822,31 +847,31 @@ const StartChatting = () => {
   // [NEW] Speak Function
   const handleSpeak = (text: string) => {
     window.speechSynthesis.cancel();
-    
+
     // Simple clean up of markdown for better speech
     const cleanText = text.replace(/\*\*/g, '').replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
-    
+
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    
+
     // [UPDATED] Voice Selection for softer, more natural female voice
     const voices = window.speechSynthesis.getVoices();
-    
+
     // Try to find a high-quality female voice
-    const preferredVoice = voices.find(voice => 
+    const preferredVoice = voices.find(voice =>
       (voice.name.includes("Google") && voice.name.includes("US English")) || // Chrome specific
       (voice.name.includes("Microsoft Zira")) || // Windows specific
       (voice.name.includes("Neural") && voice.name.includes("Female")) || // Smart filters
-      (voice.name.includes("Natural") && voice.name.includes("Female")) 
+      (voice.name.includes("Natural") && voice.name.includes("Female"))
     ) || voices.find(voice => voice.name.includes("Female")) || voices.find(v => v.lang.startsWith("en-"));
 
     if (preferredVoice) {
       utterance.voice = preferredVoice;
     }
-    
+
     // Tuning for softness
     utterance.pitch = 1.1; // Slightly higher for lighter tone
     utterance.rate = 0.95; // Slightly slower for composure
-    
+
     window.speechSynthesis.speak(utterance);
   };
 
@@ -1008,58 +1033,62 @@ const StartChatting = () => {
           </div>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center">
+          <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
             {/* Solutions / Get Workspaces */}
             <div className="relative group">
               <button
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] dark:text-gray-200 hover:text-[#D96832] hover:bg-[#164e4e]/5 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
+                className="flex items-center gap-1.5 text-sm font-bold text-[#164e4e] dark:text-white hover:text-[#D96832] transition-colors py-2"
               >
-                Get Workspaces
-                <ChevronDown className="w-4 h-4 opacity-70 group-hover:rotate-180 transition-transform duration-200" />
+                Get Workspace
+                <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300" />
               </button>
               {/* Dropdown */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[520px] bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl z-[200] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 -translate-y-1 group-hover:translate-y-0">
-                <div className="p-4 grid grid-cols-2 gap-3">
-                  <div className="border border-gray-100 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-800">
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[600px] bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-2xl shadow-2xl p-6 z-[200] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="bg-[#f8faf9] dark:bg-white/5 rounded-xl p-5 border border-border/50">
                     <div
-                      className="flex items-center gap-2 mb-1 cursor-pointer hover:text-[#D96832] transition-colors"
+                      className="flex items-center gap-2 mb-2 cursor-pointer hover:text-[#D96832] transition-colors"
                       onClick={() => handleNavigation('/Solutions/on-demand')}
                     >
                       <Zap className="w-4 h-4 text-[#D96832]" />
-                      <h4 className="text-sm font-bold text-[#164e4e] dark:text-gray-100">On-Demand</h4>
+                      <h4 className="text-sm font-bold text-[#164e4e] dark:text-white">On-Demand</h4>
                     </div>
-                    <p className="text-xs text-gray-500 mb-2">Book by the hour or day</p>
-                    {[
-                      { label: 'Event Space', href: '/Solutions/eventspace' },
-                      { label: 'Day Offices', href: '/Solutions/day-office' },
-                    ].map(item => (
-                      <button
-                        key={item.href}
-                        onClick={() => handleNavigation(item.href)}
-                        className="flex items-center justify-between w-full text-sm px-3 py-1.5 rounded-md hover:bg-white dark:hover:bg-gray-700 text-[#164e4e] dark:text-gray-200 transition-colors mb-1"
-                      >
-                        {item.label}
-                        <ArrowRight className="w-3 h-3 opacity-40" />
-                      </button>
-                    ))}
+                    <p className="text-xs text-[#164e4e]/60 dark:text-gray-400 mb-4">Book by the hour or day</p>
+                    <div className="space-y-2">
+                      {[
+                        { label: 'Event Space', href: '/Solutions/eventspace' },
+                        { label: 'Day Offices', href: '/Solutions/day-office' },
+                      ].map(item => (
+                        <button
+                          key={item.href}
+                          onClick={() => handleNavigation(item.href)}
+                          className="w-full flex items-center justify-between text-sm px-4 py-3 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-all text-[#164e4e] dark:text-white"
+                        >
+                          {item.label}
+                          <ArrowRight className="w-4 h-4 opacity-40" />
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="grid gap-2">
+                  <div className="space-y-1">
                     {[
-                      { icon: Building2, title: 'Virtual Office', desc: 'Business address, mail handling', href: '/Solutions/virtual-office' },
-                      { icon: Users, title: 'Coworking Space', desc: 'Flexible desks, private cabins', href: '/Solutions/coworking-space' },
-                      { icon: FileText, title: 'Business Setup', desc: 'Company registration, GST', href: '/Solutions/business-setup' },
+                      { icon: Building2, title: 'Virtual Office', desc: 'Business address & mail', href: '/Solutions/virtual-office' },
+                      { icon: Users, title: 'Coworking Space', desc: 'Flexible desk solutions', href: '/Solutions/coworking-space' },
+                      { icon: FileText, title: 'Business Setup', desc: 'GST & registration support', href: '/Solutions/business-setup' },
                     ].map(({ icon: Icon, title, desc, href }) => (
-                      <div
+                      <button
                         key={title}
                         onClick={() => handleNavigation(href)}
-                        className="flex items-start gap-3 p-3 rounded-lg border border-transparent hover:border-gray-100 hover:bg-white dark:hover:bg-gray-800 cursor-pointer transition-all"
+                        className="w-full text-left p-3 rounded-xl hover:bg-[#D96832]/5 group/item transition-colors"
                       >
-                        <Icon className="w-4 h-4 text-[#D96832] mt-0.5" />
-                        <div>
-                          <p className="text-sm font-bold text-[#164e4e] dark:text-gray-100">{title}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                        <div className="flex items-start gap-3">
+                          <Icon className="w-5 h-5 text-[#D96832] mt-0.5" />
+                          <div>
+                            <h5 className="text-sm font-bold text-[#164e4e] dark:text-white group-hover/item:text-[#D96832] transition-colors">{title}</h5>
+                            <p className="text-xs text-[#164e4e]/60 dark:text-gray-400">{desc}</p>
+                          </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -1069,118 +1098,85 @@ const StartChatting = () => {
             {/* Partner with Us */}
             <button
               onClick={() => handleNavigation('/partner')}
-              className="px-3 py-2 text-sm font-bold text-[#164e4e] dark:text-gray-200 hover:text-[#D96832] hover:bg-[#164e4e]/5 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
+              className="text-sm font-bold text-[#164e4e] dark:text-white hover:text-[#D96832] transition-colors"
             >
               Partner with Us
             </button>
 
-            {/* More Dropdown */}
-            <div className="relative group">
-              <button className="flex items-center gap-1.5 px-3 py-2 text-sm font-bold text-[#164e4e] dark:text-gray-200 hover:text-[#D96832] hover:bg-[#164e4e]/5 dark:hover:bg-gray-800 rounded-lg transition-all duration-200">
-                More
-                <ChevronDown className="w-4 h-4 opacity-70 group-hover:rotate-180 transition-transform duration-200" />
-              </button>
-              <ul className="absolute left-0 top-full mt-2 w-40 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-lg shadow-lg z-[200] py-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200">
-                {[
-                  { label: 'About Us', href: '/about' },
-                  { label: 'Career', href: '/career' },
-                  { label: 'Blog', href: '/blog' },
-                ].map(item => (
-                  <li key={item.label}>
-                    <button
-                      onClick={() => handleNavigation(item.href)}
-                      className="w-full text-left px-4 py-2 text-sm font-medium text-[#164e4e] dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#D96832] transition-colors"
-                    >
-                      {item.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* About Us */}
+            <button
+              onClick={() => handleNavigation('/about')}
+              className="text-sm font-bold text-[#164e4e] dark:text-white hover:text-[#D96832] transition-colors"
+            >
+              About Us
+            </button>
           </nav>
 
           <div className="flex items-center gap-3">
-            {/* Dark Mode Toggle */}
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors mr-2"
-              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-
-            {/* IND Button */}
-            <div className="hidden sm:flex items-center px-3 py-1.5 rounded-md border transition-colors duration-300 border-gray-300 dark:border-gray-700 text-black dark:text-white">
-              <span className="text-sm font-md">IND</span>
+            {/* Country Selector */}
+            <div ref={countryRef} className="hidden xl:block relative">
+              <button
+                className="flex items-center px-3 py-2 rounded-full border border-gray-200 dark:border-white/10 text-[#164e4e] dark:text-white gap-2 bg-white dark:bg-black/50 hover:bg-white dark:hover:bg-white/10 transition-all"
+                onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
+              >
+                <img src={selectedCountry.flag} alt={selectedCountry.code} className="h-5 w-5 rounded-full object-cover" />
+                <span className="text-sm font-medium">{selectedCountry.code}</span>
+                <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", countryDropdownOpen && "rotate-180")} />
+              </button>
+              {countryDropdownOpen && (
+                <ul className="absolute right-0 top-full mt-2 bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-xl shadow-2xl py-2 z-50 min-w-[120px]">
+                  {countries.map((country) => (
+                    <button
+                      key={country.code}
+                      className="flex items-center w-full px-4 py-2 hover:bg-black/5 dark:hover:bg-white/5 gap-3 text-sm text-[#164e4e] dark:text-gray-200 transition-colors"
+                      onClick={() => { setSelectedCountry(country); setCountryDropdownOpen(false); }}
+                    >
+                      <img src={country.flag} alt={country.code} className="h-4 w-4 rounded-full" />
+                      <span>{country.code}</span>
+                    </button>
+                  ))}
+                </ul>
+              )}
             </div>
-
-            {/* Get in Touch Button */}
-            <Splash3dButton
-              onClick={() => setIsContactModalOpen(true)}
-              className="hidden sm:inline-flex relative px-6 py-2.5 text-base rounded-lg font-bold bg-black dark:bg-gray-800 text-white dark:text-white border border-black dark:border-gray-700 shadow-[0_2px_8px_0_rgba(0,0,0,0.10)] hover:shadow-[0_4px_16px_0_rgba(0,0,0,0.13)] active:translate-y-1 transition-all duration-150 before:content-[''] before:absolute before:inset-0 before:rounded-lg before:pointer-events-none"
-            >
-              Get in Touch
-            </Splash3dButton>
 
             {/* Log in Button or User Profile */}
             {isAuthenticated ? (
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 border border-gray-200 dark:border-gray-700 bg-emerald-50 dark:bg-emerald-500/10"
+                  className="flex items-center gap-2 group"
                 >
                   {/* User Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#164e4e] text-white flex items-center justify-center font-bold text-sm shadow-sm group-hover:shadow-md transition-all">
                     {user?.fullName?.charAt(0).toUpperCase() || 'U'}
                   </div>
-                  {/* User Name */}
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200 max-w-[120px] truncate hidden sm:block">
-                    {user?.fullName || 'User'}
-                  </span>
-                  {/* Dropdown Icon */}
-                  <ChevronDown
-                    className={cn(
-                      "h-4 w-4 text-gray-500 dark:text-gray-400 transition-transform duration-200",
-                      isUserMenuOpen && "rotate-180"
-                    )}
-                  />
+                  <ChevronDown className={cn("w-4 h-4 text-[#164e4e]/60 transition-transform", isUserMenuOpen && "rotate-180")} />
                 </button>
 
                 {/* Dropdown Menu */}
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-2xl shadow-2xl py-3 z-50 overflow-hidden">
                     {/* User Info Header */}
-                    <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                    <div className="px-5 py-3 border-b border-border/50 dark:border-white/10 mb-2">
+                      <p className="text-sm font-bold text-[#164e4e] dark:text-white truncate">
                         {user?.fullName}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      <p className="text-xs text-[#164e4e]/60 dark:text-gray-400 truncate">
                         {user?.email}
                       </p>
                     </div>
 
                     {/* Menu Items */}
-                    <div className="py-1">
+                    <div className="px-2 space-y-1">
                       <button
                         onClick={() => {
                           handleNavigation("/dashboard");
                           setIsUserMenuOpen(false);
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#164e4e] dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
                       >
-                        <LayoutDashboard className="h-4 w-4" />
-                        <span className="font-medium">Dashboard</span>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          handleNavigation("/dashboard/profile");
-                          setIsUserMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
-                      >
-                        <UserIcon className="h-4 w-4" />
-                        <span className="font-medium">My Profile</span>
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
                       </button>
 
                       <button
@@ -1188,40 +1184,47 @@ const StartChatting = () => {
                           handleNavigation("/settings");
                           setIsUserMenuOpen(false);
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-150"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#164e4e] dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
                       >
-                        <Settings className="h-4 w-4" />
-                        <span className="font-medium">Settings</span>
+                        <Settings className="w-4 h-4" />
+                        Settings
                       </button>
-                    </div>
 
-                    {/* Logout Section */}
-                    <div className="border-t border-gray-100 dark:border-gray-800 pt-1">
+                      <hr className="my-2 border-border/50 dark:border-white/10" />
+
                       <button
                         onClick={async () => {
                           await logout();
                           setIsUserMenuOpen(false);
                           handleNavigation("/");
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-150"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                       >
-                        <LogOut className="h-4 w-4" />
-                        <span className="font-medium">Logout</span>
+                        <LogOut className="w-4 h-4" />
+                        Logout
                       </button>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <Button
+              <button
                 onClick={() => setIsLoginOpen(true)}
-                variant="outline"
-                className="hidden sm:inline-flex px-4 py-2 text-sm rounded-md transition-all duration-300 border-gray-300 dark:border-gray-700 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
-                style={{ fontFamily: 'Poppins' }}
+                className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all mr-2"
               >
-                Log in
-              </Button>
+                Sign in
+              </button>
             )}
+
+            {/* Get in Touch Button */}
+            <div
+              onClick={() => setIsContactModalOpen(true)}
+              className="inline-flex group px-6 py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
+            >
+              <span className="relative">
+                Get in Touch
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -1364,25 +1367,25 @@ const StartChatting = () => {
                       <div className="truncate">{session.title}</div>
                       <div className="text-[10px] mt-0.5" style={{ opacity: isActive ? 0.7 : 0.55 }}>{session.date}</div>
                     </button>
-                    
+
                     <button
                       onClick={async (e) => {
                         e.stopPropagation();
                         const success = await deleteChatSession(sessionKey);
                         if (success && isActive) {
-                           setChatMessages([]);
-                           setActiveChatId(null);
+                          setChatMessages([]);
+                          setActiveChatId(null);
                         }
                       }}
-                      className={`p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ${
-                        isActive ? 'text-white hover:bg-white/20' : 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-600'
-                      }`}
+                      className={`p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ${isActive ? 'text-white hover:bg-white/20' : 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-600'
+                        }`}
                       title="Delete chat"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                );})
+                );
+              })
             )}
           </div>
         </nav>
@@ -1415,116 +1418,116 @@ const StartChatting = () => {
               role="region"
               aria-label="Chat messages"
             >
-                {chatMessages.length === 0 ? (
-                 // Clean Welcome State (matching screenshot)
-                 <div className="flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto px-6">
-                   <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
-                     How can we help your business?
-                   </h2>
-                   <p className="text-gray-500 dark:text-gray-400 mb-12 max-w-md text-base leading-relaxed">
-                     Ask about coworking spaces, virtual offices, compliance, or compare plans instantly.
-                   </p>
+              {chatMessages.length === 0 ? (
+                // Clean Welcome State (matching screenshot)
+                <div className="flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto px-6">
+                  <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
+                    How can we help your business?
+                  </h2>
+                  <p className="text-gray-500 dark:text-gray-400 mb-12 max-w-md text-base leading-relaxed">
+                    Ask about coworking spaces, virtual offices, compliance, or compare plans instantly.
+                  </p>
 
-                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full">
-                     <button
-                       onClick={() => handleQuickAction('Find coworking spaces in Delhi NCR region')}
-                       className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
-                     >
-                       <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Find coworking spaces</div>
-                       <div className="text-xs text-gray-400">in Delhi NCR region</div>
-                     </button>
-                     <button
-                       onClick={() => handleQuickAction('Help me with GST Registration complete registration process')}
-                       className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
-                     >
-                       <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">GST Registration</div>
-                       <div className="text-xs text-gray-400">Complete registration</div>
-                     </button>
-                     <button
-                       onClick={() => handleQuickAction('Compare workspace plans and find the best deal')}
-                       className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
-                     >
-                       <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Compare plans</div>
-                       <div className="text-xs text-gray-400">Find the best deal</div>
-                     </button>
-                     <button
-                       onClick={() => handleQuickAction('Check business compliance requirements')}
-                       className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
-                     >
-                       <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Business compliance</div>
-                       <div className="text-xs text-gray-400">Check requirements</div>
-                     </button>
-                   </div>
-                 </div>
-
-                ) : (
-                  // Chat Messages
-                  <div className="space-y-6 max-w-5xl mx-auto pb-4 w-full">
-                    {chatMessages.map((msg) => (
-                      <div
-                        key={msg.id}
-                        className={`flex gap-4 group ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-                      >
-                        {/* Avatar */}
-                        <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${msg.role === 'user'
-                          ? 'bg-gradient-to-br from-[#35503F] to-[#3d6b4f] border-[#35503F] text-white'
-                          : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-[#35503F]'
-                          }`}>
-                          {msg.role === 'user' ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
-                        </div>
-
-                        {/* Message Bubble */}
-                        <div
-                          className={`max-w-[85%] sm:max-w-[85%] px-6 py-4 shadow-sm ${msg.role === 'user'
-                            ? 'bg-gradient-to-br from-[#35503F] to-[#3d6b4f] text-white rounded-2xl rounded-tr-sm'
-                            : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-sm'
-                            }`}
-                        >
-                          {msg.role === 'assistant' && msg.isTyping ? (
-                            <TypewriterEffect
-                              text={msg.content}
-                              onComplete={() => handleTypingComplete(msg.id)}
-                            />
-                          ) : (
-                            <div className={`text-[16px] leading-[1.8] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium font-sans ${msg.role === 'user' ? 'text-white' : 'text-gray-800 dark:text-gray-100'
-                              }`}>
-                              {formatMessage(msg.content)}
-                            </div>
-                          )}
-                          <p className={`text-[10px] mt-2 font-medium tracking-wide opacity-80 ${msg.role === 'user' ? 'text-white' : 'text-gray-400'
-                            }`}>
-                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                        </div>
-
-                        {msg.role === 'assistant' && !msg.isTyping && (
-                          <button
-                            onClick={() => handleSpeak(msg.content)}
-                            className="opacity-60 hover:opacity-100 transition-opacity duration-200 p-2 h-fit self-start mt-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-[#35503F]"
-                            title="Read Aloud"
-                            aria-label="Read message aloud"
-                          >
-                            <Volume2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-
-                    {/* Loading Indicator */}
-                    {isLoading && (
-                      <div className="flex gap-4">
-                        <div className="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center text-[#35503F] shadow-sm flex-shrink-0">
-                          <Building2 className="w-5 h-5" />
-                        </div>
-                        <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-6 py-4 shadow-sm flex items-center gap-2">
-                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce"></span>
-                        </div>
-                      </div>
-                    )}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+                    <button
+                      onClick={() => handleQuickAction('Find coworking spaces in Delhi NCR region')}
+                      className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Find coworking spaces</div>
+                      <div className="text-xs text-gray-400">in Delhi NCR region</div>
+                    </button>
+                    <button
+                      onClick={() => handleQuickAction('Help me with GST Registration complete registration process')}
+                      className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">GST Registration</div>
+                      <div className="text-xs text-gray-400">Complete registration</div>
+                    </button>
+                    <button
+                      onClick={() => handleQuickAction('Compare workspace plans and find the best deal')}
+                      className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Compare plans</div>
+                      <div className="text-xs text-gray-400">Find the best deal</div>
+                    </button>
+                    <button
+                      onClick={() => handleQuickAction('Check business compliance requirements')}
+                      className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
+                    >
+                      <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Business compliance</div>
+                      <div className="text-xs text-gray-400">Check requirements</div>
+                    </button>
                   </div>
-                )}
+                </div>
+
+              ) : (
+                // Chat Messages
+                <div className="space-y-6 max-w-5xl mx-auto pb-4 w-full">
+                  {chatMessages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={`flex gap-4 group ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                    >
+                      {/* Avatar */}
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${msg.role === 'user'
+                        ? 'bg-gradient-to-br from-[#35503F] to-[#3d6b4f] border-[#35503F] text-white'
+                        : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-[#35503F]'
+                        }`}>
+                        {msg.role === 'user' ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
+                      </div>
+
+                      {/* Message Bubble */}
+                      <div
+                        className={`max-w-[85%] sm:max-w-[85%] px-6 py-4 shadow-sm ${msg.role === 'user'
+                          ? 'bg-gradient-to-br from-[#35503F] to-[#3d6b4f] text-white rounded-2xl rounded-tr-sm'
+                          : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-sm'
+                          }`}
+                      >
+                        {msg.role === 'assistant' && msg.isTyping ? (
+                          <TypewriterEffect
+                            text={msg.content}
+                            onComplete={() => handleTypingComplete(msg.id)}
+                          />
+                        ) : (
+                          <div className={`text-[16px] leading-[1.8] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium font-sans ${msg.role === 'user' ? 'text-white' : 'text-gray-800 dark:text-gray-100'
+                            }`}>
+                            {formatMessage(msg.content)}
+                          </div>
+                        )}
+                        <p className={`text-[10px] mt-2 font-medium tracking-wide opacity-80 ${msg.role === 'user' ? 'text-white' : 'text-gray-400'
+                          }`}>
+                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+
+                      {msg.role === 'assistant' && !msg.isTyping && (
+                        <button
+                          onClick={() => handleSpeak(msg.content)}
+                          className="opacity-60 hover:opacity-100 transition-opacity duration-200 p-2 h-fit self-start mt-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-[#35503F]"
+                          title="Read Aloud"
+                          aria-label="Read message aloud"
+                        >
+                          <Volume2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Loading Indicator */}
+                  {isLoading && (
+                    <div className="flex gap-4">
+                      <div className="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center text-[#35503F] shadow-sm flex-shrink-0">
+                        <Building2 className="w-5 h-5" />
+                      </div>
+                      <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-6 py-4 shadow-sm flex items-center gap-2">
+                        <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                        <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                        <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce"></span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Chat Input */}
