@@ -215,9 +215,8 @@ export default function AdminLayout() {
     <div className="min-h-screen bg-[#FDFDFD] flex font-sans text-gray-900">
       {/* Sidebar - Desktop */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 transition-all duration-300 ${
-          isSidebarOpen ? "w-72" : "w-20"
-        } hidden md:flex flex-col shadow-sm`}
+        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 transition-all duration-300 ${isSidebarOpen ? "w-72" : "w-20"
+          } hidden md:flex flex-col shadow-sm`}
       >
         {/* Sidebar Header */}
         <div className="h-auto py-8 px-6 flex flex-col items-start gap-1">
@@ -251,10 +250,9 @@ export default function AdminLayout() {
                 to={item.path}
                 end={item.path === "/admin"}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                    isActive
-                      ? "bg-teal-600 text-white shadow-md shadow-teal-200"
-                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium"
+                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                    ? "bg-teal-600 text-white shadow-md shadow-teal-200"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium"
                   }`
                 }
               >
@@ -262,7 +260,7 @@ export default function AdminLayout() {
                   className={`w-5 h-5 flex-shrink-0 transition-colors ${
                     // Active styles handled by parent class
                     ""
-                  }`}
+                    }`}
                 />
                 {isSidebarOpen && (
                   <span className="whitespace-nowrap font-medium text-sm">
@@ -362,10 +360,9 @@ export default function AdminLayout() {
                     onClick={() => setIsMobileOpen(false)}
                     end={item.path === "/admin"}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                        isActive
-                          ? "bg-teal-600 text-white shadow-md shadow-teal-200"
-                          : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium"
+                      `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${isActive
+                        ? "bg-teal-600 text-white shadow-md shadow-teal-200"
+                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium"
                       }`
                     }
                   >
@@ -416,9 +413,8 @@ export default function AdminLayout() {
 
       {/* Main Content */}
       <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
-          isSidebarOpen ? "md:ml-72" : "md:ml-20"
-        }`}
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isSidebarOpen ? "md:ml-72" : "md:ml-20"
+          }`}
       >
         {/* Topbar - Simplified to match clean style */}
         <header className="h-20 bg-transparent flex items-center justify-between px-8 md:px-12 pt-6">

@@ -499,69 +499,58 @@ const QuotationCard = ({
                 </div>
             )}
 
-            <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative transition-all hover:border-[#5bb09c]/30">
+            <div className="bg-white p-6 rounded-2xl border border-gray-50 shadow-[0_4px_20px_rgba(0,0,0,0.02)] relative transition-all hover:shadow-md group">
                 {/* Top Row: ID and Status Badge */}
-                <div className="flex justify-between items-start mb-3">
-                    <span className="text-[11px] font-bold text-[#5bb09c] uppercase tracking-wider">
+                <div className="flex justify-between items-start mb-4">
+                    <span className="text-xs font-medium text-gray-400">
                         {id}
                     </span>
                     <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusStyles[status]}`}
+                        className={`text-[11px] font-bold px-3 py-1 rounded-full ${statusStyles[status]}`}
                     >
                         {status}
                     </span>
                 </div>
 
                 {/* Info Section */}
-                <div className="mb-4">
-                    <h4 className="font-bold text-gray-900 text-base mb-1">
+                <div className="mb-6">
+                    <h4 className="font-bold text-[#1a1a1a] text-lg mb-1">
                         {clientName}
                     </h4>
-                    <p className="text-xs text-gray-500 font-medium leading-relaxed">
+                    <div className="text-sm text-gray-500 font-medium leading-relaxed">
                         {spaceDetails}
                         <br />
                         {location}
-                    </p>
+                    </div>
                 </div>
 
                 {/* Bottom Row: Price, Date, and Actions */}
-                <div className="flex justify-between items-center pt-3 border-t border-gray-50">
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-base font-bold text-gray-900">
-                            {price}
-                        </span>
-                        <span className="text-[10px] text-gray-400 font-medium">
-                            {date}
-                        </span>
+                <div className="flex justify-between items-end">
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-lg font-bold text-[#1a1a1a]">
+                                {price}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                                {date}
+                            </span>
+                        </div>
                     </div>
 
-                    <div className="flex gap-1">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            title="Preview"
-                            className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
-                            onClick={() => setShowPreview(true)}
-                        >
-                            <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
+                    <div className="flex gap-2">
+                        <button
                             title="Share"
-                            className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
+                            className="p-2 text-gray-400 hover:text-[#2d5a4c] hover:bg-gray-50 rounded-lg transition-colors"
                         >
-                            <Share2 className="w-4 h-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="icon"
+                            <Share2 className="w-5 h-5" />
+                        </button>
+                        <button
                             title="Download PDF"
-                            className="h-8 w-8 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 pt-0.5"
+                            className="p-2 text-gray-400 hover:text-[#2d5a4c] hover:bg-gray-50 rounded-lg transition-colors"
                             onClick={handleDownloadPDF}
                         >
-                            <Download className="w-4 h-4" />
-                        </Button>
+                            <Download className="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
             </div>

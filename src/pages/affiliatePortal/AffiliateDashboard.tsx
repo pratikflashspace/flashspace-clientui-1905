@@ -317,10 +317,17 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans animate-fade-in relative">
+        <div className="min-h-screen bg-[#f8f9fa] p-8 lg:p-12 font-sans animate-fade-in relative">
             <div className="w-full space-y-10">
                 {/* 1. Page Header */}
-                {/* Header Removed */}
+                <div className="animate-fade-in-down mb-10">
+                    <h1 className="text-[2.25rem] font-black text-[#1a2d1d] tracking-tight leading-none mb-3">
+                        Affiliate <span className="text-[#35503F]">Dashboard</span>
+                    </h1>
+                    <p className="text-lg text-[#64748b] font-medium tracking-tight">
+                        Track your referrals, revenue, and performance
+                    </p>
+                </div>
 
                 {/* 2. Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -333,14 +340,12 @@ const Dashboard = () => {
                     ))}
                 </div>
 
-                {/* 3. AI Insights Section (Interactive) */}
-                <div className="space-y-6">
-                    <div className="space-y-1">
-                        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                            <Sparkles size={20} className="text-[#5aa39c]" />{" "}
+                <div className="space-y-6 pt-6">
+                    <div className="space-y-1.5">
+                        <h2 className="text-2xl font-bold text-[#1a2d1d] tracking-tight">
                             AI-Powered Insights
                         </h2>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-base text-[#64748b] font-medium">
                             Leverage AI to maximize your earnings
                         </p>
                     </div>
@@ -415,7 +420,7 @@ const Dashboard = () => {
                             <div className="flex items-center gap-2">
                                 <Sparkles
                                     size={18}
-                                    className="text-[#5aa39c] fill-[#5aa39c]"
+                                    className="text-[#334D3D] fill-[#334D3D]"
                                 />
                                 <h3 className="font-bold text-slate-800 text-lg">
                                     {INSIGHT_DATA[selectedInsight].title}
@@ -438,11 +443,11 @@ const Dashboard = () => {
                             {isLoadingInsight ? (
                                 <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 animate-fade-in">
                                     <div className="relative">
-                                        <div className="w-16 h-16 border-4 border-[#eaf4f3] border-t-[#5aa39c] rounded-full animate-spin"></div>
+                                        <div className="w-16 h-16 border-4 border-[#eaf4f3] border-t-[#334D3D] rounded-full animate-spin"></div>
                                         <div className="absolute inset-0 flex items-center justify-center">
                                             <Sparkles
                                                 size={20}
-                                                className="text-[#5aa39c] animate-pulse"
+                                                className="text-[#334D3D] animate-pulse"
                                             />
                                         </div>
                                     </div>
@@ -480,7 +485,7 @@ const Dashboard = () => {
                                                 </div>
                                                 <div className="text-right">
                                                     {metric.isHighlight ? (
-                                                        <span className="text-[#5aa39c] font-bold text-lg">
+                                                        <span className="text-[#334D3D] font-bold text-lg">
                                                             {metric.value}
                                                         </span>
                                                     ) : (
@@ -508,13 +513,13 @@ const Dashboard = () => {
                                     </div>
 
                                     {/* AI Recommendation Box */}
-                                    <div className="bg-[#eaf4f3]/50 border border-[#5aa39c]/20 rounded-xl p-4 flex gap-3 items-start">
+                                    <div className="bg-[#eaf4f3]/50 border border-[#334D3D]/20 rounded-xl p-4 flex gap-3 items-start">
                                         <Lightbulb
                                             size={20}
-                                            className="text-[#5aa39c] shrink-0 mt-0.5"
+                                            className="text-[#334D3D] shrink-0 mt-0.5"
                                         />
                                         <div>
-                                            <p className="text-xs font-bold text-[#5aa39c] mb-1">
+                                            <p className="text-xs font-bold text-[#334D3D] mb-1">
                                                 AI Recommendation
                                             </p>
                                             <p className="text-sm text-slate-700 leading-relaxed">
@@ -531,7 +536,7 @@ const Dashboard = () => {
                                     <div className="pt-2 flex justify-end">
                                         <button
                                             onClick={handleRefresh}
-                                            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 shadow-sm rounded-lg text-sm font-semibold text-gray-600 hover:text-[#5aa39c] hover:border-[#5aa39c] transition-all"
+                                            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 shadow-sm rounded-lg text-sm font-semibold text-gray-600 hover:text-[#334D3D] hover:border-[#334D3D] transition-all"
                                         >
                                             <RefreshCw size={14} /> Refresh
                                             Insights

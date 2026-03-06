@@ -8,6 +8,7 @@ import {
     Calendar,
     StickyNote,
     CheckCircle,
+    User2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,109 +28,137 @@ export interface Lead {
     lastContact: string;
 }
 
-const LeadTableRow = (lead: Lead) => {
-    const { name, phone, company, interest, status, lastContact } = lead;
-    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+const StatusBadge = ({ status }: { status: Lead['status'] }) => {
+    const styles = {
+        Hot: "bg-[#fef2f2] text-red-600 border-red-100",
+        Warm: "bg-[#fffbeb] text-amber-600 border-amber-100",
+        Cold: "bg-[#f0f9ff] text-blue-600 border-blue-100",
+        Converted: "bg-[#f0fdf4] text-[#10b981] border-[#bcf0da]",
+    };
 
-    const statusColors = {
-        Hot: "bg-red-50 text-red-500",
-        Warm: "bg-orange-50 text-orange-500",
-        Cold: "bg-blue-50 text-blue-500",
-        Converted: "bg-emerald-50 text-emerald-500",
+    const dotColors = {
+        Hot: "bg-red-500",
+        Warm: "bg-amber-500",
+        Cold: "bg-blue-500",
+        Converted: "bg-[#10b981]",
     };
 
     return (
+        <span className={`flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border ${styles[status]}`}>
+            <span className={`w-2 h-2 rounded-full ${dotColors[status]}`} />
+            {status}
+        </span>
+    );
+};
+
+interface LeadTableRowProps extends Lead {
+    delay?: number;
+}
+
+const LeadTableRow = (props: LeadTableRowProps) => {
+    const { name, phone, company, interest, status, lastContact, delay = 0 } = props;
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+    return (
         <>
-            <tr className="group hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
-                <td className="px-6 py-5">
-                    <p className="font-bold text-gray-900 text-sm">{name}</p>
-                    <p className="text-xs text-gray-400 font-medium">{phone}</p>
+            <tr
+                className="group hover:bg-gray-50/50 transition-all duration-300 animate-fade-in-up"
+                style={{ animationDelay: `${delay}ms` }}
+            >
+                {/* Lead Column */}
+                <td className="px-6 py-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-[#f1f5f9] flex items-center justify-center text-[#64748b] group-hover:bg-white group-hover:shadow-sm transition-all">
+                            <User2 size={18} />
+                        </div>
+                        <div>
+                            <p className="font-black text-[#1a2d1d] text-[15px] tracking-tight">{name}</p>
+                            <p className="text-[13px] text-[#64748b] font-medium">{phone}</p>
+                        </div>
+                    </div>
                 </td>
-                <td className="px-6 py-5 text-sm text-gray-600 font-medium">
-                    {company}
+
+                {/* Company Column */}
+                <td className="px-6 py-6">
+                    <p className="text-[15px] font-black text-[#1a2d1d] tracking-tight">
+                        {company}
+                    </p>
                 </td>
-                <td className="px-6 py-5">
-                    <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight">
+
+                {/* Interest Column */}
+                <td className="px-6 py-6">
+                    <span className="bg-[#f8f9fa] text-[#1a2d1d] px-3 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight border border-gray-100">
                         {interest}
                     </span>
                 </td>
-                <td className="px-6 py-5">
-                    <span
-                        className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase ${statusColors[status]}`}
-                    >
-                        {status}
-                    </span>
+
+                {/* Status Column */}
+                <td className="px-6 py-6">
+                    <StatusBadge status={status} />
                 </td>
-                <td className="px-6 py-5 text-sm text-gray-400 font-medium">
-                    {lastContact}
+
+                {/* Last Contact Column */}
+                <td className="px-6 py-6">
+                    <p className="text-[14px] text-[#64748b] font-medium">
+                        {lastContact}
+                    </p>
                 </td>
-                <td className="px-6 py-5 text-right">
-                    <div className="flex justify-end gap-1">
-                        {/* View Button */}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-9 w-9 text-gray-400 hover:text-[#5bb09c] hover:bg-teal-50 rounded-xl"
+
+                {/* Actions Column */}
+                <td className="px-6 py-6">
+                    <div className="flex items-center gap-2">
+                        {/* View */}
+                        <button
                             onClick={() => setIsDetailsOpen(true)}
+                            className="p-2.5 bg-[#f8f9fa] text-[#64748b] rounded-xl hover:bg-[#334D3D] hover:text-white transition-all shadow-sm border border-gray-100"
+                            title="View Details"
                         >
-                            <Eye className="w-4 h-4" />
-                        </Button>
+                            <Eye size={16} />
+                        </button>
 
-                        {/* Phone Button */}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-9 w-9 text-gray-400 hover:text-white hover:bg-[#e59e4e] rounded-xl transition-all"
-                            onClick={() =>
-                                (window.location.href = `tel:${phone}`)
-                            }
+                        {/* Phone */}
+                        <button
+                            onClick={() => window.location.href = `tel:${phone}`}
+                            className="p-2.5 bg-[#f8f9fa] text-[#64748b] rounded-xl hover:bg-[#10b981] hover:text-white transition-all shadow-sm border border-gray-100"
+                            title="Call Lead"
                         >
-                            <Phone className="w-4 h-4" />
-                        </Button>
+                            <Phone size={16} />
+                        </button>
 
-                        {/* Mail Button */}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-9 w-9 text-gray-400 hover:text-white hover:bg-[#e59e4e] rounded-xl transition-all"
-                            onClick={() =>
-                                (window.location.href = `mailto:support@flashspace.in`)
-                            }
+                        {/* Mail */}
+                        <button
+                            onClick={() => window.location.href = `mailto:support@flashspace.in`}
+                            className="p-2.5 bg-[#f8f9fa] text-[#64748b] rounded-xl hover:bg-[#3b82f6] hover:text-white transition-all shadow-sm border border-gray-100"
+                            title="Email Lead"
                         >
-                            <Mail className="w-4 h-4" />
-                        </Button>
+                            <Mail size={16} />
+                        </button>
 
-                        {/* Action Popover (Three Dots) */}
+                        {/* More Actions */}
                         <Popover>
                             <PopoverTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-9 w-9 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl"
+                                <button
+                                    className="p-2.5 bg-[#f8f9fa] text-[#64748b] rounded-xl hover:bg-white hover:text-[#1a2d1d] transition-all shadow-sm border border-gray-100"
                                 >
-                                    <MoreVertical className="w-4 h-4" />
-                                </Button>
+                                    <MoreVertical size={16} />
+                                </button>
                             </PopoverTrigger>
                             <PopoverContent
-                                className="w-52 p-1 bg-white rounded-xl shadow-xl border border-gray-100 animate-in fade-in zoom-in-95"
+                                className="w-56 p-2 bg-white rounded-[1.25rem] shadow-xl border border-gray-100 animate-in fade-in zoom-in-95 mt-2"
                                 align="end"
                             >
-                                <div className="flex flex-col">
-                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-white bg-[#e59e4e] rounded-lg mb-1 transition-colors">
-                                        <FileText className="w-4 h-4" /> Send
-                                        Quotation
+                                <div className="space-y-1">
+                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-black text-white bg-[#334D3D] rounded-xl hover:bg-[#1a2d1d] transition-all">
+                                        <FileText className="w-4 h-4" /> Send Quotation
                                     </button>
-                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                                        <Calendar className="w-4 h-4" />{" "}
-                                        Schedule Follow-up
+                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-medium text-[#64748b] hover:bg-[#f8f9fa] hover:text-[#1a2d1d] rounded-xl transition-all">
+                                        <Calendar className="w-4 h-4" /> Schedule Follow-up
                                     </button>
-                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                                        <StickyNote className="w-4 h-4" /> Add
-                                        Note
+                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-medium text-[#64748b] hover:bg-[#f8f9fa] hover:text-[#1a2d1d] rounded-xl transition-all">
+                                        <StickyNote className="w-4 h-4" /> Add Note
                                     </button>
-                                    <button className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                                        <CheckCircle className="w-4 h-4" /> Mark
-                                        as Converted
+                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-medium text-[#10b981] hover:bg-emerald-50 rounded-xl transition-all border border-emerald-50">
+                                        <CheckCircle className="w-4 h-4" /> Mark as Converted
                                     </button>
                                 </div>
                             </PopoverContent>

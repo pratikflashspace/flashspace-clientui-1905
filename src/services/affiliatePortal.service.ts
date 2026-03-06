@@ -156,6 +156,11 @@ export interface RevenueDashboardStats {
         Converted: number;
     };
     momGrowth: number;
+    revenueByProduct: {
+        label: string;
+        value: number;
+        percentage: number;
+    }[];
 }
 
 export interface AffiliateInvoice {
