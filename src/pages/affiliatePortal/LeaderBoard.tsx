@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { affiliatePortalService } from "@/services/affiliatePortal.service";
 import {
     Trophy, ChevronLeft, ChevronRight, Loader2, AlertCircle, BookCheck,
-    BadgePercent,
+    BadgePercent, Crown, Medal, Award, MapPin
 } from "lucide-react";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -37,11 +37,11 @@ const PAGE_SIZE = 10;
 const formatCurrency = (v: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(v);
 
-const getRankBadge = (rank: number) => {
-    if (rank === 1) return "🥇";
-    if (rank === 2) return "🥈";
-    if (rank === 3) return "🥉";
-    return `#${rank}`;
+const getRankIcon = (rank: number) => {
+    if (rank === 1) return <Crown className="w-6 h-6 text-yellow-500" />;
+    if (rank === 2) return <Medal className="w-6 h-6 text-gray-400" />;
+    if (rank === 3) return <Award className="w-6 h-6 text-orange-500" />;
+    return <span className="text-gray-400 font-bold text-lg">#{rank}</span>;
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -86,27 +86,27 @@ const LeaderBoard: React.FC = () => {
 
     // ─── Render ─────────────────────────────────────────────────────────────
     return (
-        <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-8">
+        <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-10 animate-in fade-in duration-500">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                    Affiliate <span className="italic text-[#5bb09c]">Leaderboard</span>
+                <h1 className="text-4xl font-extrabold text-[#1a1a1a] tracking-tight">
+                    Affiliate <span className="italic font-bold text-[#2d5a4c]">Leaderboard</span>
                 </h1>
-                <p className="text-gray-500 mt-2 text-sm">
+                <p className="text-[#6b7280] mt-2 text-lg font-medium">
                     Ranked by number of successful bookings via affiliate coupon code.
                 </p>
             </div>
 
             {/* Current User Hero Card */}
             {currentUser && (
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex items-center gap-5">
-                        <div className="w-16 h-16 bg-[#5bb09c]/10 text-[#5bb09c] rounded-full flex items-center justify-center text-2xl font-bold">
+                <div className="bg-[#f0f4f3] p-8 rounded-[2rem] flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group border-0 shadow-sm">
+                    <div className="flex items-center gap-8 relative z-10">
+                        <div className="w-20 h-20 bg-[#2d5a4c] text-white rounded-full flex items-center justify-center text-3xl font-black shadow-lg shadow-[#2d5a4c]/20 ring-4 ring-white">
                             {currentUser.rank ? `#${currentUser.rank}` : "—"}
                         </div>
-                        <div>
-                            <h3 className="text-xl font-bold text-gray-900">Your Position</h3>
-                            <p className="text-gray-400 text-sm">
+                        <div className="space-y-1">
+                            <h3 className="text-2xl font-black text-[#1a1a1a]">Your Position</h3>
+                            <p className="text-[#2d5a4c] font-bold">
                                 {currentUser.rank
                                     ? `You are ranked #${currentUser.rank} out of ${pagination.totalEntries} affiliates`
                                     : "No successful bookings yet — start referring!"}
@@ -114,89 +114,81 @@ const LeaderBoard: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="flex gap-6 sm:text-right">
+                    <div className="flex gap-12 text-center md:text-right relative z-10">
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">{currentUser.successfulBookings}</p>
-                            <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Bookings</p>
+                            <p className="text-4xl font-black text-[#1a1a1a] tracking-tighter">{currentUser.successfulBookings}</p>
+                            <p className="text-[#6b7280] font-bold text-sm uppercase tracking-widest mt-1">Bookings</p>
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-emerald-600">{formatCurrency(currentUser.totalCommission)}</p>
-                            <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Commission</p>
+                            <p className="text-4xl font-black text-[#2d5a4c] tracking-tighter">{formatCurrency(currentUser.totalCommission)}</p>
+                            <p className="text-[#6b7280] font-bold text-sm uppercase tracking-widest mt-1">Commission</p>
                         </div>
                     </div>
+
+                    <Trophy className="absolute -right-8 -bottom-8 w-48 h-48 text-[#2d5a4c] opacity-5 transform rotate-12 group-hover:scale-110 transition-transform duration-700" />
                 </div>
             )}
 
-            {/* Table */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                {/* Table Header */}
-                <div className="grid grid-cols-[60px_1fr_140px_180px] gap-4 px-6 py-3 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
-                    <span>Rank</span>
-                    <span>Affiliate</span>
-                    <span className="text-center">Bookings</span>
-                    <span className="text-right">Commission (15%)</span>
-                </div>
+            {/* Leaderboard Section */}
+            <div className="space-y-4">
 
-                {/* Rows */}
                 {loading ? (
-                    <div className="py-20 flex flex-col items-center justify-center gap-3">
-                        <Loader2 className="w-7 h-7 text-[#5bb09c] animate-spin" />
-                        <p className="text-sm text-gray-400">Loading leaderboard…</p>
+                    <div className="py-32 flex flex-col items-center justify-center gap-4">
+                        <Loader2 className="w-10 h-10 text-[#2d5a4c] animate-spin" />
+                        <p className="text-base text-gray-400 font-medium tracking-wide">Loading leaderboard…</p>
                     </div>
                 ) : error ? (
-                    <div className="py-16 flex flex-col items-center gap-3 text-center px-6">
-                        <AlertCircle className="w-10 h-10 text-red-400" />
-                        <p className="text-gray-600 font-medium">{error}</p>
+                    <div className="py-20 flex flex-col items-center gap-4 text-center px-6">
+                        <AlertCircle className="w-12 h-12 text-red-400" />
+                        <p className="text-gray-900 font-bold text-lg">{error}</p>
                         <button
                             onClick={() => fetchLeaderboard(page)}
-                            className="text-sm text-[#5bb09c] underline hover:no-underline"
+                            className="mt-2 text-[#2d5a4c] font-bold underline hover:no-underline"
                         >
                             Retry
                         </button>
                     </div>
                 ) : leaderboard.length === 0 ? (
-                    <div className="py-20 flex flex-col items-center gap-3 text-center px-6">
+                    <div className="py-32 flex flex-col items-center gap-4 text-center px-6 bg-white rounded-[2rem] shadow-sm border border-dashed border-gray-200">
                         <Trophy className="w-12 h-12 text-gray-200" />
-                        <p className="text-gray-500 font-medium">No data yet</p>
+                        <p className="text-gray-500 font-bold text-lg">No data yet</p>
                         <p className="text-sm text-gray-400">Be the first to make a successful referral booking!</p>
                     </div>
                 ) : (
                     leaderboard.map((entry) => (
                         <div
                             key={entry.affiliateId}
-                            className={`grid grid-cols-[60px_1fr_140px_180px] gap-4 items-center px-6 py-4 border-b border-gray-50 last:border-0 transition-colors ${entry.isUser ? "bg-[#5bb09c]/5 border-l-4 border-l-[#5bb09c]" : "hover:bg-gray-50/50"
+                            className={`bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] ring-1 ring-black/5 hover:ring-[#2d5a4c]/30 flex flex-col md:flex-row items-center justify-between gap-6 transition-all group ${entry.isUser ? "ring-2 ring-[#2d5a4c] bg-[#f0f4f3]/30" : ""
                                 }`}
                         >
-                            {/* Rank */}
-                            <span className={`text-lg font-bold ${entry.rank <= 3 ? "text-yellow-500" : "text-gray-400"}`}>
-                                {getRankBadge(entry.rank)}
-                            </span>
+                            <div className="flex items-center gap-6 w-full md:w-auto">
+                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${entry.rank === 1 ? "bg-yellow-50" :
+                                    entry.rank === 2 ? "bg-gray-50" :
+                                        entry.rank === 3 ? "bg-orange-50" : "bg-gray-50"
+                                    }`}>
+                                    {getRankIcon(entry.rank)}
+                                </div>
 
-                            {/* Name + Initials */}
-                            <div className="flex items-center gap-3 min-w-0">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${entry.isUser ? "bg-[#5bb09c] text-white" : "bg-gray-100 text-gray-600"
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-black shrink-0 ${entry.isUser ? "bg-[#2d5a4c] text-white" : "bg-gray-100 text-[#6b7280]"
                                     }`}>
                                     {entry.initials}
                                 </div>
-                                <div className="min-w-0">
-                                    <p className={`font-semibold truncate ${entry.isUser ? "text-[#5bb09c]" : "text-gray-800"}`}>
+
+                                <div className="space-y-0.5">
+                                    <h4 className="font-bold text-[#1a1a1a] text-xl group-hover:text-[#2d5a4c] transition-colors">
                                         {entry.isUser ? `${entry.name} (You)` : entry.name}
-                                    </p>
+                                    </h4>
                                 </div>
                             </div>
 
-                            {/* Bookings */}
-                            <div className="flex items-center justify-center gap-1.5">
-                                <BookCheck className="w-4 h-4 text-[#5bb09c]" />
-                                <span className="font-bold text-gray-900">{entry.successfulBookings}</span>
-                                <span className="text-xs text-gray-400">bookings</span>
-                            </div>
-
-                            {/* Commission */}
-                            <div className="text-right">
-                                <div className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 font-bold px-3 py-1 rounded-lg text-sm">
-                                    <BadgePercent className="w-3.5 h-3.5" />
-                                    {formatCurrency(entry.totalCommission)}
+                            <div className="flex items-center gap-12 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-4 md:pt-0 border-gray-100">
+                                <div className="text-center space-y-1">
+                                    <p className="text-2xl font-black text-[#1a1a1a]">{entry.successfulBookings}</p>
+                                    <p className="text-[#6b7280] font-bold text-[10px] uppercase tracking-widest text-right">Bookings</p>
+                                </div>
+                                <div className="text-center space-y-1">
+                                    <p className="text-2xl font-black text-[#1a1a1a]">{formatCurrency(entry.totalCommission)}</p>
+                                    <p className="text-[#6b7280] font-bold text-[10px] uppercase tracking-widest text-right">Commission (15%)</p>
                                 </div>
                             </div>
                         </div>
@@ -205,28 +197,28 @@ const LeaderBoard: React.FC = () => {
 
                 {/* Pagination Footer */}
                 {!loading && !error && pagination.totalEntries > 0 && (
-                    <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+                    <div className="flex items-center justify-between pt-6">
                         <p className="text-xs text-gray-400">
                             Showing {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, pagination.totalEntries)} of{" "}
                             {pagination.totalEntries} affiliates
                         </p>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-4">
                             <button
                                 onClick={handlePrev}
                                 disabled={!pagination.hasPrev}
-                                className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5 text-gray-500 hover:text-[#2d5a4c] disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-90"
                             >
-                                <ChevronLeft className="w-4 h-4" />
+                                <ChevronLeft className="w-5 h-5" />
                             </button>
-                            <span className="text-sm font-semibold text-gray-700">
-                                {page} / {pagination.totalPages}
+                            <span className="text-base font-bold text-[#1a1a1a] bg-white px-4 py-2 rounded-xl shadow-sm ring-1 ring-black/5">
+                                {page} <span className="text-gray-300 mx-1">/</span> {pagination.totalPages}
                             </span>
                             <button
                                 onClick={handleNext}
                                 disabled={!pagination.hasNext}
-                                className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5 text-gray-500 hover:text-[#2d5a4c] disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-90"
                             >
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className="w-5 h-5" />
                             </button>
                         </div>
                     </div>

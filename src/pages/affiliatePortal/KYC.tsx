@@ -12,9 +12,9 @@ const AffiliateKYC = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
-                        KYC <span className="text-[#5aa39c] italic">Verification</span>
-                        <Shield className="w-8 h-8 text-[#5aa39c]" />
+                    <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight flex items-center gap-3">
+                        KYC <span className="text-[#35503F] italic">Verification</span>
+                        <Shield className="w-8 h-8 text-[#35503F]" />
                     </h1>
                     <p className="text-gray-500 mt-2 text-lg font-light">
                         Complete your identity verification to enable full portal features
@@ -22,8 +22,8 @@ const AffiliateKYC = () => {
                 </motion.div>
 
                 <div className="px-5 py-3 bg-[#5aa39c]/10 border border-[#5aa39c]/20 rounded-2xl flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-[#5aa39c] animate-pulse" />
-                    <span className="text-sm font-semibold text-[#3d6b67]">Identity Protection Active</span>
+                    <div className="w-2 h-2 rounded-full bg-[#35503F] animate-pulse" />
+                    <span className="text-sm font-semibold text-[#35503F]">Identity Protection Active</span>
                 </div>
             </div>
 
