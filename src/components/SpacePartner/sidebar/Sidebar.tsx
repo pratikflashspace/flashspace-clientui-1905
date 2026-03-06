@@ -2,6 +2,7 @@ import React from "react";
 import { X, ChevronLeft, ChevronRight, LogOut, LayoutDashboard, Home } from "lucide-react";
 import { sidebarConfig } from "./SidebarConfig";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 type SidebarItemProps = {
   icon: React.ReactNode;
@@ -47,6 +48,12 @@ export default function Sidebar({
   onToggleCollapse,
 }: SidebarProps) {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
   return (
     <aside
       className={`flex h-screen flex-col overflow-hidden border-r border-[#2D3F33]/10 dark:border-white/10 bg-[#f3f4f3] dark:bg-[#0f0f0f] py-6 transition-[width,padding] duration-200 ${isCollapsed ? "w-20 px-3" : "w-72 px-4"
@@ -167,7 +174,10 @@ export default function Sidebar({
           </>
         )}
 
-        <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200/70 px-4 py-3 font-semibold text-red-600 hover:bg-red-50 transition-colors">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-semibold text-red-500 hover:bg-red-50 transition-colors"
+        >
           <LogOut size={16} />
           {!isCollapsed && <span>Logout</span>}
         </button>

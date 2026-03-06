@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
     Users2, TrendingUp, BookOpen, IndianRupee, Loader2,
-    AlertCircle, Search, Filter, BadgePercent,
+    AlertCircle, Search, Filter, BadgePercent, Calendar,
 } from "lucide-react";
 import axiosInstance from "@/lib/axios";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 interface ClientBooking {
@@ -56,8 +61,23 @@ const AffiliateClientManagement: React.FC = () => {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Search & Filter State
+    const [searchInput, setSearchInput] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
+    const [spaceFilter, setSpaceFilter] = useState("all");
+    const [commissionFilter, setCommissionFilter] = useState("All");
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+    // Staging state for Advanced Filters (applied only on button click)
+    const [pendingCommission, setPendingCommission] = useState("All");
+    const [pendingDateFrom, setPendingDateFrom] = useState("");
+    const [pendingDateTo, setPendingDateTo] = useState("");
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     useEffect(() => {
         const fetchClients = async () => {
@@ -86,16 +106,61 @@ const AffiliateClientManagement: React.FC = () => {
 
     // Filter
     const filtered = clients.filter((c) => {
+        const q = searchQuery.trim().toLowerCase();
         const matchesSearch =
-            !searchQuery ||
-            c.user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            c.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            c.space.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            c.bookingNumber.toLowerCase().includes(searchQuery.toLowerCase());
+            !q ||
+            c.user.fullName.toLowerCase().includes(q) ||
+            c.user.email.toLowerCase().includes(q) ||
+            c.space.toLowerCase().includes(q) ||
+            c.city.toLowerCase().includes(q) ||
+            c.plan.toLowerCase().includes(q) ||
+            c.bookingNumber.toLowerCase().includes(q) ||
+            c.couponCode.toLowerCase().includes(q);
 
-        const matchesStatus = statusFilter === "all" || c.status === statusFilter;
-        return matchesSearch && matchesStatus;
+        const matchesSpace = spaceFilter === "all" || c.plan === spaceFilter;
+
+        let matchesCommission = true;
+        if (commissionFilter === "< 10k") matchesCommission = c.commissionAmount < 10000;
+        else if (commissionFilter === "10k - 50k") matchesCommission = c.commissionAmount >= 10000 && c.commissionAmount <= 50000;
+        else if (commissionFilter === "> 50k") matchesCommission = c.commissionAmount > 50000;
+
+        let matchesDate = true;
+        if (dateFrom) {
+            const from = new Date(dateFrom);
+            const bookedDate = new Date(c.createdAt || "");
+            if (bookedDate < from) matchesDate = false;
+        }
+        if (dateTo) {
+            const to = new Date(dateTo);
+            to.setHours(23, 59, 59, 999);
+            const bookedDate = new Date(c.createdAt || "");
+            if (bookedDate > to) matchesDate = false;
+        }
+
+        return matchesSearch && matchesSpace && matchesCommission && matchesDate;
     });
+
+    // Pagination Logic
+    const totalPages = Math.ceil(filtered.length / rowsPerPage);
+    const paginatedClients = filtered.slice(
+        (currentPage - 1) * rowsPerPage,
+        currentPage * rowsPerPage,
+    );
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, spaceFilter, commissionFilter, dateFrom, dateTo, rowsPerPage]);
+
+    const handleSearch = () => {
+        setSearchQuery(searchInput);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter") {
+            handleSearch();
+        }
+    };
 
     // ─── Loading ──────────────────────────────────────────────────────────────
     if (loading) {
@@ -155,17 +220,126 @@ const AffiliateClientManagement: React.FC = () => {
                 </div>
             </div>
 
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search by name, email, space or booking ID…"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5aa39c]/30"
-                    />
+            {/* Search & Advanced Filter Bar */}
+            <div className="space-y-6">
+                <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-1 flex gap-2">
+                        <div className="relative flex-1">
+                            <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                            <input
+                                type="text"
+                                placeholder="Search by name, email, space, coupon or booking ID…"
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5aa39c]/30 transition-all text-sm"
+                            />
+                        </div>
+                        <button
+                            onClick={handleSearch}
+                            className="px-6 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors shadow-sm font-medium"
+                        >
+                            Search
+                        </button>
+                    </div>
+
+                    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+                        <DropdownMenuTrigger asChild>
+                            <button className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors shadow-sm font-medium">
+                                <Filter className="w-4 h-4" />
+                                <span>Advanced Filters</span>
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-64 p-4 space-y-4 bg-white cursor-pointer">
+                            <div className="space-y-2">
+                                <label className="text-xs font-semibold text-gray-500 uppercase">
+                                    Commission Range
+                                </label>
+                                <select
+                                    className="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
+                                    value={pendingCommission}
+                                    onChange={(e) => setPendingCommission(e.target.value)}
+                                >
+                                    <option value="All">Commission</option>
+                                    <option value="< 10k">&lt; ₹10,000</option>
+                                    <option value="10k - 50k">₹10,000 - ₹50,000</option>
+                                    <option value="> 50k">&gt; ₹50,000</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2 pt-2 border-t border-gray-100">
+                                <label className="text-xs font-semibold text-gray-500 uppercase flex items-center gap-1.5">
+                                    <Calendar className="w-3.5 h-3.5" />
+                                    Date Range
+                                </label>
+                                <div className="space-y-2">
+                                    <div>
+                                        <label className="text-[11px] text-gray-400 mb-0.5 block">From</label>
+                                        <input
+                                            type="date"
+                                            value={pendingDateFrom}
+                                            max={pendingDateTo || undefined}
+                                            onChange={(e) => setPendingDateFrom(e.target.value)}
+                                            className="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[11px] text-gray-400 mb-0.5 block">To</label>
+                                        <input
+                                            type="date"
+                                            value={pendingDateTo}
+                                            min={pendingDateFrom || undefined}
+                                            onChange={(e) => setPendingDateTo(e.target.value)}
+                                            className="w-full p-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
+                                        />
+                                    </div>
+                                    {(pendingDateFrom || pendingDateTo) && (
+                                        <button
+                                            onClick={() => { setPendingDateFrom(""); setPendingDateTo(""); }}
+                                            className="w-full text-xs text-red-500 hover:text-red-600 font-medium py-1 transition-colors"
+                                        >
+                                            Clear Dates
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="pt-3 border-t border-gray-100">
+                                <button
+                                    onClick={() => {
+                                        setCommissionFilter(pendingCommission);
+                                        setDateFrom(pendingDateFrom);
+                                        setDateTo(pendingDateTo);
+                                        setIsDropdownOpen(false);
+                                    }}
+                                    className="w-full py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
+                                >
+                                    Apply Filters
+                                </button>
+                            </div>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+
+                {/* Space Type Tabs */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-2">
+                    {[
+                        { label: "All Spaces", value: "all" },
+                        { label: "Private Office", value: "Private Office" },
+                        { label: "Dedicated Desk", value: "Dedicated Desk" },
+                        { label: "Meeting Room", value: "Meeting Room" },
+                        { label: "Coworking", value: "Coworking" },
+                        { label: "Virtual Office", value: "Virtual Office" },
+                    ].map((tab) => (
+                        <button
+                            key={tab.value}
+                            onClick={() => setSpaceFilter(tab.value)}
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${spaceFilter === tab.value
+                                ? "bg-gray-900 text-white"
+                                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                                }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
             </div>
 
@@ -195,11 +369,12 @@ const AffiliateClientManagement: React.FC = () => {
                                     <th className="px-5 py-3">Paid</th>
                                     <th className="px-5 py-3">Commission (15%)</th>
                                     <th className="px-5 py-3">Coupon</th>
+                                    <th className="px-5 py-3">Status</th>
                                     <th className="px-5 py-3">Booked On</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
-                                {filtered.map((c) => (
+                                {paginatedClients.map((c) => (
                                     <tr key={String(c.bookingId)} className="hover:bg-gray-50/50 transition-colors">
                                         {/* Client */}
                                         <td className="px-5 py-4">
@@ -250,7 +425,12 @@ const AffiliateClientManagement: React.FC = () => {
                                             </span>
                                         </td>
 
-
+                                        {/* Status */}
+                                        <td className="px-5 py-4">
+                                            <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider ${statusColors[c.status] || "bg-gray-50 text-gray-500 border-gray-200"}`}>
+                                                {c.status.replace(/_/g, " ")}
+                                            </span>
+                                        </td>
 
                                         {/* Date */}
                                         <td className="px-5 py-4 text-gray-500">{formatDate(c.createdAt)}</td>
@@ -260,12 +440,46 @@ const AffiliateClientManagement: React.FC = () => {
                         </table>
                     </div>
 
-                    {/* Footer */}
-                    <div className="px-5 py-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
-                        <span>Showing {filtered.length} of {clients.length} client{clients.length !== 1 ? "s" : ""}</span>
-                        <span className="font-semibold text-emerald-600">
-                            Filtered Commission: {formatCurrency(filtered.reduce((s, c) => s + c.commissionAmount, 0))}
-                        </span>
+                    {/* Pagination Footer */}
+                    <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between flex-wrap gap-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <span>Showing</span>
+                            <select
+                                className="border border-gray-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-teal-500"
+                                value={rowsPerPage}
+                                onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                            >
+                                {[5, 10, 25, 50].map((size) => (
+                                    <option key={size} value={size}>
+                                        {size}
+                                    </option>
+                                ))}
+                            </select>
+                            <span>rows of {filtered.length}</span>
+                            <span className="ml-4 font-semibold text-emerald-600">
+                                Filtered Commission: {formatCurrency(filtered.reduce((s, c) => s + c.commissionAmount, 0))}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                className="px-3 py-1.5 border border-gray-200 rounded text-sm text-gray-600 font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                            >
+                                Previous
+                            </button>
+                            <span className="text-sm text-gray-600 font-medium px-2">
+                                Page {currentPage} of {totalPages || 1}
+                            </span>
+                            <button
+                                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages || totalPages === 0}
+                                className="px-3 py-1.5 border border-gray-200 rounded text-sm text-gray-600 font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

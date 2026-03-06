@@ -19,7 +19,7 @@ import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 import VirtualOffice from "./pages/services/VirtualOffice";
 
-import CoworkingSpace from "./pages/services/CoworkingSpace";
+// import CoworkingSpace from "./pages/services/CoworkingSpace";
 import OnDemand from "./pages/services/OnDemand";
 import GetWorkspaces from "./pages/services/GetWorkspaces";
 import EventSpaces from "./pages/services/EventSpaces";
