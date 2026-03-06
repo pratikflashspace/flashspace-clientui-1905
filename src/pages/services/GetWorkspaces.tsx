@@ -470,6 +470,15 @@ const GetWorkspaces = () => {
     else navigate(`/services/virtual-office${searchStr}`);
   };
   const [searchLocation, setSearchLocation] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce: apply search filter 1 second after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchLocation);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [searchLocation]);
   const [pricingFilter, setPricingFilter] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -616,10 +625,10 @@ const GetWorkspaces = () => {
   const filteredWorkspaces = workspaces.filter((ws) => {
     // Location search filter
     const matchesSearch =
-      !searchLocation ||
-      ws.address.toLowerCase().includes(searchLocation.toLowerCase()) ||
-      ws.location.toLowerCase().includes(searchLocation.toLowerCase()) ||
-      ws.name.toLowerCase().includes(searchLocation.toLowerCase());
+      !debouncedSearch ||
+      ws.address.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      ws.location.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      ws.name.toLowerCase().includes(debouncedSearch.toLowerCase());
 
     // Price filter
     let matchesPrice = true;
@@ -716,11 +725,10 @@ const GetWorkspaces = () => {
                 onValueChange={handleWorkspaceTypeChange}
               >
                 <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${
-                    workspaceType !== "virtual-office"
-                      ? "bg-muted/50 border-border text-foreground"
-                      : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
-                  }`}
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${workspaceType !== "virtual-office"
+                    ? "bg-muted/50 border-border text-foreground"
+                    : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
+                    }`}
                 >
                   <SelectValue placeholder="Product" />
                 </SelectTrigger>
@@ -781,11 +789,10 @@ const GetWorkspaces = () => {
             <div className="sm:w-[160px]">
               <Select value={pricingFilter} onValueChange={setPricingFilter}>
                 <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${
-                    pricingFilter !== "all"
-                      ? "bg-muted/50 border-border text-foreground"
-                      : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
-                  }`}
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${pricingFilter !== "all"
+                    ? "bg-muted/50 border-border text-foreground"
+                    : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
+                    }`}
                 >
                   <SelectValue placeholder="Pricing" />
                 </SelectTrigger>
@@ -802,11 +809,10 @@ const GetWorkspaces = () => {
             <div className="sm:w-[150px]">
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${
-                    sortBy !== "rating"
-                      ? "bg-muted/50 border-border text-foreground"
-                      : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
-                  }`}
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${sortBy !== "rating"
+                    ? "bg-muted/50 border-border text-foreground"
+                    : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
+                    }`}
                 >
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
@@ -845,21 +851,19 @@ const GetWorkspaces = () => {
                 <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${
-                      viewMode === "list"
-                        ? "bg-card text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
+                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${viewMode === "list"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                      }`}
                   >
                     <List className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${
-                      viewMode === "grid"
-                        ? "bg-card text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
+                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${viewMode === "grid"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                      }`}
                   >
                     <LayoutGrid className="w-4 h-4" />
                   </button>
