@@ -93,6 +93,7 @@ const BookingPage = () => {
   const [appliedCoupon, setAppliedCoupon] = useState<{
     code: string;
     discountValue: number;
+    affiliateId?: string; // Present if this is an affiliate coupon
   } | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
 
@@ -325,6 +326,7 @@ const BookingPage = () => {
         setAppliedCoupon({
           code: result.data.code,
           discountValue: result.data.discountValue,
+          affiliateId: result.data.affiliateId || undefined, // Store affiliateId for payment attribution
         });
         toast({
           title: "Coupon Applied! 🎉",
@@ -489,6 +491,10 @@ const BookingPage = () => {
             : "virtual_office",
         startDate: new Date(selectedStartDate).toISOString(),
         holdId: searchParams.get("holdId") || undefined,
+        // ── Affiliate attribution ──────────────────────────────────
+        couponCode: appliedCoupon?.code || undefined,
+        affiliateId: appliedCoupon?.affiliateId || undefined,
+        // ──────────────────────────────────────────────────────────
       });
 
       await openRazorpayCheckout({
@@ -538,7 +544,7 @@ const BookingPage = () => {
 
             if (appliedCoupon) {
               try {
-                await markCouponUsed(appliedCoupon.code);
+                await markCouponUsed(appliedCoupon.code, user?.id);
               } catch (err) {
                 console.error("Failed to mark coupon used", err);
               }
@@ -637,6 +643,10 @@ const BookingPage = () => {
             : "virtual_office",
         startDate: new Date(selectedStartDate).toISOString(),
         holdId: searchParams.get("holdId") || undefined,
+        // ── Affiliate attribution ──────────────────────────────────
+        couponCode: appliedCoupon?.code || undefined,
+        affiliateId: appliedCoupon?.affiliateId || undefined,
+        // ──────────────────────────────────────────────────────────
       });
 
       toast({
@@ -666,7 +676,7 @@ const BookingPage = () => {
 
       if (appliedCoupon) {
         try {
-          await markCouponUsed(appliedCoupon.code);
+          await markCouponUsed(appliedCoupon.code, user?.id);
         } catch (err) {
           console.error("Failed to mark coupon used", err);
         }
@@ -797,13 +807,12 @@ const BookingPage = () => {
                     >
                       <div
                         className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ease-out shadow-sm border-2
-                      ${
-                        isCompleted
-                          ? "bg-primary border-primary text-primary-foreground shadow-md"
-                          : isActive
-                            ? "bg-card border-primary text-primary shadow-lg scale-110 ring-4 ring-primary/15"
-                            : "bg-card border-border text-muted-foreground"
-                      }`}
+                      ${isCompleted
+                            ? "bg-gradient-to-br from-teal-500 to-emerald-400 border-teal-400 text-white shadow-teal-200 shadow-md"
+                            : isActive
+                              ? "bg-white border-teal-500 text-teal-600 shadow-teal-100 shadow-lg scale-110 ring-4 ring-teal-50"
+                              : "bg-white border-gray-200 text-gray-400"
+                          }`}
                       >
                         {isCompleted ? (
                           <Check className="w-5 h-5" strokeWidth={3} />
@@ -998,11 +1007,10 @@ const BookingPage = () => {
                             key={key}
                             onClick={() => setSelectedPlanKey(key)}
                             className={`relative p-5 rounded-2xl cursor-pointer transition-all duration-300 border-2
-                               ${
-                                 isSelected
-                                   ? "border-teal-500 bg-gradient-to-br from-teal-50 to-emerald-50 shadow-lg shadow-teal-100/50 scale-[1.02]"
-                                   : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
-                               }`}
+                               ${isSelected
+                                ? "border-teal-500 bg-gradient-to-br from-teal-50 to-emerald-50 shadow-lg shadow-teal-100/50 scale-[1.02]"
+                                : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
+                              }`}
                           >
                             {isSelected && (
                               <div className="absolute -top-2.5 -right-2.5 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center shadow-md">
@@ -1071,11 +1079,10 @@ const BookingPage = () => {
                             setSelectedTenure(option.years as 1 | 2 | 3)
                           }
                           className={`relative border-2 rounded-2xl p-5 cursor-pointer transition-all duration-300
-                             ${
-                               selectedTenure === option.years
-                                 ? "border-teal-500 bg-teal-50 shadow-lg scale-[1.02]"
-                                 : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
-                             }`}
+                              ${selectedTenure === option.years
+                              ? "border-teal-500 bg-teal-50 shadow-lg scale-[1.02]"
+                              : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
+                            }`}
                         >
                           {option.popular && (
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-teal-500 to-emerald-400 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md">
@@ -1532,11 +1539,10 @@ const BookingPage = () => {
                 onClick={goNext}
                 disabled={!canProceed()}
                 className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-md
-                   ${
-                     canProceed()
-                       ? "bg-gradient-to-r from-teal-600 to-emerald-500 text-white hover:from-teal-700 hover:to-emerald-600 shadow-teal-200/50 hover:shadow-lg"
-                       : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
-                   }`}
+                   ${canProceed()
+                    ? "bg-gradient-to-r from-teal-600 to-emerald-500 text-white hover:from-teal-700 hover:to-emerald-600 shadow-teal-200/50 hover:shadow-lg"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+                  }`}
               >
                 Continue <ArrowRight className="w-4 h-4" />
               </button>
