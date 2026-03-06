@@ -134,7 +134,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     fixed top-0 left-0 z-50 h-screen bg-white shadow-xl border-r border-gray-100 flex flex-col transition-all duration-300 ease-in-out
     w-72 
     ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-    lg:static lg:translate-x-0 lg:shadow-none
+    lg:relative lg:translate-x-0 lg:shadow-none lg:h-full overflow-hidden
     ${isDesktopCollapsed ? "lg:w-20" : "lg:w-72"}
   `;
 
@@ -147,9 +147,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 />
             )}
 
-            <aside className={sidebarClasses}>
+            <aside className={sidebarClasses} data-lenis-prevent>
                 {/* Header branding */}
-                <div className={`flex flex-col transition-all duration-300 ${isDesktopCollapsed ? "p-4 items-center" : "p-8 pb-4"}`}>
+                <div className={`flex flex-col shrink-0 transition-all duration-300 ${isDesktopCollapsed ? "p-4 items-center" : "p-8 pb-4"}`}>
                     <div className={`flex items-center w-full ${isDesktopCollapsed ? "justify-center" : "justify-between"}`}>
                         <div
                             className={`font-black tracking-tight transition-all duration-300 overflow-hidden whitespace-nowrap ${isDesktopCollapsed ? "text-2xl" : "text-[2.25rem]"}`}
@@ -183,7 +183,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
 
                 {/* Navigation Menu */}
-                <div className="flex-1 overflow-y-auto px-4 space-y-2 custom-scrollbar overflow-x-hidden">
+                <div className="flex-1 min-h-0 overflow-y-scroll px-4 space-y-2 custom-scrollbar overflow-x-hidden" data-lenis-prevent>
                     {menuItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = activePage === item.name;
@@ -230,7 +230,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
 
                 {/* Footer and Bottom Actions */}
-                <div className="p-6 border-t border-gray-100 space-y-4 bg-[#f8f9fa]/30">
+                <div className="p-6 border-t border-gray-100 space-y-4 bg-[#f8f9fa]/30 shrink-0">
                     <button
                         onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
                         className={`

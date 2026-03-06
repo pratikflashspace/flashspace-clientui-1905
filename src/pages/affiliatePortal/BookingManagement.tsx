@@ -251,7 +251,7 @@ const BookingDetailsModal = ({
                 </div>
 
                 {/* Scrollable Body */}
-                <div className="p-6 pt-2 overflow-y-auto space-y-6">
+                <div className="p-6 pt-2 overflow-y-auto space-y-6 custom-scrollbar" data-lenis-prevent>
                     {/* Section 1: Basic Info */}
                     <div className="space-y-4">
                         <div className="p-4 bg-gray-50 rounded-xl space-y-1">
