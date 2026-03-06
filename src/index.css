@@ -773,35 +773,45 @@
 }
 
 /* Scrollbar styling - keep visible */
-.scrollbar-custom {
+.scrollbar-custom,
+.custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db #f3f4f6;
+  scrollbar-color: #334d3d80 #f3f4f6;
+  /* More opaque thumb */
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
 }
 
-.scrollbar-custom::-webkit-scrollbar {
+.scrollbar-custom::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
   width: 8px;
-  background-color: #f3f4f6;
+  background-color: transparent;
 }
 
-.scrollbar-custom::-webkit-scrollbar-track {
-  background: #f3f4f6;
+.scrollbar-custom::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  /* Visible background for the track */
   border-radius: 10px;
-  margin: 2px 0;
+  margin: 4px 0;
 }
 
-.scrollbar-custom::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+.scrollbar-custom::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334d3d50;
+  /* Increased opacity from 30 to 50 */
   border-radius: 10px;
-  border: 1px solid #f3f4f6;
+  border: 2px solid transparent;
+  background-clip: content-box;
   transition: all 0.2s ease;
 }
 
-.scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
-  border: 1px solid #e5e7eb;
+.scrollbar-custom::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #334d3d60;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 /* Right Panel Scrollbar - FlashSpace Yellow */
@@ -932,12 +942,28 @@
 
 
 
-/* Force scrollable containers to respond to mouse wheel */
+/* Force scrollable containers to respond to mouse wheel and touch correctly */
+[data-lenis-prevent],
+.overflow-y-auto,
+.overflow-auto,
+.overflow-y-scroll,
+[style*="overflow-y: auto"],
 [style*="overflow-y: scroll"],
 [style*="overflowY: scroll"] {
   overscroll-behavior: auto !important;
   -webkit-overflow-scrolling: touch !important;
-  touch-action: pan-y !important;
+  touch-action: auto !important;
+  pointer-events: auto !important;
+}
+
+/* Explicit fix for Lenis prevent elements */
+[data-lenis-prevent] {
+  scroll-behavior: auto !important;
+}
+
+/* Ensure no parent of a scrollable element blocks pointer events */
+#affiliate-main-content {
+  pointer-events: auto !important;
 }
 
 /* Global Animations */
