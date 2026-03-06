@@ -414,54 +414,6 @@ export default function SpacePartnerKycDetails() {
                   </div>
                 </div>
               </div>
-
-              {/* Property Details Section */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <MapPin className="w-5 h-5 text-teal-500" />
-                  <h3 className="font-bold text-gray-900">Property Details</h3>
-                </div>
-                <div className="space-y-4">
-                  {loadingProperties ? (
-                    <div className="flex justify-center py-4">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-500"></div>
-                    </div>
-                  ) : properties.length > 0 ? (
-                    properties.map((prop) => (
-                      <div
-                        key={prop._id}
-                        className="p-3 rounded-xl border border-gray-50 bg-gray-50/50 space-y-1"
-                      >
-                        <div className="flex justify-between items-start">
-                          <h4 className="font-bold text-gray-900 text-sm">
-                            {prop.name}
-                          </h4>
-                          <span
-                            className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                              prop.kycStatus === "approved"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-amber-100 text-amber-700"
-                            }`}
-                          >
-                            {prop.kycStatus}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {prop.area}, {prop.city}
-                        </p>
-                        <p className="text-[10px] text-gray-400 truncate">
-                          {prop.address}
-                        </p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-gray-400 text-center py-4 italic">
-                      No properties found for this partner.
-                    </p>
-                  )}
-                </div>
-              </div>
             </>
           ) : (
             <>
@@ -534,8 +486,12 @@ export default function SpacePartnerKycDetails() {
                 </button>
                 <button
                   onClick={() => setOverallAction("approved")}
-                  disabled={submitting}
-                  className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-sm bg-green-500 hover:bg-green-600 text-white`}
+                  disabled={submitting || !allDocsApproved}
+                  className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-sm ${
+                    submitting || !allDocsApproved
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      : "bg-green-500 hover:bg-green-600 text-white"
+                  }`}
                 >
                   <CheckCircle2 className="w-4 h-4" /> Approve{" "}
                   {propertyId ? "Property" : "KYC"}

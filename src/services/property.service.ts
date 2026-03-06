@@ -137,6 +137,30 @@ export const deleteProperty = async (id: string): Promise<boolean> => {
   }
 };
 
+export const uploadPropertyImage = async (
+  propertyId: string,
+  file: File,
+): Promise<any> => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await axiosInstance.post(
+      `/property/${propertyId}/upload-image`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error uploading property image:", error);
+    throw error;
+  }
+};
+
 export const uploadPropertyDocument = async (
   propertyId: string,
   documentType: string,
@@ -189,6 +213,7 @@ const propertyService = {
   getParameterProperties: getPartnerProperties,
   getPropertyBookingsForPartner,
   deleteProperty,
+  uploadPropertyImage,
   uploadPropertyDocument,
   deletePropertyDocument,
 };
