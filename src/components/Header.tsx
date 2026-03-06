@@ -159,7 +159,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 >
                                     {[
                                         { title: "Virtual Office", href: "/solutions/virtual-office" },
-                                        { title: "Coworking Space", href: "/solutions/coworking-space" },
+                                        { title: "Coworking Space", href: "/services/coworking-space" },
                                         { title: "Business Setup", href: "/solutions/business-setup" },
                                     ].map((item) => (
                                         <button
