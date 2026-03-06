@@ -351,7 +351,7 @@ export default function SupportChat() {
                         onClick={handleResolve}
                         className="px-4 py-2 bg-green-50 border border-green-200 text-green-700 rounded-xl text-xs font-bold hover:bg-green-100 transition-colors shadow-sm"
                       >
-                        Resolve
+                        Resolved
                       </button>
                     )}
                 </div>
@@ -463,7 +463,7 @@ export default function SupportChat() {
                   </div>
                 ) : (
                   <div className="p-6 bg-amber-50 border-t border-amber-100 text-center text-amber-700 text-sm font-medium">
-                    Click <strong>Take Over</strong> to start chatting with this
+                    Click <strong>Tap In</strong> to start chatting with this
                     user.
                   </div>
                 )

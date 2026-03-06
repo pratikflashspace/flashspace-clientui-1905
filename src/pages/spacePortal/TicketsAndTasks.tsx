@@ -418,7 +418,7 @@ export default function TicketsAndTasksPage() {
                     </div>
                   ) : (
                     <div className="p-6 bg-amber-50 border-t border-amber-100 text-center text-amber-700 text-sm font-medium">
-                      Click <strong>Take Over</strong> to start chatting with this user.
+                      Click <strong>Tap In</strong> to start chatting with this user.
                     </div>
                   )
                 ) : (
