@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿import React, { useEffect, useState } from "react";
 import SpacePartnerKycRequest from "./SpacePartnerKycRequest";
 import { adminService } from "@/services/admin.service";
@@ -1614,3 +1615,1602 @@ export default function KYCRequests() {
     </div>
   );
 }
+=======
+﻿import React, { useEffect, useState } from "react";
+import { adminService } from "@/services/admin.service";
+import {
+  Search,
+  Check,
+  X,
+  FileText,
+  AlertCircle,
+  User,
+  Building2,
+  Eye,
+  Download,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  ExternalLink,
+  Calendar,
+  File,
+  ArrowLeft,
+  ChevronRight,
+  Filter,
+  Users,
+  Briefcase,
+  RefreshCw
+} from "lucide-react";
+import { toast } from "sonner";
+import { API_CONFIG } from "@/config/api.config";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+
+interface KYCDocument {
+  type: string;
+  name: string;
+  fileUrl?: string;
+  status?: string;
+  rejectionReason?: string;
+  uploadedAt?: string;
+  verifiedAt?: string;
+}
+
+interface KYCRequest {
+  _id: string;
+  profileName?: string;
+  kycType?: "individual" | "business";
+  isPartner?: boolean;
+  user: {
+    _id: string;
+    fullName: string;
+    email: string;
+    phoneNumber?: string;
+  };
+  personalInfo?: {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+  };
+  businessInfo?: {
+    companyName?: string;
+    companyType?: string;
+    gstNumber?: string;
+    panNumber?: string;
+  };
+  overallStatus:
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "resubmit"
+  | "not_started";
+  documents: KYCDocument[];
+  progress?: number;
+  createdAt: string;
+  partnerCount?: number;
+  businessInfoCount?: number;
+}
+
+import { useNavigate } from "react-router-dom";
+
+export default function KYCRequests() {
+  const navigate = useNavigate();
+  const [requests, setRequests] = useState<KYCRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userSearchTerm, setUserSearchTerm] = useState("");
+  const [partnerSearchTerm, setPartnerSearchTerm] = useState("");
+  const [selectedRequest, setSelectedRequest] = useState<KYCRequest | null>(
+    null,
+  );
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showDocumentModal, setShowDocumentModal] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<KYCDocument | null>(
+    null,
+  );
+
+  // Partner KYC State
+  const [partnerRequests, setPartnerRequests] = useState<any[]>([]);
+  const [loadingPartnerRequests, setLoadingPartnerRequests] = useState(false);
+  const [activeTab, setActiveTab] = useState("users");
+  const [viewMode, setViewMode] = useState<
+    "list" | "user_partners" | "user_business"
+  >("list");
+  const [selectedUserForPartners, setSelectedUserForPartners] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [selectedUserForBusiness, setSelectedUserForBusiness] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
+  // Partner Modal State
+  const [showPartnerModal, setShowPartnerModal] = useState(false);
+  const [partners, setPartners] = useState<any[]>([]);
+  const [loadingPartners, setLoadingPartners] = useState(false);
+  const [selectedPartner, setSelectedPartner] = useState<any | null>(null);
+
+  // Personal Info Modal State
+  const [showPersonalInfoModal, setShowPersonalInfoModal] = useState(false);
+  const [selectedPersonalInfo, setSelectedPersonalInfo] = useState<any | null>(
+    null,
+  );
+
+  // Business Info Modal State
+  const [showBusinessInfoModal, setShowBusinessInfoModal] = useState(false);
+  const [businessInfo, setBusinessInfo] = useState<any[]>([]); // Changed to array
+  const [loadingBusinessInfo, setLoadingBusinessInfo] = useState(false);
+
+  // Helper to construct full URL from relative path
+  const getFullUrl = (url?: string): string => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    const baseUrl = API_CONFIG.BASE_URL.endsWith("/")
+      ? API_CONFIG.BASE_URL.slice(0, -1)
+      : API_CONFIG.BASE_URL;
+    const path = url.startsWith("/") ? url : `/${url}`;
+    return `${baseUrl}${path}`;
+  };
+
+  useEffect(() => {
+    fetchKYCRequests();
+    fetchPartnerKYCRequests();
+  }, []);
+
+  // Close modal on ESC key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (showDocumentModal) {
+          setShowDocumentModal(false);
+          setSelectedDocument(null);
+        }
+        if (showRejectModal) {
+          setShowRejectModal(false);
+          setRejectionReason("");
+          setSelectedRequest(null);
+        }
+        if (showPartnerModal) {
+          setShowPartnerModal(false);
+          setPartners([]);
+        }
+        if (showBusinessInfoModal) {
+          setShowBusinessInfoModal(false);
+          setBusinessInfo([]);
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [showDocumentModal, showRejectModal, showPartnerModal]);
+
+  // Derived Stats
+  const stats = React.useMemo(() => {
+    if (activeTab === "partners" || viewMode === "user_partners") {
+      return {
+        total: partnerRequests.length,
+        pending: partnerRequests.filter((r) => r.status === "pending").length,
+        approved: partnerRequests.filter((r) => r.status === "approved").length,
+        rejected: partnerRequests.filter((r) => r.status === "rejected").length,
+        partners: partnerRequests.length,
+      };
+    }
+    if (viewMode === "user_business") {
+      return {
+        total: businessInfo.length,
+        pending: businessInfo.filter(
+          (r) => r.status === "pending" || r.overallStatus === "pending",
+        ).length,
+        approved: businessInfo.filter(
+          (r) => r.status === "approved" || r.overallStatus === "approved",
+        ).length,
+        rejected: businessInfo.filter(
+          (r) => r.status === "rejected" || r.overallStatus === "rejected",
+        ).length,
+        partners: partnerRequests.length,
+      };
+    }
+    return {
+      total: requests.length,
+      pending: requests.filter((r) => r.overallStatus === "pending").length,
+      approved: requests.filter((r) => r.overallStatus === "approved").length,
+      rejected: requests.filter((r) => r.overallStatus === "rejected").length,
+      partners: partnerRequests.length, // This might need adjustment if we want total partners here
+    };
+  }, [requests, partnerRequests, businessInfo, activeTab, viewMode]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (
+      showDocumentModal ||
+      showRejectModal ||
+      showPartnerModal ||
+      showBusinessInfoModal
+    ) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [
+    showDocumentModal,
+    showRejectModal,
+    showPartnerModal,
+    showBusinessInfoModal,
+  ]);
+
+  const fetchKYCRequests = async () => {
+    setLoading(true);
+    try {
+      const response = await adminService.getPendingKYC();
+      // console.log("KYC Response:", response);
+      if (response.success && response.data) {
+        // Deduplicate by _id
+        const uniqueRequests = response.data.filter(
+          (req: KYCRequest, index: number, self: KYCRequest[]) =>
+            index === self.findIndex((r) => r._id === req._id),
+        );
+        setRequests(uniqueRequests);
+      }
+    } catch (error) {
+      console.error("Failed to fetch KYC requests", error);
+      toast.error("Failed to fetch KYC requests");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPartnerKYCRequests = async (userId?: string) => {
+    setLoadingPartnerRequests(true);
+    // console.log("Fetching partner requests for userId:", userId);
+    try {
+      const params: any = { limit: 100 };
+      const idToFetch = userId || selectedUserForPartners?.id;
+      if (idToFetch) {
+        params.userId = idToFetch;
+      }
+      // console.log("API params:", params);
+      const response = await adminService.getAllPartnerKYC(params);
+      if (response.success && response.data) {
+        setPartnerRequests(response.data.partners || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch partner KYC requests", error);
+      toast.error("Failed to fetch partner KYC requests");
+    } finally {
+      setLoadingPartnerRequests(false);
+    }
+  };
+
+  const handleViewUserPartners = (userId: string, userName: string) => {
+    // console.log("View Partners clicked:", { userId, userName });
+    if (!userId) {
+      console.error("No userId provided to handleViewUserPartners");
+      toast.error("Cannot view partners: User ID missing");
+      return;
+    }
+    setSelectedUserForPartners({ id: userId, name: userName });
+    setViewMode("user_partners");
+    // Clear current partner list and fetch specific user's partners
+    setPartnerRequests([]);
+    fetchPartnerKYCRequests(userId);
+  };
+
+  const handleBackToRequests = () => {
+    setViewMode("list");
+    setSelectedUserForPartners(null);
+    setSelectedUserForBusiness(null);
+    setPartnerRequests([]);
+    setBusinessInfo([]);
+    // Re-fetch all partners or reset to blank if we want lazy load
+    // For now, let's just reset tab to Users or fetch all partners if that was the active tab
+    if (activeTab === "partners") {
+      fetchPartnerKYCRequests();
+    }
+  };
+
+  const fetchPartners = async (userId: string) => {
+    setLoadingPartners(true);
+    try {
+      const response = await adminService.getPartnersByUser(userId);
+      if (response.success && response.data) {
+        setPartners(response.data);
+        setShowPartnerModal(true);
+      } else {
+        toast.error("Failed to fetch partners");
+      }
+    } catch (error) {
+      console.error("Error fetching partners:", error);
+      toast.error("Error fetching partners");
+    } finally {
+      setLoadingPartners(false);
+    }
+  };
+
+  const fetchBusinessInfo = async (userId: string) => {
+    setLoadingBusinessInfo(true);
+    try {
+      const response = await adminService.getBusinessInfoByUser(userId);
+      if (response.success && response.data) {
+        if (Array.isArray(response.data)) {
+          setBusinessInfo(response.data);
+        } else if (response.data) {
+          setBusinessInfo([response.data]);
+        } else {
+          setBusinessInfo([]);
+        }
+      } else {
+        // toast.error("Business info not found for this user");
+        setBusinessInfo([]);
+      }
+    } catch (error) {
+      console.error("Error fetching business info:", error);
+      toast.error("Failed to fetch business info");
+    } finally {
+      setLoadingBusinessInfo(false);
+    }
+  };
+
+  const handleViewBusinessInfo = (userId: string, userName: string) => {
+    // console.log("View Business Info clicked:", { userId, userName });
+    if (!userId) {
+      console.error("No userId provided to handleViewBusinessInfo");
+      return;
+    }
+    setSelectedUserForBusiness({ id: userId, name: userName });
+    setViewMode("user_business");
+    setBusinessInfo([]);
+    fetchBusinessInfo(userId);
+  };
+
+  const handlePartnerAction = async (
+    partnerId: string,
+    action: "approve" | "reject",
+    reason?: string,
+  ) => {
+    try {
+      const response = await adminService.updatePartnerStatus(
+        partnerId,
+        action,
+        reason,
+      );
+      if (response.success) {
+        toast.success(`Partner ${action}d successfully`);
+        // Refresh partners list
+        if (selectedRequest?.user?._id) {
+          fetchPartners(selectedRequest.user._id);
+        }
+        // Also refresh main list to update counts if needed
+        fetchKYCRequests();
+      } else {
+        toast.error(response.message || `Failed to ${action} partner`);
+      }
+    } catch (error) {
+      console.error(`Error ${action}ing partner:`, error);
+      toast.error(`Failed to ${action} partner`);
+    }
+  };
+
+  const handleApprove = async (request: KYCRequest) => {
+    try {
+      const response = await adminService.reviewKYC(request._id, "approve");
+      if (response.success) {
+        toast.success("KYC approved successfully");
+        fetchKYCRequests();
+      } else {
+        toast.error(response.message || "Failed to approve KYC");
+      }
+    } catch (error) {
+      console.error("Approve error:", error);
+      toast.error("Failed to approve KYC");
+    }
+  };
+
+  const handleReject = async () => {
+    if (!selectedRequest) return;
+
+    if (!rejectionReason.trim()) {
+      toast.error("Please provide a rejection reason");
+      return;
+    }
+
+    try {
+      const response = await adminService.reviewKYC(
+        selectedRequest._id,
+        "reject",
+        rejectionReason,
+      );
+      if (response.success) {
+        toast.success("KYC rejected successfully");
+        setShowRejectModal(false);
+        setRejectionReason("");
+        setSelectedRequest(null);
+        fetchKYCRequests();
+      } else {
+        toast.error(response.message || "Failed to reject KYC");
+      }
+    } catch (error) {
+      console.error("Failed to reject KYC", error);
+      toast.error("Failed to reject KYC");
+    }
+  };
+
+  const openRejectModal = (request: KYCRequest) => {
+    setSelectedRequest(request);
+    setShowRejectModal(true);
+  };
+
+  const openDocumentModal = (doc: KYCDocument, request: KYCRequest) => {
+    setSelectedDocument(doc);
+    setSelectedRequest(request);
+    setShowDocumentModal(true);
+  };
+
+  const openPersonalInfoModal = (partner: any) => {
+    setSelectedPersonalInfo({
+      ...partner,
+      originalRequest: partner,
+    });
+    setShowPersonalInfoModal(true);
+  };
+
+  const filteredRequests = requests.filter(
+    (request) =>
+      request.user?.fullName
+        ?.toLowerCase()
+        .includes(userSearchTerm.toLowerCase()) ||
+      request.user?.email?.toLowerCase().includes(userSearchTerm.toLowerCase()),
+  );
+
+  const filteredPartnerRequests = partnerRequests.filter(
+    (request) =>
+      request.fullName
+        ?.toLowerCase()
+        .includes(partnerSearchTerm.toLowerCase()) ||
+      request.email?.toLowerCase().includes(partnerSearchTerm.toLowerCase()) ||
+      request.phone?.toLowerCase().includes(partnerSearchTerm.toLowerCase()),
+  );
+
+  const getStatusBadge = (status: string) => {
+    const config: Record<string, { variant: "outline" | "secondary" | "destructive" | "default"; className: string; icon: any }> = {
+      pending: { variant: "outline", className: "border-amber-500/50 bg-amber-500/5 text-amber-600 font-black", icon: Clock },
+      approved: { variant: "outline", className: "border-emerald-500/50 bg-emerald-500/5 text-emerald-600 font-black", icon: CheckCircle2 },
+      rejected: { variant: "outline", className: "border-destructive/50 bg-destructive/5 text-destructive font-black", icon: XCircle },
+      resubmit: { variant: "outline", className: "border-orange-500/50 bg-orange-500/5 text-orange-600 font-black", icon: AlertCircle },
+    };
+
+    const { className, icon: Icon } = config[status] || config.pending;
+    return (
+      <Badge
+        variant="outline"
+        className={`px-3 py-1 rounded-lg text-[10px] uppercase tracking-widest flex items-center gap-1.5 shadow-none ${className}`}
+      >
+        <Icon className="w-3 h-3" />
+        {status}
+      </Badge>
+    );
+  };
+
+  const getFileExtension = (url?: string) => {
+    if (!url) return "file";
+    const ext = url.split(".").pop()?.toLowerCase();
+    return ext || "file";
+  };
+
+  const isImageFile = (url?: string) => {
+    const ext = getFileExtension(url);
+    return ["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext);
+  };
+
+  const isPDFFile = (url?: string) => {
+    return getFileExtension(url) === "pdf";
+  };
+
+  const isVideoFile = (url?: string) => {
+    const ext = getFileExtension(url);
+    return ["mp4", "webm", "mov", "avi", "mkv"].includes(ext);
+  };
+
+  return (
+    <div className="max-w-[1600px] mx-auto p-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+            {viewMode === "user_partners" ? (
+              <>
+                Partner <span className="text-primary italic">Verification</span>
+              </>
+            ) : viewMode === "user_business" ? (
+              <>
+                Business <span className="text-primary italic">Verification</span>
+              </>
+            ) : (
+              <>
+                KYC <span className="text-primary italic">Verification</span>
+              </>
+            )}
+          </h1>
+          <p className="text-muted-foreground mt-2 text-base">
+            {viewMode === "user_partners"
+              ? `Reviewing applications for ${selectedUserForPartners?.name}`
+              : viewMode === "user_business"
+                ? `Reviewing profiles for ${selectedUserForBusiness?.name}`
+                : "Manage and verify identity documentation across the platform."}
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          {(viewMode === "user_partners" || viewMode === "user_business") && (
+            <Button
+              variant="outline"
+              onClick={handleBackToRequests}
+              className="rounded-xl h-11 border-border bg-background hover:bg-muted font-bold flex items-center gap-2 shadow-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Return to Requests
+            </Button>
+          )}
+          <div className="flex bg-muted/50 p-1.5 rounded-2xl border border-border">
+            <div className="px-4 py-2 flex items-center gap-2 text-sm font-bold text-foreground">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              {viewMode === "user_partners"
+                ? `${filteredPartnerRequests.length} Partners`
+                : viewMode === "user_business"
+                  ? `${businessInfo.length} Profiles`
+                  : activeTab === "users"
+                    ? `${filteredRequests.length} Users`
+                    : `${filteredPartnerRequests.length} Pending`}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-background p-6 rounded-2xl border border-border shadow-sm group hover:shadow-md transition-all duration-300">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Awaiting Review</p>
+              <h3 className="text-3xl font-black text-foreground mt-2 tracking-tight">
+                {stats.pending.toLocaleString()}
+              </h3>
+              <div className="mt-3 flex items-center gap-2 text-xs font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded-lg w-fit">
+                <Clock className="w-3.5 h-3.5" />
+                <span>Action Needed</span>
+              </div>
+            </div>
+            <div className="p-3 bg-amber-500/10 text-amber-500 rounded-xl group-hover:scale-110 transition-transform duration-300">
+              <Clock className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-background p-6 rounded-2xl border border-border shadow-sm group hover:shadow-md transition-all duration-300">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Verified Identity</p>
+              <h3 className="text-3xl font-black text-foreground mt-2 tracking-tight">
+                {stats.approved.toLocaleString()}
+              </h3>
+              <div className="mt-3 flex items-center gap-2 text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-lg w-fit">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Compliant</span>
+              </div>
+            </div>
+            <div className="p-3 bg-emerald-500/10 text-emerald-500 rounded-xl group-hover:scale-110 transition-transform duration-300">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-background p-6 rounded-2xl border border-border shadow-sm group hover:shadow-md transition-all duration-300">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Rejected / Resubmit</p>
+              <h3 className="text-3xl font-black text-foreground mt-2 tracking-tight">
+                {stats.rejected.toLocaleString()}
+              </h3>
+              <div className="mt-3 flex items-center gap-2 text-xs font-bold text-destructive bg-destructive/10 px-2 py-1 rounded-lg w-fit">
+                <XCircle className="w-3.5 h-3.5" />
+                <span>Discrepancy</span>
+              </div>
+            </div>
+            <div className="p-3 bg-destructive/10 text-destructive rounded-xl group-hover:scale-110 transition-transform duration-300">
+              <XCircle className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-background p-6 rounded-2xl border border-border shadow-sm group hover:shadow-md transition-all duration-300">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Submission Volume</p>
+              <h3 className="text-3xl font-black text-foreground mt-2 tracking-tight">
+                {stats.total.toLocaleString()}
+              </h3>
+              <div className="mt-3 flex items-center gap-2 text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-lg w-fit">
+                <FileText className="w-3.5 h-3.5" />
+                <span>Total Requests</span>
+              </div>
+            </div>
+            <div className="p-3 bg-primary/10 text-primary rounded-xl group-hover:scale-110 transition-transform duration-300">
+              <FileText className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {viewMode === "user_partners" ? (
+        <div className="bg-background rounded-3xl border border-border shadow-sm overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
+          <div className="p-8 border-b border-border flex items-center gap-6 bg-muted/20">
+            <Button
+              variant="ghost"
+              onClick={handleBackToRequests}
+              className="p-3 hover:bg-background rounded-xl transition-all shadow-none"
+            >
+              <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+            </Button>
+            <div>
+              <h2 className="text-2xl font-black text-foreground tracking-tight">
+                Partner <span className="text-primary italic">Profiles</span>
+              </h2>
+              <p className="text-muted-foreground text-sm font-medium">
+                Reviewing managed partners for{" "}
+                <span className="font-bold text-foreground underline decoration-primary/30 underline-offset-4">
+                  {selectedUserForPartners?.name}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div className="p-8">
+            {loadingPartnerRequests ? (
+              <div className="text-center py-20">
+                <RefreshCw className="w-10 h-10 text-primary animate-spin mx-auto mb-4" />
+                <p className="text-muted-foreground font-bold tracking-tight">Synchronizing partner data...</p>
+              </div>
+            ) : partnerRequests.length === 0 ? (
+              <div className="text-center py-20 bg-muted/10 rounded-3xl border border-dashed border-border/60">
+                <Users className="w-16 h-16 text-muted-foreground/20 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground">No Partners Found</h3>
+                <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
+                  This user has not submitted any partner profiles for verification yet.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {partnerRequests.map((partner) => (
+                  <div
+                    key={partner._id}
+                    className="bg-background rounded-2xl border border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-8 group relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 p-6">
+                      {getStatusBadge(partner.status)}
+                    </div>
+                    <div className="flex items-center gap-5 mb-8">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary shadow-inner group-hover:scale-110 transition-transform duration-300">
+                        <User className="w-8 h-8" />
+                      </div>
+                      <div>
+                        <h4 className="text-xl font-black text-foreground group-hover:text-primary transition-colors">
+                          {partner.fullName}
+                        </h4>
+                        <p className="text-sm text-muted-foreground font-bold font-mono">
+                          {partner.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6 p-6 bg-muted/20 rounded-2xl mb-8">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">Communication</span>
+                        <p className="text-sm font-bold text-foreground">{partner.phone}</p>
+                      </div>
+                      <div className="space-y-1 border-l border-border pl-6">
+                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">Identification</span>
+                        <p className="text-sm font-bold text-foreground">
+                          {new Date(partner.dob).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                      <div className="space-y-1 border-t border-border pt-4">
+                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">Legal Gender</span>
+                        <p className="text-sm font-bold text-foreground capitalize">{partner.gender}</p>
+                      </div>
+                      <div className="space-y-1 border-t border-border border-l pl-6 pt-4 text-right">
+                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">Submission</span>
+                        <p className="text-xs font-bold text-muted-foreground">
+                          {new Date(partner.createdAt || Date.now()).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={() =>
+                        navigate(
+                          `/admin/kyc-requests/${partner._id}?type=partner`,
+                        )
+                      }
+                      className="w-full h-14 rounded-xl bg-foreground text-background hover:bg-foreground/90 transition-all font-black shadow-lg hover:shadow-xl active:scale-95 flex items-center justify-center gap-3"
+                    >
+                      <Eye className="w-5 h-5" />
+                      Audit Request Detail
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : viewMode === "user_business" ? (
+        <div className="bg-background rounded-3xl border border-border shadow-sm overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
+          <div className="p-8 border-b border-border flex items-center gap-6 bg-muted/20">
+            <Button
+              variant="ghost"
+              onClick={handleBackToRequests}
+              className="p-3 hover:bg-background rounded-xl transition-all shadow-none"
+            >
+              <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+            </Button>
+            <div>
+              <h2 className="text-2xl font-black text-foreground tracking-tight">
+                Business <span className="text-primary italic">Profiles</span>
+              </h2>
+              <p className="text-muted-foreground text-sm font-medium">
+                Managing corporate documentation for{" "}
+                <span className="font-bold text-foreground underline decoration-primary/30 underline-offset-4">
+                  {selectedUserForBusiness?.name}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div className="p-8">
+            {loadingBusinessInfo ? (
+              <div className="text-center py-20">
+                <RefreshCw className="w-10 h-10 text-primary animate-spin mx-auto mb-4" />
+                <p className="text-muted-foreground font-bold tracking-tight">Authenticating corporate data...</p>
+              </div>
+            ) : businessInfo.length === 0 ? (
+              <div className="text-center py-20 bg-muted/10 rounded-3xl border border-dashed border-border/60">
+                <Building2 className="w-16 h-16 text-muted-foreground/20 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground">No Business Profiles</h3>
+                <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
+                  This account has not registered any business entities for verification.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {businessInfo.map((profile, index) => (
+                  <div
+                    key={profile._id || index}
+                    className="bg-background rounded-2xl border border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group relative"
+                  >
+                    <div className="absolute top-0 right-0 p-6">
+                      {getStatusBadge(profile.status || profile.overallStatus || "pending")}
+                    </div>
+                    {/* Card Content */}
+                    <div className="p-8 border-b border-border bg-muted/30 flex items-center gap-5">
+                      <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300">
+                        <Building2 className="w-8 h-8" />
+                      </div>
+                      <div className="min-w-0 pr-20">
+                        <h4 className="text-xl font-black text-foreground truncate group-hover:text-primary transition-colors">
+                          {profile.companyName || "N/A"}
+                        </h4>
+                        <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mt-1">
+                          {profile.profileName || "Entity Profile"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-8 space-y-6 flex-1">
+                      <div className="grid grid-cols-1 gap-4">
+                        {[
+                          { label: 'GST Number', value: profile.gstNumber },
+                          { label: 'PAN Number', value: profile.panNumber },
+                          { label: 'CIN Number', value: profile.cinNumber },
+                          { label: 'Entity Type', value: profile.companyType }
+                        ].map((item, id) => (
+                          <div key={id} className="flex justify-between items-center py-3 border-b border-border/50">
+                            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                              {item.label}
+                            </span>
+                            <span className="text-sm font-extrabold text-foreground font-mono">
+                              {item.value || "N/A"}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block mb-2">
+                          Registered HQ Address
+                        </span>
+                        <p className="text-sm font-bold text-foreground line-clamp-2 leading-relaxed bg-muted/30 p-4 rounded-xl border border-border/50">
+                          {profile.registeredAddress || "Address documentation pending"}
+                        </p>
+                      </div>
+
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(
+                            `/admin/kyc-requests/${profile._id}?type=businessinfo`,
+                          );
+                        }}
+                        className="w-full h-14 rounded-xl bg-foreground text-background hover:bg-foreground/90 transition-all font-black shadow-lg hover:shadow-xl active:scale-95 flex items-center justify-center gap-3"
+                      >
+                        <Eye className="w-5 h-5" />
+                        Audit Legal Profile
+                      </Button>
+                    </div>
+
+                    <div className="px-8 py-4 bg-muted/10 border-t border-border mt-auto flex justify-between items-center">
+                      <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                        <Clock className="w-3.5 h-3.5" />
+                        Last Sync: {new Date(profile.updatedAt || Date.now()).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* Main Tab View */
+        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 border-b border-border pb-6">
+              <TabsList className="bg-muted/50 p-1.5 rounded-2xl border border-border h-14 w-full md:w-fit">
+                <TabsTrigger
+                  value="users"
+                  className="rounded-xl px-8 h-11 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-lg font-black text-xs uppercase tracking-widest transition-all gap-2"
+                >
+                  <Users className="w-4 h-4" />
+                  Account Holders
+                </TabsTrigger>
+                <TabsTrigger
+                  value="partners"
+                  className="rounded-xl px-8 h-11 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-lg font-black text-xs uppercase tracking-widest transition-all gap-2"
+                >
+                  <Briefcase className="w-4 h-4" />
+                  Partner Requests
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="relative group w-full md:max-w-md">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                <input
+                  type="text"
+                  placeholder={activeTab === "users" ? "Search account holders..." : "Search partner requests..."}
+                  value={activeTab === "users" ? userSearchTerm : partnerSearchTerm}
+                  onChange={(e) => activeTab === "users" ? setUserSearchTerm(e.target.value) : setPartnerSearchTerm(e.target.value)}
+                  className="w-full h-14 pl-12 pr-4 bg-background border border-border rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm font-bold shadow-sm"
+                />
+              </div>
+            </div>
+
+            <TabsContent value="users" className="space-y-8 mt-0 border-none p-0 outline-none">
+              {loading ? (
+                <div className="p-20 text-center bg-background rounded-3xl border border-border shadow-sm">
+                  <RefreshCw className="w-10 h-10 text-primary animate-spin mx-auto mb-4" />
+                  <p className="text-muted-foreground font-bold">Synchronizing account documentation...</p>
+                </div>
+              ) : filteredRequests.length === 0 ? (
+                <div className="bg-background rounded-3xl border border-dashed border-border p-20 text-center">
+                  <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Users className="w-10 h-10 text-muted-foreground/30" />
+                  </div>
+                  <h3 className="text-2xl font-black text-foreground mb-3">No Results Found</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto">
+                    We couldn't find any account holders matching your current search parameters.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                  {filteredRequests.map((request) => (
+                    <div
+                      key={request._id}
+                      className="bg-background rounded-3xl border border-border shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 overflow-hidden group flex flex-col h-full relative"
+                    >
+                      {/* Status Overlay */}
+                      <div className="absolute top-6 right-6 z-10">
+                        {!(request.overallStatus === "approved" && (request.partnerCount || 0) > 0) && getStatusBadge(request.overallStatus)}
+                        {request.overallStatus === "approved" && (request.partnerCount || 0) > 0 && (
+                          <Badge variant="outline" className="px-3 py-1 rounded-lg text-[10px] uppercase tracking-widest flex items-center gap-1.5 shadow-none border-amber-500/50 bg-amber-500/5 text-amber-600 font-black">
+                            <AlertCircle className="w-3 h-3" />
+                            Branch Action Required
+                          </Badge>
+                        )}
+                      </div>
+
+                      {/* Header Section */}
+                      <div className="p-8 border-b border-border bg-muted/20">
+                        <div className="flex items-center gap-5">
+                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary-foreground/30 flex items-center justify-center text-background font-black text-2xl shadow-xl group-hover:scale-110 transition-transform duration-500 flex-shrink-0">
+                            {request.user?.fullName?.charAt(0) || "U"}
+                          </div>
+                          <div className="min-w-0 pr-12">
+                            <h3 className="text-lg font-black text-foreground truncate group-hover:text-primary transition-colors">
+                              {request.user?.fullName || "Anonymous Member"}
+                            </h3>
+                            <p className="text-xs font-bold text-muted-foreground truncate font-mono mt-1">
+                              {request.user?.email || "No email provided"}
+                            </p>
+                            {request.profileName && (
+                              <Badge variant="secondary" className="mt-3 bg-primary/10 text-primary border-none font-bold text-[10px] uppercase tracking-wider">
+                                {request.isPartner ? "Partner Division" : request.kycType === "business" ? "Corporate Entity" : "Private Sector"}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Progress Monitoring */}
+                        {request.progress !== undefined && (
+                          <div className="mt-8 pt-6 border-t border-border/50">
+                            <div className="flex justify-between items-end mb-2.5">
+                              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Verification Audit</span>
+                              <span className="text-sm font-black text-primary">
+                                {request.progress}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden shadow-inner">
+                              <div
+                                className="bg-gradient-to-r from-primary via-primary/80 to-primary/40 h-full rounded-full transition-all duration-1000 ease-out"
+                                style={{ width: `${request.progress}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Summary Insights */}
+                      <div className="p-8 space-y-5 flex-grow">
+                        {request.personalInfo && (
+                          <div
+                            className="bg-muted/30 rounded-2xl p-5 cursor-pointer hover:bg-muted/50 border border-border/50 transition-all group/info relative"
+                            onClick={() => navigate(`/admin/kyc-requests/${request._id}`)}
+                          >
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="p-2 bg-background rounded-lg border border-border shadow-sm">
+                                <User className="w-4 h-4 text-primary" />
+                              </div>
+                              <h4 className="text-sm font-black text-foreground uppercase tracking-wider">Identity Overview</h4>
+                              <ChevronRight className="w-4 h-4 text-muted-foreground/30 group-hover/info:text-primary group-hover/info:translate-x-1 transition-all ml-auto" />
+                            </div>
+                            <div className="space-y-3">
+                              <div className="flex justify-between items-center text-sm">
+                                <span className="font-bold text-muted-foreground">Legal Name</span>
+                                <span className="font-bold text-foreground">{request.personalInfo.fullName || "---"}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-sm">
+                                <span className="font-bold text-muted-foreground">Phone Secure</span>
+                                <span className="font-bold text-foreground font-mono">{request.personalInfo.phone || "---"}</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Branch Modules */}
+                        <div className="grid grid-cols-1 gap-4 mt-2">
+                          {request.overallStatus === "approved" && (
+                            <button
+                              onClick={() => handleViewUserPartners(request.user._id || (request.user as any).id, request.user.fullName)}
+                              className="w-full bg-amber-500/5 hover:bg-amber-500/10 border border-amber-500/20 rounded-2xl p-5 transition-all text-left flex items-start gap-4 group/branch"
+                            >
+                              <div className="p-2 bg-background rounded-lg border border-amber-500/20 shadow-sm text-amber-500">
+                                <Users className="w-5 h-5" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-xs font-black text-amber-900 uppercase tracking-widest">Partner Network</h4>
+                                  <Badge className="bg-amber-500 text-background hover:bg-amber-500 h-5 px-1.5 font-black text-[9px] border-none">
+                                    {request.partnerCount || 0}
+                                  </Badge>
+                                </div>
+                                <p className="text-[11px] font-bold text-amber-700/70 mt-1">Audit linked associate profiles</p>
+                              </div>
+                              <ChevronRight className="w-4 h-4 text-amber-500/30 group-hover/branch:translate-x-1 transition-transform ml-auto self-center" />
+                            </button>
+                          )}
+
+                          {request.overallStatus === "approved" && (
+                            <button
+                              onClick={() => handleViewBusinessInfo(request.user._id || (request.user as any).id, request.user.fullName)}
+                              className="w-full bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-5 transition-all text-left flex items-start gap-4 group/corporate"
+                            >
+                              <div className="p-2 bg-background rounded-lg border border-indigo-500/20 shadow-sm text-indigo-500">
+                                <Building2 className="w-5 h-5" />
+                              </div>
+                              <div className="min-w-0">
+                                <h4 className="text-xs font-black text-indigo-900 uppercase tracking-widest">Corporate Ledger</h4>
+                                <p className="text-[11px] font-bold text-indigo-700/70 mt-1 truncate">
+                                  {request.businessInfo?.companyName || "Verify entity legal status"}
+                                </p>
+                              </div>
+                              <ChevronRight className="w-4 h-4 text-indigo-500/30 group-hover/corporate:translate-x-1 transition-transform ml-auto self-center" />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Documentation Audit Trail */}
+                        {request.overallStatus !== "approved" && (
+                          <div className="mt-4 pt-6 border-t border-border/50">
+                            <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4 flex items-center justify-between">
+                              Documentation Ledger
+                              <span className="text-primary">{request.documents?.length || 0} Assets</span>
+                            </h4>
+                            {request.documents && request.documents.length > 0 ? (
+                              <div className="space-y-3">
+                                {request.documents.slice(0, 2).map((doc, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="flex items-center justify-between p-3.5 bg-muted/20 rounded-xl border border-border/50 hover:border-primary/30 transition-all group/doc"
+                                  >
+                                    <div className="flex items-center gap-3 min-w-0">
+                                      <div className="p-2 bg-background rounded-lg text-primary shadow-sm ring-1 ring-border/50">
+                                        <FileText className="w-3.5 h-3.5" />
+                                      </div>
+                                      <div className="min-w-0">
+                                        <p className="text-xs font-black text-foreground uppercase tracking-tighter truncate">
+                                          {doc.type}
+                                        </p>
+                                        <p className="text-[10px] font-bold text-muted-foreground truncate">
+                                          {doc.name}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => openDocumentModal(doc, request)}
+                                      className="h-8 rounded-lg text-xs font-black hover:bg-primary/10 hover:text-primary transition-all p-2"
+                                    >
+                                      VIEW
+                                    </Button>
+                                  </div>
+                                ))}
+                                {request.documents.length > 2 && (
+                                  <p className="text-center text-[10px] font-black text-muted-foreground uppercase tracking-widest pt-1">
+                                    +{request.documents.length - 2} more documents pending audit
+                                  </p>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-6 text-center animate-pulse">
+                                <AlertCircle className="w-8 h-8 text-destructive mx-auto mb-3" />
+                                <p className="text-xs font-black text-destructive uppercase tracking-widest">No Assets Detected</p>
+                                <p className="text-[11px] font-bold text-destructive/60 mt-1">Submission required for audit</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Termination Actions */}
+                      <div className="p-8 pt-0 mt-auto">
+                        <Button
+                          onClick={() => navigate(`/admin/kyc-requests/${request._id}`)}
+                          className="w-full h-14 rounded-2xl bg-foreground text-background hover:bg-foreground/90 transition-all font-black shadow-lg hover:shadow-xl active:scale-95 flex items-center justify-center gap-3 uppercase text-xs tracking-widest"
+                        >
+                          <Filter className="w-4 h-4" />
+                          Inspect Request
+                        </Button>
+                        <div className="mt-5 flex items-center justify-center gap-2.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
+                          <Clock className="w-3.5 h-3.5" />
+                          Logged: {new Date(request.createdAt).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="partners" className="mt-0 border-none p-0 outline-none space-y-8">
+              {loadingPartnerRequests ? (
+                <div className="p-20 text-center bg-background rounded-3xl border border-border shadow-sm">
+                  <RefreshCw className="w-10 h-10 text-primary animate-spin mx-auto mb-4" />
+                  <p className="text-muted-foreground font-bold">Synchronizing partner network documentation...</p>
+                </div>
+              ) : filteredPartnerRequests.length === 0 ? (
+                <div className="bg-background rounded-3xl border border-dashed border-border p-20 text-center">
+                  <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Briefcase className="w-10 h-10 text-muted-foreground/30" />
+                  </div>
+                  <h3 className="text-2xl font-black text-foreground mb-3">No Branch Requests</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto">
+                    There are currently no partner verification requests waiting in the queue.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                  {filteredPartnerRequests.map((request) => (
+                    <div
+                      key={request._id}
+                      className="bg-background rounded-3xl border border-border shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-500 overflow-hidden flex flex-col group relative h-full"
+                    >
+                      <div className="absolute top-6 right-6 z-10">
+                        {getStatusBadge(request.status || "pending")}
+                      </div>
+
+                      {/* Header Section */}
+                      <div className="p-8 border-b border-border bg-muted/20">
+                        <div className="flex items-center gap-5">
+                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-primary flex items-center justify-center text-background font-black text-2xl shadow-xl group-hover:scale-110 transition-transform duration-500 flex-shrink-0">
+                            {request.fullName?.charAt(0) || "P"}
+                          </div>
+                          <div className="min-w-0 pr-12">
+                            <h3 className="text-lg font-black text-foreground truncate group-hover:text-primary transition-colors uppercase tracking-tight">
+                              {request.fullName || "Corporate Associate"}
+                            </h3>
+                            <p className="text-xs font-bold text-muted-foreground truncate font-mono mt-1">
+                              {request.email || "No email documentation"}
+                            </p>
+                            <div className="flex items-center gap-2 mt-3">
+                              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{request.phone || "VOIP Locked"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Partner Documentation Summary */}
+                      <div className="p-8 space-y-6 flex-grow">
+                        <div className="bg-indigo-500/5 rounded-2xl p-6 border border-indigo-500/10">
+                          <div className="flex items-center gap-3 mb-5 pb-4 border-b border-indigo-500/10">
+                            <div className="p-2 bg-background rounded-lg border border-indigo-500/10 shadow-sm text-indigo-600">
+                              <Briefcase className="w-4 h-4" />
+                            </div>
+                            <h4 className="text-[10px] font-black text-indigo-900 uppercase tracking-widest">Branch Legal Ledger</h4>
+                          </div>
+                          <div className="space-y-4">
+                            {[
+                              { label: 'PAN Identity', value: request.panNumber },
+                              { label: 'Aadhaar Secure', value: request.aadhaarNumber },
+                              { label: 'Asset Count', value: `${request.documents?.length || 0} Documents` }
+                            ].map((item, id) => (
+                              <div key={id} className="flex justify-between items-center text-sm">
+                                <span className="font-bold text-indigo-700/60 text-[11px] uppercase tracking-wider">{item.label}</span>
+                                <span className="font-black text-indigo-900 font-mono tracking-tighter">{item.value || "PENDING"}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Interface */}
+                      <div className="p-8 pt-0 mt-auto">
+                        <div className="grid grid-cols-2 gap-4">
+                          {request.status !== "rejected" && request.overallStatus !== "rejected" && (
+                            <Button
+                              variant="outline"
+                              onClick={() => openRejectModal(request)}
+                              className="h-14 rounded-2xl border-destructive/30 text-destructive hover:bg-destructive/5 transition-all text-[11px] font-black uppercase tracking-widest shadow-sm shadow-destructive/10"
+                            >
+                              <X className="w-4 h-4 mr-2" />
+                              REJECT
+                            </Button>
+                          )}
+                          {request.status !== "approved" && request.overallStatus !== "approved" && (
+                            <Button
+                              onClick={() => handleApprove(request)}
+                              className="h-14 rounded-2xl bg-emerald-600 text-background hover:bg-emerald-700 transition-all text-[11px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20"
+                            >
+                              <Check className="w-4 h-4 mr-2" />
+                              APPROVE
+                            </Button>
+                          )}
+                          {(request.status === "approved" || request.status === "rejected") && (
+                            <Button
+                              onClick={() => openPersonalInfoModal(request)}
+                              className="col-span-2 h-14 rounded-2xl bg-foreground text-background hover:bg-foreground/90 transition-all font-black text-xs uppercase tracking-widest shadow-xl flex items-center justify-center gap-3"
+                            >
+                              <Eye className="w-5 h-5" />
+                              Inspect Associate
+                            </Button>
+                          )}
+                        </div>
+                        <div className="mt-6 flex items-center justify-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-40">
+                          <Clock className="w-3.5 h-3.5" />
+                          Logged: {new Date(request.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      )}
+
+      {showDocumentModal && selectedDocument && selectedRequest && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-[100] p-4 backdrop-blur-xl bg-background/80"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowDocumentModal(false);
+              setSelectedDocument(null);
+            }
+          }}
+        >
+          <div className="bg-background rounded-[2.5rem] border border-border shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
+            {/* Modal Header */}
+            <div className="p-8 border-b border-border bg-muted/30 flex items-center justify-between">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                  <FileText className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground uppercase tracking-tight">
+                    Documentation <span className="text-primary italic">Audit</span>
+                  </h3>
+                  <p className="text-xs font-bold text-muted-foreground mt-1">
+                    Auditing assets for <span className="text-foreground">{selectedRequest.user?.fullName}</span>
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setShowDocumentModal(false);
+                  setSelectedDocument(null);
+                }}
+                className="rounded-xl hover:bg-destructive/10 hover:text-destructive transition-all"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-8 space-y-8 overflow-y-auto custom-scrollbar flex-1">
+              {/* Asset Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { label: 'Category', value: selectedDocument.type, icon: File },
+                  { label: 'Identifier', value: selectedDocument.name, icon: FileText },
+                  { label: 'Timestamp', value: selectedDocument.uploadedAt ? new Date(selectedDocument.uploadedAt).toLocaleDateString() : '---', icon: Calendar },
+                  { label: 'Audit Status', value: selectedDocument.status || 'pending', icon: CheckCircle2, isBadge: true }
+                ].map((item, id) => (
+                  <div key={id} className="bg-muted/30 rounded-2xl p-5 border border-border/50">
+                    <div className="flex items-center gap-2 mb-3">
+                      <item.icon className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{item.label}</span>
+                    </div>
+                    {item.isBadge ? (
+                      getStatusBadge(item.value)
+                    ) : (
+                      <p className="text-sm font-black text-foreground truncate uppercase">{item.value}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Secure Preview Module */}
+              {selectedDocument.fileUrl && (
+                <div className="bg-muted/20 rounded-[2rem] p-6 border border-border/50 relative overflow-hidden group">
+                  <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                      <h4 className="text-[10px] font-black text-foreground uppercase tracking-widest">Secure Preview Endpoint</h4>
+                    </div>
+                    <Badge variant="outline" className="bg-background font-black text-[9px] uppercase tracking-tighter border-border px-2 py-0.5">
+                      ENCRYPTED ACCESS
+                    </Badge>
+                  </div>
+
+                  <div className="relative min-h-[300px] flex items-center justify-center bg-background/50 rounded-2xl border border-dashed border-border group-hover:border-primary/30 transition-colors">
+                    {isImageFile(selectedDocument.fileUrl) ? (
+                      <img
+                        src={getFullUrl(selectedDocument.fileUrl)}
+                        alt={selectedDocument.name}
+                        className="max-w-full max-h-[500px] rounded-xl shadow-2xl object-contain animate-in fade-in duration-500"
+                      />
+                    ) : isPDFFile(selectedDocument.fileUrl) ? (
+                      <iframe
+                        src={getFullUrl(selectedDocument.fileUrl)}
+                        className="w-full h-[600px] rounded-xl border border-border bg-white shadow-2xl"
+                        title={selectedDocument.name}
+                      />
+                    ) : isVideoFile(selectedDocument.fileUrl) ? (
+                      <video
+                        src={getFullUrl(selectedDocument.fileUrl)}
+                        controls
+                        className="max-w-full max-h-[500px] rounded-xl shadow-2xl bg-black"
+                      >
+                        Secure playback restricted by browser environment.
+                      </video>
+                    ) : (
+                      <div className="py-20 text-center space-y-5">
+                        <div className="w-20 h-20 bg-muted rounded-3xl flex items-center justify-center mx-auto shadow-inner">
+                          <FileText className="w-10 h-10 text-muted-foreground/30" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-black text-foreground uppercase tracking-widest mb-1">Preview Unavailable</p>
+                          <p className="text-xs font-bold text-muted-foreground">Unsupported archival format for inline viewing</p>
+                        </div>
+                        <Button
+                          asChild
+                          className="bg-primary hover:bg-primary/90 rounded-xl px-8 font-black uppercase text-[10px] tracking-widest shadow-lg"
+                        >
+                          <a href={getFullUrl(selectedDocument.fileUrl)} target="_blank" rel="noopener noreferrer">
+                            <Download className="w-4 h-4 mr-2" />
+                            Extract Asset
+                          </a>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Rejection Logs */}
+              {selectedDocument.rejectionReason && (
+                <div className="bg-destructive/5 rounded-2xl p-6 border border-destructive/20 animate-in slide-in-from-top-2">
+                  <div className="flex items-center gap-3 mb-3">
+                    <XCircle className="w-5 h-5 text-destructive" />
+                    <h4 className="text-xs font-black text-destructive uppercase tracking-widest">Audit Failure Logs</h4>
+                  </div>
+                  <p className="text-sm font-bold text-destructive/80 leading-relaxed italic">
+                    "{selectedDocument.rejectionReason}"
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Termination Actions */}
+            <div className="p-8 border-t border-border bg-muted/40 flex flex-col sm:flex-row gap-4">
+              {selectedDocument.fileUrl && (
+                <>
+                  <Button
+                    variant="outline"
+                    asChild
+                    className="flex-1 h-14 rounded-2xl border-border font-black uppercase text-[10px] tracking-widest hover:bg-muted/50 transition-all"
+                  >
+                    <a href={getFullUrl(selectedDocument.fileUrl)} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      External Viewport
+                    </a>
+                  </Button>
+                  <Button
+                    asChild
+                    className="flex-1 h-14 rounded-2xl bg-foreground text-background hover:bg-foreground/90 font-black uppercase text-[10px] tracking-widest shadow-xl transition-all"
+                  >
+                    <a href={getFullUrl(selectedDocument.fileUrl)} download>
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Asset
+                    </a>
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject Modal */}
+      {showRejectModal && selectedRequest && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-[110] p-4 backdrop-blur-xl bg-background/80"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowRejectModal(false);
+              setRejectionReason("");
+              setSelectedRequest(null);
+            }
+          }}
+        >
+          <div className="bg-background rounded-[2.5rem] border border-border shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="p-8 border-b border-border bg-destructive/5 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-destructive/10 flex items-center justify-center text-destructive">
+                  <XCircle className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-foreground uppercase tracking-tight">
+                    Audit <span className="text-destructive italic">Rejection</span>
+                  </h3>
+                  <p className="text-[10px] font-bold text-muted-foreground mt-0.5 uppercase tracking-widest">
+                    Targeting: {selectedRequest.user?.fullName || selectedRequest.fullName}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setShowRejectModal(false);
+                  setRejectionReason("");
+                  setSelectedRequest(null);
+                }}
+                className="rounded-xl hover:bg-destructive/10 hover:text-destructive"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            <div className="p-8 space-y-6">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-1">
+                  Reason for Violation
+                </label>
+                <textarea
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  placeholder="Specify clear documentation failures or security concerns..."
+                  className="w-full h-40 px-5 py-4 bg-muted/30 border border-border rounded-2xl focus:outline-none focus:ring-4 focus:ring-destructive/10 focus:border-destructive transition-all text-sm font-bold resize-none custom-scrollbar"
+                />
+                <p className="text-[10px] font-bold text-muted-foreground/60 italic ml-1">
+                  * This message will be logged and transmitted to the user.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-8 border-t border-border bg-muted/40 flex gap-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowRejectModal(false);
+                  setRejectionReason("");
+                  setSelectedRequest(null);
+                }}
+                className="flex-1 h-14 rounded-2xl border-border font-black uppercase text-[10px] tracking-widest hover:bg-background transition-all"
+              >
+                ABORT
+              </Button>
+              <Button
+                onClick={handleReject}
+                disabled={!rejectionReason.trim()}
+                className="flex-1 h-14 rounded-2xl bg-destructive text-destructive-foreground hover:bg-destructive/90 font-black uppercase text-[10px] tracking-widest shadow-xl shadow-destructive/20 transition-all disabled:opacity-50"
+              >
+                EXECUTE REJECTION
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Personal Info Modal */}
+      {selectedPersonalInfo && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-[100] p-4 backdrop-blur-xl bg-background/80"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setSelectedPersonalInfo(null);
+            }
+          }}
+        >
+          <div className="bg-background rounded-[2.5rem] border border-border shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-300">
+            {/* Modal Header */}
+            <div className="p-8 border-b border-border bg-primary/5 flex items-center justify-between">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                  <User className="w-7 h-7" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground uppercase tracking-tight">
+                    Identity <span className="text-primary italic">Dossier</span>
+                  </h3>
+                  <p className="text-[10px] font-bold text-muted-foreground mt-1 uppercase tracking-widest">
+                    Secure profile decryption
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setSelectedPersonalInfo(null);
+                }}
+                className="rounded-xl hover:bg-primary/10 hover:text-primary transition-all"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-8 space-y-6 overflow-y-auto custom-scrollbar">
+              <div className="grid grid-cols-1 gap-5">
+                {[
+                  { label: 'Legal Designation', value: selectedPersonalInfo.fullName, icon: User },
+                  { label: 'Electronic Mail', value: selectedPersonalInfo.email, icon: Building2, isMono: true },
+                  { label: 'Secure Line', value: selectedPersonalInfo.phone, icon: Clock, isMono: true },
+                  { label: 'Birth Registry', value: selectedPersonalInfo.dob ? new Date(selectedPersonalInfo.dob).toLocaleDateString() : 'N/A', icon: Calendar },
+                  { label: 'Gender Archive', value: selectedPersonalInfo.gender, icon: User, capitalize: true }
+                ].map((item, id) => (
+                  <div key={id} className="group p-5 rounded-2xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-all">
+                    <div className="flex items-center gap-2 mb-2">
+                      <item.icon className="w-3.5 h-3.5 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">{item.label}</p>
+                    </div>
+                    <p className={`text-sm font-black text-foreground ${item.isMono ? 'font-mono' : ''} ${item.capitalize ? 'capitalize' : ''}`}>
+                      {item.value || "---"}
+                    </p>
+                  </div>
+                ))}
+
+                {/* Secure Documents Section */}
+                {selectedPersonalInfo.documents && selectedPersonalInfo.documents.length > 0 && (
+                  <div className="pt-4 mt-2 border-t border-border">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4 ml-1">
+                      Encrypted Assets ({selectedPersonalInfo.documents.length})
+                    </p>
+                    <div className="space-y-3">
+                      {selectedPersonalInfo.documents.map((doc: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between p-4 bg-background rounded-2xl border border-border group/asset hover:border-primary/50 transition-all shadow-sm"
+                        >
+                          <div className="flex items-center gap-4 min-w-0">
+                            <div className="p-2.5 bg-muted rounded-xl text-primary group-hover/asset:bg-primary group-hover/asset:text-background transition-all">
+                              <FileText className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-black text-foreground uppercase tracking-tight truncate">
+                                {doc.type}
+                              </p>
+                              <p className="text-[10px] font-bold text-muted-foreground truncate font-mono">
+                                {doc.name}
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              if (selectedPersonalInfo.originalRequest) {
+                                openDocumentModal(doc, selectedPersonalInfo.originalRequest);
+                              }
+                            }}
+                            className="h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/10 hover:text-primary"
+                          >
+                            AUDIT
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-8 border-t border-border bg-muted/40 flex justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowPersonalInfoModal(false);
+                  setSelectedPersonalInfo(null);
+                }}
+                className="h-12 px-8 rounded-2xl border-border font-black uppercase text-[10px] tracking-widest hover:bg-background transition-all shadow-sm"
+              >
+                CLOSE DOSSIER
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+>>>>>>> 25d54d8 (admin UI update)
