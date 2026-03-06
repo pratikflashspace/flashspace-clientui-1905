@@ -164,7 +164,7 @@ export default function Billing() {
           <p className="text-gray-700 font-medium mb-2">{error}</p>
           <button
             onClick={fetchData}
-            className="px-4 py-2 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2 mx-auto"
+            className="px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2 mx-auto"
           >
             <RefreshCw className="w-4 h-4" /> Try Again
           </button>
@@ -248,7 +248,7 @@ export default function Billing() {
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
                 className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
                   activeTab === tab.id
-                    ? "bg-[#35503F] text-white shadow-sm"
+                    ? "bg-[#35503F] text-[#FEF8C3] shadow-sm"
                     : "text-gray-500 hover:text-gray-900"
                 }`}
               >
@@ -380,7 +380,7 @@ export default function Billing() {
                           </td>
                           <td className="py-4 px-6 text-right">
                             {invoice.status === "pending" ? (
-                              <button className="inline-flex items-center px-4 py-1.5 bg-[#35503F] text-white text-xs font-medium rounded-full hover:bg-[#35503F]/90 transition-colors">
+                              <button className="inline-flex items-center px-4 py-1.5 bg-[#35503F] text-[#FEF8C3] text-xs font-medium rounded-full hover:bg-[#35503F]/90 transition-colors">
                                 Pay Now
                               </button>
                             ) : (

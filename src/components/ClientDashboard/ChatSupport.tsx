@@ -55,7 +55,7 @@ export default function ChatSupport() {
                             {/* User Message */}
                             <div className="flex gap-3 max-w-[80%] ml-auto justify-end">
                                 <div>
-                                    <div className="bg-[#35503F] text-white p-3.5 rounded-2xl rounded-tr-none text-sm shadow-sm">
+                                    <div className="bg-[#35503F] text-[#FEF8C3] p-3.5 rounded-2xl rounded-tr-none text-sm shadow-sm">
                                         I want to know about my mail delivery status
                                     </div>
                                     <span className="text-[10px] text-gray-400 mt-1.5 mr-1 block text-right font-medium">10:02 AM</span>
@@ -88,7 +88,7 @@ export default function ChatSupport() {
                                     placeholder="Type your message..."
                                     className="w-full pl-4 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
                                 />
-                                <button className="absolute right-2 p-2 bg-[#35503F] text-white rounded-lg hover:bg-[#35503F]/90 transition-colors shadow-sm">
+                                <button className="absolute right-2 p-2 bg-[#35503F] text-[#FEF8C3] rounded-lg hover:bg-[#35503F]/90 transition-colors shadow-sm">
                                     <Send className="w-4 h-4" />
                                 </button>
                             </div>
