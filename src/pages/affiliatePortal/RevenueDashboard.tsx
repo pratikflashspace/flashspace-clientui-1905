@@ -2,21 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
     TrendingUp,
     Wallet,
-    CreditCard,
     Banknote,
     Sparkles,
     ArrowUpRight,
     Loader2,
 } from "lucide-react";
-import {
-    AreaChart,
-    Area,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-} from "recharts";
 import { affiliatePortalService, RevenueDashboardStats } from "../../services/affiliatePortal.service";
 
 // --- Custom Hook for Number Counting Animation ---
@@ -66,29 +56,54 @@ const AnimatedCounter = ({
     );
 };
 
-// --- Custom Tooltip for Area Chart ---
-const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-        return (
-            <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
-                <p className="font-bold text-slate-800 mb-2">{label}</p>
-                <div className="space-y-1">
-                    <p className="text-[#5aa39c] font-medium flex justify-between gap-4">
-                        <span>Earnings:</span>
-                        <span>₹{payload[0].value.toLocaleString()}</span>
-                    </p>
-                    <p className="text-[#8fb6b1] font-medium flex justify-between gap-4">
-                        <span>Clients:</span>
-                        <span>{payload[1].value}</span>
-                    </p>
-                </div>
+const StatCard = ({ label, value, trend, icon: Icon, delay }: any) => (
+    <div
+        className="bg-white p-7 rounded-[2rem] border border-gray-100/60 shadow-sm transition-all duration-300 group animate-fade-in-up"
+        style={{ animationDelay: `${delay}ms` }}
+    >
+        <div className="flex justify-between items-start mb-4">
+            <span className="text-[#64748b] font-medium text-[14px] tracking-tight">{label}</span>
+            <div className="w-10 h-10 flex items-center justify-center bg-[#f1f5f9] rounded-full transition-colors group-hover:bg-[#e2e8f0]">
+                <Icon
+                    size={20}
+                    className="text-[#64748b]"
+                />
             </div>
-        );
-    }
-    return null;
-};
+        </div>
+        <div className="space-y-2">
+            <h3 className="text-[2rem] font-black text-[#1a2d1d] leading-none" style={{ fontFamily: "'Inter Tight', sans-serif" }}>{value}</h3>
+            {trend && (
+                <div className={`flex items-center gap-1.5 text-xs font-bold ${trend.startsWith('-') ? 'text-red-500' : 'text-[#10b981]'}`}>
+                    <ArrowUpRight size={14} className={trend.startsWith('-') ? 'rotate-90' : ''} />
+                    <span>{trend} from last month</span>
+                </div>
+            )}
+        </div>
+    </div>
+);
 
-// --- Main Component ---
+const TrendBar = ({ label, value, subValue, percentage, color = "bg-[#334D3D]" }: any) => (
+    <div className="group mb-6 last:mb-0">
+        <div className="flex justify-between items-end mb-2.5">
+            <span className="text-[14px] font-bold text-[#1a2d1d] tracking-tight">{label}</span>
+            <div className="flex items-center gap-2">
+                <span className="text-[15px] font-black text-[#1a2d1d]">{value}</span>
+                {subValue && (
+                    <span className="px-2 py-0.5 bg-gray-100 rounded-full text-[11px] font-extrabold text-[#64748b] border border-gray-200">
+                        {subValue}
+                    </span>
+                )}
+            </div>
+        </div>
+        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+            <div
+                className={`h-full ${color} rounded-full transition-all duration-1000 ease-out`}
+                style={{ width: `${percentage}%` }}
+            />
+        </div>
+    </div>
+);
+
 const DashboardRevenue = () => {
     const [stats, setStats] = useState<RevenueDashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
@@ -111,202 +126,145 @@ const DashboardRevenue = () => {
 
     if (loading || !stats) {
         return (
-            <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4 animate-pulse">
-                    <Loader2 className="w-10 h-10 animate-spin text-[#5aa39c]" />
-                    <p className="text-gray-500 font-medium">Loading your revenue data...</p>
+            <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-10 h-10 animate-spin text-[#334D3D]" />
+                    <p className="text-[#64748b] font-medium">Loading your revenue dashboard...</p>
                 </div>
             </div>
         );
     }
 
-    const monthlyEarnings = stats.monthlyEarnings || [];
+    const formatShortINR = (val: number) => {
+        if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
+        if (val >= 1000) return `₹${(val / 1000).toFixed(0)}K`;
+        return `₹${val}`;
+    };
+
+    const formatFullINR = (val: number) => `₹${val.toLocaleString("en-IN")}`;
+
+    const lastMonth = stats.monthlyEarnings && stats.monthlyEarnings.length > 0
+        ? stats.monthlyEarnings[stats.monthlyEarnings.length - 1]
+        : { earnings: 0, clients: 0 };
 
     const topCards = [
         {
             label: "Total Earnings",
-            value: stats.totalEarnings || 0,
-            prefix: "₹",
-            decimals: 2,
-            change: stats.momGrowth ? `${stats.momGrowth > 0 ? "+" : ""}${stats.momGrowth}% MoM` : null,
+            value: formatShortINR(stats.totalEarnings),
+            trend: stats.momGrowth ? `${stats.momGrowth}%` : null,
             icon: TrendingUp,
         },
         {
-            label: "Converted Clients",
-            value: stats.convertedClients || 0,
-            decimals: 0,
+            label: "This Month",
+            value: formatShortINR(lastMonth.earnings),
+            trend: stats.momGrowth ? `${stats.momGrowth}%` : null,
             icon: Wallet,
         },
         {
             label: "Pending Payout",
-            value: stats.pendingPayout || 0,
-            prefix: "₹",
-            decimals: 2,
+            value: formatShortINR(stats.pendingPayout),
             icon: Banknote,
         },
         {
-            label: "Commission Rate",
-            value: stats.commissionRate || 15,
-            suffix: "%",
-            decimals: 0,
-            icon: CreditCard,
+            label: "Avg Commission",
+            value: formatShortINR(stats.convertedClients > 0 ? stats.totalEarnings / stats.convertedClients : 0),
+            trend: null,
+            icon: Sparkles,
         },
     ];
 
+    // Dynamic Monthly Trends
+    const maxEarnings = Math.max(...(stats.monthlyEarnings?.map((m: any) => m.earnings) || [1]));
+    const dynamicMonthlyTrends = stats.monthlyEarnings?.map((m: any) => ({
+        label: m.month,
+        value: formatFullINR(m.earnings),
+        subValue: `${m.clients} deals`,
+        percentage: (m.earnings / (maxEarnings || 1)) * 100
+    })) || [];
+
+    // Map Product Revenue from actual backend data
+    const dynamicProductRevenue = stats.revenueByProduct?.map(p => ({
+        label: p.label,
+        value: formatFullINR(p.value),
+        subValue: `(${p.percentage.toFixed(0)}%)`,
+        percentage: p.percentage
+    })) || [];
+
     return (
-        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans w-full animate-fade-in">
-            <div className="max-w-[1600px] mx-auto space-y-8">
+        <div className="min-h-screen bg-[#f8f9fa] p-8 lg:p-12 font-sans w-full animate-fade-in">
+            <div className="max-w-[1400px] mx-auto space-y-12">
                 {/* 1. Header */}
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                        Revenue{" "}
-                        <span className="text-[#5aa39c] italic">
-                            Dashboard
-                        </span>
+                <div className="animate-fade-in-down">
+                    <h1 className="text-[2.25rem] font-black text-[#1a2d1d] tracking-tight leading-none mb-3">
+                        Revenue <span className="text-[#35503F] italic">Dashboard</span>
                     </h1>
-                    <p className="text-gray-500 text-lg">
-                        Track your real-time earnings and commission trends
+                    <p className="text-lg text-[#64748b] font-medium tracking-tight">
+                        Track your earnings and commission trends
                     </p>
                 </div>
 
                 {/* 2. Top Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {topCards.map((stat, idx) => (
-                        <div
+                        <StatCard
                             key={idx}
-                            className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 group"
-                            style={{ animationDelay: `${idx * 100}ms` }}
-                        >
-                            <div className="flex justify-between items-start mb-4">
-                                <span className="text-gray-500 font-medium text-sm">
-                                    {stat.label}
-                                </span>
-                                <div className="p-3 bg-gray-50 rounded-xl group-hover:bg-[#eaf4f3] group-hover:scale-110 transition-all duration-500">
-                                    <stat.icon
-                                        size={20}
-                                        className="text-gray-400 group-hover:text-[#5aa39c] transition-colors"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <h3 className="text-4xl font-bold text-slate-900 tracking-tight">
-                                    <AnimatedCounter
-                                        value={stat.value}
-                                        prefix={stat.prefix}
-                                        suffix={stat.suffix}
-                                        decimals={stat.decimals}
-                                    />
-                                </h3>
-                                {stat.change && (
-                                    <div className={`flex items-center gap-1 text-sm font-semibold ${stat.change.includes("-") ? "text-red-500" : "text-emerald-500"}`}>
-                                        <ArrowUpRight size={16} className={stat.change.includes("-") ? "rotate-90 text-red-500" : ""} />
-                                        <span>{stat.change}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                            {...stat}
+                            delay={idx * 100}
+                        />
                     ))}
                 </div>
 
-                {/* 3. Charts Section */}
-                <div className="grid grid-cols-1 gap-6">
-                    {/* Main Highlight: Full Width Area Chart */}
-                    <div className="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 h-[500px] flex flex-col">
-                        <div className="mb-8">
-                            <h3 className="text-xl font-bold text-slate-900">
-                                Earnings Overview
-                            </h3>
-                            <p className="text-sm text-gray-500 font-medium mt-1">
-                                Last 6 months performance and client acquisition
-                            </p>
+                {/* 3. Trends Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    {/* Monthly Earnings Trend */}
+                    <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
+                        <h3 className="text-[1.25rem] font-black text-[#1a2d1d] mb-10 tracking-tight">
+                            Monthly Earnings Trend
+                        </h3>
+                        <div className="space-y-1">
+                            {dynamicMonthlyTrends.length > 0 ? (
+                                dynamicMonthlyTrends.map((trend, idx) => (
+                                    <TrendBar key={idx} {...trend} />
+                                ))
+                            ) : (
+                                <p className="text-[#64748b] text-center py-10 font-medium">No earnings data available.</p>
+                            )}
                         </div>
+                    </div>
 
-                        <div className="flex-1 w-full min-h-0 relative">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart
-                                    data={monthlyEarnings}
-                                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                                >
-                                    <defs>
-                                        <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#5aa39c" stopOpacity={0.4} />
-                                            <stop offset="95%" stopColor="#5aa39c" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="colorClients" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#94d2bd" stopOpacity={0.2} />
-                                            <stop offset="95%" stopColor="#94d2bd" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    <XAxis
-                                        dataKey="month"
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }}
-                                        dy={10}
-                                    />
-                                    <YAxis
-                                        yAxisId="left"
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }}
-                                        tickFormatter={(value) => `₹${value >= 1000 ? (value / 1000).toFixed(0) + 'k' : value}`}
-                                    />
-                                    <YAxis
-                                        yAxisId="right"
-                                        orientation="right"
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }}
-                                    />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Area
-                                        yAxisId="left"
-                                        type="monotone"
-                                        dataKey="earnings"
-                                        stroke="#5aa39c"
-                                        strokeWidth={4}
-                                        fillOpacity={1}
-                                        fill="url(#colorEarnings)"
-                                        animationDuration={2000}
-                                        activeDot={{ r: 6, strokeWidth: 0, fill: '#5aa39c' }}
-                                    />
-                                    <Area
-                                        yAxisId="right"
-                                        type="monotone"
-                                        dataKey="clients"
-                                        stroke="#8fb6b1"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#colorClients)"
-                                        animationDuration={2000}
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
+                    {/* Revenue by Product */}
+                    <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
+                        <h3 className="text-[1.25rem] font-black text-[#1a2d1d] mb-10 tracking-tight">
+                            Revenue by Product
+                        </h3>
+                        <div className="space-y-1">
+                            {dynamicProductRevenue.length > 0 ? (
+                                dynamicProductRevenue.map((product, idx) => (
+                                    <TrendBar key={idx} {...product} />
+                                ))
+                            ) : (
+                                <p className="text-[#64748b] text-center py-10 font-medium">No product breakdown available.</p>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* 4. AI Insight Footer */}
-                <div className="bg-gradient-to-r from-[#eaf4f3] to-[#f4fafa] border border-[#5aa39c]/20 p-6 lg:p-8 rounded-3xl animate-slide-up relative overflow-hidden shadow-sm">
-                    {/* Decorative blurred blob */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#5aa39c]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
-
-                    <div className="relative z-10 w-full flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-                        <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#5aa39c]/10 shrink-0">
-                            <Sparkles className="w-8 h-8 text-[#5aa39c]" />
+                <div className="bg-white border border-gray-100 p-10 rounded-[3rem] animate-slide-up relative overflow-hidden shadow-sm">
+                    <div className="relative z-10 w-full flex flex-col sm:flex-row gap-8 items-start sm:items-center">
+                        <div className="bg-[#f1f5f9] p-5 rounded-2xl shadow-sm shrink-0">
+                            <Sparkles className="w-8 h-8 text-[#334D3D]" />
                         </div>
-                        <div className="flex-1 space-y-2">
+                        <div className="flex-1 space-y-3">
                             <div className="flex items-center gap-3">
-                                <h4 className="font-bold text-slate-900 text-lg">AI Performance Insight</h4>
+                                <h4 className="font-black text-[#1a2d1d] text-[1.25rem] tracking-tight">AI Performance Insight</h4>
                                 {stats.momGrowth !== undefined && stats.momGrowth > 0 && (
-                                    <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                                    <span className="bg-[#f0fdf4] text-[#10b981] border border-[#bcf0da] text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
                                         Growing {stats.momGrowth}% MoM
                                     </span>
                                 )}
                             </div>
-                            <p className="text-slate-600 text-base leading-relaxed max-w-4xl">
+                            <p className="text-[#64748b] text-[16px] leading-relaxed font-medium max-w-4xl">
                                 {stats.momGrowth !== undefined && stats.momGrowth > 0 ? (
                                     <>Your earnings have grown <strong>{stats.momGrowth}%</strong> compared to last month. You've successfully converted <strong>{stats.convertedClients || 0} clients</strong> so far. Keep up the momentum to maximize your 15% commission rate, and focus on your Hot Leads pipeline to ensure this month's payouts peak.</>
                                 ) : (
@@ -316,25 +274,41 @@ const DashboardRevenue = () => {
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Global CSS for Animations */}
-            <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+                {/* Global CSS for Animations */}
+                <style>{`
+        @keyframes fadeInDown {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         @keyframes slideUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
         .animate-fade-in {
           animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-fade-in-down {
+          animation: fadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-fade-in-up {
+          animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          opacity: 0;
+          animation-fill-mode: forwards;
         }
         .animate-slide-up {
           animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
+            </div>
         </div>
     );
 };

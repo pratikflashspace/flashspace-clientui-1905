@@ -18,21 +18,18 @@ const InsightCard: React.FC<InsightCardProps> = ({
 }) => (
     <div
         onClick={() => onClick(id)}
-        className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group relative overflow-hidden"
+        className="bg-white p-7 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group relative overflow-hidden"
     >
-        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Sparkles size={40} className="text-[#5aa39c]" />
-        </div>
-        <div className="flex justify-between items-start mb-4 relative z-10">
-            <h3 className="font-bold text-slate-900 group-hover:text-[#5aa39c] transition-colors text-base">
+        <div className="flex justify-between items-start mb-4">
+            <h3 className="font-bold text-[#1a2d1d] text-lg leading-snug max-w-[70%]">
                 {title}
             </h3>
-            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 rounded-full text-[10px] font-bold text-gray-600 border border-gray-200 tracking-wide uppercase">
-                <Sparkles size={10} className="text-[#5aa39c] fill-[#5aa39c]" />{" "}
+            <span className="flex items-center gap-1.5 px-3 py-1 bg-[#fefce8] rounded-full text-[11px] font-bold text-[#854d0e] border border-[#fef08a] tracking-wide uppercase">
+                <Sparkles size={12} className="text-[#a16207] fill-[#a16207]" />{" "}
                 AI
             </span>
         </div>
-        <p className="text-sm text-gray-500 leading-relaxed relative z-10 pr-4">
+        <p className="text-[15px] text-[#64748b] leading-relaxed font-medium">
             {description}
         </p>
     </div>
