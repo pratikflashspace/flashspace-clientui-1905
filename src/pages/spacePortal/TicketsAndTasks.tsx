@@ -86,12 +86,24 @@ export default function TicketsAndTasksPage() {
       setTickets(prev => prev.map(t => t._id === data.ticketId ? data.ticket : t));
     };
 
+     const handlePartnerNewTicket = (data: { ticket: any }) => {
+      // Check if this ticket belongs to us (it will appear in our list if it does)
+      toast.success(`New query from a client: "${data.ticket?.subject || 'New Query'}"`, {
+        icon: '🔔',
+        duration: 5000,
+      });
+      // Refresh the ticket list to show the new ticket
+      fetchTickets();
+    };
+
     socket.on('new_message', handleNewMessage);
     socket.on('ticket_updated', handleTicketUpdated);
+    socket.on('partner_new_ticket', handlePartnerNewTicket);
 
     return () => {
       socket.off('new_message', handleNewMessage);
       socket.off('ticket_updated', handleTicketUpdated);
+      socket.off('partner_new_ticket', handlePartnerNewTicket);
     };
   }, [socket, activeTicketId]);
 
