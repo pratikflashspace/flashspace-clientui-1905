@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import type {
   Client,
@@ -15,25 +16,15 @@ import {
   MoreVertical,
   Filter,
   Loader2,
+  X,
+  Send,
 } from "lucide-react";
 
 import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
 import { userDashboardService } from "@/services/userDashboard.service";
+import partnerTicketService from "@/services/spacePortal/partnerTicket.service";
 
-/**
- * Clients Page
- *
- * Features:
- * - Global search integration (query from context)
- * - Filters (Status, Plan, KYC)
- * - Client listing in table
- * - Navigate to client detail page
- *
- * Backend-ready:
- * - Later CLIENTS will be replaced with API response.
- * - Filters + query will be passed to backend via query params.
- */
 export default function Clients() {
   const navigate = useNavigate();
   const { query } = useSpacePortalSearch();
@@ -41,16 +32,13 @@ export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /**
-   * Filters state (UI dropdown filters)
-   */
+  // The client currently targeted for the message form
+  const [messageTarget, setMessageTarget] = useState<Client | null>(null);
+
   const [statusFilter, setStatusFilter] = useState<ClientStatus | "ALL">("ALL");
   const [planFilter, setPlanFilter] = useState<ClientPlan | "ALL">("ALL");
   const [kycFilter, setKycFilter] = useState<KycStatus | "ALL">("ALL");
 
-  /**
-   * Fetch clients from backend
-   */
   useEffect(() => {
     const fetchClients = async () => {
       try {
@@ -68,10 +56,6 @@ export default function Clients() {
     fetchClients();
   }, []);
 
-  /**
-   * Filter dropdown options (keeps JSX clean)
-   */
-  // ... (rest of the code using clients instead of CLIENTS)
   const statusOptions = useMemo(
     () => [
       { label: "All Status", value: "ALL" },
@@ -102,25 +86,11 @@ export default function Clients() {
     [],
   );
 
-  /**
-   * Normalized search query
-   */
   const normalizedQuery = useMemo(() => query.trim().toLowerCase(), [query]);
 
-  /**
-   * Small helper for filtering.
-   */
-  const matchesFilter = <T,>(filter: T | "ALL", value: T) => {
-    return filter === "ALL" ? true : filter === value;
-  };
+  const matchesFilter = <T,>(filter: T | "ALL", value: T) =>
+    filter === "ALL" ? true : filter === value;
 
-  /**
-   * Filtered clients list based on:
-   * - query
-   * - status filter
-   * - plan filter
-   * - kyc filter
-   */
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
       const matchesQuery =
@@ -129,40 +99,37 @@ export default function Clients() {
         client.id.toLowerCase().includes(normalizedQuery) ||
         client.space.toLowerCase().includes(normalizedQuery);
 
-      const matchesStatus = matchesFilter(statusFilter, client.status);
-      const matchesPlan = matchesFilter(planFilter, client.plan);
-      const matchesKyc = matchesFilter(kycFilter, client.kycStatus);
-
-      return matchesQuery && matchesStatus && matchesPlan && matchesKyc;
+      return (
+        matchesQuery &&
+        matchesFilter(statusFilter, client.status) &&
+        matchesFilter(planFilter, client.plan) &&
+        matchesFilter(kycFilter, client.kycStatus)
+      );
     });
   }, [clients, normalizedQuery, statusFilter, planFilter, kycFilter]);
 
   return (
     <div className="flex-1">
-      {/* Search + Filter */}
+      {/* Filters */}
       <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex items-center gap-2 text-slate-700">
           <Filter size={18} />
           <p className="text-sm font-semibold">Filters</p>
         </div>
-
         <p className="mt-1 text-xs text-slate-500">
           Narrow down clients by status, plan, and KYC.
         </p>
-
         <div className="mt-4 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center">
           <SelectBox
             value={statusFilter}
             onChange={(val) => setStatusFilter(val as ClientStatus | "ALL")}
             options={statusOptions}
           />
-
           <SelectBox
             value={planFilter}
             onChange={(val) => setPlanFilter(val as ClientPlan | "ALL")}
             options={planOptions}
           />
-
           <SelectBox
             value={kycFilter}
             onChange={(val) => setKycFilter(val as KycStatus | "ALL")}
@@ -171,7 +138,7 @@ export default function Clients() {
         </div>
       </div>
 
-      {/* Table Card */}
+      {/* Table */}
       <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
         <table className="w-full min-w-[900px] border-collapse text-left text-sm">
           <thead className="bg-slate-50">
@@ -185,44 +152,191 @@ export default function Clients() {
               <th className="px-6 py-4 text-center font-semibold">Actions</th>
             </tr>
           </thead>
-
           <tbody>
             {filteredClients.map((client) => (
               <ClientRow
                 key={client.id}
                 client={client}
                 onView={() => navigate(`/spaceportal/clients/${client.userId}`)}
+                onMessage={() => setMessageTarget(client)}
               />
             ))}
           </tbody>
         </table>
 
-        {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center justify-center p-12">
             <Loader2 className="h-8 w-8 animate-spin text-[#3FA69E]" />
             <p className="mt-2 text-sm text-slate-500">Loading clients...</p>
           </div>
         )}
-
-        {/* Empty State */}
         {!loading && filteredClients.length === 0 && (
           <p className="p-12 text-center text-slate-500">No clients found.</p>
         )}
+      </div>{/* ← closes overflow-x-auto table wrapper */}
+
+      {/* Send Message Modal */}
+      {messageTarget && (
+        <SendMessageModal
+          client={messageTarget}
+          onClose={() => setMessageTarget(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SendMessageModal — simple form the partner fills to message a client
+// ─────────────────────────────────────────────────────────────────────────────
+
+function SendMessageModal({
+  client,
+  onClose,
+}: {
+  client: Client;
+  onClose: () => void;
+}) {
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const initials = client.companyName
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+
+  const handleSend = async () => {
+    if (!subject.trim() || !message.trim()) {
+      toast.error("Please fill in both fields.");
+      return;
+    }
+    if (!client.bookingId) {
+      toast.error("Cannot identify booking for this client.");
+      return;
+    }
+    setSending(true);
+    try {
+      const res = await partnerTicketService.createTicketForClient({
+        clientUserId: client.userId,
+        bookingId: client.bookingId,
+        subject: subject.trim(),
+        message: message.trim(),
+      });
+
+      if (res.success) {
+        toast.success("Message sent! The client will see it in their support section.");
+        onClose();
+      } else {
+        toast.error(res.message || "Failed to send message.");
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Something went wrong.");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg rounded-3xl bg-white shadow-2xl overflow-hidden">
+
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-sm font-bold text-teal-700">
+              {initials}
+            </div>
+            <div>
+              <h2 className="font-bold text-gray-900">Send Message</h2>
+              <p className="text-xs text-gray-400">
+                To: {client.contactName} · {client.companyName}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-full p-2 hover:bg-gray-100 transition-colors"
+          >
+            <X size={18} className="text-gray-400" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+              Subject
+            </label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="e.g. Important update about your workspace"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-teal-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+              Message
+            </label>
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={5}
+              placeholder="Write your message to the client…"
+              className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-teal-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all"
+            />
+          </div>
+
+          <p className="text-xs text-gray-400">
+            📬 This message will appear in the client's <strong>Support / My Tickets</strong> section. They'll get a notification instantly.
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 border-t border-gray-100 px-6 py-4">
+          <button
+            onClick={onClose}
+            disabled={sending}
+            className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSend}
+            disabled={sending || !subject.trim() || !message.trim()}
+            className="flex items-center gap-2 rounded-xl bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 transition-colors shadow-md shadow-teal-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {sending ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Send size={16} />
+            )}
+            {sending ? "Sending…" : "Send Message"}
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-/**
- * Client Row Component
- * Displays one client record in table.
- */
-function ClientRow({ client, onView }: { client: Client; onView: () => void }) {
-  /**
-   * Create initials from company name.
-   * Example: "Flash Space" => "FS"
-   */
+// ─────────────────────────────────────────────────────────────────────────────
+// Table subcomponents
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ClientRow({
+  client,
+  onView,
+  onMessage,
+}: {
+  client: Client;
+  onView: () => void;
+  onMessage: () => void;
+}) {
   const initials = useMemo(() => {
     return client.companyName
       .split(" ")
@@ -234,13 +348,11 @@ function ClientRow({ client, onView }: { client: Client; onView: () => void }) {
 
   return (
     <tr className="border-t border-slate-100 hover:bg-slate-50">
-      {/* Client */}
       <td className="px-6 py-5">
         <div className="flex items-center gap-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-[#3FA69E]">
             {initials}
           </div>
-
           <div>
             <p className="font-semibold text-slate-900">{client.companyName}</p>
             <p className="text-sm text-slate-500">{client.contactName}</p>
@@ -248,10 +360,8 @@ function ClientRow({ client, onView }: { client: Client; onView: () => void }) {
         </div>
       </td>
 
-      {/* Plan */}
       <td className="px-6 py-5 font-semibold text-slate-800">{client.plan}</td>
 
-      {/* Space */}
       <td className="px-6 py-5 text-slate-600">
         <div className="flex items-center gap-2">
           <MapPin size={16} className="text-slate-400" />
@@ -259,37 +369,35 @@ function ClientRow({ client, onView }: { client: Client; onView: () => void }) {
         </div>
       </td>
 
-      {/* Duration */}
       <td className="px-6 py-5 text-slate-600">
         <p>{client.startDate}</p>
         <p className="text-xs text-slate-400">to {client.endDate}</p>
       </td>
 
-      {/* Status */}
       <td className="px-6 py-5">
         <StatusPill status={client.status} />
       </td>
 
-      {/* KYC */}
       <td className="px-6 py-5">
         <KycPill status={client.kycStatus} />
       </td>
 
-      {/* Actions */}
       <td className="px-6 py-5">
         <div className="flex items-center justify-center gap-4 text-slate-500">
           <button
             onClick={onView}
             className="hover:text-slate-900"
-            aria-label="Quick preview"
+            aria-label="View Client"
             type="button"
           >
             <Eye size={18} />
           </button>
 
           <button
-            className="hover:text-slate-900"
-            aria-label="Send message"
+            onClick={onMessage}
+            className="hover:text-teal-600 transition-colors"
+            aria-label="Send message to client"
+            title="Send message"
             type="button"
           >
             <MessageSquare size={18} />
@@ -316,10 +424,6 @@ function ClientRow({ client, onView }: { client: Client; onView: () => void }) {
   );
 }
 
-/**
- * Status pill component
- * Keeps UI consistent + avoids repeated ternary styling.
- */
 function StatusPill({ status }: { status: ClientStatus }) {
   const config =
     status === "ACTIVE"
@@ -337,9 +441,6 @@ function StatusPill({ status }: { status: ClientStatus }) {
   );
 }
 
-/**
- * KYC pill component
- */
 function KycPill({ status }: { status: KycStatus }) {
   const config =
     status === "VERIFIED"
