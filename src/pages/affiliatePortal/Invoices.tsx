@@ -161,10 +161,9 @@ const StatusBadge = ({ status }: { status: string }) => {
     };
     return (
         <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
-                styles[status as keyof typeof styles] ||
+            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${styles[status as keyof typeof styles] ||
                 "bg-gray-100 text-gray-600"
-            }`}
+                }`}
         >
             {status}
         </span>
@@ -412,11 +411,10 @@ const Invoices = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setShowFilter(!showFilter)}
-                                className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold transition ${
-                                    statusFilter.length > 0
-                                        ? "bg-[#5aa39c]/10 text-[#5aa39c] border-[#5aa39c]"
-                                        : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
-                                }`}
+                                className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold transition ${statusFilter.length > 0
+                                    ? "bg-[#5aa39c]/10 text-[#5aa39c] border-[#5aa39c]"
+                                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                    }`}
                             >
                                 <Filter size={16} /> Filter{" "}
                                 {statusFilter.length > 0 &&
@@ -446,14 +444,14 @@ const Invoices = () => {
                                                                     status,
                                                                 )
                                                                     ? prev.filter(
-                                                                          (s) =>
-                                                                              s !==
-                                                                              status,
-                                                                      )
+                                                                        (s) =>
+                                                                            s !==
+                                                                            status,
+                                                                    )
                                                                     : [
-                                                                          ...prev,
-                                                                          status,
-                                                                      ],
+                                                                        ...prev,
+                                                                        status,
+                                                                    ],
                                                         )
                                                     }
                                                     className="rounded text-[#5aa39c] focus:ring-[#5aa39c]"

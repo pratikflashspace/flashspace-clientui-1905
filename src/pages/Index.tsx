@@ -12,7 +12,13 @@ import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
 
-const FadeInSection = ({ children, delay = 0 }: { children: ReactNode; delay?: number }) => (
+const FadeInSection = ({
+  children,
+  delay = 0,
+}: {
+  children: ReactNode;
+  delay?: number;
+}) => (
   <motion.div
     initial={{ opacity: 0, y: 32 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -34,16 +40,34 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
       <Header openLogin={openLogin} openSignup={openSignup} />
       <main>
         <HeroWithSearch />
-        <FadeInSection><PlanLocationsShowcase /></FadeInSection>
-        <FadeInSection><ScrollNavLayout /></FadeInSection>
-        <FadeInSection><FeatureCTA /></FadeInSection>
-        <FadeInSection><Stats /></FadeInSection>
-        <FadeInSection><FounderTestimonial /></FadeInSection>
-        <FadeInSection><BlogSection /></FadeInSection>
-        <FadeInSection><FAQSection /></FadeInSection>
-        <FadeInSection><CTA /></FadeInSection>
+        <FadeInSection>
+          <PlanLocationsShowcase />
+        </FadeInSection>
+        <FadeInSection>
+          <ScrollNavLayout />
+        </FadeInSection>
+        <FadeInSection>
+          <FeatureCTA />
+        </FadeInSection>
+        <FadeInSection>
+          <Stats />
+        </FadeInSection>
+        <FadeInSection>
+          <FounderTestimonial />
+        </FadeInSection>
+        <FadeInSection>
+          <BlogSection />
+        </FadeInSection>
+        <FadeInSection>
+          <FAQSection />
+        </FadeInSection>
+        <FadeInSection>
+          <CTA />
+        </FadeInSection>
       </main>
-      <FadeInSection><Footer /></FadeInSection>
+      <FadeInSection>
+        <Footer />
+      </FadeInSection>
     </div>
   );
 };

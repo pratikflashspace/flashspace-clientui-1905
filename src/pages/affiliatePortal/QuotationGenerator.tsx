@@ -351,11 +351,11 @@ const QuotationGenerator = () => {
 
     const statusBadge = (status: string) => {
         const map: Record<string, string> = {
-            Sent: "bg-orange-50 text-orange-600 border-orange-100",
-            Viewed: "bg-blue-50 text-blue-600 border-blue-100",
-            Accepted: "bg-emerald-50 text-emerald-600 border-emerald-100",
+            Sent: "bg-orange-50 text-orange-600",
+            Viewed: "bg-blue-50 text-blue-600",
+            Accepted: "bg-emerald-50 text-emerald-600",
         };
-        return <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${map[status] || map.Sent}`}>{status}</span>;
+        return <span className={`text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap ${map[status] || map.Sent}`}>{status}</span>;
     };
 
     return (
@@ -468,8 +468,8 @@ const QuotationGenerator = () => {
                                             key={p}
                                             onClick={() => setCurrentPage(p as number)}
                                             className={`w-9 h-9 rounded-xl text-sm font-bold transition-colors ${p === currentPage
-                                                    ? 'bg-[#5bb09c] text-white shadow-sm'
-                                                    : 'text-gray-500 hover:bg-gray-100'
+                                                ? 'bg-[#5bb09c] text-white shadow-sm'
+                                                : 'text-gray-500 hover:bg-gray-100'
                                                 }`}
                                         >{p}</button>
                                     ))
@@ -487,12 +487,11 @@ const QuotationGenerator = () => {
                 </div>
             )}
             {/* Header Section */}
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                    Quotation{" "}
-                    <span className="italic text-[#5bb09c]">Generator</span>
+            <div className="mb-10">
+                <h1 className="text-4xl font-extrabold text-[#1a1a1a] tracking-tight">
+                    Quotation <span className="italic font-bold text-[#2d5a4c]">Generator</span>
                 </h1>
-                <p className="text-gray-500 mt-1 font-medium">
+                <p className="text-[#6b7280] mt-2 text-lg font-medium">
                     Create instant quotations with FlashSpace and your affiliate branding
                 </p>
             </div>
@@ -501,81 +500,78 @@ const QuotationGenerator = () => {
                 {/* LEFT COLUMN: FORM AREA (7/12) */}
                 <div className="lg:col-span-7 animate-slide-up">
                     <div className="bg-white p-6 md:p-10 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-10">
-                        <div className="flex items-center gap-4 pb-4 border-b border-gray-100/50">
-                            <div className="p-2.5 bg-[#5bb09c]/10 rounded-xl text-[#5bb09c]">
-                                <FileText className="w-5 h-5" />
+                        <div className="flex items-center gap-3 pb-6 border-b border-gray-100">
+                            <div className="p-2.5 bg-gray-50 rounded-xl text-gray-600">
+                                <FileText className="w-6 h-6" />
                             </div>
-                            <div>
-                                <h2 className="text-xl font-bold text-gray-900">
-                                    Create New Quotation
-                                </h2>
-                                <p className="text-sm text-gray-500 mt-0.5">Fill in the details below to generate a new pricing quote.</p>
-                            </div>
+                            <h2 className="text-2xl font-bold text-[#1a1a1a]">
+                                Create New Quotation
+                            </h2>
                         </div>
 
                         {/* Client Details */}
                         <div className="space-y-6">
-                            <div className="mb-6">
-                                <span className="text-xs font-bold text-[#5bb09c] bg-[#5bb09c]/10 px-3 py-1.5 rounded-full uppercase tracking-wider">
+                            <div className="mb-4">
+                                <h3 className="text-base font-bold text-[#1a1a1a]">
                                     Client Details
-                                </span>
+                                </h3>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <Label className={`text-sm font-semibold text-gray-700 ${errors.clientName ? "text-red-500" : ""}`}>Client Name <span className="text-red-500">*</span></Label>
+                                    <Label className={`text-sm font-semibold text-[#374151] ${errors.clientName ? "text-red-500" : ""}`}>Client Name</Label>
                                     <Input
                                         placeholder="Enter client name"
-                                        className={`bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus-visible:ring-2 focus-visible:ring-[#5bb09c]/20 focus-visible:border-[#5bb09c]/40 h-12 rounded-xl ${errors.clientName ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                                        className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus-visible:ring-1 focus-visible:ring-gray-200 h-14 rounded-xl text-[#1a1a1a] placeholder:text-[#9ca3af] ${errors.clientName ? "bg-red-50 text-red-900" : ""}`}
                                         value={formData.clientName}
                                         onChange={(e) => handleInputChange("clientName", e.target.value)}
                                     />
-                                    {errors.clientName && <p className="text-xs text-red-500">{errors.clientName}</p>}
+                                    {errors.clientName && <p className="text-xs text-red-500 font-medium">{errors.clientName}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className={`text-sm font-semibold text-gray-700 ${errors.email ? "text-red-500" : ""}`}>Email Address <span className="text-red-500">*</span></Label>
+                                    <Label className={`text-sm font-semibold text-[#374151] ${errors.email ? "text-red-500" : ""}`}>Email Address</Label>
                                     <Input
                                         placeholder="client@company.com"
-                                        className={`bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus-visible:ring-2 focus-visible:ring-[#5bb09c]/20 focus-visible:border-[#5bb09c]/40 h-12 rounded-xl ${errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                                        className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus-visible:ring-1 focus-visible:ring-gray-200 h-14 rounded-xl text-[#1a1a1a] placeholder:text-[#9ca3af] ${errors.email ? "bg-red-50 text-red-900" : ""}`}
                                         value={formData.email}
                                         onChange={(e) => handleInputChange("email", e.target.value)}
                                     />
-                                    {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
+                                    {errors.email && <p className="text-xs text-red-500 font-medium">{errors.email}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className={`text-sm font-semibold text-gray-700 ${errors.phone ? "text-red-500" : ""}`}>Phone Number <span className="text-red-500">*</span></Label>
+                                    <Label className={`text-sm font-semibold text-[#374151] ${errors.phone ? "text-red-500" : ""}`}>Phone Number</Label>
                                     <Input
                                         placeholder="+91 98765 43210"
-                                        className={`bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus-visible:ring-2 focus-visible:ring-[#5bb09c]/20 focus-visible:border-[#5bb09c]/40 h-12 rounded-xl ${errors.phone ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                                        className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus-visible:ring-1 focus-visible:ring-gray-200 h-14 rounded-xl text-[#1a1a1a] placeholder:text-[#9ca3af] ${errors.phone ? "bg-red-50 text-red-900" : ""}`}
                                         value={formData.phone}
                                         onChange={(e) => handleInputChange("phone", e.target.value)}
                                     />
-                                    {errors.phone && <p className="text-xs text-red-500">{errors.phone}</p>}
+                                    {errors.phone && <p className="text-xs text-red-500 font-medium">{errors.phone}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className={`text-sm font-semibold text-gray-700 ${errors.companyName ? "text-red-500" : ""}`}>Company Name <span className="text-red-500">*</span></Label>
+                                    <Label className={`text-sm font-semibold text-[#374151] ${errors.companyName ? "text-red-500" : ""}`}>Company Name</Label>
                                     <Input
                                         placeholder="Company name"
-                                        className={`bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus-visible:ring-2 focus-visible:ring-[#5bb09c]/20 focus-visible:border-[#5bb09c]/40 h-12 rounded-xl ${errors.companyName ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                                        className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus-visible:ring-1 focus-visible:ring-gray-200 h-14 rounded-xl text-[#1a1a1a] placeholder:text-[#9ca3af] ${errors.companyName ? "bg-red-50 text-red-900" : ""}`}
                                         value={formData.companyName}
                                         onChange={(e) => handleInputChange("companyName", e.target.value)}
                                     />
-                                    {errors.companyName && <p className="text-xs text-red-500">{errors.companyName}</p>}
+                                    {errors.companyName && <p className="text-xs text-red-500 font-medium">{errors.companyName}</p>}
                                 </div>
                             </div>
                         </div>
 
                         {/* Space Requirements */}
-                        <div className="space-y-6 pt-4 border-t border-gray-100/50">
-                            <div className="mb-6">
-                                <span className="text-xs font-bold text-[#5bb09c] bg-[#5bb09c]/10 px-3 py-1.5 rounded-full uppercase tracking-wider">
+                        <div className="space-y-6">
+                            <div className="mb-4">
+                                <h3 className="text-base font-bold text-[#1a1a1a]">
                                     Space Requirements
-                                </span>
+                                </h3>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <Label className={`text-sm font-semibold text-gray-700 ${errors.spaceType ? "text-red-500" : ""}`}>Space Type <span className="text-red-500">*</span></Label>
+                                    <Label className={`text-sm font-semibold text-[#374151] ${errors.spaceType ? "text-red-500" : ""}`}>Space Type</Label>
                                     <Select value={formData.spaceType} onValueChange={(val) => handleInputChange("spaceType", val)}>
-                                        <SelectTrigger className={`bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus:ring-2 focus:ring-[#5bb09c]/20 h-12 rounded-xl ${errors.spaceType ? "border-red-500 ring-offset-red-100" : ""}`}>
+                                        <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.spaceType ? "bg-red-50" : ""}`}>
                                             <SelectValue placeholder="Select space type" />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
@@ -586,9 +582,9 @@ const QuotationGenerator = () => {
                                     {errors.spaceType && <p className="text-xs text-red-500">{errors.spaceType}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className={`text-sm font-semibold text-gray-700 ${errors.city ? "text-red-500" : ""}`}>City <span className="text-red-500">*</span></Label>
+                                    <Label className={`text-sm font-semibold text-[#374151] ${errors.city ? "text-red-500" : ""}`}>City</Label>
                                     <Select value={formData.city} onValueChange={(val) => handleInputChange("city", val)}>
-                                        <SelectTrigger className={`bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus:ring-2 focus:ring-[#5bb09c]/20 h-12 rounded-xl ${errors.city ? "border-red-500 ring-offset-red-100" : ""}`}>
+                                        <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.city ? "bg-red-50" : ""}`}>
                                             <SelectValue placeholder="Select city" />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
@@ -603,7 +599,7 @@ const QuotationGenerator = () => {
                                     <div className="md:col-span-2 flex py-1">
                                         <Button
                                             variant="secondary"
-                                            className="bg-[#5bb09c] text-white hover:bg-[#4a9b89] gap-2 h-12 px-6 rounded-xl shadow-md transition-all font-semibold"
+                                            className="bg-[#2d5a4c] text-white hover:bg-[#1a3a3a] gap-2 h-14 px-8 rounded-xl shadow-md transition-all font-bold text-base"
                                             onClick={handleFetchSpaces}
                                             disabled={isFetchingSpaces}
                                         >
@@ -624,7 +620,7 @@ const QuotationGenerator = () => {
                                                 setSelectedSpace(space);
                                             }}
                                         >
-                                            <SelectTrigger className={`bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus:ring-2 focus:ring-[#5bb09c]/20 h-12 rounded-xl ${errors.location ? "border-red-500" : "border-[#5bb09c]/30 border-2"}`}>
+                                            <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.location ? "bg-red-50" : ""}`}>
                                                 <SelectValue placeholder="Choose an office from results" />
                                             </SelectTrigger>
                                             <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
@@ -643,15 +639,15 @@ const QuotationGenerator = () => {
                                     <>
                                         {formData.spaceType === "Coworking" ? (
                                             <div className="space-y-2">
-                                                <Label className={`text-sm font-semibold text-gray-700 ${errors.numberOfSeats ? "text-red-500" : ""}`}>Number of Seats <span className="text-red-500">*</span></Label>
+                                                <Label className={`text-sm font-semibold text-[#374151] ${errors.numberOfSeats ? "text-red-500" : ""}`}>Number of Seats</Label>
                                                 <Input
                                                     type="number"
                                                     placeholder="e.g., 10"
-                                                    className={`bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus-visible:ring-2 focus-visible:ring-[#5bb09c]/20 focus-visible:border-[#5bb09c]/40 h-12 rounded-xl border-gray-200 ${errors.numberOfSeats ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                                                    className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus-visible:ring-1 focus-visible:ring-gray-200 h-14 rounded-xl text-[#1a1a1a] placeholder:text-[#9ca3af] ${errors.numberOfSeats ? "bg-red-50 text-red-900" : ""}`}
                                                     value={formData.numberOfSeats}
                                                     onChange={(e) => handleInputChange("numberOfSeats", e.target.value)}
                                                 />
-                                                {errors.numberOfSeats && <p className="text-xs text-red-500">{errors.numberOfSeats}</p>}
+                                                {errors.numberOfSeats && <p className="text-xs text-red-500 font-medium">{errors.numberOfSeats}</p>}
                                             </div>
                                         ) : (
                                             <div className="space-y-2">
@@ -669,28 +665,28 @@ const QuotationGenerator = () => {
                                             </div>
                                         )}
                                         <div className="space-y-2">
-                                            <Label className={`text-sm font-semibold text-gray-700 ${errors.duration ? "text-red-500" : ""}`}>Duration (Months) <span className="text-red-500">*</span></Label>
+                                            <Label className={`text-sm font-semibold text-[#374151] ${errors.duration ? "text-red-500" : ""}`}>Duration (Months)</Label>
                                             <Select value={formData.duration} onValueChange={(val) => handleInputChange("duration", val)}>
-                                                <SelectTrigger className={`bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus:ring-2 focus:ring-[#5bb09c]/20 h-12 rounded-xl ${errors.duration ? "border-red-500 ring-offset-red-100" : ""}`}>
+                                                <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.duration ? "bg-red-50" : ""}`}>
                                                     <SelectValue placeholder="Select duration" />
                                                 </SelectTrigger>
                                                 <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                                     {[1, 2, 3, 6, 12, 24].map(m => (
-                                                        <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" key={m} value={m.toString()}>{m} {m === 1 ? 'Month' : 'Months'}</SelectItem>
+                                                        <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#2d5a4c]/10 focus:text-[#2d5a4c] font-semibold transition-colors py-3 pr-3 pl-10" key={m} value={m.toString()}>{m} {m === 1 ? 'Month' : 'Months'}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                            {errors.duration && <p className="text-xs text-red-500">{errors.duration}</p>}
+                                            {errors.duration && <p className="text-xs text-red-500 font-medium">{errors.duration}</p>}
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className={`text-sm font-semibold text-gray-700 ${errors.startDate ? "text-red-500" : ""}`}>Start Date <span className="text-red-500">*</span></Label>
+                                            <Label className={`text-sm font-semibold text-[#374151] ${errors.startDate ? "text-red-500" : ""}`}>Start Date</Label>
                                             <Input
                                                 type="date"
-                                                className={`bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus-visible:ring-2 focus-visible:ring-[#5bb09c]/20 focus-visible:border-[#5bb09c]/40 h-12 rounded-xl border-gray-200 ${errors.startDate ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                                                className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus-visible:ring-1 focus-visible:ring-gray-200 h-14 rounded-xl text-[#1a1a1a] ${errors.startDate ? "bg-red-50 text-red-900" : ""}`}
                                                 value={formData.startDate}
                                                 onChange={(e) => handleInputChange("startDate", e.target.value)}
                                             />
-                                            {errors.startDate && <p className="text-xs text-red-500">{errors.startDate}</p>}
+                                            {errors.startDate && <p className="text-xs text-red-500 font-medium">{errors.startDate}</p>}
                                         </div>
                                     </>
                                 )}
@@ -698,26 +694,23 @@ const QuotationGenerator = () => {
                         </div>
 
                         {/* Additional Notes */}
-                        <div className="space-y-2 pt-4 border-t border-gray-100/50">
-                            <Label className="text-sm font-semibold text-gray-700">Additional Notes</Label>
+                        <div className="space-y-2">
+                            <Label className="text-sm font-semibold text-[#374151]">Additional Notes</Label>
                             <Textarea
                                 placeholder="Any specific requirements or preferences..."
-                                className="bg-gray-50/40 hover:bg-gray-50/80 transition-colors focus-visible:ring-2 focus-visible:ring-[#5bb09c]/20 focus-visible:border-[#5bb09c]/40 min-h-[120px] rounded-2xl resize-y border-gray-200 p-4 shadow-inner-sm"
+                                className="bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus-visible:ring-1 focus-visible:ring-gray-200 min-h-[140px] rounded-2xl resize-none text-[#1a1a1a] placeholder:text-[#9ca3af] p-5"
                                 value={formData.notes}
                                 onChange={(e) => handleInputChange("notes", e.target.value)}
                             />
                         </div>
 
                         {/* Price Calculation Block */}
-                        <div className="bg-gradient-to-br from-[#f2faf9] to-[#ffffff] p-6 md:p-8 rounded-[2rem] border border-[#5bb09c]/20 shadow-[0_4px_20px_rgb(91,176,156,0.06)] space-y-3 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-8 transform translate-x-12 -translate-y-8 opacity-5 group-hover:scale-110 transition-transform duration-700">
-                                <Sparkles className="w-48 h-48 text-[#5bb09c]" />
-                            </div>
+                        <div className="bg-[#f9fafb] p-8 rounded-[2rem] space-y-3 relative overflow-hidden group">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center relative z-10 gap-4">
                                 <div className="space-y-1">
-                                    <div className="flex items-center gap-2 text-[#5bb09c]">
-                                        <Sparkles className="w-4 h-4" />
-                                        <span className="text-sm font-bold uppercase tracking-widest text-[#5bb09c]">
+                                    <div className="flex items-center gap-2 text-[#2d5a4c]">
+                                        <Sparkles className="w-5 h-5" />
+                                        <span className="text-sm font-bold uppercase tracking-widest text-[#2d5a4c]">
                                             Calculated Price
                                         </span>
                                     </div>
@@ -740,11 +733,11 @@ const QuotationGenerator = () => {
                         {/* Form Actions */}
                         <div className="flex flex-col sm:flex-row gap-4 pt-6 mt-6">
                             <Button
-                                className="flex-1 bg-[#5bb09c] text-white hover:bg-[#4a9b89] h-14 gap-2 shadow-lg hover:shadow-[#5bb09c]/30 rounded-xl transition-all hover:-translate-y-0.5 text-base font-semibold"
+                                className="flex-1 bg-[#2d5a4c] text-white hover:bg-[#1a3a3a] h-16 gap-3 shadow-lg hover:shadow-[#2d5a4c]/30 rounded-2xl transition-all hover:-translate-y-0.5 text-lg font-bold"
                                 onClick={handleGenerateQuotation}
                                 disabled={generating}
                             >
-                                {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                                {generating ? <Loader2 className="w-6 h-6 animate-spin" /> : <Plus className="w-6 h-6" />}
                                 {generating ? "Generating Quotation..." : "Generate Quotation"}
                             </Button>
                         </div>
@@ -755,18 +748,15 @@ const QuotationGenerator = () => {
                 <div className="lg:col-span-5 space-y-8 animate-slide-up">
                     {/* Recent Quotations Section */}
                     <div className="bg-white p-6 md:p-8 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
-                        <div className="flex justify-between items-center pb-4 border-b border-gray-100/50">
-                            <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-[#5bb09c]"></span>
-                                Recent Quotations
-                            </h3>
-                            <button
-                                onClick={handleOpenViewAll}
-                                className="text-xs font-bold text-gray-500 hover:text-[#5bb09c] transition-colors uppercase tracking-wider bg-gray-50 hover:bg-[#5bb09c]/10 px-3 py-1.5 rounded-full"
-                            >
-                                View All
-                            </button>
-                        </div>
+                        <h3 className="font-bold text-[#1a1a1a] text-xl">
+                            Recent Quotations
+                        </h3>
+                        <button
+                            onClick={handleOpenViewAll}
+                            className="text-sm font-bold text-[#6b7280] hover:text-[#2d5a4c] transition-colors"
+                        >
+                            View All
+                        </button>
 
                         {/* Scroll Area for History */}
                         <div className="space-y-4 max-h-[480px] overflow-y-auto pr-2 custom-scrollbar pb-2">

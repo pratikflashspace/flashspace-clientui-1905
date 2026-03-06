@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2 } from "lucide-react";
+import { Send, Bot, User, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -83,26 +83,27 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
     };
 
     return (
-        <div className="flex flex-col h-[600px] bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="flex flex-col h-[650px] bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
             {/* Chat Header */}
-            <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white rounded-lg border border-gray-100 shadow-sm text-[#5bb09c]">
-                        <Bot className="w-5 h-5" />
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-[#f9fafb] rounded-2xl flex items-center justify-center text-[#2d5a4c] ring-1 ring-black/5">
+                        <Bot className="w-6 h-6" />
                     </div>
                     <div>
-                        <h4 className="font-bold text-gray-900 text-sm">
+                        <h4 className="font-black text-[#1a1a1a]">
                             FlashSpace AI Assistant
                         </h4>
-                        <p className="text-[10px] text-emerald-500 font-bold flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />{" "}
+                        <p className="text-xs text-[#16a34a] font-bold flex items-center gap-1.5">
+                            <span className="w-2 h-2 bg-[#16a34a] rounded-full animate-pulse" />{" "}
                             Online
                         </p>
                     </div>
                 </div>
-                <span className="text-[10px] font-bold bg-[#5bb09c]/10 text-[#5bb09c] px-2 py-1 rounded-md uppercase tracking-wider">
+                <div className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2d5a4c] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
+                    <Sparkles className="w-3 h-3 fill-white" />
                     AI Powered
-                </span>
+                </div>
             </div>
 
             {/* Messages Area */}
@@ -113,15 +114,15 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
                 {messages.map((msg, i) => (
                     <div
                         key={i}
-                        className={`flex items-start gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+                        className={`flex items-start gap-4 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
                     >
                         <div
                            className={`p-2 rounded-lg border shrink-0 ${msg.role === "user" ? "bg-[#5bb09c] text-white border-[#5bb09c]" : "bg-gray-50 text-gray-700 border-gray-200"}`}
                         >
                             {msg.role === "user" ? (
-                                <User className="w-4 h-4" />
+                                <User className="w-5 h-5" />
                             ) : (
-                                <Bot className="w-4 h-4" />
+                                <Bot className="w-5 h-5" />
                             )}
                         </div>
                         <div
@@ -146,7 +147,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
                             >
                                 {msg.text}
                             </div>
-                            <p className="text-[10px] text-gray-400 font-medium px-1">
+                            <p className="text-[10px] text-[#9ca3af] font-bold px-2 uppercase tracking-tight">
                                 {msg.time}
                             </p>
                         </div>
@@ -167,25 +168,25 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
             {/* Input Area */}
             <form
                 onSubmit={handleSendMessage}
-                className="p-4 bg-gray-50/30 border-t border-gray-100"
+                className="p-6 bg-white border-t border-gray-100"
             >
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                     <Input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Type your message..."
-                        className="bg-white border-gray-200 focus-visible:ring-[#5bb09c]"
+                        className="h-14 bg-[#f9fafb] border-0 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#2d5a4c] font-medium"
                         disabled={isLoading}
                     />
                     <Button
                         type="submit"
-                        className="bg-[#5bb09c] hover:bg-[#4a9b89] px-6 text-white"
+                        className="h-14 w-14 bg-[#2d5a4c] hover:bg-[#1a3a3a] rounded-2xl text-white shadow-lg hover:shadow-[#2d5a4c]/20 transition-all flex items-center justify-center p-0"
                         disabled={isLoading || !input.trim()}
                     >
                         {isLoading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <Loader2 className="w-6 h-6 animate-spin" />
                         ) : (
-                            <Send className="w-4 h-4" />
+                            <Send className="w-6 h-6" />
                         )}
                     </Button>
                 </div>

@@ -1185,7 +1185,7 @@ export default function KYCVerification() {
                   <div className="p-3 bg-gray-50 rounded-full group-hover:bg-[#80dad3bb] mb-3 transition-colors">
                     <Building2 className="w-6 h-6" />
                   </div>
-                  <span className="font-medium">Begin Verification</span>
+                  <span className="font-medium">Add New Space</span>
                 </button>
               </div>
             </div>
@@ -1311,17 +1311,7 @@ export default function KYCVerification() {
                   </p>
                   <button
                     onClick={() => {
-                      // Just move user to the personal info step; do NOT call backend yet.
-                      // Backend save happens from the "Confirm & Continue" button after required fields are filled.
                       setHasStartedNewProfile(true);
-                      setActiveStep("personal");
-
-                      // Prefill full name and email from logged-in user if available
-                      setPersonalForm((prev) => ({
-                        ...prev,
-                        fullName: prev.fullName || user?.fullName || "",
-                        email: prev.email || user?.email || "",
-                      }));
                     }}
                     disabled={saving || !businessForm.profileName}
                     className="w-full py-3 bg-[#3FA69E] text-black rounded-lg font-bold hover:bg-[#3FA69E] transition-colors disabled:opacity-50"
@@ -1508,8 +1498,9 @@ export default function KYCVerification() {
                           try {
                             // Save personal info first
                             await upsertSpaceUserKyc({
-                              fullName: personalForm.fullName,
-                              email: personalForm.email,
+                              fullName:
+                                personalForm.fullName || user?.fullName || "",
+                              email: personalForm.email || user?.email || "",
                               phoneNumber: personalForm.phone,
                               dateOfBirth: personalForm.dateOfBirth,
                               aadhaarNumber: personalForm.aadhaar,

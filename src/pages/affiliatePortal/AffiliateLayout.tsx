@@ -82,7 +82,7 @@ const AffiliateLayout = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+        <div className="flex h-screen bg-gray-50 overflow-hidden font-sans" data-lenis-prevent>
             {/* 1. Sidebar */}
             <Sidebar
                 isMobileOpen={isMobileOpen}
@@ -94,7 +94,7 @@ const AffiliateLayout = () => {
             />
 
             {/* 2. Main Content Wrapper */}
-            <div className="flex-1 flex flex-col h-full overflow-hidden relative transition-all duration-300">
+            <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden relative transition-all duration-300">
                 {/* --- Header (Mobile Only) --- */}
                 <header className="lg:hidden bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 shrink-0 z-30 relative">
                     <div className="flex items-center gap-2 font-bold text-xl">
@@ -110,7 +110,7 @@ const AffiliateLayout = () => {
                 </header>
 
                 {/* --- Main Content Area --- */}
-                <main id="affiliate-main-content" className="flex-1 overflow-auto relative">
+                <main id="affiliate-main-content" className="flex-1 min-h-0 overflow-y-auto relative custom-scrollbar" data-lenis-prevent>
                     {/* <Outlet /> renders the child route (e.g., Dashboard.tsx) here */}
                     <Outlet />
                 </main>

@@ -73,11 +73,11 @@ export const getVirtualOfficesByCity = async (
         coordinates:
           o.coordinates ||
           (Array.isArray(o.location?.coordinates) &&
-          o.location.coordinates.length === 2
+            o.location.coordinates.length === 2
             ? {
-                lat: o.location.coordinates[1],
-                lng: o.location.coordinates[0],
-              }
+              lat: o.location.coordinates[1],
+              lng: o.location.coordinates[0],
+            }
             : undefined),
         features: o.features || [],
         gstPlanPrice:
@@ -133,11 +133,11 @@ export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
         coordinates:
           o.coordinates ||
           (Array.isArray(o.location?.coordinates) &&
-          o.location.coordinates.length === 2
+            o.location.coordinates.length === 2
             ? {
-                lat: o.location.coordinates[1],
-                lng: o.location.coordinates[0],
-              }
+              lat: o.location.coordinates[1],
+              lng: o.location.coordinates[0],
+            }
             : undefined),
         features: o.features || [],
         gstPlanPrice:
@@ -266,18 +266,41 @@ export const deleteVirtualOffice = async (id: string): Promise<boolean> => {
 };
 
 /**
- * Get all cities that have at least one active workspace (Virtual Office, Coworking, or Meeting Room).
+ * Get all cities that have at least one active workspace.
+ * Derived client-side by fetching all three workspace types and extracting unique city values.
  */
 export const getAvailableCities = async (): Promise<string[]> => {
   try {
-    const response = await axiosInstance.get<ApiResponse<string[]>>(
-      "/property/available-cities",
-    );
-    const data = response.data;
-    if (data.success && Array.isArray(data.data)) {
-      return data.data.sort();
+    const [voRes, cwRes, mrRes] = await Promise.allSettled([
+      axiosInstance.get<ApiResponse<any>>("/virtualOffice/getAll"),
+      axiosInstance.get<ApiResponse<any>>("/coworkingSpace/getAll"),
+      axiosInstance.get<ApiResponse<any>>("/meetingRoom/getAll"),
+    ]);
+
+    const extractItems = (result: PromiseSettledResult<any>): any[] => {
+      if (result.status !== "fulfilled") return [];
+      const data = result.value.data;
+      if (!data?.success) return [];
+      const raw = data.data;
+      if (Array.isArray(raw)) return raw;
+      return raw?.offices || raw?.spaces || raw?.rooms || [];
+    };
+
+    const allItems = [
+      ...extractItems(voRes),
+      ...extractItems(cwRes),
+      ...extractItems(mrRes),
+    ];
+
+    const cities = new Set<string>();
+    for (const item of allItems) {
+      const city = item?.city || item?.area;
+      if (city && typeof city === "string" && city.trim().length > 1) {
+        cities.add(city.trim());
+      }
     }
-    return [];
+
+    return Array.from(cities).sort();
   } catch (error: any) {
     console.error("Error fetching available cities:", error);
     return [];

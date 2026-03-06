@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
     LayoutGrid,
-    Users,
     Users2,
     LineChart,
     Wallet,
@@ -29,7 +28,6 @@ interface SidebarProps {
     setIsMobileOpen: (isOpen: boolean) => void;
     isDesktopCollapsed: boolean;
     setIsDesktopCollapsed: (isCollapsed: boolean) => void;
-    // New Props to control active page from parent
     activePage: string;
     setActivePage: (page: string) => void;
 }
@@ -43,9 +41,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     setActivePage,
 }) => {
     const { user } = useAuth();
-
     const navigate = useNavigate();
-    const [kycStatus, setKycStatus] = useState<string>("approved"); // default hidden
+    const [kycStatus, setKycStatus] = useState<string>("approved");
 
     useEffect(() => {
         const fetchMyKycStatus = async () => {
@@ -74,73 +71,61 @@ const Sidebar: React.FC<SidebarProps> = ({
         {
             name: "Dashboard",
             icon: LayoutGrid,
-            section: "main",
             path: "/affiliate-portal/affiliate-dashboard",
         },
         {
-            name: "Client Management",
+            name: "Booking Management", // Keeping this name from the reference image as requested by UI task
             icon: Users2,
-            section: "main",
             path: "/affiliate-portal/client-management",
         },
         {
             name: "Revenue Dashboard",
             icon: LineChart,
-            section: "main",
             path: "/affiliate-portal/revenue-dashboard",
         },
         {
             name: "Payouts",
             icon: Wallet,
-            section: "main",
             path: "/affiliate-portal/payouts",
         },
         {
             name: "Invoices",
             icon: FileText,
-            section: "main",
             path: "/affiliate-portal/affiliate-invoices",
         },
         {
             name: "Lead Management",
             icon: Target,
-            section: "main",
             path: "/affiliate-portal/lead-management",
         },
         {
             name: "Quotation Generator",
             icon: FileOutput,
-            section: "main",
             path: "/affiliate-portal/quotation-generator",
         },
         {
             name: "Marketing Tools",
             icon: Send,
-            section: "main",
             path: "/affiliate-portal/marketing-tools",
         },
         {
             name: "Leaderboard",
             icon: Trophy,
-            section: "main",
             path: "/affiliate-portal/leaderboard",
         },
         {
             name: "Support",
             icon: MessageSquare,
-            section: "main",
             path: "/affiliate-portal/support",
         },
         {
             name: "KYC Verification",
             icon: Shield,
-            section: "main",
             path: "/affiliate-portal/kyc",
         },
         {
             name: "Notifications",
             icon: Bell,
-            section: "main",
             path: "/affiliate-portal/notifications",
         },
     ];
@@ -149,7 +134,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     fixed top-0 left-0 z-50 h-screen bg-white shadow-xl border-r border-gray-100 flex flex-col transition-all duration-300 ease-in-out
     w-72 
     ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-    lg:static lg:translate-x-0 lg:shadow-none
+    lg:relative lg:translate-x-0 lg:shadow-none lg:h-full overflow-hidden
     ${isDesktopCollapsed ? "lg:w-20" : "lg:w-72"}
   `;
 
@@ -162,27 +147,20 @@ const Sidebar: React.FC<SidebarProps> = ({
                 />
             )}
 
-            <aside className={sidebarClasses}>
-                {/* Header */}
-                <div
-                    className={`flex flex-col transition-all duration-300 ${isDesktopCollapsed ? "p-4 items-center justify-center" : "p-6 pb-2"}`}
-                >
-                    <div
-                        className={`flex items-center w-full ${isDesktopCollapsed ? "justify-center" : "justify-between"}`}
-                    >
+            <aside className={sidebarClasses} data-lenis-prevent>
+                {/* Header branding */}
+                <div className={`flex flex-col shrink-0 transition-all duration-300 ${isDesktopCollapsed ? "p-4 items-center" : "p-8 pb-4"}`}>
+                    <div className={`flex items-center w-full ${isDesktopCollapsed ? "justify-center" : "justify-between"}`}>
                         <div
-                            className={`font-bold tracking-tight transition-all duration-300 overflow-hidden whitespace-nowrap ${isDesktopCollapsed ? "text-3xl" : "text-2xl"}`}
+                            className={`font-black tracking-tight transition-all duration-300 overflow-hidden whitespace-nowrap ${isDesktopCollapsed ? "text-2xl" : "text-[2.25rem]"}`}
+                            style={{ fontFamily: "'Inter Tight', sans-serif" }}
                         >
                             {isDesktopCollapsed ? (
-                                <span className="text-slate-900">f</span>
+                                <span className="text-[#1a2d1d]">f</span>
                             ) : (
                                 <>
-                                    <span className="text-slate-900">
-                                        flash
-                                    </span>
-                                    <span className="text-[#5aa39c]">
-                                        space
-                                    </span>
+                                    <span className="text-[#1a2d1d]">flash</span>
+                                    <span className="text-[#334d3d] opacity-80">space</span>
                                 </>
                             )}
                         </div>
@@ -194,48 +172,46 @@ const Sidebar: React.FC<SidebarProps> = ({
                         </button>
                     </div>
 
-                    <div
-                        className={`mt-1 overflow-hidden transition-all duration-300 ${isDesktopCollapsed ? "h-0 opacity-0" : "h-auto opacity-100 mb-6"}`}
-                    >
-                        <h2 className="text-lg font-bold text-slate-900 whitespace-nowrap">
+                    <div className={`mt-6 overflow-hidden transition-all duration-300 ${isDesktopCollapsed ? "h-0 opacity-0" : "h-auto opacity-100 mb-6"}`}>
+                        <h2 className="text-xl font-bold text-[#1a2d1d] whitespace-nowrap mb-1">
                             Affiliate Portal
                         </h2>
-                        <p className="text-sm text-gray-500 whitespace-nowrap">
+                        <p className="text-sm text-[#64748b] whitespace-nowrap font-medium">
                             Manage referrals and earnings
                         </p>
                     </div>
                 </div>
 
-                {/* Menu Items */}
-                <div className="flex-1 overflow-y-auto px-3 space-y-2 custom-scrollbar overflow-x-hidden">
+                {/* Navigation Menu */}
+                <div className="flex-1 min-h-0 overflow-y-scroll px-4 space-y-2 custom-scrollbar overflow-x-hidden" data-lenis-prevent>
                     {menuItems.map((item) => {
                         const Icon = item.icon;
-                        const isActive = activePage === item.name; // Use Prop here
+                        const isActive = activePage === item.name;
 
                         return (
                             <button
                                 key={item.name}
                                 onClick={() => {
-                                    setActivePage(item.name); // Set Parent State
-                                    setIsMobileOpen(false); // Close mobile menu on click
+                                    setActivePage(item.name);
+                                    setIsMobileOpen(false);
                                 }}
                                 title={isDesktopCollapsed ? item.name : ""}
                                 className={`
-                  flex items-center transition-all duration-200 rounded-lg group relative
-                  ${isDesktopCollapsed ? "justify-center w-full py-3 px-0" : "justify-start w-full px-4 py-3 gap-3"}
+                  flex items-center transition-all duration-300 rounded-[1.25rem] group relative
+                  ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "justify-start w-full px-5 py-4 gap-4"}
                   ${isActive
-                                        ? "bg-[#5aa39c] text-white shadow-sm"
-                                        : "text-gray-600 hover:bg-gray-50 hover:text-slate-900"
+                                        ? "bg-[#334d3d] text-[#fdfcf2] shadow-sm"
+                                        : "text-[#64748b] hover:bg-gray-50 hover:text-[#1a2d1d]"
                                     }
                 `}
                             >
                                 <Icon
-                                    size={isDesktopCollapsed ? 24 : 20}
+                                    size={isDesktopCollapsed ? 24 : 22}
                                     strokeWidth={isActive ? 2.5 : 2}
                                     className="shrink-0"
                                 />
                                 <span
-                                    className={`whitespace-nowrap transition-all duration-200 ${isDesktopCollapsed ? "w-0 opacity-0 overflow-hidden absolute" : "w-auto opacity-100 static"}`}
+                                    className={`text-[15px] font-semibold whitespace-nowrap transition-all duration-200 ${isDesktopCollapsed ? "w-0 opacity-0 overflow-hidden absolute" : "w-auto opacity-100 static"}`}
                                 >
                                     {item.name}
                                 </span>
@@ -253,56 +229,48 @@ const Sidebar: React.FC<SidebarProps> = ({
                     })}
                 </div>
 
-                {/* Footer */}
-                <div className="p-4 border-t border-gray-100 space-y-2 bg-white">
+                {/* Footer and Bottom Actions */}
+                <div className="p-6 border-t border-gray-100 space-y-4 bg-[#f8f9fa]/30 shrink-0">
                     <button
-                        onClick={() =>
-                            setIsDesktopCollapsed(!isDesktopCollapsed)
-                        }
+                        onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
                         className={`
-              hidden lg:flex items-center transition-colors text-gray-600 hover:text-slate-900 py-2
-              ${isDesktopCollapsed ? "justify-center w-full" : "justify-center gap-2 w-full"}
+              hidden lg:flex items-center transition-colors text-[#64748b] hover:text-[#1a2d1d] py-2
+              ${isDesktopCollapsed ? "justify-center w-full" : "justify-center gap-3 w-full"}
             `}
                     >
                         {isDesktopCollapsed ? (
-                            <ChevronRight size={20} />
+                            <ChevronRight size={22} />
                         ) : (
                             <>
-                                <ChevronLeft size={16} />
-                                <span className="text-sm font-medium">
-                                    Collapse
-                                </span>
+                                <ChevronLeft size={20} />
+                                <span className="text-[15px] font-bold">Collapse</span>
                             </>
                         )}
                     </button>
 
                     <button
-                        onClick={() => navigate('/dashboard')}
+                        onClick={() => navigate("/dashboard")}
                         className={`
-              flex items-center rounded-xl shadow-sm font-semibold transition-colors bg-teal-50 border border-teal-100 text-teal-700 hover:bg-teal-100
-              ${isDesktopCollapsed ? "justify-center w-full p-3" : "justify-center gap-2 w-full px-4 py-3 text-sm"}
+              flex items-center rounded-2xl shadow-sm font-bold transition-all border border-gray-200 text-[#164e4e] bg-[#f8f9fa] hover:bg-white hover:shadow-md
+              ${isDesktopCollapsed ? "justify-center w-full h-14" : "justify-center gap-3 w-full px-4 py-4 text-[15px]"}
             `}
                     >
-                        <LayoutDashboard size={18} className="text-teal-600" />
+                        <LayoutDashboard size={20} className="text-[#164e4e]" />
                         {!isDesktopCollapsed && (
-                            <span className="whitespace-nowrap">
-                                User Dashboard
-                            </span>
+                            <span className="whitespace-nowrap">User Dashboard</span>
                         )}
                     </button>
 
                     <button
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate("/")}
                         className={`
-              flex items-center rounded-xl shadow-sm font-semibold transition-colors bg-white border border-gray-200 text-slate-900 hover:bg-gray-50
-              ${isDesktopCollapsed ? "justify-center w-full p-3" : "justify-center gap-2 w-full px-4 py-3 text-sm"}
+              flex items-center rounded-2xl shadow-sm font-bold transition-all border border-gray-200 text-[#1a2d1d] bg-white hover:bg-gray-50 hover:shadow-md
+              ${isDesktopCollapsed ? "justify-center w-full h-14" : "justify-center gap-3 w-full px-4 py-4 text-[15px]"}
             `}
                     >
-                        <Home size={18} />
+                        <Home size={20} />
                         {!isDesktopCollapsed && (
-                            <span className="whitespace-nowrap">
-                                Back to Home
-                            </span>
+                            <span className="whitespace-nowrap">Back to Home</span>
                         )}
                     </button>
                 </div>

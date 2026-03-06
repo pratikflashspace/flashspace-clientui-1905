@@ -181,14 +181,14 @@ const SupportTickets = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-in fade-in zoom-in-95 duration-200">
                 <button
                     onClick={() => setSelectedTicket(null)}
-                    className="flex items-center gap-2 text-gray-500 hover:text-[#5bb09c] mb-6 transition-colors font-medium text-sm"
+                    className="flex items-center gap-2 text-[#6b7280] hover:text-[#2d5a4c] mb-6 transition-colors font-bold text-sm"
                 >
                     <ArrowLeft className="w-4 h-4" /> Back to Tickets
                 </button>
 
                 <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-50">
                     <div>
-                        <p className="text-xs font-bold text-[#5bb09c] mb-1">{selectedTicket.ticketNumber}</p>
+                        <p className="text-xs font-black text-[#2d5a4c] mb-1">{selectedTicket.ticketNumber}</p>
                         <h2 className="text-2xl font-bold text-gray-900 leading-tight">{selectedTicket.subject}</h2>
                         <div className="flex items-center gap-3 mt-3">
                             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusConfig(selectedTicket.status).bg} ${getStatusConfig(selectedTicket.status).text}`}>
@@ -225,13 +225,13 @@ const SupportTickets = () => {
 
                 {/* Reply Interface */}
                 {selectedTicket.status !== "closed" && selectedTicket.status !== "resolved" ? (
-                    <div className="bg-gray-50 rounded-2xl p-2 border border-gray-100 flex items-end gap-2 focus-within:ring-2 focus-within:ring-[#5bb09c]/20 focus-within:border-[#5bb09c]/50 transition-all">
+                    <div className="bg-[#f9fafb] rounded-[1.5rem] p-2 ring-1 ring-black/5 flex items-end gap-2 focus-within:ring-2 focus-within:ring-[#2d5a4c]/20 focus-within:bg-white transition-all">
                         <textarea
                             value={replyMessage}
                             onChange={(e) => setReplyMessage(e.target.value)}
                             placeholder="Type your reply here..."
                             rows={1}
-                            className="flex-1 max-h-32 min-h-[44px] bg-transparent resize-none px-4 py-3 text-sm focus:outline-none placeholder:text-gray-400"
+                            className="flex-1 max-h-32 min-h-[44px] bg-transparent resize-none px-4 py-3 text-sm font-medium focus:outline-none placeholder:text-gray-400"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && !e.shiftKey) {
                                     e.preventDefault();
@@ -242,7 +242,7 @@ const SupportTickets = () => {
                         <Button
                             onClick={handleReply}
                             disabled={submitting || !replyMessage.trim()}
-                            className="bg-[#5bb09c] text-white hover:bg-[#4a9b89] rounded-xl h-11 px-6 shadow-sm"
+                            className="bg-[#2d5a4c] text-white hover:bg-[#1a3a3a] rounded-xl h-11 px-6 shadow-lg shadow-[#2d5a4c]/10"
                         >
                             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                         </Button>
@@ -259,7 +259,7 @@ const SupportTickets = () => {
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-in fade-in duration-500">
+        <div className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden animate-in fade-in duration-500">
             {showNewTicket ? (
                 <div className="p-6 md:p-8 animate-in slide-in-from-bottom-4 duration-300">
                     <div className="flex items-center justify-between mb-8">
@@ -297,7 +297,7 @@ const SupportTickets = () => {
                                         required
                                         value={formData.category}
                                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full h-12 px-4 rounded-lg bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5bb09c]/20 focus:border-[#5bb09c] transition-colors"
+                                        className="w-full h-12 px-4 rounded-xl bg-gray-50 border border-gray-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#2d5a4c]/10 focus:border-[#2d5a4c] transition-colors appearance-none"
                                     >
                                         <option value="">Select Category</option>
                                         <option value="billing">Commissions & Payouts</option>
@@ -322,7 +322,7 @@ const SupportTickets = () => {
                                 <Button
                                     type="submit"
                                     disabled={submitting || formData.description.length < 10}
-                                    className="bg-[#5bb09c] text-white hover:bg-[#4a9b89] h-12 px-8 rounded-xl shadow-md shadow-[#5bb09c]/20 w-full md:w-auto text-base font-bold"
+                                    className="bg-[#2d5a4c] text-white hover:bg-[#1a3a3a] h-14 px-10 rounded-2xl shadow-xl shadow-[#2d5a4c]/20 w-full md:w-auto text-base font-black"
                                 >
                                     {submitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                                     {submitting ? "Submitting..." : "Submit Ticket"}
@@ -344,7 +344,7 @@ const SupportTickets = () => {
                             />
                         </div>
                         <Button
-                            className="bg-[#5bb09c] text-white hover:bg-[#4a9b89] gap-2 h-12 px-6 rounded-xl shadow-md shadow-[#5bb09c]/20 w-full md:w-auto font-bold"
+                            className="bg-[#2d5a4c] text-white hover:bg-[#1a3a3a] gap-2 h-12 px-6 rounded-xl shadow-lg shadow-[#2d5a4c]/10 w-full md:w-auto font-black"
                             onClick={() => setShowNewTicket(true)}
                         >
                             <Plus className="w-4 h-4" /> New Ticket
@@ -368,22 +368,22 @@ const SupportTickets = () => {
                                     >
                                         <div className="space-y-1.5 flex-1">
                                             <div className="flex items-center gap-3">
-                                                <span className="text-[10px] font-bold text-[#5bb09c] bg-[#5bb09c]/10 px-2.5 py-1 rounded-md tracking-wider">
+                                                <span className="text-[10px] font-black text-[#2d5a4c] bg-[#2d5a4c]/5 px-2.5 py-1 rounded-md tracking-widest uppercase">
                                                     {t.ticketNumber}
                                                 </span>
-                                                <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${statusConfig.bg} ${statusConfig.text}`}>
+                                                <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${statusConfig.bg} ${statusConfig.text}`}>
                                                     {statusConfig.label}
                                                 </span>
                                             </div>
-                                            <h4 className="font-bold text-gray-900 text-lg group-hover:text-[#5bb09c] transition-colors">{t.subject}</h4>
-                                            <p className="text-xs text-gray-400 font-medium flex items-center gap-2">
+                                            <h4 className="font-black text-[#1a1a1a] text-lg group-hover:text-[#2d5a4c] transition-colors">{t.subject}</h4>
+                                            <p className="text-xs text-[#9ca3af] font-bold flex items-center gap-2">
                                                 Created {new Date(t.createdAt).toLocaleDateString("en-IN", { month: 'short', day: 'numeric', year: 'numeric' })}
-                                                {t.category && <span className="w-1 h-1 rounded-full bg-gray-300"></span>}
+                                                {t.category && <span className="w-1.5 h-1.5 rounded-full bg-gray-200"></span>}
                                                 {t.category && <span className="capitalize">{t.category.replace('_', ' ')}</span>}
                                             </p>
                                         </div>
                                         <div className="flex items-center gap-4 border-t md:border-t-0 border-gray-100 pt-4 md:pt-0 shrink-0">
-                                            <div className="text-sm font-bold text-[#5bb09c] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0">
+                                            <div className="text-sm font-black text-[#2d5a4c] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0">
                                                 View Thread <ArrowLeft className="w-4 h-4 rotate-180" />
                                             </div>
                                         </div>

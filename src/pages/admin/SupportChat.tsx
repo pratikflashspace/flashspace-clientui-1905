@@ -10,12 +10,18 @@ import {
   AlertCircle,
   Bot,
   MoreHorizontal,
+  Loader2
 } from "lucide-react";
 import { adminService, AdminTicketData } from "@/services/admin.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSocket } from "@/contexts/SocketContext";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function SupportChat() {
   const { user } = useAuth();
@@ -35,7 +41,7 @@ export default function SupportChat() {
   // Admin has taken over if they explicitly clicked Take Over OR if there's already an admin message in the chat
   const hasTakenOver = activeTicketId
     ? takenOverTickets.has(activeTicketId) ||
-      (activeTicket?.messages?.some((m) => m.sender === "admin") ?? false)
+    (activeTicket?.messages?.some((m) => m.sender === "admin") ?? false)
     : false;
 
   const fetchTickets = async () => {
@@ -151,7 +157,6 @@ export default function SupportChat() {
     }
   };
 
-  // Resolve = Close directly (no intermediate "resolved" state)
   const handleResolve = async () => {
     if (!activeTicketId) return;
     try {
@@ -163,7 +168,6 @@ export default function SupportChat() {
     }
   };
 
-  // Filter tickets based on search
   const filteredTickets = tickets.filter(
     (t) =>
       t.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -171,35 +175,22 @@ export default function SupportChat() {
       t.ticketNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case "open":
-        return "bg-red-50 text-red-600 border-red-100";
+        return "destructive";
       case "in_progress":
-        return "bg-blue-50 text-blue-600 border-blue-100";
-      case "escalated":
-        return "bg-orange-50 text-orange-600 border-orange-100";
+        return "default";
       case "resolved":
-        return "bg-green-50 text-green-600 border-green-100";
       case "closed":
-        return "bg-gray-50 text-gray-500 border-gray-100";
+        return "secondary";
       default:
-        return "bg-gray-50 text-gray-500 border-gray-100";
+        return "outline";
     }
   };
 
-  // Sort tickets: Open/In Progress first, then by date
-  filteredTickets.sort((a, b) => {
-    const score = (status: string) => {
-      if (status === "open") return 3;
-      if (status === "in_progress") return 2;
-      if (status === "escalated") return 2;
-      return 0;
-    };
-    const scoreDiff = score(b.status) - score(a.status);
-    if (scoreDiff !== 0) return scoreDiff;
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
+  const activeChatsCount = tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length;
+  const waitingCount = tickets.filter(t => t.status === 'open' && !takenOverTickets.has(t._id)).length;
 
   // ── Role badge config ────────────────────────────────────────────
   const ROLE_BADGE: Record<string, { bg: string; text: string; label: string; dot: string }> = {
@@ -221,8 +212,8 @@ export default function SupportChat() {
 
   if (loading) {
     return (
-      <div className="p-12 text-center text-gray-500">
-        Loading support chats...
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -231,27 +222,45 @@ export default function SupportChat() {
     <div className="min-h-screen bg-transparent space-y-8 font-sans animate-in fade-in duration-500 pb-12">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-          Support <span className="text-teal-500 italic">Chats</span>
+        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+          Support <span className="text-primary italic">Chats</span>
         </h1>
-        <p className="text-gray-500 mt-2 text-lg font-light">
+        <p className="text-muted-foreground mt-2">
           Manage live chats and take over from AI when needed
         </p>
       </div>
 
-      {/* Chat Interface */}
-      <div className="flex flex-col lg:flex-row gap-6 h-[700px]">
+      {/* Stats Row */}
+      <div className="grid gap-4 sm:grid-cols-4 mb-6">
+        <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+          <p className="text-xl font-extrabold text-foreground">{activeChatsCount}</p>
+          <p className="text-sm text-muted-foreground">Active Chats</p>
+        </div>
+        <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+          <p className="text-xl font-extrabold text-yellow-600">{waitingCount}</p>
+          <p className="text-sm text-muted-foreground">Waiting</p>
+        </div>
+        <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+          <p className="text-xl font-extrabold text-green-600">89%</p>
+          <p className="text-sm text-muted-foreground">AI Resolution</p>
+        </div>
+        <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+          <p className="text-xl font-extrabold text-foreground">2.3 min</p>
+          <p className="text-sm text-muted-foreground">Avg Response</p>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-4 h-[600px]">
         {/* Chat List */}
-        <div className="w-full lg:w-1/3 bg-white rounded-[24px] border border-gray-100 flex flex-col shadow-sm">
-          <div className="p-6 border-b border-gray-100">
+        <div className="bg-background border border-border rounded-xl overflow-hidden flex flex-col shadow-sm">
+          <div className="p-4 border-b border-border">
             <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
                 placeholder="Search chats..."
+                className="pl-10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all text-sm"
               />
             </div>
           </div>
@@ -305,33 +314,44 @@ export default function SupportChat() {
                       {ticket.status.replace("_", " ")}
                     </span>
                   </div>
+                  {/* Unread dot placeholder could go here */}
                 </div>
-              ))
+                <p className="text-xs text-muted-foreground truncate italic">"{ticket.subject}"</p>
+                <div className="flex items-center justify-between mt-3">
+                  <span className="text-[10px] text-muted-foreground">
+                    {format(new Date(ticket.updatedAt || ticket.createdAt), "h:mm a")}
+                  </span>
+                  <Badge variant={getStatusVariant(ticket.status)} className="text-[10px] px-1.5 py-0">
+                    {ticket.status.replace("_", " ")}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+            {filteredTickets.length === 0 && (
+              <div className="p-8 text-center text-muted-foreground text-sm">
+                No active chats
+              </div>
             )}
-          </div>
+          </ScrollArea>
         </div>
 
         {/* Chat Window */}
-        <div className="w-full lg:w-2/3 bg-white rounded-[24px] border border-gray-100 flex flex-col shadow-sm overflow-hidden">
+        <div className="lg:col-span-3 bg-background border border-border rounded-xl overflow-hidden flex flex-col shadow-sm">
           {activeTicket ? (
             <>
-              {/* Header */}
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold bg-teal-100 text-teal-700`}
-                  >
-                    {activeTicket.user?.fullName
-                      ?.substring(0, 2)
-                      .toUpperCase() || "US"}
-                  </div>
+              {/* Chat Header */}
+              <div className="p-4 border-b border-border flex items-center justify-between bg-muted/10">
+                <div className="flex items-center gap-3">
+                  <Avatar>
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      {activeTicket.user?.fullName?.substring(0, 2).toUpperCase() || "US"}
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
-                    <h2 className="text-lg font-bold text-gray-900">
+                    <h3 className="font-semibold text-foreground text-base">
                       {activeTicket.user?.fullName || "Unknown User"}
-                    </h2>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Ticket: {activeTicket.ticketNumber}
-                    </p>
+                    </h3>
+                    <p className="text-xs text-muted-foreground">Ticket: #{activeTicket.ticketNumber}</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -430,35 +450,28 @@ export default function SupportChat() {
                           {format(new Date(msg.createdAt), "h:mm a")}
                         </span>
                       </div>
-                    </div>
-                  );
-                })}
-                <div ref={messagesEndRef} />
-              </div>
+                    );
+                  })}
+                  <div ref={messagesEndRef} />
+                </div>
+              </ScrollArea>
 
               {/* Input Area */}
               {activeTicket.status !== "resolved" &&
                 activeTicket.status !== "closed" ? (
                 hasTakenOver ? (
-                  <div className="p-6 bg-white border-t border-gray-100">
-                    <div className="flex items-center gap-4 bg-gray-50 p-2 pr-2 rounded-2xl border border-gray-200 focus-within:ring-2 focus-within:ring-teal-100 focus-within:border-teal-200 transition-all">
-                      <input
-                        type="text"
+                  <div className="p-4 border-t border-border bg-white">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Type your message..."
                         value={messageInput}
                         onChange={(e) => setMessageInput(e.target.value)}
-                        onKeyDown={(e) =>
-                          e.key === "Enter" && handleSendMessage()
-                        }
-                        placeholder="Type your message..."
-                        className="flex-1 bg-transparent border-none focus:outline-none px-4 text-sm text-gray-700 placeholder:text-gray-400"
+                        onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                        className="flex-1"
                       />
-                      <button
-                        onClick={handleSendMessage}
-                        disabled={!messageInput.trim()}
-                        className="p-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors shadow-md shadow-teal-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
+                      <Button onClick={handleSendMessage} disabled={!messageInput.trim()}>
                         <Send className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ) : (
@@ -468,16 +481,16 @@ export default function SupportChat() {
                   </div>
                 )
               ) : (
-                <div className="p-6 bg-gray-50 border-t border-gray-100 text-center text-gray-500 text-sm">
-                  This ticket is closed. Create a new one to continue.
+                <div className="p-4 bg-gray-50 border-t border-gray-100 text-center text-gray-400 text-sm">
+                  This ticket is closed.
                 </div>
               )}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400">
-              <Headphones className="w-16 h-16 mb-4 opacity-20" />
-              <h3 className="text-xl font-bold text-gray-600">Select a chat</h3>
-              <p>Choose a ticket from the left to start chatting</p>
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground bg-muted/5">
+              <MessageSquare className="w-16 h-16 mb-4 opacity-10" />
+              <h3 className="text-xl font-bold">Select a chat</h3>
+              <p className="text-sm">Choose a ticket from the left to start chatting</p>
             </div>
           )}
         </div>

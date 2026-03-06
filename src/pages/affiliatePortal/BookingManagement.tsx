@@ -13,6 +13,8 @@ import {
     Phone,
     MessageSquare,
     FileText,
+    CheckCircle,
+    RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { affiliatePortalService } from "@/services/affiliatePortal.service";
@@ -186,30 +188,28 @@ const StatCard = ({
     delay: number;
 }) => (
     <div
-        className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-in-up"
+        className="bg-white px-8 py-7 rounded-2xl border border-gray-100/60 shadow-sm transition-all duration-300 animate-fade-in-up"
         style={{ animationDelay: `${delay}ms` }}
     >
-        <h3 className={`text-3xl font-bold ${colorClass} mb-1`}>{value}</h3>
-        <p className="text-gray-500 font-medium text-sm">{label}</p>
+        <h3 className={`text-[2rem] font-black ${colorClass} leading-none mb-2`} style={{ fontFamily: "'Inter Tight', sans-serif" }}>{value}</h3>
+        <p className="text-[#64748b] font-medium text-sm tracking-tight">{label}</p>
     </div>
 );
 
 const StatusBadge = ({ status }: { status: string }) => {
     const styles = {
-        Active: "bg-green-50 text-green-600 border-green-100",
-        Pending: "bg-yellow-50 text-yellow-600 border-yellow-100",
-        "Renewal Due": "bg-orange-50 text-orange-600 border-orange-100",
+        Active: "text-[#10b981] bg-[#f0fdf4] border-[#bcf0da]",
+        Pending: "text-[#f59e0b] bg-[#fffbeb] border-[#fef3c7]",
+        "Renewal Due": "text-[#ef4444] bg-[#fef2f2] border-[#fee2e2]",
     };
 
     return (
         <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold border whitespace-nowrap ${styles[status as keyof typeof styles] || "bg-gray-50 text-gray-600"}`}
+            className={`px-2.5 py-1 rounded-full text-[11px] font-bold border flex items-center gap-1.5 w-fit ${styles[status as keyof typeof styles] || "bg-gray-50 text-gray-600"}`}
         >
-            {status === "Renewal Due"
-                ? "⚠ Renewal Due"
-                : status === "Active"
-                    ? "✓ Active"
-                    : "⏳ Pending"}
+            {status === "Active" && <CheckCircle size={12} strokeWidth={3} />}
+            {status === "Pending" && <div className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] animate-pulse" />}
+            {status}
         </span>
     );
 };
@@ -251,14 +251,14 @@ const BookingDetailsModal = ({
                 </div>
 
                 {/* Scrollable Body */}
-                <div className="p-6 pt-2 overflow-y-auto space-y-6">
+                <div className="p-6 pt-2 overflow-y-auto space-y-6 custom-scrollbar" data-lenis-prevent>
                     {/* Section 1: Basic Info */}
                     <div className="space-y-4">
                         <div className="p-4 bg-gray-50 rounded-xl space-y-1">
                             <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
                                 Booking ID
                             </p>
-                            <p className="text-lg font-bold text-[#5aa39c] font-mono">
+                            <p className="text-lg font-bold text-[#334D3D] font-mono">
                                 {booking.id}
                             </p>
                         </div>
@@ -267,7 +267,7 @@ const BookingDetailsModal = ({
                             <div className="flex items-start gap-3">
                                 <Building2
                                     size={20}
-                                    className="text-[#5aa39c] mt-0.5 shrink-0"
+                                    className="text-[#334D3D] mt-0.5 shrink-0"
                                 />
                                 <div>
                                     <p className="font-bold text-slate-900">
@@ -281,7 +281,7 @@ const BookingDetailsModal = ({
                             <div className="flex items-center gap-3">
                                 <MapPin
                                     size={20}
-                                    className="text-[#5aa39c] shrink-0"
+                                    className="text-[#334D3D] shrink-0"
                                 />
                                 <p className="text-sm text-slate-700">
                                     {booking.location}
@@ -290,7 +290,7 @@ const BookingDetailsModal = ({
                             <div className="flex items-center gap-3">
                                 <Calendar
                                     size={20}
-                                    className="text-[#5aa39c] shrink-0"
+                                    className="text-[#334D3D] shrink-0"
                                 />
                                 <p className="text-sm text-slate-700">
                                     {booking.duration}
@@ -325,7 +325,7 @@ const BookingDetailsModal = ({
                                 <span className="text-sm text-gray-500 font-medium">
                                     Your Commission
                                 </span>
-                                <span className="text-base font-bold text-[#5aa39c]">
+                                <span className="text-base font-bold text-[#334D3D]">
                                     {booking.commission}
                                 </span>
                             </div>
@@ -339,13 +339,13 @@ const BookingDetailsModal = ({
                         </h3>
                         <div className="bg-[#f8f9fa] p-5 rounded-xl space-y-3 border border-gray-100">
                             <div className="flex items-center gap-3">
-                                <Mail size={16} className="text-[#5aa39c]" />
+                                <Mail size={16} className="text-[#334D3D]" />
                                 <p className="text-sm text-slate-700">
                                     {booking.email}
                                 </p>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Phone size={16} className="text-[#5aa39c]" />
+                                <Phone size={16} className="text-[#334D3D]" />
                                 <p className="text-sm text-slate-700">
                                     {booking.phone}
                                 </p>
@@ -360,7 +360,7 @@ const BookingDetailsModal = ({
                         <Download size={18} />
                         Agreement
                     </button>
-                    <button className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#5aa39c] text-white font-semibold text-sm hover:bg-[#4a8b85] shadow-sm shadow-teal-100 transition-colors">
+                    <button className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#334D3D] text-white font-semibold text-sm hover:bg-[#26392D] shadow-sm shadow-emerald-100 transition-colors">
                         <MessageSquare size={18} />
                         Contact
                     </button>
@@ -495,7 +495,7 @@ const BookingManagement = () => {
     }, [activeBookings, pendingBookings, renewalBookings]);
 
     return (
-        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans w-full relative">
+        <div className="min-h-screen bg-[#f8f9fa] p-8 lg:p-12 font-sans w-full relative">
             {/* Modal Injection */}
             {selectedBooking && (
                 <BookingDetailsModal
@@ -506,14 +506,11 @@ const BookingManagement = () => {
 
             <div className="w-full space-y-8 animate-fade-in">
                 {/* Header */}
-                <div className="space-y-2">
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                        Booking{" "}
-                        <span className="text-[#5aa39c] italic">
-                            Management
-                        </span>
+                <div className="animate-fade-in-down mb-10">
+                    <h1 className="text-[2.25rem] font-black text-[#1a2d1d] tracking-tight leading-none mb-3">
+                        Booking <span className="text-[#35503F] italic">Management</span>
                     </h1>
-                    <p className="text-gray-500 text-lg">
+                    <p className="text-lg text-[#64748b] font-medium tracking-tight">
                         Track all your referred clients and their bookings
                     </p>
                 </div>
@@ -523,79 +520,53 @@ const BookingManagement = () => {
                     <StatCard
                         value={`${activeBookings.length}`}
                         label="Active Bookings"
-                        colorClass="text-slate-900"
+                        colorClass="text-[#1a2d1d]"
                         delay={0}
                     />
                     <StatCard
                         value={`${pendingBookings.length}`}
                         label="Pending Activation"
-                        colorClass="text-yellow-600"
+                        colorClass="text-[#1a2d1d]"
                         delay={100}
                     />
                     <StatCard
                         value={`${renewalBookings.length}`}
                         label="Renewals Due"
-                        colorClass="text-blue-600"
+                        colorClass="text-[#1a2d1d]"
                         delay={200}
                     />
                     <StatCard
-                        value={totalCommissions}
+                        value={totalCommissions.replace("₹", "₹")} // Ensure it shows correctly
                         label="Total Commissions"
-                        colorClass="text-[#5aa39c]"
+                        colorClass="text-[#10b981]"
                         delay={300}
                     />
                 </div>
 
                 {/* Filter & Tabs */}
                 <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div className="flex p-1 bg-gray-100/80 rounded-xl overflow-x-auto max-w-full">
-                            {(["active", "pending", "renewals"] as const).map(
-                                (tab) => (
-                                    <button
-                                        key={tab}
-                                        onClick={() => setActiveTab(tab)}
-                                        className={`
-                    px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-300 capitalize whitespace-nowrap
+                    <div className="flex bg-[#f1f5f9]/60 p-1 rounded-xl w-fit mb-6">
+                        {(["active", "pending", "renewals"] as const).map(
+                            (tab) => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab)}
+                                    className={`
+                    px-5 py-2 rounded-lg text-[13px] font-bold transition-all duration-300 capitalize whitespace-nowrap
                     ${activeTab === tab
-                                                ? "bg-white text-slate-900 shadow-sm"
-                                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
-                                            }
+                                            ? "bg-white text-[#1a2d1d] shadow-sm"
+                                            : "text-[#64748b] hover:text-[#1a2d1d]"
+                                        }
                   `}
-                                    >
-                                        {tab === "active"
-                                            ? "Active Bookings"
-                                            : tab === "renewals"
-                                                ? "Upcoming Renewals"
-                                                : "Pending"}
-                                    </button>
-                                ),
-                            )}
-                        </div>
-
-                        <div className="flex gap-3 w-full sm:w-auto">
-                            <div className="relative flex-1 sm:flex-initial group">
-                                <Search
-                                    size={18}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-[#5aa39c] transition-colors"
-                                />
-                                <input
-                                    type="text"
-                                    placeholder="Search bookings..."
-                                    value={searchQuery}
-                                    onChange={(e) =>
-                                        setSearchQuery(e.target.value)
-                                    }
-                                    className="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5aa39c]/20 focus:border-[#5aa39c] transition-all text-sm"
-                                />
-                            </div>
-                            <button className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 transition-colors">
-                                <Filter size={18} />
-                            </button>
-                            <button className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 transition-colors">
-                                <Download size={18} />
-                            </button>
-                        </div>
+                                >
+                                    {tab === "active"
+                                        ? "Active Bookings"
+                                        : tab === "renewals"
+                                            ? "Upcoming Renewals"
+                                            : "Pending"}
+                                </button>
+                            ),
+                        )}
                     </div>
 
                     {/* Table */}
@@ -603,7 +574,7 @@ const BookingManagement = () => {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-gray-50/50 border-b border-gray-100">
+                                    <tr className="border-b border-gray-50">
                                         {[
                                             "Booking ID",
                                             "Company",
@@ -616,14 +587,14 @@ const BookingManagement = () => {
                                         ].map((head) => (
                                             <th
                                                 key={head}
-                                                className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                                                className="px-6 py-5 text-[12px] font-bold text-[#64748b] uppercase tracking-wider whitespace-nowrap"
                                             >
                                                 {head}
                                             </th>
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-gray-50/80">
                                     {filteredData.length > 0 ? (
                                         filteredData.map((booking, idx) => (
                                             <tr
@@ -633,46 +604,46 @@ const BookingManagement = () => {
                                                     animationDelay: `${idx * 50}ms`,
                                                 }}
                                             >
-                                                <td className="px-6 py-4 text-sm font-medium text-slate-900 whitespace-nowrap">
+                                                <td className="px-6 py-6 text-[13px] font-bold text-[#1a2d1d] whitespace-nowrap">
                                                     {booking.id}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
+                                                <td className="px-6 py-6 text-[13px] text-[#1a2d1d] font-bold whitespace-nowrap">
                                                     {booking.company}
                                                 </td>
 
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="inline-block px-3 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-600 border border-gray-200 whitespace-nowrap">
+                                                <td className="px-6 py-6 whitespace-nowrap">
+                                                    <div className="inline-flex px-3 py-1.5 bg-[#f8fafc]/80 rounded-xl text-[11px] font-bold text-[#475569] border border-[#e2e8f0]/60 whitespace-nowrap leading-tight">
                                                         {booking.plan}
-                                                    </span>
+                                                    </div>
                                                 </td>
 
-                                                <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                                    <div className="flex items-center gap-1">
+                                                <td className="px-6 py-6 text-[13px] text-[#64748b] font-medium whitespace-nowrap">
+                                                    <div className="flex items-center gap-1.5">
                                                         <MapPin
                                                             size={14}
-                                                            className="text-gray-400"
+                                                            className="text-gray-300"
                                                         />
                                                         {booking.location}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                                    <div className="flex items-center gap-1">
+                                                <td className="px-6 py-6 text-[13px] text-[#64748b] font-medium whitespace-nowrap">
+                                                    <div className="flex items-center gap-1.5">
                                                         <Calendar
                                                             size={14}
-                                                            className="text-gray-400"
+                                                            className="text-gray-300"
                                                         />
                                                         {booking.duration}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 text-sm font-bold text-[#5aa39c] whitespace-nowrap">
+                                                <td className="px-6 py-6 text-[14px] font-black text-[#10b981] whitespace-nowrap">
                                                     {booking.commission}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                <td className="px-6 py-6 whitespace-nowrap">
                                                     <StatusBadge
                                                         status={booking.status}
                                                     />
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                <td className="px-6 py-6 whitespace-nowrap">
                                                     <div className="flex items-center gap-2">
                                                         {/* Eye Button now triggers modal */}
                                                         <button
@@ -681,12 +652,12 @@ const BookingManagement = () => {
                                                                     booking,
                                                                 )
                                                             }
-                                                            className="p-2 bg-gray-50 hover:bg-teal-50 text-gray-500 hover:text-[#5aa39c] rounded-full transition-all duration-200"
+                                                            className="p-2.5 bg-[#f8fafc] hover:bg-[#1a2d1d]/5 text-[#64748b] hover:text-[#1a2d1d] rounded-xl transition-all duration-200 border border-transparent hover:border-[#1a2d1d]/10"
                                                             title="View Details"
                                                         >
                                                             <Eye size={16} />
                                                         </button>
-                                                        <button className="p-2 bg-gray-50 hover:bg-blue-50 text-gray-500 hover:text-blue-600 rounded-full transition-all duration-200">
+                                                        <button className="p-2.5 bg-[#f8fafc] hover:bg-[#1a2d1d]/5 text-[#64748b] hover:text-[#1a2d1d] rounded-xl transition-all duration-200 border border-transparent hover:border-[#1a2d1d]/10">
                                                             <Share2 size={16} />
                                                         </button>
                                                     </div>
@@ -714,20 +685,6 @@ const BookingManagement = () => {
                         </div>
                     </div>
 
-                    <div className="flex justify-between items-center px-2 text-sm text-gray-500">
-                        <span>Showing {filteredData.length} entries</span>
-                        <div className="flex gap-2">
-                            <button
-                                className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50"
-                                disabled
-                            >
-                                Previous
-                            </button>
-                            <button className="px-3 py-1 border rounded hover:bg-gray-50">
-                                Next
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
