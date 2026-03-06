@@ -103,6 +103,8 @@ export default function KYCDetail() {
         response = await adminService.getPartnerDetails(kycId);
       } else if (type === "business" || type === "businessinfo") {
         response = await adminService.getBusinessInfoById(kycId);
+      } else if (type === "property") {
+        response = await adminService.getKYCDetails(kycId);
       } else {
         response = await adminService.getKYCDetails(kycId);
       }
@@ -110,7 +112,7 @@ export default function KYCDetail() {
         setKycData(response.data);
       } else {
         toast.error("Failed to load KYC details");
-        navigate("/admin/kyc-requests");
+        navigate(-1);
       }
     } catch (error) {
       console.error("Error fetching KYC details:", error);
@@ -172,7 +174,7 @@ export default function KYCDetail() {
       }
       if (response.success) {
         toast.success("KYC approved successfully");
-        navigate("/admin/kyc-requests");
+        navigate(-1);
       } else {
         toast.error(response.message || "Failed to approve KYC");
       }
@@ -237,7 +239,7 @@ export default function KYCDetail() {
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8">
         <button
-          onClick={() => navigate("/admin/kyc-requests")}
+          onClick={() => navigate(-1)}
           className="flex items-center text-gray-500 hover:text-gray-900 transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to KYC Requests
@@ -275,7 +277,9 @@ export default function KYCDetail() {
               </div>
               <div className="flex-1 overflow-hidden">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
-                  Main Account Holder
+                  {type === "property"
+                    ? "Property Owner"
+                    : "Main Account Holder"}
                 </p>
                 <h3 className="font-bold text-gray-900 text-lg truncate">
                   {kycData.user.fullName}
@@ -302,52 +306,83 @@ export default function KYCDetail() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <div className="flex items-center gap-2 mb-4">
                 <User className="w-5 h-5 text-blue-500" />
-                <h3 className="font-bold text-gray-900">Personal Info</h3>
+                <h3 className="font-bold text-gray-900">
+                  {type === "property" ? "Property Details" : "Personal Info"}
+                </h3>
               </div>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Name:</span>
-                  <span className="font-medium text-gray-900">
-                    {kycData.personalInfo.fullName}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Phone:</span>
-                  <span className="font-medium text-gray-900">
-                    {kycData.personalInfo.phone || "N/A"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Email:</span>
-                  <span className="font-medium text-gray-900">
-                    {kycData.personalInfo.email || "N/A"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Pan Number:</span>
-                  <span className="font-medium text-gray-900">
-                    {kycData.personalInfo.panNumber || "N/A"}
-                  </span>
-                </div>
-                {kycData.personalInfo.aadhaarNumber && (
+              {type === "property" ? (
+                <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Aadhaar Number:</span>
+                    <span className="text-gray-500">Property Name:</span>
                     <span className="font-medium text-gray-900">
-                      {kycData.personalInfo.aadhaarNumber}
+                      {kycData.personalInfo.fullName}
                     </span>
                   </div>
-                )}
-                {kycData.personalInfo.dateOfBirth && (
                   <div className="flex justify-between">
-                    <span className="text-gray-500">DOB:</span>
-                    <span className="font-medium text-gray-900">
-                      {new Date(
-                        kycData.personalInfo?.dateOfBirth,
-                      ).toLocaleDateString()}
+                    <span className="text-gray-500">Address:</span>
+                    <span className="font-medium text-gray-900 text-right ml-4">
+                      {kycData.personalInfo.address || "N/A"}
                     </span>
                   </div>
-                )}
-              </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">City:</span>
+                    <span className="font-medium text-gray-900">
+                      {kycData.personalInfo.city || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Area:</span>
+                    <span className="font-medium text-gray-900">
+                      {kycData.personalInfo.area || "N/A"}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Name:</span>
+                    <span className="font-medium text-gray-900">
+                      {kycData.personalInfo.fullName}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Phone:</span>
+                    <span className="font-medium text-gray-900">
+                      {kycData.personalInfo.phone || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Email:</span>
+                    <span className="font-medium text-gray-900">
+                      {kycData.personalInfo.email || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Pan Number:</span>
+                    <span className="font-medium text-gray-900">
+                      {kycData.personalInfo.panNumber || "N/A"}
+                    </span>
+                  </div>
+                  {kycData.personalInfo.aadhaarNumber && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Aadhaar Number:</span>
+                      <span className="font-medium text-gray-900">
+                        {kycData.personalInfo.aadhaarNumber}
+                      </span>
+                    </div>
+                  )}
+                  {kycData.personalInfo.dateOfBirth && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">DOB:</span>
+                      <span className="font-medium text-gray-900">
+                        {new Date(
+                          kycData.personalInfo?.dateOfBirth,
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -406,7 +441,8 @@ export default function KYCDetail() {
                     disabled={processing}
                     className="w-full py-3 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                   >
-                    <XCircle className="w-4 h-4" /> Reject KYC
+                    <XCircle className="w-4 h-4" />{" "}
+                    {type === "property" ? "Reject Property KYC" : "Reject KYC"}
                   </button>
                   <button
                     onClick={handleApproveKYC}
@@ -416,22 +452,27 @@ export default function KYCDetail() {
                         (doc) => doc.status === "approved",
                       )
                     }
-                    className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-sm ${!kycData.documents?.every(
-                      (doc) => doc.status === "approved",
-                    )
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-green-500 hover:bg-green-600 text-white"
-                      }`}
+                    className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-sm ${
+                      !kycData.documents?.every(
+                        (doc) => doc.status === "approved",
+                      )
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-green-500 hover:bg-green-600 text-white"
+                    }`}
                   >
-                    <CheckCircle2 className="w-4 h-4" /> Approve KYC
+                    <CheckCircle2 className="w-4 h-4" />{" "}
+                    {type === "property"
+                      ? "Approve Property KYC"
+                      : "Approve KYC"}
                   </button>
                   {!kycData.documents?.every(
                     (doc) => doc.status === "approved",
                   ) && (
-                      <p className="text-xs text-orange-500 text-center mt-2">
-                        All documents must be approved before approving KYC.
-                      </p>
-                    )}
+                    <p className="text-xs text-orange-500 text-center mt-2 flex items-center justify-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      All documents must be approved before approving KYC.
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -599,7 +640,9 @@ export default function KYCDetail() {
           <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg text-gray-900">
-                {selectedDocId === "kyc" ? "Reject Application" : "Reject Document"}
+                {selectedDocId === "kyc"
+                  ? "Reject Application"
+                  : "Reject Document"}
               </h3>
               <button
                 onClick={() => setShowRejectModal(false)}
@@ -609,14 +652,19 @@ export default function KYCDetail() {
               </button>
             </div>
             <p className="text-gray-500 text-sm mb-4">
-              Please provide a reason for rejecting this {selectedDocId === "kyc" ? "application" : "document"}. This will be
-              visible to the user.
+              Please provide a reason for rejecting this{" "}
+              {selectedDocId === "kyc" ? "application" : "document"}. This will
+              be visible to the user.
             </p>
             <textarea
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               className="w-full border border-gray-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-red-100 min-h-[100px] mb-4 text-sm resize-none"
-              placeholder={selectedDocId === "kyc" ? "e.g., Inconsistent information, Blurred documents..." : "e.g., Image is blurry, Incorrect document type..."}
+              placeholder={
+                selectedDocId === "kyc"
+                  ? "e.g., Inconsistent information, Blurred documents..."
+                  : "e.g., Image is blurry, Incorrect document type..."
+              }
               autoFocus
             />
             <div className="flex gap-3">
@@ -635,17 +683,32 @@ export default function KYCDetail() {
                       try {
                         let response;
                         if (type === "business") {
-                          response = await adminService.updateBusinessInfoStatus(id!, "reject", rejectionReason);
+                          response =
+                            await adminService.updateBusinessInfoStatus(
+                              id!,
+                              "reject",
+                              rejectionReason,
+                            );
                         } else if (type === "partner") {
-                          response = await adminService.updatePartnerStatus(id!, "reject", rejectionReason);
+                          response = await adminService.updatePartnerStatus(
+                            id!,
+                            "reject",
+                            rejectionReason,
+                          );
                         } else {
-                          response = await adminService.reviewKYC(id!, "reject", rejectionReason);
+                          response = await adminService.reviewKYC(
+                            id!,
+                            "reject",
+                            rejectionReason,
+                          );
                         }
                         if (response.success) {
                           toast.success("KYC rejected successfully");
-                          navigate("/admin/kyc-requests");
+                          navigate(-1);
                         } else {
-                          toast.error(response.message || "Failed to reject KYC");
+                          toast.error(
+                            response.message || "Failed to reject KYC",
+                          );
                         }
                       } catch (error) {
                         console.error("Error rejecting KYC:", error);
@@ -681,9 +744,12 @@ export default function KYCDetail() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="w-8 h-8 text-green-600" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Approve KYC?</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Approve KYC?
+              </h3>
               <p className="text-gray-500 text-sm">
-                Are you sure you want to approve this KYC application? This action cannot be undone efficiently.
+                Are you sure you want to approve this KYC application? This
+                action cannot be undone efficiently.
               </p>
             </div>
             <div className="flex gap-3">

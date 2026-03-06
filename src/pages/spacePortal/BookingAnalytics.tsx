@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-
+import { useQuery } from "@tanstack/react-query";
+import { fetchBookingAnalytics } from "@/services/spacePortal/spacePartner.service";
 import StatCard from "@/components/ui/SpacePartner/StatCard";
-import { BOOKING_ANALYTICS } from "@/data/spacePortal/bookingAnalytics";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import {
   Users,
@@ -9,6 +10,7 @@ import {
   XCircle,
   Clock,
   TrendingUp,
+  AlertCircle,
 } from "lucide-react";
 
 import {
@@ -27,16 +29,19 @@ import {
  * - Revenue trend chart
  * - Plan-wise + Space-wise revenue division
  *
- * Currently using mock data: BOOKING_ANALYTICS
- * Later backend integration will replace this with API response.
+ * Now integrated with backend API.
  */
 export default function BookingAnalytics() {
-  /**
-   * Extracting mock analytics data.
-   * Later this will come from backend.
-   */
-  const { summary, planDivision, spaceDivision, revenueTrend } =
-    BOOKING_ANALYTICS;
+  const {
+    data: analyticsData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["partner-booking-analytics"],
+    queryFn: fetchBookingAnalytics,
+  });
+
+  const analytics = analyticsData?.data;
 
   /**
    * Tooltip trigger changes depending on device type:
@@ -44,7 +49,7 @@ export default function BookingAnalytics() {
    * - Mobile -> click
    */
   const [tooltipTrigger, setTooltipTrigger] = useState<"hover" | "click">(
-    "hover"
+    "hover",
   );
 
   /**
@@ -56,7 +61,7 @@ export default function BookingAnalytics() {
       style: "currency",
       currency: "INR",
       maximumFractionDigits: 0,
-    }).format(value);
+    }).format(value || 0);
   };
 
   /**
@@ -64,14 +69,19 @@ export default function BookingAnalytics() {
    * Safety check prevents division by zero.
    */
   const growth = useMemo(() => {
-    if (!summary.revenueLastMonth || summary.revenueLastMonth === 0) return 0;
+    if (
+      !analytics?.summary?.revenueLastMonth ||
+      analytics.summary.revenueLastMonth === 0
+    )
+      return 0;
 
     return (
-      ((summary.revenueThisMonth - summary.revenueLastMonth) /
-        summary.revenueLastMonth) *
+      ((analytics.summary.revenueThisMonth -
+        analytics.summary.revenueLastMonth) /
+        analytics.summary.revenueLastMonth) *
       100
     );
-  }, [summary.revenueThisMonth, summary.revenueLastMonth]);
+  }, [analytics]);
 
   /**
    * KPI Cards Config
@@ -81,34 +91,34 @@ export default function BookingAnalytics() {
     () => [
       {
         title: "Total Bookings",
-        value: summary.totalBookings,
+        value: analytics?.summary?.totalBookings || 0,
         icon: <CalendarCheck size={22} />,
         trend: "up" as const,
         trendLabel: "8%",
       },
       {
         title: "Active Clients",
-        value: summary.activeClients,
+        value: analytics?.summary?.activeClients || 0,
         icon: <Users size={22} />,
         trend: "up" as const,
         trendLabel: "5%",
       },
       {
         title: "Cancelled Bookings",
-        value: summary.cancelledBookings,
+        value: analytics?.summary?.cancelledBookings || 0,
         icon: <XCircle size={22} />,
         trend: "down" as const,
         trendLabel: "2%",
       },
       {
         title: "Pending Requests",
-        value: summary.pendingRequests,
+        value: analytics?.summary?.pendingRequests || 0,
         icon: <Clock size={22} />,
         trend: "up" as const,
         trendLabel: "3%",
       },
     ],
-    [summary]
+    [analytics],
   );
 
   /**
@@ -135,6 +145,36 @@ export default function BookingAnalytics() {
     mq.addListener(updateTrigger);
     return () => mq.removeListener(updateTrigger);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 p-8 space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <Skeleton className="xl:col-span-2 h-[400px] w-full rounded-2xl" />
+          <Skeleton className="h-[400px] w-full rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-slate-500">
+        <AlertCircle size={48} className="mb-4 text-red-500" />
+        <h2 className="text-xl font-semibold text-slate-900">
+          Failed to load analytics
+        </h2>
+        <p className="mt-2 text-sm text-slate-500">
+          Please try again later or contact support.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1">
@@ -164,7 +204,7 @@ export default function BookingAnalytics() {
           <div className="mt-4 h-[240px] sm:mt-6 sm:h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
-                data={revenueTrend}
+                data={analytics?.revenueTrend || []}
                 margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
@@ -204,14 +244,14 @@ export default function BookingAnalytics() {
             <div>
               <p className="text-sm text-slate-500">This Month</p>
               <p className="text-2xl font-bold text-slate-900">
-                {formatCurrency(summary.revenueThisMonth)}
+                {formatCurrency(analytics?.summary?.revenueThisMonth)}
               </p>
             </div>
 
             <div>
               <p className="text-sm text-slate-500">Last Month</p>
               <p className="text-xl font-bold text-slate-700">
-                {formatCurrency(summary.revenueLastMonth)}
+                {formatCurrency(analytics?.summary?.revenueLastMonth)}
               </p>
             </div>
 
@@ -229,7 +269,7 @@ export default function BookingAnalytics() {
         <DivisionCard
           title="Plan-wise Division"
           description="Compare bookings and revenue by plan type."
-          items={planDivision.map((plan) => ({
+          items={(analytics?.planDivision || []).map((plan: any) => ({
             key: plan.plan,
             name: plan.plan,
             bookings: plan.bookings,
@@ -242,7 +282,7 @@ export default function BookingAnalytics() {
         <DivisionCard
           title="Space-wise Division"
           description="Performance breakdown by each space location."
-          items={spaceDivision.map((space) => ({
+          items={(analytics?.spaceDivision || []).map((space: any) => ({
             key: space.space,
             name: space.space,
             bookings: space.bookings,
@@ -288,9 +328,7 @@ function DivisionCard({
           >
             <div>
               <p className="font-semibold text-slate-900">{item.name}</p>
-              <p className="text-xs text-slate-500">
-                {item.bookings} bookings
-              </p>
+              <p className="text-xs text-slate-500">{item.bookings} bookings</p>
             </div>
 
             <p className="font-bold text-slate-900">

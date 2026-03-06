@@ -108,8 +108,8 @@ export const HeroWithSearch = () => {
                                 key={tab.label}
                                 onClick={() => { setActiveTab(tab.label); setActiveSubTab(0); }}
                                 className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors relative ${activeTab === tab.label
-                                        ? "text-foreground"
-                                        : "text-muted-foreground hover:text-foreground"
+                                    ? "text-foreground"
+                                    : "text-muted-foreground hover:text-foreground"
                                     }`}
                             >
                                 <tab.icon className="w-4 h-4" />
@@ -131,8 +131,8 @@ export const HeroWithSearch = () => {
                                 key={sub.label}
                                 onClick={() => setActiveSubTab(i)}
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border transition-colors ${activeSubTab === i
-                                        ? "border-primary/30 bg-primary/5 text-foreground"
-                                        : "border-border bg-background text-muted-foreground hover:text-foreground hover:border-primary/20"
+                                    ? "border-primary/30 bg-primary/5 text-foreground"
+                                    : "border-border bg-background text-muted-foreground hover:text-foreground hover:border-primary/20"
                                     }`}
                             >
                                 <sub.icon className="w-4 h-4" />
@@ -157,16 +157,16 @@ export const HeroWithSearch = () => {
                                     className="flex items-center bg-background rounded-xl border border-border overflow-visible relative"
                                 >
                                     {/* City selector */}
-                                    <div ref={cityRef} className="relative shrink-0">
-                                        <button
+                                    {/* <div ref={cityRef} className="relative shrink-0"> */}
+                                        {/* <button
                                             onClick={() => { setShowCityDropdown(!showCityDropdown); setCitySearch(""); }}
                                             className="flex items-center gap-1 px-5 py-3.5 border-r border-border text-sm"
                                         >
                                             <span className="font-medium text-foreground">{selectedCity}</span>
                                             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${showCityDropdown ? "rotate-180" : ""}`} />
-                                        </button>
+                                        </button> */}
 
-                                        <AnimatePresence>
+                                        {/* <AnimatePresence>
                                             {showCityDropdown && (() => {
                                                 const q = citySearch.toLowerCase();
                                                 const filteredPopular = popularCities.filter(c => c.toLowerCase().includes(q));
@@ -223,8 +223,8 @@ export const HeroWithSearch = () => {
                                                     </motion.div>
                                                 );
                                             })()}
-                                        </AnimatePresence>
-                                    </div>
+                                        </AnimatePresence> */}
+                                    {/* </div> */}
 
                                     {/* Search input with city dropdown */}
                                     <div ref={locationRef} className="relative flex items-center flex-1 px-4 gap-2">
@@ -243,10 +243,11 @@ export const HeroWithSearch = () => {
                                                     setSelectedCity(cityToUse);
                                                     setLocationSearch("");
                                                     setShowLocationDropdown(false);
-                                                    navigate(`/get-workspaces?city=${encodeURIComponent(cityToUse)}`);
+                                                    navigate(`/services/virtual-office?city=${encodeURIComponent(cityToUse)}`);
                                                 }
                                             }}
-                                            placeholder={`Search location or workspaces in ${selectedCity}`}
+                                            // placeholder={`Search location or workspaces in ${selectedCity}`}
+                                            placeholder={`Search location or workspaces`}
                                             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground py-3.5"
                                         />
 
@@ -274,7 +275,7 @@ export const HeroWithSearch = () => {
                                                                             setSelectedCity(city);
                                                                             setLocationSearch("");
                                                                             setShowLocationDropdown(false);
-                                                                            navigate(`/get-workspaces?city=${encodeURIComponent(city)}`);
+                                                                            navigate(`/services/virtual-office?city=${encodeURIComponent(city)}`);
                                                                         }}
                                                                         className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted/60 transition-colors"
                                                                     >
@@ -293,7 +294,7 @@ export const HeroWithSearch = () => {
                                                                             setSelectedCity(city);
                                                                             setLocationSearch("");
                                                                             setShowLocationDropdown(false);
-                                                                            navigate(`/get-workspaces?city=${encodeURIComponent(city)}`);
+                                                                            navigate(`/services/virtual-office?city=${encodeURIComponent(city)}`);
                                                                         }}
                                                                         className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted/60 transition-colors"
                                                                     >

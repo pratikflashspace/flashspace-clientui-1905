@@ -1,1176 +1,493 @@
-import { Building, MapPin, Mail, Phone, Wifi, Coffee, CheckCircle, Star, Users, Award, ChevronDown, Search, ArrowRight, Sparkles, Calendar, Shield, Zap, TrendingUp, DollarSign, Network, Maximize, Target, Quote, X, Check } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
-import { useState, useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  Search,
+  ArrowRight,
+  ArrowUpRight,
+  Mic,
+  Send,
+  Wifi,
+  Coffee,
+  Users,
+  Monitor,
+  Calendar,
+  Clock,
+  CreditCard,
+  Sparkles,
+  Zap,
+  Shield,
+  BarChart3,
+  MessageSquare,
+  Bot,
+  Play,
+} from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { DraggableCardContainer, DraggableCardBody } from "@/components/ui/draggable-card";
+import { FeatureCTA } from "@/components/sections/FeatureCTA";
+import { Stats } from "@/components/sections/Stats";
+import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
+import { BlogSection } from "@/components/sections/BlogSection";
+import { CTA } from "@/components/sections/CTA";
+
+const featureCoworking = "/coworking-illustrated-themed.jpg";
+const featureDayPasses = "/feature-day-passes.jpg";
+const featureMeetingRooms = "/feature-meeting-rooms.jpg";
+const officeIllustrated = "/hero-illustrated.jpg";
+const videoTestimonial = "/business-setup-illustrated.jpg";
+
+const availableCities = [
+  "Mumbai",
+  "Delhi",
+  "Bangalore",
+  "Chennai",
+  "Hyderabad",
+  "Pune",
+  "Kolkata",
+  "Ahmedabad",
+  "Jaipur",
+  "Lucknow",
+  "Chandigarh",
+  "Kochi",
+  "Indore",
+  "Nagpur",
+  "Coimbatore",
+];
+
+const logos = [
+  { src: "/Logo/flipkart.png", alt: "Flipkart", className: "h-12" },
+  { src: "/Logo/trulymadly.png", alt: "TrulyMadly", className: "h-12" },
+  { src: "/Logo/Stage2.png", alt: "Stage", className: "h-10" },
+  { src: "/Logo/StudyIQ.png", alt: "StudyIQ", className: "h-10" },
+  { src: "/Logo/Adda247.png", alt: "Adda247", className: "h-12" },
+  { src: "/Logo/luv.png", alt: "Luv Films", className: "h-12" },
+];
+
+const sidebarItems = [
+  { id: "features", label: "Features" },
+  { id: "amenities", label: "Amenities" },
+  { id: "ai", label: "AI Platform" },
+];
+
+const coworkingFeatures = [
+  { icon: Users, title: "Hot Desks", desc: "Drop in and get to work — flexible seating across all locations with day pass or monthly access." },
+  { icon: Monitor, title: "Dedicated Desks", desc: "Your own permanent desk with storage, 24/7 access, and exclusive member benefits." },
+  { icon: Calendar, title: "Meeting Rooms", desc: "Book professional meeting rooms by the hour — fully equipped with AV and video conferencing." },
+  { icon: Coffee, title: "Community & Events", desc: "Join a thriving community of founders, freelancers, and remote teams. Attend events and workshops." },
+];
+
+const amenities = [
+  { icon: Wifi, label: "High-speed WiFi" },
+  { icon: Coffee, label: "Pantry & Café" },
+  { icon: Users, label: "Community Events" },
+  { icon: Monitor, label: "Ergonomic Setup" },
+];
+
+const aiCapabilities = [
+  { id: "booking", label: "Smart Booking", icon: Zap, active: true },
+  { id: "compliance", label: "Compliance", icon: Shield, active: false },
+  { id: "access", label: "Access Control", icon: Sparkles, active: false },
+  { id: "analytics", label: "Analytics", icon: BarChart3, active: false },
+];
 
 const CoworkingSpace = () => {
   const navigate = useNavigate();
-  const [selectedCity, setSelectedCity] = useState("Delhi");
-  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [active, setActive] = useState("features");
+  const [cityQuery, setCityQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
-  // Refs for interactive background
-  const bgRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const filteredCities = cityQuery.length > 0
+    ? availableCities.filter((c) => c.toLowerCase().includes(cityQuery.toLowerCase()))
+    : [];
 
   useEffect(() => {
-    const container = containerRef.current;
-    const bg = bgRef.current;
-    if (!container || !bg) return;
-
-    const handleMove = (e: MouseEvent | globalThis.MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-      const translateX = x * 14;
-      const translateY = y * 10;
-      bg.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(1.03)`;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
     };
-
-    const handleLeave = () => {
-      if (bg) bg.style.transform = `translate3d(0, 0, 0) scale(1.03)`;
-    };
-
-    container.addEventListener('mousemove', handleMove);
-    container.addEventListener('mouseleave', handleLeave);
-
-    return () => {
-      container.removeEventListener('mousemove', handleMove);
-      container.removeEventListener('mouseleave', handleLeave);
-    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // City data with famous landmark images
-  const cityData = [
-    { name: "Ahmedabad", image: "https://images.unsplash.com/photo-1569596082827-c5c81c9e3898?w=400&q=80", landmark: "Sabarmati Ashram" },
-    { name: "Bangalore", image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=400&q=80", landmark: "Tech Hub" },
-    { name: "Chennai", image: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400&q=80", landmark: "Marina Beach" },
-    { name: "Delhi", image: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&q=80", landmark: "India Gate" },
-    { name: "Dharamshala", image: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&q=80", landmark: "Himalayas" },
-    { name: "Gurgaon", image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&q=80", landmark: "Cyber City" },
-    { name: "Hyderabad", image: "https://images.unsplash.com/photo-1572638001012-c342e59c4d56?w=400&q=80", landmark: "Charminar" },
-    { name: "Jaipur", image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=400&q=80", landmark: "Hawa Mahal" },
-    { name: "Jammu", image: "https://images.unsplash.com/photo-1623070573483-65a6c3e79c98?w=400&q=80", landmark: "Vaishno Devi" },
-  ];
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length) setActive(visible[0].target.id);
+      },
+      { rootMargin: "-25% 0px -65% 0px" },
+    );
+    Object.values(sectionRefs.current).forEach((el) => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
-  // Handle search navigation
-  const handleSearch = () => {
-    navigate(`/services/coworking-space?city=${encodeURIComponent(selectedCity)}&service=coworking-space`);
+  const assignRef = (id: string) => (el: HTMLElement | null) => {
+    sectionRefs.current[id] = el;
   };
 
-  const features = [
-    {
-      icon: Wifi,
-      title: "High-Speed Internet",
-      description: "Lightning-fast fiber optic connectivity with backup internet for uninterrupted work",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: Coffee,
-      title: "Premium Amenities",
-      description: "Complimentary tea, coffee, refreshments, and modern pantry facilities",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    },
-    {
-      icon: Calendar,
-      title: "Flexible Plans",
-      description: "Daily, weekly, or monthly passes - choose what works best for you",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: Users,
-      title: "Community Events",
-      description: "Regular networking events, workshops, and community meetups",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    },
-    {
-      icon: Shield,
-      title: "24/7 Access",
-      description: "Round-the-clock access with secure biometric entry and CCTV surveillance",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: Award,
-      title: "Professional Environment",
-      description: "Ergonomic furniture, natural lighting, and collaborative work zones",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    }
-  ];
-
-  const coworkingTypes = [
-    {
-      icon: Users,
-      title: "Hot Desks",
-      description: "Flexible first-come, first-served seating in open coworking areas. Perfect for freelancers and remote workers.",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: Building,
-      title: "Dedicated Desks",
-      description: "Your own personal desk in a shared workspace. Same spot every day with storage space.",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    },
-    {
-      icon: Shield,
-      title: "Private Cabins",
-      description: "Fully furnished private offices for teams. Secure, customizable, and professional spaces.",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: Award,
-      title: "Meeting Rooms",
-      description: "On-demand conference rooms equipped with projectors, whiteboards, and video conferencing.",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    }
-  ];
-
-  const howItWorks = [
-    {
-      step: "01",
-      title: "Visit & Tour",
-      description: "Schedule a free tour of our coworking spaces. Explore the facilities, meet the community, and find the perfect spot.",
-      icon: MapPin,
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      step: "02",
-      title: "Choose Your Plan",
-      description: "Select from hot desk, dedicated desk, or private cabin options. Pick daily, weekly, or monthly plans that suit your needs.",
-      icon: Target,
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    },
-    {
-      step: "03",
-      title: "Payment",
-      description: "Complete secure online payment with flexible payment options. Get instant confirmation and receipt for your booking.",
-      icon: DollarSign,
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      step: "04",
-      title: "Complete Documentation",
-      description: "Submit your KYC documents and complete the onboarding process. Our team will verify and activate your membership.",
-      icon: CheckCircle,
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    },
-    {
-      step: "05",
-      title: "Start Working",
-      description: "Get your access card and start working immediately. Enjoy all amenities, networking events, and community benefits.",
-      icon: Zap,
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    }
-  ];
-
-  const whyChoose = [
-    {
-      icon: MapPin,
-      title: "Prime Locations",
-      description: "Strategic locations in business districts with excellent connectivity and nearby amenities",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: DollarSign,
-      title: "Cost Effective",
-      description: "Save up to 70% compared to traditional office rentals. No security deposits or long-term commitments",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    },
-    {
-      icon: Network,
-      title: "Networking Opportunities",
-      description: "Connect with entrepreneurs, startups, and professionals from diverse industries",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: Maximize,
-      title: "Scalable Solutions",
-      description: "Easily scale up or down as your team grows. Add or remove seats without hassle",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    },
-    {
-      icon: Target,
-      title: "Productivity Boost",
-      description: "Designed workspaces that enhance focus, creativity, and collaboration",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      icon: Star,
-      title: "All-Inclusive",
-      description: "Internet, electricity, housekeeping, pantry, and admin support - all included",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    }
-  ];
-
-  const membershipPlans = [
-    {
-      name: "Hot Desk",
-      price: "6,999",
-      period: "per month",
-      description: "Perfect for freelancers and remote workers",
-      features: [
-        "Access to any hot desk",
-        "High-speed internet",
-        "Tea, coffee & refreshments",
-        "Community events access",
-        "Locker facility",
-        "Business hours access (9 AM - 7 PM)"
-      ],
-      gradient: "from-[#EDB003] to-[#f5c242]",
-      popular: false
-    },
-    {
-      name: "Dedicated Desk",
-      price: "11,999",
-      period: "per month",
-      description: "Best for regular professionals",
-      features: [
-        "Your own dedicated desk",
-        "Storage drawer & locker",
-        "High-speed internet",
-        "All-day refreshments",
-        "Priority booking for meeting rooms",
-        "24/7 access available",
-        "Mail handling services"
-      ],
-      gradient: "from-[#172A3A] to-[#2a4a5a]",
-      popular: true
-    },
-    {
-      name: "Private Cabin",
-      price: "24,999",
-      period: "per month",
-      description: "Ideal for teams and small businesses",
-      features: [
-        "Private lockable cabin (2-6 seats)",
-        "Fully furnished workspace",
-        "Customizable interiors",
-        "Dedicated receptionist support",
-        "Unlimited meeting room hours",
-        "24/7 access",
-        "Virtual office services included",
-        "Priority support"
-      ],
-      gradient: "from-[#EDB003] to-[#f5c242]",
-      popular: false
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: "Priya Sharma",
-      role: "Freelance Designer",
-      company: "Mumbai",
-      avatar: "PS",
-      rating: 5,
-      text: "FlashSpace coworking has transformed my work life! The creative environment and networking opportunities have helped me grow my freelance business significantly. The amenities are top-notch and the community is incredibly supportive.",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    },
-    {
-      name: "Rahul Mehta",
-      role: "Startup Founder",
-      company: "Bangalore",
-      avatar: "RM",
-      rating: 5,
-      text: "We started with a hot desk and now have our own private cabin. The scalability is amazing! The location is prime, costs are reasonable, and the professional environment helped us close several important deals. Highly recommend!",
-      gradient: "from-[#172A3A] to-[#2a4a5a]"
-    },
-    {
-      name: "Sneha Patel",
-      role: "Content Creator",
-      company: "Delhi",
-      avatar: "SP",
-      rating: 5,
-      text: "Best decision I made for my business! The flexibility of the hot desk plan allows me to work on my schedule. I've met amazing collaborators here, and the energy is always positive. The 24/7 access is a game-changer.",
-      gradient: "from-[#EDB003] to-[#f5c242]"
-    }
-  ];
-
-  const faqs = [
-    {
-      question: "What is a coworking space?",
-      answer: "A coworking space is a shared workspace where professionals, freelancers, startups, and remote workers can work in a collaborative environment. It offers flexible desk options, meeting rooms, high-speed internet, and various amenities without the commitment of a traditional office lease."
-    },
-    {
-      question: "What's the difference between hot desk and dedicated desk?",
-      answer: "A hot desk is a flexible, first-come-first-served seating arrangement in the open area - you can use any available desk. A dedicated desk is your own personal workspace in the shared area that's reserved for you every day, including storage space for your belongings."
-    },
-    {
-      question: "Can I try before committing to a membership?",
-      answer: "Absolutely! We offer free tours of all our locations. You can also purchase a day pass to experience the space before committing to a monthly membership. This helps you understand if our coworking environment suits your needs."
-    },
-    {
-      question: "Are meeting rooms included in the membership?",
-      answer: "Meeting room access varies by plan. Hot desk members get discounted hourly rates, dedicated desk members receive priority booking with some free hours, and private cabin members get unlimited access to meeting rooms."
-    },
-    {
-      question: "Is there 24/7 access available?",
-      answer: "Yes! Dedicated desk and private cabin members have 24/7 access to the space with secure biometric entry. Hot desk members have access during business hours (9 AM - 7 PM), with optional 24/7 upgrade available."
-    },
-    {
-      question: "What amenities are included?",
-      answer: "All memberships include high-speed internet, electricity, tea/coffee, printing services, housekeeping, air conditioning, locker facility, and access to community events. Private cabin members also get virtual office services and receptionist support."
-    },
-    {
-      question: "Can I scale my membership as my team grows?",
-      answer: "Yes! Our plans are highly scalable. You can start with a hot desk, upgrade to a dedicated desk, and eventually move to a private cabin as your team expands. We make the transition smooth and hassle-free."
-    },
-    {
-      question: "What is your cancellation policy?",
-      answer: "We require a 30-day notice for cancellation. Monthly memberships are flexible with no long-term commitment. For private cabins, we typically have a 3-month minimum commitment period. No hidden fees or penalties apply."
-    }
-  ];
-
-  const cityLocations = [
-    {
-      city: "Bangalore",
-      centers: 5,
-      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
-      description: "Silicon Valley coworking hubs"
-    },
-    {
-      city: "Delhi NCR",
-      centers: 15,
-      image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80",
-      description: "Premium coworking in capital region"
-    },
-    {
-      city: "Mumbai",
-      centers: 4,
-      image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&q=80",
-      description: "Business district workspace solutions"
-    },
-    {
-      city: "Kolkata",
-      centers: 8,
-      image: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80",
-      description: "Cultural capital workspace hubs"
-    },
-    {
-      city: "Hyderabad",
-      centers: 4,
-      image: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800&q=80",
-      description: "Innovation district workspaces"
-    },
-    {
-      city: "Chennai",
-      centers: 2,
-      image: "https://images.unsplash.com/photo-1497366412874-3415097a27e7?w=800&q=80",
-      description: "Southern hub coworking centers"
-    }
-  ];
-
-  const stats = [
-    { number: "500+", label: "Clients", icon: Users },
-    { number: "68+", label: "Centers Pan India", icon: Building },
-    { number: "50+", label: "Cities", icon: MapPin },
-    { number: "24/7", label: "Access Available", icon: Shield }
-  ];
-
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 }
+  const scrollTo = (id: string) => {
+    sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-
-  const draggableImages = [
-    {
-      image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500&q=80",
-      className: "absolute top-[0%] left-[5%] z-20 w-44 h-64 rounded-[2rem]",
-      alt: "Coworking Vibe"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&q=80",
-      className: "absolute top-[5%] right-[5%] z-10 w-56 h-56 rounded-[2.5rem]",
-      alt: "Team Collaboration"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=500&q=80",
-      className: "absolute top-[28%] left-[32%] z-30 w-48 h-48 rounded-[2rem]",
-      alt: "Meeting"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&q=80",
-      className: "absolute top-[45%] right-[2%] z-20 w-32 h-32 rounded-[1.5rem]",
-      alt: "Laptop"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80",
-      className: "absolute bottom-[20%] left-[-5%] z-20 w-64 h-36 rounded-[2rem]",
-      alt: "City"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500&q=80",
-      className: "absolute bottom-[28%] left-[25%] z-10 w-40 h-40 rounded-[2rem]",
-      alt: "Team"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80",
-      className: "absolute -bottom-[5%] right-[8%] z-40 w-60 h-80 rounded-[3rem]",
-      alt: "High Five"
-    }
-  ];
-
-
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
-      {/* Header */}
+    <div className="min-h-screen" style={{ backgroundColor: "#f8f7f4" }}>
       <Header />
 
-      {/* Hero Section */}
-      {/* Hero Section (MindTrip Style - Floating Cluster) */}
-      <section ref={containerRef} className="relative min-h-[90vh] flex items-center bg-slate-50 dark:bg-[#0B1120] transition-colors duration-300 z-30 pt-20 overflow-hidden">
-
-        {/* Clean Background with subtle gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-amber-50 dark:from-[#0B1120] dark:via-[#111] dark:to-[#1a1a1a]" />
-
-        {/* Animated Gradient Orbs (Subtle) */}
-        <div className="absolute top-20 left-20 w-[500px] h-[500px] bg-[#EDB003]/5 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px] animate-pulse delay-1000" />
-
-        <div className="container mx-auto px-4 relative z-10 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-            {/* LEFT COLUMN: Content */}
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeInUp}
-              transition={{ duration: 0.8 }}
-              className="text-center lg:text-left relative z-20 mx-auto max-w-3xl lg:max-w-none"
-            >
-              <motion.div
-                className="inline-flex items-center gap-2 bg-white dark:bg-white/5 border border-amber-200 dark:border-white/10 px-4 py-2 rounded-full mb-8 shadow-sm"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Sparkles className="w-4 h-4 text-[#EDB003]" />
-                <span className="text-sm font-bold tracking-wide text-slate-800 dark:text-white">Premium Coworking Spaces</span>
-              </motion.div>
-
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1] text-slate-900 dark:text-white tracking-tight">
-                Collaborative <br />
-                workspaces <span className="text-[#EDB003]">for teams.</span>
-              </h1>
-
-              <p className="text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-lg leading-relaxed">
-                Join a vibrant community of professionals in premium spaces designed for productivity, networking, and growth.
-              </p>
-
-              {/* Search Container (Relative Parent) */}
-              <div className="relative max-w-md w-full mx-auto lg:mx-0">
-
-                {/* Compact Search Bar */}
-                <div className="bg-white dark:bg-white/5 p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-white/10 w-full relative z-20">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      onClick={() => setIsLocationOpen(!isLocationOpen)}
-                      className="flex-1 justify-between h-12 px-4 hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl text-slate-700 dark:text-white"
-                    >
-                      <span className="truncate mr-2">{selectedCity || "Select City"}</span>
-                      <ChevronDown className="w-4 h-4 opacity-50" />
-                    </Button>
-                    <Button onClick={handleSearch} className="bg-[#EDB003] hover:bg-[#d69f03] text-black font-bold h-12 px-6 rounded-xl">
-                      Find Desk
-                    </Button>
-                  </div>
+      <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-16 overflow-hidden">
+        <div className="relative z-10 mx-auto max-w-3xl text-center px-6">
+          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="text-5xl sm:text-6xl lg:text-[4rem] font-medium text-foreground leading-[1.1] mb-6 tracking-[-0.02em]">
+            <span className="whitespace-nowrap">High-Performance Coworking</span>
+            <br />
+            Spaces
+          </motion.h1>
+          <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="text-lg text-muted-foreground max-w-[680px] mx-auto mb-10 leading-relaxed">
+            Book desks, meeting rooms, and collaborative workspaces instantly — in the best locations across India.
+          </motion.p>
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }} className="flex flex-wrap items-center justify-center gap-4 mt-8">
+            <div ref={searchRef} className="relative">
+              <div className="flex items-center h-12 rounded-xl border border-foreground/10 bg-white overflow-hidden shadow-lg" style={{ width: 400, maxWidth: "90vw" }}>
+                <Search className="w-4 h-4 ml-4 text-muted-foreground shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search coworking spaces in your city…"
+                  value={cityQuery}
+                  onChange={(e) => {
+                    setCityQuery(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => cityQuery.length > 0 && setShowSuggestions(true)}
+                  className="flex-1 h-full px-3 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none min-w-0"
+                />
+                <button className="p-2.5 text-muted-foreground hover:text-foreground transition-opacity"><Mic className="w-4 h-4" /></button>
+                <button className="p-2.5 mr-1 text-primary hover:text-primary/80 transition-opacity"><Send className="w-4 h-4" /></button>
+              </div>
+              {showSuggestions && filteredCities.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-foreground/10 rounded-xl shadow-lg z-50 overflow-hidden py-1">
+                  {filteredCities.map((city) => (
+                    <button key={city} onClick={() => { setCityQuery(city); setShowSuggestions(false); }} className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-foreground/5 transition-colors">{city}</button>
+                  ))}
                 </div>
-
-                {/* Horizontal City Selector Overlay (Anchored to Parent) */}
-                <AnimatePresence>
-                  {isLocationOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
-                      animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
-                      transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                      className="absolute bottom-full left-0 mb-3 z-30 w-full bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-2xl rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-white/20 ring-1 ring-black/5 overflow-hidden"
-                    >
-                      {/* Decorative Top Gradient Line */}
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#EDB003] to-transparent opacity-50" />
-                      <div className="p-5">
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="font-bold text-lg dark:text-white flex items-center gap-2">
-                            <MapPin className="w-5 h-5 text-[#EDB003]" /> Select Location
-                          </h3>
-                          <button onClick={() => setIsLocationOpen(false)} className="p-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-colors">
-                            <X className="w-5 h-5 text-slate-400" />
-                          </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
-                          {cityData.map(c => (
-                            <button
-                              key={c.name}
-                              onClick={() => { setSelectedCity(c.name); setIsLocationOpen(false); }}
-                              className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 border ${selectedCity === c.name
-                                ? 'bg-[#EDB003] text-black border-[#EDB003] shadow-md shadow-[#EDB003]/20'
-                                : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-transparent hover:bg-slate-100 dark:hover:bg-white/10 hover:scale-[1.02]'
-                                }`}
-                            >
-                              {c.name}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              <div className="flex items-center justify-center lg:justify-start gap-6 mt-10 text-sm font-medium text-slate-500 dark:text-slate-400">
-                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#EDB003]" /> <span>High-Speed Wifi</span></div>
-                <div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#EDB003]" /> <span>Community Events</span></div>
-              </div>
-            </motion.div>
-
-            {/* RIGHT COLUMN: Draggable Cards Cluster */}
-            <div className="hidden lg:block h-[650px] w-full">
-              <DraggableCardContainer className="perspective-1000">
-                {draggableImages.map((item, index) => (
-                  <DraggableCardBody key={index} className={item.className}>
-                    <div className="w-full h-full overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222] rounded-[inherit] hover:shadow-xl transition-shadow duration-300">
-                      <img
-                        src={item.image}
-                        alt={item.alt}
-                        className="w-full h-full object-cover pointer-events-none"
-                      />
-                    </div>
-                  </DraggableCardBody>
-                ))}
-              </DraggableCardContainer>
+              )}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section (Redesigned - Clean & Premium) */}
-      <section className="py-10 border-y border-slate-100 dark:border-white/10 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-md relative z-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-100 dark:divide-white/5">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                className="text-center group"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <div className="mb-2 flex justify-center">
-                  <div className="w-12 h-12 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-center group-hover:bg-[#EDB003]/10 transition-colors duration-300">
-                    <stat.icon className="w-6 h-6 text-slate-400 dark:text-slate-500 group-hover:text-[#EDB003] transition-colors" />
-                  </div>
-                </div>
-                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1" style={{ fontFamily: 'Poppins' }}>
-                  {stat.number}
-                </div>
-                <div className="text-slate-500 dark:text-slate-400 text-sm font-medium tracking-wide">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Premium Coworking Benefits Section - Floating MindTrip Style */}
-      <section className="py-24 bg-gradient-to-b from-white to-slate-50 dark:from-[#0a0a0a] dark:to-[#111] transition-colors duration-300 relative overflow-hidden">
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="inline-block px-5 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-bold mb-6 border border-[#EDB003]/20 tracking-wider">
-              WHY CHOOSE US
-            </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-slate-900 dark:text-white tracking-tight" >
-              Premium <span className="text-[#EDB003]">Coworking Benefits</span>
-            </h2>
-            <p className="text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
-              Everything you need for a productive and collaborative work experience
-            </p>
+            <Button
+              size="lg"
+              variant="outline"
+              className="font-semibold px-8 h-12 rounded-xl border-foreground/20 text-foreground hover:bg-foreground/5 hover:border-foreground/30 bg-transparent"
+              onClick={() => navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`)}
+            >
+              Explore Spaces <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
           </motion.div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 max-w-7xl mx-auto">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                className="group flex flex-col items-center text-center relative"
-              >
-                {/* Floating Icon Bubble */}
-                <div className="relative mb-6">
-                  {/* Glow */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 scale-125"></div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 }} className="mt-20 w-full">
+          <p className="text-center text-base font-normal text-muted-foreground/70 mb-6 tracking-normal">Trusted by Growing Businesses</p>
+          <div className="relative overflow-hidden w-full">
+            <motion.div className="flex items-center gap-20" animate={{ x: ["0%", "-50%"] }} transition={{ duration: 22, repeat: Infinity, ease: "linear" }}>
+              {[...logos, ...logos].map((l, i) => (
+                <img key={i} src={l.src} alt={l.alt} className={`${l.className} w-auto object-contain opacity-50 select-none shrink-0`} />
+              ))}
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
 
-                  {/* Main Container */}
-                  <div className="w-24 h-24 bg-white dark:bg-[#1E293B] rounded-[2rem] shadow-[0_15px_30px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.5)] flex items-center justify-center transform group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300 border-2 border-slate-50 dark:border-white/5 relative z-10">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md bg-gradient-to-br ${index === 0 ? "from-[#EDB003] to-[#FFD700]" : // Wifi (Gold)
-                      index === 1 ? "from-emerald-500 to-teal-400" : // Coffee (Green)
-                        index === 2 ? "from-blue-500 to-cyan-400" :   // Flexible (Blue)
-                          index === 3 ? "from-purple-500 to-indigo-400" : // Community (Purple)
-                            index === 4 ? "from-rose-500 to-orange-400" :   // 24/7 (Rose)
-                              "from-indigo-500 to-sky-500" // Professional (Indigo)
-                      }`}>
-                      <feature.icon className="w-6 h-6" />
-                    </div>
-                  </div>
-                </div>
+      <div className="lg:hidden sticky top-16 z-30 bg-white/90 backdrop-blur border-b border-border/40">
+        <div className="flex justify-center gap-2 px-4 py-2.5">
+          {sidebarItems.map((n) => (
+            <button key={n.id} onClick={() => scrollTo(n.id)} className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase transition-colors ${active === n.id ? "bg-[#35503f] text-white" : "text-foreground/50 hover:text-foreground"}`}>{n.label}</button>
+          ))}
+        </div>
+      </div>
 
-                {/* Text Content */}
-                <div className="relative z-10 px-4">
-                  <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-[#EDB003] transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                    {feature.description}
-                  </p>
+      <div className="flex w-full">
+        <aside className="hidden lg:block w-[300px] shrink-0">
+          <nav className="sticky top-[120px] pl-10 pr-[24px] py-12 flex flex-col gap-1">
+            {sidebarItems.map((n) => {
+              const isActive = active === n.id;
+              return (
+                <button key={n.id} onClick={() => scrollTo(n.id)} className="flex items-center text-left py-2.5 transition-all duration-200 bg-transparent border-0 outline-none" style={{ color: "#1F1F1F", opacity: isActive ? 1 : 0.6 }}>
+                  {isActive && <span className="shrink-0 rounded-full" style={{ width: 8, height: 8, backgroundColor: "#36503F", marginRight: 10 }} />}
+                  <span className={`text-[14px] tracking-widest uppercase ${isActive ? "font-medium" : "font-normal"}`}>{n.label.toUpperCase()}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
+
+        <div className="flex-1 min-w-0">
+          <section ref={assignRef("features")} id="features" className="py-12 lg:py-16">
+            <div className="space-y-10 px-6 lg:px-8">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden">
+                <img src={featureCoworking} alt="Coworking space" className="w-full h-[350px] lg:h-[420px] object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
+                  <span className="text-primary-foreground/70 text-sm font-semibold uppercase tracking-wider mb-2 block">Coworking</span>
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
+                    Flexible desks & cabins
+                    <br />
+                    <span className="text-white/70">for every team size.</span>
+                  </h2>
                 </div>
               </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* What is Coworking Space Section - Floating MindTrip Style */}
-      <section className="py-24 bg-slate-50 dark:bg-[#0f172a] transition-colors duration-300 relative overflow-hidden">
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="inline-block px-5 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-bold mb-6 border border-[#EDB003]/20 tracking-wider">
-              UNDERSTANDING COWORKING
-            </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-slate-900 dark:text-white tracking-tight" >
-              What is <span className="text-[#EDB003] relative inline-block">Coworking Space?
-                <svg className="absolute w-full h-3 -bottom-1 left-0 text-[#EDB003] opacity-40" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.8077 4.00844 57.0722 2.05308 97.4608 2.00085C138.694 1.94753 171.758 4.79326 198.001 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
-              </span>
-            </h2>
-            <p className="text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
-              Coworking spaces are shared work environments where individuals and teams from different companies work side-by-side.
-              It's a modern alternative to traditional offices, offering flexibility, community, and cost savings.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            {coworkingTypes.map((type, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                className="group flex flex-col items-center text-center relative"
-              >
-                {/* Floating Icon Bubble */}
-                <div className="relative mb-6">
-                  {/* Glow */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 scale-125"></div>
-
-                  {/* Main Container */}
-                  <div className="w-24 h-24 bg-white dark:bg-[#1E293B] rounded-[2rem] shadow-[0_15px_30px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.5)] flex items-center justify-center transform group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300 border-2 border-slate-50 dark:border-white/5 relative z-10">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md bg-gradient-to-br ${index === 0 ? "from-[#EDB003] to-[#FFD700]" : // Hot Desks (Gold)
-                      index === 1 ? "from-blue-500 to-cyan-400" :   // Dedicated Desks (Blue)
-                        index === 2 ? "from-purple-500 to-indigo-400" : // Private Cabins (Purple)
-                          "from-rose-500 to-orange-400" // Meeting Rooms (Rose)
-                      }`}>
-                      <type.icon className="w-6 h-6" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Text Content */}
-                <div className="relative z-10 px-4">
-                  <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-[#EDB003] transition-colors">
-                    {type.title}
-                  </h3>
-                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                    {type.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section - Connected Process Timeline */}
-      <section className="py-24 bg-white dark:bg-[#0a0a0a] transition-colors duration-300 relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent"></div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="inline-block px-5 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-bold mb-6 border border-[#EDB003]/20 tracking-wider">
-              SIMPLE PROCESS
-            </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-slate-900 dark:text-white tracking-tight" >
-              How It <span className="text-[#EDB003]">Works</span>
-            </h2>
-            <p className="text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
-              Get started with FlashSpace coworking in five simple steps
-            </p>
-          </motion.div>
-
-          <div className="relative max-w-7xl mx-auto">
-            {/* Connecting Line (Desktop) */}
-            <div className="hidden md:block absolute top-[45px] left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#EDB003]/50 to-transparent border-t-2 border-dashed border-[#EDB003]/30 z-0"></div>
-
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-y-16 gap-x-4 relative z-10">
-              {howItWorks.map((step, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.15, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="group flex flex-col items-center text-center"
+              <div className="max-w-2xl">
+                <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                  From hot desks to private cabins, find the perfect coworking setup for individuals
+                  and teams. Fully furnished, move-in ready spaces with world-class amenities.
+                </p>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="group border-primary/30 hover:bg-primary/5 font-semibold"
+                  onClick={() => navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`)}
                 >
-                  {/* Step Number & Icon Bubble */}
-                  <div className="relative mb-8">
-                    {/* Hover Glow */}
-                    <div className="absolute inset-0 bg-[#EDB003] rounded-full blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-500"></div>
+                  Browse Coworking Spaces
+                  <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </Button>
+              </div>
 
-                    {/* Number Bubble */}
-                    <div className="w-24 h-24 bg-white dark:bg-[#1f1f1f] rounded-full border-4 border-slate-50 dark:border-[#2a2a2a] shadow-xl flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform duration-300">
-                      <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${step.gradient} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}></div>
-
-                      <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-[#EDB003] to-[#FFD700] rounded-full flex items-center justify-center text-black font-bold text-sm shadow-md border-2 border-white dark:border-[#0a0a0a]">
-                        {step.step}
-                      </div>
-
-                      <step.icon className="w-8 h-8 text-slate-700 dark:text-white group-hover:text-[#EDB003] transition-colors duration-300" />
+              <div className="grid sm:grid-cols-2 gap-6">
+                {coworkingFeatures.map((f, i) => (
+                  <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="p-6 rounded-2xl bg-card border border-border flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <f.icon className="w-5 h-5 text-primary" />
                     </div>
-                  </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-1">{f.title}</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
 
-                  {/* Content */}
-                  <div className="px-2">
-                    <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-[#EDB003] transition-colors">
-                      {step.title}
-                    </h3>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                      {step.description}
+              <div className="flex flex-wrap gap-8 lg:gap-16 pt-8 border-t border-border/50">
+                {[
+                  { value: "500+", label: "Coworking locations" },
+                  { value: "₹4,999", label: "Starting price/month" },
+                  { value: "24/7", label: "Access available" },
+                ].map((stat) => (
+                  <div key={stat.label}>
+                    <div className="text-2xl lg:text-3xl font-bold text-foreground tracking-tight">{stat.value}</div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section ref={assignRef("amenities")} id="amenities" className="py-12 lg:py-16 border-t border-border/50">
+            <div className="space-y-10 px-6 lg:px-8">
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                <span className="text-primary text-sm font-semibold uppercase tracking-wider mb-3 block">On Demand</span>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground leading-tight tracking-tight mb-4">
+                  Book by the hour
+                  <br />
+                  <span className="text-muted-foreground">or by the day.</span>
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
+                  Day passes, meeting rooms, and conference spaces — pay only for what you use.
+                  Perfect for remote workers and hybrid teams.
+                </p>
+              </motion.div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-2xl overflow-hidden border border-border group">
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img src={featureDayPasses} alt="Day passes" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">Day Pass</h3>
+                    <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+                      Drop into any coworking space for a day. Starting at ₹200/day with all amenities included.
                     </p>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> Flexible hours</span>
+                      <span className="flex items-center gap-1"><CreditCard className="w-4 h-4" /> Pay per use</span>
+                    </div>
                   </div>
                 </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Why Choose FlashSpace Section - Floating MindTrip Style */}
-      <section className="py-24 bg-slate-50 dark:bg-[#0f172a] relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
-          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}>
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="inline-block px-5 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-bold mb-6 border border-[#EDB003]/20 tracking-wider">
-              OUR ADVANTAGES
-            </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-slate-900 dark:text-white tracking-tight" >
-              Why Choose <span className="text-[#EDB003] relative inline-block">FlashSpace?
-                <svg className="absolute w-full h-3 -bottom-1 left-0 text-[#EDB003] opacity-40" viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 6.99997C25.8077 4.00844 57.0722 2.05308 97.4608 2.00085C138.694 1.94753 171.758 4.79326 198.001 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
-              </span>
-            </h2>
-            <p className="text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
-              Experience the difference with India's fastest-growing coworking community
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16 max-w-7xl mx-auto">
-            {whyChoose.map((benefit, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                className="group flex flex-col items-center text-center relative"
-              >
-                {/* Floating Icon Bubble */}
-                <div className="relative mb-6">
-                  {/* Glow */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 scale-125"></div>
-
-                  {/* Main Container */}
-                  <div className="w-24 h-24 bg-white dark:bg-[#1E293B] rounded-[2rem] shadow-[0_15px_30px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.5)] flex items-center justify-center transform group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-300 border-2 border-slate-50 dark:border-white/5 relative z-10">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md bg-gradient-to-br ${index === 0 ? "from-[#EDB003] to-[#FFD700]" : // Prime Locations (Gold)
-                      index === 1 ? "from-emerald-500 to-teal-400" : // Cost Effective (Green)
-                        index === 2 ? "from-blue-500 to-cyan-400" :   // Networking (Blue)
-                          index === 3 ? "from-purple-500 to-indigo-400" : // Scalable (Purple)
-                            index === 4 ? "from-rose-500 to-orange-400" :   // Productivity (Rose)
-                              "from-indigo-500 to-sky-500" // All Inclusive (Indigo/Sky)
-                      }`}>
-                      <benefit.icon className="w-6 h-6" />
-                    </div>
+                <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="rounded-2xl overflow-hidden border border-border group">
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img src={featureMeetingRooms} alt="Meeting rooms" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
-                </div>
-
-                {/* Text Content */}
-                <div className="relative z-10 px-4">
-                  <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white group-hover:text-[#EDB003] transition-colors">
-                    {benefit.title}
-                  </h3>
-                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                    {benefit.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Membership Plans Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Flexible Pricing
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
-              Membership Plans
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Choose the plan that fits your work style and budget
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {membershipPlans.map((plan, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="relative"
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <span className="bg-gradient-to-r from-[#EDB003] to-[#f5c242] text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-                      MOST POPULAR
-                    </span>
-                  </div>
-                )}
-
-                <Card className={`border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden ${plan.popular ? 'ring-2 ring-[#EDB003]' : ''}`}>
-                  <CardContent className="p-8 relative">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${plan.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
-
-                    <h3 className="text-3xl font-bold mb-2 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
-                      {plan.name}
-                    </h3>
-
-                    <p className="text-gray-600 dark:text-gray-300 mb-6">{plan.description}</p>
-
-                    <div className="mb-8">
-                      <span className="text-5xl font-bold text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
-                        ₹{plan.price}
-                      </span>
-                      <span className="text-gray-600 dark:text-gray-400 ml-2">/{plan.period}</span>
-                    </div>
-
-                    <ul className="space-y-4 mb-8">
-                      {plan.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-3">
-                          <CheckCircle className="w-5 h-5 text-[#EDB003] flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-700">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <Button className={`w-full py-6 text-lg font-semibold ${plan.popular ? 'bg-gradient-to-r from-[#EDB003] to-[#f5c242] hover:from-[#d69f03] hover:to-[#EDB003] text-white' : 'bg-[#172A3A] hover:bg-[#2a4a5a] text-white'} shadow-lg hover:shadow-xl transition-all duration-300`}>
-                      Get Started
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            className="text-center mt-12"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-gray-600 mb-4">Need a custom plan for your team?</p>
-            <Button variant="outline" className="border-2 border-[#EDB003] text-[#EDB003] hover:bg-[#EDB003] hover:text-white font-semibold px-8 py-6">
-              Contact Sales for Enterprise Plans
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Success Stories
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
-              What Our Members Say
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Join thousands of satisfied professionals who've transformed their work life with FlashSpace
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group hover:-translate-y-2 h-full bg-white dark:bg-[#1f1f1f] overflow-hidden">
-                  <CardContent className="p-8 relative">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${testimonial.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
-
-                    <Quote className="w-12 h-12 text-[#EDB003]/20 mb-4" />
-
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 fill-[#EDB003] text-[#EDB003]" />
-                      ))}
-                    </div>
-
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 italic">
-                      "{testimonial.text}"
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">Meeting Rooms</h3>
+                    <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+                      Conference rooms, board rooms, and training spaces. Book by the hour with AV equipment included.
                     </p>
-
-                    <div className="flex items-center gap-4">
-                      <div className={`w-14 h-14 bg-gradient-to-br ${testimonial.gradient} rounded-full flex items-center justify-center text-white font-bold text-lg`}>
-                        {testimonial.avatar}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-[#172A3A] dark:text-white">{testimonial.name}</h4>
-                        <p className="text-sm text-gray-600">{testimonial.role}</p>
-                        <p className="text-xs text-gray-500">{testimonial.company}</p>
-                      </div>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> Instant booking</span>
+                      <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> Hourly rates</span>
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+                  </div>
+                </motion.div>
+              </div>
 
-      {/* FAQs Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-[#111] dark:to-[#0a0a0a] transition-colors duration-300">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Got Questions?
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
-              Frequently Asked Questions
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Everything you need to know about coworking at FlashSpace
-            </p>
-          </motion.div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {amenities.map((a, i) => (
+                  <motion.div key={a.label} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border">
+                    <a.icon className="w-5 h-5 text-primary" />
+                    <span className="text-sm font-medium text-foreground">{a.label}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
 
-          <div className="max-w-4xl mx-auto space-y-6">
-            {faqs.map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                viewport={{ once: true }}
-              >
-                <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-[#1f1f1f]">
-                  <CardContent className="p-8">
-                    <div className="flex items-start gap-4">
-                      <div className="w-8 h-8 bg-gradient-to-br from-[#EDB003] to-[#f5c242] rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white font-bold text-sm">Q</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold mb-3 text-[#172A3A] dark:text-white">
-                          {faq.question}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                          {faq.answer}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            className="text-center mt-12"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-gray-600 mb-4">Still have questions?</p>
-            <Button className="bg-gradient-to-r from-[#EDB003] to-[#f5c242] hover:from-[#d69f03] hover:to-[#EDB003] text-white font-semibold px-8 py-6">
-              <Phone className="w-5 h-5 mr-2" />
-              Talk to Our Team
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Location Grid Section */}
-      <section className="py-20 bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <span className="inline-block px-4 py-2 bg-[#EDB003]/10 text-[#EDB003] rounded-full text-sm font-semibold mb-4">
-              Our Locations
-            </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-[#172A3A] dark:text-white" style={{ fontFamily: 'Poppins' }}>
-              Across <span className="text-[#EDB003]">28+</span> States
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">Find your perfect coworking space location</p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {cityLocations.map((location, index) => (
-              <motion.div
-                key={index}
-                className="group relative overflow-hidden rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -10 }}
-              >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={location.image}
-                    alt={location.city}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
+          <section ref={assignRef("ai")} id="ai" className="py-12 lg:py-16 border-t border-border/50">
+            <div className="space-y-10 px-6 lg:px-8">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden">
+                <img src={officeIllustrated} alt="AI workspace platform" className="w-full h-[400px] lg:h-[500px] object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-4">
+                    <Sparkles className="w-4 h-4 text-secondary-foreground" />
+                    <span className="text-white/90 text-sm font-medium">AI-Powered</span>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
+                    Flash. The #1 AI
+                    <br />
+                    <span className="text-white/70">for workspace management.</span>
+                  </h2>
                 </div>
+              </motion.div>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-[#172A3A]/95 via-[#172A3A]/60 to-transparent"></div>
+              <div className="grid lg:grid-cols-2 gap-12 items-start">
+                <div>
+                  <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                    Flash AI works with any workspace to handle even your most complex
+                    requirements—from desk availability to smart access control,
+                    across all your locations.
+                  </p>
+                  <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
+                    Learn more
+                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </Button>
+                </div>
+                <div>
+                  <div className="text-sm text-primary uppercase tracking-wider mb-4 font-semibold">Capabilities</div>
+                  <h3 className="text-xl lg:text-2xl font-medium text-foreground mb-6 tracking-tight">
+                    Built to handle the most complex requirements.
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {aiCapabilities.map((cap) => (
+                      <button key={cap.id} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all ${cap.active ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}>
+                        <cap.icon className="w-4 h-4" />
+                        {cap.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-[#EDB003]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                <div className="absolute bottom-0 left-0 right-0 p-8 text-white transform transition-transform duration-500 group-hover:translate-y-0">
-                  <h3 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Poppins' }}>{location.city}</h3>
-                  <p className="text-white/90 mb-4 text-lg">{location.description}</p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                      <Building className="w-5 h-5" />
-                      <span className="font-semibold text-lg">{location.centers} Centers</span>
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-card rounded-2xl shadow-lg overflow-hidden border border-border">
+                <div className="grid lg:grid-cols-3">
+                  <div className="lg:col-span-2 p-6 border-r border-border">
+                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent/70 flex items-center justify-center text-white font-bold">AP</div>
+                        <div>
+                          <span className="font-semibold text-foreground block">Amit Patel</span>
+                          <span className="text-xs text-muted-foreground">Mumbai HQ • Hot Desk</span>
+                        </div>
+                      </div>
+                      <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">✓ Active</span>
                     </div>
-
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform">
-                      <ArrowRight className="w-6 h-6 text-[#EDB003]" />
+                    <div className="space-y-4">
+                      <div className="flex gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-accent/70 flex-shrink-0" />
+                        <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm">
+                          <p className="text-sm text-foreground">Hi, I need to book a meeting room for 10 people tomorrow afternoon. Is there anything available?</p>
+                        </div>
+                      </div>
+                      <div className="ml-11 flex items-center gap-2">
+                        <Clock className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">1m ago</span>
+                      </div>
+                      <div className="flex gap-3 justify-end">
+                        <div className="bg-primary/10 border border-primary/20 rounded-2xl rounded-tr-sm px-4 py-3 max-w-md">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Bot className="w-4 h-4 text-primary" />
+                            <span className="text-xs font-semibold text-primary">Flash AI</span>
+                          </div>
+                          <p className="text-sm text-foreground">I found 3 meeting rooms available tomorrow 2-5 PM. Conference Room A (12 seats) has video conferencing. Shall I book it?</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-6 bg-muted/30">
+                    <div className="flex items-center gap-4 mb-6">
+                      <button className="text-sm font-semibold text-foreground border-b-2 border-primary pb-1">Details</button>
+                      <button className="text-sm text-muted-foreground font-medium">AI Assist</button>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MessageSquare className="w-4 h-4 text-primary" />
+                          <h4 className="font-semibold text-foreground">Booking Request</h4>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Meeting room for 10 people. Suggested: Conference Room A with VC setup.</p>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Location</span>
+                          <span className="text-foreground font-medium">Mumbai, MH</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Plan</span>
+                          <span className="text-foreground font-medium">Enterprise</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Bookings (MTD)</span>
+                          <span className="text-foreground font-bold">24</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-[#172A3A] via-[#172A3A] to-[#2a4a5a] relative overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-[#EDB003] rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#EDB003] rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden group cursor-pointer">
+                <img src={videoTestimonial} alt="Customer testimonial" className="w-full h-[400px] object-cover object-center transition-transform duration-500 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-foreground/40" />
+                <div className="absolute top-8 left-8"><span className="text-white/80 font-semibold tracking-wider">TECHSTART</span></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                    <Play className="w-8 h-8 text-white fill-white ml-1" />
+                  </motion.div>
+                </div>
+              </motion.div>
 
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{ fontFamily: 'Poppins' }}>
-              Ready to Join Our
-              <br />
-              <span className="text-[#EDB003]">Vibrant Community?</span>
-            </h2>
-
-            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-              Join 3000+ professionals who choose FlashSpace for their coworking needs.
-              Book your free tour today!
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-[#EDB003] hover:bg-[#f5c242] text-[#172A3A] text-lg px-10 py-7 rounded-full font-bold shadow-2xl hover:shadow-[#EDB003]/50 transition-all duration-300 transform hover:scale-105">
-                <Sparkles className="w-5 h-5 mr-2" />
-                Book Free Tour
-              </Button>
-
-              <Button className="bg-white hover:bg-[#EDB003] text-black hover:text-white text-lg px-10 py-7 rounded-full font-bold transition-all duration-300">
-                <Phone className="w-5 h-5 mr-2" />
-                Talk to Expert
-              </Button>
+              <blockquote className="max-w-3xl">
+                <p className="text-2xl lg:text-3xl font-semibold text-foreground leading-snug mb-6 tracking-tight">
+                  "If you&apos;re debating whether to build your own workspace solution
+                  or use FlashSpace, my advice would be to use FlashSpace—it&apos;s
+                  transformed how we operate."
+                </p>
+                <footer className="flex items-center gap-4">
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&auto=format" alt="Rajesh Kumar" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
+                  <div>
+                    <div className="font-semibold text-foreground">Rajesh Kumar</div>
+                    <div className="text-sm text-muted-foreground">CEO at TechStart India</div>
+                  </div>
+                </footer>
+              </blockquote>
             </div>
-          </motion.div>
+          </section>
         </div>
-      </section>
+      </div>
 
-      {/* Footer */}
+      <FeatureCTA />
+      <Stats />
+      <FounderTestimonial />
+      <BlogSection />
+      <CTA />
       <Footer />
     </div>
   );

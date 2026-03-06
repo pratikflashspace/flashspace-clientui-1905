@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-animation";
 import { cn } from "@/lib/utils";
 
@@ -180,7 +180,7 @@ const Footer = () => {
               <Link to="/about" className="hover:text-white transition-colors">Cookies</Link>
             </div>
             <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">
-              © {currentYear} FlashSpace Technologies Private Limited.
+              ┬⌐ {currentYear} FlashSpace Technologies Private Limited.
             </p>
           </div>
         </div>

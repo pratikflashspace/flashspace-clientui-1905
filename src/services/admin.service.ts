@@ -41,7 +41,17 @@ export interface UserData {
   fullName: string;
   email: string;
   phoneNumber?: string;
-  role: "user" | "super_admin" | "admin" | "affiliate_manager" | "space_partner_manager" | "support" | "partner" | "space_manager" | "sales" | "affiliate";
+  role:
+    | "user"
+    | "super_admin"
+    | "admin"
+    | "affiliate_manager"
+    | "space_partner_manager"
+    | "support"
+    | "partner"
+    | "space_manager"
+    | "sales"
+    | "affiliate";
   status: "active" | "inactive" | "pending";
   isEmailVerified?: boolean;
   createdAt: string;
@@ -64,11 +74,11 @@ export interface BookingData {
   };
   type: "virtual_office" | "coworking_space";
   status:
-  | "pending_payment"
-  | "pending_kyc"
-  | "active"
-  | "expired"
-  | "cancelled";
+    | "pending_payment"
+    | "pending_kyc"
+    | "active"
+    | "expired"
+    | "cancelled";
   plan: {
     name: string;
     price: number;
@@ -108,11 +118,11 @@ export interface KYCData {
     partners?: string[];
   };
   overallStatus:
-  | "not_started"
-  | "pending"
-  | "approved"
-  | "rejected"
-  | "resubmit";
+    | "not_started"
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "resubmit";
   documents: Array<{
     type: string;
     name: string;
@@ -123,6 +133,33 @@ export interface KYCData {
   progress?: number;
   createdAt: string;
   partnerCount?: number;
+}
+
+export interface PartnerKYCData {
+  _id: string;
+  partnerProfileId?: string;
+  partnerInfo: {
+    fullName: string;
+    email: string;
+    phone: string;
+    panNumber: string;
+    aadhaarNumber: string;
+    verified: boolean;
+  };
+  overallStatus: "pending" | "approved" | "rejected" | string;
+  progress?: number;
+  isDeleted?: boolean;
+  documents?: Array<{
+    _id?: string;
+    type: string;
+    name?: string;
+    fileUrl?: string;
+    status?: string;
+    uploadedAt?: string;
+    verifiedAt?: string;
+  }>;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 // Admin ticket types for TicketSystem
@@ -197,9 +234,21 @@ class AdminService {
     return response.data;
   }
 
-  async getPendingKYC(): Promise<ApiResponse<KYCData[]>> {
+  async getPendingKYC(
+    includeApproved: boolean = false,
+  ): Promise<ApiResponse<KYCData[]>> {
     const response = await axiosInstance.get<ApiResponse<KYCData[]>>(
       "/api/admin/kyc/pending",
+      {
+        params: includeApproved ? { includeApproved: true } : undefined,
+      },
+    );
+    return response.data;
+  }
+
+  async getKYCById(kycId: string): Promise<ApiResponse<KYCData>> {
+    const response = await axiosInstance.get<ApiResponse<KYCData>>(
+      `/api/admin/kyc/${kycId}`,
     );
     return response.data;
   }
@@ -260,8 +309,8 @@ class AdminService {
     docId: string,
     action: "approve" | "reject",
     rejectionReason?: string,
-  ): Promise<ApiResponse<void>> {
-    const response = await axiosInstance.put<ApiResponse<void>>(
+  ): Promise<ApiResponse<KYCData>> {
+    const response = await axiosInstance.put<ApiResponse<KYCData>>(
       `/api/admin/kyc/${kycId}/document/${docId}/review`,
       {
         action,
@@ -515,6 +564,24 @@ class AdminService {
     return response.data;
   }
 
+  async getPartnerKYCList(params?: {
+    userId?: string;
+    profileId?: string;
+  }): Promise<ApiResponse<PartnerKYCData[]>> {
+    const response = await axiosInstance.get<ApiResponse<PartnerKYCData[]>>(
+      "/api/admin/kyc/partners",
+      { params },
+    );
+    return response.data;
+  }
+
+  async getPartnerKYCById(id: string): Promise<ApiResponse<PartnerKYCData>> {
+    const response = await axiosInstance.get<ApiResponse<PartnerKYCData>>(
+      `/api/admin/kyc/partners/${id}`,
+    );
+    return response.data;
+  }
+
   async resolveTicket(ticketId: string): Promise<ApiResponse<AdminTicketData>> {
     const response = await axiosInstance.post<ApiResponse<AdminTicketData>>(
       `/api/tickets/admin/${ticketId}/resolve`,
@@ -639,6 +706,21 @@ class AdminService {
     const response = await axiosInstance.get<ApiResponse<any>>(
       `/api/admin/kyc/business-info/${id}`,
     );
+    return response.data;
+  }
+
+  async getAllInvoices(params?: {
+    page?: number;
+    limit?: number;
+    type?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+  }): Promise<ApiResponse<{ invoices: any[]; pagination: any }>> {
+    const response = await axiosInstance.get<
+      ApiResponse<{ invoices: any[]; pagination: any }>
+    >("/api/admin/invoices", { params });
     return response.data;
   }
 }

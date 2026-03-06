@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
+import SpacePartnerKycRequest from "./SpacePartnerKycRequest";
 import { adminService } from "@/services/admin.service";
 import {
   Search,
@@ -55,11 +56,11 @@ interface KYCRequest {
     panNumber?: string;
   };
   overallStatus:
-  | "pending"
-  | "approved"
-  | "rejected"
-  | "resubmit"
-  | "not_started";
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "resubmit"
+    | "not_started";
   documents: KYCDocument[];
   progress?: number;
   createdAt: string;
@@ -838,151 +839,6 @@ export default function KYCRequests() {
             )}
           </div>
         </div>
-      ) : viewMode === "user_business" ? (
-        /* Business Info View */
-        <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-100 flex items-center gap-4">
-            <button
-              onClick={handleBackToRequests}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
-            </button>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">
-                Business Profiles
-              </h2>
-              <p className="text-gray-500 text-sm">
-                Managing business profiles for {selectedUserForBusiness?.name}
-              </p>
-            </div>
-          </div>
-
-          <div className="p-6">
-            {(() => {
-              const profiles = Array.isArray(businessInfo)
-                ? businessInfo
-                : [businessInfo];
-
-              if (profiles.length === 0) {
-                return (
-                  <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                    <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500 font-medium">
-                      No business profiles found.
-                    </p>
-                  </div>
-                );
-              }
-
-              return (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {profiles.map((profile: any, index: number) => {
-                    // console.log("Rendering profile:", profile);
-                    return (
-                      <div
-                        key={profile._id || index}
-                        className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col"
-                      >
-                        {/* Card Header */}
-                        <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-white flex justify-between items-start">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
-                              <Building2 className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <h4 className="font-bold text-gray-900 line-clamp-1">
-                                {profile.companyName || "N/A"}
-                              </h4>
-                              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-                                {profile.profileName || "Business Profile"}
-                              </p>
-                            </div>
-                          </div>
-                          {getStatusBadge(profile.status || "pending")}
-                        </div>
-
-                        {/* Card Body */}
-                        <div className="p-5 space-y-4 flex-1">
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                              <span className="text-xs font-medium text-gray-500 uppercase">
-                                GST Number
-                              </span>
-                              <span className="text-sm font-medium text-gray-900 font-mono">
-                                {profile.gstNumber || "N/A"}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                              <span className="text-xs font-medium text-gray-500 uppercase">
-                                PAN Number
-                              </span>
-                              <span className="text-sm font-medium text-gray-900 font-mono">
-                                {profile.panNumber || "N/A"}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                              <span className="text-xs font-medium text-gray-500 uppercase">
-                                CIN Number
-                              </span>
-                              <span className="text-sm font-medium text-gray-900 font-mono">
-                                {profile.cinNumber || "N/A"}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-xs font-medium text-gray-500 uppercase block mb-1">
-                                Company Type
-                              </span>
-                              <span className="text-sm font-medium text-gray-900">
-                                {profile.companyType || "N/A"}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-xs font-medium text-gray-500 uppercase block mb-1">
-                                Registered Address
-                              </span>
-                              <span
-                                className="text-sm text-gray-700 block line-clamp-2"
-                                title={profile.registeredAddress}
-                              >
-                                {profile.registeredAddress || "N/A"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card Footer */}
-                        <div className="p-4 bg-gray-50 border-t border-gray-100 mt-auto flex items-center justify-between">
-                          <div className="text-xs text-gray-400">
-                            Updated:{" "}
-                            {new Date(
-                              profile.updatedAt || Date.now(),
-                            ).toLocaleDateString()}
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // console.log(
-                              //   "Navigating to business detail:",
-                              //   profile._id,
-                              // );
-                              navigate(
-                                `/admin/kyc-requests/${profile._id}?type=business`,
-                              );
-                            }}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700"
-                          >
-                            View Details
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })()}
-          </div>
-        </div>
       ) : (
         /* Main Tab View */
         <div className="space-y-6">
@@ -991,6 +847,24 @@ export default function KYCRequests() {
             onValueChange={setActiveTab}
             className="space-y-6"
           >
+            <div className="flex justify-end">
+              <TabsList className="inline-flex h-10 items-center justify-center rounded-xl bg-gray-100/50 p-1 text-gray-500 border border-gray-200 shadow-sm">
+                <TabsTrigger
+                  value="users"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-md"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Client KYC
+                </TabsTrigger>
+                <TabsTrigger
+                  value="partners"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-md"
+                >
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Partner KYC
+                </TabsTrigger>
+              </TabsList>
+            </div>
             <TabsContent value="users" className="space-y-6">
               {/* Search Bar */}
               <div className="relative">
@@ -1047,9 +921,9 @@ export default function KYCRequests() {
                               {request.profileName && (
                                 <p className="text-xs text-blue-600 font-medium truncate mt-0.5">
                                   {request.isPartner
-                                    ? "🤝 Partner: "
+                                    ? "≡ƒñ¥ Partner: "
                                     : request.kycType === "business"
-                                      ? "🏢 "
+                                      ? "≡ƒÅó "
                                       : ""}
                                   {request.profileName}
                                 </p>
@@ -1202,7 +1076,7 @@ export default function KYCRequests() {
                               {request.documents?.length || 0})
                             </h4>
                             {request.documents &&
-                              request.documents.length > 0 ? (
+                            request.documents.length > 0 ? (
                               <div className="space-y-2">
                                 {request.documents.map((doc, idx) => (
                                   <div
@@ -1277,241 +1151,7 @@ export default function KYCRequests() {
             </TabsContent>
 
             <TabsContent value="partners" className="space-y-6">
-              {/* Search Bar */}
-              <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="relative max-w-md">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search partners by name, email, or phone..."
-                    value={partnerSearchTerm}
-                    onChange={(e) => setPartnerSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-gray-900 placeholder:text-gray-400"
-                  />
-                </div>
-              </div>
-
-              {/* Partner KYC Requests Grid */}
-              {filteredPartnerRequests.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-16 text-center">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <AlertCircle className="w-10 h-10 text-gray-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    No Partner Requests
-                  </h3>
-                  <p className="text-gray-500">
-                    No partner KYC requests match your criteria.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filteredPartnerRequests.map((request) => (
-                    <div
-                      key={request._id}
-                      className="bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
-                    >
-                      {/* Header */}
-                      <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                        <div className="flex items-center justify-between mb-4 gap-3">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
-                              {request.fullName?.charAt(0) || "P"}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <h3 className="font-bold text-gray-900 truncate">
-                                {request.fullName || "Unknown Partner"}
-                              </h3>
-                              <p className="text-sm text-gray-500 truncate">
-                                {request.email || ""}
-                              </p>
-                              {request.phone && (
-                                <p className="text-xs text-blue-600 font-medium truncate mt-0.5">
-                                  📞 {request.phone}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex-shrink-0 flex flex-col items-end gap-1">
-                            {getStatusBadge(request.status || "pending")}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Partner Details */}
-                      <div className="p-6 space-y-4">
-                        <div className="bg-indigo-50 rounded-xl p-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <User className="w-4 h-4 text-indigo-600" />
-                            <h4 className="text-sm font-semibold text-indigo-900">
-                              Partner Details
-                            </h4>
-                          </div>
-                          <div className="space-y-1 text-sm">
-                            {request.panNumber && (
-                              <p className="text-gray-700">
-                                <span className="font-medium">PAN:</span>{" "}
-                                {request.panNumber}
-                              </p>
-                            )}
-                            {request.aadhaarNumber && (
-                              <p className="text-gray-700">
-                                <span className="font-medium">Aadhaar:</span>{" "}
-                                {request.aadhaarNumber}
-                              </p>
-                            )}
-                            {request.documents && (
-                              <p className="text-gray-700">
-                                <span className="font-medium">Documents:</span>{" "}
-                                {request.documents.length} uploaded
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="p-6 pt-0">
-                        <div className="grid grid-cols-2 gap-3">
-                          {request.overallStatus !== "rejected" && (
-                            <button
-                              onClick={() => openRejectModal(request)}
-                              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 transition-all text-sm font-semibold hover:scale-105"
-                            >
-                              <X className="w-4 h-4" />
-                              Reject
-                            </button>
-                          )}
-                          {request.overallStatus !== "approved" && (
-                            <button
-                              onClick={() => handleApprove(request)}
-                              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-105"
-                            >
-                              <Check className="w-4 h-4" />
-                              Approve
-                            </button>
-                          )}
-                        </div>
-                        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
-                          <Clock className="w-3 h-3" />
-                          Submitted:{" "}
-                          {new Date(request.createdAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="partners" className="space-y-6">
-              {/* Partner Search Bar */}
-              <div className="relative">
-                <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search partners by name, email, or phone..."
-                  value={partnerSearchTerm}
-                  onChange={(e) => setPartnerSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all text-sm shadow-sm"
-                />
-              </div>
-
-              {/* Partner KYC Grid */}
-              {loadingPartnerRequests ? (
-                <div className="p-12 text-center bg-white rounded-[24px] border border-gray-100">
-                  <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                  <p className="text-gray-500">Loading partner requests...</p>
-                </div>
-              ) : filteredPartnerRequests.length === 0 ? (
-                <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm p-16 text-center">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <User className="w-10 h-10 text-gray-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    No Partner Requests
-                  </h3>
-                  <p className="text-gray-500 max-w-sm mx-auto">
-                    No partner KYC requests found.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filteredPartnerRequests.map((request) => (
-                    <div
-                      key={request._id}
-                      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col"
-                    >
-                      <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                              <User className="w-6 h-6 text-indigo-600" />
-                            </div>
-                            <div>
-                              <h3 className="text-lg font-bold text-gray-900">
-                                {request.fullName}
-                              </h3>
-                              <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
-                                <span>{request.email}</span>
-                              </div>
-                              {request.phone && (
-                                <div className="text-sm text-gray-500 mt-0.5">
-                                  {request.phone}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex-shrink-0">
-                            {getStatusBadge(request.status || "pending")}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-6 space-y-4 flex-1">
-                        <div className="bg-indigo-50 rounded-xl p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <User className="w-4 h-4 text-indigo-600" />
-                              <h4 className="text-sm font-semibold text-indigo-900">
-                                Partner Details
-                              </h4>
-                            </div>
-                          </div>
-                          <div className="space-y-1 text-sm">
-                            {request.panNumber && (
-                              <p className="text-gray-700">
-                                <span className="font-medium">PAN:</span>{" "}
-                                {request.panNumber}
-                              </p>
-                            )}
-                            {request.aadhaarNumber && (
-                              <p className="text-gray-700">
-                                <span className="font-medium">Aadhaar:</span>{" "}
-                                {request.aadhaarNumber}
-                              </p>
-                            )}
-                            <p className="text-gray-700">
-                              <span className="font-medium">Documents:</span>{" "}
-                              {request.documents?.length || 0} uploaded
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-6 pt-0">
-                        <button
-                          onClick={() => openPersonalInfoModal(request)}
-                          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all text-sm font-semibold shadow-md hover:shadow-lg hover:scale-[1.02]"
-                        >
-                          <Eye className="w-4 h-4" />
-                          View Details
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <SpacePartnerKycRequest />
             </TabsContent>
           </Tabs>
         </div>
@@ -1654,11 +1294,15 @@ export default function KYCRequests() {
                         controls
                         controlsList="nodownload"
                         className="max-w-full max-h-96 mx-auto rounded-lg shadow-md"
-                        onLoadStart={() => { /* console.log("Video loading started") */ }}
+                        onLoadStart={() => {
+                          /* console.log("Video loading started") */
+                        }}
                         onLoadedMetadata={() => {
                           /* console.log("Video metadata loaded") */
                         }}
-                        onCanPlay={() => { /* console.log("Video can play") */ }}
+                        onCanPlay={() => {
+                          /* console.log("Video can play") */
+                        }}
                         onError={(e) => {
                           console.error("Video load error:", e);
                           console.error("Video URL:", selectedDocument.fileUrl);

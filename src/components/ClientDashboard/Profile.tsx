@@ -40,9 +40,9 @@ interface ProfileDataState {
 const Profile: React.FC = () => {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState<
-    "personal" | "company" | "kyc"
-  >("personal");
+  const [activeTab, setActiveTab] = useState<"personal" | "company" | "kyc">(
+    "personal",
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -91,25 +91,35 @@ const Profile: React.FC = () => {
         // Fetch KYC data for business info
         const kycResponse = await userDashboardService.getKYC();
         if (kycResponse.success && kycResponse.data) {
-          const kyc = Array.isArray(kycResponse.data)
-            ? kycResponse.data[0]
-            : kycResponse.data;
-          setKycData(kyc);
+          const profiles = Array.isArray(kycResponse.data)
+            ? kycResponse.data
+            : [kycResponse.data];
 
-          if (kyc && kyc.businessInfo) {
-            setProfileData((prev) => ({
-              ...prev,
-              registeredAddress: kyc.businessInfo?.address || "",
-            }));
-            setBusinessInfoForm({
-              companyName: kyc.businessInfo.companyName || "",
-              companyType: kyc.businessInfo.companyType || "",
-              gstNumber: kyc.businessInfo.gstNumber || "",
-              panNumber: kyc.businessInfo.panNumber || "",
-              cinNumber: kyc.businessInfo.cinNumber || "",
-              address: kyc.businessInfo.address || "",
-              businessNature: kyc.businessInfo.businessNature || "",
-            });
+          // Find the best profile: approved/verified first, then any profile
+          const approvedKyc = profiles.find(
+            (p) =>
+              p.overallStatus === "approved" || p.overallStatus === "verified",
+          );
+          const kyc = approvedKyc || profiles[0];
+
+          if (kyc) {
+            setKycData(kyc);
+
+            if (kyc.businessInfo) {
+              setProfileData((prev) => ({
+                ...prev,
+                registeredAddress: kyc.businessInfo?.address || "",
+              }));
+              setBusinessInfoForm({
+                companyName: kyc.businessInfo.companyName || "",
+                companyType: kyc.businessInfo.companyType || "",
+                gstNumber: kyc.businessInfo.gstNumber || "",
+                panNumber: kyc.businessInfo.panNumber || "",
+                cinNumber: kyc.businessInfo.cinNumber || "",
+                address: kyc.businessInfo.address || "",
+                businessNature: kyc.businessInfo.businessNature || "",
+              });
+            }
           }
         }
 
@@ -148,10 +158,18 @@ const Profile: React.FC = () => {
         // Refresh data after save
         const kycResponse = await userDashboardService.getKYC();
         if (kycResponse.success && kycResponse.data) {
-          const kyc = Array.isArray(kycResponse.data)
-            ? kycResponse.data[0]
-            : kycResponse.data;
-          setKycData(kyc);
+          const profiles = Array.isArray(kycResponse.data)
+            ? kycResponse.data
+            : [kycResponse.data];
+
+          const approvedKyc = profiles.find(
+            (p) => p.overallStatus === "approved",
+          );
+          const kyc = approvedKyc || profiles[0];
+
+          if (kyc) {
+            setKycData(kyc);
+          }
         }
       }
       setIsEditing(false);
@@ -291,7 +309,7 @@ const Profile: React.FC = () => {
                     {!isEditing ? (
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-[#35503F] text-white rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
                       >
                         <Edit3 className="w-4 h-4" /> Edit Profile
                       </button>
@@ -329,10 +347,11 @@ const Profile: React.FC = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                      ? "bg-[#35503F] text-white"
-                      : "text-gray-600 hover:bg-gray-100"
-                      }`}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      activeTab === tab.id
+                        ? "bg-[#35503F] text-[#FEF8C3]"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
                   >
                     <tab.icon className="w-4 h-4" />
                     <span className="hidden sm:inline">{tab.label}</span>

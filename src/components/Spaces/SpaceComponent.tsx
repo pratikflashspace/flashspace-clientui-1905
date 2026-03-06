@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Star, Wifi, Coffee, Printer, Monitor, Shield, ArrowLeft, ChevronLeft, ChevronRight, Users, MessageCircle, CheckCircle2, Clock } from 'lucide-react';
+import { MapPin, Star, Wifi, Coffee, Printer, Monitor, Shield, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getVirtualOfficeById } from '@/services/virtualOffice.service';
+import { getReviewsBySpaceId, Review } from '@/services/review.service';
 import { VirtualOfficeItem } from '@/types/services';
 import { getVirtualOfficePricing } from '@/utils/priceUtils';
 import { SpaceDetailSkeleton } from '@/components/ui/skeleton-loaders';
@@ -22,6 +23,7 @@ const SpaceComponent = () => {
   const navigate = useNavigate();
   // State for API data
   const [spaceDetails, setSpaceDetails] = useState<VirtualOfficeItem | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   // UI State
@@ -50,8 +52,12 @@ const SpaceComponent = () => {
       setError("");
 
       try {
-        const data = await getVirtualOfficeById(id);
+        const [data, reviewsData] = await Promise.all([
+          getVirtualOfficeById(id),
+          getReviewsBySpaceId(id).catch(() => [] as Review[])
+        ]);
         setSpaceDetails(data);
+        setReviews(reviewsData);
       } catch (err: any) {
         console.error("Error fetching space details:", err);
         setError(err.message || "Failed to load space details");
@@ -105,7 +111,7 @@ const SpaceComponent = () => {
   const handleBookNow = () => {
     if (!spaceDetails || !pricing) return;
     if (spaceDetails.availability?.toLowerCase() === 'unavailable') return;
-    navigate(`/booking/${spaceDetails._id}/complete?plan=${selectedPlan}&type=virtual_office`);
+    navigate(`/booking/${spaceDetails._id}?plan=${selectedPlan}`);
   };
 
   // Loading State - Show Skeleton
@@ -113,7 +119,7 @@ const SpaceComponent = () => {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
-        <main className="relative flex-grow bg-white pt-20">
+        <main className="flex-grow bg-white pt-20">
           <SpaceDetailSkeleton />
         </main>
         <Footer />
@@ -126,9 +132,9 @@ const SpaceComponent = () => {
     return (
       <div className="flex flex-col min-h-screen">
         <Header />
-        <main className="relative flex-grow bg-white pt-20 flex items-center justify-center">
+        <main className="flex-grow bg-white pt-20 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-red-500 text-xl mb-4"> {error || "Space not found"}</p>
+            <p className="text-red-500 text-xl mb-4">😕 {error || "Space not found"}</p>
             <button
               onClick={() => navigate(-1)}
               className="px-6 py-2 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition"
@@ -146,7 +152,7 @@ const SpaceComponent = () => {
 
   return (<div className="flex flex-col min-h-screen">
     <Header />
-    <main className="relative flex-grow bg-white dark:bg-[#0a0a0a] pt-20 transition-colors duration-300">
+    <main className="flex-grow bg-white dark:bg-[#0a0a0a] pt-20 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 py-10 font-poppins text-gray-800 dark:text-gray-100">
 
         {/* --- HEADER SECTION --- */}
@@ -308,56 +314,6 @@ const SpaceComponent = () => {
               </div>
             </div>
 
-            {/* LIVE SPACE ACTIVITY - STATIC METRICS */}
-            <div className="border-b dark:border-white/10 pb-8 mb-8">
-              <h2 className="text-xl font-semibold mb-4 font-geist text-black dark:text-white">Live Space Activity</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Bookings */}
-                <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10 hover:border-yellow-400/50 transition-colors group">
-                  <div className="p-2.5 bg-blue-100/50 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-                    <Users className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Bookings</p>
-                    <p className="font-bold text-black dark:text-white">24 This Month</p>
-                  </div>
-                </div>
-
-                {/* Queries */}
-                <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10 hover:border-yellow-400/50 transition-colors group">
-                  <div className="p-2.5 bg-purple-100/50 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
-                    <MessageCircle className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Queries</p>
-                    <p className="font-bold text-black dark:text-white">15 Enquiries/Week</p>
-                  </div>
-                </div>
-
-                {/* Approval Rates */}
-                <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10 hover:border-yellow-400/50 transition-colors group">
-                  <div className="p-2.5 bg-green-100/50 dark:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform">
-                    <CheckCircle2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Approval Rate</p>
-                    <p className="font-bold text-black dark:text-white">98% Success</p>
-                  </div>
-                </div>
-
-                {/* Avg Documentation Time */}
-                <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10 hover:border-yellow-400/50 transition-colors group">
-                  <div className="p-2.5 bg-orange-100/50 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-transform">
-                    <Clock className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Avg Doc Time</p>
-                    <p className="font-bold text-black dark:text-white">~2 Days</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-4 font-geist text-black dark:text-white">Where you'll be</h2>
               <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden relative">
@@ -373,6 +329,47 @@ const SpaceComponent = () => {
               </div>
               <p className="mt-2 text-sm text-gray-500">{spaceDetails.address}</p>
             </div>
+
+            {/* Reviews Section */}
+            {reviews.length > 0 && (
+              <div className="mb-8 border-t dark:border-white/10 pt-8">
+                <div className="flex items-center gap-2 mb-6">
+                  <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                  <h2 className="text-xl font-semibold font-geist text-black dark:text-white">
+                    {spaceDetails.rating} · {reviews.length} reviews
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {reviews.map((review) => (
+                    <div key={review._id} className="bg-gray-50 dark:bg-white/5 rounded-xl p-5 border border-gray-100 dark:border-white/10">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center font-bold text-gray-600 dark:text-gray-300">
+                          {review.user?.fullName?.charAt(0) || 'U'}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-gray-100 leading-none mb-1">
+                            {review.user?.fullName || 'Anonymous'}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200 dark:fill-gray-600 dark:text-gray-600'}`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* RIGHT COLUMN: Sticky Booking Card */}

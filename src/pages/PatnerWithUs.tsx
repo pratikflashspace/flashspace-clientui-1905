@@ -1,54 +1,99 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Building2,
-  Users,
   TrendingUp,
   Globe,
+  Headphones,
+  BarChart3,
+  Shield,
   CheckCircle2,
   ArrowRight,
-  Phone,
-  Mail,
-  MapPin,
-  Handshake,
-  Award,
-  Target,
+  FileText,
+  BadgeCheck,
+  Coins,
   Zap,
-  Star,
-  Briefcase,
-  Shield,
-  Clock,
-  Rocket,
-  DollarSign,
-  HeartHandshake,
-  TrendingUpIcon,
-  CheckCircle
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { submitPartnerInquiry } from "@/services/partnerInquiry.service";
+import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
+
+const benefits = [
+  {
+    icon: TrendingUp,
+    title: "Maximize Occupancy",
+    description:
+      "Fill empty desks and rooms with our network of verified professionals and enterprises.",
+  },
+  {
+    icon: Globe,
+    title: "Pan-India Reach",
+    description:
+      "Get discovered by businesses across India through our platform and sales team.",
+  },
+  {
+    icon: BarChart3,
+    title: "AI-Powered Insights",
+    description:
+      "Access real-time analytics on demand trends, pricing, and occupancy optimization.",
+  },
+  {
+    icon: Headphones,
+    title: "Dedicated Support",
+    description:
+      "A dedicated account manager and 24/7 support to help you grow your business.",
+  },
+  {
+    icon: Shield,
+    title: "Verified Clients",
+    description:
+      "All clients are verified through our platform, so you can focus on delivering great experiences.",
+  },
+  {
+    icon: Building2,
+    title: "Flexible Listing",
+    description:
+      "List hot desks, private offices, meeting rooms, or virtual office plans — your call.",
+  },
+];
+
+const stats = [
+  { value: "500+", label: "Partner Spaces" },
+  { value: "68+", label: "Cities" },
+  { value: "95%", label: "Partner Retention" },
+  { value: "3x", label: "Average Revenue Lift" },
+];
+
+const fadeInProps = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-100px" },
+  transition: { duration: 0.8, ease: "easeOut" },
+} as const;
+
+const staggerContainerProps = {
+  initial: { opacity: 0 },
+  whileInView: { opacity: 1 },
+  viewport: { once: true, margin: "-100px" },
+  transition: { staggerChildren: 0.1 },
+} as const;
 
 const PartnerWithUs = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    company: "",
-    partnershipType: "",
+    spaceName: "",
+    city: "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,858 +104,494 @@ const PartnerWithUs = () => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        company: formData.company,
-        partnershipType: formData.partnershipType,
-        message: formData.message,
+        company: formData.spaceName,
+        partnershipType: "Workspace Partner",
+        message: `City: ${formData.city}. ${formData.message}`,
       });
 
-      toast.success("Thank you for your interest! Our partnership team will contact you within 24 hours.");
+      toast.success(
+        "Thank you for your interest! Our partnership team will contact you within 24 hours.",
+      );
 
-      // Reset form
       setFormData({
         name: "",
         email: "",
         phone: "",
-        company: "",
-        partnershipType: "",
+        spaceName: "",
+        city: "",
         message: "",
       });
     } catch (error: any) {
-      console.error('Partnership submission error:', error);
-      toast.error(error.message || "Failed to submit partnership request. Please try again.");
+      console.error("Partnership submission error:", error);
+      toast.error(
+        error.message ||
+        "Failed to submit partnership request. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const partnershipTypes = [
-    {
-      icon: Building2,
-      title: "Property Partners",
-      description: "List your commercial space with us and earn consistent revenue",
-      benefits: ["Guaranteed occupancy", "Professional management", "Marketing support", "Revenue sharing"],
-      color: "from-yellow-500/20 to-orange-500/20",
-      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80"
-    },
-    {
-      icon: Users,
-      title: "Corporate Partners",
-      description: "Provide flexible workspace solutions for your employees",
-      benefits: ["Custom solutions", "Dedicated support", "Volume discounts", "Pan-India access"],
-      color: "from-blue-500/20 to-purple-500/20",
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80"
-    },
-    {
-      icon: Handshake,
-      title: "Business Associates",
-      description: "Join our network and help us expand our reach",
-      benefits: ["Attractive commissions", "Training & support", "Exclusive leads", "Growth opportunities"],
-      color: "from-green-500/20 to-teal-500/20",
-      image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&q=80"
-    },
-    {
-      icon: Globe,
-      title: "Strategic Alliance",
-      description: "Collaborate with us to create innovative workspace solutions",
-      benefits: ["Co-branding opportunities", "Technology integration", "Joint marketing", "Revenue sharing"],
-      color: "from-pink-500/20 to-red-500/20",
-      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80"
-    }
-  ];
-
-  const stats = [
-    { number: "500+", label: "Partner Spaces", icon: Building2 },
-    { number: "50+", label: "Cities Covered", icon: Globe },
-    { number: "10,000+", label: "Happy Clients", icon: Users },
-    { number: "98%", label: "Partner Satisfaction", icon: Award }
-  ];
-
-  const benefits = [
-    {
-      icon: TrendingUp,
-      title: "Revenue Growth",
-      description: "Increase your property's revenue by up to 40% with our proven business model",
-      gradient: "from-yellow-400 to-orange-500"
-    },
-    {
-      icon: Target,
-      title: "Zero Hassle",
-      description: "We handle operations, marketing, and customer service - you just earn",
-      gradient: "from-blue-400 to-purple-500"
-    },
-    {
-      icon: Zap,
-      title: "Quick Setup",
-      description: "Get your space listed and operational within 7 days",
-      gradient: "from-green-400 to-teal-500"
-    },
-    {
-      icon: Star,
-      title: "Premium Branding",
-      description: "Leverage our strong brand presence and marketing expertise",
-      gradient: "from-pink-400 to-red-500"
-    }
-  ];
-
-  const successStories = [
-    {
-      name: "Rajesh Kumar",
-      role: "Property Owner, Mumbai",
-      image: "https://randomuser.me/api/portraits/men/32.jpg",
-      quote: "FlashSpace transformed my vacant office space into a profitable asset. Revenue increased by 45% in just 3 months!",
-      rating: 5
-    },
-    {
-      name: "Priya Sharma",
-      role: "Corporate Partner, Bangalore",
-      image: "https://randomuser.me/api/portraits/women/44.jpg",
-      quote: "The flexibility and pan-India coverage have been game-changers for our remote workforce. Highly recommended!",
-      rating: 5
-    },
-    {
-      name: "Amit Patel",
-      role: "Business Associate, Delhi",
-      image: "https://randomuser.me/api/portraits/men/52.jpg",
-      quote: "The commission structure is excellent, and the support team is always there to help. Best partnership decision ever!",
-      rating: 5
-    }
-  ];
-
-  const processSteps = [
-    {
-      step: "01",
-      title: "Submit Inquiry",
-      description: "Fill out our partnership form with your details and requirements",
-      icon: Mail,
-      color: "bg-yellow-500"
-    },
-    {
-      step: "02",
-      title: "Initial Discussion",
-      description: "Our team schedules a call to understand your goals and opportunities",
-      icon: Phone,
-      color: "bg-blue-500"
-    },
-    {
-      step: "03",
-      title: "Site Visit & Assessment",
-      description: "We evaluate your space or business model for partnership fit",
-      icon: MapPin,
-      color: "bg-green-500"
-    },
-    {
-      step: "04",
-      title: "Agreement & Onboarding",
-      description: "Sign partnership agreement and begin onboarding process",
-      icon: CheckCircle,
-      color: "bg-purple-500"
-    },
-    {
-      step: "05",
-      title: "Launch & Grow",
-      description: "Go live and start earning with our full support",
-      icon: Rocket,
-      color: "bg-pink-500"
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a] transition-colors duration-300">
+    <div className="min-h-screen bg-white transition-colors duration-300">
       <Header />
-
-      {/* Hero Section (Clean 2-Column Layout) */}
-      <section className="relative min-h-[90vh] flex items-center bg-slate-50 dark:bg-[#0B1120] overflow-hidden">
-        {/* Background Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white via-amber-50/30 to-white dark:from-[#0B1120] dark:via-[#111] dark:to-[#1a1a1a]" />
-
-        {/* Decorative Blob */}
-        <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-[#EFAD1A]/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="container mx-auto px-4 relative z-10 w-full pt-20 pb-10">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-            {/* LEFT COLUMN: Text Content */}
+      <main>
+        {/* Hero Section - Centered and Premium */}
+        <section className="relative pt-32 pb-16 lg:pt-48 lg:pb-32 overflow-hidden illustrated-bg">
+          <div className="container mx-auto px-4 lg:px-8 relative">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-left relative z-20"
+              className="max-w-4xl mx-auto text-center"
             >
-              <div className="inline-flex items-center gap-2 bg-white dark:bg-white/5 border border-amber-200 dark:border-white/10 px-4 py-2 rounded-full mb-8 shadow-sm">
-                <Handshake className="w-4 h-4 text-[#EFAD1A]" />
-                <span className="text-sm font-bold tracking-wide text-slate-800 dark:text-white">Join Our Network</span>
-              </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 border border-slate-100 text-[#334d3d] text-sm font-semibold mb-8 shadow-sm"
+              >
+                <Zap className="w-4 h-4" />
+                <span>India's #1 Workspace Network</span>
+              </motion.div>
 
-              <h1 className="font-grotesk text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-[1.1] text-slate-900 dark:text-white tracking-tight">
-                Partner with <br />
-                <span className="text-[#EFAD1A]">FlashSpace</span>
+              <h1 className="text-5xl lg:text-8xl font-medium tracking-tight mb-8 leading-[1.05] text-[#1A1A1A]">
+                Partner with us. <br />
+                <span className="text-[#334d3d]">Grow your business.</span>
               </h1>
 
-              <p className="text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-lg leading-relaxed font-medium">
-                Monetize your commercial real estate and unlock consistent revenue streams by joining India's fastest-growing workspace network.
+              <p className="text-lg lg:text-2xl text-slate-500 max-w-2xl mx-auto mb-12 leading-relaxed font-normal">
+                Join our network of verified professionals. List your space,
+                reach thousands of clients, and leverage our AI-powered growth
+                tools.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
                 <Button
-                  onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="px-8 py-6 bg-[#EFAD1A] hover:bg-[#d69f03] text-slate-900 text-lg rounded-full font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                  onClick={() =>
+                    document
+                      .getElementById("partner-form")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                  size="lg"
+                  className="bg-[#334d3d] text-white hover:bg-[#26392d] font-bold px-10 h-14 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto"
                 >
-                  Become a Partner
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  List Your Space <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
                 <Button
-                  onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })}
-                  variant="outline"
-                  className="px-8 py-6 border-2 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 text-lg rounded-full font-bold transition-all duration-300"
+                  onClick={() => setIsMeetingModalOpen(true)}
+                  size="lg"
+                  variant="ghost"
+                  className="font-semibold px-8 h-14 rounded-2xl text-slate-600 hover:text-[#334d3d] hover:bg-slate-50 transition-all duration-300"
                 >
-                  Explore Benefits
+                  Talk to Our Team
                 </Button>
               </div>
             </motion.div>
+          </div>
+        </section>
 
-            {/* RIGHT COLUMN: Floating Cluster */}
-            {/* RIGHT COLUMN: Complex Floating Cluster */}
-            <div className="relative h-[650px] w-full hidden lg:block perspective-1000">
-
-              {/* 1. Top Left - Tall w/ Brick Wall */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: [0, -15, 0] }} transition={{ opacity: { delay: 0.2 }, y: { repeat: Infinity, duration: 6, ease: "easeInOut" } }}
-                className="absolute top-[0%] left-[5%] z-20"
-              >
-                <div className="w-44 h-64 rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222]">
-                  <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=500&q=80" alt="Meeting" className="w-full h-full object-cover" />
-                </div>
-                {/* Pill: Verified */}
-                <div className="absolute -bottom-4 -left-8 bg-white dark:bg-[#222] px-4 py-2 rounded-full shadow-xl flex items-center gap-2 z-30 animate-bounce-slow">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                    <Shield className="w-4 h-4" />
+        {/* Stats Section - Clean and Glassy */}
+        <section className="py-12 border-y border-border organic-bg overflow-hidden">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={{
+                initial: { opacity: 0 },
+                animate: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.15,
+                  },
+                },
+              }}
+              className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
+            >
+              {stats.map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  variants={{
+                    initial: { opacity: 0, y: 30, filter: "blur(10px)" },
+                    animate: { opacity: 1, y: 0, filter: "blur(0px)" },
+                  }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="text-center group"
+                >
+                  <div className="text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-2 group-hover:text-[#334d3d] transition-colors duration-300">
+                    {stat.value}
                   </div>
-                  <span className="font-bold text-slate-800 dark:text-white text-xs">Verified Partner</span>
-                </div>
-              </motion.div>
-
-              {/* 2. Top Right - Bright Office */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: [0, -10, 0] }} transition={{ opacity: { delay: 0.4 }, y: { repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 } }}
-                className="absolute top-[5%] right-[5%] z-10"
-              >
-                <div className="w-56 h-56 rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222]">
-                  <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80" alt="Office" className="w-full h-full object-cover" />
-                </div>
-                {/* Pill: Support */}
-                <div className="absolute top-8 -left-20 bg-white dark:bg-[#222] px-4 py-2 rounded-full shadow-xl flex items-center gap-2 z-30">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                    <Phone className="w-4 h-4" />
+                  <div className="text-xs lg:text-sm text-slate-400 font-bold uppercase tracking-widest">
+                    {stat.label}
                   </div>
-                  <span className="font-bold text-slate-800 dark:text-white text-xs">24/7 Support</span>
-                </div>
-              </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
 
-              {/* 3. Center - Industrial */}
+        {/* Benefits Section - Glassy Cards */}
+        <section className="py-24 lg:py-32 organic-bg relative">
+          <div className="container mx-auto px-4 lg:px-8">
+            <motion.div {...fadeInProps} className="mb-20 text-center">
+              <h2 className="text-4xl lg:text-5xl font-bold text-[#1A1A1A] tracking-tight mb-6">
+                Why partner with us?
+              </h2>
+              <p className="text-slate-500 text-xl max-w-2xl mx-auto leading-relaxed">
+                We provide the technology, reach, and support you need to scale
+                your workspace business effortlessly.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true, amount: 0.1 }}
+              variants={{
+                initial: { opacity: 0 },
+                animate: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.1,
+                  },
+                },
+              }}
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              {benefits.map((b, i) => {
+                const Icon = b.icon;
+                return (
+                  <motion.div
+                    key={b.title}
+                    variants={{
+                      initial: {
+                        opacity: 0,
+                        y: 50,
+                        x: i % 3 === 0 ? -20 : i % 3 === 2 ? 20 : 0,
+                      },
+                      animate: { opacity: 1, y: 0, x: 0 },
+                    }}
+                    transition={{
+                      duration: 0.8,
+                      ease: [0.21, 0.47, 0.32, 0.98],
+                    }}
+                    whileHover={{ y: -8 }}
+                    className="p-10 rounded-3xl border border-border glass-card hover:bg-primary/[0.02] hover:border-primary/20 hover:shadow-2xl transition-all duration-500 group relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#334d3d]/[0.03] rounded-bl-full -mr-10 -mt-10 group-hover:bg-[#334d3d]/[0.08] transition-colors duration-500" />
+
+                    <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-[#334d3d] transition-all duration-500">
+                      <Icon className="w-7 h-7 text-[#334d3d] group-hover:text-white transition-colors duration-500" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-[#1A1A1A] mb-4">
+                      {b.title}
+                    </h3>
+                    <p className="text-slate-500 text-lg leading-relaxed">
+                      {b.description}
+                    </p>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* How it works Section - Minimalist Timeline */}
+        <section className="py-24 organic-bg relative overflow-hidden">
+          <div className="container mx-auto px-4 lg:px-8 relative z-10 w-full">
+            <motion.div {...fadeInProps} className="text-center mb-24">
+              <h2 className="text-4xl lg:text-5xl font-bold text-[#1A1A1A] tracking-tight">
+                How it works
+              </h2>
+            </motion.div>
+
+            <div className="relative max-w-5xl mx-auto">
+              {/* Connector lines animation */}
+              <div className="hidden lg:block absolute top-[28px] left-[15%] right-[15%] z-0">
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 }}
+                  style={{ originX: 0 }}
+                  className="h-[2px] bg-gradient-to-r from-slate-100 via-[#334d3d]/20 to-slate-100 w-full"
+                />
+              </div>
+
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1, y: [0, -18, 0] }} transition={{ opacity: { delay: 0.6 }, scale: { delay: 0.6 }, y: { repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 0.5 } }}
-                className="absolute top-[28%] left-[32%] z-30"
+                {...staggerContainerProps}
+                className="grid lg:grid-cols-3 gap-12 relative z-10"
               >
-                <div className="w-48 h-48 rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222]">
-                  <img src="https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?w=500&q=80" alt="Coworking" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
+                {[
+                  {
+                    step: "01",
+                    title: "Apply",
+                    desc: "Fill out the form below with your workspace details.",
+                    Icon: FileText,
+                  },
+                  {
+                    step: "02",
+                    title: "Onboard",
+                    desc: "Our team verifies and lists your space within 48 hours.",
+                    Icon: BadgeCheck,
+                  },
+                  {
+                    step: "03",
+                    title: "Earn",
+                    desc: "Start receiving bookings and grow your revenue.",
+                    Icon: Coins,
+                  },
+                ].map((item, i) => (
+                  <motion.div
+                    key={item.step}
+                    variants={{
+                      initial: { opacity: 0, y: 30, scale: 0.95 },
+                      whileInView: { opacity: 1, y: 0, scale: 1 },
+                    }}
+                    whileHover={{ y: -5 }}
+                    className="flex flex-col items-center text-center group cursor-default"
+                  >
+                    <motion.div
+                      whileHover={{ rotate: 5, scale: 1.1 }}
+                      className="w-14 h-14 rounded-full bg-white flex items-center justify-center mb-8 border border-slate-100 shadow-sm group-hover:border-[#334d3d]/30 group-hover:shadow-md transition-all duration-300 relative z-10"
+                    >
+                      <item.Icon className="w-6 h-6 text-[#334d3d]" />
+                    </motion.div>
 
-              {/* 4. Center Right - Laptop Small */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0, y: [0, -12, 0] }} transition={{ opacity: { delay: 0.8 }, x: { delay: 0.8 }, y: { repeat: Infinity, duration: 6.5, ease: "easeInOut", delay: 1.5 } }}
-                className="absolute top-[45%] right-[2%] z-20"
-              >
-                <div className="w-32 h-32 rounded-[1.5rem] overflow-hidden shadow-xl border-[5px] border-white dark:border-[#222]">
-                  <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&q=80" alt="Laptop" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      transition={{ delay: 0.2 + i * 0.2 }}
+                      className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em] mb-3 group-hover:text-[#334d3d] transition-colors"
+                    >
+                      Step {item.step}
+                    </motion.span>
 
-              {/* 5. Bottom Left - Wide City */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0, y: [0, -20, 0] }} transition={{ opacity: { delay: 1.0 }, x: { delay: 1.0 }, y: { repeat: Infinity, duration: 8, ease: "easeInOut", delay: 2 } }}
-                className="absolute bottom-[20%] left-[-5%] z-20"
-              >
-                <div className="w-64 h-36 rounded-[2rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-[#222]">
-                  <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80" alt="City" className="w-full h-full object-cover" />
-                </div>
-              </motion.div>
+                    <h3 className="text-2xl font-bold text-[#1A1A1A] mb-4 group-hover:translate-y-[-2px] transition-transform duration-300">
+                      {item.title}
+                    </h3>
+                    <p className="text-slate-500 leading-relaxed text-base max-w-[240px] group-hover:text-slate-600 transition-colors">
+                      {item.desc}
+                    </p>
 
-              {/* 6. Middle Left - People */}
-              <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1, y: [0, -14, 0] }} transition={{ opacity: { delay: 1.2 }, y: { repeat: Infinity, duration: 7.5, ease: "easeInOut", delay: 0.8 } }}
-                className="absolute bottom-[28%] left-[25%] z-10"
-              >
-                <div className="w-40 h-40 rounded-[2rem] overflow-hidden shadow-lg border-[5px] border-white dark:border-[#222]">
-                  <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=500&q=80" alt="Team" className="w-full h-full object-cover" />
-                </div>
+                    {/* Hover Glow Effect */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-[#334d3d]/[0.02] rounded-full blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                  </motion.div>
+                ))}
               </motion.div>
-
-              {/* 7. Bottom Right - Large Tall Lounge */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: [0, -16, 0] }} transition={{ opacity: { delay: 1.4 }, y: { repeat: Infinity, duration: 9, ease: "easeInOut", delay: 0.2 } }}
-                className="absolute -bottom-[5%] right-[8%] z-40"
-              >
-                <div className="w-60 h-80 rounded-[3rem] overflow-hidden shadow-2xl border-[8px] border-white dark:border-[#222]">
-                  <img src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600&q=80" alt="Lounge" className="w-full h-full object-cover" />
-                </div>
-                {/* Pill: Prime Locations */}
-                <div className="absolute top-12 -right-12 bg-white dark:bg-[#222] px-5 py-3 rounded-full shadow-xl flex items-center gap-2 z-50">
-                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                  <span className="font-bold text-slate-800 dark:text-white text-sm">High Occupancy</span>
-                </div>
-                {/* Pill: Business Address */}
-                <div className="absolute bottom-8 -left-10 bg-white dark:bg-[#222] px-5 py-3 rounded-full shadow-xl flex items-center gap-3 z-50">
-                  <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-                    <Building2 className="w-4 h-4" />
-                  </div>
-                  <span className="font-bold text-slate-800 dark:text-white text-sm">Premium Brand</span>
-                </div>
-              </motion.div>
-
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Stats Section (Clean) */}
-      <section className="py-10 border-y border-slate-100 dark:border-white/10 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-md relative z-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-slate-100 dark:divide-white/5">
-            {stats.map((stat, index) => (
+        {/* Partner Form Section - Column Layout matching image */}
+        <section className="py-24 lg:py-32 organic-bg" id="partner-form">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="grid lg:grid-cols-[1fr,1.2fr] gap-16 lg:gap-24 items-start">
+              {/* Left Column */}
               <motion.div
-                key={index}
-                className="text-center px-4 group cursor-default"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                initial={{ opacity: 1, x: 10 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
               >
-                <div className="mb-3 inline-flex p-3 rounded-2xl bg-[#EFAD1A]/10 text-[#EFAD1A] group-hover:scale-110 transition-transform duration-300">
-                  <stat.icon className="w-6 h-6" />
-                </div>
-                <div className="text-3xl md:font-grotesk text-4xl font-bold text-slate-900 dark:text-white mb-1">
-                  {stat.number}
-                </div>
-                <div className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Partnership Types Section */}
-      <section className="py-24 px-4 bg-white dark:bg-[#0a0a0a] relative transition-colors duration-300">
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
-          backgroundSize: '40px 40px'
-        }}></div>
-
-        <div className="container mx-auto max-w-7xl relative z-10">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="font-grotesk text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4">
-              Partnership <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">Opportunities</span>
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Choose the partnership model that aligns with your business vision
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {partnershipTypes.map((type, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="group hover:shadow-2xl transition-all duration-500 border border-slate-200 hover:border-[#EFAD1A] overflow-hidden h-full bg-white dark:bg-[#1f1f1f] dark:border-white/10">
-                  {/* Image Section */}
-                  <div className="relative h-56 overflow-hidden">
-                    <img
-                      src={type.image}
-                      alt={type.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all"></div>
-                  </div>
-
-                  <CardContent className="p-8 relative">
-                    <div className="absolute -top-10 right-8 p-4 bg-white dark:bg-[#1f1f1f] rounded-2xl shadow-lg border border-slate-100 dark:border-white/10 group-hover:scale-110 transition-transform">
-                      <type.icon className="w-8 h-8 text-[#EFAD1A]" />
-                    </div>
-
-                    <h3 className="font-grotesk text-2xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-[#EFAD1A] transition-colors">
-                      {type.title}
-                    </h3>
-                    <p className="text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
-                      {type.description}
-                    </p>
-
-                    <div className="space-y-3 mb-8">
-                      {type.benefits.map((benefit, idx) => (
-                        <div key={idx} className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                          <span className="text-slate-600 dark:text-slate-300 text-sm font-medium">{benefit}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <Button
-                      onClick={() => {
-                        handleInputChange('partnershipType', type.title);
-                        document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-[#EFAD1A] dark:hover:bg-[#EFAD1A] rounded-xl py-6 font-bold shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                      Get Started
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section id="benefits" className="py-24 px-4 bg-slate-50 dark:bg-[#0f172a] relative overflow-hidden transition-colors duration-300">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#EFAD1A]/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
-
-        <div className="container mx-auto max-w-7xl relative z-10">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="font-grotesk text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4">
-              Why Partner with <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">Us?</span>
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Experience the FlashSpace advantage and accelerate your business growth
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {benefits.map((benefit, index) => (
-              <motion.div
-                key={index}
-                className="group text-center"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -10 }}
-              >
-                <div className={`inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br ${benefit.gradient} rounded-2xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg`}>
-                  <benefit.icon className="w-12 h-12 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-yellow-600 transition-colors">
-                  {benefit.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {benefit.description}
+                <h2 className="text-5xl lg:text-7xl font-bold text-[#1a2d1d] tracking-tight mb-6">
+                  List your space today
+                </h2>
+                <p className="text-[#334d3d] text-xl lg:text-2xl leading-relaxed mb-12">
+                  Fill in your details and our partnership team will get in touch
+                  within 24 hours.
                 </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Success Stories / Testimonials */}
-      <section className="py-24 px-4 bg-white dark:bg-[#0a0a0a] relative overflow-hidden">
-
-        <div className="container mx-auto max-w-7xl relative z-10">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="font-grotesk text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4">
-              Success <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EFAD1A] to-amber-500">Stories</span>
-            </h2>
-            <p className="text-lg text-slate-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Hear from our partners who are thriving with FlashSpace
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {successStories.map((story, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.15 }}
-              >
-                <Card className="bg-slate-50 dark:bg-[#1f1f1f] border border-slate-100 dark:border-white/10 hover:border-[#EFAD1A] transition-all duration-300 hover:shadow-xl hover:-translate-y-2 h-full">
-                  <CardContent className="p-8">
-                    {/* Rating Stars */}
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(story.rating)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
-
-                    {/* Quote */}
-                    <p className="text-slate-600 dark:text-gray-300 mb-6 italic leading-relaxed">
-                      "{story.quote}"
-                    </p>
-
-                    {/* Author */}
-                    <div className="flex items-center gap-4 pt-4 border-t border-slate-200 dark:border-white/10">
-                      <img
-                        src={story.image}
-                        alt={story.name}
-                        className="w-14 h-14 rounded-full border-2 border-[#EFAD1A]"
-                      />
-                      <div>
-                        <h4 className="font-bold text-slate-900 dark:text-white">{story.name}</h4>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{story.role}</p>
+                <div className="space-y-6 mb-16">
+                  {[
+                    "Zero listing fees — we only earn when you do",
+                    "Full control over pricing and availability",
+                    "Dashboard to manage bookings and clients",
+                    "Marketing support and premium placement",
+                  ].map((point, i) => (
+                    <motion.div
+                      key={point}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
+                      className="flex items-center gap-5"
+                    >
+                      <div className="w-7 h-7 rounded-full border-[#1a2d1d]/30 border flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-4 h-4 text-[#1a2d1d]" />
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+                      <span className="text-lg text-[#1a2d1d] font-medium">
+                        {point}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
 
-      {/* Process Timeline Section */}
-      <section className="py-24 px-4 bg-gradient-to-br from-amber-50 via-white to-yellow-50/30 dark:from-[#1a1a1a] dark:via-black dark:to-[#111] relative transition-colors duration-300">
-        <div className="container mx-auto max-w-7xl">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="font-grotesk text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4">
-              Partnership <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">Process</span>
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Your journey to becoming a FlashSpace partner in 5 simple steps
-            </p>
-          </motion.div>
-
-          <div className="relative">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative">
-              {processSteps.map((step, index) => (
                 <motion.div
-                  key={index}
-                  className="text-center"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: 0.6, duration: 0.8 }}
+                  className="grid grid-cols-2 gap-4"
                 >
-                  {/* Icon Circle */}
-                  <div className="relative inline-block mb-6">
-                    <div className={`${step.color} w-20 h-20 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform duration-300 relative z-10`}>
-                      <step.icon className="w-10 h-10 text-white" />
+                  {[
+                    { value: "48hrs", label: "Average Onboarding" },
+                    { value: "95%", label: "Partner Retention" },
+                    { value: "3x", label: "Revenue Uplift" },
+                    { value: "24/7", label: "Support Available" },
+                  ].map((s) => (
+                    <div
+                      key={s.label}
+                      className="bg-[#FEFCE8] rounded-[2rem] p-8 text-center flex flex-col justify-center items-center shadow-sm"
+                    >
+                      <div className="text-3xl font-bold text-[#334d3d] mb-1">
+                        {s.value}
+                      </div>
+                      <div className="text-sm text-[#334d3d] font-medium leading-tight">
+                        {s.label}
+                      </div>
                     </div>
-                    <div className="absolute -top-3 -right-3 bg-white border-4 border-yellow-400 rounded-full w-10 h-10 flex items-center justify-center font-bold text-slate-900 z-20">
-                      {step.step}
-                    </div>
-                  </div>
-
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {step.description}
-                  </p>
+                  ))}
                 </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+              </motion.div>
 
-      {/* Contact Form Section */}
-      <section id="contact-form" className="py-24 px-4 bg-white dark:bg-black transition-colors duration-300">
-        {/* 🟢 FORM stays inside narrow container */}
-        <div className="container mx-auto max-w-4xl">
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2
-              className="font-grotesk text-4xl md:text-6xl font-bold text-slate-900 dark:text-white mb-4"
+              {/* Right Column - Form Container */}
+              <motion.div
+                initial={{ opacity: 1, y: 20, scale: 1 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-white border border-black/20 rounded-[2.5rem] p-8 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden"
+              >
+                {/* Subtle Form Background Glow */}
+                {/* <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#334d3d]/[0.03] blur-[60px] rounded-full pointer-events-none" /> */}
 
-            >
-              Let's Build{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-amber-500">
-                Together
-              </span>
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              Fill out the form below and our partnership team will reach out to you
-              within 24 hours
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <Card className="border-2 border-gray-100 dark:border-white/10 shadow-2xl hover:shadow-yellow-400/20 transition-shadow duration-300 bg-white dark:bg-[#1a1a1a]">
-              <CardContent className="p-8 md:p-12">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="name"
-                        className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2"
-                      >
-                        <Users className="w-4 h-4" />
-                        Full Name *
-                      </Label>
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-6 relative z-10  "
+                >
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <div className="space-y-2.5">
+                      <label className="text-base font-semibold text-[#1A1A1A]">
+                        Your Name
+                      </label>
                       <Input
-                        id="name"
                         value={formData.name}
-                        onChange={(e) => handleInputChange("name", e.target.value)}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
                         placeholder="John Doe"
-                        className="border-gray-300 dark:border-white/20 dark:bg-black/30 dark:text-white focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
                         required
+                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="email"
-                        className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2"
-                      >
-                        <Mail className="w-4 h-4" />
-                        Email *
-                      </Label>
+                    <div className="space-y-2.5">
+                      <label className="text-base font-semibold text-[#1A1A1A]">
+                        Email
+                      </label>
                       <Input
-                        id="email"
                         type="email"
                         value={formData.email}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
-                        placeholder="john@example.com"
-                        className="border-gray-300 dark:border-white/20 dark:bg-black/30 dark:text-white focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
+                        placeholder="john@workspace.com"
                         required
+                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="phone"
-                        className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2"
-                      >
-                        <Phone className="w-4 h-4" />
-                        Phone Number *
-                      </Label>
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <div className="space-y-2.5">
+                      <label className="text-base font-semibold text-[#1A1A1A]">
+                        Phone
+                      </label>
                       <Input
-                        id="phone"
                         type="tel"
                         value={formData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                        placeholder="+91 XXXXX XXXXX"
-                        className="border-gray-300 dark:border-white/20 dark:bg-black/30 dark:text-white focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                        onChange={(e) =>
+                          setFormData({ ...formData, phone: e.target.value })
+                        }
+                        placeholder="+91 98765 43210"
                         required
+                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="company"
-                        className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2"
-                      >
-                        <Building2 className="w-4 h-4" />
-                        Company Name
-                      </Label>
+                    <div className="space-y-2.5">
+                      <label className="text-base font-semibold text-[#1A1A1A]">
+                        Space Name
+                      </label>
                       <Input
-                        id="company"
-                        value={formData.company}
-                        onChange={(e) => handleInputChange("company", e.target.value)}
-                        placeholder="Your Company"
-                        className="border-gray-300 dark:border-white/20 dark:bg-black/30 dark:text-white focus:border-yellow-400 focus:ring-yellow-400/20 h-12"
+                        value={formData.spaceName}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            spaceName: e.target.value,
+                          })
+                        }
+                        placeholder="Your Workspace Name"
+                        required
+                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="partnershipType"
-                      className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-2"
-                    >
-                      <Handshake className="w-4 h-4" />
-                      Partnership Type *
-                    </Label>
-                    <select
-                      id="partnershipType"
-                      value={formData.partnershipType}
+                  <div className="space-y-2.5">
+                    <label className="text-base font-semibold text-[#1A1A1A]">
+                      City
+                    </label>
+                    <Input
+                      value={formData.city}
                       onChange={(e) =>
-                        handleInputChange("partnershipType", e.target.value)
+                        setFormData({ ...formData, city: e.target.value })
                       }
-                      className="w-full h-12 px-4 border border-gray-300 dark:border-white/20 rounded-md focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 bg-white dark:bg-black/30 dark:text-white"
+                      placeholder="e.g. Delhi, Mumbai, Bangalore"
                       required
-                    >
-                      <option value="">Select partnership type</option>
-                      <option value="Property Partners">Property Partners</option>
-                      <option value="Corporate Partners">Corporate Partners</option>
-                      <option value="Business Associates">Business Associates</option>
-                      <option value="Strategic Alliance">Strategic Alliance</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="message"
-                      className="text-gray-700 dark:text-gray-300 font-medium"
-                    >
-                      Tell us more about your requirements
-                    </Label>
-                    <Textarea
-                      id="message"
-                      value={formData.message}
-                      onChange={(e) => handleInputChange("message", e.target.value)}
-                      placeholder="Share your goals, property details, or any questions you have..."
-                      className="border-gray-300 dark:border-white/20 dark:bg-black/30 dark:text-white focus:border-yellow-400 focus:ring-yellow-400/20 min-h-[140px]"
-                      rows={5}
+                      className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
                     />
                   </div>
 
-                  <div className="flex justify-center pt-6">
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="group bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-slate-900 px-12 py-7 text-lg rounded-full font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <span className="animate-spin mr-2">⏳</span>
-                          Submitting...
-                        </>
-                      ) : (
-                        <>
-                          Submit Partnership Request
-                          <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </Button>
+                  <div className="space-y-2.5">
+                    <label className="text-base font-semibold text-[#1A1A1A]">
+                      Message (optional)
+                    </label>
+                    <Textarea
+                      value={formData.message}
+                      onChange={(e) =>
+                        setFormData({ ...formData, message: e.target.value })
+                      }
+                      placeholder="Tell us about your space..."
+                      rows={5}
+                      className="bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all p-4 placeholder:text-slate-400"
+                    />
                   </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#334d3d] text-[#FDE68A] hover:bg-[#26392d] h-16 rounded-2xl font-bold text-lg shadow-xl shadow-[#334d3d]/20 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      "Submitting..."
+                    ) : (
+                      <>
+                        Submit Application <ArrowRight className="w-5 h-5" />
+                      </>
+                    )}
+                  </Button>
                 </form>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div> {/* ✅ Closed container here */}
-
-        {/* 🟢 Contact Info Cards — moved OUTSIDE container for full width */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="mt-16 px-6 md:px-20"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 isolate bg-gray-100 dark:bg-[#111] py-12 px-8 rounded-3xl shadow-inner transition-colors duration-300">
-            {[
-              {
-                icon: Phone,
-                label: "Call Us",
-                value: "+91 XXX XXX XXXX",
-                gradient: "from-blue-500 to-blue-600",
-              },
-              {
-                icon: Mail,
-                label: "Email Us",
-                value: "partners@flashspace.com",
-                gradient: "from-purple-500 to-purple-600",
-              },
-              {
-                icon: MapPin,
-                label: "Visit Us",
-                value: "Pan India Presence",
-                gradient: "from-pink-500 to-pink-600",
-              },
-            ].map((contact, index) => (
-              <motion.div
-                key={index}
-                className="relative z-0 group flex items-center gap-4 p-8 bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-lg hover:shadow-2xl
-                     transition-all duration-300 border border-gray-200 dark:border-white/10 hover:border-yellow-400 hover:z-10 overflow-hidden"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-              >
-                <div
-                  className={`p-4 bg-gradient-to-br ${contact.gradient} rounded-lg shadow-lg group-hover:scale-110 transition-transform`}
-                >
-                  <contact.icon className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600 font-medium">
-                    {contact.label}
-                  </p>
-                  <p className="font-bold text-slate-900 text-sm md:text-base whitespace-nowrap">
-                    {contact.value}
-                  </p>
-                </div>
               </motion.div>
-            ))}
+            </div>
           </div>
-        </motion.div>
-      </section>
-
-
-      {/* Final CTA Section with Background */}
-      <section className="relative py-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80"
-            alt="CTA Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-yellow-900/70"></div>
-        </div>
-
-        <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-          >
-            <HeartHandshake className="w-20 h-20 text-yellow-400 mx-auto mb-6" />
-            <h2 className="font-grotesk text-4xl md:text-6xl font-bold text-white mb-6">
-              Ready to Grow Together?
-            </h2>
-            <p className="text-xl text-gray-200 mb-10 max-w-2xl mx-auto">
-              Join hundreds of successful partners who are transforming the workspace industry with FlashSpace
-            </p>
-            <Button
-              onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-slate-900 px-12 py-7 text-lg rounded-full font-bold shadow-2xl hover:shadow-yellow-500/50 hover:scale-110 transition-all duration-300"
-
-            >
-              Start Your Partnership Journey
-              <Rocket className="ml-2 h-5 w-5" />
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
+        </section>
+      </main>
+      <MeetingBookingModal
+        isOpen={isMeetingModalOpen}
+        onClose={() => setIsMeetingModalOpen(false)}
+        item={{ name: "Partnership Team", address: "Online Call" } as any}
+      />
       <Footer />
     </div>
   );

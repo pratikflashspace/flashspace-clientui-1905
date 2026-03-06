@@ -353,7 +353,7 @@ const MyBookings: React.FC = () => {
           </div>
           <a
             href="/services/virtual-office"
-            className="inline-flex items-center gap-2 bg-[#35503F] text-white px-6 py-3 rounded-full font-medium hover:bg-[#35503F]/90 transition-colors"
+            className="inline-flex items-center gap-2 bg-[#35503F] text-[#FEF8C3] px-6 py-3 rounded-full font-medium hover:bg-[#35503F]/90 transition-colors"
           >
             <span className="text-lg">+</span>
             Book New Space
@@ -528,7 +528,7 @@ const MyBookings: React.FC = () => {
             </p>
             <a
               href="/services/virtual-office"
-              className="inline-flex items-center gap-2 bg-[#35503F] text-white px-6 py-2.5 rounded-full font-medium hover:bg-[#35503F]/90 transition-colors text-sm"
+              className="inline-flex items-center gap-2 bg-[#35503F] text-[#FEF8C3] px-6 py-2.5 rounded-full font-medium hover:bg-[#35503F]/90 transition-colors text-sm"
             >
               Browse Spaces
             </a>

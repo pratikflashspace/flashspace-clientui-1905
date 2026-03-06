@@ -12,6 +12,36 @@ interface ApiResponse<T> {
   message?: string;
 }
 
+const isBadImageUrl = (url?: string) => {
+  if (!url) return true;
+  const value = String(url).trim().toLowerCase();
+  return (
+    value.length === 0 ||
+    value.startsWith("url") ||
+    value === "img1.jpg" ||
+    value === "url1.jpg" ||
+    value.includes("shorturl.at") ||
+    value.includes("tinyurl.com")
+  );
+};
+
+const pickBestImage = (item: any) => {
+  const firstArrayImage = Array.isArray(item.images) ? item.images.find((img: string) => !isBadImageUrl(img)) : undefined;
+  if (firstArrayImage) return firstArrayImage;
+  if (!isBadImageUrl(item.image)) return item.image;
+  return "/hero-illustrated.jpg";
+};
+
+const toNumber = (value: any) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : 0;
+};
+
+const formatMonthPrice = (value: any) => {
+  const amount = toNumber(value);
+  return amount > 0 ? `₹${amount.toLocaleString()}/mo` : "";
+};
+
 /**
  * Get coworking spaces by city
  * @param city - City name
@@ -33,8 +63,47 @@ export const getCoworkingSpacesByCity = async (
         ? data.data
         : data.data?.spaces || data.data?.offices || [];
 
-      // console.log(`✅ Successfully fetched ${spaces.length} coworking spaces`);
-      return spaces;
+      console.log(`✅ Successfully fetched ${spaces.length} coworking spaces`);
+
+      // Map backend data to frontend expectations
+      return spaces.map((s: any) => {
+        // Find the lowest monthly price in inventory
+        const monthlyPrices =
+          s.inventory
+            ?.filter((i: any) => i.pricePerMonth)
+            .map((i: any) => i.pricePerMonth) || [];
+
+        const minPrice =
+          monthlyPrices.length > 0 ? Math.min(...monthlyPrices) : 0;
+
+        return {
+          ...s,
+          coordinates:
+            s.coordinates ||
+            (Array.isArray(s.location?.coordinates) &&
+            s.location.coordinates.length === 2
+              ? {
+                  lat: s.location.coordinates[1],
+                  lng: s.location.coordinates[0],
+                }
+              : undefined),
+          features: s.amenities || [],
+          price:
+            (minPrice ? `₹${minPrice.toLocaleString()}/mo` : "") ||
+            s.price ||
+            formatMonthPrice(s.finalPricePerMonth || s.partnerPricePerMonth) ||
+            "Price on request",
+          image: pickBestImage(s),
+          images:
+            Array.isArray(s.images) && s.images.length > 0
+              ? s.images.filter((img: string) => !isBadImageUrl(img))
+              : !isBadImageUrl(s.image)
+                ? [s.image]
+                : ["/hero-illustrated.jpg"],
+          rating: toNumber(s.rating) || toNumber(s.avgRating),
+          reviews: toNumber(s.reviews) || toNumber(s.totalReviews),
+        };
+      });
     }
 
     throw new Error(data.message || "Failed to fetch coworking spaces");
@@ -64,7 +133,44 @@ export const getAllCoworkingSpaces = async (): Promise<
       const spaces = Array.isArray(data.data)
         ? data.data
         : data.data?.spaces || data.data?.offices || [];
-      return spaces;
+
+      return spaces.map((s: any) => {
+        const monthlyPrices =
+          s.inventory
+            ?.filter((i: any) => i.pricePerMonth)
+            .map((i: any) => i.pricePerMonth) || [];
+
+        const minPrice =
+          monthlyPrices.length > 0 ? Math.min(...monthlyPrices) : 0;
+
+        return {
+          ...s,
+          coordinates:
+            s.coordinates ||
+            (Array.isArray(s.location?.coordinates) &&
+            s.location.coordinates.length === 2
+              ? {
+                  lat: s.location.coordinates[1],
+                  lng: s.location.coordinates[0],
+                }
+              : undefined),
+          features: s.amenities || [],
+          price:
+            (minPrice ? `₹${minPrice.toLocaleString()}/mo` : "") ||
+            s.price ||
+            formatMonthPrice(s.finalPricePerMonth || s.partnerPricePerMonth) ||
+            "Price on request",
+          image: pickBestImage(s),
+          images:
+            Array.isArray(s.images) && s.images.length > 0
+              ? s.images.filter((img: string) => !isBadImageUrl(img))
+              : !isBadImageUrl(s.image)
+                ? [s.image]
+                : ["/hero-illustrated.jpg"],
+          rating: toNumber(s.rating) || toNumber(s.avgRating),
+          reviews: toNumber(s.reviews) || toNumber(s.totalReviews),
+        };
+      });
     }
 
     throw new Error(data.message || "Failed to fetch coworking spaces");
@@ -87,7 +193,44 @@ export const getCoworkingSpaceById = async (
     const data = response.data as ApiResponse<CoworkingSpaceItem>;
 
     if (response.status === 200 && data.success) {
-      return data.data;
+      const s = data.data;
+      const monthlyPrices =
+        (s as any).inventory
+          ?.filter((i: any) => i.pricePerMonth)
+          .map((i: any) => i.pricePerMonth) || [];
+
+      const minPrice =
+        monthlyPrices.length > 0 ? Math.min(...monthlyPrices) : 0;
+
+      return {
+        ...s,
+        coordinates:
+          (s as any).coordinates ||
+          (Array.isArray((s as any).location?.coordinates) &&
+          (s as any).location.coordinates.length === 2
+            ? {
+                lat: (s as any).location.coordinates[1],
+                lng: (s as any).location.coordinates[0],
+              }
+            : undefined),
+        features: (s as any).amenities || [],
+        price:
+          (minPrice ? `₹${minPrice.toLocaleString()}/mo` : "") ||
+          (s as any).price ||
+          formatMonthPrice(
+            (s as any).finalPricePerMonth || (s as any).partnerPricePerMonth,
+          ) ||
+          "Price on request",
+        image: pickBestImage(s),
+        images:
+          Array.isArray((s as any).images) && (s as any).images.length > 0
+            ? (s as any).images.filter((img: string) => !isBadImageUrl(img))
+            : !isBadImageUrl((s as any).image)
+              ? [(s as any).image]
+              : ["/hero-illustrated.jpg"],
+        rating: toNumber((s as any).rating) || toNumber((s as any).avgRating),
+        reviews: toNumber((s as any).reviews) || toNumber((s as any).totalReviews),
+      };
     }
 
     throw new Error(data.message || "Failed to fetch coworking space");
@@ -109,7 +252,7 @@ export const createCoworkingSpace = async (
     const response = await axiosInstance.post("/coworkingSpace/create", data);
     const responseData = response.data as ApiResponse<CoworkingSpaceItem>;
 
-    if (response.status === 200 && responseData.success) {
+    if ([200, 201].includes(response.status) && responseData.success) {
       return responseData.data;
     }
 
@@ -137,7 +280,7 @@ export const updateCoworkingSpace = async (
     );
     const responseData = response.data as ApiResponse<CoworkingSpaceItem>;
 
-    if (response.status === 200 && responseData.success) {
+    if ([200, 201].includes(response.status) && responseData.success) {
       return responseData.data;
     }
 
@@ -158,7 +301,7 @@ export const deleteCoworkingSpace = async (id: string): Promise<boolean> => {
     const response = await axiosInstance.delete(`/coworkingSpace/delete/${id}`);
     const responseData = response.data as ApiResponse<any>;
 
-    if (response.status === 200 && responseData.success) {
+    if ([200, 201].includes(response.status) && responseData.success) {
       return true;
     }
 

@@ -132,13 +132,13 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex h-full flex-1 items-center justify-center">
-        <div className="text-slate-500">Loading your dashboard...</div>
+        <div className="text-[#164e4e]/70 dark:text-gray-400">Loading your dashboard...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1">
+    <div className="flex-1" style={{ fontFamily: "'Inter Tight', sans-serif", fontWeight: 500 }}>
       {/* Stats */}
       <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
@@ -175,9 +175,9 @@ export default function Dashboard() {
       </div>
 
       {/* Filters + Table */}
-      <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-bold text-slate-900">Client Overview</h2>
-        <p className="text-sm text-slate-500">
+      <div className="mt-10 rounded-2xl border border-[#2D3F33]/10 dark:border-white/10 bg-white dark:bg-[#0f0f0f] p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-[#164e4e] dark:text-white">Client Overview</h2>
+        <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
           Search and filter clients by plan, status, and space.
         </p>
 
@@ -221,7 +221,7 @@ export default function Dashboard() {
 
           {/* Empty State */}
           {filteredClients.length === 0 && (
-            <p className="mt-6 text-center text-slate-500">No clients found.</p>
+            <p className="mt-6 text-center text-[#164e4e]/70 dark:text-gray-400">No clients found.</p>
           )}
         </div>
       </div>
@@ -236,7 +236,7 @@ export default function Dashboard() {
 function StatusPill({ status }: { status: ClientStatus }) {
   const config =
     status === "ACTIVE"
-      ? { label: "Active", className: "bg-emerald-50 text-[#3FA69E]" }
+      ? { label: "Active", className: "bg-[#2D3F33]/10 text-[#2D3F33] dark:text-[#FDE68A]" }
       : status === "EXPIRING_SOON"
         ? { label: "Expiring Soon", className: "bg-amber-50 text-amber-700" }
         : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
@@ -256,7 +256,7 @@ function StatusPill({ status }: { status: ClientStatus }) {
 function KycPill({ status }: { status: string }) {
   const config =
     status === "VERIFIED"
-      ? { label: "Verified", className: "bg-emerald-50 text-[#3FA69E]" }
+      ? { label: "Verified", className: "bg-[#2D3F33]/10 text-[#2D3F33] dark:text-[#FDE68A]" }
       : { label: "Pending", className: "bg-amber-50 text-amber-700" };
 
   return (

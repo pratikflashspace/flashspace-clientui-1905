@@ -115,6 +115,15 @@ export default function Support() {
     description: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [contactSubmitting, setContactSubmitting] = useState(false);
+  const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [contactFormData, setContactFormData] = useState({
+    name: user?.fullName || "",
+    email: user?.email || "",
+    phone: (user as any)?.phone || "",
+    subject: "",
+    message: "",
+  });
 
   const fetchTickets = async () => {
     setLoading(true);
@@ -226,6 +235,45 @@ export default function Support() {
     }
   };
 
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setContactSubmitting(true);
+    try {
+      // Use FormSubmit.co via AJAX
+      const response = await fetch("https://formsubmit.co/ajax/komalmishra2008@gmail.com", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: contactFormData.name,
+          email: contactFormData.email,
+          phone: contactFormData.phone,
+          subject: contactFormData.subject,
+          message: contactFormData.message,
+          _subject: `Support Request: ${contactFormData.subject}`,
+          _template: "table"
+        })
+      });
+
+      if (response.ok) {
+        setContactSubmitted(true);
+        setTimeout(() => {
+          setContactSubmitted(false);
+          setContactFormData(prev => ({ ...prev, subject: "", message: "" }));
+        }, 3000);
+      } else {
+        alert("Failed to send message via FormSubmit. Please try again later.");
+      }
+    } catch (err: unknown) {
+      console.error("Failed to send contact message via FormSubmit", err);
+      alert("Failed to send message. Please check your internet connection and try again.");
+    } finally {
+      setContactSubmitting(false);
+    }
+  };
+
   const handleReply = async () => {
     if (!selectedTicket || !replyMessage.trim()) return;
     setSubmitting(true);
@@ -322,7 +370,7 @@ export default function Support() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                  ? "bg-[#35503F] text-white"
+                  ? "bg-[#35503F] text-[#FEF8C3]"
                   : "text-gray-600 hover:bg-gray-100"
                   }`}
               >
@@ -443,7 +491,7 @@ export default function Support() {
                       <button
                         onClick={handleReply}
                         disabled={submitting || !replyMessage.trim()}
-                        className="px-6 py-2.5 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors disabled:opacity-50 self-end"
+                        className="px-6 py-2.5 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors disabled:opacity-50 self-end"
                       >
                         {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                       </button>
@@ -471,7 +519,7 @@ export default function Support() {
                   <h2 className="text-lg font-semibold text-gray-900">Support Tickets</h2>
                   <button
                     onClick={() => setShowNewTicket(true)}
-                    className="px-4 py-2 bg-[#35503F] text-white rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
+                    className="px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
                   >
                     + New Ticket
                   </button>
@@ -538,7 +586,7 @@ export default function Support() {
                           <button
                             type="submit"
                             disabled={submitting || formData.description.length < 10}
-                            className="px-6 py-2.5 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-2.5 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Submit Ticket"}
                           </button>
@@ -611,20 +659,22 @@ export default function Support() {
             <h2 className="text-lg font-semibold text-gray-900 mb-2">Send us a Message</h2>
             <p className="text-gray-500 text-sm mb-6">For general inquiries and feedback</p>
 
-            {submitted ? (
+            {contactSubmitted ? (
               <div className="text-center py-12">
                 <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
                 <p className="text-gray-500">Thank you for contacting us. We will get back to you within 24 hours.</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleContactSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">Your Name</label>
                     <input
                       type="text"
                       required
+                      value={contactFormData.name}
+                      onChange={(e) => setContactFormData({ ...contactFormData, name: e.target.value })}
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                       placeholder="Enter your name"
                     />
@@ -634,6 +684,8 @@ export default function Support() {
                     <input
                       type="email"
                       required
+                      value={contactFormData.email}
+                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                       placeholder="Enter your email"
                     />
@@ -643,6 +695,8 @@ export default function Support() {
                   <label className="block text-sm text-gray-600 mb-1">Phone Number</label>
                   <input
                     type="tel"
+                    value={contactFormData.phone}
+                    onChange={(e) => setContactFormData({ ...contactFormData, phone: e.target.value })}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                     placeholder="+91 XXXXX XXXXX"
                   />
@@ -652,6 +706,8 @@ export default function Support() {
                   <input
                     type="text"
                     required
+                    value={contactFormData.subject}
+                    onChange={(e) => setContactFormData({ ...contactFormData, subject: e.target.value })}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                     placeholder="What is this regarding?"
                   />
@@ -661,15 +717,19 @@ export default function Support() {
                   <textarea
                     required
                     rows={5}
+                    value={contactFormData.message}
+                    onChange={(e) => setContactFormData({ ...contactFormData, message: e.target.value })}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
                     placeholder="Tell us more about your inquiry..."
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#35503F] text-white rounded-xl font-semibold hover:bg-[#35503F]/90 transition-colors flex items-center justify-center gap-2"
+                  disabled={contactSubmitting}
+                  className="w-full py-3 bg-[#35503F] text-[#FEF8C3] rounded-xl font-semibold hover:bg-[#35503F]/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-5 h-5" /> Send Message
+                  {contactSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                  {contactSubmitting ? "Sending..." : "Send Message"}
                 </button>
               </form>
             )}

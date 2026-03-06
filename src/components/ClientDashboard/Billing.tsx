@@ -16,14 +16,19 @@ import {
   RefreshCw,
   Loader2,
   Filter,
+  ArrowDown,
 } from "lucide-react";
 
 // Types
 type InvoiceStatus = "paid" | "pending" | "overdue" | "cancelled";
 
 export default function Billing() {
-  const [activeTab, setActiveTab] = useState<"invoices" | "subscriptions" | "payments">("invoices");
-  const [statusFilter, setStatusFilter] = useState<"all" | InvoiceStatus>("all");
+  const [activeTab, setActiveTab] = useState<
+    "invoices" | "subscriptions" | "payments"
+  >("invoices");
+  const [statusFilter, setStatusFilter] = useState<"all" | InvoiceStatus>(
+    "all",
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [subscriptions, setSubscriptions] = useState<Booking[]>([]);
@@ -35,7 +40,9 @@ export default function Billing() {
     setError(null);
     try {
       const [invoicesRes, bookingsRes] = await Promise.all([
-        userDashboardService.getInvoices({ status: statusFilter === "all" ? undefined : statusFilter }),
+        userDashboardService.getInvoices({
+          status: statusFilter === "all" ? undefined : statusFilter,
+        }),
         userDashboardService.getBookings({ status: "active" }),
       ]);
       if (invoicesRes.success && invoicesRes.data) {
@@ -75,15 +82,45 @@ export default function Billing() {
   const getStatusConfig = (status: string) => {
     switch (status) {
       case "paid":
-        return { bg: "bg-green-50", text: "text-green-700", border: "border-green-200", icon: CheckCircle2, label: "Paid" };
+        return {
+          bg: "bg-green-50",
+          text: "text-green-700",
+          border: "border-green-200",
+          icon: CheckCircle2,
+          label: "Paid",
+        };
       case "pending":
-        return { bg: "bg-yellow-50", text: "text-yellow-700", border: "border-yellow-200", icon: Clock, label: "Pending" };
+        return {
+          bg: "bg-yellow-50",
+          text: "text-yellow-700",
+          border: "border-yellow-200",
+          icon: Clock,
+          label: "Pending",
+        };
       case "overdue":
-        return { bg: "bg-red-50", text: "text-red-700", border: "border-red-200", icon: AlertCircle, label: "Overdue" };
+        return {
+          bg: "bg-red-50",
+          text: "text-red-700",
+          border: "border-red-200",
+          icon: AlertCircle,
+          label: "Overdue",
+        };
       case "cancelled":
-        return { bg: "bg-gray-50", text: "text-gray-600", border: "border-gray-200", icon: AlertCircle, label: "Cancelled" };
+        return {
+          bg: "bg-gray-50",
+          text: "text-gray-600",
+          border: "border-gray-200",
+          icon: AlertCircle,
+          label: "Cancelled",
+        };
       default:
-        return { bg: "bg-gray-50", text: "text-gray-600", border: "border-gray-200", icon: Clock, label: status };
+        return {
+          bg: "bg-gray-50",
+          text: "text-gray-600",
+          border: "border-gray-200",
+          icon: Clock,
+          label: status,
+        };
     }
   };
 
@@ -97,9 +134,14 @@ export default function Billing() {
 
   // Calculate totals
   const stats = {
-    totalPaid: invoices.filter((i) => i.status === "paid").reduce((sum, i) => sum + i.total, 0),
-    pendingAmount: invoices.filter((i) => i.status === "pending").reduce((sum, i) => sum + i.total, 0),
-    activeSubscriptions: subscriptions.filter((s) => s.status === "active").length,
+    totalPaid: invoices
+      .filter((i) => i.status === "paid")
+      .reduce((sum, i) => sum + i.total, 0),
+    pendingAmount: invoices
+      .filter((i) => i.status === "pending")
+      .reduce((sum, i) => sum + i.total, 0),
+    activeSubscriptions: subscriptions.filter((s) => s.status === "active")
+      .length,
     nextBilling: subscriptions.length > 0 ? subscriptions[0].endDate : null,
   };
 
@@ -122,7 +164,7 @@ export default function Billing() {
           <p className="text-gray-700 font-medium mb-2">{error}</p>
           <button
             onClick={fetchData}
-            className="px-4 py-2 bg-[#35503F] text-white rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2 mx-auto"
+            className="px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2 mx-auto"
           >
             <RefreshCw className="w-4 h-4" /> Try Again
           </button>
@@ -140,7 +182,9 @@ export default function Billing() {
             <h1 className="text-3xl md:text-4xl font-bold  text-[#35503F]">
               Billing & <span className="italic">Payments</span>
             </h1>
-            <p className="text-gray-500 mt-2">Manage your invoices, active subscriptions, and history.</p>
+            <p className="text-gray-500 mt-2">
+              Manage your invoices, active subscriptions, and history.
+            </p>
           </div>
           <button className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-6 py-2.5 rounded-full font-medium hover:bg-gray-50 transition-colors shadow-sm">
             <Download className="w-4 h-4" />
@@ -154,7 +198,9 @@ export default function Billing() {
             <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-4">
               <CheckCircle2 className="w-5 h-5 text-green-600" />
             </div>
-            <p className="text-3xl font-bold text-[#35503F] mb-1">{formatCurrency(stats.totalPaid)}</p>
+            <p className="text-3xl font-bold text-[#35503F] mb-1">
+              {formatCurrency(stats.totalPaid)}
+            </p>
             <p className="text-sm text-gray-500">Total Paid</p>
           </div>
 
@@ -162,7 +208,9 @@ export default function Billing() {
             <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center mb-4">
               <Clock className="w-5 h-5 text-orange-600" />
             </div>
-            <p className="text-3xl font-bold text-[#35503F] mb-1">{formatCurrency(stats.pendingAmount)}</p>
+            <p className="text-3xl font-bold text-[#35503F] mb-1">
+              {formatCurrency(stats.pendingAmount)}
+            </p>
             <p className="text-sm text-gray-500">Pending Dues</p>
           </div>
 
@@ -170,7 +218,9 @@ export default function Billing() {
             <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-4">
               <RefreshCw className="w-5 h-5 text-blue-600" />
             </div>
-            <p className="text-3xl font-bold text-[#35503F] mb-1">{stats.activeSubscriptions}</p>
+            <p className="text-3xl font-bold text-[#35503F] mb-1">
+              {stats.activeSubscriptions}
+            </p>
             <p className="text-sm text-gray-500">Active Subscriptions</p>
           </div>
 
@@ -178,7 +228,9 @@ export default function Billing() {
             <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center mb-4">
               <Calendar className="w-5 h-5 text-purple-600" />
             </div>
-            <p className="text-3xl font-bold text-[#35503F] mb-1">{stats.nextBilling ? formatDate(stats.nextBilling) : "-"}</p>
+            <p className="text-3xl font-bold text-[#35503F] mb-1">
+              {stats.nextBilling ? formatDate(stats.nextBilling) : "-"}
+            </p>
             <p className="text-sm text-gray-500">Next Billing</p>
           </div>
         </div>
@@ -194,10 +246,11 @@ export default function Billing() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${activeTab === tab.id
-                  ? "bg-[#35503F] text-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-900"
-                  }`}
+                className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
+                  activeTab === tab.id
+                    ? "bg-[#35503F] text-[#FEF8C3] shadow-sm"
+                    : "text-gray-500 hover:text-gray-900"
+                }`}
               >
                 {tab.label}
               </button>
@@ -219,18 +272,26 @@ export default function Billing() {
               <div className="relative group">
                 <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-[#FAF6D3] hover:text-[#35503F] hover:border-[#F2EEB3] transition-colors focus:outline-none focus:ring-2 focus:ring-[#35503F]/20">
                   <Filter className="w-4 h-4" />
-                  <span>{statusFilter === 'all' ? 'Filter by Status' : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}</span>
+                  <span>
+                    {statusFilter === "all"
+                      ? "Filter by Status"
+                      : statusFilter.charAt(0).toUpperCase() +
+                        statusFilter.slice(1)}
+                  </span>
                 </button>
                 <div className="absolute right-0 top-full w-48 pt-2 hidden group-hover:block z-10 transition-all opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-200">
                   <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-2">
                     {["all", "paid", "pending", "overdue"].map((status) => (
                       <button
                         key={status}
-                        onClick={() => setStatusFilter(status as typeof statusFilter)}
-                        className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors capitalize ${statusFilter === status
-                          ? "bg-[#FAF6D3] text-[#35503F] font-semibold"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                          }`}
+                        onClick={() =>
+                          setStatusFilter(status as typeof statusFilter)
+                        }
+                        className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors capitalize ${
+                          statusFilter === status
+                            ? "bg-[#FAF6D3] text-[#35503F] font-semibold"
+                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        }`}
                       >
                         {status === "all" ? "All Invoices" : status}
                       </button>
@@ -249,18 +310,33 @@ export default function Billing() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Invoice ID</th>
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Service</th>
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="text-right py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</th>
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Invoice ID
+                    </th>
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Service
+                    </th>
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="text-right py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Action
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {filteredInvoices.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-12 text-center text-gray-500">
+                      <td
+                        colSpan={6}
+                        className="py-12 text-center text-gray-500"
+                      >
                         No invoices found
                       </td>
                     </tr>
@@ -268,30 +344,43 @@ export default function Billing() {
                     filteredInvoices.map((invoice) => {
                       const statusConfig = getStatusConfig(invoice.status);
                       return (
-                        <tr key={invoice._id} className="hover:bg-gray-50/50 transition-colors group">
+                        <tr
+                          key={invoice._id}
+                          className="hover:bg-gray-50/50 transition-colors group"
+                        >
                           <td className="py-4 px-6">
-                            <span className="font-medium text-gray-900">{invoice.invoiceNumber}</span>
-                          </td>
-                          <td className="py-4 px-6">
-                            <span className="text-sm text-gray-600">{invoice.description || "Subscription Invoice"}</span>
-                          </td>
-                          <td className="py-4 px-6">
-                            <span className="text-sm text-gray-600">
-                              {invoice.status === "paid" && invoice.paidAt ? formatDate(invoice.paidAt) : formatDate(invoice.dueDate || "")}
+                            <span className="font-medium text-gray-900">
+                              {invoice.invoiceNumber}
                             </span>
                           </td>
                           <td className="py-4 px-6">
-                            <span className="font-semibold text-gray-900">{formatCurrency(invoice.total)}</span>
+                            <span className="text-sm text-gray-600">
+                              {invoice.description || "Subscription Invoice"}
+                            </span>
                           </td>
                           <td className="py-4 px-6">
-                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}>
+                            <span className="text-sm text-gray-600">
+                              {invoice.status === "paid" && invoice.paidAt
+                                ? formatDate(invoice.paidAt)
+                                : formatDate(invoice.dueDate || "")}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="font-semibold text-gray-900">
+                              {formatCurrency(invoice.total)}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}
+                            >
                               <statusConfig.icon className="w-3 h-3" />
                               {statusConfig.label}
                             </span>
                           </td>
                           <td className="py-4 px-6 text-right">
                             {invoice.status === "pending" ? (
-                              <button className="inline-flex items-center px-4 py-1.5 bg-[#35503F] text-white text-xs font-medium rounded-full hover:bg-[#35503F]/90 transition-colors">
+                              <button className="inline-flex items-center px-4 py-1.5 bg-[#35503F] text-[#FEF8C3] text-xs font-medium rounded-full hover:bg-[#35503F]/90 transition-colors">
                                 Pay Now
                               </button>
                             ) : (
@@ -321,22 +410,40 @@ export default function Billing() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {subscriptions.map((sub) => {
                   const endDate = sub.endDate || new Date().toISOString();
-                  const daysRemaining = Math.ceil((new Date(endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                  const daysRemaining = Math.ceil(
+                    (new Date(endDate).getTime() - Date.now()) /
+                      (1000 * 60 * 60 * 24),
+                  );
                   const isExpiring = daysRemaining <= 30;
                   return (
-                    <div key={sub._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                    <div
+                      key={sub._id}
+                      className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
+                    >
                       <div className="flex flex-col justify-between h-full gap-4">
                         <div>
                           <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-lg font-bold text-gray-900 line-clamp-1">{sub.plan.name}</h3>
-                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${sub.status === "active" && !isExpiring ? "bg-green-50 text-green-700 border-green-200" :
-                              isExpiring ? "bg-orange-50 text-orange-700 border-orange-200" :
-                                "bg-gray-50 text-gray-600 border-gray-200"
-                              }`}>
-                              {isExpiring ? "Expiring Soon" : sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
+                            <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
+                              {sub.plan.name}
+                            </h3>
+                            <span
+                              className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
+                                sub.status === "active" && !isExpiring
+                                  ? "bg-green-50 text-green-700 border-green-200"
+                                  : isExpiring
+                                    ? "bg-orange-50 text-orange-700 border-orange-200"
+                                    : "bg-gray-50 text-gray-600 border-gray-200"
+                              }`}
+                            >
+                              {isExpiring
+                                ? "Expiring Soon"
+                                : sub.status.charAt(0).toUpperCase() +
+                                  sub.status.slice(1)}
                             </span>
                           </div>
-                          <p className="text-gray-600 text-sm mb-1">{sub.spaceSnapshot?.name || "Space"}</p>
+                          <p className="text-gray-600 text-sm mb-1">
+                            {sub.spaceSnapshot?.name || "Space"}
+                          </p>
                           <p className="text-gray-400 text-xs">
                             {sub.spaceSnapshot?.address}
                           </p>
@@ -344,8 +451,13 @@ export default function Billing() {
 
                         <div className="pt-4 border-t border-gray-50 flex items-center justify-between">
                           <div>
-                            <p className="text-lg font-bold text-gray-900">{formatCurrency(sub.plan.price)}</p>
-                            <p className="text-xs text-gray-500">/{sub.plan.tenure} {sub.plan.tenureUnit || "months"}</p>
+                            <p className="text-lg font-bold text-gray-900">
+                              {formatCurrency(sub.plan.price)}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              /{sub.plan.tenure}{" "}
+                              {sub.plan.tenureUnit || "months"}
+                            </p>
                           </div>
                           <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                             Manage
@@ -366,9 +478,12 @@ export default function Billing() {
               <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CreditCard className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Payment Methods</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Payment Methods
+              </h3>
               <p className="text-gray-500 mb-6 max-w-sm mx-auto text-sm">
-                Your payments are securely processed via Razorpay. We do not store your card details.
+                Your payments are securely processed via Razorpay. We do not
+                store your card details.
               </p>
               <button className="px-6 py-2.5 background-[#35503F] text-white rounded-full text-sm font-medium hover:bg-[#35503F]/90 transition-colors">
                 Add Payment Method

@@ -97,7 +97,7 @@ export default function MailRecords() {
           <p className="text-gray-500 mb-6">{error}</p>
           <button
             onClick={fetchMails}
-            className="px-6 py-2.5 bg-[#35503F] text-white rounded-full font-medium hover:bg-[#35503F]/90 transition-colors inline-flex items-center gap-2"
+            className="px-6 py-2.5 bg-[#35503F] text-[#FEF8C3] rounded-full font-medium hover:bg-[#35503F]/90 transition-colors inline-flex items-center gap-2"
           >
             <RefreshCw className="w-4 h-4" /> Try Again
           </button>

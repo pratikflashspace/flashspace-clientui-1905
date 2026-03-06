@@ -1,0 +1,57 @@
+
+[1m[33mwarn[39m[22m - The class `delay-[${delay}ms]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `delay-&lsqb;${delay}ms&rsqb;` to silence this warning.
+
+[1m[33mwarn[39m[22m - The class `duration-[10ms]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `duration-&lsqb;10ms&rsqb;` to silence this warning.
+
+[1m[33mwarn[39m[22m - The class `duration-[2000ms]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `duration-&lsqb;2000ms&rsqb;` to silence this warning.
+
+[1m[33mwarn[39m[22m - The class `ease-[cubic-bezier(.7,.22,.26,.98)]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `ease-&lsqb;cubic-bezier(.7,.22,.26,.98)&rsqb;` to silence this warning.
+
+[1m[33mwarn[39m[22m - The class `ease-[cubic-bezier(0.25,0.1,0.25,1)]` is ambiguous and matches multiple utilities.
+[1m[33mwarn[39m[22m - If this is content and not a class, replace it with `ease-&lsqb;cubic-bezier(0.25,0.1,0.25,1)&rsqb;` to silence this warning.
+[31mx[39m Build failed in 2.08s
+[31merror during build:
+[31m[vite:esbuild] Transform failed with 3 errors:
+C:/Users/dhruv/Documents/Antigravity/FlashSpace-web-client/src/pages/admin/KYCRequests.tsx:28:8: ERROR: The symbol "partnerRequests" has already been declared
+C:/Users/dhruv/Documents/Antigravity/FlashSpace-web-client/src/pages/admin/KYCRequests.tsx:28:8: ERROR: The symbol "setPartnerRequests" has already been declared
+C:/Users/dhruv/Documents/Antigravity/FlashSpace-web-client/src/pages/admin/KYCRequests.tsx:109:5: ERROR: Unexpected ","[31m
+file: [36mC:/Users/dhruv/Documents/Antigravity/FlashSpace-web-client/src/pages/admin/KYCRequests.tsx:28:8[31m
+[33m
+[33mThe symbol "partnerRequests" has already been declared[33m
+26 |  
+27 |    // Partner KYC State
+28 |    const [partnerRequests, setPartnerRequests] = useState<any[]>([]);
+   |          ^
+29 |    const [loadingPartnerRequests, setLoadingPartnerRequests] = useState(false);
+30 |    const [activeTab, setActiveTab] = useState("users");
+
+[33mThe symbol "setPartnerRequests" has already been declared[33m
+26 |  
+27 |    // Partner KYC State
+28 |    const [partnerRequests, setPartnerRequests] = useState<any[]>([]);
+   |          ^
+29 |    const [loadingPartnerRequests, setLoadingPartnerRequests] = useState(false);
+30 |    const [activeTab, setActiveTab] = useState("users");
+
+[33mUnexpected ","[33m
+107|              document.body.style.overflow = 'unset';
+108|          };
+109|      }, [showDocumentModal, showRejectModal]);
+   |       ^
+110|  
+111|      const fetchKYCRequests = async () => {
+[31m
+    at failureErrorWithLog (C:\Users\dhruv\Documents\Antigravity\FlashSpace-web-client\node_modules\vite\node_modules\esbuild\lib\main.js:1472:15)
+    at C:\Users\dhruv\Documents\Antigravity\FlashSpace-web-client\node_modules\vite\node_modules\esbuild\lib\main.js:755:50
+    at responseCallbacks.<computed> (C:\Users\dhruv\Documents\Antigravity\FlashSpace-web-client\node_modules\vite\node_modules\esbuild\lib\main.js:622:9)
+    at handleIncomingPacket (C:\Users\dhruv\Documents\Antigravity\FlashSpace-web-client\node_modules\vite\node_modules\esbuild\lib\main.js:677:12)
+    at Socket.readFromStdout (C:\Users\dhruv\Documents\Antigravity\FlashSpace-web-client\node_modules\vite\node_modules\esbuild\lib\main.js:600:7)
+    at Socket.emit (node:events:524:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)[39m

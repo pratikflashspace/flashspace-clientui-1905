@@ -2,6 +2,7 @@ import React from "react";
 import { X, ChevronLeft, ChevronRight, LogOut, LayoutDashboard, Home } from "lucide-react";
 import { sidebarConfig } from "./SidebarConfig";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 type SidebarItemProps = {
   icon: React.ReactNode;
@@ -18,14 +19,14 @@ function SidebarItem({ icon, label, to, collapsed }: SidebarItemProps) {
       aria-label={label}
       className={({ isActive }) =>
         `flex w-full items-center rounded-xl text-left text-sm font-semibold transition ${isActive
-          ? "bg-[#3FA69E] text-white shadow-sm"
-          : "text-slate-600 hover:bg-slate-100"
+          ? "bg-[#2D3F33] text-[#FDE68A] shadow-sm"
+          : "text-[#485753] dark:text-slate-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5"
         } ${collapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"}`
       }
     >
       {({ isActive }) => (
         <>
-          <span className={`${isActive ? "text-white" : "text-slate-500"}`}>
+          <span className={`${isActive ? "text-[#FDE68A]" : "text-[#7a8682] dark:text-gray-400"}`}>
             {icon}
           </span>
           {collapsed ? null : <span>{label}</span>}
@@ -47,9 +48,15 @@ export default function Sidebar({
   onToggleCollapse,
 }: SidebarProps) {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
   return (
     <aside
-      className={`flex h-screen flex-col overflow-hidden border-r border-slate-200 bg-white py-6 transition-[width,padding] duration-200 ${isCollapsed ? "w-20 px-3" : "w-72 px-4"
+      className={`flex h-screen flex-col overflow-hidden border-r border-[#2D3F33]/10 dark:border-white/10 bg-[#f3f4f3] dark:bg-[#0f0f0f] py-6 transition-[width,padding] duration-200 ${isCollapsed ? "w-20 px-3" : "w-72 px-4"
         }`}
     >
       {/* Logo */}
@@ -60,7 +67,7 @@ export default function Sidebar({
             className="rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#3FA69E]/30"
             aria-label="Go to Space Portal dashboard"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-sm font-bold text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2D3F33] text-sm font-bold text-[#FDE68A]">
               FS
             </div>
           </NavLink>
@@ -70,7 +77,7 @@ export default function Sidebar({
               type="button"
               onClick={onClose}
               aria-label="Close sidebar"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 lg:hidden"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D3F33]/20 dark:border-white/10 text-[#164e4e] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 lg:hidden"
             >
               <X size={18} />
             </button>
@@ -84,12 +91,12 @@ export default function Sidebar({
             aria-label="Go to Space Portal dashboard"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-sm font-bold text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2D3F33] text-sm font-bold text-[#FDE68A]">
                 FS
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-900">flashspace</h1>
-                <p className="text-sm text-slate-500">Space Partner Portal</p>
+                <h1 className="text-xl font-bold text-[#164e4e] dark:text-white">flashspace</h1>
+                <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">Space Partner Portal</p>
               </div>
             </div>
           </NavLink>
@@ -100,7 +107,7 @@ export default function Sidebar({
                 type="button"
                 onClick={onToggleCollapse}
                 aria-label="Collapse sidebar"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D3F33]/20 dark:border-white/10 text-[#164e4e] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -111,7 +118,7 @@ export default function Sidebar({
                 type="button"
                 onClick={onClose}
                 aria-label="Close sidebar"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 lg:hidden"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D3F33]/20 dark:border-white/10 text-[#164e4e] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 lg:hidden"
               >
                 <X size={18} />
               </button>
@@ -138,7 +145,7 @@ export default function Sidebar({
           type="button"
           onClick={onToggleCollapse}
           aria-label="Expand sidebar"
-          className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50"
+          className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-xl border border-[#2D3F33]/20 dark:border-white/10 text-[#164e4e] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5"
         >
           <ChevronRight size={18} />
         </button>
@@ -151,15 +158,15 @@ export default function Sidebar({
           <>
             <button
               onClick={() => navigate('/dashboard')}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-50 border border-teal-100 px-4 py-3 font-semibold text-teal-700 hover:bg-teal-100 transition-colors"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#2D3F33]/10 border border-[#2D3F33]/20 dark:border-white/10 px-4 py-3 font-semibold text-[#2D3F33] dark:text-[#FDE68A] hover:bg-[#2D3F33]/15 transition-colors"
             >
-              <LayoutDashboard size={16} className="text-teal-600" />
+              <LayoutDashboard size={16} className="text-[#2D3F33] dark:text-[#FDE68A]" />
               <span>User Dashboard</span>
             </button>
 
             <button
               onClick={() => navigate('/')}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#2D3F33]/20 dark:border-white/10 px-4 py-3 font-semibold text-[#164e4e] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 transition-colors"
             >
               <Home size={16} />
               <span>Back to Home</span>
@@ -167,7 +174,10 @@ export default function Sidebar({
           </>
         )}
 
-        <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-semibold text-red-500 hover:bg-red-50 transition-colors">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-semibold text-red-500 hover:bg-red-50 transition-colors"
+        >
           <LogOut size={16} />
           {!isCollapsed && <span>Logout</span>}
         </button>

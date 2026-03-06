@@ -12,9 +12,16 @@ import {
 import {
     FileText,
     Plus,
-    Eye,
     Sparkles,
     Loader2,
+    Search,
+    X,
+    ChevronLeft,
+    ChevronRight,
+    Eye,
+    Download,
+    MapPin,
+    Building2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import QuotationCard from "@/components/affiliatePortal/QuotationCard";
@@ -61,6 +68,14 @@ const QuotationGenerator = () => {
     });
     const [loading, setLoading] = useState(false);
     const [generating, setGenerating] = useState(false);
+
+    // View All Modal State
+    const [showAllModal, setShowAllModal] = useState(false);
+    const [allQuotations, setAllQuotations] = useState<any[]>([]);
+    const [allLoading, setAllLoading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const PAGE_SIZE = 10;
 
     // Form State
     const [formData, setFormData] = useState({
@@ -122,6 +137,41 @@ const QuotationGenerator = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const fetchAllQuotations = async () => {
+        setAllLoading(true);
+        try {
+            const response = await affiliatePortalService.getQuotations();
+            if (response.success && Array.isArray(response.data)) {
+                const mapped = response.data.map((quote) => ({
+                    id: quote.quotationId,
+                    clientName: quote.clientDetails.name,
+                    company: quote.clientDetails.companyName || "-",
+                    spaceDetails: `${quote.spaceRequirements.spaceType} - ${quote.spaceRequirements.numberOfSeats} Seater`,
+                    location: `${quote.spaceRequirements.location}, ${quote.spaceRequirements.city}`,
+                    price: `₹${quote.price.toLocaleString("en-IN")}`,
+                    date: new Date(quote.createdAt).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                    }),
+                    status: quote.status === "Viewed" ? "Viewed" : quote.status === "Accepted" ? "Accepted" : "Sent",
+                }));
+                setAllQuotations(mapped);
+            }
+        } catch (error) {
+            console.error("Failed to fetch all quotations", error);
+        } finally {
+            setAllLoading(false);
+        }
+    };
+
+    const handleOpenViewAll = () => {
+        setShowAllModal(true);
+        setSearchQuery("");
+        setCurrentPage(1);
+        fetchAllQuotations();
     };
 
     useEffect(() => {
@@ -292,8 +342,150 @@ const QuotationGenerator = () => {
         }
     };
 
+    // Compute filtered + paginated data for the modal
+    const filteredAll = allQuotations.filter(q =>
+        q.id.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    const totalPages = Math.max(1, Math.ceil(filteredAll.length / PAGE_SIZE));
+    const pagedAll = filteredAll.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+    const statusBadge = (status: string) => {
+        const map: Record<string, string> = {
+            Sent: "bg-orange-50 text-orange-600 border-orange-100",
+            Viewed: "bg-blue-50 text-blue-600 border-blue-100",
+            Accepted: "bg-emerald-50 text-emerald-600 border-emerald-100",
+        };
+        return <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${map[status] || map.Sent}`}>{status}</span>;
+    };
+
     return (
         <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-700">
+
+            {/* ===== VIEW ALL MODAL ===== */}
+            {showAllModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAllModal(false)} />
+                    <div className="relative bg-white w-full max-w-5xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900">All Quotations</h2>
+                                <p className="text-sm text-gray-500 mt-0.5">{filteredAll.length} quotation{filteredAll.length !== 1 ? 's' : ''} found</p>
+                            </div>
+                            <button onClick={() => setShowAllModal(false)} className="p-2.5 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Search Bar */}
+                        <div className="px-6 py-4 border-b border-gray-50 flex-shrink-0">
+                            <div className="relative max-w-sm">
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search by quotation ID..."
+                                    value={searchQuery}
+                                    onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5bb09c]/30 focus:border-[#5bb09c]/50 transition-all"
+                                />
+                                {searchQuery && (
+                                    <button onClick={() => { setSearchQuery(""); setCurrentPage(1); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                        <X className="w-3.5 h-3.5" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Table */}
+                        <div className="flex-1 overflow-auto">
+                            {allLoading ? (
+                                <div className="flex items-center justify-center py-20">
+                                    <Loader2 className="w-8 h-8 animate-spin text-[#5bb09c]" />
+                                </div>
+                            ) : pagedAll.length === 0 ? (
+                                <div className="text-center py-20 text-gray-400">
+                                    <p className="font-medium">No quotations found.</p>
+                                </div>
+                            ) : (
+                                <table className="w-full text-sm">
+                                    <thead className="sticky top-0 bg-gray-50/80 backdrop-blur-sm">
+                                        <tr className="text-left">
+                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Quotation ID</th>
+                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Client</th>
+                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Space</th>
+                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Location</th>
+                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Price</th>
+                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Date</th>
+                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {pagedAll.map((q) => (
+                                            <tr key={q.id} className="hover:bg-gray-50/50 transition-colors group">
+                                                <td className="px-6 py-4">
+                                                    <span className="text-[11px] font-bold text-[#5bb09c] uppercase tracking-wider">{q.id}</span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <p className="font-semibold text-gray-900">{q.clientName}</p>
+                                                    <p className="text-[11px] text-gray-400">{q.company}</p>
+                                                </td>
+                                                <td className="px-6 py-4 text-gray-600 max-w-[160px] truncate">{q.spaceDetails}</td>
+                                                <td className="px-6 py-4 text-gray-500 text-[12px] max-w-[140px] truncate">{q.location}</td>
+                                                <td className="px-6 py-4 font-bold text-gray-900">{q.price}</td>
+                                                <td className="px-6 py-4 text-gray-400 text-[12px] whitespace-nowrap">{q.date}</td>
+                                                <td className="px-6 py-4">{statusBadge(q.status)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+
+                        {/* Pagination */}
+                        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 flex-shrink-0">
+                            <p className="text-sm text-gray-500">
+                                Page <span className="font-semibold text-gray-700">{currentPage}</span> of <span className="font-semibold text-gray-700">{totalPages}</span>
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    <ChevronLeft className="w-4 h-4" /> Prev
+                                </button>
+                                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                    .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                                    .reduce<(number | '...')[]>((acc, p, idx, arr) => {
+                                        if (idx > 0 && (arr[idx - 1] as number) + 1 < p) acc.push('...');
+                                        acc.push(p);
+                                        return acc;
+                                    }, [])
+                                    .map((p, i) => p === '...' ? (
+                                        <span key={`ellipsis-${i}`} className="px-2 text-gray-400 text-sm">…</span>
+                                    ) : (
+                                        <button
+                                            key={p}
+                                            onClick={() => setCurrentPage(p as number)}
+                                            className={`w-9 h-9 rounded-xl text-sm font-bold transition-colors ${p === currentPage
+                                                    ? 'bg-[#5bb09c] text-white shadow-sm'
+                                                    : 'text-gray-500 hover:bg-gray-100'
+                                                }`}
+                                        >{p}</button>
+                                    ))
+                                }
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Next <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Header Section */}
             <div>
                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
@@ -555,12 +747,6 @@ const QuotationGenerator = () => {
                                 {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
                                 {generating ? "Generating Quotation..." : "Generate Quotation"}
                             </Button>
-                            <Button
-                                variant="outline"
-                                className="sm:w-32 h-14 rounded-xl gap-2 border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 transition-all font-semibold shadow-sm"
-                            >
-                                <Eye className="w-5 h-5" /> Preview
-                            </Button>
                         </div>
                     </div>
                 </div>
@@ -574,7 +760,10 @@ const QuotationGenerator = () => {
                                 <span className="w-2 h-2 rounded-full bg-[#5bb09c]"></span>
                                 Recent Quotations
                             </h3>
-                            <button className="text-xs font-bold text-gray-500 hover:text-[#5bb09c] transition-colors uppercase tracking-wider bg-gray-50 hover:bg-[#5bb09c]/10 px-3 py-1.5 rounded-full">
+                            <button
+                                onClick={handleOpenViewAll}
+                                className="text-xs font-bold text-gray-500 hover:text-[#5bb09c] transition-colors uppercase tracking-wider bg-gray-50 hover:bg-[#5bb09c]/10 px-3 py-1.5 rounded-full"
+                            >
                                 View All
                             </button>
                         </div>
