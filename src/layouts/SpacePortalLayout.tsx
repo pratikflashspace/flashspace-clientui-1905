@@ -7,8 +7,10 @@ import Footer from "@/components/SpacePartner/footer/Footer";
 
 import { SpacePortalSearchProvider } from "@/contexts/SpacePortalSearchContext";
 import { SpacePortalNotificationsProvider } from "@/contexts/SpacePortalNotificationsContext";
+import { useSocket } from "@/contexts/SocketContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { API_CONFIG } from "@/config/api.config";
 
-import { SPACE_PORTAL_NOTIFICATIONS } from "@/data/spacePortal/notifications";
 import type { SpacePortalNotification } from "@/types/spacePortal/notification";
 
 /**
@@ -18,16 +20,35 @@ import type { SpacePortalNotification } from "@/types/spacePortal/notification";
  * - Sidebar layout (desktop + mobile)
  * - Topbar header (title, subtitle, search bar)
  * - Search query persistence per route
- * - Notification context provider
+ * - Notification context provider (real-time via Socket.io + REST API)
  * - Toast queue handling
- *
- * Backend-ready:
- * - Replace SPACE_PORTAL_NOTIFICATIONS with API fetched notifications.
- * - Replace addNotification logic with WebSocket / polling updates.
+ * /
+ /**
+ * Map a raw backend INotification to SpacePortalNotification.
  */
+function mapNotification(raw: any): SpacePortalNotification {
+  const id = raw._id?.toString() ?? raw.id ?? String(Date.now());
+  return {
+    _id: id,
+    id,
+    title: raw.title ?? "",
+    description: raw.message ?? raw.description ?? undefined,
+    read: raw.read ?? false,
+    createdAt: raw.createdAt ?? undefined,
+    time: raw.createdAt
+      ? new Date(raw.createdAt).toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+      : undefined,
+  };
+}
+
 export default function SpacePortalLayout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { socket } = useSocket();
+  const { user } = useAuth();
 
   // Sidebar UI state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -46,12 +67,11 @@ export default function SpacePortalLayout() {
   >({});
 
   /**
-   * Notifications state (currently using mock data)
-   */
-  const [notifications, setNotifications] = useState(
-    SPACE_PORTAL_NOTIFICATIONS
-  );
-
+  * Notifications state — populated from API on mount,
+  * updated in real-time via Socket.io.
+  */
+   const [notifications, setNotifications] = useState<SpacePortalNotification[]>([]);
+  
   /**
    * Toast queue system (shows 1 toast at a time)
    */
@@ -62,16 +82,63 @@ export default function SpacePortalLayout() {
   const toastTimeoutRef = useRef<number | null>(null);
 
   /**
-   * Used to detect new notifications (by ID)
+   * Used to detect new notifications (by ID) for toast/browser-notification.
    */
-  const prevNotificationIdsRef = useRef<Set<string>>(
-    new Set(SPACE_PORTAL_NOTIFICATIONS.map((item) => item.id))
-  );
+  const prevNotificationIdsRef = useRef<Set<string>>(new Set());
 
   /**
    * Avoid requesting Notification permission repeatedly.
    */
   const hasRequestedNotificationPermissionRef = useRef(false);
+
+  // ───────────────────────────────────────────────
+  // 1. Fetch notifications from API on mount
+  // ───────────────────────────────────────────────
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch(`${API_CONFIG.BASE_URL}/api/notifications`, {
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          const mapped: SpacePortalNotification[] = data.data.map(mapNotification);
+          setNotifications(mapped);
+          // Seed the set so existing notifications don't re-toast
+          prevNotificationIdsRef.current = new Set(mapped.map((n) => n.id));
+        }
+      } catch (err) {
+        console.error("[SpacePortal] Failed to fetch notifications:", err);
+      }
+    };
+
+    fetchNotifications();
+  }, [user]);
+
+  // ───────────────────────────────────────────────
+  // 2. Subscribe to real-time notifications via Socket.io
+  // ───────────────────────────────────────────────
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    const userId = (user as any)._id ?? (user as any).id;
+
+    // Join the partner's personal feed room
+    socket.emit("join_user_feed", userId);
+
+    const handleNewNotification = (raw: any) => {
+      const notification = mapNotification(raw);
+      setNotifications((prev) => [notification, ...prev]);
+    };
+
+    socket.on("notification:new", handleNewNotification);
+
+    return () => {
+      socket.off("notification:new", handleNewNotification);
+    };
+  }, [socket, user]);
 
   /**
    * Search bar configuration per route.
@@ -352,27 +419,58 @@ export default function SpacePortalLayout() {
   };
 
   /**
-   * Notification provider value extracted (cleaner + backend ready).
+   * Notification provider value — all mutations are optimistic
+   * (local state updates immediately; API call follows async).
    */
   const notificationsProviderValue = useMemo(() => {
+     const base = API_CONFIG.BASE_URL;
+
     return {
       notifications,
 
-      markAllRead: () =>
-        setNotifications((prev) => prev.map((item) => ({ ...item, read: true }))),
+      markAllRead: async () => {
+        setNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
+        try {
+          await fetch(`${base}/api/notifications/read-all`, {
+            method: "PATCH",
+            credentials: "include",
+          });
+        } catch (err) {
+          console.error("[SpacePortal] markAllRead failed:", err);
+        }
+      },
 
-      markRead: (id: string) =>
+    markRead: async (id: string) => {
         setNotifications((prev) =>
           prev.map((item) => (item.id === id ? { ...item, read: true } : item))
-        ),
+ );
+        try {
+          await fetch(`${base}/api/notifications/${id}/read`, {
+            method: "PATCH",
+            credentials: "include",
+          });
+        } catch (err) {
+          console.error("[SpacePortal] markRead failed:", err);
+        }
+      },
 
+      // Mark unread is local-only (no backend PATCH for unread)
       markUnread: (id: string) =>
         setNotifications((prev) =>
           prev.map((item) => (item.id === id ? { ...item, read: false } : item))
         ),
 
-      deleteNotification: (id: string) =>
-        setNotifications((prev) => prev.filter((item) => item.id !== id)),
+      deleteNotification: async (id: string) => {
+        setNotifications((prev) => prev.filter((item) => item.id !== id));
+        try {
+          await fetch(`${base}/api/notifications/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+        } catch (err) {
+          console.error("[SpacePortal] deleteNotification failed:", err);
+        }
+      },
 
       restoreNotification: (
         notification: SpacePortalNotification,
@@ -394,7 +492,17 @@ export default function SpacePortalLayout() {
           ];
         }),
 
-      clearNotifications: () => setNotifications([]),
+      clearNotifications: async () => {
+        setNotifications([]);
+        try {
+          await fetch(`${base}/api/notifications/all`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+        } catch (err) {
+          console.error("[SpacePortal] clearNotifications failed:", err);
+        }
+      },
 
       addNotification: (notification: SpacePortalNotification) =>
         setNotifications((prev) => [notification, ...prev]),
