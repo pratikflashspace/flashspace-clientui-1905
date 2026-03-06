@@ -486,6 +486,8 @@ const GetWorkspaces = () => {
     getAvailableCities().then((cities) => {
       setAvailableCities(cities);
       setCitiesLoading(false);
+    }).catch(() => {
+      setCitiesLoading(false);
     });
   }, []);
 
