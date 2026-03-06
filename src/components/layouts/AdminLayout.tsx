@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   LayoutDashboard,
   Users,
@@ -17,6 +20,7 @@ import {
   Briefcase,
   Shield,
   ChevronLeft,
+  ChevronRight,
   Home,
   LineChart,
   Target,
@@ -32,16 +36,21 @@ import { adminService } from "@/services/admin.service";
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const location = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [pendingKycCount, setPendingKycCount] = useState(0);
+
+  const isActive = (path: string) => {
+    if (path === "/admin") return location.pathname === "/admin";
+    return location.pathname.startsWith(path);
+  };
 
   React.useEffect(() => {
     const fetchPendingKyc = async () => {
       try {
         const response = await adminService.getPendingKYC();
         if (response.success && response.data) {
-          // Deduplicate by _id in case the backend returns duplicate joins
           const uniqueRequests = response.data.filter(
             (req: any, index: number, self: any[]) =>
               index === self.findIndex((r) => r._id === req._id),
@@ -212,253 +221,154 @@ export default function AdminLayout() {
   );
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] flex font-sans text-gray-900">
-      {/* Sidebar - Desktop */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 transition-all duration-300 ${isSidebarOpen ? "w-72" : "w-20"
-          } hidden md:flex flex-col shadow-sm`}
-      >
-        {/* Sidebar Header */}
-        <div className="h-auto py-8 px-6 flex flex-col items-start gap-1">
-          <div className="flex items-center gap-2 text-xl font-bold tracking-tight text-teal-900 font-sans mb-2">
-            {isSidebarOpen ? (
-              <span className="text-2xl font-extrabold tracking-tighter text-teal-950">
-                flashspace
+    <div className="min-h-screen bg-muted/30">
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background border-b border-border z-50 flex items-center justify-between px-4">
+        <Link to="/" className="flex items-baseline">
+          <span className="text-xl font-extrabold tracking-tight text-foreground">flash</span>
+          <span className="text-lg font-extrabold tracking-tight text-primary italic">space</span>
+        </Link>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </Button>
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={cn(
+        "fixed top-0 left-0 h-full bg-background border-r border-border z-50 transition-all duration-300",
+        collapsed ? "w-20" : "w-72",
+        mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
+        <div className="flex flex-col h-full">
+          {/* Sidebar Header */}
+          <div className="p-6 border-b border-border">
+            <Link to="/" className="flex items-baseline mb-4">
+              <span className={cn(
+                "font-extrabold tracking-tight text-foreground transition-all",
+                collapsed ? "text-xl" : "text-2xl"
+              )}>
+                {collapsed ? "f" : "flash"}
               </span>
-            ) : (
-              <span className="text-2xl font-extrabold text-teal-600">f.</span>
+              {!collapsed && (
+                <span className="text-xl font-extrabold tracking-tight text-primary italic">space</span>
+              )}
+            </Link>
+            {!collapsed && (
+              <div>
+                <h2 className="font-bold text-foreground text-sm">FlashSpace Admin</h2>
+                <p className="text-xs text-muted-foreground mt-1">Complete platform management</p>
+              </div>
             )}
           </div>
-          {isSidebarOpen && (
-            <>
-              <h2 className="text-sm font-bold text-gray-900">
-                FlashSpace Admin
-              </h2>
-              <p className="text-xs text-gray-500 font-medium">
-                Complete platform management
-              </p>
-            </>
-          )}
-        </div>
 
-        {/* Navigation */}
-        <div className="flex-1 min-h-0 w-full overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-300">
-          <nav className="px-4 space-y-2 pb-4">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.path === "/admin"}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                    ? "bg-teal-600 text-white shadow-md shadow-teal-200"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium"
-                  }`
-                }
-              >
-                <item.icon
-                  className={`w-5 h-5 flex-shrink-0 transition-colors ${
-                    // Active styles handled by parent class
-                    ""
-                    }`}
-                />
-                {isSidebarOpen && (
-                  <span className="whitespace-nowrap font-medium text-sm">
-                    {item.label}
-                  </span>
-                )}
+          {/* Navigation */}
+          <ScrollArea className="flex-1 py-4">
+            <nav className="px-3 space-y-1">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  end={item.path === "/admin"}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) => cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  {!collapsed && <span className="whitespace-nowrap">{item.label}</span>}
 
-                {item.label === "KYC Verification" && pendingKycCount > 0 && (
-                  <span
-                    className={`ml-auto flex items-center gap-1 text-xs font-bold text-red-500 transition-all duration-200 ${!isSidebarOpen ? "absolute right-2 shadow-md bg-white p-0.5 rounded-full" : ""}`}
-                    title={`${pendingKycCount} Pending KYC Requests`}
-                  >
-                    <AlertTriangle size={14} strokeWidth={2.5} />
-                    {isSidebarOpen && "Request"}
-                  </span>
-                )}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
+                  {item.label === "KYC Verification" && pendingKycCount > 0 && (
+                    <span
+                      className={cn(
+                        "ml-auto flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 border border-red-200",
+                        collapsed && "absolute right-2 top-2"
+                      )}
+                    >
+                      {pendingKycCount}
+                    </span>
+                  )}
+                </NavLink>
+              ))}
+            </nav>
+          </ScrollArea>
 
-        {/* Bottom Actions */}
-        <div className="p-4 mt-auto border-t border-gray-100 space-y-2">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className={`flex items-center gap-3 px-4 py-2.5 w-full bg-teal-50 rounded-xl text-teal-700 hover:bg-teal-100 transition-colors ${!isSidebarOpen ? "justify-center" : ""}`}
-          >
-            <LayoutDashboard className="w-5 h-5 text-teal-600" />
-            {isSidebarOpen && (
-              <span className="font-semibold text-sm">User Dashboard</span>
-            )}
-          </button>
+          {/* Collapse Toggle */}
+          <div className="p-4 border-t border-border hidden lg:block">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-center"
+              onClick={() => setCollapsed(!collapsed)}
+            >
+              {collapsed ? (
+                <ChevronRight className="w-4 h-4" />
+              ) : (
+                <>
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  <span>Collapse</span>
+                </>
+              )}
+            </Button>
+          </div>
 
-          <button
-            onClick={() => navigate("/")}
-            className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-gray-500 hover:bg-gray-50 transition-colors ${!isSidebarOpen ? "justify-center" : ""}`}
-          >
-            <Home className="w-5 h-5" />
-            {isSidebarOpen && (
-              <span className="font-medium text-sm">Back to Home</span>
-            )}
-          </button>
+          {/* Bottom Actions */}
+          <div className="p-4 border-t border-border space-y-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className={cn("w-full justify-start", collapsed && "justify-center px-2")}
+              onClick={() => navigate("/dashboard")}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              {!collapsed && <span className="ml-2">User Dashboard</span>}
+            </Button>
 
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-gray-400 hover:bg-gray-50 transition-colors ${!isSidebarOpen ? "justify-center" : ""}`}
-          >
-            <ChevronLeft
-              className={`w-5 h-5 transition-transform ${!isSidebarOpen ? "rotate-180" : ""}`}
-            />
-            {isSidebarOpen && (
-              <span className="font-medium text-xs uppercase tracking-wider">
-                Collapse
-              </span>
-            )}
-          </button>
+            <Link to="/">
+              <Button variant="ghost" size="sm" className={cn("w-full justify-start", collapsed && "justify-center px-2")}>
+                <Home className="w-4 h-4" />
+                {!collapsed && <span className="ml-2">Back to Home</span>}
+              </Button>
+            </Link>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn("w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50", collapsed && "justify-center px-2")}
+              onClick={handleLogout}
+            >
+              <LogOut className="w-4 h-4" />
+              {!collapsed && <span className="ml-2">Logout</span>}
+            </Button>
+          </div>
         </div>
       </aside>
 
-      {/* Mobile Sidebar Overlay */}
-      {isMobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-teal-900/20 backdrop-blur-sm"
-            onClick={() => setIsMobileOpen(false)}
-          />
-
-          {/* Sidebar Panel */}
-          <aside className="fixed inset-y-0 left-0 w-72 bg-white text-gray-900 flex flex-col shadow-2xl animate-in slide-in-from-left duration-300">
-            {/* Header */}
-            <div className="py-8 px-6 flex flex-col items-start gap-1 border-b border-gray-100">
-              <span className="text-2xl font-extrabold tracking-tighter text-teal-950">
-                flashspace
-              </span>
-              <h2 className="text-sm font-bold text-gray-900 mt-2">
-                FlashSpace Admin
-              </h2>
-              <p className="text-xs text-gray-500 font-medium">
-                Complete platform management
-              </p>
-              <button
-                onClick={() => setIsMobileOpen(false)}
-                className="absolute top-6 right-6 p-2 hover:bg-gray-50 rounded-full transition-colors text-gray-400"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Nav Links */}
-            <div className="flex-1 min-h-0 w-full overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-300">
-              <nav className="px-4 py-6 space-y-2 pb-8">
-                {navItems.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setIsMobileOpen(false)}
-                    end={item.path === "/admin"}
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${isActive
-                        ? "bg-teal-600 text-white shadow-md shadow-teal-200"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium"
-                      }`
-                    }
-                  >
-                    <item.icon className="w-5 h-5 flex-shrink-0" />
-                    <span className="font-medium text-sm">{item.label}</span>
-                    {item.label === "KYC Verification" &&
-                      pendingKycCount > 0 && (
-                        <span
-                          className="ml-auto flex items-center gap-1 text-xs font-bold text-red-500"
-                          title={`${pendingKycCount} Pending KYC Requests`}
-                        >
-                          <AlertTriangle size={14} strokeWidth={2.5} />
-                          KYC
-                        </span>
-                      )}
-                  </NavLink>
-                ))}
-              </nav>
-            </div>
-
-            {/* Bottom */}
-            <div className="p-4 border-t border-gray-100 space-y-2">
-              <button
-                onClick={() => navigate("/dashboard")}
-                className="flex items-center gap-3 px-4 py-3 w-full bg-teal-50 rounded-xl text-teal-700 hover:bg-teal-100 transition-colors"
-              >
-                <LayoutDashboard className="w-5 h-5 text-teal-600" />
-                <span className="font-semibold text-sm">User Dashboard</span>
-              </button>
-              <button
-                onClick={() => navigate("/")}
-                className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-gray-500 hover:bg-gray-50 transition-colors"
-              >
-                <Home className="w-5 h-5" />
-                <span className="font-medium text-sm">Back to Home</span>
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-500 hover:bg-red-50 transition-colors"
-              >
-                <LogOut className="w-5 h-5" />
-                <span className="font-medium text-sm">Logout</span>
-              </button>
-            </div>
-          </aside>
-        </div>
-      )}
-
       {/* Main Content */}
-      <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isSidebarOpen ? "md:ml-72" : "md:ml-20"
-          }`}
-      >
-        {/* Topbar - Simplified to match clean style */}
-        <header className="h-20 bg-transparent flex items-center justify-between px-8 md:px-12 pt-6">
-          <div className="flex items-center gap-4">
-            <button
-              className="md:hidden p-2 hover:bg-gray-100 rounded-lg text-gray-500"
-              onClick={() => setIsMobileOpen(true)}
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-            {/* Breadcrumbs or Title could go here, but Dashboard usually handles its own header */}
-          </div>
-
-          <div className="flex items-center gap-6">
-            {/* Search Bar - Optional, based on ref it might be cleaner without or minimal */}
-            {/*  <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200 shadow-sm focus-within:ring-2 focus-within:ring-teal-100 transition-all w-64">
-                            <Search className="w-4 h-4 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                className="bg-transparent border-none focus:outline-none text-sm w-full text-gray-600 placeholder:text-gray-400"
-                            />
-                        </div> */}
-
-            {/* Profile/Notifs */}
-            {/*  <button className="relative p-2 hover:bg-white rounded-full text-gray-400 hover:text-gray-600 transition-colors">
-                            <Bell className="w-5 h-5" />
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                        </button> */}
-
-            {/* Minimal Profile */}
-            {/* <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold shadow-md cursor-pointer hover:scale-105 transition-transform">
-                             {user?.fullName?.charAt(0) || 'U'}
-                        </div> */}
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <main className="flex-1 px-8 md:px-12 py-6">
+      <main className={cn(
+        "transition-all duration-300 pt-16 lg:pt-0 min-h-screen flex flex-col",
+        collapsed ? "lg:ml-20" : "lg:ml-72"
+      )}>
+        <div className="p-6 lg:p-8 flex-1">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

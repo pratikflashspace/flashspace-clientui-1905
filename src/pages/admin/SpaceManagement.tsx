@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { adminService } from "@/services/admin.service";
 import { Search, MapPin, Star, Plus, Trash2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import EditSpaceModal from "@/components/admin/EditSpaceModal";
 import AddSpaceModal from "@/components/admin/AddSpaceModal";
 
@@ -146,24 +147,21 @@ export default function SpaceManagement() {
   });
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="p-8 max-w-[1600px] mx-auto animate-in fade-in duration-500">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-[Poppins]">
-            Space Management
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+            Space <span className="text-primary italic">Management</span>
           </h1>
-          <p className="text-gray-500 mt-2 text-lg">
+          <p className="text-muted-foreground mt-2">
             Manage and organize all your office listings in one place.
           </p>
         </div>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="group px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium"
-        >
-          <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          <span>Add New Space</span>
-        </button>
+        <Button onClick={() => setIsAddModalOpen(true)}>
+          <Plus className="w-4 h-4 mr-2" />
+          Add New Space
+        </Button>
       </div>
 
       {/* Controls & Filters */}
@@ -212,21 +210,19 @@ export default function SpaceManagement() {
           <div className="flex bg-gray-100 p-1 rounded-xl">
             <button
               onClick={() => setViewMode("active")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                viewMode === "active"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${viewMode === "active"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+                }`}
             >
               Active Listings
             </button>
             <button
               onClick={() => setViewMode("deleted")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                viewMode === "deleted"
-                  ? "bg-white text-red-600 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${viewMode === "deleted"
+                ? "bg-white text-red-600 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+                }`}
             >
               <Trash2 className="w-4 h-4" />
               Recycle Bin
@@ -248,11 +244,10 @@ export default function SpaceManagement() {
           {filteredSpaces.map((space) => (
             <div
               key={space._id}
-              className={`group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col ${
-                viewMode === "deleted"
-                  ? "opacity-80 hover:opacity-100 grayscale-[0.3] hover:grayscale-0"
-                  : ""
-              }`}
+              className={`group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col ${viewMode === "deleted"
+                ? "opacity-80 hover:opacity-100 grayscale-[0.3] hover:grayscale-0"
+                : ""
+                }`}
             >
               {/* Image Header */}
               <div className="h-56 relative overflow-hidden">
@@ -281,11 +276,10 @@ export default function SpaceManagement() {
                     </span>
                   </div>
                   <span
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm backdrop-blur-md text-white border border-white/10 ${
-                      space.type === "virtual-office"
-                        ? "bg-blue-600/90"
-                        : "bg-indigo-600/90"
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm backdrop-blur-md text-white border border-white/10 ${space.type === "virtual-office"
+                      ? "bg-blue-600/90"
+                      : "bg-indigo-600/90"
+                      }`}
                   >
                     {space.type === "virtual-office"
                       ? "Virtual Office"
@@ -363,11 +357,10 @@ export default function SpaceManagement() {
                               : "Unavailable",
                           });
                         }}
-                        className={`flex-1 py-2.5 font-semibold rounded-xl border transition-all text-sm whitespace-nowrap px-2 ${
-                          space.availability === "Unavailable"
-                            ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                            : "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100"
-                        }`}
+                        className={`flex-1 py-2.5 font-semibold rounded-xl border transition-all text-sm whitespace-nowrap px-2 ${space.availability === "Unavailable"
+                          ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                          : "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100"
+                          }`}
                       >
                         {space.availability === "Unavailable"
                           ? "Make Available"
