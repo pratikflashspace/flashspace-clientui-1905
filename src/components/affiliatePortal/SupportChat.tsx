@@ -116,7 +116,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
                         className={`flex items-start gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
                     >
                         <div
-                            className={`p-2 rounded-lg border shrink-0 ${msg.role === "user" ? "bg-[#5bb09c] text-white" : "bg-gray-50 text-gray-700"}`}
+                           className={`p-2 rounded-lg border shrink-0 ${msg.role === "user" ? "bg-[#5bb09c] text-white border-[#5bb09c]" : "bg-gray-50 text-gray-700 border-gray-200"}`}
                         >
                             {msg.role === "user" ? (
                                 <User className="w-4 h-4" />
@@ -125,14 +125,24 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
                             )}
                         </div>
                         <div
-                            className={`max-w-[80%] space-y-1 ${msg.role === "user" ? "text-right" : ""}`}
+                            className={`max-w-[80%] space-y-1.5 ${msg.role === "user" ? "text-right" : ""}`}
                         >
+                            {/* Role badge */}
+                            <div className={`flex items-center gap-1.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider
+                                    ${msg.role === "user"
+                                        ? 'bg-[#5bb09c]/15 text-[#3d8a78]'
+                                        : 'bg-purple-100 text-purple-700'
+                                    }`}>
+                                    <span className={`w-1 h-1 rounded-full shrink-0 ${msg.role === "user" ? 'bg-[#5bb09c]' : 'bg-purple-400 animate-pulse'}`} />
+                                    {msg.role === "user" ? "Affiliate" : "AI Support"}
+                                </span>
+                            </div>
                             <div
-                                className={`p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
-                                    msg.role === "user"
+                                className={`p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === "user"
                                         ? "bg-[#5bb09c] text-white rounded-tr-none"
                                         : "bg-gray-50 text-gray-700 rounded-tl-none border border-gray-100"
-                                }`}
+                                    }`}
                             >
                                 {msg.text}
                             </div>

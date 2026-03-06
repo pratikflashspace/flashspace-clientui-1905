@@ -75,7 +75,7 @@ export default function SupportChat() {
             const exists = t.messages.some(
               (m) =>
                 new Date(m.createdAt).getTime() ===
-                  new Date(data.message.createdAt).getTime() &&
+                new Date(data.message.createdAt).getTime() &&
                 m.message === data.message.message,
             );
             if (exists) return t;
@@ -202,6 +202,22 @@ export default function SupportChat() {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
+  // ── Role badge config ────────────────────────────────────────────
+  const ROLE_BADGE: Record<string, { bg: string; text: string; label: string; dot: string }> = {
+    user: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Client', dot: 'bg-blue-400' },
+    admin: { bg: 'bg-teal-100', text: 'text-teal-700', label: 'Admin', dot: 'bg-teal-400' },
+    partner: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Space Partner', dot: 'bg-amber-400' },
+    support: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'AI Support', dot: 'bg-purple-400' },
+  };
+
+  const getMsgIdentifier = (sender: string, ticket: AdminTicketData, adminEmail?: string): string => {
+    if (sender === 'user') return ticket.user?.email || ticket.user?.fullName || '';
+    if (sender === 'admin') return adminEmail || 'admin@flashspace.io';
+    if (sender === 'partner') return 'partner@flashspace.io';
+    return 'AI · flashspace.io';
+  };
+  // ────────────────────────────────────────────────────────────────
+
   if (loading) {
     return (
       <div className="p-12 text-center text-gray-500">
@@ -248,11 +264,10 @@ export default function SupportChat() {
                 <div
                   key={ticket._id}
                   onClick={() => setActiveTicketId(ticket._id)}
-                  className={`p-4 rounded-xl cursor-pointer transition-all ${
-                    activeTicketId === ticket._id
+                  className={`p-4 rounded-xl cursor-pointer transition-all ${activeTicketId === ticket._id
                       ? "bg-teal-50 border border-teal-100 shadow-sm"
                       : "hover:bg-gray-50 border border-transparent"
-                  }`}
+                    }`}
                 >
                   <div className="flex justify-between items-start mb-1">
                     <div className="flex items-center gap-3">
@@ -354,42 +369,39 @@ export default function SupportChat() {
                   const isAdmin = msg.sender === "admin";
                   const isSupport = msg.sender === "support";
                   const isUser = msg.sender === "user";
+                  const isMine = isAdmin || isSupport;
+                  const badge = ROLE_BADGE[msg.sender] || ROLE_BADGE.support;
+                  const identifier = getMsgIdentifier(msg.sender, activeTicket, user?.email);
 
                   return (
                     <div
                       key={idx}
-                      className={`flex ${isAdmin || isSupport ? "justify-end" : "justify-start"}`}
+                      className={`flex ${isMine ? "justify-end" : "justify-start"}`}
                     >
                       <div className="max-w-[80%]">
                         <div
                           className={`p-4 rounded-2xl shadow-sm relative group
-                                                    ${
-                                                      isAdmin
-                                                        ? "bg-teal-600 text-white rounded-tr-none"
-                                                        : isSupport
-                                                          ? "bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none"
-                                                          : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
-                                                    }
-                                                `}
-                        >
-                          {/* Sender Label */}
-                          <p
-                            className={`text-xs font-bold mb-1
-                                                        ${
-                                                          isAdmin
-                                                            ? "text-teal-100"
-                                                            : isSupport
-                                                              ? "text-purple-600"
-                                                              : "text-gray-400"
-                                                        }
-                                                    `}
-                          >
-                            {isAdmin
-                              ? "You (Admin)"
+                                ${isAdmin
+                              ? "bg-teal-600 text-white rounded-tr-none"
                               : isSupport
-                                ? "AI Support"
-                                : activeTicket.user?.fullName || "User"}
-                          </p>
+                               ? "bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none"
+                                : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
+                            }
+                          `}
+                        >
+                          {/* Role badge + identifier */}
+                          <div className={`flex items-center gap-1.5 mb-2 ${isMine ? 'flex-row-reverse' : ''}`}>
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider
+                              ${isAdmin ? 'bg-white/20 text-white' : isSupport ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                              <span className={`w-1 h-1 rounded-full shrink-0 ${isAdmin ? 'bg-white' : badge.dot}`} />
+                              {badge.label}
+                            </span>
+                            {identifier && (
+                              <span className={`text-[10px] font-medium truncate max-w-[140px] ${isAdmin ? 'text-white/60' : isSupport ? 'text-purple-400' : 'text-gray-400'}`}>
+                                {identifier}
+                              </span>
+                            )}
+                          </div>
 
                           {isSupport && (
                             <div className="absolute -right-10 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -407,13 +419,11 @@ export default function SupportChat() {
                             </div>
                           )}
 
-                          <p
-                            className={`text-sm leading-relaxed whitespace-pre-wrap`}
-                          >
+                           <p className="text-sm leading-relaxed whitespace-pre-wrap">
                             {msg.message}
                           </p>
                         </div>
-                        <span className="text-[10px] text-gray-400 mt-1 block px-2 text-right">
+                         <span className={`text-[10px] text-gray-400 mt-1 block px-2 ${isMine ? 'text-right' : ''}`}>
                           {format(new Date(msg.createdAt), "h:mm a")}
                         </span>
                       </div>
@@ -425,7 +435,7 @@ export default function SupportChat() {
 
               {/* Input Area */}
               {activeTicket.status !== "resolved" &&
-              activeTicket.status !== "closed" ? (
+                activeTicket.status !== "closed" ? (
                 hasTakenOver ? (
                   <div className="p-6 bg-white border-t border-gray-100">
                     <div className="flex items-center gap-4 bg-gray-50 p-2 pr-2 rounded-2xl border border-gray-200 focus-within:ring-2 focus-within:ring-teal-100 focus-within:border-teal-200 transition-all">

@@ -29,6 +29,7 @@ interface Ticket {
         spaceSnapshot?: { name?: string };
     };
     assignee?: { fullName: string; email: string };
+    user?: { fullName?: string; email?: string }; // Populated in some contexts
     createdAt: string;
     updatedAt: string;
 }
@@ -159,6 +160,21 @@ export default function ChatSupport() {
         return 'AI Support';
     };
 
+     // Role badge config: bg color + text color + label
+    const ROLE_BADGE: Record<string, { bg: string; text: string; label: string; dot: string }> = {
+        user: { bg: 'bg-emerald-700/30', text: 'text-emerald-100', label: 'Client', dot: 'bg-emerald-300' },
+        partner: { bg: 'bg-teal-500/30', text: 'text-teal-100', label: 'Space Partner', dot: 'bg-teal-300' },
+        admin: { bg: 'bg-indigo-100', text: 'text-indigo-700', label: 'Admin', dot: 'bg-indigo-400' },
+        support: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'AI Support', dot: 'bg-purple-400' },
+    };
+
+    const getSenderIdentifier = (sender: string, ticket: Ticket, currentUserEmail?: string): string => {
+        if (sender === 'user') return currentUserEmail || ticket.user?.email || '';
+        if (sender === 'partner' && ticket.assignee?.email) return ticket.assignee.email;
+        if (sender === 'admin') return 'flashspace.io';
+        return 'AI · flashspace.io';
+    };
+
     const getSenderColors = (sender: string) => {
         if (sender === 'user') return 'bg-[#35503F] text-white rounded-tr-none';
         if (sender === 'partner') return 'bg-teal-600 text-white rounded-tl-none';
@@ -265,13 +281,24 @@ export default function ChatSupport() {
                                         )}
                                         {activeTicket.messages.map((msg, idx) => {
                                             const isUser = msg.sender === 'user';
+                                            const badge = ROLE_BADGE[msg.sender] || ROLE_BADGE.support;
+                                            const identifier = getSenderIdentifier(msg.sender, activeTicket, user?.email);
                                             return (
                                                 <div key={idx} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
                                                     <div className="max-w-[75%]">
                                                         <div className={`p-3.5 rounded-2xl text-sm shadow-sm ${getSenderColors(msg.sender)}`}>
-                                                            <p className={`text-[10px] font-bold mb-1 ${isUser ? 'text-white/70' : msg.sender === 'partner' ? 'text-teal-100' : 'text-indigo-600'}`}>
-                                                                {getSenderLabel(msg.sender, activeTicket)}
-                                                            </p>
+                                                             {/* Role badge + sender name row */}
+                                                            <div className={`flex items-center gap-1.5 mb-2 ${isUser ? 'flex-row-reverse' : ''}`}>
+                                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${badge.bg} ${badge.text}`}>
+                                                                    <span className={`w-1 h-1 rounded-full shrink-0 ${badge.dot}`} />
+                                                                    {badge.label}
+                                                                </span>
+                                                                {identifier && (
+                                                                    <span className={`text-[10px] font-medium truncate max-w-[120px] ${isUser ? 'text-white/60' : 'text-gray-400'}`}>
+                                                                        {identifier}
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                             <p className="leading-relaxed whitespace-pre-wrap">{msg.message}</p>
                                                         </div>
                                                         <span className={`text-[10px] text-gray-400 mt-1 block px-1 ${isUser ? 'text-right' : ''}`}>
