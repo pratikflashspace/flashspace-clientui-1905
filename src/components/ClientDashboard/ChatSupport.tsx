@@ -179,6 +179,7 @@ export default function ChatSupport() {
         if (sender === 'user') return 'bg-[#35503F] text-white rounded-tr-none';
         if (sender === 'partner') return 'bg-teal-600 text-white rounded-tl-none';
         if (sender === 'admin') return 'bg-indigo-50 text-gray-800 border border-indigo-100 rounded-tl-none';
+        if (sender === 'affiliate') return 'bg-amber-50 text-gray-800 border border-amber-200 rounded-tl-none';
         return 'bg-gray-100 text-gray-700 rounded-tl-none';
     };
 

@@ -2,7 +2,7 @@ import axiosInstance from '@/lib/axios';
 
 // ============ TYPES ============
 export interface PartnerTicketMessage {
-    sender: 'user' | 'support' | 'admin' | 'partner';
+    sender: 'user' | 'support' | 'admin' | 'partner' | 'affiliate';
     message: string;
     attachments?: string[];
     createdAt: string;
@@ -87,7 +87,7 @@ class PartnerTicketService {
         const response = await axiosInstance.post<ApiResponse<PartnerTicketData>>(`/api/tickets/partner/${ticketId}/close`);
         return response.data;
     }
-    
+
     /**
      * Partner sends a message to a client by creating a ticket on their behalf.
      * The ticket appears in the client's "My Tickets" section.

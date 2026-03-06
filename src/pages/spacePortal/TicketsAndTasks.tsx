@@ -297,7 +297,7 @@ export default function TicketsAndTasksPage() {
                         onClick={handleTakeOver}
                         className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors shadow-sm"
                       >
-                        Take Over
+                        🎯 Tap In
                       </button>
                     )}
                     {activeTicket.status !== 'resolved' && activeTicket.status !== 'closed' && (
@@ -324,51 +324,67 @@ export default function TicketsAndTasksPage() {
                     const isPartner = msg.sender === 'partner';
                     const isAdmin = msg.sender === 'admin';
                     const isSupport = msg.sender === 'support';
+                    const isAffiliate = msg.sender === 'affiliate';
                     const isRightSide = isPartner || isAdmin || isSupport;
+
+                    // ── Role badge config ────────────────────────────
+                    const ROLE_BADGE: Record<string, { bg: string; text: string; label: string; dot: string; bubbleDot?: string }> = {
+                      user: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Client', dot: 'bg-blue-400' },
+                      partner: { bg: 'bg-white/25', text: 'text-white', label: 'You (Partner)', dot: 'bg-white' },
+                      admin: { bg: 'bg-indigo-100', text: 'text-indigo-700', label: 'Admin', dot: 'bg-indigo-400' },
+                      affiliate: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Affiliate', dot: 'bg-amber-400' },
+                      support: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'AI Support', dot: 'bg-purple-400' },
+                    };
+
+                    const badge = ROLE_BADGE[msg.sender] || ROLE_BADGE.user;
+
+                    // Email/identifier shown under the badge
+                    const getIdentifier = (): string => {
+                      if (msg.sender === 'user') return activeTicket.user?.email || activeTicket.user?.fullName || '';
+                      if (msg.sender === 'partner') return user?.email || 'partner@flashspace.io';
+                      if (msg.sender === 'admin') return 'admin@flashspace.io';
+                      if (msg.sender === 'affiliate') return 'affiliate@flashspace.io';
+                      return 'AI · flashspace.io';
+                    };
+
+                    // Bubble background
+                    const getBubble = (): string => {
+                      if (isPartner) return 'bg-teal-600 text-white rounded-tr-none';
+                      if (isAdmin) return 'bg-indigo-50 text-gray-800 border border-indigo-100 rounded-tr-none';
+                      if (isSupport) return 'bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none';
+                      if (isAffiliate) return 'bg-amber-50 text-gray-800 border border-amber-200 rounded-tl-none';
+                      return 'bg-white text-gray-800 border border-gray-200 rounded-tl-none';
+                    };
+
+                    // System messages (join announcements)
+                    const isSystem = msg.message.startsWith('[') && msg.message.endsWith(']');
+                    if (isSystem) {
+                      return (
+                        <div key={idx} className="flex justify-center">
+                          <span className="text-[10px] text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
+                            {msg.message.replace(/\[|\]/g, '')}
+                          </span>
+                        </div>
+                      );
+                    }
 
                     return (
                       <div key={idx} className={`flex ${isRightSide ? 'justify-end' : 'justify-start'}`}>
-                        <div className="max-w-[80%]">
-                          <div className={`p-4 rounded-2xl shadow-sm relative group
-                                                        ${isPartner ? 'bg-teal-600 text-white rounded-tr-none' :
-                              isAdmin ? 'bg-indigo-50 text-gray-800 border border-indigo-100 rounded-tr-none' :
-                                isSupport ? 'bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none' :
-                                  'bg-white text-gray-800 border border-gray-200 rounded-tl-none'}
-                                                    `}>
-                            {/* Sender Label */}
-                            <p className={`text-xs font-bold mb-1
-                                                            ${isPartner ? 'text-teal-100' :
-                                isAdmin ? 'text-indigo-600' :
-                                  isSupport ? 'text-purple-600' :
-                                    'text-gray-400'}
-                                                        `}>
-                              {isPartner ? 'You (Partner)' :
-                                isAdmin ? 'Admin' :
-                                  isSupport ? 'AI Support' :
-                                    (activeTicket.user?.fullName || 'User')}
-                            </p>
-
-                            {isSupport && (
-                              <div className="absolute -right-10 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
-                                  <Bot className="w-4 h-4" />
-                                </div>
-                              </div>
-                            )}
-
-                            {isPartner && (
-                              <div className="absolute -right-10 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div className="w-8 h-8 bg-teal-50 rounded-full flex items-center justify-center text-teal-600">
-                                  <Headphones className="w-4 h-4" />
-                                </div>
-                              </div>
-                            )}
-
-                            <p className={`text-sm leading-relaxed whitespace-pre-wrap`}>
-                              {msg.message}
-                            </p>
+                        <div className="max-w-[80%] space-y-1.5">
+                          <div className={`p-4 rounded-2xl shadow-sm ${getBubble()}`}>
+                            {/* Role badge row */}
+                            <div className={`flex items-center gap-1.5 mb-2 ${isRightSide ? 'flex-row-reverse' : ''}`}>
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${badge.bg} ${badge.text}`}>
+                                <span className={`w-1 h-1 rounded-full shrink-0 ${badge.dot}`} />
+                                {badge.label}
+                              </span>
+                              <span className={`text-[10px] font-medium truncate max-w-[130px] ${isPartner ? 'text-white/60' : 'text-gray-400'}`}>
+                                {getIdentifier()}
+                              </span>
+                            </div>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</p>
                           </div>
-                          <span className="text-[10px] text-gray-400 mt-1 block px-2 text-right">
+                          <span className={`text-[10px] text-gray-400 block px-1 ${isRightSide ? 'text-right' : ''}`}>
                             {format(new Date(msg.createdAt), 'h:mm a')}
                           </span>
                         </div>

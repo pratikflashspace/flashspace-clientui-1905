@@ -129,15 +129,14 @@ export default function SupportChat() {
 
   const handleTakeOver = async () => {
     if (!activeTicketId) return;
-    const takeoverMessage =
-      "Hi, I'm the admin now. I will be the one continuing the chat.";
     try {
-      await adminService.replyToTicket(activeTicketId, takeoverMessage);
+      // Use the new tap-in endpoint which also sends a system message
+      await adminService.replyToTicket(activeTicketId, "[Admin joined the conversation]");
       setTakenOverTickets((prev) => new Set(prev).add(activeTicketId));
-      toast.success("You have taken over the chat");
+      toast.success("You have tapped in to the chat");
     } catch (error) {
-      console.error("Failed to take over", error);
-      toast.error("Failed to take over chat");
+      console.error("Failed to tap in", error);
+      toast.error("Failed to tap in to chat");
     }
   };
 
@@ -207,12 +206,14 @@ export default function SupportChat() {
     user: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Client', dot: 'bg-blue-400' },
     admin: { bg: 'bg-teal-100', text: 'text-teal-700', label: 'Admin', dot: 'bg-teal-400' },
     partner: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Space Partner', dot: 'bg-amber-400' },
+    affiliate: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Affiliate', dot: 'bg-orange-400' },
     support: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'AI Support', dot: 'bg-purple-400' },
   };
 
   const getMsgIdentifier = (sender: string, ticket: AdminTicketData, adminEmail?: string): string => {
     if (sender === 'user') return ticket.user?.email || ticket.user?.fullName || '';
     if (sender === 'admin') return adminEmail || 'admin@flashspace.io';
+     if (sender === 'affiliate') return 'affiliate@flashspace.io';
     if (sender === 'partner') return 'partner@flashspace.io';
     return 'AI · flashspace.io';
   };
@@ -265,8 +266,8 @@ export default function SupportChat() {
                   key={ticket._id}
                   onClick={() => setActiveTicketId(ticket._id)}
                   className={`p-4 rounded-xl cursor-pointer transition-all ${activeTicketId === ticket._id
-                      ? "bg-teal-50 border border-teal-100 shadow-sm"
-                      : "hover:bg-gray-50 border border-transparent"
+                    ? "bg-teal-50 border border-teal-100 shadow-sm"
+                    : "hover:bg-gray-50 border border-transparent"
                     }`}
                 >
                   <div className="flex justify-between items-start mb-1">
@@ -341,7 +342,7 @@ export default function SupportChat() {
                         onClick={handleTakeOver}
                         className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors shadow-sm"
                       >
-                        Take Over
+                        🎯 Tap In
                       </button>
                     )}
                   {activeTicket.status !== "resolved" &&
@@ -385,7 +386,9 @@ export default function SupportChat() {
                               ? "bg-teal-600 text-white rounded-tr-none"
                               : isSupport
                                ? "bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none"
-                                : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
+                                : msg.sender === 'affiliate'
+                                  ? "bg-orange-50 text-gray-800 border border-orange-200 rounded-tl-none"
+                                  : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
                             }
                           `}
                         >
