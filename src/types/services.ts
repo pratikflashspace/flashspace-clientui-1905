@@ -521,6 +521,7 @@ export interface MailRecord {
   sender: string;
   type: string;
   space: string;
+  documentUrl?: string;
   received: string;
   status: "Pending Action" | "Forwarded" | "Collected";
   createdAt: string;
