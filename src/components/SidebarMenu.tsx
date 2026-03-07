@@ -357,7 +357,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
         <div
           ref={menuScrollRef}
           onWheel={handleSidebarWheel}
-          className="flex-1 overflow-y-auto flex flex-col overscroll-contain touch-pan-y min-h-0 scroll-smooth"
+          className="flex-1 overflow-y-auto pb-32 flex flex-col overscroll-contain touch-pan-y min-h-0 scroll-smooth"
         >
           <div className="p-5 space-y-2 text-sm tracking-wide flex-1">
             <nav className="space-y-2">
@@ -417,20 +417,22 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
               ))}
             </nav>
 
+            {/* Footer */}
+            {!hideLogoFooter && (
+              <>
+                {/* User Profile Section - Only for Authenticated Users */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => handleNavigation("#contact")}
+                    className="w-full rounded-[20px] bg-[#e8e2ad] text-[#253734] font-medium py-3 text-[15px] hover:bg-[#e2da99] active:scale-[0.98] transition shadow-sm"
+                  >
+                    Get Consultation
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-
-        {/* Sticky Footer — Get Consultation */}
-        {!hideLogoFooter && (
-          <div className="p-5 border-t border-neutral-200/80 dark:border-white/10 bg-[#f3f4f3] dark:bg-[#0f0f0f]">
-            <button
-              onClick={() => handleNavigation("#contact")}
-              className="w-full rounded-[20px] bg-[#e8e2ad] text-[#253734] font-medium py-3 text-[15px] hover:bg-[#e2da99] active:scale-[0.98] transition shadow-sm"
-            >
-              Get Consultation
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
