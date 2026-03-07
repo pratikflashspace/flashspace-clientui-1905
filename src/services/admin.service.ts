@@ -190,6 +190,7 @@ export interface AdminTicketData {
     message: string;
     createdAt: string;
   }>;
+  unreadCount?: number;
 }
 
 export interface TicketStats {
@@ -242,13 +243,6 @@ class AdminService {
       {
         params: includeApproved ? { includeApproved: true } : undefined,
       },
-    );
-    return response.data;
-  }
-
-  async getKYCById(kycId: string): Promise<ApiResponse<KYCData>> {
-    const response = await axiosInstance.get<ApiResponse<KYCData>>(
-      `/api/admin/kyc/${kycId}`,
     );
     return response.data;
   }
@@ -721,6 +715,136 @@ class AdminService {
     const response = await axiosInstance.get<
       ApiResponse<{ invoices: any[]; pagination: any }>
     >("/api/admin/invoices", { params });
+    return response.data;
+  }
+
+  async getLeaderboard(): Promise<
+    ApiResponse<{
+      sales: Array<{
+        _id: string;
+        fullName: string;
+        email: string;
+        role: string;
+        rank: number;
+      }>;
+      support: Array<{
+        _id: string;
+        fullName: string;
+        email: string;
+        role: string;
+        rank: number;
+        totalTickets: number;
+        resolvedTickets: number;
+        resolution: string;
+        resolutionRate: number;
+      }>;
+    }>
+  > {
+    const response = await axiosInstance.get("/api/admin/leaderboard");
+    return response.data;
+  }
+
+  async getRevenueDashboard(): Promise<
+    ApiResponse<{
+      metrics: {
+        totalRevenue: number;
+        mtdRevenue: number;
+        ytdRevenue: number;
+        avgRevenuePerClient: number;
+      };
+      revenueByCity: Array<{
+        city: string;
+        revenue: number;
+        percentage: number;
+      }>;
+      revenueByCategory: Array<{
+        category: string;
+        revenue: number;
+        percentage: number;
+      }>;
+    }>
+  > {
+    const response = await axiosInstance.get("/api/admin/revenue/dashboard");
+    return response.data;
+  }
+
+  async getFinanceSummary(): Promise<
+    ApiResponse<{
+      metrics: {
+        totalReceivable: number;
+        overdueReceivable: number;
+        totalPayable: number;
+        dueThisWeek: number;
+      };
+      receivables: Array<{
+        _id: string;
+        client: string;
+        email: string;
+        amount: number;
+        bookingNumber: string;
+        type: string;
+        dueDate: string;
+        ageDays: number;
+        status: "current" | "upcoming" | "overdue";
+      }>;
+      payables: Array<{
+        partner: string;
+        city: string;
+        amount: number;
+        totalRevenue: number;
+        bookingCount: number;
+        dueDate: string;
+        ageDays: number;
+        status: "scheduled" | "pending" | "overdue";
+      }>;
+    }>
+  > {
+    const response = await axiosInstance.get("/api/admin/finance/summary");
+    return response.data;
+  }
+
+  async getBalanceSheet(params?: {
+    startDate?: string;
+    endDate?: string;
+  }): Promise<
+    ApiResponse<{
+      overallSummary: Array<{
+        label: string;
+        amount: number;
+        type: "credit" | "debit" | "profit";
+      }>;
+      monthlyBreakdown: Array<{
+        month: string;
+        revenue: number;
+        expenses: number;
+        profit: number;
+      }>;
+      cityBreakdown: Array<{
+        city: string;
+        revenue: number;
+        expenses: number;
+        profit: number;
+        margin: string;
+      }>;
+    }>
+  > {
+    const response = await axiosInstance.get(
+      "/api/admin/finance/balance-sheet",
+      { params },
+    );
+    return response.data;
+  }
+
+  async createTicket(data: {
+    subject: string;
+    category: string;
+    description: string;
+    priority?: string;
+  }): Promise<ApiResponse<any>> {
+    const response = await axiosInstance.post<ApiResponse<any>>(
+      "/api/tickets",
+      data,
+    );
     return response.data;
   }
 }

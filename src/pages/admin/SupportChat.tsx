@@ -175,7 +175,7 @@ export default function SupportChat() {
       t.ticketNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  // Sort tickets: Open/In Progress first, then by date (Incorporating logic from UAT)
+  // Added sorting logic from conflicted version
   filteredTickets.sort((a, b) => {
     const score = (status: string) => {
       if (status === "open") return 3;
@@ -185,22 +185,8 @@ export default function SupportChat() {
     };
     const scoreDiff = score(b.status) - score(a.status);
     if (scoreDiff !== 0) return scoreDiff;
-    return new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime();
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
-
-  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-    switch (status) {
-      case "open":
-        return "destructive";
-      case "in_progress":
-        return "default";
-      case "resolved":
-      case "closed":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -211,6 +197,8 @@ export default function SupportChat() {
       case "resolved":
       case "closed":
         return "bg-green-50 text-green-600 border-green-200";
+      case "escalated":
+        return "bg-orange-50 text-orange-600 border-orange-200";
       default:
         return "bg-gray-50 text-gray-600 border-gray-200";
     }
@@ -231,7 +219,7 @@ export default function SupportChat() {
   const getMsgIdentifier = (sender: string, ticket: AdminTicketData, adminEmail?: string): string => {
     if (sender === 'user') return ticket.user?.email || ticket.user?.fullName || '';
     if (sender === 'admin') return adminEmail || 'admin@flashspace.io';
-     if (sender === 'affiliate') return 'affiliate@flashspace.io';
+    if (sender === 'affiliate') return 'affiliate@flashspace.io';
     if (sender === 'partner') return 'partner@flashspace.io';
     return 'AI · flashspace.io';
   };

@@ -1,4 +1,5 @@
-import axiosInstance, { handleApiError } from "@/services/api.service";
+import axiosInstance from "@/lib/axios";
+import { handleApiError } from "@/services/api.service";
 
 /**
  * Fetch all coworking spaces for the logged-in partner.
@@ -7,7 +8,7 @@ import axiosInstance, { handleApiError } from "@/services/api.service";
 export const fetchPartnerSpaces = async (token?: string) => {
   try {
     const response: any = await axiosInstance.get(
-      "/coworkingSpace/partner/spaces",
+      "/api/coworkingSpace/partner/spaces",
     );
     return response.data.data;
   } catch (error) {
@@ -21,7 +22,7 @@ export const fetchPartnerSpaces = async (token?: string) => {
 export const fetchPartnerVirtualOffices = async () => {
   try {
     const response: any = await axiosInstance.get(
-      "/virtualOffice/partner/spaces",
+      "/api/virtualOffice/partner/spaces",
     );
     return response.data.data;
   } catch (error) {
@@ -40,7 +41,7 @@ export const fetchSpaceBookings = async (
   year?: number,
 ) => {
   try {
-    let url = `/user/partner/space/${spaceId}/bookings?year=${year || new Date().getFullYear()}`;
+    let url = `/api/user/partner/space/${spaceId}/bookings?year=${year || new Date().getFullYear()}`;
     if (month) {
       url += `&month=${month}`;
     }
@@ -60,7 +61,7 @@ export const fetchScheduledCalls = async (
 ) => {
   try {
     const response: any = await axiosInstance.get(
-      `/meetings/calls?startDate=${startDate}&endDate=${endDate}`,
+      `/api/meetings/calls?startDate=${startDate}&endDate=${endDate}`,
     );
     return response.data.data;
   } catch (error) {
@@ -73,7 +74,7 @@ export const fetchScheduledCalls = async (
  */
 export const fetchPartnerDashboard = async () => {
   try {
-    const response = await axiosInstance.get("/user/partner/dashboard");
+    const response = await axiosInstance.get("/api/user/partner/dashboard");
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -85,7 +86,7 @@ export const fetchPartnerDashboard = async () => {
  */
 export const fetchAllPartnerSpaces = async () => {
   try {
-    const response: any = await axiosInstance.get("/user/partner/spaces");
+    const response: any = await axiosInstance.get("/api/user/partner/spaces");
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -97,7 +98,9 @@ export const fetchAllPartnerSpaces = async () => {
  */
 export const fetchPartnerActiveRequests = async () => {
   try {
-    const response = await axiosInstance.get("/user/partner/active-requests");
+    const response = await axiosInstance.get(
+      "/api/user/partner/active-requests",
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -109,7 +112,7 @@ export const fetchPartnerActiveRequests = async () => {
  */
 export const fetchBookingAnalytics = async () => {
   try {
-    const response = await axiosInstance.get("/user/partner/analytics");
+    const response = await axiosInstance.get("/api/user/partner/analytics");
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -128,7 +131,7 @@ export const fetchBookingAnalytics = async () => {
 export const createSpace = async (data: any) => {
   try {
     const response: any = await axiosInstance.post(
-      "/spacePartner/spaces",
+      "/api/spacePartner/spaces",
       data,
     );
     return response.data;
@@ -142,7 +145,7 @@ export const createSpace = async (data: any) => {
  */
 export const fetchPartnerSpacesDocs = async () => {
   try {
-    const response: any = await axiosInstance.get("/spacePartner/spaces");
+    const response: any = await axiosInstance.get("/api/spacePartner/spaces");
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -154,7 +157,9 @@ export const fetchPartnerSpacesDocs = async () => {
  */
 export const fetchSpaceById = async (id: string) => {
   try {
-    const response: any = await axiosInstance.get(`/spacePartner/spaces/${id}`);
+    const response: any = await axiosInstance.get(
+      `/api/spacePartner/spaces/${id}`,
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -167,7 +172,7 @@ export const fetchSpaceById = async (id: string) => {
 export const updateSpace = async (id: string, data: any) => {
   try {
     const response: any = await axiosInstance.put(
-      `/spacePartner/spaces/${id}`,
+      `/api/spacePartner/spaces/${id}`,
       data,
     );
     return response.data;
@@ -182,7 +187,7 @@ export const updateSpace = async (id: string, data: any) => {
 export const deleteSpace = async (id: string) => {
   try {
     const response: any = await axiosInstance.delete(
-      `/spacePartner/spaces/${id}`,
+      `/api/spacePartner/spaces/${id}`,
     );
     return response.data;
   } catch (error) {
@@ -196,7 +201,7 @@ export const deleteSpace = async (id: string) => {
 export const createInvoice = async (data: any) => {
   try {
     const response: any = await axiosInstance.post(
-      "/spacePartner/invoices",
+      "/api/spacePartner/invoices",
       data,
     );
     return response.data.data;
@@ -210,7 +215,7 @@ export const createInvoice = async (data: any) => {
  */
 export const fetchInvoices = async () => {
   try {
-    const response: any = await axiosInstance.get("/spacePartner/invoices");
+    const response: any = await axiosInstance.get("/api/spacePartner/invoices");
     return response.data.data;
   } catch (error) {
     return handleApiError(error);
@@ -223,7 +228,7 @@ export const fetchInvoices = async () => {
 export const createPayment = async (data: any) => {
   try {
     const response: any = await axiosInstance.post(
-      "/spacePartner/payments",
+      "/api/spacePartner/payments",
       data,
     );
     return response.data.data;
@@ -237,7 +242,7 @@ export const createPayment = async (data: any) => {
  */
 export const fetchPayments = async () => {
   try {
-    const response: any = await axiosInstance.get("/spacePartner/payments");
+    const response: any = await axiosInstance.get("/api/spacePartner/payments");
     return response.data.data;
   } catch (error) {
     return handleApiError(error);
@@ -252,7 +257,7 @@ export const fetchPayments = async () => {
 export const createCoworkingSpace = async (data: any) => {
   try {
     const response: any = await axiosInstance.post(
-      "/coworkingSpace/create",
+      "/api/coworkingSpace/create",
       data,
     );
     return response.data;
@@ -269,9 +274,12 @@ export const fetchAllCoworkingSpacesPublic = async (params?: {
   property?: string;
 }) => {
   try {
-    const response: any = await axiosInstance.get("/coworkingSpace/getAll", {
-      params,
-    });
+    const response: any = await axiosInstance.get(
+      "/api/coworkingSpace/getAll",
+      {
+        params,
+      },
+    );
     return response.data.data;
   } catch (error) {
     return handleApiError(error);
@@ -284,7 +292,7 @@ export const fetchAllCoworkingSpacesPublic = async (params?: {
 export const fetchCoworkingSpacesByCity = async (city: string) => {
   try {
     const response: any = await axiosInstance.get(
-      `/coworkingSpace/getByCity/${city}`,
+      `/api/coworkingSpace/getByCity/${city}`,
     );
     return response.data.data;
   } catch (error) {
@@ -298,7 +306,7 @@ export const fetchCoworkingSpacesByCity = async (city: string) => {
 export const fetchCoworkingSpaceById = async (id: string) => {
   try {
     const response: any = await axiosInstance.get(
-      `/coworkingSpace/getById/${id}`,
+      `/api/coworkingSpace/getById/${id}`,
     );
     return response.data.data;
   } catch (error) {
@@ -312,7 +320,7 @@ export const fetchCoworkingSpaceById = async (id: string) => {
 export const updateCoworkingSpace = async (id: string, data: any) => {
   try {
     const response: any = await axiosInstance.put(
-      `/coworkingSpace/update/${id}`,
+      `/api/coworkingSpace/update/${id}`,
       data,
     );
     return response.data.data;
@@ -327,7 +335,7 @@ export const updateCoworkingSpace = async (id: string, data: any) => {
 export const deleteCoworkingSpace = async (id: string) => {
   try {
     const response: any = await axiosInstance.delete(
-      `/coworkingSpace/delete/${id}`,
+      `/api/coworkingSpace/delete/${id}`,
     );
     return response.data;
   } catch (error) {
@@ -347,7 +355,7 @@ export const fetchAllMeetingRooms = async (params?: {
   property?: string;
 }) => {
   try {
-    const response: any = await axiosInstance.get("/meetingRoom/getAll", {
+    const response: any = await axiosInstance.get("/api/meetingRoom/getAll", {
       params,
     });
     return response.data.data;
@@ -361,7 +369,9 @@ export const fetchAllMeetingRooms = async (params?: {
  */
 export const fetchMeetingRoomById = async (id: string) => {
   try {
-    const response: any = await axiosInstance.get(`/meetingRoom/getById/${id}`);
+    const response: any = await axiosInstance.get(
+      `/api/meetingRoom/getById/${id}`,
+    );
     return response.data.data;
   } catch (error) {
     return handleApiError(error);
@@ -374,7 +384,7 @@ export const fetchMeetingRoomById = async (id: string) => {
 export const fetchMeetingRoomsByCity = async (city: string) => {
   try {
     const response: any = await axiosInstance.get(
-      `/meetingRoom/getByCity/${city}`,
+      `/api/meetingRoom/getByCity/${city}`,
     );
     return response.data.data;
   } catch (error) {
@@ -387,7 +397,10 @@ export const fetchMeetingRoomsByCity = async (city: string) => {
  */
 export const createMeetingRoom = async (data: any) => {
   try {
-    const response: any = await axiosInstance.post("/meetingRoom/create", data);
+    const response: any = await axiosInstance.post(
+      "/api/meetingRoom/create",
+      data,
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error);
@@ -400,7 +413,7 @@ export const createMeetingRoom = async (data: any) => {
 export const updateMeetingRoom = async (id: string, data: any) => {
   try {
     const response: any = await axiosInstance.put(
-      `/meetingRoom/update/${id}`,
+      `/api/meetingRoom/update/${id}`,
       data,
     );
     return response.data;
@@ -415,7 +428,7 @@ export const updateMeetingRoom = async (id: string, data: any) => {
 export const deleteMeetingRoom = async (id: string) => {
   try {
     const response: any = await axiosInstance.delete(
-      `/meetingRoom/delete/${id}`,
+      `/api/meetingRoom/delete/${id}`,
     );
     return response.data;
   } catch (error) {
@@ -429,7 +442,7 @@ export const deleteMeetingRoom = async (id: string) => {
 export const fetchPartnerMeetingRooms = async () => {
   try {
     const response: any = await axiosInstance.get(
-      "/meetingRoom/partner/my-rooms",
+      "/api/meetingRoom/partner/my-rooms",
     );
     return response.data.data;
   } catch (error) {
@@ -447,7 +460,7 @@ export const fetchAllVirtualOfficesPublic = async (params?: {
   property?: string;
 }) => {
   try {
-    const response: any = await axiosInstance.get("/virtualOffice/getAll", {
+    const response: any = await axiosInstance.get("/api/virtualOffice/getAll", {
       params,
     });
     return response.data.data;
@@ -462,7 +475,7 @@ export const fetchAllVirtualOfficesPublic = async (params?: {
 export const fetchVirtualOfficesByCity = async (city: string) => {
   try {
     const response: any = await axiosInstance.get(
-      `/virtualOffice/getByCity/${city}`,
+      `/api/virtualOffice/getByCity/${city}`,
     );
     return response.data.data;
   } catch (error) {
@@ -476,7 +489,7 @@ export const fetchVirtualOfficesByCity = async (city: string) => {
 export const fetchVirtualOfficeById = async (id: string) => {
   try {
     const response: any = await axiosInstance.get(
-      `/virtualOffice/getById/${id}`,
+      `/api/virtualOffice/getById/${id}`,
     );
     return response.data.data;
   } catch (error) {
@@ -490,7 +503,7 @@ export const fetchVirtualOfficeById = async (id: string) => {
 export const createVirtualOffice = async (data: any) => {
   try {
     const response: any = await axiosInstance.post(
-      "/virtualOffice/create",
+      "/api/virtualOffice/create",
       data,
     );
     return response.data;
@@ -505,7 +518,7 @@ export const createVirtualOffice = async (data: any) => {
 export const updateVirtualOffice = async (id: string, data: any) => {
   try {
     const response: any = await axiosInstance.put(
-      `/virtualOffice/update/${id}`,
+      `/api/virtualOffice/update/${id}`,
       data,
     );
     return response.data;
@@ -520,7 +533,7 @@ export const updateVirtualOffice = async (id: string, data: any) => {
 export const deleteVirtualOffice = async (id: string, restore = false) => {
   try {
     const response: any = await axiosInstance.delete(
-      `/virtualOffice/delete/${id}${restore ? "?restore=true" : ""}`,
+      `/api/virtualOffice/delete/${id}${restore ? "?restore=true" : ""}`,
     );
     return response.data;
   } catch (error) {

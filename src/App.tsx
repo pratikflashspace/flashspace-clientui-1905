@@ -88,6 +88,8 @@ import AdminNotifications from "./pages/admin/Notifications";
 import AdminPropertyDetails from "./pages/admin/PropertyDetailsAdmin";
 import PropertyManagement from "./pages/admin/PropertyManagement";
 import AdminInvoices from "./pages/admin/Invoices";
+import ReceivablePayable from "./pages/admin/ReceivablePayable";
+import BalanceSheet from "./pages/admin/BalanceSheet";
 
 import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
@@ -394,21 +396,20 @@ const App = () => (
                         <Route path="coupons" element={<Coupons />} />
                         <Route path="learning-hub" element={<LearningHub />} />
                         <Route
-                          path="booking-analysis"
+                          path="sales-analytics"
                           element={<SalesAnalytics />}
                         />
                         <Route path="leaderboard" element={<Leaderboard />} />
                         <Route path="support" element={<SupportChat />} />
-                        <Route
-                          path="revenue-dashboard"
-                          element={<RevenueDashboard />}
-                        />
+                        <Route path="revenue" element={<RevenueDashboard />} />
                         <Route path="tickets" element={<TicketSystem />} />
                         <Route
                           path="notifications"
                           element={<AdminNotifications />}
                         />
                         <Route path="invoices" element={<AdminInvoices />} />
+                        <Route path="finance" element={<ReceivablePayable />} />
+                        <Route path="balance" element={<BalanceSheet />} />
                         <Route path="leads" element={<LeadManagement />} />
                         <Route
                           path="affiliates"
