@@ -57,64 +57,78 @@ export default function Notifications() {
     }
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="flex justify-between items-center">
+        <div className="p-8 max-w-[1600px] mx-auto animate-in fade-in duration-500">
+            <div className="mb-8 flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
-                    <p className="text-gray-500 text-sm mt-1">Manage all your system alerts and updates</p>
+                    <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+                        System <span className="text-primary italic">Notifications</span>
+                    </h1>
+                    <p className="text-muted-foreground mt-2">
+                        Stay updated with real-time system alerts and activities.
+                    </p>
                 </div>
-                <div className="bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm text-sm font-medium text-gray-600">
-                    {notifications.length} Total
+                <div className="flex items-center gap-4">
+                    <div className="bg-background px-6 py-3 rounded-2xl border border-border flex items-center gap-3 shadow-sm">
+                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        <span className="text-sm font-bold text-foreground">
+                            {notifications.length} Total Alerts
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
+            <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden">
                 {notifications.length === 0 ? (
-                    <div className="p-12 text-center text-gray-400 flex flex-col items-center gap-3">
-                        <Bell className="w-12 h-12 opacity-20" />
-                        <h3 className="text-lg font-medium text-gray-900">No notifications</h3>
-                        <p>You're all caught up!</p>
+                    <div className="p-16 text-center text-muted-foreground flex flex-col items-center gap-3">
+                        <Bell className="w-16 h-16 opacity-10 mb-2" />
+                        <h3 className="text-xl font-bold text-foreground">All caught up!</h3>
+                        <p>You don't have any new notifications at the moment.</p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-gray-50">
+                    <div className="divide-y divide-border">
                         {notifications.map((notification) => (
                             <div
                                 key={notification._id}
-                                className={`p-6 hover:bg-gray-50 transition-colors group flex gap-4 ${!notification.read ? 'bg-blue-50/30' : ''}`}
+                                className={`p-8 hover:bg-muted/30 transition-all group flex gap-6 items-start ${!notification.read ? 'bg-primary/5' : ''}`}
                             >
-                                <div className={`p-3 rounded-full bg-white border border-gray-100 shadow-sm h-fit ${!notification.read ? 'ring-2 ring-blue-100' : ''}`}>
+                                <div className={`p-4 rounded-2xl bg-background border border-border shadow-sm h-fit transition-transform group-hover:scale-105 ${!notification.read ? 'ring-2 ring-primary/20' : ''}`}>
                                     {getIcon(notification.type)}
                                 </div>
 
                                 <div className="flex-1">
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h3 className={`font-semibold text-gray-900 ${!notification.read ? 'text-blue-900' : ''}`}>
-                                            {notification.title}
-                                        </h3>
-                                        <span className="text-xs text-gray-400 flex items-center gap-1">
-                                            <Clock className="w-3 h-3" />
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="flex items-center gap-3">
+                                            <h3 className={`text-lg font-bold text-foreground ${!notification.read ? 'text-primary' : ''}`}>
+                                                {notification.title}
+                                            </h3>
+                                            {!notification.read && (
+                                                <span className="w-2 h-2 rounded-full bg-primary" />
+                                            )}
+                                        </div>
+                                        <span className="text-sm font-medium text-muted-foreground flex items-center gap-2 bg-muted/50 px-3 py-1 rounded-full border border-border">
+                                            <Clock className="w-4 h-4" />
                                             {format(new Date(notification.createdAt), 'MMM d, h:mm a')}
                                         </span>
                                     </div>
-                                    <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                                    <p className="text-muted-foreground text-base leading-relaxed mb-4 max-w-4xl">
                                         {notification.message}
                                     </p>
 
-                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all translate-y-1 group-hover:translate-y-0">
                                         {!notification.read && (
                                             <button
                                                 onClick={(e) => handleMarkAsRead(notification._id, e)}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-teal-600 hover:bg-teal-50 transition-colors"
+                                                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 transition-all active:scale-95"
                                             >
-                                                <Check className="w-3.5 h-3.5" />
+                                                <Check className="w-4 h-4" />
                                                 Mark as read
                                             </button>
                                         )}
                                         <button
                                             onClick={(e) => handleDelete(notification._id, e)}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-all active:scale-95"
                                         >
-                                            <Trash2 className="w-3.5 h-3.5" />
+                                            <Trash2 className="w-4 h-4" />
                                             Delete
                                         </button>
                                     </div>

@@ -89,7 +89,7 @@ const Notifications: React.FC = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <h1 className="text-[28px] font-bold font-[Poppins] text-[#1a2f24] tracking-tight hover:text-[#0d3b2e] transition-colors">
+                        <h1 className="text-[28px] font-bold font-[Poppins] text-[#35503F] tracking-tight hover:text-[#0d3b2e] transition-colors">
                             Notifications
                         </h1>
                         {unreadCount > 0 && (
@@ -100,7 +100,7 @@ const Notifications: React.FC = () => {
                     </div>
                     <button
                         onClick={() => fetchNotifications()}
-                        className="p-2 text-gray-400 hover:text-[#5aa39c] transition-colors rounded-full hover:bg-[#5aa39c]/10"
+                        className="p-2 text-gray-400 hover:text-[#35503F] transition-colors rounded-full hover:bg-[#35503F]/10"
                         title="Refresh"
                     >
                         <RefreshCw className="w-5 h-5" />
@@ -165,7 +165,7 @@ const Notifications: React.FC = () => {
                             {unreadCount > 0 && (
                                 <button
                                     onClick={() => markAllAsRead()}
-                                    className="flex items-center gap-1.5 text-xs font-medium text-[#5aa39c] hover:text-[#4a8a83] transition-colors"
+                                    className="flex items-center gap-1.5 text-xs font-medium text-[#35503F] hover:text-[#35553F] transition-colors"
                                     title="Mark all notifications as read"
                                 >
                                     <Check className="w-3.5 h-3.5" />

@@ -38,8 +38,8 @@ const QuotationStats = ({ data }: QuotationStatsProps) => {
             label: "Conversion",
             value: `${data?.conversion ?? 38}%`,
             icon: PieChart, // Or any other suitable icon for conversion
-            color: "text-[#5bb09c]",
-            bg: "bg-[#5bb09c]/10",
+            color: "text-[#2d5a4c]",
+            bg: "bg-[#2d5a4c]/10",
         },
     ];
 
@@ -48,7 +48,7 @@ const QuotationStats = ({ data }: QuotationStatsProps) => {
             {stats.map((stat, index) => (
                 <div
                     key={index}
-                    className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between hover:border-[#5bb09c]/30 transition-colors group"
+                    className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between hover:border-[#2d5a4c]/30 transition-colors group"
                 >
                     <div
                         className={`w-8 h-8 rounded-lg ${stat.bg} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}

@@ -266,7 +266,7 @@ const Dashboard = () => {
     if (isLoading) {
         return (
             <div className="flex h-screen items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-[#5aa39c]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#334D3D]" />
             </div>
         );
     }
@@ -279,7 +279,7 @@ const Dashboard = () => {
                     <div className="space-y-2">
                         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
                             Affiliate{" "}
-                            <span className="text-[#5aa39c] italic ">
+                            <span className="text-[#35503F] italic ">
                                 Dashboard
                             </span>
                         </h1>
@@ -309,7 +309,7 @@ const Dashboard = () => {
                 <div className="space-y-6">
                     <div className="space-y-1">
                         <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                            <Sparkles size={20} className="text-[#5aa39c]" />{" "}
+                            <Sparkles size={20} className="text-[#334D3D]" />{" "}
                             AI-Powered Insights
                         </h2>
                         <p className="text-sm text-gray-500">
@@ -348,18 +348,18 @@ const Dashboard = () => {
 
                 {/* Referral Reward Program (Coupon Generation) */}
                 <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#5aa39c]/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110 duration-700"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#334D3D]/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110 duration-700"></div>
 
                     <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
                         <div className="space-y-4 max-w-2xl">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-[#eaf4f3] rounded-lg">
-                                    <Trophy size={24} className="text-[#5aa39c]" />
+                                    <Trophy size={24} className="text-[#334D3D]" />
                                 </div>
                                 <h2 className="text-2xl font-bold text-slate-900">Referral Reward Program</h2>
                             </div>
                             <p className="text-gray-500 leading-relaxed">
-                                Share your unique coupon code with potential clients. They get a <span className="text-[#5aa39c] font-bold text-lg">10% discount</span> on their first booking, and you earn commissions on every successful conversion!
+                                Share your unique coupon code with potential clients. They get a <span className="text-[#334D3D] font-bold text-lg">10% discount</span> on their first booking, and you earn commissions on every successful conversion!
                             </p>
                             {!user?.kycVerified && (
                                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-100 rounded-full text-amber-700 text-xs font-semibold">
@@ -370,7 +370,7 @@ const Dashboard = () => {
 
                         <div className="shrink-0">
                             {coupon ? (
-                                <div className="bg-slate-50 border-2 border-dashed border-[#5aa39c]/30 rounded-2xl p-6 flex flex-col items-center gap-4 animate-fade-in min-w-[280px]">
+                                <div className="bg-slate-50 border-2 border-dashed border-[#334D3D]/30 rounded-2xl p-6 flex flex-col items-center gap-4 animate-fade-in min-w-[280px]">
                                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Your Unique Code</span>
                                     <div className="flex items-center gap-3">
                                         <code className="text-3xl font-black text-slate-900 tracking-tighter bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
@@ -378,13 +378,13 @@ const Dashboard = () => {
                                         </code>
                                         <button
                                             onClick={() => copyToClipboard(coupon.code)}
-                                            className="p-3 bg-[#5aa39c] text-white rounded-xl hover:bg-[#4a8a83] transition-colors shadow-md hover:shadow-lg active:scale-95 translate-y-0 hover:-translate-y-1 duration-200"
+                                            className="p-3 bg-[#334D3D] text-white rounded-xl hover:bg-[#335D3D] transition-colors shadow-md hover:shadow-lg active:scale-95 translate-y-0 hover:-translate-y-1 duration-200"
                                             title="Copy Code"
                                         >
                                             <Copy size={20} />
                                         </button>
                                     </div>
-                                    <div className="flex items-center gap-2 text-[#5aa39c] text-xs font-bold">
+                                    <div className="flex items-center gap-2 text-[#334D3D] text-xs font-bold">
                                         <CheckCircle size={14} /> Ready to share
                                     </div>
                                 </div>
@@ -393,7 +393,7 @@ const Dashboard = () => {
                                     onClick={handleGenerateCoupon}
                                     disabled={!user?.kycVerified || isGenerating}
                                     className={`relative px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-xl flex items-center gap-3 overflow-hidden ${user?.kycVerified
-                                        ? "bg-[#5aa39c] text-white hover:bg-[#4a8a83] hover:shadow-[#5aa39c]/20 hover:-translate-y-1 active:translate-y-0 active:scale-95"
+                                        ? "bg-[#334D3D] text-white hover:bg-[#335D3D] hover:shadow-[#334D3D]/20 hover:-translate-y-1 active:translate-y-0 active:scale-95"
                                         : "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200 shadow-none"
                                         }`}
                                 >
@@ -448,7 +448,7 @@ const Dashboard = () => {
                             <div className="flex items-center gap-2">
                                 <Sparkles
                                     size={18}
-                                    className="text-[#5aa39c] fill-[#5aa39c]"
+                                    className="text-[#334D3D] fill-[#334D3D]"
                                 />
                                 <h3 className="font-bold text-slate-800 text-lg">
                                     {insightData[selectedInsight].title}
@@ -471,11 +471,11 @@ const Dashboard = () => {
                             {isLoadingInsight ? (
                                 <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 animate-fade-in">
                                     <div className="relative">
-                                        <div className="w-16 h-16 border-4 border-[#eaf4f3] border-t-[#5aa39c] rounded-full animate-spin"></div>
+                                        <div className="w-16 h-16 border-4 border-[#eaf4f3] border-t-[#334D3D] rounded-full animate-spin"></div>
                                         <div className="absolute inset-0 flex items-center justify-center">
                                             <Sparkles
                                                 size={20}
-                                                className="text-[#5aa39c] animate-pulse"
+                                                className="text-[#334D3D] animate-pulse"
                                             />
                                         </div>
                                     </div>
@@ -513,7 +513,7 @@ const Dashboard = () => {
                                                 </div>
                                                 <div className="text-right">
                                                     {metric.isHighlight ? (
-                                                        <span className="text-[#5aa39c] font-bold text-lg">
+                                                        <span className="text-[#334D3D] font-bold text-lg">
                                                             {metric.value}
                                                         </span>
                                                     ) : (
@@ -541,13 +541,13 @@ const Dashboard = () => {
                                     </div>
 
                                     {/* AI Recommendation Box */}
-                                    <div className="bg-[#eaf4f3]/50 border border-[#5aa39c]/20 rounded-xl p-4 flex gap-3 items-start">
+                                    <div className="bg-[#eaf4f3]/50 border border-[#334D3D]/20 rounded-xl p-4 flex gap-3 items-start">
                                         <Lightbulb
                                             size={20}
-                                            className="text-[#5aa39c] shrink-0 mt-0.5"
+                                            className="text-[#334D3D] shrink-0 mt-0.5"
                                         />
                                         <div>
-                                            <p className="text-xs font-bold text-[#5aa39c] mb-1">
+                                            <p className="text-xs font-bold text-[#334D3D] mb-1">
                                                 AI Recommendation
                                             </p>
                                             <p className="text-sm text-slate-700 leading-relaxed">
@@ -564,7 +564,7 @@ const Dashboard = () => {
                                     <div className="pt-2 flex justify-end">
                                         <button
                                             onClick={handleRefresh}
-                                            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 shadow-sm rounded-lg text-sm font-semibold text-gray-600 hover:text-[#5aa39c] hover:border-[#5aa39c] transition-all"
+                                            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 shadow-sm rounded-lg text-sm font-semibold text-gray-600 hover:text-[#334D3D] hover:border-[#334D3D] transition-all"
                                         >
                                             <RefreshCw size={14} /> Refresh
                                             Insights

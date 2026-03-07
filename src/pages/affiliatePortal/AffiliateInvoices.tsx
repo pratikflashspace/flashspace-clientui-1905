@@ -495,7 +495,7 @@ const Invoices = () => {
                         </div>
 
                         {/* Modal Body (Scrollable) */}
-                        <div className="overflow-y-auto flex-1 bg-white">
+                        <div className="overflow-y-auto flex-1 bg-white custom-scrollbar" data-lenis-prevent>
                             {/* Reuse the InvoicePaper component for visual consistency */}
                             <InvoicePaper data={selectedInvoice} />
                         </div>

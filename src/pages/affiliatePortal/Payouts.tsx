@@ -202,11 +202,11 @@ const Payouts = () => {
                 <div className="space-y-2">
                     <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
                         Payout{" "}
-                        <span className="text-[#5aa39c] italic">
+                        <span className="text-[#35503D] italic">
                             Management
                         </span>
                     </h1>
-                    <p className="text-gray-500 text-lg">
+                    <p className="text-[#677E73]text-lg">
                         Track your commission payouts
                     </p>
                 </div>
