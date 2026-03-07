@@ -1,39 +1,25 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axiosInstance from "@/lib/axios";
 import {
-  Search,
-  Clock,
-  AlertCircle,
-  CheckCircle,
-  Eye,
-  RefreshCw,
-  Plus,
-  ArrowLeft,
-  ArrowRight,
-  Trophy,
-  Target,
-  Wallet,
-  TrendingUp,
-  Tag,
   Users,
+  TrendingUp,
   DollarSign,
+  Search,
   ChevronRight,
-  UserCheck,
-  Loader2,
+  ArrowLeft,
+  Trophy,
+  Tag,
+  Star,
   Phone,
   Mail,
   Calendar,
   Hash,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Loader2,
+  AlertCircle,
+  UserCheck,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/hooks/use-toast";
-import { StatsCard } from '@/components/dashboard/StatsCard';
 
 // ---------------------------------------------------------------
 // Types
@@ -96,25 +82,33 @@ const formatDate = (d: string) =>
     year: "numeric",
   });
 
-const getInitials = (name: string) =>
-  name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-
-const getRandomGradient = (name: string) => {
-  const gradients = [
-    'from-blue-600 to-indigo-600',
-    'from-emerald-600 to-teal-600',
-    'from-violet-600 to-purple-600',
-    'from-amber-600 to-orange-600',
-    'from-rose-600 to-pink-600',
-    'from-cyan-600 to-blue-600',
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return gradients[Math.abs(hash) % gradients.length];
-};
-
+// ---------------------------------------------------------------
+// Stat Card
+// ---------------------------------------------------------------
+const StatCard = ({
+  label,
+  value,
+  icon: Icon,
+  color,
+  sub,
+}: {
+  label: string;
+  value: string;
+  icon: React.ElementType;
+  color: string;
+  sub?: string;
+}) => (
+  <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex items-start gap-4">
+    <div className={`p-3 rounded-xl ${color}`}>
+      <Icon className="w-5 h-5" />
+    </div>
+    <div>
+      <p className="text-xs text-gray-500 font-medium">{label}</p>
+      <p className="text-xl font-bold text-gray-900 mt-0.5">{value}</p>
+      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+    </div>
+  </div>
+);
 
 // ---------------------------------------------------------------
 // Affiliate Row
@@ -129,79 +123,60 @@ const AffiliateRow = ({
   onClick: () => void;
 }) => (
   <tr
-    className="border-t border-border hover:bg-muted/30 transition-colors group cursor-pointer"
+    className="border-b border-gray-50 hover:bg-gray-50/60 transition-colors cursor-pointer group"
     onClick={onClick}
   >
-    <td className="p-4">
-      <div className="flex items-center gap-3">
+    <td className="px-5 py-4">
+      <div className="flex items-center gap-2">
         <span
-          className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black
-                    ${rank === 1
-              ? "bg-amber-100 text-amber-700 border border-amber-200"
-              : rank === 2
-                ? "bg-gray-100 text-gray-600 border border-gray-200"
-                : rank === 3
-                  ? "bg-orange-100 text-orange-700 border border-orange-200"
-                  : "bg-muted text-muted-foreground border border-border"
-            }`}
+          className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold
+                    ${
+                      rank === 1
+                        ? "bg-amber-100 text-amber-700"
+                        : rank === 2
+                          ? "bg-gray-200 text-gray-600"
+                          : rank === 3
+                            ? "bg-orange-100 text-orange-700"
+                            : "bg-gray-100 text-gray-400"
+                    }`}
         >
-          {rank <= 3 ? <Trophy className="w-4 h-4" /> : rank}
+          {rank <= 3 ? <Trophy className="w-3.5 h-3.5" /> : rank}
         </span>
         <div>
-          <div className="flex items-center gap-2">
-            <Avatar className="w-8 h-8">
-              <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
-                {getInitials(affiliate.fullName)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-bold text-foreground text-sm leading-tight">
-                {affiliate.fullName}
-              </p>
-              <p className="text-xs text-muted-foreground">{affiliate.email}</p>
-            </div>
-          </div>
+          <p className="font-semibold text-gray-900 text-sm">
+            {affiliate.fullName}
+          </p>
+          <p className="text-xs text-gray-400">{affiliate.email}</p>
         </div>
       </div>
     </td>
-    <td className="p-4">
+    <td className="px-5 py-4">
       {affiliate.couponCode ? (
-        <Badge variant="outline" className="font-mono text-[10px] bg-teal-50 text-teal-700 border-teal-100 uppercase tracking-wider px-2 py-0.5">
+        <span className="font-mono text-xs bg-teal-50 text-teal-700 border border-teal-100 px-2.5 py-1 rounded-lg font-bold tracking-wide">
           {affiliate.couponCode}
-        </Badge>
+        </span>
       ) : (
-        <span className="text-xs text-muted-foreground italic opacity-50">No code</span>
+        <span className="text-xs text-gray-400 italic">No code</span>
       )}
     </td>
-    <td className="p-4 text-center">
-      <span className="font-extrabold text-foreground">{affiliate.totalClients}</span>
+    <td className="px-5 py-4 text-center">
+      <span className="font-bold text-gray-800">{affiliate.totalClients}</span>
     </td>
-    <td className="p-4">
-      <span className="font-bold text-foreground">
+    <td className="px-5 py-4">
+      <span className="font-semibold text-gray-800">
         {formatCurrency(affiliate.totalRevenue)}
       </span>
     </td>
-    <td className="p-4">
-      <Badge className="bg-green-50 text-green-700 hover:bg-green-100 border-green-100 font-bold px-2 py-0.5">
+    <td className="px-5 py-4">
+      <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg text-sm">
         {formatCurrency(affiliate.totalCommission)}
-      </Badge>
+      </span>
     </td>
-    <td className="p-4 text-xs text-muted-foreground whitespace-nowrap">
+    <td className="px-5 py-4 text-xs text-gray-400">
       {formatDate(affiliate.createdAt)}
     </td>
-    <td className="p-4 text-right pr-6">
-      <Button
-        variant="outline"
-        size="sm"
-        className="gap-1 rounded-lg h-8 px-3 text-[10px] font-bold uppercase tracking-widest border-border hover:bg-muted"
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick();
-        }}
-      >
-        <Eye className="w-3 h-3" />
-        View
-      </Button>
+    <td className="px-5 py-4">
+      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-teal-600 transition-colors" />
     </td>
   </tr>
 );
@@ -245,64 +220,47 @@ const AffiliateDetailPanel = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-50 flex">
       {/* Backdrop */}
-      <div className="flex-1 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="w-full max-w-2xl bg-background h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-500">
+      <div className="w-full max-w-3xl bg-white h-full shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-8 py-8 border-b border-border bg-muted/30">
-          <Button
-            variant="ghost"
+        <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-teal-600 to-teal-700 text-white">
+          <button
             onClick={onClose}
-            className="mb-6 -ml-2 text-muted-foreground hover:text-foreground gap-2 h-8 px-2"
+            className="mb-3 flex items-center gap-2 text-teal-100 hover:text-white text-sm transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Back to Network</span>
-          </Button>
-
-          <div className="flex items-center gap-4 mb-6">
-            <Avatar className="w-16 h-16 border-4 border-background shadow-xl">
-              <AvatarFallback className="text-xl bg-primary/10 text-primary font-black">
-                {data ? getInitials(data.affiliate.fullName) : "?"}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              {loading ? (
-                <div className="space-y-2">
-                  <div className="h-6 w-48 bg-muted animate-pulse rounded" />
-                  <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                </div>
-              ) : (
-                <>
-                  <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase italic italic">
-                    {data?.affiliate.fullName}
-                  </h2>
-                  <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-70">
-                    {data?.affiliate.email}
-                  </p>
-                </>
-              )}
-            </div>
-          </div>
+            <ArrowLeft className="w-4 h-4" /> Back to Affiliates
+          </button>
+          {loading ? (
+            <div className="animate-pulse h-6 bg-teal-500 rounded w-48 mb-2" />
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold">{data?.affiliate.fullName}</h2>
+              <p className="text-teal-100 text-sm mt-0.5">
+                {data?.affiliate.email}
+              </p>
+            </>
+          )}
 
           {/* Mini Stats */}
           {data && (
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-background border border-border rounded-2xl p-4 shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Impact</p>
-                <p className="text-xl font-black text-foreground">{data.stats.totalClients} <span className="text-[10px] text-muted-foreground not-italic">Clients</span></p>
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              <div className="bg-white/15 rounded-xl p-3 text-center">
+                <p className="text-xs text-teal-100">Total Clients</p>
+                <p className="text-xl font-bold">{data.stats.totalClients}</p>
               </div>
-              <div className="bg-background border border-border rounded-2xl p-4 shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Growth</p>
-                <p className="text-xl font-black text-foreground">
+              <div className="bg-white/15 rounded-xl p-3 text-center">
+                <p className="text-xs text-teal-100">Revenue</p>
+                <p className="text-xl font-bold">
                   {formatCurrency(data.stats.totalRevenue)}
                 </p>
               </div>
-              <div className="bg-background border border-border rounded-2xl p-4 shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Reward</p>
-                <p className="text-xl font-black text-emerald-600">
+              <div className="bg-white/15 rounded-xl p-3 text-center">
+                <p className="text-xs text-teal-100">Commission</p>
+                <p className="text-xl font-bold">
                   {formatCurrency(data.stats.totalCommission)}
                 </p>
               </div>
@@ -312,19 +270,19 @@ const AffiliateDetailPanel = ({
 
         {/* Coupon Info */}
         {data?.coupon && (
-          <div className="px-8 py-4 bg-teal-50/30 border-b border-teal-100/50 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Tag className="w-4 h-4 text-teal-600" />
-              <div>
-                <p className="text-[10px] font-black text-teal-800 uppercase tracking-widest">Active Protocol</p>
-                <p className="font-mono font-bold text-teal-700 text-sm">
-                  {data.coupon.code}
-                </p>
-              </div>
+          <div className="px-8 py-4 bg-teal-50 border-b border-teal-100 flex items-center gap-4">
+            <Tag className="w-4 h-4 text-teal-600 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-xs text-teal-700 font-medium">
+                Referral Coupon Code
+              </p>
+              <p className="font-mono font-bold text-teal-800 text-sm">
+                {data.coupon.code}
+              </p>
             </div>
             <div className="text-right">
-              <p className="text-[10px] font-black text-teal-800 uppercase tracking-widest">Deployment Count</p>
-              <p className="font-black text-teal-700 text-xl">
+              <p className="text-xs text-gray-500">Total Uses</p>
+              <p className="font-bold text-teal-700">
                 {data.coupon.usageCount}
               </p>
             </div>
@@ -332,88 +290,78 @@ const AffiliateDetailPanel = ({
         )}
 
         {/* Client List */}
-        <div className="flex-1 overflow-y-auto bg-muted/10">
+        <div className="flex-1 overflow-y-auto">
           {/* Search */}
-          <div className="px-8 py-4 border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
+          <div className="px-8 py-4 border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur-sm">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
                 type="text"
-                placeholder="Synchronize searching clients…"
+                placeholder="Search clients…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-11 rounded-xl border-border bg-background"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-300"
               />
             </div>
           </div>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-32 gap-4">
-              <RefreshCw className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Fetching Data Stream...</p>
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-32 text-muted-foreground/30">
-              <UserCheck className="w-16 h-16 mb-4 opacity-10" />
-              <p className="text-[10px] font-black uppercase tracking-widest">Archive Void: No Clients Detected</p>
+            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+              <UserCheck className="w-12 h-12 mb-3 opacity-30" />
+              <p className="font-medium">No clients found</p>
             </div>
           ) : (
-            <div className="p-6 space-y-4">
+            <div className="px-8 py-4 space-y-3">
               {filtered.map((client) => (
                 <div
                   key={client.bookingId.toString()}
-                  className="bg-background rounded-2xl border border-border shadow-sm p-5 hover:border-primary/30 transition-all hover:shadow-md group"
+                  className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:border-teal-200 transition-colors"
                 >
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="w-10 h-10 border border-border">
-                        <AvatarFallback className="text-xs bg-muted text-foreground font-bold">
-                          {getInitials(client.user.fullName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-bold text-foreground text-sm uppercase">
-                          {client.user.fullName}
-                        </p>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight opacity-70">
-                          {client.user.email}
-                        </p>
-                      </div>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 text-sm truncate mb-0.5">
+                        {client.user.fullName}
+                      </p>
+                      <p className="text-xs text-gray-400 truncate">
+                        {client.user.email}
+                      </p>
                     </div>
-                    <div className="text-right">
-                      <p className="font-black text-emerald-600 text-lg leading-none mb-1">
+                    <div className="text-right flex-shrink-0">
+                      <p className="font-bold text-emerald-700 text-sm">
                         {formatCurrency(client.commissionAmount)}
                       </p>
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-50">Yield Received</p>
+                      <p className="text-xs text-gray-400">commission</p>
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
-                    <div className="space-y-1">
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-50">Sector</p>
-                      <p className="font-bold text-foreground text-xs truncate">{client.space}</p>
+                  <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-gray-600">
+                    <div>
+                      <p className="text-gray-400 font-medium">Space</p>
+                      <p className="font-medium truncate">{client.space}</p>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-50">Blueprint</p>
-                      <p className="font-bold text-foreground text-xs truncate">
+                    <div>
+                      <p className="text-gray-400 font-medium">Plan</p>
+                      <p className="font-medium">
                         {client.plan} · {client.tenure}
                       </p>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-50">Transaction</p>
-                      <p className="font-bold text-foreground text-xs">
+                    <div>
+                      <p className="text-gray-400 font-medium">Paid</p>
+                      <p className="font-medium">
                         {formatCurrency(client.amount)}
                       </p>
                     </div>
                   </div>
-
-                  <div className="mt-4 flex items-center justify-between pt-4 border-t border-border/50">
-                    <Badge variant="secondary" className="font-mono text-[9px] uppercase tracking-tighter bg-muted/50">
-                      ID: {client.bookingNumber}
-                    </Badge>
-                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="font-mono text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-500">
+                      {client.bookingNumber}
+                    </span>
+                    <span className="text-xs text-gray-400">
                       {formatDate(client.createdAt)}
-                    </p>
+                    </span>
                   </div>
                 </div>
               ))}
@@ -438,7 +386,6 @@ export default function AdminAffiliateManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
   const [selectedAffiliateId, setSelectedAffiliateId] = useState<string | null>(
     null,
   );
@@ -468,133 +415,112 @@ export default function AdminAffiliateManagement() {
   }, [fetchAffiliates]);
 
   const filtered = (affiliates || []).filter(
-    (a) => {
-      const matchesSearch = a.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        a.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (a.couponCode && a.couponCode.toLowerCase().includes(searchQuery.toLowerCase()));
-
-      if (!matchesSearch) return false;
-
-      // Filter by tab if needed (currently all are active by default in mock, 
-      // but in real app we might have status)
-      if (activeTab === "active") return a.isActive;
-      if (activeTab === "inactive") return !a.isActive;
-
-      return true;
-    }
+    (a) =>
+      a.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (a.couponCode &&
+        a.couponCode.toLowerCase().includes(searchQuery.toLowerCase())),
   );
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto animate-in fade-in duration-500">
+    <div className="space-y-8">
       {/* Page Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-            Affiliate <span className="text-primary italic">Management</span>
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Monitor and scale the global referral architecture.
-          </p>
-        </div>
-        <div className="flex gap-4">
-          <Button variant="outline" onClick={fetchAffiliates} className="rounded-xl h-11">
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Synchronize
-          </Button>
-          <Button onClick={() => { }}>
-            <Plus className="w-4 h-4 mr-2" />
-            Integrate Partner
-          </Button>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Affiliate Management
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Monitor all affiliate partners, their referral codes, clients, and
+          commission earnings.
+        </p>
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-5 gap-6 mb-12">
-        <StatsCard title="Active Affiliates" value={String(summary.totalAffiliates)} icon={Users} />
-        <StatsCard title="Total Yield Generated" value={formatCurrency(summary.totalRevenue)} icon={TrendingUp} />
-        <StatsCard title="Payable Rewards" value={formatCurrency(summary.totalCommissionPayable)} icon={DollarSign} />
-        <StatsCard title="Active Coupon Codes" value={String(affiliates.filter(a => a.couponCode).length)} icon={Tag} />
-        <StatsCard title="Avg Node Yield" value={formatCurrency(summary.totalRevenue / (summary.totalAffiliates || 1))} icon={Wallet} />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          label="Total Affiliates"
+          value={String(summary.totalAffiliates)}
+          icon={Users}
+          color="bg-teal-100 text-teal-600"
+        />
+        <StatCard
+          label="Total Revenue Generated"
+          value={formatCurrency(summary.totalRevenue)}
+          icon={TrendingUp}
+          color="bg-indigo-100 text-indigo-600"
+          sub="From affiliate referrals"
+        />
+        <StatCard
+          label="Total Commission Payable"
+          value={formatCurrency(summary.totalCommissionPayable)}
+          icon={DollarSign}
+          color="bg-emerald-100 text-emerald-600"
+          sub="15% of referred revenue"
+        />
       </div>
 
-      {/* Toolbar & Search */}
-      <div className="flex gap-4 mb-8">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search network by ID, identity or protocol code..."
-            className="pl-11 h-12 rounded-xl border-border bg-background shadow-sm focus:ring-primary/20"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <div className="flex items-center text-[10px] font-black text-muted-foreground uppercase tracking-widest px-4">
-          Displaying {filtered.length} of {affiliates.length} segments
-        </div>
-      </div>
-
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-        <TabsList className="bg-transparent border-b border-border w-full justify-start rounded-none h-auto p-0 gap-8">
-          <TabsTrigger value="all" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-3 font-semibold text-muted-foreground data-[state=active]:text-foreground uppercase text-[11px] tracking-widest">
-            All Affiliates
-          </TabsTrigger>
-          <TabsTrigger value="active" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-3 font-semibold text-muted-foreground data-[state=active]:text-foreground uppercase text-[11px] tracking-widest">
-            Active Nodes
-          </TabsTrigger>
-          <TabsTrigger value="inactive" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-2 pb-3 font-semibold text-muted-foreground data-[state=active]:text-foreground uppercase text-[11px] tracking-widest">
-            Pending/Disabled
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={activeTab} className="mt-0">
-          {/* Table Container */}
-          <div className="bg-background border border-border rounded-2xl overflow-hidden shadow-xl">
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-32 gap-4">
-                <RefreshCw className="w-10 h-10 text-primary animate-spin" />
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Synchronizing Network Stream...</p>
-              </div>
-            ) : error ? (
-              <div className="flex flex-col items-center justify-center py-32 text-red-500 gap-4">
-                <AlertCircle className="w-16 h-16 opacity-20" />
-                <p className="font-bold uppercase tracking-widest text-xs">{error}</p>
-                <Button variant="outline" size="sm" onClick={fetchAffiliates} className="h-8 rounded-lg text-[10px] font-black uppercase tracking-widest">Retry Connection</Button>
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-32 text-muted-foreground/30 gap-4">
-                <Users className="w-16 h-16 opacity-10" />
-                <p className="text-[10px] font-black uppercase tracking-widest">No segments matched current query</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-muted/50 border-b border-border">
-                    <tr className="text-left">
-                      <th className="p-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Affiliate Node</th>
-                      <th className="p-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Protocol Code</th>
-                      <th className="p-4 text-center text-[10px] font-black text-muted-foreground uppercase tracking-widest">Volume</th>
-                      <th className="p-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Total Yield</th>
-                      <th className="p-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Available Reward</th>
-                      <th className="p-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Deployment</th>
-                      <th className="p-4 text-right pr-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/50">
-                    {filtered.map((affiliate, idx) => (
-                      <AffiliateRow
-                        key={affiliate._id}
-                        affiliate={affiliate}
-                        rank={idx + 1}
-                        onClick={() => setSelectedAffiliateId(affiliate._id)}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+      {/* Table Card */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        {/* Toolbar */}
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by name, email, or coupon code…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-300"
+            />
           </div>
-        </TabsContent>
-      </Tabs>
+          <span className="text-xs text-gray-400 whitespace-nowrap">
+            {filtered.length} of {affiliates.length}
+          </span>
+        </div>
+
+        {/* Table */}
+        {loading ? (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-20 text-red-500 gap-3">
+            <AlertCircle className="w-10 h-10" />
+            <p className="font-medium">{error}</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
+            <Users className="w-12 h-12 opacity-30" />
+            <p className="font-medium">No affiliates found</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
+                  <th className="px-5 py-3">Affiliate</th>
+                  <th className="px-5 py-3">Coupon Code</th>
+                  <th className="px-5 py-3 text-center">Clients</th>
+                  <th className="px-5 py-3">Revenue</th>
+                  <th className="px-5 py-3">Commission</th>
+                  <th className="px-5 py-3">Joined</th>
+                  <th className="px-5 py-3" />
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((affiliate, idx) => (
+                  <AffiliateRow
+                    key={affiliate._id}
+                    affiliate={affiliate}
+                    rank={idx + 1}
+                    onClick={() => setSelectedAffiliateId(affiliate._id)}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       {/* Affiliate Detail Panel */}
       {selectedAffiliateId && (

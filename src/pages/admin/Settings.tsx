@@ -283,14 +283,10 @@ export default function AdminSettings() {
     );
 
     return (
-        <div className="p-8 max-w-[1600px] mx-auto animate-in fade-in duration-500">
-            <div className="mb-8 flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-                        Platform <span className="text-primary italic">Settings</span>
-                    </h1>
-                    <p className="text-muted-foreground mt-2">Manage your account and platform preferences.</p>
-                </div>
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-[Poppins]">Settings</h1>
+                <p className="text-gray-500 mt-2 text-lg">Manage your account and platform preferences.</p>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-8">
