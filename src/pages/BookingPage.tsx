@@ -466,7 +466,7 @@ const BookingPage = () => {
     try {
       setPaymentLoading(true);
       const orderData = await createPaymentOrder({
-        userId: user.id,
+        userId: user.id || (user as any)._id,
         userEmail: user.email,
         userName: user.fullName || user.email.split("@")[0],
         userPhone: (user as any).phoneNumber,
@@ -614,7 +614,7 @@ const BookingPage = () => {
     try {
       setPaymentLoading(true);
       const orderData = await createPaymentOrder({
-        userId: user.id,
+        userId: user.id || (user as any)._id,
         userEmail: user.email,
         userName: user.fullName || user.email.split("@")[0],
         userPhone: (user as any).phoneNumber,
