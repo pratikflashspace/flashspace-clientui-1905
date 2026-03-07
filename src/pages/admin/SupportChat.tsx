@@ -175,6 +175,19 @@ export default function SupportChat() {
       t.ticketNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  // Sort tickets: Open/In Progress first, then by date (Incorporating logic from UAT)
+  filteredTickets.sort((a, b) => {
+    const score = (status: string) => {
+      if (status === "open") return 3;
+      if (status === "in_progress") return 2;
+      if (status === "escalated") return 2;
+      return 0;
+    };
+    const scoreDiff = score(b.status) - score(a.status);
+    if (scoreDiff !== 0) return scoreDiff;
+    return new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime();
+  });
+
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case "open":
