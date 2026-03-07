@@ -144,7 +144,7 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
         // If we updated the backend, these would be saved.
       };
 
-      await mailService.create(payload as any);
+      await mailService.create(payload, selectedFile || undefined);
       toast.success("Delivery logged successfully");
 
       // Reset form
