@@ -159,7 +159,7 @@ const CompleteBookingPage = () => {
 
     // ─── BUILD PAYLOAD ────────────────────────
     const buildPayload = () => ({
-        userId: user!.id,
+        userId: user!.id || (user as any)._id,
         userEmail: user!.email,
         userName: user!.fullName || user!.email,
         userPhone: (user as any)?.phoneNumber,
