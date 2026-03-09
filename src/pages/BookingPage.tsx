@@ -251,7 +251,11 @@ const BookingPage = () => {
           // 2. Fallback: Search user holdings to find an active one for this space
           const response = await axiosInstance.get<any>("/seat-bookings/user");
           if (response.data?.success && response.data?.data) {
-            const activeBooking = response.data.data.find((b: any) => {
+            const bookings = Array.isArray(response.data.data)
+              ? response.data.data
+              : response.data.data.bookings || [];
+
+            const activeBooking = bookings.find((b: any) => {
               const matchId =
                 typeof b.space === "object" && b.space !== null
                   ? b.space._id === id
@@ -797,13 +801,12 @@ const BookingPage = () => {
                     >
                       <div
                         className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ease-out shadow-sm border-2
-                      ${
-                        isCompleted
-                          ? "bg-primary border-primary text-primary-foreground shadow-md"
-                          : isActive
-                            ? "bg-card border-primary text-primary shadow-lg scale-110 ring-4 ring-primary/15"
-                            : "bg-card border-border text-muted-foreground"
-                      }`}
+                      ${isCompleted
+                            ? "bg-primary border-primary text-primary-foreground shadow-md"
+                            : isActive
+                              ? "bg-card border-primary text-primary shadow-lg scale-110 ring-4 ring-primary/15"
+                              : "bg-card border-border text-muted-foreground"
+                          }`}
                       >
                         {isCompleted ? (
                           <Check className="w-5 h-5" strokeWidth={3} />
@@ -998,11 +1001,10 @@ const BookingPage = () => {
                             key={key}
                             onClick={() => setSelectedPlanKey(key)}
                             className={`relative p-5 rounded-2xl cursor-pointer transition-all duration-300 border-2
-                               ${
-                                 isSelected
-                                   ? "border-teal-500 bg-gradient-to-br from-teal-50 to-emerald-50 shadow-lg shadow-teal-100/50 scale-[1.02]"
-                                   : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
-                               }`}
+                               ${isSelected
+                                ? "border-teal-500 bg-gradient-to-br from-teal-50 to-emerald-50 shadow-lg shadow-teal-100/50 scale-[1.02]"
+                                : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
+                              }`}
                           >
                             {isSelected && (
                               <div className="absolute -top-2.5 -right-2.5 w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center shadow-md">
@@ -1071,11 +1073,10 @@ const BookingPage = () => {
                             setSelectedTenure(option.years as 1 | 2 | 3)
                           }
                           className={`relative border-2 rounded-2xl p-5 cursor-pointer transition-all duration-300
-                             ${
-                               selectedTenure === option.years
-                                 ? "border-teal-500 bg-teal-50 shadow-lg scale-[1.02]"
-                                 : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
-                             }`}
+                             ${selectedTenure === option.years
+                              ? "border-teal-500 bg-teal-50 shadow-lg scale-[1.02]"
+                              : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
+                            }`}
                         >
                           {option.popular && (
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-teal-500 to-emerald-400 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md">
@@ -1532,11 +1533,10 @@ const BookingPage = () => {
                 onClick={goNext}
                 disabled={!canProceed()}
                 className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-md
-                   ${
-                     canProceed()
-                       ? "bg-gradient-to-r from-teal-600 to-emerald-500 text-white hover:from-teal-700 hover:to-emerald-600 shadow-teal-200/50 hover:shadow-lg"
-                       : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
-                   }`}
+                   ${canProceed()
+                    ? "bg-gradient-to-r from-teal-600 to-emerald-500 text-white hover:from-teal-700 hover:to-emerald-600 shadow-teal-200/50 hover:shadow-lg"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+                  }`}
               >
                 Continue <ArrowRight className="w-4 h-4" />
               </button>

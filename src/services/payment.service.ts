@@ -1,5 +1,5 @@
-import axios from "axios";
-import { API } from "@/api";
+import axiosInstance from "@/lib/axios";
+import { API_ENDPOINTS } from "@/config/api.config";
 
 // Razorpay Key - Public Key (safe to expose)
 const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || "";
@@ -33,10 +33,10 @@ export interface CreateOrderPayload {
   discountPercent: number;
   discountAmount: number;
   paymentType?:
-    | "virtual_office"
-    | "coworking_space"
-    | "meeting_room"
-    | "seat_booking";
+  | "virtual_office"
+  | "coworking_space"
+  | "meeting_room"
+  | "seat_booking";
   startDate?: string; // ISO date string for booking start
   holdId?: string;
   couponCode?: string; // Coupon code applied by user (for affiliate attribution)
@@ -76,10 +76,9 @@ export const createPaymentOrder = async (
   payload: CreateOrderPayload,
 ): Promise<CreateOrderResponse> => {
   try {
-    const response = await axios.post<APIResponse<CreateOrderResponse>>(
-      `${API.domain}/api/payment/create-order`,
+    const response = await axiosInstance.post<APIResponse<CreateOrderResponse>>(
+      API_ENDPOINTS.PAYMENT.CREATE_ORDER,
       payload,
-      { withCredentials: true },
     );
 
     if (response.data.success) {
@@ -106,11 +105,9 @@ export const verifyPayment = async (
   payload: VerifyPaymentPayload,
 ): Promise<PaymentVerificationResponse> => {
   try {
-    const response = await axios.post<APIResponse<PaymentVerificationResponse>>(
-      `${API.domain}/api/payment/verify`,
-      payload,
-      { withCredentials: true },
-    );
+    const response = await axiosInstance.post<
+      APIResponse<PaymentVerificationResponse>
+    >(API_ENDPOINTS.PAYMENT.VERIFY, payload);
 
     if (response.data.success) {
       return response.data.data;
@@ -121,8 +118,8 @@ export const verifyPayment = async (
     console.error("Error verifying payment:", error);
     throw new Error(
       error.response?.data?.message ||
-        error.message ||
-        "Payment verification failed",
+      error.message ||
+      "Payment verification failed",
     );
   }
 };
@@ -136,15 +133,11 @@ export const reportPaymentFailure = async (
   errorDescription: string,
 ) => {
   try {
-    await axios.post(
-      `${API.domain}/api/payment/failed`,
-      {
-        razorpay_order_id: orderId,
-        error_code: errorCode,
-        error_description: errorDescription,
-      },
-      { withCredentials: true },
-    );
+    await axiosInstance.post(API_ENDPOINTS.PAYMENT.FAILED, {
+      razorpay_order_id: orderId,
+      error_code: errorCode,
+      error_description: errorDescription,
+    });
   } catch (error) {
     console.error("Error reporting payment failure:", error);
   }
@@ -158,16 +151,14 @@ export const simulatePayment = async (
   orderId: string,
 ): Promise<PaymentVerificationResponse> => {
   try {
-    const response = await axios.post<APIResponse<PaymentVerificationResponse>>(
-      `${API.domain}/api/payment/verify`,
-      {
-        razorpay_order_id: orderId,
-        razorpay_payment_id: `pay_sim_${Date.now()}`,
-        razorpay_signature: "simulated_signature",
-        devMode: true,
-      },
-      { withCredentials: true },
-    );
+    const response = await axiosInstance.post<
+      APIResponse<PaymentVerificationResponse>
+    >(API_ENDPOINTS.PAYMENT.VERIFY, {
+      razorpay_order_id: orderId,
+      razorpay_payment_id: `pay_sim_${Date.now()}`,
+      razorpay_signature: "simulated_signature",
+      devMode: true,
+    });
 
     if (response.data.success) {
       return response.data.data;
@@ -178,8 +169,8 @@ export const simulatePayment = async (
     console.error("Error simulating payment:", error);
     throw new Error(
       error.response?.data?.message ||
-        error.message ||
-        "Payment simulation failed",
+      error.message ||
+      "Payment simulation failed",
     );
   }
 };
@@ -189,9 +180,8 @@ export const simulatePayment = async (
  */
 export const getPaymentStatus = async (orderId: string) => {
   try {
-    const response = await axios.get<APIResponse<any>>(
-      `${API.domain}/api/payment/status/${orderId}`,
-      { withCredentials: true },
+    const response = await axiosInstance.get<APIResponse<any>>(
+      API_ENDPOINTS.PAYMENT.STATUS(orderId),
     );
 
     if (response.data.success) {
@@ -210,9 +200,8 @@ export const getPaymentStatus = async (orderId: string) => {
  */
 export const getUserPayments = async (userId: string, page = 1, limit = 10) => {
   try {
-    const response = await axios.get<APIResponse<any>>(
-      `${API.domain}/api/payment/user/${userId}?page=${page}&limit=${limit}`,
-      { withCredentials: true },
+    const response = await axiosInstance.get<APIResponse<any>>(
+      `${API_ENDPOINTS.PAYMENT.USER_HISTORY(userId)}?page=${page}&limit=${limit}`,
     );
 
     if (response.data.success) {
@@ -290,7 +279,7 @@ export const openRazorpayCheckout = async (
     currency: options.currency,
     name: "FlashSpace",
     description: `${options.planName} - ${options.spaceName}`,
-    image: "/Logo/Logo.svg", // Your logo
+    image: "https://flashspace.ai/Logo/Flashspace%20Logo.png", // Use absolute public URL to avoid PNA issues
     order_id: options.orderId,
     handler: function (response: any) {
       options.onSuccess({
