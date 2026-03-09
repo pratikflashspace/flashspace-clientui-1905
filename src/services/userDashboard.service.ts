@@ -277,6 +277,23 @@ class UserDashboardService {
     }
   }
 
+  // Delete KYC Profile
+  async deleteKYCProfile(profileId: string): Promise<ApiResponse<void>> {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<void>>(
+        `/api/user/kyc/profile/${profileId}`,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete profile";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
   // Link booking to profile
   async linkBookingToProfile(
     bookingId: string,
