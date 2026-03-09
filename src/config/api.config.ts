@@ -126,4 +126,14 @@ export const API_ENDPOINTS = {
     INVOICES: "/api/affiliate/invoices",
     INVOICE_BY_ID: (id: string) => `/api/affiliate/invoices/${id}`,
   },
+
+  // Payment endpoints
+  PAYMENT: {
+    CREATE_ORDER: "/api/payment/create-order",
+    VERIFY: "/api/payment/verify",
+    FAILED: "/api/payment/failed",
+    STATUS: (orderId: string) => `/api/payment/status/${orderId}`,
+    USER_HISTORY: (userId: string) => `/api/payment/user/${userId}`,
+    BY_ID: (paymentId: string) => `/api/payment/${paymentId}`,
+  },
 };

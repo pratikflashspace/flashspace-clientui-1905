@@ -252,7 +252,11 @@ const BookingPage = () => {
           // 2. Fallback: Search user holdings to find an active one for this space
           const response = await axiosInstance.get<any>("/seat-bookings/user");
           if (response.data?.success && response.data?.data) {
-            const activeBooking = response.data.data.find((b: any) => {
+            const bookings = Array.isArray(response.data.data)
+              ? response.data.data
+              : response.data.data.bookings || [];
+
+            const activeBooking = bookings.find((b: any) => {
               const matchId =
                 typeof b.space === "object" && b.space !== null
                   ? b.space._id === id
@@ -1079,7 +1083,7 @@ const BookingPage = () => {
                             setSelectedTenure(option.years as 1 | 2 | 3)
                           }
                           className={`relative border-2 rounded-2xl p-5 cursor-pointer transition-all duration-300
-                              ${selectedTenure === option.years
+                               ${selectedTenure === option.years
                               ? "border-teal-500 bg-teal-50 shadow-lg scale-[1.02]"
                               : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
                             }`}
