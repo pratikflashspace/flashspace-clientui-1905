@@ -21,23 +21,23 @@ export type ListingItem = (
   | CoworkingSpaceItem
   | MeetingRoomItem
   | {
-      _id: string;
-      name: string;
-      address: string;
-      area: string;
-      price: string;
-      originalPrice?: string;
-      rating: number;
-      reviews: number;
-      image?: string;
-      features: string[];
-      popular?: boolean;
-      availability?: string;
-      coordinates?: {
-        lat: number;
-        lng: number;
-      };
-    }
+    _id: string;
+    name: string;
+    address: string;
+    area: string;
+    price: string;
+    originalPrice?: string;
+    rating: number;
+    reviews: number;
+    image?: string;
+    features: string[];
+    popular?: boolean;
+    availability?: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  }
 ) & {
   images?: string[];
   avgRating?: number;
@@ -146,13 +146,13 @@ const ListingCardModern = memo<ListingCardModernProps>(
 
     return (
       <div
-        className="group cursor-pointer"
+        className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-all duration-[250ms] ease-out shadow-sm hover:shadow-md h-full flex flex-col"
         onClick={handleCardClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Image Container */}
-        <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-3">
+        <div className="relative aspect-[16/10] overflow-hidden">
           {/* Image */}
           <img
             src={images[currentImageIndex]}
@@ -186,11 +186,10 @@ const ListingCardModern = memo<ListingCardModernProps>(
           <div className="absolute top-3 right-3 flex items-center gap-2">
             <button
               onClick={handleFavoriteClick}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
-                isFavorite
-                  ? "bg-white text-red-500"
-                  : "bg-white/80 hover:bg-white text-gray-600 hover:text-red-500"
-              }`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${isFavorite
+                ? "bg-white text-red-500"
+                : "bg-white/80 hover:bg-white text-gray-600 hover:text-red-500"
+                }`}
             >
               <Heart
                 className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`}
@@ -205,10 +204,16 @@ const ListingCardModern = memo<ListingCardModernProps>(
           </div>
 
           {/* Popular Badge */}
-          {item.popular && (
-            <div className="absolute top-3 left-3">
-              <span className="bg-amber-500 text-white text-xs px-2.5 py-1 rounded-full font-medium shadow-lg">
-                🔥 Popular
+          {item.popular ? (
+            <div className="absolute bottom-3 left-3">
+              <span className="bg-[#FE8A00] text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 uppercase tracking-tight">
+                <span className="animate-pulse">🔥</span> Popular
+              </span>
+            </div>
+          ) : (
+            <div className="absolute bottom-3 left-3">
+              <span className="bg-primary text-primary-foreground text-[10px] font-normal px-2.5 py-1 rounded-full shadow-sm">
+                Available Now
               </span>
             </div>
           )}
@@ -232,11 +237,10 @@ const ListingCardModern = memo<ListingCardModernProps>(
                     e.stopPropagation();
                     setCurrentImageIndex(index);
                   }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
-                    index === currentImageIndex
-                      ? "bg-white w-2.5"
-                      : "bg-white/60 hover:bg-white/80"
-                  }`}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${index === currentImageIndex
+                    ? "bg-white w-2.5"
+                    : "bg-white/60 hover:bg-white/80"
+                    }`}
                 />
               ))}
             </div>
@@ -244,19 +248,18 @@ const ListingCardModern = memo<ListingCardModernProps>(
         </div>
 
         {/* Content */}
-        <div className="px-1">
+        <div className="p-4 flex flex-col flex-1">
           {/* Title Row */}
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <h3 className="font-semibold text-gray-900 text-base leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <h4 className="text-base font-bold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1">
               {item.name}
-            </h3>
-            {/* Rating */}
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <Star className="w-4 h-4 text-gray-900 fill-current" />
-              <span className="font-medium text-sm text-gray-900">
+            </h4>
+            <div className="flex items-center gap-1 shrink-0">
+              <Star className="w-3.5 h-3.5 text-[#EDB003] fill-[#EDB003]" />
+              <span className="text-sm font-bold text-foreground">
                 {displayRating}
               </span>
-              <span className="text-gray-500 text-sm">
+              <span className="text-muted-foreground text-[11px]">
                 ({formatReviews(displayReviews)})
               </span>
             </div>
@@ -273,142 +276,84 @@ const ListingCardModern = memo<ListingCardModernProps>(
             {item.features?.slice(0, 2).map((feature, idx) => (
               <span
                 key={idx}
-                className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md"
+                className="text-[11px] text-muted-foreground border border-border rounded-full px-2.5 py-0.5"
               >
                 {feature}
               </span>
             ))}
           </div>
 
-          {/* Pricing - All 3 Plans Vertical */}
-          <div className="flex flex-col gap-1 mb-2">
-            {/* GST Plan */}
+          {/* Pricing Section */}
+          <div className="space-y-2 mb-4">
+            {/* Virtual Office Plans */}
             {(("finalGstPricePerYear" in item && item.finalGstPricePerYear) ||
               ("gstPlanPricePerYear" in item && item.gstPlanPricePerYear) ||
               ("gstPlanPrice" in item && item.gstPlanPrice)) && (
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">GST Plan</span>
-                <div className="text-right">
-                  {"finalGstPricePerYear" in item &&
-                  item.finalGstPricePerYear ? (
-                    <span className="text-sm font-semibold text-gray-900 block">
-                      {formatCurrency(item.finalGstPricePerYear)}/yr
-                    </span>
-                  ) : "gstPlanPricePerYear" in item &&
-                    item.gstPlanPricePerYear ? (
-                    <span className="text-sm font-semibold text-gray-900 block">
-                      {formatCurrency(item.gstPlanPricePerYear)}/yr
-                    </span>
-                  ) : (
-                    <>
-                      <span className="text-sm font-semibold text-gray-900 block">
-                        {item.gstPlanPrice}
-                      </span>
-                      {item.gstPlanPriceYearly && (
-                        <span className="text-xs text-gray-500 block">
-                          ₹{item.gstPlanPriceYearly}/yr
-                        </span>
-                      )}
-                    </>
-                  )}
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">GST Plan</span>
+                  <span className="font-bold text-foreground">
+                    {"finalGstPricePerYear" in item && item.finalGstPricePerYear
+                      ? formatCurrency(item.finalGstPricePerYear)
+                      : "gstPlanPricePerYear" in item && item.gstPlanPricePerYear
+                        ? formatCurrency(item.gstPlanPricePerYear)
+                        : item.gstPlanPrice}
+                    /yr
+                  </span>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Mailing Plan */}
             {(("finalMailingPricePerYear" in item &&
               item.finalMailingPricePerYear) ||
               ("mailingPlanPricePerYear" in item &&
                 item.mailingPlanPricePerYear) ||
               ("mailingPlanPrice" in item && item.mailingPlanPrice)) && (
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">Mailing Plan</span>
-                <div className="text-right">
-                  {"finalMailingPricePerYear" in item &&
-                  item.finalMailingPricePerYear ? (
-                    <span className="text-sm font-semibold text-gray-900 block">
-                      {formatCurrency(item.finalMailingPricePerYear)}/yr
-                    </span>
-                  ) : "mailingPlanPricePerYear" in item &&
-                    item.mailingPlanPricePerYear ? (
-                    <span className="text-sm font-semibold text-gray-900 block">
-                      {formatCurrency(item.mailingPlanPricePerYear)}/yr
-                    </span>
-                  ) : (
-                    <>
-                      <span className="text-sm font-semibold text-gray-900 block">
-                        {item.mailingPlanPrice}
-                      </span>
-                      {item.mailingPlanPriceYearly && (
-                        <span className="text-xs text-gray-500 block">
-                          ₹{item.mailingPlanPriceYearly}/yr
-                        </span>
-                      )}
-                    </>
-                  )}
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Mailing Plan</span>
+                  <span className="font-bold text-foreground">
+                    {"finalMailingPricePerYear" in item &&
+                      item.finalMailingPricePerYear
+                      ? formatCurrency(item.finalMailingPricePerYear)
+                      : "mailingPlanPricePerYear" in item &&
+                        item.mailingPlanPricePerYear
+                        ? formatCurrency(item.mailingPlanPricePerYear)
+                        : item.mailingPlanPrice}
+                    /yr
+                  </span>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Business Registration Plan */}
             {(("finalBrPricePerYear" in item && item.finalBrPricePerYear) ||
               ("brPlanPricePerYear" in item && item.brPlanPricePerYear) ||
               ("brPlanPrice" in item && item.brPlanPrice)) && (
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">Business Reg</span>
-                <div className="text-right">
-                  {"finalBrPricePerYear" in item && item.finalBrPricePerYear ? (
-                    <span className="text-sm font-semibold text-gray-900 block">
-                      {formatCurrency(item.finalBrPricePerYear)}/yr
-                    </span>
-                  ) : "brPlanPricePerYear" in item &&
-                    item.brPlanPricePerYear ? (
-                    <span className="text-sm font-semibold text-gray-900 block">
-                      {formatCurrency(item.brPlanPricePerYear)}/yr
-                    </span>
-                  ) : (
-                    <>
-                      <span className="text-sm font-semibold text-gray-900 block">
-                        {item.brPlanPrice}
-                      </span>
-                      {item.brPlanPriceYearly && (
-                        <span className="text-xs text-gray-500 block">
-                          ₹{item.brPlanPriceYearly}/yr
-                        </span>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Default Price (for Coworking/Meeting Rooms) */}
-            {!("gstPlanPricePerYear" in item) && !("gstPlanPrice" in item) && (
-              <div className="text-right">
-                <span className="text-lg font-bold text-gray-900 block">
-                  {item.price}
-                </span>
-                {"priceYearly" in item && item.priceYearly && (
-                  <span className="text-xs text-gray-500 block">
-                    ₹{item.priceYearly}/yr
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Business Reg</span>
+                  <span className="font-bold text-foreground">
+                    {"finalBrPricePerYear" in item && item.finalBrPricePerYear ? (
+                      formatCurrency(item.finalBrPricePerYear)
+                    ) : "brPlanPricePerYear" in item &&
+                      item.brPlanPricePerYear ? (
+                      formatCurrency(item.brPlanPricePerYear)
+                    ) : (
+                      item.brPlanPrice
+                    )}
+                    /yr
                   </span>
-                )}
-              </div>
-            )}
-          </div>
+                </div>
+              )}
 
-          {/* Negotiable Tag */}
-          <div className="mb-3">
-            <span className="text-xs text-gray-500 italic">
-              Price negotiable
-            </span>
+            {/* Default Starting from for Coworking/Meeting */}
+            {!("gstPlanPricePerYear" in item) && !("gstPlanPrice" in item) && (
+              <p className="text-sm text-muted-foreground">
+                Starting from <span className="font-bold text-foreground">{item.price}</span>
+              </p>
+            )}
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 mt-auto">
             <button
               onClick={handleCardClick}
-              className="flex-1 py-3 bg-gray-900 hover:bg-[#EDB003] text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-md hover:text-gray-900"
+              className="flex-1 bg-primary text-primary-foreground text-sm font-normal py-2.5 rounded-xl hover:bg-primary/90 transition-all active:scale-[0.98]"
             >
               Get Best Price
             </button>
@@ -417,7 +362,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
                 e.stopPropagation();
                 setIsMeetingModalOpen(true);
               }}
-              className="flex-1 py-3 bg-white border-2 border-gray-900 hover:bg-gray-900 text-gray-900 hover:text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-md flex items-center justify-center gap-1.5"
+              className="flex-1 flex items-center justify-center gap-1.5 border border-border text-sm font-normal text-foreground py-2.5 rounded-xl hover:bg-muted/50 transition-all active:scale-[0.98]"
             >
               <Phone className="w-4 h-4" />
               Contact Sales
