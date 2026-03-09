@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
@@ -32,9 +32,12 @@ import { adminService } from "@/services/admin.service";
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [pendingKycCount, setPendingKycCount] = useState(0);
+
+  const isDashboardPage = location.pathname.startsWith("/admin");
 
   React.useEffect(() => {
     const fetchPendingKyc = async () => {
@@ -95,8 +98,8 @@ export default function AdminLayout() {
     },
     {
       icon: LineChart,
-      label: "Booking Analysis",
-      path: "/admin/booking-analysis",
+      label: "Sales Analytics",
+      path: "/admin/sales-analytics",
       roles: [
         "admin",
         "super_admin",
@@ -211,12 +214,17 @@ export default function AdminLayout() {
     (item) => user?.role && item.roles.includes(user.role),
   );
 
+  if (isDashboardPage) {
+    return <Outlet />;
+  }
+
   return (
     <div className="min-h-screen bg-[#FDFDFD] flex font-sans text-gray-900">
       {/* Sidebar - Desktop */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 transition-all duration-300 ${isSidebarOpen ? "w-72" : "w-20"
-          } hidden md:flex flex-col shadow-sm`}
+        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 transition-all duration-300 ${
+          isSidebarOpen ? "w-72" : "w-20"
+        } hidden md:flex flex-col shadow-sm`}
       >
         {/* Sidebar Header */}
         <div className="h-auto py-8 px-6 flex flex-col items-start gap-1">
@@ -250,9 +258,10 @@ export default function AdminLayout() {
                 to={item.path}
                 end={item.path === "/admin"}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                    ? "bg-teal-600 text-white shadow-md shadow-teal-200"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium"
+                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                    isActive
+                      ? "bg-teal-600 text-white shadow-md shadow-teal-200"
+                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium"
                   }`
                 }
               >
@@ -260,7 +269,7 @@ export default function AdminLayout() {
                   className={`w-5 h-5 flex-shrink-0 transition-colors ${
                     // Active styles handled by parent class
                     ""
-                    }`}
+                  }`}
                 />
                 {isSidebarOpen && (
                   <span className="whitespace-nowrap font-medium text-sm">
@@ -360,9 +369,10 @@ export default function AdminLayout() {
                     onClick={() => setIsMobileOpen(false)}
                     end={item.path === "/admin"}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${isActive
-                        ? "bg-teal-600 text-white shadow-md shadow-teal-200"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium"
+                      `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                        isActive
+                          ? "bg-teal-600 text-white shadow-md shadow-teal-200"
+                          : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium"
                       }`
                     }
                   >
@@ -413,51 +423,36 @@ export default function AdminLayout() {
 
       {/* Main Content */}
       <div
-        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${isSidebarOpen ? "md:ml-72" : "md:ml-20"
-          }`}
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
+          isSidebarOpen ? "md:ml-72" : "md:ml-20"
+        }`}
       >
-        {/* Topbar - Simplified to match clean style */}
-        <header className="h-20 bg-transparent flex items-center justify-between px-8 md:px-12 pt-6">
-          <div className="flex items-center gap-4">
-            <button
-              className="md:hidden p-2 hover:bg-gray-100 rounded-lg text-gray-500"
-              onClick={() => setIsMobileOpen(true)}
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-            {/* Breadcrumbs or Title could go here, but Dashboard usually handles its own header */}
-          </div>
+        {isDashboardPage ? (
+          /* Dashboard pages manage their own header + padding via DashboardLayout */
+          <Outlet />
+        ) : (
+          <>
+            {/* Topbar - Simplified to match clean style */}
+            <header className="h-20 bg-transparent flex items-center justify-between px-8 md:px-12 pt-6">
+              <div className="flex items-center gap-4">
+                <button
+                  className="md:hidden p-2 hover:bg-gray-100 rounded-lg text-gray-500"
+                  onClick={() => setIsMobileOpen(true)}
+                >
+                  <Menu className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="flex items-center gap-6" />
+            </header>
 
-          <div className="flex items-center gap-6">
-            {/* Search Bar - Optional, based on ref it might be cleaner without or minimal */}
-            {/*  <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200 shadow-sm focus-within:ring-2 focus-within:ring-teal-100 transition-all w-64">
-                            <Search className="w-4 h-4 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                className="bg-transparent border-none focus:outline-none text-sm w-full text-gray-600 placeholder:text-gray-400"
-                            />
-                        </div> */}
-
-            {/* Profile/Notifs */}
-            {/*  <button className="relative p-2 hover:bg-white rounded-full text-gray-400 hover:text-gray-600 transition-colors">
-                            <Bell className="w-5 h-5" />
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                        </button> */}
-
-            {/* Minimal Profile */}
-            {/* <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold shadow-md cursor-pointer hover:scale-105 transition-transform">
-                             {user?.fullName?.charAt(0) || 'U'}
-                        </div> */}
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <main className="flex-1 px-8 md:px-12 py-6">
-          <div className="max-w-7xl mx-auto">
-            <Outlet />
-          </div>
-        </main>
+            {/* Page Content */}
+            <main className="flex-1 px-8 md:px-12 py-6">
+              <div className="max-w-7xl mx-auto">
+                <Outlet />
+              </div>
+            </main>
+          </>
+        )}
       </div>
     </div>
   );

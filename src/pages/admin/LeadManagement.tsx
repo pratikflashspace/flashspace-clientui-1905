@@ -1,278 +1,464 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { adminService } from "@/services/admin.service";
 import {
-    Plus,
-    Search,
-    Filter,
-    Eye,
-    Phone,
-    Mail,
-    MoreVertical,
-    Target,
-    Loader2
-} from 'lucide-react';
-import { adminService } from '@/services/admin.service';
+  Plus,
+  Search,
+  Filter,
+  Phone,
+  Mail,
+  MoreVertical,
+  Eye,
+  MessageSquare,
+  Loader2,
+} from "lucide-react";
+import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
 
-export default function LeadManagement() {
-    const [activeTab, setActiveTab] = useState('All Leads');
-    const [leads, setLeads] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [stats, setStats] = useState({
-        total: 0,
-        hot: 0,
-        warm: 0,
-        conversion: 0
+const LeadManagement = () => {
+  const [leads, setLeads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [selectedLead, setSelectedLead] = useState<any | null>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchLeads = async () => {
+      try {
+        const response = await adminService.getAllBookings(); // Using bookings as leads for now
+        if (response.success && response.data && response.data.bookings) {
+          processLeads(response.data.bookings);
+        }
+      } catch (error) {
+        console.error("Failed to fetch leads", error);
+        toast({
+          title: "Error",
+          description: "Failed to load lead data.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeads();
+  }, []);
+
+  const processLeads = (bookings: any[]) => {
+    const sortedBookings = [...bookings].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
+    const processed = sortedBookings.map((booking, index) => {
+      const amount = Number(booking.amount || booking.plan?.price || 0);
+      const randomBase = Math.floor(Math.random() * (95 - 65) + 65);
+      const score = Math.min(randomBase + (amount > 10000 ? 5 : 0), 99);
+
+      let status = "warm";
+      if (booking.status === "confirmed" || booking.status === "completed") {
+        status = "won";
+      } else if (booking.status === "cancelled") {
+        status = "cold";
+      } else if (score > 85) {
+        status = "hot";
+      }
+
+      let interest = booking.plan?.name || booking.type || "Inquiry";
+      interest = interest
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+
+      return {
+        id: booking.bookingNumber || `LD-${100 + index}`,
+        name:
+          booking.user?.companyName ||
+          (booking.user?.firstName
+            ? `${booking.user.firstName} ${booking.user.lastName || ""}`
+            : "Unknown Client"),
+        contact: booking.user?.firstName
+          ? `${booking.user.firstName} ${booking.user.lastName || ""}`
+          : "N/A",
+        email: booking.user?.email || "No email",
+        phone: booking.user?.phone || "+91 00000 00000",
+        interest: interest,
+        source: booking.user?.source || "Website",
+        score: score,
+        status: status,
+        assignee: "Unassigned",
+        lastActivity: new Date(booking.createdAt).toLocaleDateString(
+          undefined,
+          {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          },
+        ),
+        notes: "Auto-generated lead from booking request.",
+        rawStatus: booking.status,
+      };
     });
 
-    useEffect(() => {
-        const fetchLeads = async () => {
-            try {
-                const response = await adminService.getAllBookings(); // Using bookings as leads for now
-                if (response.success && response.data && response.data.bookings) {
-                    processLeads(response.data.bookings);
-                }
-            } catch (error) {
-                console.error("Failed to fetch leads", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    setLeads(processed);
+  };
 
-        fetchLeads();
-    }, []);
-
-    const processLeads = (bookings: any[]) => {
-        // Sort bookings by date descending
-        const sortedBookings = [...bookings].sort((a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-
-        const processed = sortedBookings.map(booking => {
-            // Simulate AI score and status based on data
-            const amount = Number(booking.amount || booking.plan?.price || 0);
-
-            // Random score but biased by amount
-            const randomBase = Math.floor(Math.random() * (95 - 65) + 65);
-            const score = Math.min(randomBase + (amount > 10000 ? 5 : 0), 99);
-
-            let status = 'Warm';
-            if (booking.status === 'confirmed' || booking.status === 'completed') {
-                status = 'Won';
-            } else if (booking.status === 'cancelled') {
-                status = 'Cold';
-            } else if (score > 85) {
-                status = 'Hot Lead';
-            }
-
-            // Format interest nicely
-            let interest = booking.plan?.name || booking.type || "Inquiry";
-            interest = interest.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-
-            return {
-                company: booking.user?.companyName || (booking.user?.firstName ? `${booking.user.firstName} ${booking.user.lastName || ''}` : "Unknown Client"),
-                contact: booking.user?.email || "No contact info",
-                interest: interest,
-                source: booking.user?.source || "Website",
-                score: score,
-                status: status,
-                assignee: "Unassigned",
-                lastActivity: new Date(booking.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-                rawStatus: booking.status
-            };
-        });
-
-        // Calculate stats
-        const total = processed.length;
-        const hot = processed.filter(l => l.status === 'Hot Lead').length;
-        const warm = processed.filter(l => l.status === 'Warm').length;
-        const won = processed.filter(l => l.status === 'Won').length;
-
-        setStats({
-            total,
-            hot,
-            warm,
-            conversion: total > 0 ? (won / total) * 100 : 0
-        });
-
-        setLeads(processed);
-    };
-
-    const getScoreColor = (score: number) => {
-        if (score >= 80) return "text-green-600";
-        if (score >= 60) return "text-orange-500";
-        return "text-red-500";
-    };
-
-    const getStatusStyle = (status: string) => {
-        if (status === "Hot Lead") return "bg-red-50 text-red-600 border-red-100";
-        if (status === "Warm") return "bg-orange-50 text-orange-600 border-orange-100";
-        if (status === "Won") return "bg-green-50 text-green-600 border-green-100";
-        if (status === "Cold") return "bg-gray-100 text-gray-500 border-gray-200";
-        return "bg-gray-50 text-gray-600 border-gray-100";
-    };
-
-    const filteredLeads = activeTab === 'All Leads'
-        ? leads
-        : leads.filter(l => {
-            if (activeTab === 'Hot') return l.status === 'Hot Lead';
-            if (activeTab === 'Won') return l.status === 'Won';
-            if (activeTab === 'Cold') return l.status === 'Cold';
-            return l.status === activeTab;
-        });
-
-    if (loading) {
+  const getStatusBadge = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "hot":
+        return <Badge variant="destructive">Hot Lead</Badge>;
+      case "warm":
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
-            </div>
+          <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100">
+            Warm
+          </Badge>
         );
+      case "cold":
+        return <Badge variant="secondary">Cold</Badge>;
+      case "won":
+        return (
+          <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+            Won
+          </Badge>
+        );
+      default:
+        return <Badge variant="outline">{status}</Badge>;
     }
+  };
 
-    return (
-        <div className="min-h-screen bg-transparent space-y-8 font-sans animate-in fade-in duration-500 pb-12">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                        Lead <span className="text-teal-500 italic">Management</span>
-                    </h1>
-                    <p className="text-gray-500 mt-2 text-lg font-light">
-                        Track, score, and convert leads with AI assistance
-                    </p>
-                </div>
-                <button className="flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors shadow-md shadow-teal-200 font-medium">
-                    <Plus className="w-5 h-5" />
-                    <span>Add Lead</span>
-                </button>
-            </div>
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
+  };
 
-            {/* Stats Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                    { label: "Total Leads", value: stats.total.toString() },
-                    { label: "Hot Leads", value: stats.hot.toString(), color: "text-red-600" },
-                    { label: "Warm Leads", value: stats.warm.toString(), color: "text-orange-600" },
-                    { label: "Conversion Rate", value: `${stats.conversion.toFixed(1)}%` }
-                ].map((stat, idx) => (
-                    <div key={idx} className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
-                        <h3 className={`text-4xl font-extrabold tracking-tight ${stat.color || 'text-gray-900'}`}>{stat.value}</h3>
-                        <p className="text-gray-500 font-medium mt-1">{stat.label}</p>
+  const handleView = (lead: any) => {
+    setSelectedLead(lead);
+    setViewModalOpen(true);
+  };
+
+  const handleCall = (phone: string) => {
+    toast({
+      title: "Initiating Call",
+      description: `Calling ${phone}...`,
+    });
+  };
+
+  const handleEmail = (email: string) => {
+    window.location.href = `mailto:${email}`;
+  };
+
+  const handleAddLead = () => {
+    toast({
+      title: "Add New Lead",
+      description: "Opening lead creation form...",
+    });
+  };
+
+  const hotLeads = leads.filter((l) => l.status === "hot");
+  const warmLeads = leads.filter((l) => l.status === "warm");
+  const coldLeads = leads.filter((l) => l.status === "cold");
+
+  // Stats
+  const wonLeadsCount = leads.filter((l) => l.status === "won").length;
+  const conversionRate =
+    leads.length > 0 ? ((wonLeadsCount / leads.length) * 100).toFixed(1) : 0;
+
+  const renderLeadTable = (tableLeads: typeof leads) => (
+    <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-muted/50 border-b border-border">
+            <tr>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Lead
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Interest
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Source
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                AI Score
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Status
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Assignee
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Last Activity
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {tableLeads.map((lead, idx) => (
+              <tr
+                key={lead.id || idx}
+                className="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors"
+              >
+                <td className="p-4">
+                  <div>
+                    <div className="font-medium text-foreground">
+                      {lead.name}
                     </div>
-                ))}
-            </div>
-
-            {/* Filters and Table */}
-            <div className="space-y-6">
-                {/* Search & Filter Bar */}
-                <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1 relative">
-                        <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                        <input
-                            type="text"
-                            placeholder="Search leads..."
-                            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all text-sm"
-                        />
+                    <div className="text-sm text-muted-foreground">
+                      {lead.contact}
                     </div>
-                    <button className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors shadow-sm font-medium">
-                        <Filter className="w-4 h-4" />
-                        <span>Filter</span>
-                    </button>
-                </div>
-
-                {/* Tabs */}
-                <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                    {/* Dynamic Tabs based on counts */}
-                    {[
-                        { name: 'All Leads', count: leads.length },
-                        { name: 'Hot', count: stats.hot },
-                        { name: 'Warm', count: stats.warm },
-                        { name: 'Won', count: leads.filter(l => l.status === 'Won').length },
-                        { name: 'Cold', count: leads.filter(l => l.status === 'Cold').length }
-                    ].map((tab) => (
-                        <button
-                            key={tab.name}
-                            onClick={() => setActiveTab(tab.name)}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab.name
-                                    ? 'bg-gray-900 text-white'
-                                    : 'bg-transparent text-gray-500 hover:bg-gray-100'
-                                }`}
-                        >
-                            {tab.name} ({tab.count})
-                        </button>
-                    ))}
-                </div>
-
-                {/* Table */}
-                <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
-                            <thead className="bg-gray-50/50 text-gray-900 font-semibold border-b border-gray-100">
-                                <tr>
-                                    <th className="px-6 py-5">Lead</th>
-                                    <th className="px-6 py-5">Interest</th>
-                                    <th className="px-6 py-5">Source</th>
-                                    <th className="px-6 py-5">AI Score</th>
-                                    <th className="px-6 py-5">Status</th>
-                                    <th className="px-6 py-5">Assignee</th>
-                                    <th className="px-6 py-5">Last Activity</th>
-                                    <th className="px-6 py-5">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {filteredLeads.length > 0 ? (
-                                    filteredLeads.map((lead, idx) => (
-                                        <tr key={idx} className="hover:bg-gray-50/50 transition-colors group">
-                                            <td className="px-6 py-5">
-                                                <div>
-                                                    <p className="font-bold text-gray-900 text-base">{lead.company}</p>
-                                                    <p className="text-xs text-gray-500 mt-0.5">{lead.contact}</p>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-5">
-                                                <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium border border-gray-200">
-                                                    {lead.interest}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-5 text-gray-500">{lead.source}</td>
-                                            <td className="px-6 py-5 font-bold text-base">
-                                                <span className={getScoreColor(lead.score)}>{lead.score}</span>
-                                            </td>
-                                            <td className="px-6 py-5">
-                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold border ${getStatusStyle(lead.status)}`}>
-                                                    {lead.status}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-5 text-gray-600">{lead.assignee}</td>
-                                            <td className="px-6 py-5 text-gray-400 text-xs whitespace-nowrap">{lead.lastActivity}</td>
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button className="p-2 bg-teal-50 text-teal-600 rounded-lg hover:bg-teal-100 transition-colors">
-                                                        <Eye className="w-4 h-4" />
-                                                    </button>
-                                                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
-                                                        <Phone className="w-4 h-4" />
-                                                    </button>
-                                                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
-                                                        <Mail className="w-4 h-4" />
-                                                    </button>
-                                                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
-                                                        <MoreVertical className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
-                                            No leads found in this category.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                  </div>
+                </td>
+                <td className="p-4">
+                  <Badge variant="outline">{lead.interest}</Badge>
+                </td>
+                <td className="p-4 text-sm text-muted-foreground">
+                  {lead.source}
+                </td>
+                <td className="p-4">
+                  <span
+                    className={`font-bold text-lg ${getScoreColor(lead.score)}`}
+                  >
+                    {lead.score}
+                  </span>
+                </td>
+                <td className="p-4">{getStatusBadge(lead.status)}</td>
+                <td className="p-4 text-sm text-muted-foreground">
+                  {lead.assignee}
+                </td>
+                <td className="p-4 text-sm text-muted-foreground">
+                  {lead.lastActivity}
+                </td>
+                <td className="p-4">
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleView(lead)}
+                      className="bg-primary/10 hover:bg-primary/20"
+                    >
+                      <Eye className="w-4 h-4 text-primary" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleCall(lead.phone)}
+                    >
+                      <Phone className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEmail(lead.email)}
+                    >
+                      <Mail className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm">
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {tableLeads.length === 0 && (
+        <div className="p-8 text-center text-muted-foreground">
+          No leads in this category
         </div>
+      )}
+    </div>
+  );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
     );
-}
+  }
+
+  return (
+    <DashboardLayout
+      portalName="FlashSpace Admin"
+      portalDescription="Complete platform management"
+      navItems={ADMIN_NAV_ITEMS}
+    >
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+            Lead <span className="text-primary italic">Management</span>
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Track, score, and convert leads with AI assistance
+          </p>
+        </div>
+        <Button onClick={handleAddLead}>
+          <Plus className="w-4 h-4 mr-2" />
+          Add Lead
+        </Button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid gap-4 sm:grid-cols-4 mb-8">
+        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
+          <p className="text-2xl font-extrabold text-foreground">
+            {leads.length}
+          </p>
+          <p className="text-sm text-muted-foreground">Total Leads</p>
+        </div>
+        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
+          <p className="text-2xl font-extrabold text-red-600">
+            {hotLeads.length}
+          </p>
+          <p className="text-sm text-muted-foreground">Hot Leads</p>
+        </div>
+        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
+          <p className="text-2xl font-extrabold text-orange-600">
+            {warmLeads.length}
+          </p>
+          <p className="text-sm text-muted-foreground">Warm Leads</p>
+        </div>
+        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
+          <p className="text-2xl font-extrabold text-foreground">
+            {conversionRate}%
+          </p>
+          <p className="text-sm text-muted-foreground">Conversion Rate</p>
+        </div>
+      </div>
+
+      {/* Search & Filter */}
+      <div className="flex gap-4 mb-6">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input placeholder="Search leads..." className="pl-10" />
+        </div>
+        <Button variant="outline">
+          <Filter className="w-4 h-4 mr-2" />
+          Filter
+        </Button>
+      </div>
+
+      <Tabs defaultValue="all" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="all">All Leads ({leads.length})</TabsTrigger>
+          <TabsTrigger value="hot">Hot ({hotLeads.length})</TabsTrigger>
+          <TabsTrigger value="warm">Warm ({warmLeads.length})</TabsTrigger>
+          <TabsTrigger value="cold">Cold ({coldLeads.length})</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all">{renderLeadTable(leads)}</TabsContent>
+
+        <TabsContent value="hot">{renderLeadTable(hotLeads)}</TabsContent>
+
+        <TabsContent value="warm">{renderLeadTable(warmLeads)}</TabsContent>
+
+        <TabsContent value="cold">{renderLeadTable(coldLeads)}</TabsContent>
+      </Tabs>
+
+      {/* Lead View Modal */}
+      <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Lead Details</DialogTitle>
+          </DialogHeader>
+          {selectedLead && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-foreground">
+                    {selectedLead.name}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {selectedLead.contact}
+                  </p>
+                </div>
+                {getStatusBadge(selectedLead.status)}
+              </div>
+
+              <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">AI Score</span>
+                  <span
+                    className={`font-bold text-xl ${getScoreColor(selectedLead.score)}`}
+                  >
+                    {selectedLead.score}/100
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Interest</span>
+                  <Badge variant="outline">{selectedLead.interest}</Badge>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Source</span>
+                  <span className="text-foreground">{selectedLead.source}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Assigned To</span>
+                  <span className="text-foreground">
+                    {selectedLead.assignee}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-semibold text-foreground">
+                  Contact Information
+                </h4>
+                <div className="flex items-center gap-3 p-2 bg-muted/30 rounded-lg">
+                  <Mail className="w-4 h-4 text-primary" />
+                  <span className="text-sm">{selectedLead.email}</span>
+                </div>
+                <div className="flex items-center gap-3 p-2 bg-muted/30 rounded-lg">
+                  <Phone className="w-4 h-4 text-primary" />
+                  <span className="text-sm">{selectedLead.phone}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-semibold text-foreground">Notes</h4>
+                <p className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                  {selectedLead.notes}
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => handleCall(selectedLead.phone)}
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Call
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={() => handleEmail(selectedLead.email)}
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Email
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </DashboardLayout>
+  );
+};
+
+export default LeadManagement;

@@ -75,13 +75,22 @@ const isVideoFile = (url?: string) => {
   return ["mp4", "webm", "mov", "avi", "mkv"].includes(ext);
 };
 
+import { API_CONFIG } from "@/config/api.config";
+// ... (rest of imports)
+
+// ...
+
 // Set your backend API base URL here
-const API_BASE_URL = "http://localhost:5000"; // Change this if your backend runs elsewhere
+const API_BASE_URL = API_CONFIG.BASE_URL;
 const getFullUrl = (url?: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
   // Prepend API base URL for relative paths (e.g., /uploads/...)
-  return `${API_BASE_URL}${url}`;
+  const baseUrl = API_BASE_URL.endsWith("/")
+    ? API_BASE_URL.slice(0, -1)
+    : API_BASE_URL;
+  const path = url.startsWith("/") ? url : `/${url}`;
+  return `${baseUrl}${path}`;
 };
 
 export default function SpacePartnerKycDetails() {

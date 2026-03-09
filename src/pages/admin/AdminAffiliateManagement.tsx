@@ -20,6 +20,8 @@ import {
   AlertCircle,
   UserCheck,
 } from "lucide-react";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 
 // ---------------------------------------------------------------
 // Types
@@ -423,112 +425,118 @@ export default function AdminAffiliateManagement() {
   );
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Affiliate Management
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Monitor all affiliate partners, their referral codes, clients, and
-          commission earnings.
-        </p>
-      </div>
-
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          label="Total Affiliates"
-          value={String(summary.totalAffiliates)}
-          icon={Users}
-          color="bg-teal-100 text-teal-600"
-        />
-        <StatCard
-          label="Total Revenue Generated"
-          value={formatCurrency(summary.totalRevenue)}
-          icon={TrendingUp}
-          color="bg-indigo-100 text-indigo-600"
-          sub="From affiliate referrals"
-        />
-        <StatCard
-          label="Total Commission Payable"
-          value={formatCurrency(summary.totalCommissionPayable)}
-          icon={DollarSign}
-          color="bg-emerald-100 text-emerald-600"
-          sub="15% of referred revenue"
-        />
-      </div>
-
-      {/* Table Card */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        {/* Toolbar */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by name, email, or coupon code…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-300"
-            />
-          </div>
-          <span className="text-xs text-gray-400 whitespace-nowrap">
-            {filtered.length} of {affiliates.length}
-          </span>
+    <DashboardLayout
+      portalName="FlashSpace Admin"
+      portalDescription="Complete platform management"
+      navItems={ADMIN_NAV_ITEMS}
+    >
+      <div className="space-y-8">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Affiliate Management
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Monitor all affiliate partners, their referral codes, clients, and
+            commission earnings.
+          </p>
         </div>
 
-        {/* Table */}
-        {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+        {/* Summary Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard
+            label="Total Affiliates"
+            value={String(summary.totalAffiliates)}
+            icon={Users}
+            color="bg-teal-100 text-teal-600"
+          />
+          <StatCard
+            label="Total Revenue Generated"
+            value={formatCurrency(summary.totalRevenue)}
+            icon={TrendingUp}
+            color="bg-indigo-100 text-indigo-600"
+            sub="From affiliate referrals"
+          />
+          <StatCard
+            label="Total Commission Payable"
+            value={formatCurrency(summary.totalCommissionPayable)}
+            icon={DollarSign}
+            color="bg-emerald-100 text-emerald-600"
+            sub="15% of referred revenue"
+          />
+        </div>
+
+        {/* Table Card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          {/* Toolbar */}
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by name, email, or coupon code…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-300"
+              />
+            </div>
+            <span className="text-xs text-gray-400 whitespace-nowrap">
+              {filtered.length} of {affiliates.length}
+            </span>
           </div>
-        ) : error ? (
-          <div className="flex flex-col items-center justify-center py-20 text-red-500 gap-3">
-            <AlertCircle className="w-10 h-10" />
-            <p className="font-medium">{error}</p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
-            <Users className="w-12 h-12 opacity-30" />
-            <p className="font-medium">No affiliates found</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
-                  <th className="px-5 py-3">Affiliate</th>
-                  <th className="px-5 py-3">Coupon Code</th>
-                  <th className="px-5 py-3 text-center">Clients</th>
-                  <th className="px-5 py-3">Revenue</th>
-                  <th className="px-5 py-3">Commission</th>
-                  <th className="px-5 py-3">Joined</th>
-                  <th className="px-5 py-3" />
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((affiliate, idx) => (
-                  <AffiliateRow
-                    key={affiliate._id}
-                    affiliate={affiliate}
-                    rank={idx + 1}
-                    onClick={() => setSelectedAffiliateId(affiliate._id)}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
+
+          {/* Table */}
+          {loading ? (
+            <div className="flex items-center justify-center py-24">
+              <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-20 text-red-500 gap-3">
+              <AlertCircle className="w-10 h-10" />
+              <p className="font-medium">{error}</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
+              <Users className="w-12 h-12 opacity-30" />
+              <p className="font-medium">No affiliates found</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
+                    <th className="px-5 py-3">Affiliate</th>
+                    <th className="px-5 py-3">Coupon Code</th>
+                    <th className="px-5 py-3 text-center">Clients</th>
+                    <th className="px-5 py-3">Revenue</th>
+                    <th className="px-5 py-3">Commission</th>
+                    <th className="px-5 py-3">Joined</th>
+                    <th className="px-5 py-3" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((affiliate, idx) => (
+                    <AffiliateRow
+                      key={affiliate._id}
+                      affiliate={affiliate}
+                      rank={idx + 1}
+                      onClick={() => setSelectedAffiliateId(affiliate._id)}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Affiliate Detail Panel */}
+        {selectedAffiliateId && (
+          <AffiliateDetailPanel
+            affiliateId={selectedAffiliateId}
+            onClose={() => setSelectedAffiliateId(null)}
+          />
         )}
       </div>
-
-      {/* Affiliate Detail Panel */}
-      {selectedAffiliateId && (
-        <AffiliateDetailPanel
-          affiliateId={selectedAffiliateId}
-          onClose={() => setSelectedAffiliateId(null)}
-        />
-      )}
-    </div>
+    </DashboardLayout>
   );
 }
