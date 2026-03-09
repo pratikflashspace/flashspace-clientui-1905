@@ -1166,7 +1166,7 @@ export default function PropertyManagement() {
                         )}
                       </div>
                     )}
-
+  
                     {activeCategory === "virtual" && (
                       <div className="space-y-2">
                         <div className="bg-white p-3 rounded-xl border border-gray-100 space-y-3">

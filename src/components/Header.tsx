@@ -198,6 +198,16 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
                         {/* RIGHT: Actions */}
                         <div className="flex items-center gap-3">
+                            <div
+                                onClick={() => setIsContactOpen(true)}
+                                className="inline-flex group px-6 py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
+
+                            >
+                                <span className="relative">
+                                    Get in Touch
+                                </span>
+                            </div>
+
                             {/* User Authentication */}
                             {isAuthenticated ? (
                                 <div ref={userMenuRef} className="relative">
@@ -235,21 +245,11 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                             ) : (
                                 <button
                                     onClick={() => setIsLoginOpen(true)}
-                                    className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all mr-2"
+                                    className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all"
                                 >
                                     Sign in
                                 </button>
                             )}
-
-                            <div
-                                onClick={() => setIsContactOpen(true)}
-                                className="inline-flex group px-6 py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
-
-                            >
-                                <span className="relative">
-                                    Get in Touch
-                                </span>
-                            </div>
                         </div>
                     </div>
                 </div>
