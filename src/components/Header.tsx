@@ -141,7 +141,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 <button
                                     onMouseEnter={() => setIsSolutionsOpen(true)}
                                     className={cn(
-                                        "flex items-center gap-1.5 text-sm font-medium transition-colors py-2",
+                                        "flex items-center gap-1.5 text-sm font-medium transition-all duration-300 py-2 px-4 rounded-xl hover:bg-black/10 dark:hover:bg-white/5 hover:shadow-[0_8px_30px_rgba(51,77,61,0.12)]",
                                         scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white",
                                         "hover:text-[#2D3F33] dark:hover:text-[#FDE68A]"
                                     )}

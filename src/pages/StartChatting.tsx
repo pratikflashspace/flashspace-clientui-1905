@@ -31,6 +31,7 @@ import { LoginModal } from '@/components/auth/LoginModal'; // [NEW]
 import { SignupModal } from '@/components/auth/SignupModal'; // [NEW]
 import ContactModal from '@/components/ui/ContactModal'; // [NEW]
 import { API_CONFIG } from '@/config/api.config'; // [NEW] Import API Config
+import Header from "@/components/Header";
 
 // [NEW] Custom Text Formatter to handle bold text, URLs, Images, and PDFs
 const formatMessage = (text: string) => {
@@ -369,33 +370,8 @@ const StartChatting = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // [NEW] User menu state
   const [showUpdates, setShowUpdates] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false); // [NEW] Contact form state
-  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
-  const countries = [
-    { code: "IND", name: "India", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_India_Flat_Round-128x128.png" },
-    { code: "USA", name: "United States", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_States_Flat_Round-128x128.png" },
-    { code: "UK", name: "United Kingdom", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Kingdom_Flat_Round-128x128.png" },
-    { code: "UAE", name: "United Arab Emirates", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Arab_Emirates_Flat_Round-128x128.png" },
-    { code: "CAN", name: "Canada", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Canada_Flat_Round-128x128.png" },
-    { code: "AUS", name: "Australia", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Australia_Flat_Round-128x128.png" },
-    { code: "GER", name: "Germany", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Germany_Flat_Round-128x128.png" },
-    { code: "FRA", name: "France", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_France_Flat_Round-128x128.png" },
-    { code: "JPN", name: "Japan", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Japan_Flat_Round-128x128.png" },
-    { code: "SGP", name: "Singapore", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Singapore_Flat_Round-128x128.png" },
-  ];
-  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
-  const countryRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // Close country dropdown on outside click
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (countryRef.current && !countryRef.current.contains(event.target as Node)) {
-        setCountryDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: '',
@@ -700,39 +676,6 @@ const StartChatting = () => {
     }
   };
 
-  const popularSpaces: PopularSpace[] = [
-    { name: 'Connaught Place Hub', location: 'CP, New Delhi', type: 'Premium', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80&fit=crop&crop=entropy&auto=format' },
-    { name: 'Nehru Place Tech', location: 'Nehru Place, Delhi', type: 'Startup', image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&q=80&fit=crop&crop=entropy&auto=format' },
-    { name: 'Saket Business', location: 'Saket, New Delhi', type: 'Premium', image: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600&q=80&fit=crop&crop=entropy&auto=format' },
-    { name: 'Dwarka Workspace', location: 'Dwarka, Delhi', type: 'Startup', image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=80&fit=crop&crop=entropy&auto=format' }
-  ];
-
-  const inspirationCards = [
-    {
-      title: 'Ultimate Workspace Guide',
-      description: 'Everything you need to know about choosing the perfect workspace',
-      image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=400&q=80&fit=crop'
-    },
-    {
-      title: 'Startup Success Stories',
-      description: 'How Indian startups scaled with the right workspace solutions',
-      image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&q=80&fit=crop'
-    },
-    {
-      title: 'Workspace Trends 2025',
-      description: 'Latest trends shaping the future of flexible workspaces',
-      image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80&fit=crop'
-    }
-  ];
-
-  const complianceServices: string[] = [
-    'GST Registration',
-    'Company Formation',
-    'FSSAI License',
-    'Trade License',
-    'Professional Tax',
-    'Labour License'
-  ];
 
 
   const sidebarMenuItems: SidebarMenuItem[] = [
@@ -1012,222 +955,7 @@ const StartChatting = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0B1120] dark:text-gray-100 flex flex-col overflow-x-hidden font-grotesk">
-      {/* Header */}
-      <header className={`fixed top-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50 transition-all duration-300 ${isSidebarOpen ? 'left-[260px]' : 'left-[60px]'}`}>
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {/* Mobile Back Button */}
-            <button
-              onClick={() => navigate(-1)}
-              className="lg:hidden p-2 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </button>
-            {/* Main Text Logo */}
-            <img
-              src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
-              alt="FlashSpace Logo"
-              className="h-7 w-auto cursor-pointer dark:invert"
-              onClick={() => handleNavigation('/')}
-            />
-          </div>
-
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
-            {/* Solutions / Get Workspaces */}
-            <div className="relative group">
-              <button
-                className="flex items-center gap-1.5 text-sm font-bold text-[#164e4e] dark:text-white hover:text-[#D96832] transition-colors py-2"
-              >
-                Get Workspace
-                <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300" />
-              </button>
-              {/* Dropdown */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[600px] bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-2xl shadow-2xl p-6 z-[200] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="bg-[#f8faf9] dark:bg-white/5 rounded-xl p-5 border border-border/50">
-                    <div
-                      className="flex items-center gap-2 mb-2 cursor-pointer hover:text-[#D96832] transition-colors"
-                      onClick={() => handleNavigation('/Solutions/on-demand')}
-                    >
-                      <Zap className="w-4 h-4 text-[#D96832]" />
-                      <h4 className="text-sm font-bold text-[#164e4e] dark:text-white">On-Demand</h4>
-                    </div>
-                    <p className="text-xs text-[#164e4e]/60 dark:text-gray-400 mb-4">Book by the hour or day</p>
-                    <div className="space-y-2">
-                      {[
-                        { label: 'Event Space', href: '/Solutions/eventspace' },
-                        { label: 'Day Offices', href: '/Solutions/day-office' },
-                      ].map(item => (
-                        <button
-                          key={item.href}
-                          onClick={() => handleNavigation(item.href)}
-                          className="w-full flex items-center justify-between text-sm px-4 py-3 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-all text-[#164e4e] dark:text-white"
-                        >
-                          {item.label}
-                          <ArrowRight className="w-4 h-4 opacity-40" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    {[
-                      { icon: Building2, title: 'Virtual Office', desc: 'Business address & mail', href: '/Solutions/virtual-office' },
-                      { icon: Users, title: 'Coworking Space', desc: 'Flexible desk solutions', href: '/Solutions/coworking-space' },
-                      { icon: FileText, title: 'Business Setup', desc: 'GST & registration support', href: '/Solutions/business-setup' },
-                    ].map(({ icon: Icon, title, desc, href }) => (
-                      <button
-                        key={title}
-                        onClick={() => handleNavigation(href)}
-                        className="w-full text-left p-3 rounded-xl hover:bg-[#D96832]/5 group/item transition-colors"
-                      >
-                        <div className="flex items-start gap-3">
-                          <Icon className="w-5 h-5 text-[#D96832] mt-0.5" />
-                          <div>
-                            <h5 className="text-sm font-bold text-[#164e4e] dark:text-white group-hover/item:text-[#D96832] transition-colors">{title}</h5>
-                            <p className="text-xs text-[#164e4e]/60 dark:text-gray-400">{desc}</p>
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Partner with Us */}
-            <button
-              onClick={() => handleNavigation('/partner')}
-              className="text-sm font-bold text-[#164e4e] dark:text-white hover:text-[#D96832] transition-colors"
-            >
-              Partner with Us
-            </button>
-
-            {/* About Us */}
-            <button
-              onClick={() => handleNavigation('/about')}
-              className="text-sm font-bold text-[#164e4e] dark:text-white hover:text-[#D96832] transition-colors"
-            >
-              About Us
-            </button>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            {/* Country Selector */}
-            <div ref={countryRef} className="hidden xl:block relative">
-              <button
-                className="flex items-center px-3 py-2 rounded-full border border-gray-200 dark:border-white/10 text-[#164e4e] dark:text-white gap-2 bg-white dark:bg-black/50 hover:bg-white dark:hover:bg-white/10 transition-all"
-                onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
-              >
-                <img src={selectedCountry.flag} alt={selectedCountry.code} className="h-5 w-5 rounded-full object-cover" />
-                <span className="text-sm font-medium">{selectedCountry.code}</span>
-                <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", countryDropdownOpen && "rotate-180")} />
-              </button>
-              {countryDropdownOpen && (
-                <ul className="absolute right-0 top-full mt-2 bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-xl shadow-2xl py-2 z-50 min-w-[120px]">
-                  {countries.map((country) => (
-                    <button
-                      key={country.code}
-                      className="flex items-center w-full px-4 py-2 hover:bg-black/5 dark:hover:bg-white/5 gap-3 text-sm text-[#164e4e] dark:text-gray-200 transition-colors"
-                      onClick={() => { setSelectedCountry(country); setCountryDropdownOpen(false); }}
-                    >
-                      <img src={country.flag} alt={country.code} className="h-4 w-4 rounded-full" />
-                      <span>{country.code}</span>
-                    </button>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            {/* Log in Button or User Profile */}
-            {isAuthenticated ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-2 group"
-                >
-                  {/* User Avatar */}
-                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#164e4e] text-white flex items-center justify-center font-bold text-sm shadow-sm group-hover:shadow-md transition-all">
-                    {user?.fullName?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                  <ChevronDown className={cn("w-4 h-4 text-[#164e4e]/60 transition-transform", isUserMenuOpen && "rotate-180")} />
-                </button>
-
-                {/* Dropdown Menu */}
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-2xl shadow-2xl py-3 z-50 overflow-hidden">
-                    {/* User Info Header */}
-                    <div className="px-5 py-3 border-b border-border/50 dark:border-white/10 mb-2">
-                      <p className="text-sm font-bold text-[#164e4e] dark:text-white truncate">
-                        {user?.fullName}
-                      </p>
-                      <p className="text-xs text-[#164e4e]/60 dark:text-gray-400 truncate">
-                        {user?.email}
-                      </p>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div className="px-2 space-y-1">
-                      <button
-                        onClick={() => {
-                          handleNavigation("/dashboard");
-                          setIsUserMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#164e4e] dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
-                      >
-                        <LayoutDashboard className="w-4 h-4" />
-                        Dashboard
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          handleNavigation("/settings");
-                          setIsUserMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#164e4e] dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
-                      >
-                        <Settings className="w-4 h-4" />
-                        Settings
-                      </button>
-
-                      <hr className="my-2 border-border/50 dark:border-white/10" />
-
-                      <button
-                        onClick={async () => {
-                          await logout();
-                          setIsUserMenuOpen(false);
-                          handleNavigation("/");
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsLoginOpen(true)}
-                className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all mr-2"
-              >
-                Sign in
-              </button>
-            )}
-
-            {/* Get in Touch Button */}
-            <div
-              onClick={() => setIsContactModalOpen(true)}
-              className="inline-flex group px-6 py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
-            >
-              <span className="relative">
-                Get in Touch
-              </span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header openLogin={isLoginOpen} openSignup={isSignupOpen} />
 
       {showUpdates && (
         <div
@@ -1254,7 +982,7 @@ const StartChatting = () => {
       )}
       {/* Mini Sidebar — visible when full sidebar is collapsed */}
       {!isSidebarOpen && (
-        <div className="fixed top-0 left-0 h-screen w-[60px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[60] flex flex-col items-center pt-4 gap-4">
+        <div className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-[60px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[60] flex flex-col items-center pt-4 gap-4">
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -1277,7 +1005,7 @@ const StartChatting = () => {
       {/* Fixed Left Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ width: '260px' }}
       >
         {/* New Chat + Collapse button row */}
@@ -1611,28 +1339,6 @@ const StartChatting = () => {
           </div>
         </div>
       )}
-      {/* Auth Modals */}
-      <LoginModal
-        isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}
-        onSignupClick={() => {
-          setIsLoginOpen(false);
-          setIsSignupOpen(true);
-        }}
-        onLoginSuccess={() => setIsLoginOpen(false)}
-      />
-      <SignupModal
-        isOpen={isSignupOpen}
-        onClose={() => setIsSignupOpen(false)}
-        onLoginClick={() => {
-          setIsSignupOpen(false);
-          setIsLoginOpen(true);
-        }}
-      />
-      <ContactModal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-      />
     </div>
   );
 };
