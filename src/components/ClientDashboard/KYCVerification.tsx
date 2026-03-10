@@ -795,7 +795,7 @@ export default function KYCVerification() {
           <p className="text-gray-700 font-medium mb-2">{error}</p>
           <div className="flex gap-2 justify-center">
             <button
-              onClick={fetchKYC}
+              onClick={() => fetchKYC()}
               className="px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2"
             >
               <RefreshCw className="w-4 h-4" /> Try Again
