@@ -59,7 +59,7 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user
                     </p>
                 </div>
 
-                <SignupForm initialRole={initialRole} />
+                <SignupForm initialRole={initialRole} onSuccess={onClose} />
 
                 <div className="mt-6 text-center">
                     <p className="text-sm text-slate-600">

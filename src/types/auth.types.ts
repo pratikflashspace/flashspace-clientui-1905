@@ -101,6 +101,7 @@ export interface LoginResponse {
 
 export interface SignupResponse {
   user: User;
+  tokens?: AuthTokens;
 }
 
 export interface VerifyOTPResponse {
