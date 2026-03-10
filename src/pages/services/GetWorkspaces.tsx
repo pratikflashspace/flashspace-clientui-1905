@@ -472,13 +472,9 @@ const GetWorkspaces = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  // Debounce: apply search filter 1 second after user stops typing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchLocation);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [searchLocation]);
+  const handleSearch = () => {
+    setDebouncedSearch(searchLocation);
+  };
   const [pricingFilter, setPricingFilter] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -624,39 +620,40 @@ const GetWorkspaces = () => {
   }, [workspaceType, activeCity]);
 
   // Client-side filtering logic
-  const filteredWorkspaces = workspaces.filter((ws) => {
-    // Location search filter
-    const matchesSearch =
-      !debouncedSearch ||
-      ws.address.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      ws.location.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      ws.name.toLowerCase().includes(debouncedSearch.toLowerCase());
+  const filteredWorkspaces = useMemo(() => {
+    return workspaces.filter((ws) => {
+      // Location search filter
+      const matchesSearch =
+        !debouncedSearch ||
+        ws.address.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        ws.location.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        ws.name.toLowerCase().includes(debouncedSearch.toLowerCase());
 
-    // Price filter
-    let matchesPrice = true;
-    if (pricingFilter !== "all") {
-      const rawPrice = ws.plans?.[0]?.price;
-      const numericPrice = rawPrice
-        ? Number(String(rawPrice).replace(/[^0-9.]/g, ""))
-        : null;
+      // Price filter
+      let matchesPrice = true;
+      if (pricingFilter !== "all") {
+        const rawPrice = ws.plans?.[0]?.price;
+        const numericPrice = rawPrice
+          ? Number(String(rawPrice).replace(/[^0-9.]/g, ""))
+          : null;
 
-      if (
-        numericPrice !== null &&
-        Number.isFinite(numericPrice) &&
-        numericPrice > 0
-      ) {
-        if (pricingFilter === "low") matchesPrice = numericPrice < 5000;
-        else if (pricingFilter === "mid")
-          matchesPrice = numericPrice >= 5000 && numericPrice <= 15000;
-        else if (pricingFilter === "high") matchesPrice = numericPrice > 15000;
-      } else {
-        // If price is unknown, hide it when a filter is active
-        matchesPrice = false;
+        if (
+          numericPrice !== null &&
+          Number.isFinite(numericPrice) &&
+          numericPrice > 0
+        ) {
+          if (pricingFilter === "low") matchesPrice = numericPrice < 5000;
+          else if (pricingFilter === "mid")
+            matchesPrice = numericPrice >= 5000 && numericPrice <= 15000;
+          else if (pricingFilter === "high") matchesPrice = numericPrice > 15000;
+        } else {
+          matchesPrice = false;
+        }
       }
-    }
 
-    return matchesSearch && matchesPrice;
-  });
+      return matchesSearch && matchesPrice;
+    });
+  }, [workspaces, debouncedSearch, pricingFilter]);
 
   const sortedWorkspaces = useMemo(() => {
     const list = [...filteredWorkspaces];
@@ -729,7 +726,7 @@ const GetWorkspaces = () => {
                 <SelectTrigger
                   className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${workspaceType !== "virtual-office"
                     ? "bg-muted/50 border-border text-foreground"
-                    : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
+                    : "border-border/60 hover:border-border hover:shadow-sm"
                     }`}
                 >
                   <SelectValue placeholder="Product" />
@@ -776,14 +773,26 @@ const GetWorkspaces = () => {
 
             {/* Search Location */}
             <div className="relative flex-1 min-w-[140px]">
-              <div className="flex items-center bg-card border border-border/60 rounded-xl h-10 overflow-hidden transition-all duration-200">
+              <div className="flex items-center bg-card border border-border/60 rounded-xl h-10 overflow-hidden transition-all duration-200 focus-within:ring-2 focus-within:ring-primary/20">
                 <MapPin className="w-4 h-4 text-muted-foreground ml-3 flex-shrink-0" />
                 <Input
                   value={searchLocation}
                   onChange={(e) => setSearchLocation(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearch();
+                    }
+                  }}
                   className="border-0 shadow-none h-full text-sm font-medium text-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none bg-transparent px-3 placeholder:text-muted-foreground/40 min-w-0 flex-1"
                   placeholder="Search location..."
                 />
+                <button
+                  onClick={handleSearch}
+                  className="px-3 h-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted transition-colors border-l border-border/60"
+                  title="Search"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
@@ -924,11 +933,11 @@ const GetWorkspaces = () => {
               <ChevronRight className="w-4 h-4" />
             </button>
             <MapLibreMap
-              center={{
+              center={useMemo(() => ({
                 lat: sortedWorkspaces[0]?.lat || workspaces[0]?.lat || 28.6139,
                 lng: sortedWorkspaces[0]?.lng || workspaces[0]?.lng || 77.209,
-              }}
-              markers={sortedWorkspaces.map((ws) => ({
+              }), [sortedWorkspaces, workspaces])}
+              markers={useMemo(() => sortedWorkspaces.map((ws) => ({
                 id: ws.id,
                 position: { lat: ws.lat, lng: ws.lng },
                 title: ws.location || ws.name,
@@ -936,7 +945,7 @@ const GetWorkspaces = () => {
                 price: ws.plans?.[0]?.price,
                 rating: ws.rating,
                 address: ws.address,
-              }))}
+              })), [sortedWorkspaces])}
               height="100%"
               mapStyle="retro"
             />
@@ -1013,11 +1022,11 @@ const GetWorkspaces = () => {
               <ChevronRight className="w-3.5 h-3.5 rotate-180" /> Back to list
             </button>
             <MapLibreMap
-              center={{
+              center={useMemo(() => ({
                 lat: sortedWorkspaces[0]?.lat || workspaces[0]?.lat || 28.6139,
                 lng: sortedWorkspaces[0]?.lng || workspaces[0]?.lng || 77.209,
-              }}
-              markers={sortedWorkspaces.map((ws) => ({
+              }), [sortedWorkspaces, workspaces])}
+              markers={useMemo(() => sortedWorkspaces.map((ws) => ({
                 id: ws.id,
                 position: { lat: ws.lat, lng: ws.lng },
                 title: ws.location || ws.name,
@@ -1025,7 +1034,7 @@ const GetWorkspaces = () => {
                 price: ws.plans?.[0]?.price,
                 rating: ws.rating,
                 address: ws.address,
-              }))}
+              })), [sortedWorkspaces])}
               height="100%"
               mapStyle="retro"
             />

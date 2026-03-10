@@ -336,7 +336,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
             color: ${primary};
           ">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 21V5h9v4h9v12h-4v-4H7v4H3zm6-6h2v-2H9v2zm0-4h2V9H9v2z" />
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
             </svg>
           </span>
 
