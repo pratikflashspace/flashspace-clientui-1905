@@ -22,6 +22,7 @@ import {
   RefreshCw,
   ShieldCheck,
 } from "lucide-react";
+import { Country, State, City } from "country-state-city";
 
 import KYCVerification from "./KYCVerification";
 
@@ -33,6 +34,7 @@ interface ProfileDataState {
   alternatePhone: string;
   city: string;
   state: string;
+  country: string;
   pincode: string;
   registeredAddress: string;
 }
@@ -46,6 +48,7 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [pincodeLoading, setPincodeLoading] = useState(false);
 
   const [profileData, setProfileData] = useState<ProfileDataState>({
     fullName: "",
@@ -54,6 +57,7 @@ const Profile: React.FC = () => {
     alternatePhone: "",
     city: "",
     state: "",
+    country: "IN",
     pincode: "",
     registeredAddress: "",
   });
@@ -144,6 +148,45 @@ const Profile: React.FC = () => {
 
     fetchProfileData();
   }, [user]);
+
+  const fetchPincodeDetails = async (pincode: string) => {
+    if (pincode.length !== 6) return;
+    try {
+      setPincodeLoading(true);
+      const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+      const data = await response.json();
+      if (data && data[0] && data[0].Status === "Success" && data[0].PostOffice && data[0].PostOffice.length > 0) {
+        const postOffice = data[0].PostOffice[0];
+        let stateName = postOffice.State;
+        let cityName = postOffice.District;
+        let countryCode = profileData.country || "IN";
+
+        // Try mapping to exact country-state-city values
+        const states = State.getStatesOfCountry(countryCode);
+        const matchedState = states.find(s => s.name.toLowerCase() === stateName.toLowerCase() || s.name.toLowerCase().includes(stateName.toLowerCase()) || stateName.toLowerCase().includes(s.name.toLowerCase()));
+        
+        if (matchedState) {
+          stateName = matchedState.name;
+          const cities = City.getCitiesOfState(countryCode, matchedState.isoCode);
+          const matchedCity = cities.find(c => c.name.toLowerCase() === cityName.toLowerCase() || c.name.toLowerCase().includes(cityName.toLowerCase()) || cityName.toLowerCase().includes(c.name.toLowerCase()));
+          if (matchedCity) {
+            cityName = matchedCity.name;
+          }
+        }
+
+        setProfileData(prev => ({
+          ...prev,
+          city: cityName,
+          state: stateName,
+          country: countryCode, 
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to fetch pincode details", err);
+    } finally {
+      setPincodeLoading(false);
+    }
+  };
 
   const handleSave = async () => {
     try {
@@ -485,21 +528,121 @@ const Profile: React.FC = () => {
                           />
                         ) : (
                           <p className="text-gray-900">
-                            {profileData.registeredAddress}
+                            {profileData.registeredAddress || "N/A"}
                           </p>
                         )}
                       </div>
+                      
+                      {/* Pincode Field */}
                       <div>
                         <label className="block text-sm text-gray-500 mb-1">
-                          City
+                          Pincode
                         </label>
-                        <p className="text-gray-900">{profileData.city}</p>
+                        {isEditing ? (
+                          <div className="relative">
+                            <input
+                              type="text"
+                              maxLength={6}
+                              value={profileData.pincode}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '');
+                                handleInputChange("pincode", value);
+                                if (value.length === 6) fetchPincodeDetails(value);
+                              }}
+                              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
+                            />
+                            {pincodeLoading && (
+                              <Loader2 className="w-4 h-4 text-gray-400 animate-spin absolute right-3 top-3.5" />
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-gray-900">{profileData.pincode || "N/A"}</p>
+                        )}
                       </div>
+                      
+                      {/* Country Field */}
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">
+                          Country
+                        </label>
+                        {isEditing ? (
+                          <select
+                            value={profileData.country}
+                            onChange={(e) => {
+                              handleInputChange("country", e.target.value);
+                              handleInputChange("state", "");
+                              handleInputChange("city", "");
+                            }}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all bg-white"
+                          >
+                            <option value="">Select Country</option>
+                            {Country.getAllCountries().map((c) => (
+                              <option key={c.isoCode} value={c.isoCode}>{c.name}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <p className="text-gray-900">
+                            {Country.getCountryByCode(profileData.country || "IN")?.name || profileData.country || "N/A"}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* State Field */}
                       <div>
                         <label className="block text-sm text-gray-500 mb-1">
                           State
                         </label>
-                        <p className="text-gray-900">{profileData.state}</p>
+                        {isEditing ? (
+                          <select
+                            value={profileData.state}
+                            onChange={(e) => {
+                              handleInputChange("state", e.target.value);
+                              handleInputChange("city", ""); // Reset city when state changes
+                            }}
+                            disabled={!profileData.country}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all bg-white disabled:opacity-50"
+                          >
+                            <option value="">Select State</option>
+                            {profileData.country && State.getStatesOfCountry(profileData.country).map((s) => (
+                              <option key={s.isoCode} value={s.name}>{s.name}</option>
+                            ))}
+                            {profileData.state && profileData.country && !State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state) && (
+                              <option value={profileData.state}>{profileData.state}</option>
+                            )}
+                          </select>
+                        ) : (
+                          <p className="text-gray-900">{profileData.state || "N/A"}</p>
+                        )}
+                      </div>
+
+                      {/* City Field */}
+                      <div>
+                        <label className="block text-sm text-gray-500 mb-1">
+                          City
+                        </label>
+                        {isEditing ? (
+                          <select
+                            value={profileData.city}
+                            onChange={(e) => handleInputChange("city", e.target.value)}
+                            disabled={!profileData.state || !profileData.country}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all bg-white disabled:opacity-50"
+                          >
+                            <option value="">Select City</option>
+                            {profileData.state && profileData.country && State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state)?.isoCode && (
+                              City.getCitiesOfState(profileData.country, State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state)!.isoCode).map((c) => (
+                                <option key={c.name} value={c.name}>{c.name}</option>
+                              ))
+                            )}
+                            {profileData.city && profileData.state && profileData.country && State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state)?.isoCode && !City.getCitiesOfState(profileData.country, State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state)!.isoCode).find(c => c.name === profileData.city) && (
+                              <option value={profileData.city}>{profileData.city}</option>
+                            )}
+                            {profileData.city && profileData.state && profileData.country && !State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state) && (
+                              <option value={profileData.city}>{profileData.city}</option>
+                            )}
+                          </select>
+                        ) : (
+                          <p className="text-gray-900">{profileData.city || "N/A"}</p>
+                        )}
                       </div>
                     </div>
                   </div>
