@@ -131,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     ];
 
     const sidebarClasses = `
-    fixed top-0 left-0 z-50 h-screen bg-white shadow-xl border-r border-gray-100 flex flex-col transition-all duration-300 ease-in-out
+    fixed top-0 left-0 z-50 h-screen bg-[#f8f8f8] shadow-xl border-r border-[#edede6] flex flex-col transition-all duration-300 ease-in-out
     w-72 
     ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
     lg:relative lg:translate-x-0 lg:shadow-none lg:h-full overflow-hidden
@@ -149,10 +149,10 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             <aside className={sidebarClasses} data-lenis-prevent>
                 {/* Header branding */}
-                <div className={`flex flex-col shrink-0 transition-all duration-300 ${isDesktopCollapsed ? "p-4 items-center" : "p-8 pb-4"}`}>
+                <div className={`flex flex-col shrink-0 transition-all duration-300 ${isDesktopCollapsed ? "p-4 items-center" : "w-[287px] h-[137px] p-[24px]"}`}>
                     <div className={`flex items-center w-full ${isDesktopCollapsed ? "justify-center" : "justify-between"}`}>
                         <div
-                            className={`font-black tracking-tight transition-all duration-300 overflow-hidden whitespace-nowrap ${isDesktopCollapsed ? "text-2xl" : "text-[2.25rem]"}`}
+                            className={`font-black tracking-tight transition-all duration-300 overflow-hidden whitespace-nowrap flex items-center ${isDesktopCollapsed ? "text-2xl" : "w-[239px] h-[32px] text-[32px] leading-none"}`}
                             style={{ fontFamily: "'Inter Tight', sans-serif" }}
                         >
                             {isDesktopCollapsed ? (
@@ -172,11 +172,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                         </button>
                     </div>
 
-                    <div className={`mt-6 overflow-hidden transition-all duration-300 ${isDesktopCollapsed ? "h-0 opacity-0" : "h-auto opacity-100 mb-6"}`}>
-                        <h2 className="text-xl font-bold text-[#1a2d1d] whitespace-nowrap mb-1">
+                    <div className={`mt-[17px] overflow-hidden transition-all duration-300 flex flex-col gap-1 ${isDesktopCollapsed ? "h-0 opacity-0" : "h-auto opacity-100"}`}>
+                        <h2 className="w-[239px] h-[20px] text-[14px] font-bold text-[#1a2d1d] whitespace-nowrap leading-none flex items-center">
                             Affiliate Portal
                         </h2>
-                        <p className="text-sm text-[#64748b] whitespace-nowrap font-medium">
+                        <p className="w-[239px] h-[16px] text-[12px] text-[#64748b] whitespace-nowrap font-medium leading-none flex items-center">
                             Manage referrals and earnings
                         </p>
                     </div>
@@ -197,11 +197,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 }}
                                 title={isDesktopCollapsed ? item.name : ""}
                                 className={`
-                  flex items-center transition-all duration-300 rounded-[1.25rem] group relative
-                  ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "justify-start w-full px-5 py-4 gap-4"}
+                  flex items-center transition-all duration-300 rounded-lg group relative
+                  ${isDesktopCollapsed ? "justify-center w-12 h-12 mx-auto" : "justify-start w-[263px] h-[40px] px-[12px] gap-4 mx-auto"}
                   ${isActive
-                                        ? "bg-[#334d3d] text-[#fdfcf2] shadow-sm"
-                                        : "text-[#64748b] hover:bg-gray-50 hover:text-[#1a2d1d]"
+                                        ? "bg-[#334d3d] text-[#FEF8C3] shadow-sm"
+                                        : "text-[#677e73] hover:bg-gray-50 hover:text-[#1a2d1d]"
                                     }
                 `}
                             >
@@ -211,7 +211,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                     className="shrink-0"
                                 />
                                 <span
-                                    className={`text-[15px] font-semibold whitespace-nowrap transition-all duration-200 ${isDesktopCollapsed ? "w-0 opacity-0 overflow-hidden absolute" : "w-auto opacity-100 static"}`}
+                                    className={`text-[14px] font-semibold whitespace-nowrap transition-all duration-200 ${isDesktopCollapsed ? "w-0 opacity-0 overflow-hidden absolute" : "w-auto opacity-100 static"}`}
                                 >
                                     {item.name}
                                 </span>
@@ -234,8 +234,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <button
                         onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
                         className={`
-              hidden lg:flex items-center transition-colors text-[#64748b] hover:text-[#1a2d1d] py-2
-              ${isDesktopCollapsed ? "justify-center w-full" : "justify-center gap-3 w-full"}
+              hidden lg:flex items-center transition-colors text-[#677e73] hover:text-[#1a2d1d] py-2 mx-auto
+              ${isDesktopCollapsed ? "justify-center w-full" : "justify-center gap-3 w-[255px] h-[36px] px-[12px]"}
             `}
                     >
                         {isDesktopCollapsed ? (
@@ -248,7 +248,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         )}
                     </button>
 
-                    <button
+                    {/* <button
                         onClick={() => navigate("/dashboard")}
                         className={`
               flex items-center rounded-2xl shadow-sm font-bold transition-all border border-gray-200 text-[#164e4e] bg-[#f8f9fa] hover:bg-white hover:shadow-md
@@ -259,13 +259,13 @@ const Sidebar: React.FC<SidebarProps> = ({
                         {!isDesktopCollapsed && (
                             <span className="whitespace-nowrap">User Dashboard</span>
                         )}
-                    </button>
+                    </button> */}
 
                     <button
                         onClick={() => navigate("/")}
                         className={`
-              flex items-center rounded-2xl shadow-sm font-bold transition-all border border-gray-200 text-[#1a2d1d] bg-white hover:bg-gray-50 hover:shadow-md
-              ${isDesktopCollapsed ? "justify-center w-full h-14" : "justify-center gap-3 w-full px-4 py-4 text-[15px]"}
+              flex items-center rounded-lg shadow-sm font-bold transition-all border border-gray-200 text-[#677e73] bg-white hover:bg-gray-50 hover:shadow-md mx-auto
+              ${isDesktopCollapsed ? "justify-center w-full h-14" : "justify-center gap-3 w-[255px] h-[36px] px-[12px] text-[14px]"}
             `}
                     >
                         <Home size={20} />

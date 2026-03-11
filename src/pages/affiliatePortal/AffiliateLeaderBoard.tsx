@@ -85,7 +85,7 @@ const LeaderBoard = () => {
     return (
         <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-500">
             {/* Header */}
-{/* Header Removed */}
+            {/* Header Removed */}
 
             {/* User Position Hero Card */}
             <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between animate-scale-up">

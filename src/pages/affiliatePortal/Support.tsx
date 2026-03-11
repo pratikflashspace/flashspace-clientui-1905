@@ -58,7 +58,7 @@ const Support = () => {
             {/* Sidebar: Only visible in Chat Tab */}
             <div className="lg:col-span-4 space-y-8 animate-slide-up">
               {/* Contact Us Card */}
-              <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
+              <div className="bg-[#f8f8f8] p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
                 <h3 className="text-xl font-black text-[#1a1a1a]">Contact Us</h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-4 p-4 bg-[#f9fafb] rounded-[1.5rem] ring-1 ring-black/5 group cursor-pointer hover:bg-white hover:shadow-md transition-all">
@@ -92,7 +92,7 @@ const Support = () => {
               </div>
 
               {/* Quick Links Card */}
-              <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
+              <div className="bg-[#f8f8f8] p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
                 <h3 className="text-xl font-black text-[#1a1a1a]">Quick Links</h3>
                 <div className="space-y-3">
                   {[

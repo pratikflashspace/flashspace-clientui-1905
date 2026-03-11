@@ -275,7 +275,7 @@ const Invoices = () => {
     };
 
     return (
-        <div className="w-full bg-[#fafafa] p-6 lg:p-10 pb-2 lg:pb-4 font-sans relative">
+        <div className="w-full bg-[#f7f7f6] p-6 lg:p-10 pb-2 lg:pb-4 font-sans relative">
             {/* --- HIDDEN PRINT AREA --- 
           This is what will be printed. It is hidden from screen but visible to print.
       */}
@@ -291,7 +291,7 @@ const Invoices = () => {
                 {/* Header Removed */}
 
                 {/* Toolbar */}
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#f8f8f8] p-4 rounded-xl border border-gray-200 shadow">
                     <div className="relative flex-1 w-full sm:max-w-md">
                         <Search
                             size={18}
@@ -322,7 +322,7 @@ const Invoices = () => {
                             </button>
 
                             {showFilter && (
-                                <div className="absolute right-0 top-12 w-48 bg-white border border-gray-200 rounded-xl shadow-xl p-3 z-30 animate-fade-in-up">
+                                <div className="absolute right-0 top-12 w-48 bg-[#f8f8f8] border border-gray-200 rounded-xl shadow-xl p-3 z-30 animate-fade-in-up">
                                     <p className="text-xs font-bold text-gray-400 uppercase mb-2">
                                         Status
                                     </p>
@@ -371,7 +371,7 @@ const Invoices = () => {
                 </div>
 
                 {/* Table */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
+                <div className="bg-[#f8f8f8] rounded-2xl border border-gray-200 shadow overflow-hidden min-h-[400px]">
                     <div className="overflow-x-auto">
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-24 gap-3">
@@ -381,7 +381,7 @@ const Invoices = () => {
                         ) : (
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-gray-50/50 border-b border-gray-100">
+                                    <tr className="bg-[#f6f6f4] border-b border-[#f1f2ed]">
                                         {[
                                             "Invoice ID",
                                             "Client",
@@ -400,7 +400,7 @@ const Invoices = () => {
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-[#f1f2ed]">
                                     {filteredData.length > 0 ? (
                                         filteredData.map((inv) => (
                                             <tr
