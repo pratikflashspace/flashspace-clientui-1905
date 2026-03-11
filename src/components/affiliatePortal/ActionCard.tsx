@@ -7,7 +7,7 @@ interface ActionCardProps {
 }
 
 const ActionCard: React.FC<ActionCardProps> = ({ title, description, badge }) => (
-    <div className="bg-white p-7 rounded-[1.25rem] border border-gray-100/80 shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col group cursor-pointer">
+    <div className="bg-[#f7f7f7] p-7 rounded-2xl border border-gray-200 shadow transition-all duration-300 h-full flex flex-col group cursor-pointer">
         <div className="flex justify-between items-start mb-2">
             <h3 className="font-bold text-[#1a2d1d] text-[15px] group-hover:text-[#334d3d] transition-colors leading-tight">
                 {title}

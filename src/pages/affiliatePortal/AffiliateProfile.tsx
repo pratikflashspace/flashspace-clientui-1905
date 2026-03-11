@@ -86,7 +86,7 @@ export default function Profile() {
 
         if (response.success && response.data) {
           const data = Array.isArray(response.data) ? response.data[0] : response.data;
-          
+
           if (data && data.businessInfo) {
             setProfile({
               company: data.businessInfo.companyName,
@@ -127,7 +127,7 @@ export default function Profile() {
 
         {/* Profile Card */}
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-[#f8f8f8] p-6 shadow">
 
           <div className="flex items-center gap-4">
 
@@ -197,7 +197,7 @@ export default function Profile() {
 
           {/* Contact Details */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-[#f8f8f8] p-6 shadow">
 
             <h2 className="text-lg font-bold text-slate-900">
 
@@ -233,7 +233,7 @@ export default function Profile() {
 
           {/* Organization Details */}
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 bg-[#f8f8f8] p-6 shadow-sm">
 
             <h2 className="text-lg font-bold text-slate-900">
 

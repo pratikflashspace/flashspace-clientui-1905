@@ -31,11 +31,10 @@ const LeaderboardRow = ({
 
     return (
         <div
-            className={`flex items-center justify-between p-5 rounded-2xl border transition-all ${
-                isUser
-                    ? "bg-teal-50/50 border-teal-100"
-                    : "bg-white border-gray-100 hover:border-gray-200"
-            }`}
+            className={`flex items-center justify-between p-5 rounded-2xl border border-gray-200 shadow transition-all ${isUser
+                    ? "bg-teal-50/50 border-teal-200"
+                    : "bg-white"
+                }`}
         >
             <div className="flex items-center gap-6 flex-1">
                 {/* Rank Icon/Number */}

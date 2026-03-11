@@ -48,7 +48,7 @@ const QuotationStats = ({ data }: QuotationStatsProps) => {
             {stats.map((stat, index) => (
                 <div
                     key={index}
-                    className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between hover:border-[#2d5a4c]/30 transition-colors group"
+                    className="bg-[#f8f8f8] p-4 rounded-xl border border-gray-200 shadow flex flex-col justify-between transition-colors group"
                 >
                     <div
                         className={`w-8 h-8 rounded-lg ${stat.bg} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}

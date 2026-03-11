@@ -85,7 +85,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
     return (
         <div className="flex flex-col h-[650px] bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
             {/* Chat Header */}
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <div className=" bg-[#f8f8f8] p-6 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-[#f9fafb] rounded-2xl flex items-center justify-center text-[#2d5a4c] ring-1 ring-black/5">
                         <Bot className="w-6 h-6" />
@@ -157,7 +157,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
             {/* Input Area */}
             <form
                 onSubmit={handleSendMessage}
-                className="p-6 bg-white border-t border-gray-100"
+                className="p-6 bg-[#f8f8f8] border-t border-gray-100"
             >
                 <div className="flex gap-3">
                     <Input
