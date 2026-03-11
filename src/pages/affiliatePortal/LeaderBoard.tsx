@@ -86,7 +86,7 @@ const LeaderBoard: React.FC = () => {
 
     // ─── Render ─────────────────────────────────────────────────────────────
     return (
-        <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-10 animate-in fade-in duration-500">
+        <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-10 animate-in fade-in duration-500 bg-[#f7f7f6]">
             {/* Header */}
             <div>
                 <h1 className="text-4xl font-extrabold text-[#1a1a1a] tracking-tight">
@@ -99,7 +99,7 @@ const LeaderBoard: React.FC = () => {
 
             {/* Current User Hero Card */}
             {currentUser && (
-                <div className="bg-[#f0f4f3] p-8 rounded-[2rem] flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group border-0 shadow-sm">
+                <div className="bg-[#f0f4f3] p-8 rounded-[2rem] flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group border border-gray-200 shadow">
                     <div className="flex items-center gap-8 relative z-10">
                         <div className="w-20 h-20 bg-[#2d5a4c] text-white rounded-full flex items-center justify-center text-3xl font-black shadow-lg shadow-[#2d5a4c]/20 ring-4 ring-white">
                             {currentUser.rank ? `#${currentUser.rank}` : "—"}
@@ -158,7 +158,7 @@ const LeaderBoard: React.FC = () => {
                     leaderboard.map((entry) => (
                         <div
                             key={entry.affiliateId}
-                            className={`bg-white p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] ring-1 ring-black/5 hover:ring-[#2d5a4c]/30 flex flex-col md:flex-row items-center justify-between gap-6 transition-all group ${entry.isUser ? "ring-2 ring-[#2d5a4c] bg-[#f0f4f3]/30" : ""
+                            className={`bg-[#f8f8f8] p-6 rounded-[2rem] shadow border border-gray-200 hover:ring-[#2d5a4c]/30 flex flex-col md:flex-row items-center justify-between gap-6 transition-all group ${entry.isUser ? "ring-2 ring-[#2d5a4c] bg-[#f0f4f3]/30" : ""
                                 }`}
                         >
                             <div className="flex items-center gap-6 w-full md:w-auto">

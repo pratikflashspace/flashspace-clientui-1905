@@ -216,8 +216,8 @@ const StatusBadge = ({ status }: { status: string }) => {
             {status === "Renewal Due"
                 ? "⚠ Renewal Due"
                 : status === "Active"
-                  ? "✓ Active"
-                  : "⏳ Pending"}
+                    ? "✓ Active"
+                    : "⏳ Pending"}
         </span>
     );
 };
@@ -435,7 +435,7 @@ const BookingManagement = () => {
     });
 
     return (
-        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans w-full relative">
+        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans w-full relative">
             {/* Modal Injection */}
             {selectedBooking && (
                 <BookingDetailsModal
@@ -446,7 +446,7 @@ const BookingManagement = () => {
 
             <div className="w-full space-y-8 animate-fade-in">
                 {/* Header */}
-{/* Header Removed */}
+                {/* Header Removed */}
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -487,18 +487,17 @@ const BookingManagement = () => {
                                         onClick={() => setActiveTab(tab)}
                                         className={`
                     px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-300 capitalize whitespace-nowrap
-                    ${
-                        activeTab === tab
-                            ? "bg-white text-slate-900 shadow-sm"
-                            : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
-                    }
+                    ${activeTab === tab
+                                                ? "bg-white text-slate-900 shadow-sm"
+                                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+                                            }
                   `}
                                     >
                                         {tab === "active"
                                             ? "Active Bookings"
                                             : tab === "renewals"
-                                              ? "Upcoming Renewals"
-                                              : "Pending"}
+                                                ? "Upcoming Renewals"
+                                                : "Pending"}
                                     </button>
                                 ),
                             )}
@@ -520,7 +519,7 @@ const BookingManagement = () => {
                                     className="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5aa39c]/20 focus:border-[#5aa39c] transition-all text-sm"
                                 />
                             </div>
-                            
+
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className={`p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors ${dateFilter !== 'all' ? 'text-[#5aa39c] border-[#5aa39c]' : 'text-gray-600'}`}>

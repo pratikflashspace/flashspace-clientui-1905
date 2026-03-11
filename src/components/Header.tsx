@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, ReactNode } from "react";
+import { useState, useEffect, useRef, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -258,6 +258,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                     isOpen={isMenuOpen}
                     onClose={() => setIsMenuOpen(false)}
                     onOpenLogin={() => setIsLoginOpen(true)}
+                    onOpenContact={() => setIsContactOpen(true)}
                 />
             </header>
 

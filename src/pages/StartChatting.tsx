@@ -1021,7 +1021,7 @@ const StartChatting = () => {
         </div>
 
         {/* Main Nav */}
-        <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5">
           <button
             onClick={handleNewChat}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
@@ -1089,12 +1089,12 @@ const StartChatting = () => {
                         setChatMessages(session.messages);
                         setActiveChatId(sessionKey);
                       }}
-                      className={`flex-1 text-left px-3 py-2 text-sm font-${isActive ? 'semibold' : 'normal'}`}
+                      className={`flex-1 text-left px-3 py-2 text-sm min-w-0 font-${isActive ? 'semibold' : 'normal'}`}
                       style={{ color: isActive ? 'white' : '#677e73' }}
                       title={session.title}
                     >
-                      <div className="truncate">{session.title}</div>
-                      <div className="text-[10px] mt-0.5" style={{ opacity: isActive ? 0.7 : 0.55 }}>{session.date}</div>
+                      <div className="truncate w-full">{session.title}</div>
+                      <div className="text-[10px] mt-0.5 truncate" style={{ opacity: isActive ? 0.7 : 0.55 }}>{session.date}</div>
                     </button>
 
                     <button

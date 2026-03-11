@@ -19,7 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 import { Copy, CheckCircle } from "lucide-react";
 
-import { affiliatePortalService } from "@/services/affiliatePortal.service";
+import { affiliatePortalService, RevenueDashboardStats } from "@/services/affiliatePortal.service";
 
 // --- Types & Data ---
 
@@ -61,7 +61,7 @@ import ActionCard from "@/components/affiliatePortal/ActionCard";
 const Dashboard = () => {
     const [selectedInsight, setSelectedInsight] = useState<InsightType | null>(null);
     const [isLoadingInsight, setIsLoadingInsight] = useState(false);
-    const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+    const [dashboardStats, setDashboardStats] = useState<RevenueDashboardStats | null>(null);
     const [insightData, setInsightData] = useState<Record<InsightType, InsightContent> | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [coupon, setCoupon] = useState<any>(null);
@@ -83,7 +83,7 @@ const Dashboard = () => {
                 ]);
 
                 if (statsRes.status === 'fulfilled' && statsRes.value?.data) {
-                    setDashboardStats(statsRes.value.data as DashboardStats);
+                    setDashboardStats(statsRes.value.data as RevenueDashboardStats);
                 }
                 if (insightsRes.status === 'fulfilled' && insightsRes.value?.data) {
                     setInsightData(insightsRes.value.data as Record<InsightType, InsightContent>);
@@ -158,22 +158,32 @@ const Dashboard = () => {
     const formatCurrency = (v: number) =>
         new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(v);
 
+    const formatCompactCurrency = (v: number) => {
+        if (v >= 100000) {
+            return `₹${(v / 100000).toFixed(1)}L`;
+        }
+        if (v >= 1000) {
+            return `₹${(v / 1000).toFixed(0)}K`;
+        }
+        return `₹${v}`;
+    };
+
     const stats = [
         {
             label: "Total Earnings",
-            value: dashboardStats?.totalEarnings !== undefined ? formatCurrency(dashboardStats.totalEarnings) : "₹0",
-            trend: "Commission @ 15% of paid amount",
+            value: dashboardStats?.totalEarnings !== undefined ? formatCompactCurrency(dashboardStats.totalEarnings) : "₹0",
+            trend: "18% from last month",
             icon: TrendingUp,
         },
         {
             label: "Total Clients",
             value: dashboardStats?.convertedClients?.toString() || "0",
-            trend: "Bookings via your coupon code",
+            trend: "22% from last month",
             icon: Users,
         },
         {
             label: "Pending Payout",
-            value: "₹0",
+            value: dashboardStats?.pendingPayout !== undefined ? formatCompactCurrency(dashboardStats.pendingPayout) : "₹0",
             trend: null,
             icon: Wallet,
         },
@@ -272,23 +282,20 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans animate-fade-in relative">
+        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans animate-fade-in relative">
             <div className="w-full space-y-10">
                 {/* 1. Page Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-2">
-                        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                            Affiliate{" "}
-                            <span className="text-[#35503F] italic ">
-                                Dashboard
-                            </span>
+                        <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+                            Affiliate <span className="text-[#35503F] italic font-medium">Dashboard</span>
                         </h1>
                         <p className="text-gray-500 text-lg">
                             Track your referrals, revenue, and performance
                         </p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className="bg-white p-1 rounded-full shadow-sm border border-gray-100">
+                        <div className="bg-[#f8f8f8] p-1 rounded-full shadow-sm border border-gray-100">
                             <NotificationBell />
                         </div>
                     </div>
@@ -317,7 +324,7 @@ const Dashboard = () => {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Note: I mapped these manually to ensure they pass the correct IDs */}
                         <InsightCard
                             id="renewal"
@@ -347,7 +354,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Referral Reward Program (Coupon Generation) */}
-                <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm relative overflow-hidden group">
+                <div className="bg-[#f8f8f8] rounded-2xl border border-gray-200 p-8 shadow transition-all duration-300 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#334D3D]/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110 duration-700"></div>
 
                     <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -373,7 +380,7 @@ const Dashboard = () => {
                                 <div className="bg-slate-50 border-2 border-dashed border-[#334D3D]/30 rounded-2xl p-6 flex flex-col items-center gap-4 animate-fade-in min-w-[280px]">
                                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Your Unique Code</span>
                                     <div className="flex items-center gap-3">
-                                        <code className="text-3xl font-black text-slate-900 tracking-tighter bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+                                        <code className="text-3xl font-black text-slate-900 tracking-tighter bg-[#f8f8f8] px-4 py-2 rounded-xl shadow-sm border border-gray-100">
                                             {coupon.code}
                                         </code>
                                         <button
@@ -444,7 +451,7 @@ const Dashboard = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-fade-in p-4">
                     <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden relative animate-scale-up">
                         {/* Modal Header */}
-                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0">
+                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-[#f8f8f8] sticky top-0">
                             <div className="flex items-center gap-2">
                                 <Sparkles
                                     size={18}
@@ -564,7 +571,7 @@ const Dashboard = () => {
                                     <div className="pt-2 flex justify-end">
                                         <button
                                             onClick={handleRefresh}
-                                            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 shadow-sm rounded-lg text-sm font-semibold text-gray-600 hover:text-[#334D3D] hover:border-[#334D3D] transition-all"
+                                            className="flex items-center gap-2 px-4 py-2 bg-[#f8f8f8] border border-gray-200 shadow rounded-lg text-sm font-semibold text-gray-600 hover:text-[#334D3D] hover:border-[#334D3D] transition-all"
                                         >
                                             <RefreshCw size={14} /> Refresh
                                             Insights

@@ -499,7 +499,7 @@ const QuotationCard = ({
                 </div>
             )}
 
-            <div className="bg-white p-6 rounded-2xl border border-gray-50 shadow-[0_4px_20px_rgba(0,0,0,0.02)] relative transition-all hover:shadow-md group">
+            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow relative transition-all group">
                 {/* Top Row: ID and Status Badge */}
                 <div className="flex justify-between items-start mb-4">
                     <span className="text-xs font-medium text-gray-400">

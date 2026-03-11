@@ -138,7 +138,7 @@ const MarketingTools = () => {
 
         {/* --- REFERRAL LINKS TAB --- */}
         <TabsContent value="referral" className="space-y-10 outline-none animate-slide-up">
-          <div className="bg-white p-8 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-8">
+          <div className="bg-[#f8f8f8] p-8 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-8">
             <h3 className="font-bold text-[#1a1a1a] text-xl">Your Unique Referral Link</h3>
             <div className="flex flex-col xl:flex-row gap-5 items-center">
               <div className="flex-1 bg-[#f9fafb] px-6 py-4 rounded-2xl font-medium text-base text-[#1a1a1a] flex items-center min-w-0 w-full h-16">
@@ -200,7 +200,7 @@ const MarketingTools = () => {
             )}
           </div>
 
-          <div className="bg-white rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
+          <div className="bg-[#f8f8f8] rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
             <div className="p-8 border-b border-gray-100">
               <h3 className="font-bold text-[#1a1a1a] text-xl">Link Performance</h3>
             </div>
@@ -288,7 +288,7 @@ const MarketingTools = () => {
             {ASSETS_DATA.map((asset, idx) => (
               <div
                 key={idx}
-                className="bg-white p-6 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 flex flex-col justify-between group hover:shadow-lg transition-all"
+                className="bg-[#f8f8f8] p-6 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 flex flex-col justify-between group hover:shadow-lg transition-all"
               >
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
@@ -321,7 +321,7 @@ const MarketingTools = () => {
             {QR_CODES_DATA.map((qr, idx) => (
               <div
                 key={idx}
-                className="bg-white p-6 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 flex flex-col items-center group hover:shadow-lg transition-all"
+                className="bg-[#f8f8f8] p-6 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 flex flex-col items-center group hover:shadow-lg transition-all"
               >
 
                 {/* QR Code Container (Reduced padding) */}

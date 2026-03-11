@@ -365,7 +365,7 @@ const QuotationGenerator = () => {
             {showAllModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAllModal(false)} />
-                    <div className="relative bg-white w-full max-w-5xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="relative bg-[#f8f8f8] w-full max-w-5xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
                         {/* Modal Header */}
                         <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
                             <div>
@@ -499,7 +499,7 @@ const QuotationGenerator = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* LEFT COLUMN: FORM AREA (7/12) */}
                 <div className="lg:col-span-7 animate-slide-up">
-                    <div className="bg-white p-6 md:p-10 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-10">
+                    <div className="bg-[#f8f8f8] p-6 md:p-10 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-10">
                         <div className="flex items-center gap-3 pb-6 border-b border-gray-100">
                             <div className="p-2.5 bg-gray-50 rounded-xl text-gray-600">
                                 <FileText className="w-6 h-6" />
@@ -574,7 +574,7 @@ const QuotationGenerator = () => {
                                         <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.spaceType ? "bg-red-50" : ""}`}>
                                             <SelectValue placeholder="Select space type" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                        <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                             <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Coworking">Coworking</SelectItem>
                                             <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Virtual Office">Virtual Office</SelectItem>
                                         </SelectContent>
@@ -587,7 +587,7 @@ const QuotationGenerator = () => {
                                         <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.city ? "bg-red-50" : ""}`}>
                                             <SelectValue placeholder="Select city" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                        <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                             <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Ahmedabad">Ahmedabad</SelectItem>
                                             <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Delhi">Delhi</SelectItem>
                                             <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Bangalore">Bangalore</SelectItem>
@@ -623,7 +623,7 @@ const QuotationGenerator = () => {
                                             <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.location ? "bg-red-50" : ""}`}>
                                                 <SelectValue placeholder="Choose an office from results" />
                                             </SelectTrigger>
-                                            <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                            <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                                 {availableSpaces.map(space => (
                                                     <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" key={space._id} value={space._id}>
                                                         {space.name} ({space.area})
@@ -656,7 +656,7 @@ const QuotationGenerator = () => {
                                                     <SelectTrigger className="bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus:ring-2 focus:ring-[#5bb09c]/20 h-12 rounded-xl">
                                                         <SelectValue placeholder="Select plan type" />
                                                     </SelectTrigger>
-                                                    <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                                    <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                                         <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="br">Business Registration (BR)</SelectItem>
                                                         <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="gst">GST Registration</SelectItem>
                                                         <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="mailing">Mailing Address</SelectItem>
@@ -670,7 +670,7 @@ const QuotationGenerator = () => {
                                                 <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.duration ? "bg-red-50" : ""}`}>
                                                     <SelectValue placeholder="Select duration" />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                                <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                                     {[1, 2, 3, 6, 12, 24].map(m => (
                                                         <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#2d5a4c]/10 focus:text-[#2d5a4c] font-semibold transition-colors py-3 pr-3 pl-10" key={m} value={m.toString()}>{m} {m === 1 ? 'Month' : 'Months'}</SelectItem>
                                                     ))}
@@ -747,7 +747,7 @@ const QuotationGenerator = () => {
                 {/* RIGHT COLUMN: SIDEBAR (5/12) */}
                 <div className="lg:col-span-5 space-y-8 animate-slide-up">
                     {/* Recent Quotations Section */}
-                    <div className="bg-white p-6 md:p-8 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
+                    <div className="bg-[#f8f8f8] p-6 md:p-8 rounded-[2rem] border border-gray-200 shadow space-y-6">
                         <h3 className="font-bold text-[#1a1a1a] text-xl">
                             Recent Quotations
                         </h3>
@@ -772,7 +772,7 @@ const QuotationGenerator = () => {
                     </div>
 
                     {/* Fixed Performance Section */}
-                    <div className="bg-white p-6 md:p-8 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
+                    <div className="bg-[#f8f8f8] p-6 md:p-8 rounded-[2rem] border border-gray-200 shadow space-y-6">
                         <div className="pb-4 border-b border-gray-100/50">
                             <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-[#ffb020]"></span>
