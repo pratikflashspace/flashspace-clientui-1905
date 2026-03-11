@@ -26,6 +26,7 @@ interface SidebarMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenLogin: () => void;
+  onOpenContact?: () => void;
 }
 
 const MENU_WIDTH_OPEN = 300;
@@ -203,7 +204,7 @@ const UpdatesPopup = ({
 
 // Let's replace the component logic.
 
-const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
+const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMenuProps) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const menuScrollRef = useRef<HTMLDivElement>(null);
@@ -423,7 +424,14 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin }: SidebarMenuProps) => {
                 {/* User Profile Section - Only for Authenticated Users */}
                 <div className="mt-3">
                   <button
-                    onClick={() => handleNavigation("#contact")}
+                    onClick={() => {
+                      if (onOpenContact) {
+                        onOpenContact();
+                        closeBoth();
+                      } else {
+                        handleNavigation("#contact");
+                      }
+                    }}
                     className="w-full rounded-[20px] bg-[#e8e2ad] text-[#253734] font-medium py-3 text-[15px] hover:bg-[#e2da99] active:scale-[0.98] transition shadow-sm"
                   >
                     Get Consultation

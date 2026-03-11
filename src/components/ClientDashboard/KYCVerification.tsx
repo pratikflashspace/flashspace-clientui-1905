@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import userDashboardService, {
@@ -597,10 +597,10 @@ export default function KYCVerification() {
   // Check if data is saved to server (for navigation locking)
   const isPersonalInfoSaved = () => {
     return !!(
-      kycData?.personalInfo?.phone &&
-      kycData?.personalInfo?.dateOfBirth &&
-      kycData?.personalInfo?.aadhaarNumber &&
-      kycData?.personalInfo?.panNumber
+      (kycData?.personalInfo?.phone || personalForm.phone) &&
+      (kycData?.personalInfo?.dateOfBirth || personalForm.dateOfBirth) &&
+      (kycData?.personalInfo?.aadhaarNumber || personalForm.aadhaar) &&
+      (kycData?.personalInfo?.panNumber || personalForm.pan)
     );
   };
 
@@ -795,7 +795,7 @@ export default function KYCVerification() {
           <p className="text-gray-700 font-medium mb-2">{error}</p>
           <div className="flex gap-2 justify-center">
             <button
-              onClick={fetchKYC}
+              onClick={() => fetchKYC()}
               className="px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2"
             >
               <RefreshCw className="w-4 h-4" /> Try Again
