@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import ListingCardModern from "@/components/services/ListingCardModern";
 import { getAllVirtualOffices } from "@/services/virtualOffice.service";
 import { VirtualOfficeItem } from "@/types/services";
@@ -60,6 +61,18 @@ export const PlanLocationsShowcase = () => {
     const [slideIndex, setSlideIndex] = useState(0);
     const [dynamicSpaces, setDynamicSpaces] = useState<VirtualOfficeItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const handleGetBestPrice = (item: any, isDynamic: boolean) => {
+        if (isDynamic) {
+            // Take directly to payment/booking completion for dynamic spaces
+            // We use 'gst' as the default plan for the direct payment path
+            navigate(`/booking/${item._id}/complete?plan=gst&type=virtual_office`);
+        } else {
+            // For static registrations, take to the virtual office solutions page
+            navigate(`/Solutions/virtual-office`);
+        }
+    };
 
     useEffect(() => {
         const fetchSpaces = async () => {
@@ -192,7 +205,11 @@ export const PlanLocationsShowcase = () => {
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: i * 0.08, duration: 0.5 }}
                                         >
-                                            <ListingCardModern item={loc as VirtualOfficeItem} />
+                                            <ListingCardModern
+                                                item={loc as VirtualOfficeItem}
+                                                onGetBestPrice={() => handleGetBestPrice(loc, true)}
+                                                onClick={() => handleGetBestPrice(loc, true)}
+                                            />
                                         </motion.div>
                                     );
                                 }
@@ -208,7 +225,7 @@ export const PlanLocationsShowcase = () => {
                                     >
                                         <div className="relative aspect-[16/10] overflow-hidden">
                                             <img src={(loc as any).image} alt={loc.name} className="w-full h-full object-cover transition-transform duration-[250ms] ease-out group-hover:scale-105" />
-                                            <span className="absolute bottom-3 left-3 bg-primary text-primary-foreground text-[10px] font-normal px-2.5 py-1 rounded-full">
+                                            <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-normal px-2.5 py-1 rounded-full z-10">
                                                 Available Now
                                             </span>
                                         </div>
@@ -229,10 +246,16 @@ export const PlanLocationsShowcase = () => {
                                                 Starting from <span className="font-bold text-foreground">{loc.startingFrom}</span>
                                             </p>
                                             <div className="flex gap-2">
-                                                <button className="flex-1 bg-primary text-primary-foreground text-sm font-normal py-2.5 rounded-xl hover:bg-primary/90 transition-colors">
+                                                <button
+                                                    onClick={() => handleGetBestPrice(loc, false)}
+                                                    className="flex-1 bg-primary text-primary-foreground text-sm font-normal py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
+                                                >
                                                     Get Best Price
                                                 </button>
-                                                <button className="flex-1 flex items-center justify-center gap-1.5 border border-border text-sm font-normal text-foreground py-2.5 rounded-xl hover:bg-muted/50 transition-colors">
+                                                <button
+                                                    onClick={() => navigate('/services/virtual-office')}
+                                                    className="flex-1 flex items-center justify-center gap-1.5 border border-border text-sm font-normal text-foreground py-2.5 rounded-xl hover:bg-muted/50 transition-colors"
+                                                >
                                                     Explore More
                                                 </button>
                                             </div>
