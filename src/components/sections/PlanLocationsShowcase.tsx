@@ -65,9 +65,8 @@ export const PlanLocationsShowcase = () => {
 
     const handleGetBestPrice = (item: any, isDynamic: boolean) => {
         if (isDynamic) {
-            // Take directly to payment/booking completion for dynamic spaces
-            // We use 'gst' as the default plan for the direct payment path
-            navigate(`/booking/${item._id}/complete?plan=gst&type=virtual_office`);
+            // Navigate to the workspace detail page to show images, details & pricing
+            navigate(`/space/${item._id}`);
         } else {
             // For static registrations, take to the virtual office solutions page
             navigate(`/Solutions/virtual-office`);
