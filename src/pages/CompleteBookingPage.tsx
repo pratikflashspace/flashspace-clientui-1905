@@ -289,7 +289,7 @@ const CompleteBookingPage = () => {
         <div className="min-h-screen flex flex-col bg-background text-foreground">
             <Header />
 
-            <main className="relative flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-8">
+            <main className="relative flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 pt-28 pb-8">
                 {/* Back */}
                 <button
                     onClick={() => navigate(-1)}
@@ -316,8 +316,8 @@ const CompleteBookingPage = () => {
                                         key={opt.years}
                                         onClick={() => setSelectedTenure(opt.years)}
                                         className={`relative rounded-2xl border-2 p-5 text-left transition-all duration-200 ${selectedTenure === opt.years
-                                                ? 'border-primary/60 bg-primary/10 shadow-md'
-                                                : 'border-border bg-card hover:border-primary/40'
+                                            ? 'border-primary/60 bg-primary/10 shadow-md'
+                                            : 'border-border bg-card hover:border-primary/40'
                                             }`}
                                     >
                                         {/* Popular badge */}

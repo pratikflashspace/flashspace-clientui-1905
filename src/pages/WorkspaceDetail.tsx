@@ -563,7 +563,7 @@ const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
             <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
               {data.name}
             </h1>
-            <span className="bg-primary/10 text-primary-foreground bg-primary px-3 py-1 rounded-full text-xs font-semibold">
+            <span className="bg-primary text-primary-foreground bg-[#2D3F33] px-3 py-1 rounded-full text-xs font-semibold">
               {type.replace("-", " ").toUpperCase()}
             </span>
           </div>
