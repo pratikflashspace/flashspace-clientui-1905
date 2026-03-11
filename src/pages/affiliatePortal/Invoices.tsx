@@ -368,7 +368,7 @@ const Invoices = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans w-full relative">
+        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans w-full relative">
             {/* --- HIDDEN PRINT AREA --- 
           This is what will be printed. It is hidden from screen but visible to print.
       */}
@@ -391,7 +391,7 @@ const Invoices = () => {
                 </div>
 
                 {/* Toolbar */}
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#f8f8f8] p-4 rounded-xl border-2 border-[#f1f2ed] shadow">
                     <div className="relative flex-1 w-full sm:max-w-md">
                         <Search
                             size={18}
@@ -471,11 +471,11 @@ const Invoices = () => {
                 </div>
 
                 {/* Table */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-[#f8f8f8] rounded-2xl border-[3px] border-[#f1f2ed] shadow overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-gray-50/50 border-b border-gray-100">
+                                <tr className="bg-[#f6f6f4] border-b-[3px] border-[#f1f2ed]">
                                     {[
                                         "Invoice ID",
                                         "Client",
@@ -494,7 +494,7 @@ const Invoices = () => {
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y-[3px] divide-[#f1f2ed]">
                                 {filteredData.length > 0 ? (
                                     filteredData.map((inv) => (
                                         <tr

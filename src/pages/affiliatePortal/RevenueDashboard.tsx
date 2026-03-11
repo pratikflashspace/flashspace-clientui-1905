@@ -58,7 +58,7 @@ const AnimatedCounter = ({
 
 const StatCard = ({ label, value, trend, icon: Icon, delay }: any) => (
     <div
-        className="bg-white p-7 rounded-[2rem] border border-gray-100/60 shadow-sm transition-all duration-300 group animate-fade-in-up"
+        className="bg-[#f8f8f8] p-7 rounded-[2rem] border border-gray-200 shadow transition-all duration-300 group animate-fade-in-up"
         style={{ animationDelay: `${delay}ms` }}
     >
         <div className="flex justify-between items-start mb-4">
@@ -126,7 +126,7 @@ const DashboardRevenue = () => {
 
     if (loading || !stats) {
         return (
-            <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+            <div className="min-h-screen bg-[#f7f7f6] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="w-10 h-10 animate-spin text-[#334D3D]" />
                     <p className="text-[#64748b] font-medium">Loading your revenue dashboard...</p>
@@ -191,7 +191,7 @@ const DashboardRevenue = () => {
     })) || [];
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] p-8 lg:p-12 font-sans w-full animate-fade-in">
+        <div className="min-h-screen bg-[#f7f7f6] p-8 lg:p-12 font-sans w-full animate-fade-in">
             <div className="max-w-[1400px] mx-auto space-y-12">
                 {/* 1. Header */}
                 <div className="animate-fade-in-down">
@@ -217,7 +217,7 @@ const DashboardRevenue = () => {
                 {/* 3. Trends Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     {/* Monthly Earnings Trend */}
-                    <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
+                    <div className="bg-[#f8f8f8] p-10 rounded-[2.5rem] border border-gray-200 shadow">
                         <h3 className="text-[1.25rem] font-black text-[#1a2d1d] mb-10 tracking-tight">
                             Monthly Earnings Trend
                         </h3>
@@ -233,7 +233,7 @@ const DashboardRevenue = () => {
                     </div>
 
                     {/* Revenue by Product */}
-                    <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
+                    <div className="bg-[#f8f8f8] p-10 rounded-[2.5rem] border border-gray-200 shadow">
                         <h3 className="text-[1.25rem] font-black text-[#1a2d1d] mb-10 tracking-tight">
                             Revenue by Product
                         </h3>
@@ -250,9 +250,9 @@ const DashboardRevenue = () => {
                 </div>
 
                 {/* 4. AI Insight Footer */}
-                <div className="bg-white border border-gray-100 p-10 rounded-[3rem] animate-slide-up relative overflow-hidden shadow-sm">
+                <div className="bg-[#f8f8f8] border border-gray-200 p-10 rounded-[3rem] animate-slide-up relative overflow-hidden shadow">
                     <div className="relative z-10 w-full flex flex-col sm:flex-row gap-8 items-start sm:items-center">
-                        <div className="bg-[#f1f5f9] p-5 rounded-2xl shadow-sm shrink-0">
+                        <div className="bg-[#f1f5f9] p-5 rounded-2xl shadow shrink-0">
                             <Sparkles className="w-8 h-8 text-[#334D3D]" />
                         </div>
                         <div className="flex-1 space-y-3">

@@ -116,7 +116,7 @@ const StatCard = ({
     delay: number;
 }) => (
     <div
-        className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group animate-fade-in-up"
+        className="bg-[#f8f8f8] p-6 rounded-2xl border border-gray-200 shadow transition-all duration-300 hover:-translate-y-1 group animate-fade-in-up"
         style={{ animationDelay: `${delay}ms` }}
     >
         <h3 className={`text-3xl font-bold ${colorClass} mb-1`}>
@@ -156,10 +156,10 @@ const Payouts = () => {
     );
 
     return (
-        <div className="w-full bg-[#fafafa] p-6 lg:p-10 pb-2 lg:pb-4 font-sans">
+        <div className="w-full bg-[#f7f7f6] p-6 lg:p-10 pb-2 lg:pb-4 font-sans">
             <div className="w-full space-y-8 animate-fade-in">
                 {/* 1. Header */}
-{/* Header Removed */}
+                {/* Header Removed */}
 
                 {/* 2. Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -200,11 +200,10 @@ const Payouts = () => {
                             onClick={() => setActiveTab("pending")}
                             className={`
                 px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-300
-                ${
-                    activeTab === "pending"
-                        ? "bg-white text-slate-900 shadow-sm ring-1 ring-gray-200"
-                        : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-                }
+                ${activeTab === "pending"
+                                    ? "bg-white text-slate-900 shadow-sm ring-1 ring-gray-200"
+                                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                                }
               `}
                         >
                             Pending Payouts
@@ -213,11 +212,10 @@ const Payouts = () => {
                             onClick={() => setActiveTab("completed")}
                             className={`
                 px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-300
-                ${
-                    activeTab === "completed"
-                        ? "bg-white text-slate-900 shadow-sm ring-1 ring-gray-200"
-                        : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-                }
+                ${activeTab === "completed"
+                                    ? "bg-white text-slate-900 shadow-sm ring-1 ring-gray-200"
+                                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                                }
               `}
                         >
                             Completed
@@ -232,7 +230,7 @@ const Payouts = () => {
                                 {pendingPayouts.map((item, idx) => (
                                     <div
                                         key={item.id}
-                                        className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+                                        className="bg-[#f8f8f8] rounded-2xl border border-gray-200 p-6 shadow transition-all duration-300 group flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
                                         style={{
                                             animationDelay: `${idx * 100}ms`,
                                         }}
@@ -263,11 +261,11 @@ const Payouts = () => {
                             </div>
                         ) : (
                             // --- COMPLETED VIEW (Table Style) ---
-                            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                            <div className="bg-[#f8f8f8] rounded-2xl border border-gray-200 shadow overflow-hidden">
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="bg-gray-50/50 border-b border-gray-100">
+                                            <tr className="bg-[#f6f6f4] border-b border-[#f1f2ed]">
                                                 {[
                                                     "Payout ID",
                                                     "Period",
@@ -286,7 +284,7 @@ const Payouts = () => {
                                                 ))}
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-50">
+                                        <tbody className="divide-y divide-[#f1f2ed]">
                                             {completedPayouts.map(
                                                 (payout, idx) => (
                                                     <tr

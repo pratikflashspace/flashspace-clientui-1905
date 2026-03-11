@@ -18,7 +18,7 @@ const InsightCard: React.FC<InsightCardProps> = ({
 }) => (
     <div
         onClick={() => onClick(id)}
-        className="bg-white p-7 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group relative overflow-hidden"
+        className="bg-[#f7f7f7] p-7 rounded-2xl border border-gray-200 shadow transition-all duration-300 cursor-pointer group relative overflow-hidden"
     >
         <div className="flex justify-between items-start mb-4">
             <h3 className="font-bold text-[#1a2d1d] text-lg leading-snug max-w-[70%]">
