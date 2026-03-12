@@ -1,6 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/ai-chat", "destination": "http://91.108.105.211:8001/chat" },
+    { "source": "/api/:path*", "destination": "https://api.flashspace.co/:path*" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
