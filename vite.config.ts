@@ -14,6 +14,11 @@ export default defineConfig({
     port: 5173,
     host: true,
     proxy: {
+      '/api/ai-chat': {
+        target: 'http://91.108.105.211:8001',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/ai-chat$/, '/chat')
+      },
       '/api/webhook': {
         target: 'https://n8n.srv906242.hstgr.cloud/webhook',
         changeOrigin: true,
