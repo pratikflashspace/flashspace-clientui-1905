@@ -189,8 +189,8 @@ interface ContactForm {
 // ChatMessage now comes from ChatContext
 import { useChat, ChatMessage } from "@/contexts/ChatContext";
 
-// AI backend configuration
-const AI_BACKEND_URL = import.meta.env.VITE_AI_BACKEND_URL || import.meta.env.AI_BACKEND_URL || '/api/webhook/b8d3444c-ca76-4796-a0b7-a8c0b9c320c2';
+// Backend chat endpoint (backend calls AI backend internally)
+const BACKEND_CHAT_URL = "/api/chat/send";
 
 interface SidebarMenuItem {
   label: string;
@@ -862,16 +862,14 @@ const StartChatting = () => {
     setIsLoading(true);
 
     try {
-      // Call deployed AI backend
-      const response = await fetch(AI_BACKEND_URL, {
+      // Call backend chat endpoint (backend calls AI backend internally)
+      const response = await fetch(BACKEND_CHAT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: userMessage.content,
-          conversation_id: 'default',
-          session_id: getSessionId()
+          message: userMessage.content
         })
       });
 
@@ -883,21 +881,9 @@ const StartChatting = () => {
       }
 
       const data = await response.json();
-      // console.log('AI backend response:', data); // Debug log
 
-      // Try multiple possible response formats from backend
-      let aiResponseText = '';
-
-      if (Array.isArray(data)) {
-        // If response is an array, get first item
-        const firstItem = data[0];
-        aiResponseText = firstItem?.reply || firstItem?.output || firstItem?.response || firstItem?.text || firstItem?.message || JSON.stringify(firstItem);
-      } else if (typeof data === 'object') {
-        // Try different possible field names
-        aiResponseText = data.reply || data.Response || data.output || data.response || data.text || data.message || data.result || data.answer || JSON.stringify(data);
-      } else {
-        aiResponseText = String(data);
-      }
+      // Backend returns reply directly from AI backend
+      let aiResponseText = data.reply || data.message || 'I apologize, but I encountered an error. Please try again.';
 
       // Add AI response to chat
       const assistantMessage: ChatMessage = {
@@ -910,7 +896,7 @@ const StartChatting = () => {
 
       setChatMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Error sending message to AI backend:', error);
+      console.error('Error sending message to backend:', error);
 
       // Add error message
       const errorMessage: ChatMessage = {
