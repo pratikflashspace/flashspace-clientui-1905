@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-animation";
 import { cn } from "@/lib/utils";
 
@@ -44,14 +44,14 @@ const Footer = () => {
     <footer id="footer" className="bg-foreground text-white dark:bg-[#050505] border-t border-white/5 overflow-hidden">
       {/* Links Section */}
       <div className={cn(
-        "container mx-auto px-6 py-16",
+        "container mx-auto px-4 sm:px-6 py-12 sm:py-16",
         getAnimationClasses(isVisible, 'slideUp', 0)
       )}>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-y-10 gap-x-4 sm:gap-8 lg:gap-12">
 
           {/* Solutions */}
-          <div className="border-l border-white/10 pl-6 space-y-6">
-            <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
+          <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
+            <h4 className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
               Solutions
             </h4>
             <ul className="space-y-4">
@@ -69,8 +69,8 @@ const Footer = () => {
           </div>
 
           {/* Portals */}
-          <div className="border-l border-white/10 pl-6 space-y-6">
-            <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
+          <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
+            <h4 className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
               Portals
             </h4>
             <ul className="space-y-4">
@@ -88,8 +88,8 @@ const Footer = () => {
           </div>
 
           {/* Resources */}
-          <div className="border-l border-white/10 pl-6 space-y-6">
-            <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
+          <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
+            <h4 className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
               Resources
             </h4>
             <ul className="space-y-4">
@@ -107,8 +107,8 @@ const Footer = () => {
           </div>
 
           {/* Company */}
-          <div className="border-l border-white/10 pl-6 space-y-6">
-            <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
+          <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
+            <h4 className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
               Company
             </h4>
             <ul className="space-y-4">
@@ -126,8 +126,8 @@ const Footer = () => {
           </div>
 
           {/* Community */}
-          <div className="border-l border-white/10 pl-6 space-y-6">
-            <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
+          <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
+            <h4 className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
               Community
             </h4>
             <ul className="space-y-4">
@@ -159,7 +159,7 @@ const Footer = () => {
 
       {/* Bottom Section */}
       <div className={cn(
-        "container mx-auto px-6 py-12 lg:py-16 border-t border-white/5",
+        "container mx-auto px-4 sm:px-6 py-10 lg:py-16 border-t border-white/5",
         getAnimationClasses(isVisible, 'fadeIn', 400)
       )}>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12">
@@ -168,7 +168,7 @@ const Footer = () => {
             <img
               src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
               alt="FlashSpace"
-              className="h-16 lg:h-20 w-auto brightness-0 invert opacity-40 group-hover:opacity-100 transition-opacity"
+              className="h-10 sm:h-16 lg:h-20 w-auto brightness-0 invert opacity-40 group-hover:opacity-100 transition-opacity"
             />
           </Link>
 
@@ -179,8 +179,8 @@ const Footer = () => {
               <Link to="/about" className="hover:text-white transition-colors">Privacy</Link>
               <Link to="/about" className="hover:text-white transition-colors">Cookies</Link>
             </div>
-            <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">
-              ┬⌐ {currentYear} FlashSpace Technologies Private Limited.
+            <p className="text-[9px] sm:text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] sm:tracking-[0.3em]">
+              © {currentYear} FlashSpace Technologies Private Limited.
             </p>
           </div>
         </div>
