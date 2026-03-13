@@ -93,73 +93,79 @@ const InvoiceViewModal = ({
   if (!invoice) return null;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Invoice {invoice.invoiceNumber}</DialogTitle>
+      <DialogContent className="max-w-lg p-0 overflow-hidden rounded-3xl border-0 shadow-2xl">
+        <DialogHeader className="px-6 py-5 border-b border-gray-100">
+          <DialogTitle className="text-xl font-bold text-gray-900">
+            Invoice {invoice.invoiceNumber}
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 text-sm">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-muted-foreground text-xs mb-1">Customer</p>
-              <p className="font-semibold text-foreground">
+        <div className="p-6 space-y-5 text-sm max-h-[80vh] overflow-y-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-gray-50 p-3 rounded-xl">
+              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Customer</p>
+              <p className="font-semibold text-gray-900 leading-tight">
                 {invoice.userName}
               </p>
-              <p className="text-muted-foreground text-xs">
+              <p className="text-gray-400 text-xs truncate">
                 {invoice.userEmail}
               </p>
             </div>
-            <div>
-              <p className="text-muted-foreground text-xs mb-1">Status</p>
-              {getStatusBadge(invoice.status)}
+            <div className="bg-gray-50 p-3 rounded-xl">
+              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Status</p>
+              <div className="mt-0.5">
+                {getStatusBadge(invoice.status)}
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-muted-foreground text-xs mb-1">Space</p>
-              <p className="font-medium text-foreground">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-gray-50 p-3 rounded-xl">
+              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Space</p>
+              <p className="font-medium text-gray-900">
                 {invoice.spaceName || "—"}
               </p>
             </div>
-            <div>
-              <p className="text-muted-foreground text-xs mb-1">Service Type</p>
-              <p className="font-medium text-foreground">
+            <div className="bg-gray-50 p-3 rounded-xl">
+              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Service Type</p>
+              <p className="font-medium text-gray-900">
                 {categoryLabel(invoice.paymentType)}
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-muted-foreground text-xs mb-1">Plan</p>
-              <p className="font-medium text-foreground">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-gray-50 p-3 rounded-xl">
+              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Plan</p>
+              <p className="font-medium text-gray-900">
                 {invoice.planName || "—"}
               </p>
             </div>
-            <div>
-              <p className="text-muted-foreground text-xs mb-1">Date</p>
-              <p className="font-medium text-foreground">
+            <div className="bg-gray-50 p-3 rounded-xl">
+              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Date</p>
+              <p className="font-medium text-gray-900">
                 {invoice.createdAt
                   ? format(new Date(invoice.createdAt), "dd MMM yyyy")
                   : "—"}
               </p>
             </div>
           </div>
-          <div className="border-t border-border pt-4">
-            <div className="flex items-center justify-between">
-              <p className="text-muted-foreground">Total Amount</p>
-              <p className="text-2xl font-extrabold text-foreground">
+          <div className="border-t border-gray-100 pt-5 mt-2">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-gray-500 font-medium">Total Amount</p>
+              <p className="text-2xl font-black text-primary">
                 {formatCurrency(invoice.totalAmount)}
               </p>
             </div>
-            {invoice.razorpayOrderId && (
-              <p className="text-xs text-muted-foreground mt-2">
-                Order ID: {invoice.razorpayOrderId}
-              </p>
-            )}
-            {invoice.razorpayPaymentId && (
-              <p className="text-xs text-muted-foreground">
-                Payment ID: {invoice.razorpayPaymentId}
-              </p>
-            )}
+            <div className="mt-4 p-3 bg-gray-50 rounded-xl space-y-1">
+              {invoice.razorpayOrderId && (
+                <p className="text-[10px] text-gray-400 font-medium">
+                  Order ID: <span className="font-mono text-gray-600">{invoice.razorpayOrderId}</span>
+                </p>
+              )}
+              {invoice.razorpayPaymentId && (
+                <p className="text-[10px] text-gray-400 font-medium">
+                  Payment ID: <span className="font-mono text-gray-600">{invoice.razorpayPaymentId}</span>
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>
@@ -260,93 +266,97 @@ const Invoices = () => {
       navItems={ADMIN_NAV_ITEMS}
     >
       <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
           Invoice <span className="text-primary italic">Management</span>
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-sm md:text-base text-muted-foreground mt-1">
           Review and manage all client invoices and payments
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-4 mb-8">
-        <div className="bg-background border border-border rounded-xl p-5">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-yellow-200 transition-colors">
           <p className="text-2xl font-extrabold text-yellow-600">
             {loading ? "—" : pendingCount}
           </p>
-          <p className="text-sm text-muted-foreground">Pending (This Page)</p>
+          <p className="text-sm text-muted-foreground font-medium">Pending (This Page)</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-red-200 transition-colors">
           <p className="text-2xl font-extrabold text-red-600">
             {loading ? "—" : failedCount}
           </p>
-          <p className="text-sm text-muted-foreground">Failed</p>
+          <p className="text-sm text-muted-foreground font-medium">Failed</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-blue-200 transition-colors">
           <p className="text-2xl font-extrabold text-blue-600">
             {loading ? "—" : total}
           </p>
-          <p className="text-sm text-muted-foreground">Total Invoices</p>
+          <p className="text-sm text-muted-foreground font-medium">Total Invoices</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-green-200 transition-colors">
           <p className="text-2xl font-extrabold text-green-600">
             {loading ? "—" : formatCurrency(totalRevenue)}
           </p>
-          <p className="text-sm text-muted-foreground">Cleared (This Page)</p>
+          <p className="text-sm text-muted-foreground font-medium">Cleared (This Page)</p>
         </div>
       </div>
 
       {/* Search & Filter */}
-      <form onSubmit={handleSearch} className="flex gap-4 mb-6">
-        <div className="relative flex-1 max-w-md">
+      <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-3 mb-6">
+        <div className="relative flex-1 md:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search invoices..."
-            className="pl-10"
+            className="pl-10 h-11"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <select
-          value={typeFilter}
-          onChange={(e) => {
-            setTypeFilter(e.target.value);
-            setPage(1);
-          }}
-          className="px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground outline-none"
-        >
-          <option value="all">All Types</option>
-          <option value="virtual_office">Virtual Office</option>
-          <option value="coworking_space">Coworking Space</option>
-          <option value="meeting_room">Meeting Room</option>
-        </select>
-        <select
-          value={statusFilter}
-          onChange={(e) => {
-            setStatusFilter(e.target.value);
-            setPage(1);
-          }}
-          className="px-3 py-2 bg-background border border-border rounded-md text-sm text-foreground outline-none"
-        >
-          <option value="all">All Status</option>
-          <option value="completed">Paid</option>
-          <option value="pending">Pending</option>
-          <option value="failed">Failed</option>
-        </select>
-        <Button type="submit" variant="outline">
+        <div className="flex gap-3 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+          <select
+            value={typeFilter}
+            onChange={(e) => {
+              setTypeFilter(e.target.value);
+              setPage(1);
+            }}
+            className="flex-1 md:flex-none px-4 py-2 bg-background border border-border rounded-lg text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 min-w-[140px] appearance-none"
+          >
+            <option value="all">All Types</option>
+            <option value="virtual_office">Virtual Office</option>
+            <option value="coworking_space">Coworking Space</option>
+            <option value="meeting_room">Meeting Room</option>
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setPage(1);
+            }}
+            className="flex-1 md:flex-none px-4 py-2 bg-background border border-border rounded-lg text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 min-w-[120px] appearance-none"
+          >
+            <option value="all">All Status</option>
+            <option value="completed">Paid</option>
+            <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+        <Button type="submit" variant="outline" className="h-11 shadow-sm px-6">
           <Filter className="w-4 h-4 mr-2" />
-          Apply
+          Apply Filters
         </Button>
       </form>
 
       <Tabs defaultValue="all" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="pending">
-            Pending ({pendingInvoices.length})
-          </TabsTrigger>
-          <TabsTrigger value="paid">Paid ({paidInvoices.length})</TabsTrigger>
-          <TabsTrigger value="all">All Invoices</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-1 -mx-2 px-2 scrollbar-none">
+          <TabsList className="h-auto p-1 bg-muted/50 rounded-lg inline-flex w-full md:w-auto">
+            <TabsTrigger value="pending" className="px-5 py-2.5 text-sm">
+              Pending ({pendingInvoices.length})
+            </TabsTrigger>
+            <TabsTrigger value="paid" className="px-5 py-2.5 text-sm">Paid ({paidInvoices.length})</TabsTrigger>
+            <TabsTrigger value="all" className="px-5 py-2.5 text-sm">All Invoices</TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* ── Pending Tab ── */}
         <TabsContent value="pending">
@@ -363,48 +373,56 @@ const Invoices = () => {
               {pendingInvoices.map((invoice) => (
                 <div
                   key={invoice._id}
-                  className="bg-background border border-border rounded-xl p-5 flex items-center justify-between"
+                  className="bg-background border border-border rounded-xl p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-primary/20 transition-colors"
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-medium text-foreground">
+                  <div className="flex-1 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className="font-bold text-foreground text-sm tracking-tight">
                         {invoice.invoiceNumber}
                       </span>
-                      <Badge variant="outline">
-                        {categoryLabel(invoice.paymentType)}
-                      </Badge>
-                      {getStatusBadge(invoice.status)}
+                      <div className="flex gap-2">
+                        <Badge variant="outline" className="text-[10px] h-5 py-0">
+                          {categoryLabel(invoice.paymentType)}
+                        </Badge>
+                        {getStatusBadge(invoice.status)}
+                      </div>
                     </div>
-                    <p className="text-foreground font-medium">
-                      {invoice.userName}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {invoice.userEmail}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {invoice.spaceName} · {invoice.planName}
+                    <div>
+                      <p className="text-foreground font-semibold text-base leading-tight">
+                        {invoice.userName}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {invoice.userEmail}
+                      </p>
+                    </div>
+                    <p className="text-xs text-muted-foreground font-medium pt-1">
+                      {invoice.spaceName} · <span className="text-primary">{invoice.planName}</span>
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-extrabold text-foreground">
-                      {formatCurrency(invoice.totalAmount)}
-                    </p>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      {format(new Date(invoice.createdAt), "dd MMM yyyy")}
-                    </p>
-                    <div className="flex gap-2 justify-end">
+                  <div className="flex items-end md:items-center justify-between md:flex-col md:text-right border-t border-border/50 md:border-0 pt-3 md:pt-0">
+                    <div className="md:mb-1">
+                      <p className="text-xl md:text-2xl font-black text-foreground md:leading-none">
+                        {formatCurrency(invoice.totalAmount)}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-1 font-medium">
+                        {format(new Date(invoice.createdAt), "dd MMM yyyy")}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => handleViewInvoice(invoice)}
+                        className="h-9 px-4 rounded-lg border-muted-foreground/20"
                       >
-                        <Eye className="w-4 h-4 mr-1" />
+                        <Eye className="w-4 h-4 mr-2" />
                         View
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => handleDownload(invoice)}
+                        className="h-9 w-9 p-0 rounded-lg hover:bg-muted"
                       >
                         <Download className="w-4 h-4" />
                       </Button>
@@ -498,94 +516,170 @@ const InvoiceTable = ({
     );
 
   return (
-    <div className="bg-background border border-border rounded-xl overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-muted/50">
-          <tr>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Invoice ID
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Customer
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Service
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Amount
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Date
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Status
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {invoices.map((invoice) => (
-            <tr
-              key={invoice._id}
-              className="border-t border-border hover:bg-muted/20 transition-colors"
-            >
-              <td className="p-4">
-                <p className="font-medium text-foreground">
+    <div className="space-y-4">
+      {/* Desktop View */}
+      <div className="hidden lg:block bg-background border border-border rounded-xl overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-muted/50">
+            <tr>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Invoice ID
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Customer
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Service
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Amount
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Date
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Status
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground text-right px-6">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {invoices.map((invoice) => (
+              <tr
+                key={invoice._id}
+                className="border-t border-border hover:bg-muted/20 transition-colors"
+              >
+                <td className="p-4">
+                  <p className="font-bold text-foreground text-sm tracking-tight">
+                    {invoice.invoiceNumber}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground font-mono truncate max-w-[120px]">
+                    {invoice.razorpayOrderId}
+                  </p>
+                </td>
+                <td className="p-4">
+                  <p className="font-semibold text-foreground text-sm">
+                    {invoice.userName}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate max-w-[150px]">
+                    {invoice.userEmail}
+                  </p>
+                </td>
+                <td className="p-4">
+                  <p className="text-xs font-medium text-foreground truncate max-w-[150px]">
+                    {invoice.spaceName || "—"}
+                  </p>
+                  <Badge variant="outline" className="mt-1 text-[10px] h-5 py-0 px-2 font-medium">
+                    {categoryLabel(invoice.paymentType)}
+                  </Badge>
+                </td>
+                <td className="p-4 font-black text-foreground">
+                  {formatCurrency(invoice.totalAmount)}
+                </td>
+                <td className="p-4 text-muted-foreground text-xs font-medium">
+                  {invoice.createdAt
+                    ? format(new Date(invoice.createdAt), "dd MMM yyyy")
+                    : "—"}
+                </td>
+                <td className="p-4">{getStatusBadge(invoice.status)}</td>
+                <td className="p-4 text-right px-6">
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onView(invoice)}
+                      className="h-8 w-8 p-0 rounded-lg"
+                    >
+                      <Eye className="w-4 h-4 text-muted-foreground" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onDownload(invoice)}
+                      className="h-8 w-8 p-0 rounded-lg"
+                    >
+                      <Download className="w-4 h-4 text-muted-foreground" />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile/Tablet View */}
+      <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+        {invoices.map((invoice) => (
+          <div
+            key={invoice._id}
+            className="bg-background border border-border rounded-xl p-4 space-y-4 hover:border-primary/20 transition-colors"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-0.5">
                   {invoice.invoiceNumber}
                 </p>
-                <p className="text-xs text-muted-foreground font-mono">
-                  {invoice.razorpayOrderId}
-                </p>
-              </td>
-              <td className="p-4">
-                <p className="font-medium text-foreground">
+                <h3 className="font-bold text-foreground leading-tight">
                   {invoice.userName}
-                </p>
-                <p className="text-sm text-muted-foreground">
+                </h3>
+                <p className="text-xs text-muted-foreground truncate max-w-[200px]">
                   {invoice.userEmail}
                 </p>
-              </td>
-              <td className="p-4">
-                <p className="text-sm text-foreground">
+              </div>
+              {getStatusBadge(invoice.status)}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 py-3 border-y border-border/50">
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Service</p>
+                <p className="text-xs font-semibold text-foreground leading-tight truncate">
                   {invoice.spaceName || "—"}
                 </p>
-                <Badge variant="outline" className="mt-1 text-xs">
+                <Badge variant="outline" className="mt-1 text-[9px] h-4 py-0 leading-none px-1.5">
                   {categoryLabel(invoice.paymentType)}
                 </Badge>
-              </td>
-              <td className="p-4 font-semibold text-foreground">
-                {formatCurrency(invoice.totalAmount)}
-              </td>
-              <td className="p-4 text-muted-foreground text-sm">
-                {invoice.createdAt
-                  ? format(new Date(invoice.createdAt), "dd MMM yyyy")
-                  : "—"}
-              </td>
-              <td className="p-4">{getStatusBadge(invoice.status)}</td>
-              <td className="p-4">
-                <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onView(invoice)}
-                  >
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDownload(invoice)}
-                  >
-                    <Download className="w-4 h-4" />
-                  </Button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Date</p>
+                <p className="text-xs font-semibold text-foreground">
+                  {invoice.createdAt ? format(new Date(invoice.createdAt), "dd MMM yyyy") : "—"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight leading-none mb-1">Total Amount</p>
+                <p className="text-xl font-black text-primary leading-none">
+                  {formatCurrency(invoice.totalAmount)}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onView(invoice)}
+                  className="h-10 px-4 rounded-xl border-muted-foreground/20 font-bold text-xs"
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  Details
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onDownload(invoice)}
+                  className="h-10 w-10 p-0 rounded-xl border-muted-foreground/20"
+                >
+                  <Download className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

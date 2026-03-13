@@ -244,7 +244,7 @@ export default function KYCDetail() {
     >
       <div className="min-h-screen bg-transparent animate-in fade-in duration-500">
         {/* Header */}
-        <div className="max-w-7xl mx-auto mb-8">
+        <div className="max-w-7xl mx-auto mb-8 px-4 md:px-0">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center text-gray-500 hover:text-gray-900 transition-colors mb-4"
@@ -252,28 +252,30 @@ export default function KYCDetail() {
             <ArrowLeft className="w-4 h-4 mr-1" /> Back to KYC Requests
           </button>
 
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-extrabold text-gray-900">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
                 KYC <span className="text-teal-500 italic">Verification</span>
               </h1>
-              <p className="text-gray-500 mt-1">
+              <p className="text-gray-500 mt-2 text-sm md:text-base">
                 Review all details, documents, and take an approval decision.
               </p>
             </div>
-            <div className="flex flex-col items-end gap-1">
+            <div className="flex flex-col items-center md:items-end gap-2 bg-white md:bg-transparent p-4 md:p-0 rounded-2xl md:rounded-none border md:border-0 border-gray-100 shadow-sm md:shadow-none">
               {getStatusBadge(kycData.overallStatus)}
-              <span className="text-xs text-gray-500">
-                Progress: {kycData.progress || 0}%
-              </span>
-              <span className="text-xs text-gray-400">
-                Submitted: {new Date(kycData.createdAt).toLocaleString()}
-              </span>
+              <div className="flex flex-col items-center md:items-end">
+                <span className="text-xs text-gray-500 font-medium">
+                  Progress: {kycData.progress || 0}%
+                </span>
+                <span className="text-[10px] md:text-xs text-gray-400">
+                  Submitted: {new Date(kycData.createdAt).toLocaleString()}
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto px-4 md:px-0 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
           {/* Left Column: User & Business Info */}
           <div className="space-y-6">
             {/* User Profile Card */}
@@ -318,70 +320,70 @@ export default function KYCDetail() {
                   </h3>
                 </div>
                 {type === "property" ? (
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Property Name:</span>
-                      <span className="font-medium text-gray-900">
+                  <div className="space-y-4 text-sm">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                      <span className="text-gray-500 text-xs sm:text-sm">Property Name:</span>
+                      <span className="font-bold text-gray-900">
                         {kycData.personalInfo.fullName}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Address:</span>
-                      <span className="font-medium text-gray-900 text-right ml-4">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                      <span className="text-gray-500 text-xs sm:text-sm">Address:</span>
+                      <span className="font-bold text-gray-900 sm:text-right sm:ml-4 leading-relaxed">
                         {kycData.personalInfo.address || "N/A"}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">City:</span>
-                      <span className="font-medium text-gray-900">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                      <span className="text-gray-500 text-xs sm:text-sm">City:</span>
+                      <span className="font-bold text-gray-900">
                         {kycData.personalInfo.city || "N/A"}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Area:</span>
-                      <span className="font-medium text-gray-900">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                      <span className="text-gray-500 text-xs sm:text-sm">Area:</span>
+                      <span className="font-bold text-gray-900">
                         {kycData.personalInfo.area || "N/A"}
                       </span>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Name:</span>
-                      <span className="font-medium text-gray-900">
+                  <div className="space-y-4 text-sm">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                      <span className="text-gray-500 text-xs sm:text-sm">Name:</span>
+                      <span className="font-bold text-gray-900">
                         {kycData.personalInfo.fullName}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Phone:</span>
-                      <span className="font-medium text-gray-900">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                      <span className="text-gray-500 text-xs sm:text-sm">Phone:</span>
+                      <span className="font-bold text-gray-900 font-mono">
                         {kycData.personalInfo.phone || "N/A"}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Email:</span>
-                      <span className="font-medium text-gray-900">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                      <span className="text-gray-500 text-xs sm:text-sm">Email:</span>
+                      <span className="font-bold text-gray-900 break-all sm:break-normal">
                         {kycData.personalInfo.email || "N/A"}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Pan Number:</span>
-                      <span className="font-medium text-gray-900">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                      <span className="text-gray-500 text-xs sm:text-sm">Pan Number:</span>
+                      <span className="font-bold text-gray-900 font-mono">
                         {kycData.personalInfo.panNumber || "N/A"}
                       </span>
                     </div>
                     {kycData.personalInfo.aadhaarNumber && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Aadhaar Number:</span>
-                        <span className="font-medium text-gray-900">
+                      <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                        <span className="text-gray-500 text-xs sm:text-sm">Aadhaar Number:</span>
+                        <span className="font-bold text-gray-900 font-mono">
                           {kycData.personalInfo.aadhaarNumber}
                         </span>
                       </div>
                     )}
                     {kycData.personalInfo.dateOfBirth && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">DOB:</span>
-                        <span className="font-medium text-gray-900">
+                      <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                        <span className="text-gray-500 text-xs sm:text-sm">DOB:</span>
+                        <span className="font-bold text-gray-900">
                           {new Date(
                             kycData.personalInfo?.dateOfBirth,
                           ).toLocaleDateString()}
@@ -400,36 +402,36 @@ export default function KYCDetail() {
                   <MapPin className="w-5 h-5 text-purple-500" />
                   <h3 className="font-bold text-gray-900">Business Info</h3>
                 </div>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Company Name:</span>
-                    <span className="font-medium text-gray-900 text-right">
+                <div className="space-y-4 text-sm">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-gray-500 text-xs sm:text-sm">Company Name:</span>
+                    <span className="font-bold text-gray-900 sm:text-right leading-tight">
                       {kycData.businessInfo.companyName}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Type:</span>
-                    <span className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-gray-500 text-xs sm:text-sm">Type:</span>
+                    <span className="font-bold text-gray-900">
                       {kycData.businessInfo.companyType}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">GST:</span>
-                    <span className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-gray-500 text-xs sm:text-sm">GST:</span>
+                    <span className="font-bold text-gray-900 font-mono">
                       {kycData.businessInfo.gstNumber || "N/A"}
                     </span>
                   </div>
                   {kycData.businessInfo.cinNumber && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">CIN:</span>
-                      <span className="font-medium text-gray-900">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                      <span className="text-gray-500 text-xs sm:text-sm">CIN:</span>
+                      <span className="font-bold text-gray-900 font-mono">
                         {kycData.businessInfo.cinNumber}
                       </span>
                     </div>
                   )}
-                  <div className="mt-2 pt-2 border-t border-gray-50">
-                    <span className="text-gray-500 block mb-1">Address:</span>
-                    <p className="text-gray-900 font-medium leading-relaxed">
+                  <div className="mt-4 pt-4 border-t border-gray-50">
+                    <span className="text-gray-500 block mb-2 text-xs uppercase font-bold tracking-wider">Registered Address:</span>
+                    <p className="text-gray-900 font-medium leading-relaxed bg-gray-50 p-3 rounded-xl border border-gray-100">
                       {kycData.businessInfo.registeredAddress || "N/A"}
                     </p>
                   </div>
@@ -513,73 +515,75 @@ export default function KYCDetail() {
                       key={doc._id || index}
                       className="group border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all bg-gray-50/50"
                     >
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
                         {/* File Icon & Info */}
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <div className="flex items-center gap-4 w-full sm:w-auto">
+                          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                             <FileText className="w-6 h-6 text-blue-600" />
                           </div>
-                          <div>
+                          <div className="min-w-0 flex-1">
                             <h4
-                              className="font-bold text-gray-900 capitalize truncate max-w-[200px]"
+                              className="font-bold text-gray-900 capitalize truncate"
                               title={doc.name || doc.type.replace(/_/g, " ")}
                             >
                               {doc.name || doc.type.replace(/_/g, " ")}
                             </h4>
-                            <p className="text-xs text-gray-500 truncate max-w-[200px]">
+                            <p className="text-xs text-gray-500 truncate mt-0.5">
                               {doc.fileUrl?.split("/").pop()}
                             </p>
                             {doc.rejectionReason &&
                               doc.status === "rejected" && (
-                                <p className="text-xs text-red-600 mt-1 font-medium bg-red-50 p-1 px-2 rounded inline-block">
-                                  Reason: {doc.rejectionReason}
-                                </p>
+                                <div className="mt-2 text-[10px] md:text-xs text-red-600 font-medium bg-red-50 p-2 rounded-lg border border-red-100 leading-tight">
+                                  <span className="font-bold">Reason:</span> {doc.rejectionReason}
+                                </div>
                               )}
                           </div>
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
                           {/* Status Label */}
-                          <div className="mr-2">
+                          <div className="sm:mr-2">
                             {doc.status === "approved" && (
-                              <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded">
-                                Approved
+                              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-600 bg-green-50 px-2.5 py-1.5 rounded-lg border border-green-100">
+                                <CheckCircle2 className="w-3 h-3" /> APPROVED
                               </span>
                             )}
                             {doc.status === "rejected" && (
-                              <span className="text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded">
-                                Rejected
+                              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-red-600 bg-red-50 px-2.5 py-1.5 rounded-lg border border-red-100">
+                                <XCircle className="w-3 h-3" /> REJECTED
                               </span>
                             )}
                             {doc.status === "pending" && (
-                              <span className="text-xs font-semibold text-yellow-600 bg-yellow-50 px-2 py-1 rounded">
-                                Pending
+                              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2.5 py-1.5 rounded-lg border border-yellow-100">
+                                <Clock className="w-3 h-3" /> PENDING
                               </span>
                             )}
                           </div>
 
                           {/* Action Buttons */}
-                          <div className="flex gap-1">
+                          <div className="flex gap-1.5 shrink-0">
                             {doc.status !== "approved" && (
                               <button
                                 onClick={() =>
                                   handleDocumentAction(doc._id, "approve")
                                 }
+                                title="Approve"
                                 disabled={processing}
-                                className="p-2 px-3 bg-white border border-green-200 text-green-600 hover:bg-green-50 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                className="p-2.5 bg-white border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm"
                               >
-                                <CheckCircle2 className="w-3 h-3" /> Accept
+                                <CheckCircle2 className="w-4 h-4" />
                               </button>
                             )}
 
                             {doc.status !== "rejected" && (
                               <button
                                 onClick={() => openRejectModal(doc._id)}
+                                title="Reject"
                                 disabled={processing}
-                                className="p-2 px-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                className="p-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"
                               >
-                                <XCircle className="w-3 h-3" /> Reject
+                                <XCircle className="w-4 h-4" />
                               </button>
                             )}
 
@@ -589,9 +593,10 @@ export default function KYCDetail() {
                                 setSelectedDoc(doc);
                                 window.scrollTo({ top: 0, behavior: "smooth" });
                               }}
-                              className="p-2 px-3 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                              className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all flex items-center gap-2 font-medium text-xs px-4"
                             >
-                              <Eye className="w-3 h-3" /> View
+                              <Eye className="w-4 h-4" />
+                              <span className="hidden sm:inline">View</span>
                             </button>
                           </div>
                         </div>
@@ -728,18 +733,20 @@ export default function KYCDetail() {
                         } finally {
                           setProcessing(false);
                           setShowRejectModal(false);
+                          setRejectionReason("");
                         }
-                      } else if (selectedDocId) {
+                      } else {
+                        // This case is for rejecting a specific document
                         handleDocumentAction(
                           selectedDocId,
                           "reject",
-                          rejectionReason,
+                          rejectionReason
                         );
                       }
                     }
                   }}
                   disabled={!rejectionReason.trim() || processing}
-                  className="flex-1 py-2.5 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
+                  className="w-full sm:flex-1 py-2.5 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors disabled:opacity-50 order-1 sm:order-2"
                 >
                   {processing ? "Processing..." : "Confirm Rejection"}
                 </button>
@@ -764,17 +771,17 @@ export default function KYCDetail() {
                   action cannot be undone efficiently.
                 </p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => setShowApproveModal(false)}
-                  className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                  className="w-full sm:flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors order-2 sm:order-1"
                   disabled={processing}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={performApproveKYC}
-                  className="flex-1 py-2.5 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors disabled:opacity-50"
+                  className="w-full sm:flex-1 py-2.5 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition-colors disabled:opacity-50 order-1 sm:order-2"
                   disabled={processing}
                 >
                   {processing ? "Approving..." : "Yes, Approve"}

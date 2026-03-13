@@ -360,104 +360,187 @@ export default function TicketSystem() {
       .join(" ");
   };
 
-  const renderTicketTable = () => (
-    <div className="bg-background border border-border rounded-xl overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-muted/50">
-          <tr>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Ticket
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Client
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Category
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Priority
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Assignee
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Created
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Status
-            </th>
-            <th className="text-left p-4 text-sm font-semibold text-foreground">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {tickets.map((ticket) => (
-            <tr
-              key={ticket._id}
-              className="border-t border-border hover:bg-muted/30 transition-colors"
-            >
-              <td className="p-4">
-                <div>
-                  <span className="text-xs text-muted-foreground">
-                    {ticket.ticketNumber}
-                  </span>
-                  <p className="font-medium text-foreground">
-                    {ticket.subject}
-                  </p>
+  const renderTicketList = () => (
+    <div className="space-y-4">
+      {/* Desktop Table View */}
+      <div className="hidden lg:block bg-background border border-border rounded-xl overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-muted/50">
+            <tr>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Ticket
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Client
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Category
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Priority
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Assignee
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Created
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Status
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {tickets.map((ticket) => (
+              <tr
+                key={ticket._id}
+                className="border-t border-border hover:bg-muted/30 transition-colors"
+              >
+                <td className="p-4">
+                  <div>
+                    <span className="text-xs text-muted-foreground">
+                      {ticket.ticketNumber}
+                    </span>
+                    <p className="font-medium text-foreground">
+                      {ticket.subject}
+                    </p>
+                  </div>
+                </td>
+                <td className="p-4 text-sm text-muted-foreground">
+                  {ticket.user?.fullName || "Unknown"}
+                </td>
+                <td className="p-4">
+                  <Badge variant="outline">
+                    {formatCategory(ticket.category)}
+                  </Badge>
+                </td>
+                <td className="p-4">{getPriorityBadge("medium")}</td>
+                <td className="p-4">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="w-6 h-6">
+                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                        {ticket.assignee?.fullName
+                          ? ticket.assignee.fullName.substring(0, 2).toUpperCase()
+                          : "UA"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm text-muted-foreground">
+                      {ticket.assignee?.fullName || "Unassigned"}
+                    </span>
+                  </div>
+                </td>
+                <td className="p-4 text-sm text-muted-foreground">
+                  {new Date(ticket.createdAt).toLocaleDateString("en-IN")}
+                </td>
+                <td className="p-4">{getStatusBadge(ticket.status)}</td>
+                <td className="p-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleViewTicket(ticket)}
+                    className="gap-1"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile/Tablet Card View */}
+      <div className="lg:hidden grid gap-4 md:grid-cols-2">
+        {tickets.map((ticket) => (
+          <div
+            key={ticket._id}
+            className="bg-background border border-border rounded-xl p-4 space-y-4 hover:border-primary/50 transition-colors"
+          >
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                  {ticket.ticketNumber}
+                </span>
+                <h3 className="font-semibold text-foreground leading-tight">
+                  {ticket.subject}
+                </h3>
+              </div>
+              {getStatusBadge(ticket.status)}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 py-2 border-y border-border/50">
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase font-medium">Client</p>
+                <p className="text-sm font-medium text-foreground truncate">
+                  {ticket.user?.fullName || "Unknown"}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase font-medium">Category</p>
+                <div className="mt-0.5">
+                  <Badge variant="outline" className="text-[10px] py-0 h-5">
+                    {formatCategory(ticket.category)}
+                  </Badge>
                 </div>
-              </td>
-              <td className="p-4 text-sm text-muted-foreground">
-                {ticket.user?.fullName || "Unknown"}
-              </td>
-              <td className="p-4">
-                <Badge variant="outline">
-                  {formatCategory(ticket.category)}
-                </Badge>
-              </td>
-              <td className="p-4">{getPriorityBadge("medium")}</td>
-              <td className="p-4">
-                <div className="flex items-center gap-2">
-                  <Avatar className="w-6 h-6">
-                    <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                      {ticket.assignee?.fullName
-                        ? ticket.assignee.fullName.substring(0, 2).toUpperCase()
-                        : "UA"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm text-muted-foreground">
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center gap-2">
+                <Avatar className="w-6 h-6 border border-border">
+                  <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
+                    {ticket.assignee?.fullName
+                      ? ticket.assignee.fullName.substring(0, 2).toUpperCase()
+                      : "UA"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                  <p className="text-[10px] text-muted-foreground leading-none">Assignee</p>
+                  <span className="text-xs font-medium text-foreground">
                     {ticket.assignee?.fullName || "Unassigned"}
                   </span>
                 </div>
-              </td>
-              <td className="p-4 text-sm text-muted-foreground">
-                {new Date(ticket.createdAt).toLocaleDateString("en-IN")}
-              </td>
-              <td className="p-4">{getStatusBadge(ticket.status)}</td>
-              <td className="p-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleViewTicket(ticket)}
-                  className="gap-1"
-                >
-                  <Eye className="w-4 h-4" />
-                  View
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] text-muted-foreground leading-none">Created</p>
+                <span className="text-xs font-medium">
+                  {new Date(ticket.createdAt).toLocaleDateString("en-IN")}
+                </span>
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleViewTicket(ticket)}
+              className="w-full gap-2 mt-2 h-9 border-muted-foreground/20"
+            >
+              <Eye className="w-4 h-4" />
+              View Ticket Details
+            </Button>
+          </div>
+        ))}
+      </div>
+
       {tickets.length === 0 && (
-        <div className="p-8 text-center text-muted-foreground flex flex-col justify-center items-center">
+        <div className="p-12 text-center text-muted-foreground flex flex-col justify-center items-center bg-background border border-border rounded-xl">
           {loading ? (
             <>
-              <RefreshCw className="w-6 h-6 animate-spin mb-2" />
-              Loading tickets...
+              <RefreshCw className="w-8 h-8 animate-spin mb-4 text-primary" />
+              <p className="font-medium">Loading tickets...</p>
             </>
           ) : (
-            "No tickets in this category"
+            <div className="space-y-2">
+              <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-6 h-6 text-muted-foreground" />
+              </div>
+              <p className="font-medium text-foreground">No tickets found</p>
+              <p className="text-sm">Try adjusting your filters or search term</p>
+            </div>
           )}
         </div>
       )}
@@ -470,48 +553,48 @@ export default function TicketSystem() {
       portalDescription="Complete platform management"
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
             Ticket <span className="text-primary italic">System</span>
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm md:text-base text-muted-foreground mt-1">
             Manage and resolve support tickets
           </p>
         </div>
-        <Button onClick={handleCreateTicket}>
+        <Button onClick={handleCreateTicket} className="w-full md:w-auto shadow-lg shadow-primary/10">
           <Plus className="w-4 h-4 mr-2" />
           Create Ticket
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-5 mb-8">
-        <div className="bg-background border border-border rounded-xl p-5">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 mb-8">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
           <p className="text-2xl font-extrabold text-foreground">
             {stats.open}
           </p>
           <p className="text-sm text-muted-foreground">Open Tickets</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-blue-200 transition-colors">
           <p className="text-2xl font-extrabold text-blue-600">
             {stats.in_progress}
           </p>
           <p className="text-sm text-muted-foreground">In Progress</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-red-200 transition-colors">
           <p className="text-2xl font-extrabold text-red-600">
             {stats.escalated}
           </p>
           <p className="text-sm text-muted-foreground">Escalated</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-green-200 transition-colors">
           <p className="text-2xl font-extrabold text-green-600">
             {stats.resolvedThisMonth}
           </p>
           <p className="text-sm text-muted-foreground">Resolved (MTD)</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
           <p className="text-2xl font-extrabold text-foreground">
             {stats.totalTickets}
           </p>
@@ -520,12 +603,12 @@ export default function TicketSystem() {
       </div>
 
       {/* Search */}
-      <div className="flex gap-4 mb-6">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="relative flex-1 md:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search tickets..."
-            className="pl-10"
+            className="pl-10 h-11"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -537,24 +620,26 @@ export default function TicketSystem() {
         onValueChange={setActiveTab}
         className="space-y-6"
       >
-        <TabsList>
-          <TabsTrigger value="all">All Tickets</TabsTrigger>
-          <TabsTrigger value="open">Open ({stats.open})</TabsTrigger>
-          <TabsTrigger value="in_progress">
-            In Progress ({stats.in_progress})
-          </TabsTrigger>
-          <TabsTrigger value="escalated">
-            Escalated ({stats.escalated})
-          </TabsTrigger>
-          <TabsTrigger value="resolved">Resolved</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-1 -mx-2 px-2 scrollbar-none">
+          <TabsList className="w-full md:w-auto h-auto p-1 bg-muted/50 rounded-lg inline-flex">
+            <TabsTrigger value="all" className="px-4 py-2 text-sm">All Tickets</TabsTrigger>
+            <TabsTrigger value="open" className="px-4 py-2 text-sm">Open ({stats.open})</TabsTrigger>
+            <TabsTrigger value="in_progress" className="px-4 py-2 text-sm text-nowrap">
+              In Progress ({stats.in_progress})
+            </TabsTrigger>
+            <TabsTrigger value="escalated" className="px-4 py-2 text-sm">
+              Escalated ({stats.escalated})
+            </TabsTrigger>
+            <TabsTrigger value="resolved" className="px-4 py-2 text-sm">Resolved</TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Because we filter natively from the API via `activeTab`, we don't need distinct filtered array mapping, we just re-render the current tickets state table for the active tab */}
-        <TabsContent value="all">{renderTicketTable()}</TabsContent>
-        <TabsContent value="open">{renderTicketTable()}</TabsContent>
-        <TabsContent value="in_progress">{renderTicketTable()}</TabsContent>
-        <TabsContent value="escalated">{renderTicketTable()}</TabsContent>
-        <TabsContent value="resolved">{renderTicketTable()}</TabsContent>
+        <TabsContent value="all">{renderTicketList()}</TabsContent>
+        <TabsContent value="open">{renderTicketList()}</TabsContent>
+        <TabsContent value="in_progress">{renderTicketList()}</TabsContent>
+        <TabsContent value="escalated">{renderTicketList()}</TabsContent>
+        <TabsContent value="resolved">{renderTicketList()}</TabsContent>
       </Tabs>
 
       <TicketViewModal
