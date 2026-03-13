@@ -42,7 +42,7 @@ export const BlogSection = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
-                                className="flex items-center justify-between py-5 px-6 -mx-6 border-b border-border group cursor-pointer transition-all duration-200 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg"
+                                className="flex items-center justify-between py-5 px-6 border-b border-border group cursor-pointer transition-all duration-200 hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg"
                             >
                                 <h3 className="text-base lg:text-lg font-medium text-foreground tracking-tight">
                                     {post.title}

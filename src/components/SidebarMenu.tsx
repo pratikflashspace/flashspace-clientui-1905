@@ -31,7 +31,7 @@ interface SidebarMenuProps {
 
 const MENU_WIDTH_OPEN = 300;
 const MENU_WIDTH_ICON = 68;
-const UPDATES_WIDTH = 420;
+// const UPDATES_WIDTH = 420;
 
 // ------------------------------------------------
 // UpdatesPopup component (no blur / no overlay)
@@ -47,6 +47,16 @@ const UpdatesPopup = ({
 }) => {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [activeFilter, setActiveFilter] = useState("All");
+  const [updatesWidth, setUpdatesWidth] = useState(420);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setUpdatesWidth(window.innerWidth < 640 ? window.innerWidth : 420);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   if (!open) return null;
 
@@ -92,12 +102,12 @@ const UpdatesPopup = ({
       className={`fixed top-0 left-0 z-[13000] h-screen transition-transform duration-400 ease-[cubic-bezier(.7,.22,.26,.98)] ${open ? "translate-x-0" : "translate-x-[120%]"
         }`}
       style={{
-        width: UPDATES_WIDTH,
-        left: menuWidth,
+        width: updatesWidth,
+        left: window.innerWidth < 640 ? 0 : menuWidth,
       }}
     >
       <div
-        className="w-full h-full overflow-y-auto flex flex-col relative bg-[#F8F9FA] dark:bg-[#0a0a0a] border-l border-neutral-200 dark:border-white/10 shadow-2xl rounded-r-[22px] rounded-l-none text-black dark:text-white p-6 md:p-8"
+        className="w-full h-full overflow-y-auto flex flex-col relative bg-[#F8F9FA] dark:bg-[#0a0a0a] border-l border-neutral-200 dark:border-white/10 shadow-2xl rounded-r-none sm:rounded-r-[22px] rounded-l-none text-black dark:text-white p-5 sm:p-6 md:p-8"
       >
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
@@ -327,9 +337,9 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMen
         style={{
           fontFamily: "'Inter Tight', sans-serif",
           fontWeight: 500,
-          width: showUpdates ? 0 : `${MENU_WIDTH_OPEN}px`,
-          minWidth: showUpdates ? 0 : `${MENU_WIDTH_OPEN}px`,
-          maxWidth: showUpdates ? 0 : `${MENU_WIDTH_OPEN}px`,
+          width: showUpdates ? 0 : (window.innerWidth < 640 ? '100vw' : `${MENU_WIDTH_OPEN}px`),
+          minWidth: showUpdates ? 0 : (window.innerWidth < 640 ? '100vw' : `${MENU_WIDTH_OPEN}px`),
+          maxWidth: showUpdates ? 0 : (window.innerWidth < 640 ? '100vw' : `${MENU_WIDTH_OPEN}px`),
           opacity: showUpdates ? 0 : 1,
           transition:
             "width 0.36s cubic-bezier(.7,.22,.26,.98), min-width 0.36s cubic-bezier(.7,.22,.26,.98), max-width 0.36s cubic-bezier(.7,.22,.26,.98), opacity 0.2s ease"
@@ -420,24 +430,33 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMen
 
             {/* Footer */}
             {!hideLogoFooter && (
-              <>
-                {/* User Profile Section - Only for Authenticated Users */}
-                <div className="mt-3">
+              <div className="space-y-3 mt-4">
+                {!isAuthenticated && (
                   <button
                     onClick={() => {
-                      if (onOpenContact) {
-                        onOpenContact();
-                        closeBoth();
-                      } else {
-                        handleNavigation("#contact");
-                      }
+                      onOpenLogin();
+                      onClose();
                     }}
-                    className="w-full rounded-[20px] bg-[#e8e2ad] text-[#253734] font-medium py-3 text-[15px] hover:bg-[#e2da99] active:scale-[0.98] transition shadow-sm"
+                    className="w-full flex items-center justify-center gap-2 py-3 px-4 text-[15px] font-semibold text-[#164e4e] dark:text-white border border-[#164e4e]/20 dark:border-white/20 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all"
                   >
-                    Get Consultation
+                    Log In / Sign Up
                   </button>
-                </div>
-              </>
+                )}
+                
+                <button
+                  onClick={() => {
+                    if (onOpenContact) {
+                      onOpenContact();
+                      closeBoth();
+                    } else {
+                      handleNavigation("#contact");
+                    }
+                  }}
+                  className="w-full rounded-[20px] bg-[#e8e2ad] text-[#253734] font-semibold py-3 text-[15px] hover:bg-[#e2da99] active:scale-[0.98] transition shadow-sm"
+                >
+                  Get Consultation
+                </button>
+              </div>
             )}
           </div>
         </div>

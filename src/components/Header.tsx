@@ -107,29 +107,29 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         <>
             <header
                 className={cn(
-                    "fixed top-0 w-full z-[100] transition-all duration-300 bg-white dark:bg-[#0a0a0a] border-b border-border dark:border-white/10 shadow-sm py-2"
+                    "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 bg-white dark:bg-[#0a0a0a] border-b border-border dark:border-white/10 shadow-sm py-2"
                 )}
                 style={{ fontFamily: "'Inter Tight', sans-serif", fontWeight: 500 }}
             >
-                <div className="w-full px-4 md:px-10">
-                    <div className="flex items-center justify-between h-14 md:h-16">
+                <div className="w-full px-3 md:px-10">
+                    <div className="flex items-center justify-between h-14 md:h-20">
                         {/* LEFT: Hamburger + Logo */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 md:gap-4">
                             <button
                                 onClick={() => setIsMenuOpen(true)}
-                                className="p-2 -ml-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 rounded-lg"
+                                className="p-1.5 md:p-2 -ml-1 md:-ml-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 rounded-lg"
                                 aria-label="Open menu"
                             >
-                                <Menu className="w-6 h-6 dark:text-white" />
+                                <Menu className="w-5 h-5 md:w-6 md:h-6 dark:text-white" />
                             </button>
                             <div
-                                className="cursor-pointer"
+                                className="cursor-pointer flex items-center"
                                 onClick={() => handleNavigation("/")}
                             >
                                 <img
                                     src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
                                     alt="FlashSpace Logo"
-                                    className="h-5 md:h-8 w-auto dark:invert"
+                                    className="h-6 md:h-9 w-auto dark:invert"
                                 />
                             </div>
                         </div>
@@ -197,11 +197,10 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                         </nav>
 
                         {/* RIGHT: Actions */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 md:gap-3">
                             <div
                                 onClick={() => setIsContactOpen(true)}
-                                className="inline-flex group px-6 py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
-
+                                className="inline-flex group px-4 sm:px-6 py-2 sm:py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-xs sm:text-sm font-medium rounded-xl sm:rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
                             >
                                 <span className="relative">
                                     Get in Touch

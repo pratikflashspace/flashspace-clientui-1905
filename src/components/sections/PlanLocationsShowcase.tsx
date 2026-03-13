@@ -113,33 +113,33 @@ export const PlanLocationsShowcase = () => {
     const canNext = slideIndex < totalPages - 1;
 
     return (
-        <section className="py-[100px] bg-muted/30">
+        <section className="py-16 sm:py-20 lg:py-[100px] bg-muted/30 overflow-hidden">
             <div className="container mx-auto px-4 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mb-12 text-center"
+                    className="mb-8 sm:mb-12 text-center"
                 >
-                    <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-3">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-3 px-2">
                         Everything Your Business Needs, Pan India
                     </h2>
-                    <p className="text-muted-foreground max-w-lg mx-auto">
+                    <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto px-4">
                         Flexible workspace and business solutions tailored to your needs.
                     </p>
                 </motion.div>
 
                 {/* Tabs + Slider arrows */}
-                <div className="flex items-center justify-between mb-10 flex-wrap gap-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-10 gap-6">
                     <div className="hidden lg:block w-32" />
-                    <div className="bg-[#F4F4F2] rounded-[14px] px-6 py-4 inline-block">
+                    <div className="bg-[#F4F4F2] rounded-xl sm:rounded-[14px] px-4 sm:px-6 py-3 sm:py-4 inline-block max-w-full overflow-x-auto">
                         <div className="relative">
-                            <div className="flex gap-9">
+                            <div className="flex gap-6 sm:gap-9 whitespace-nowrap">
                                 {services.map((s, i) => (
                                     <button
                                         key={s.name}
                                         onClick={() => { setActiveIndex(i); setSlideIndex(0); }}
-                                        className={`relative pb-3 text-[15px] transition-colors duration-250 ease-out cursor-pointer border-none outline-none bg-transparent ${i === activeIndex
+                                        className={`relative pb-2 sm:pb-3 text-sm sm:text-[15px] transition-colors duration-250 ease-out cursor-pointer border-none outline-none bg-transparent ${i === activeIndex
                                             ? "font-medium text-foreground"
                                             : "font-normal text-muted-foreground hover:text-foreground/70"
                                             }`}
@@ -160,7 +160,7 @@ export const PlanLocationsShowcase = () => {
                     </div>
 
                     {/* Arrow buttons */}
-                    <div className="flex gap-2">
+                    <div className="hidden sm:flex gap-2">
                         <button
                             onClick={() => setSlideIndex((p) => Math.max(0, p - 1))}
                             disabled={!canPrev}
