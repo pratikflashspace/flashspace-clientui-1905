@@ -243,7 +243,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 </div>
                             ) : (
                                 <button
-                                    onClick={() => setIsLoginOpen(true)}
+                                   onClick={() => navigate('/login')}
                                     className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all"
                                 >
                                     Sign in
@@ -256,13 +256,26 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 <SidebarMenu
                     isOpen={isMenuOpen}
                     onClose={() => setIsMenuOpen(false)}
-                    onOpenLogin={() => setIsLoginOpen(true)}
+                    onOpenLogin={() => navigate('/login')}
                     onOpenContact={() => setIsContactOpen(true)}
                 />
             </header>
 
-            <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
-            <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} initialRole={signupRole} />
+            <LoginModal
+                isOpen={isLoginOpen}
+                onClose={() => navigate('/')}
+                onSignupClick={() => {
+                    navigate('/signup');
+                }}
+            />
+            <SignupModal
+                isOpen={isSignupOpen}
+                onClose={() => navigate('/')}
+                initialRole={signupRole}
+                onLoginClick={() => {
+                    navigate('/login');
+                }}
+            />
             <PartnerChoiceModal isOpen={isPartnerChoiceOpen} onClose={() => setIsPartnerChoiceOpen(false)} onSelect={openPartnerSignup} />
             <GetInTouchModal open={isContactOpen} onClose={() => setIsContactOpen(false)} />
         </>
