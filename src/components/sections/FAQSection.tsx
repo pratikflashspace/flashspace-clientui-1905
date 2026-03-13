@@ -141,7 +141,7 @@ export const FAQSection = () => {
     };
 
     return (
-        <section className="py-20 lg:py-28 bg-background">
+        <section className="py-16 sm:py-20 lg:py-28 bg-background overflow-hidden">
             <div className="container mx-auto px-4 lg:px-8">
                 {/* Header */}
                 <motion.div
@@ -150,13 +150,13 @@ export const FAQSection = () => {
                     viewport={{ once: true }}
                     className="text-center mb-10"
                 >
-                    <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-3 block">
+                    <span className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-3 block">
                         FAQ
                     </span>
-                    <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-3">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-3 px-2">
                         Everything You Need to Know
                     </h2>
-                    <p className="text-muted-foreground max-w-lg mx-auto">
+                    <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto px-4">
                         Get instant answers to the most common questions about our solutions and services.
                     </p>
                 </motion.div>
@@ -171,7 +171,7 @@ export const FAQSection = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -40 }}
                                 transition={{ duration: 0.25 }}
-                                className="flex items-center bg-card rounded-full border border-border overflow-hidden"
+                                className="flex flex-col sm:flex-row items-stretch sm:items-center bg-card rounded-2xl sm:rounded-full border border-border overflow-hidden p-1 sm:p-0"
                             >
                                 <div className="relative flex-1">
                                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -188,7 +188,7 @@ export const FAQSection = () => {
                                         setAiMode(true);
                                         setTimeout(() => aiInputRef.current?.focus(), 100);
                                     }}
-                                    className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-medium mr-1.5 hover:bg-primary/90 transition-colors shrink-0"
+                                    className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-sm font-medium sm:mr-1.5 hover:bg-primary/90 transition-colors shrink-0 mt-1 sm:mt-0"
                                 >
                                     <Sparkles className="w-4 h-4" />
                                     Chat with AI
@@ -201,11 +201,11 @@ export const FAQSection = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 40 }}
                                 transition={{ duration: 0.25 }}
-                                className="flex items-center bg-card rounded-full border border-primary/40 overflow-hidden shadow-[0_0_12px_-4px_hsl(var(--primary)/0.3)]"
+                                className="flex flex-col sm:flex-row items-stretch sm:items-center bg-card rounded-2xl sm:rounded-full border border-primary/40 overflow-hidden shadow-[0_0_12px_-4px_hsl(var(--primary)/0.3)] p-1 sm:p-0"
                             >
-                                <div className="flex items-center gap-2 px-4 border-r border-border shrink-0">
+                                <div className="flex items-center gap-2 px-4 border-b sm:border-b-0 sm:border-r border-border shrink-0 py-2 sm:py-3">
                                     <Sparkles className="w-4 h-4 text-primary" />
-                                    <span className="text-sm font-medium text-primary py-3">AI</span>
+                                    <span className="text-sm font-medium text-primary">AI</span>
                                 </div>
                                 <input
                                     ref={aiInputRef}
@@ -221,27 +221,29 @@ export const FAQSection = () => {
                                             setAiQuery("");
                                         }
                                     }}
-                                    placeholder="Ask AI anything about FlashSpace..."
+                                    placeholder="Ask AI anything..."
                                     className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground px-4 py-3"
                                 />
-                                <button
-                                    onClick={() => { setAiMode(false); setAiQuery(""); }}
-                                    className="text-muted-foreground hover:text-foreground text-sm px-3 py-3 transition-colors shrink-0"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        if (aiQuery.trim()) {
-                                            navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`);
-                                        }
-                                    }}
-                                    disabled={!aiQuery.trim()}
-                                    className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-medium mr-1.5 hover:bg-primary/90 transition-colors shrink-0 disabled:opacity-40"
-                                >
-                                    <Search className="w-4 h-4" />
-                                    Ask AI
-                                </button>
+                                <div className="flex items-center gap-2 sm:mr-1.5">
+                                    <button
+                                        onClick={() => { setAiMode(false); setAiQuery(""); }}
+                                        className="flex-1 sm:flex-none text-muted-foreground hover:text-foreground text-sm px-3 py-2.5 transition-colors shrink-0"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (aiQuery.trim()) {
+                                                navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`);
+                                            }
+                                        }}
+                                        disabled={!aiQuery.trim()}
+                                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-xl sm:rounded-full text-sm font-medium hover:bg-primary/90 transition-colors shrink-0 disabled:opacity-40"
+                                    >
+                                        <Search className="w-4 h-4" />
+                                        Ask
+                                    </button>
+                                </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -267,13 +269,13 @@ export const FAQSection = () => {
                 <div className="relative">
                     <button
                         onClick={() => scroll("left")}
-                        className="absolute -left-14 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors hidden sm:flex"
+                        className="absolute -left-4 lg:-left-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors hidden sm:flex"
                     >
                         <ChevronLeft className="w-5 h-5" />
                     </button>
                     <button
                         onClick={() => scroll("right")}
-                        className="absolute -right-14 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors hidden sm:flex"
+                        className="absolute -right-4 lg:-right-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors hidden sm:flex"
                     >
                         <ChevronRight className="w-5 h-5" />
                     </button>

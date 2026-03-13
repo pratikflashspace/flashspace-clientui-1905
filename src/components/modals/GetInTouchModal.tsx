@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send } from "lucide-react";
 
@@ -38,6 +38,17 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
 
+    useEffect(() => {
+        if (open) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "unset";
+        }
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, [open]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // TODO: integrate with backend
@@ -46,24 +57,20 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
     return (
         <AnimatePresence>
             {open && (
-                <motion.div
+                <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-8"
+                    className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-foreground/20 backdrop-blur-sm p-4 sm:p-6"
                     onClick={onClose}
                 >
-                    {/* Backdrop */}
-                    <div className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" />
-
-                    {/* Modal */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         transition={{ duration: 0.25, ease: "easeOut" }}
-                        className="relative w-full max-w-[900px] bg-card rounded-2xl shadow-2xl border border-border"
+                        className="relative w-full max-w-[500px] md:max-w-[900px] bg-card rounded-2xl shadow-2xl border border-border mt-8 mb-8"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close */}
@@ -75,8 +82,8 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                         </button>
 
                         <div className="grid md:grid-cols-2 gap-0">
-                            {/* Left — Contact Cards */}
-                            <div className="p-5 sm:p-6 space-y-3">
+                            {/* Left — Contact Cards (Desktop only) */}
+                            <div className="hidden md:block p-5 sm:p-6 space-y-3">
                                 {contactCards.map((card) => (
                                     <div
                                         key={card.title}
@@ -105,7 +112,7 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                             </div>
 
                             {/* Right — Form */}
-                            <div className="p-5 sm:p-6 border-t md:border-t-0 md:border-l border-border">
+                            <div className="p-5 sm:p-6 md:border-l border-border">
                                 <h2 className="text-xl font-bold text-foreground text-center mb-4">
                                     Get in <span className="text-primary">Touch</span>
                                 </h2>
