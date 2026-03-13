@@ -66,10 +66,7 @@ export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: L
                         Don't have an account?{' '}
                         {onSignupClick ? (
                             <button
-                                onClick={() => {
-                                    onClose();
-                                    onSignupClick();
-                                }}
+                                  onClick={onSignupClick}
                                 className="font-bold text-[#35503F] hover:text-[#1F2E26] transition-colors duration-200"
                             >
                                 Sign up for free
