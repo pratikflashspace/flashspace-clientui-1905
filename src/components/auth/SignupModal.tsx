@@ -62,6 +62,7 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user
 
                 <SignupForm initialRole={initialRole} onSuccess={onClose} />
 
+<<<<<<< HEAD
                  <div className="mt-6 text-center">
                         <p className="text-sm text-slate-600">
                             Already have an account?{' '}
@@ -79,6 +80,24 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user
                             )}
                         </p>
                     </div>
+=======
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-slate-600">
+                        Already have an account?{' '}
+                        {onLoginClick ? (
+                            <button
+                                onClick={onLoginClick}
+                                className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200"
+                            >
+                                Sign in
+                            </button>
+                        ) : (
+                            <Link to="/login" onClick={onClose} className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200">
+                                Sign in
+                            </Link>
+                        )}
+                    </p>
+>>>>>>> 6fcdb63 (signup)
                 </div>
             </div>
         </div>
