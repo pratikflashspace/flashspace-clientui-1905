@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import chatService from '@/services/chat.service';
 import { useDarkMode } from '@/contexts/DarkModeContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from "@/lib/utils";
 import {
@@ -371,6 +371,7 @@ const UpdatesPopup = ({
 
 const StartChatting = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [message, setMessage] = useState('');
@@ -835,8 +836,9 @@ const StartChatting = () => {
     };
   }, []);
 
-  const handleSendMessage = async () => {
-    if (!message.trim() || isLoading) return;
+  const handleSendMessage = async (text?: string) => {
+    const messageContent = text || message;
+    if (!messageContent.trim() || isLoading) return;
 
     // [NEW] Guest Chat Limit Check
     if (!isAuthenticated) {
@@ -852,13 +854,13 @@ const StartChatting = () => {
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: message.trim(),
+      content: messageContent.trim(),
       timestamp: new Date()
     };
 
     // Add user message to chat
     setChatMessages(prev => [...prev, userMessage]);
-    setMessage('');
+    if (!text) setMessage('');
     setIsLoading(true);
 
     try {
@@ -891,7 +893,7 @@ const StartChatting = () => {
       const data = await response.json();
 
       // Backend returns reply directly from AI backend
-      let aiResponseText = data.reply || data.message || 'I apologize, but I encountered an error. Please try again.';
+      const aiResponseText = data.reply || data.message || 'I apologize, but I encountered an error. Please try again.';
 
       // Add AI response to chat
       const assistantMessage: ChatMessage = {
@@ -920,6 +922,18 @@ const StartChatting = () => {
       setIsLoading(false);
     }
   };
+
+  // [NEW] Handle message from landing page
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get('q');
+    if (query) {
+      // Clear the search params and keep current path
+      navigate(location.pathname, { replace: true });
+      // Send the message
+      handleSendMessage(query);
+    }
+  }, [location.search, location.pathname, navigate, handleSendMessage]);
 
   // Generate or retrieve session ID for conversation tracking
   const getSessionId = () => {
@@ -1312,7 +1326,7 @@ const StartChatting = () => {
                     <Mic className={`w-5 h-5 ${isListening ? 'fill-current' : ''}`} />
                   </button>
                   <button
-                    onClick={handleSendMessage}
+                    onClick={() => handleSendMessage()}
                     className="p-3 bg-[#35503F] text-white rounded-xl shadow-sm hover:bg-[#2d4435] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!message.trim() || isLoading}
                   >
