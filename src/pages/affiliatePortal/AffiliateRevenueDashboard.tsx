@@ -154,10 +154,10 @@ const revenueByProduct = [
 // --- Main Component ---
 const RevenueDashboard = () => {
     return (
-        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans w-full animate-fade-in">
+        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans w-full animate-fade-in">
             <div className="w-full space-y-8">
                 {/* 1. Header */}
-{/* Header Removed */}
+                {/* Header Removed */}
 
                 {/* 2. Top Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

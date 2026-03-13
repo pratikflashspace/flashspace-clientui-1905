@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import userDashboardService, {
@@ -597,10 +597,10 @@ export default function KYCVerification() {
   // Check if data is saved to server (for navigation locking)
   const isPersonalInfoSaved = () => {
     return !!(
-      kycData?.personalInfo?.phone &&
-      kycData?.personalInfo?.dateOfBirth &&
-      kycData?.personalInfo?.aadhaarNumber &&
-      kycData?.personalInfo?.panNumber
+      (kycData?.personalInfo?.phone || personalForm.phone) &&
+      (kycData?.personalInfo?.dateOfBirth || personalForm.dateOfBirth) &&
+      (kycData?.personalInfo?.aadhaarNumber || personalForm.aadhaar) &&
+      (kycData?.personalInfo?.panNumber || personalForm.pan)
     );
   };
 

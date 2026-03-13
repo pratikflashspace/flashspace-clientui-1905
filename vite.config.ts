@@ -14,10 +14,9 @@ export default defineConfig({
     port: 5173,
     host: true,
     proxy: {
-      '/api/webhook': {
-        target: 'https://n8n.srv906242.hstgr.cloud/webhook',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/webhook/, '')
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
       }
     }
   },

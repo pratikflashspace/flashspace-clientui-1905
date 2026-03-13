@@ -50,17 +50,17 @@ const StatCard = ({ label, value, icon: Icon, delay, colorClass = "text-[#1a2d1d
 
     return (
         <div
-            className="bg-white p-7 rounded-[2rem] border border-gray-100/60 shadow-sm transition-all duration-300 group animate-fade-in-up"
+            className="bg-[#f8f8f8] p-6 rounded-2xl border border-gray-200 shadow transition-all duration-300 group animate-fade-in-up flex flex-col justify-between h-[160px]"
             style={{ animationDelay: `${delay}ms` }}
         >
-            <div className="flex justify-between items-start mb-4">
-                <span className="text-[#64748b] font-medium text-[14px] tracking-tight">{label}</span>
-                <div className="w-10 h-10 flex items-center justify-center bg-[#f1f5f9] rounded-full text-[#64748b]">
-                    <Icon size={20} />
+            <div className="flex justify-between items-start">
+                <span className="text-[#677e73] font-medium text-sm tracking-tight">{label}</span>
+                <div className="w-8 h-8 flex items-center justify-center bg-[#f8f8f8] rounded-full text-[#677e73] transition-colors group-hover:bg-[#e2e8f0]">
+                    <Icon size={18} />
                 </div>
             </div>
-            <div className="space-y-1">
-                <h3 className={`text-[2.25rem] font-black ${colorClass} leading-none tracking-tight`} style={{ fontFamily: "'Inter Tight', sans-serif" }}>
+            <div className="mt-auto space-y-2">
+                <h3 className={`text-[30px] font-black ${colorClass} leading-none tracking-tight`} style={{ fontFamily: "'Inter Tight', sans-serif" }}>
                     {isPercentage ? `${Math.round(count)}%` : Math.round(count)}
                 </h3>
             </div>
@@ -129,7 +129,7 @@ const LeadManagementAffiliate = () => {
     }, [leads, searchQuery, activeTab]);
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] p-8 lg:p-12 font-sans w-full animate-fade-in relative overflow-x-hidden">
+        <div className="min-h-screen bg-[#f7f7f6] p-8 lg:p-12 font-sans w-full animate-fade-in relative overflow-x-hidden">
             <div className="max-w-[1400px] mx-auto space-y-12">
                 {/* 1. Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-fade-in-down">
@@ -147,7 +147,7 @@ const LeadManagementAffiliate = () => {
                 </div>
 
                 {/* 2. Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in-up">
+                <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in-up">
                     <StatCard
                         label="Total Leads"
                         value={stats.total}
@@ -178,7 +178,7 @@ const LeadManagementAffiliate = () => {
                 </div>
 
                 {/* 3. Main Content Area */}
-                <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden animate-slide-up">
+                <div className="bg-[#f8f8f8] rounded-[2.5rem] border border-gray-200 shadow transition-all duration-300 overflow-hidden animate-slide-up">
                     <div className="p-8 space-y-8">
                         {/* Toolbar */}
                         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
@@ -187,7 +187,7 @@ const LeadManagementAffiliate = () => {
                                 <Search size={20} className="absolute left-6 top-1/2 -translate-y-1/2 text-[#64748b]" />
                                 <Input
                                     placeholder="Search leads..."
-                                    className="w-full pl-14 pr-6 py-4 bg-[#f8f9fa] border-transparent rounded-[1.25rem] focus:bg-white focus:border-[#334D3D]/10 focus:ring-2 focus:ring-[#334D3D]/5 shadow-none text-[15px] font-medium text-[#1a2d1d] h-auto"
+                                    className="w-full pl-14 pr-6 py-4 bg-[#f8f9fa] border-[#edede6] rounded-[1.25rem] focus:bg-white focus:border-[#334D3D]/10 focus:ring-2 focus:ring-[#334D3D]/5 shadow-none text-[15px] font-medium text-[#1a2d1d] h-auto"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
@@ -222,7 +222,7 @@ const LeadManagementAffiliate = () => {
                         <div className="overflow-x-auto -mx-8 px-8">
                             <table className="w-full text-left border-collapse min-w-[1000px]">
                                 <thead>
-                                    <tr className="border-b border-gray-100">
+                                    <tr className="bg-[#f6f6f4] border-b border-[#f1f2ed]">
                                         {[
                                             "Lead",
                                             "Company",
@@ -237,7 +237,7 @@ const LeadManagementAffiliate = () => {
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-[#f1f2ed]">
                                     {loading ? (
                                         <tr>
                                             <td colSpan={6} className="px-6 py-24 text-center">

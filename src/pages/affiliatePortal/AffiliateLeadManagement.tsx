@@ -3,13 +3,13 @@ import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-    Dialog, 
-    DialogContent, 
-    DialogTrigger, 
-    DialogTitle, 
-    DialogDescription 
-} from "@/components/ui/dialog"; 
+import {
+    Dialog,
+    DialogContent,
+    DialogTrigger,
+    DialogTitle,
+    DialogDescription
+} from "@/components/ui/dialog";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import LeadStatCard from "@/components/affiliatePortal/LeadStatCard";
 import LeadTableRow, { Lead } from "@/components/affiliatePortal/LeadTableRow";
@@ -75,19 +75,19 @@ const LeadManagementAffiliate = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <h1 className="text-2xl font-bold text-gray-800">Lead Management</h1>
-                
+
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogTrigger asChild>
                         <Button className="bg-[#5bb09c] text-white hover:bg-[#4a9b89] gap-2 shadow-md">
                             <Plus className="w-4 h-4 text-white" /> Add Lead
                         </Button>
                     </DialogTrigger>
-                    
+
                     {/* [&>button]:hidden removes the default shadcn close (X) button.
                         bg-transparent and border-none allow your AddLeadForm's 3xl rounded corners to show.
                     */}
                     <DialogContent className="sm:max-w-[600px] p-0 bg-transparent border-none shadow-none focus:outline-none overflow-y-auto max-h-[90vh] [&>button]:hidden">
-                        
+
                         {/* Accessibility requirement: Title and Description hidden from sight but available to Screen Readers */}
                         <VisuallyHidden.Root>
                             <DialogTitle>Add New Lead</DialogTitle>
@@ -110,7 +110,7 @@ const LeadManagementAffiliate = () => {
             </div>
 
             {/* Main Content Area */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-slide-up">
+            <div className="bg-[#f8f8f8] rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-slide-up">
                 <div className="p-6 space-y-6">
                     <div className="relative max-w-md">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />

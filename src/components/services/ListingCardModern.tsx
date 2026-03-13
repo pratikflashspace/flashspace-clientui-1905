@@ -204,14 +204,17 @@ const ListingCardModern = memo<ListingCardModernProps>(
           </div>
 
           {/* Popular Badge */}
-          {item.popular ? (
-            <div className="absolute bottom-3 left-3">
+          {item.popular && (
+            <div className="absolute top-3 left-3 z-10">
               <span className="bg-[#FE8A00] text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 uppercase tracking-tight">
                 <span className="animate-pulse">🔥</span> Popular
               </span>
             </div>
-          ) : (
-            <div className="absolute bottom-3 left-3">
+          )}
+
+          {/* Availability Badge */}
+          {!item.popular && (
+            <div className="absolute top-3 left-3 z-10">
               <span className="bg-primary text-primary-foreground text-[10px] font-normal px-2.5 py-1 rounded-full shadow-sm">
                 Available Now
               </span>

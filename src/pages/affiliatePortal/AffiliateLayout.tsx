@@ -82,7 +82,7 @@ const AffiliateLayout = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gray-50 overflow-hidden font-sans" data-lenis-prevent>
+        <div className="flex h-screen bg-[#F7F7F6] overflow-hidden font-sans" data-lenis-prevent>
             {/* 1. Sidebar */}
             <Sidebar
                 isMobileOpen={isMobileOpen}

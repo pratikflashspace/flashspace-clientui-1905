@@ -37,11 +37,21 @@ import Header from "@/components/Header";
 const formatMessage = (text: string) => {
   if (!text) return null;
 
+  // Normalize common HTML-like tags returned by AI backend into plain readable text.
+  const normalizedText = text
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<details>\s*<summary>([\s\S]*?)<\/summary>\s*([\s\S]*?)<\/details>/gi, '\n$1\n$2\n')
+    .replace(/<\/?summary>/gi, '')
+    .replace(/<\/?details>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
   // URL regex pattern
   const urlRegex = /(https?:\/\/[^\s]+)/g;
 
   // Split by bold markers first
-  const parts = text.split(/(\*\*.*?\*\*)/g);
+  const parts = normalizedText.split(/(\*\*.*?\*\*)/g);
 
   return parts.map((part, index) => {
     // Handle Bold
@@ -177,11 +187,10 @@ interface ContactForm {
 }
 
 // ChatMessage now comes from ChatContext
-import { useChat } from "@/contexts/ChatContext";
+import { useChat, ChatMessage } from "@/contexts/ChatContext";
 
-// n8n Webhook Configuration
-// Use proxy in development to avoid CORS issues
-const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || '/api/webhook/b8d3444c-ca76-4796-a0b7-a8c0b9c320c2';
+// Backend chat endpoint (backend calls AI backend internally)
+const BACKEND_CHAT_URL = "/api/chat/send";
 
 interface SidebarMenuItem {
   label: string;
@@ -369,6 +378,7 @@ const StartChatting = () => {
   const [activeChatId, setActiveChatId] = useState<string | null>(() => sessionStorage.getItem('flashspace_activeChatId'));
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // [NEW] User menu state
   const [showUpdates, setShowUpdates] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false); // [NEW] Contact form state
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -852,17 +862,22 @@ const StartChatting = () => {
     setIsLoading(true);
 
     try {
-      // Call n8n webhook
-      const response = await fetch(N8N_WEBHOOK_URL, {
+      const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      const sessionId = getSessionId();
+
+      // Call backend chat endpoint (backend calls AI backend internally)
+      const response = await fetch(BACKEND_CHAT_URL, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
           message: userMessage.content,
-          // response: userMessage.content,
-          sessionId: getSessionId(),
-          timestamp: userMessage.timestamp.toISOString()
+          query: userMessage.content,
+          conversation_id: 'default',
+          session_id: sessionId
         })
       });
 
@@ -874,21 +889,9 @@ const StartChatting = () => {
       }
 
       const data = await response.json();
-      // console.log('n8n response:', data); // Debug log
 
-      // Try multiple possible response formats from n8n
-      let aiResponseText = '';
-
-      if (Array.isArray(data)) {
-        // If response is an array, get first item
-        const firstItem = data[0];
-        aiResponseText = firstItem?.output || firstItem?.response || firstItem?.text || firstItem?.message || JSON.stringify(firstItem);
-      } else if (typeof data === 'object') {
-        // Try different possible field names
-        aiResponseText = data.Response || data.output || data.response || data.text || data.message || data.result || data.answer || JSON.stringify(data);
-      } else {
-        aiResponseText = String(data);
-      }
+      // Backend returns reply directly from AI backend
+      let aiResponseText = data.reply || data.message || 'I apologize, but I encountered an error. Please try again.';
 
       // Add AI response to chat
       const assistantMessage: ChatMessage = {
@@ -901,7 +904,7 @@ const StartChatting = () => {
 
       setChatMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Error sending message to n8n:', error);
+      console.error('Error sending message to backend:', error);
 
       // Add error message
       const errorMessage: ChatMessage = {
@@ -934,6 +937,24 @@ const StartChatting = () => {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [chatMessages]);
+
+  // Keep native wheel scrolling reliable inside chat panel when Lenis is enabled globally.
+  useEffect(() => {
+    const scrollContainer = chatContainerRef.current;
+    if (!scrollContainer) return;
+
+    scrollContainer.setAttribute('data-lenis-prevent', 'true');
+
+    const preventLenisWheel = (event: WheelEvent) => {
+      event.stopPropagation();
+    };
+
+    scrollContainer.addEventListener('wheel', preventLenisWheel, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener('wheel', preventLenisWheel);
+    };
+  }, []);
 
   const handleContactSubmit = () => {
     // console.log('Contact form submitted:', contactForm);
@@ -1021,7 +1042,7 @@ const StartChatting = () => {
         </div>
 
         {/* Main Nav */}
-        <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5">
           <button
             onClick={handleNewChat}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
@@ -1089,12 +1110,12 @@ const StartChatting = () => {
                         setChatMessages(session.messages);
                         setActiveChatId(sessionKey);
                       }}
-                      className={`flex-1 text-left px-3 py-2 text-sm font-${isActive ? 'semibold' : 'normal'}`}
+                      className={`flex-1 text-left px-3 py-2 text-sm min-w-0 font-${isActive ? 'semibold' : 'normal'}`}
                       style={{ color: isActive ? 'white' : '#677e73' }}
                       title={session.title}
                     >
-                      <div className="truncate">{session.title}</div>
-                      <div className="text-[10px] mt-0.5" style={{ opacity: isActive ? 0.7 : 0.55 }}>{session.date}</div>
+                      <div className="truncate w-full">{session.title}</div>
+                      <div className="text-[10px] mt-0.5 truncate" style={{ opacity: isActive ? 0.7 : 0.55 }}>{session.date}</div>
                     </button>
 
                     <button
@@ -1141,8 +1162,9 @@ const StartChatting = () => {
             {/* Chat Content */}
             <div
               ref={chatContainerRef}
-              className="flex-1 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth"
+              className="chat-container custom-scrollbar flex-1 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth"
               style={{ height: '100%' }}
+              data-lenis-prevent
               tabIndex={0}
               role="region"
               aria-label="Chat messages"

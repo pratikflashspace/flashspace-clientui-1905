@@ -58,7 +58,7 @@ export const HeroWithSearch = () => {
     }, []);
 
     return (
-        <section className="relative min-h-[92vh] flex flex-col items-center justify-center overflow-visible">
+        <section className="relative min-h-[92vh] flex flex-col items-center justify-center overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0">
                 <img
@@ -71,16 +71,16 @@ export const HeroWithSearch = () => {
             </div>
 
             {/* Content */}
-            <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center text-center px-4 lg:px-8 pt-24 lg:pt-36 pb-32 lg:pb-40">
+            <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center text-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-36 pb-24 sm:pb-32 lg:pb-40">
                 {/* Headline */}
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-4xl sm:text-5xl lg:text-5xl font-bold text-foreground tracking-tight leading-[1.15] mb-4"
+                    className="text-3xl xs:text-4xl sm:text-5xl lg:text-5xl font-bold text-foreground tracking-tight leading-[1.2] sm:leading-[1.15] mb-4"
                 >
                     World's #1 AI Enabled
-                    <br />
+                    <br className="hidden xs:block" />
                     <span className="text-primary italic">Business Solutions Platform.</span>
                 </motion.h1>
 
@@ -89,7 +89,7 @@ export const HeroWithSearch = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="text-muted-foreground text-lg max-w-2xl mx-auto mb-10"
+                    className="text-muted-foreground text-sm sm:text-lg max-w-2xl mx-auto mb-8 sm:mb-10 px-2"
                 >
                     Choose between office space, pay-per-use plans or fixed desks for large enterprises and individuals
                 </motion.p>
@@ -107,7 +107,7 @@ export const HeroWithSearch = () => {
                             <button
                                 key={tab.label}
                                 onClick={() => { setActiveTab(tab.label); setActiveSubTab(0); }}
-                                className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors relative ${activeTab === tab.label
+                                className={`flex-1 flex items-center justify-center gap-2 px-3 sm:px-6 py-4 text-xs sm:text-sm font-medium transition-colors relative ${activeTab === tab.label
                                     ? "text-foreground"
                                     : "text-muted-foreground hover:text-foreground"
                                     }`}
@@ -125,24 +125,24 @@ export const HeroWithSearch = () => {
                     </div>
 
                     {/* Sub Tabs */}
-                    <div className="flex justify-center gap-2 pt-5 pb-3 px-6 flex-wrap">
+                    <div className="flex justify-center gap-2 pt-5 pb-3 px-4 sm:px-6 flex-wrap">
                         {currentSubTabs.map((sub, i) => (
                             <button
                                 key={sub.label}
                                 onClick={() => setActiveSubTab(i)}
-                                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border transition-colors ${activeSubTab === i
+                                className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-[11px] sm:text-sm font-medium border transition-colors ${activeSubTab === i
                                     ? "border-primary/30 bg-primary/5 text-foreground"
                                     : "border-border bg-background text-muted-foreground hover:text-foreground hover:border-primary/20"
                                     }`}
                             >
-                                <sub.icon className="w-4 h-4" />
+                                <sub.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 {sub.label}
                             </button>
                         ))}
                     </div>
 
                     {/* Description */}
-                    <p className="text-sm text-muted-foreground px-6 pb-4">{currentDescription}</p>
+                    <p className="text-[11px] sm:text-sm text-muted-foreground px-6 pb-4">{currentDescription}</p>
 
                     {/* Search Bar */}
                     <div className="px-6 pb-6">
@@ -154,7 +154,7 @@ export const HeroWithSearch = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -40 }}
                                     transition={{ duration: 0.25 }}
-                                    className="flex items-center bg-background rounded-xl border border-border overflow-visible relative"
+                                    className="flex flex-col sm:flex-row sm:items-center bg-background rounded-xl sm:rounded-2xl border border-border overflow-hidden sm:overflow-visible relative p-1 sm:p-0"
                                 >
                                     {/* City selector */}
                                     {/* <div ref={cityRef} className="relative shrink-0"> */}
@@ -227,7 +227,7 @@ export const HeroWithSearch = () => {
                                     {/* </div> */}
 
                                     {/* Search input with city dropdown */}
-                                    <div ref={locationRef} className="relative flex items-center flex-1 px-4 gap-2">
+                                    <div ref={locationRef} className="relative flex items-center flex-1 px-3 sm:px-4 gap-2">
                                         <Search className="w-4 h-4 text-muted-foreground shrink-0" />
                                         <input
                                             type="text"
@@ -246,9 +246,8 @@ export const HeroWithSearch = () => {
                                                     navigate(`/services/virtual-office?city=${encodeURIComponent(cityToUse)}`);
                                                 }
                                             }}
-                                            // placeholder={`Search location or workspaces in ${selectedCity}`}
                                             placeholder={`Search location or workspaces`}
-                                            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground py-3.5"
+                                            className="flex-1 bg-transparent text-xs sm:text-sm outline-none placeholder:text-muted-foreground py-3 sm:py-3.5"
                                         />
 
                                         <AnimatePresence>
@@ -315,9 +314,9 @@ export const HeroWithSearch = () => {
                                             setAiMode(true);
                                             setTimeout(() => aiInputRef.current?.focus(), 100);
                                         }}
-                                        className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-medium mr-2 hover:bg-primary/90 transition-colors shrink-0"
+                                        className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-xs sm:text-sm font-medium sm:mr-2 hover:bg-primary/90 transition-colors shrink-0"
                                     >
-                                        <Sparkles className="w-4 h-4" />
+                                        <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                         Chat with AI
                                     </button>
                                 </motion.div>
@@ -328,11 +327,11 @@ export const HeroWithSearch = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 40 }}
                                     transition={{ duration: 0.25 }}
-                                    className="flex items-center bg-background rounded-xl border border-primary/40 overflow-visible relative shadow-[0_0_12px_-4px_hsl(var(--primary)/0.3)]"
+                                    className="flex flex-col sm:flex-row sm:items-center bg-background rounded-xl sm:rounded-2xl border border-primary/40 overflow-hidden sm:overflow-visible relative shadow-[0_0_12px_-4px_hsl(var(--primary)/0.3)] p-1 sm:p-0"
                                 >
-                                    <div className="flex items-center gap-2 px-4 border-r border-border shrink-0">
-                                        <Sparkles className="w-4 h-4 text-primary" />
-                                        <span className="text-sm font-medium text-primary py-3.5">AI</span>
+                                    <div className="flex items-center gap-2 px-4 border-b sm:border-b-0 sm:border-r border-border shrink-0">
+                                        <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                                        <span className="text-xs sm:text-sm font-medium text-primary py-2.5 sm:py-3.5">AI Assistant</span>
                                     </div>
                                     <input
                                         ref={aiInputRef}
@@ -348,27 +347,29 @@ export const HeroWithSearch = () => {
                                                 setAiQuery("");
                                             }
                                         }}
-                                        placeholder="Ask AI anything — workspaces, compliance, plans..."
-                                        className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground px-4 py-3.5"
+                                        placeholder="Ask about workspaces, plans..."
+                                        className="flex-1 bg-transparent text-xs sm:text-sm outline-none placeholder:text-muted-foreground px-4 py-3 sm:py-3.5"
                                     />
-                                    <button
-                                        onClick={() => { setAiMode(false); setAiQuery(""); }}
-                                        className="text-muted-foreground hover:text-foreground text-sm px-3 py-3.5 transition-colors shrink-0"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            if (aiQuery.trim()) {
-                                                navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`);
-                                            }
-                                        }}
-                                        disabled={!aiQuery.trim()}
-                                        className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-medium mr-2 hover:bg-primary/90 transition-colors shrink-0 disabled:opacity-40"
-                                    >
-                                        <Search className="w-4 h-4" />
-                                        Ask AI
-                                    </button>
+                                    <div className="flex items-center gap-2 sm:mr-2">
+                                        <button
+                                            onClick={() => { setAiMode(false); setAiQuery(""); }}
+                                            className="flex-1 sm:flex-none text-muted-foreground hover:text-foreground text-[11px] sm:text-sm px-3 py-2.5 transition-colors shrink-0"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (aiQuery.trim()) {
+                                                    navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`);
+                                                }
+                                            }}
+                                            disabled={!aiQuery.trim()}
+                                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium hover:bg-primary/90 transition-colors shrink-0 disabled:opacity-40"
+                                        >
+                                            <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                            Ask AI
+                                        </button>
+                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>

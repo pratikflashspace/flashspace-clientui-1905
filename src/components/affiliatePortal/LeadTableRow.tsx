@@ -56,7 +56,7 @@ interface LeadTableRowProps extends Lead {
 }
 
 const LeadTableRow = (props: LeadTableRowProps) => {
-    const { name, phone, company, interest, status, lastContact, delay = 0 } = props;
+    const { id, name, phone, company, interest, status, lastContact, delay = 0 } = props;
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
     return (
@@ -169,7 +169,7 @@ const LeadTableRow = (props: LeadTableRowProps) => {
 
             {/* Details Modal */}
             <LeadDetailsModal
-                lead={lead}
+                lead={{ id, name, phone, company, interest, status, lastContact }}
                 isOpen={isDetailsOpen}
                 onClose={() => setIsDetailsOpen(false)}
             />

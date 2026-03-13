@@ -173,6 +173,15 @@
     @apply border-border;
   }
 
+  html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+    width: 100vw;
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: "InterTight", "Lato", system-ui, sans-serif;
