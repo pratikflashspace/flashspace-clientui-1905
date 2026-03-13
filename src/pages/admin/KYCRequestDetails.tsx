@@ -104,7 +104,7 @@ export default function KYCRequestDetails() {
     const fetchById = async () => {
       setLoading(true);
       try {
-        const res = await adminService.getKYCById(id);
+        const res = await adminService.getKYCDetails(id);
         if (res.success && res.data) {
           setRequest(res.data as unknown as KYCRequest);
         } else {
@@ -124,7 +124,7 @@ export default function KYCRequestDetails() {
   const refreshKYC = async () => {
     if (!id) return;
     try {
-      const res = await adminService.getKYCById(id);
+      const res = await adminService.getKYCDetails(id);
       if (res.success && res.data) {
         setRequest(res.data as unknown as KYCRequest);
       }

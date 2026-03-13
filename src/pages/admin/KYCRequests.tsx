@@ -123,11 +123,18 @@ export default function KYCRequests() {
   // Helper to construct full URL from relative path
   const getFullUrl = (url?: string): string => {
     if (!url) return "";
-    if (url.startsWith("http")) return url;
+
+    let cleanUrl = url;
+    if (cleanUrl.includes("localhost:5000")) {
+      cleanUrl = cleanUrl.replace(/https?:\/\/localhost:5000(\/api)?/, "");
+    }
+
+    if (cleanUrl.startsWith("http")) return cleanUrl;
+
     const baseUrl = API_CONFIG.BASE_URL.endsWith("/")
       ? API_CONFIG.BASE_URL.slice(0, -1)
       : API_CONFIG.BASE_URL;
-    const path = url.startsWith("/") ? url : `/${url}`;
+    const path = cleanUrl.startsWith("/") ? cleanUrl : `/${cleanUrl}`;
     return `${baseUrl}${path}`;
   };
 

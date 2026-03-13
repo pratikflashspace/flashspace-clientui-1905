@@ -18,7 +18,16 @@
  * 4. Adjust any service-specific features
  */
 
-import { Building, MapPin, Phone, Users, ChevronDown, Grid3X3, List, Search } from "lucide-react";
+import {
+  Building,
+  MapPin,
+  Phone,
+  Users,
+  ChevronDown,
+  Grid3X3,
+  List,
+  Search,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
@@ -32,7 +41,7 @@ import {
   BusinessSolution,
   ViewMode,
   SortBy,
-  VirtualOfficeItem // Or use CoworkingSpaceItem, EventSpaceItem based on your service
+  VirtualOfficeItem, // Or use CoworkingSpaceItem, EventSpaceItem based on your service
 } from "@/types/services";
 import ListingCardModern from "./ListingCardModern";
 
@@ -68,19 +77,17 @@ const ServicePageTemplate = () => {
     { name: "Ahmedabad", key: "ahmedabad" },
     { name: "Jaipur", key: "jaipur" },
     { name: "Surat", key: "surat" },
-    { name: "Lucknow", key: "lucknow" }
+    { name: "Lucknow", key: "lucknow" },
   ];
 
   // Initialize from URL params
   useEffect(() => {
-    const city = searchParams.get('city') || 'Delhi';
-    const location = searchParams.get('location') || '';
+    const city = searchParams.get("city") || "Delhi";
+    const location = searchParams.get("location") || "";
     setSelectedCity(city);
     setSelectedLocation(location);
     setSearchCity(city);
   }, [searchParams]);
-
-
 
   // Fetch data from API
   useEffect(() => {
@@ -91,9 +98,12 @@ const ServicePageTemplate = () => {
       setError("");
 
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const apiUrl =
+          import.meta.env.VITE_API_URL || "http://localhost:5000/api";
         // TODO: Update this endpoint based on your service type
-        const response = await fetch(`${apiUrl}/yourService/getByCity/${selectedCity}`);
+        const response = await fetch(
+          `${apiUrl}/yourService/getByCity/${selectedCity}`,
+        );
         const data = await response.json();
 
         if (data.success) {
@@ -115,8 +125,8 @@ const ServicePageTemplate = () => {
   }, [selectedCity]);
 
   // Filter cities based on search input
-  const filteredCities: City[] = availableCities.filter(city =>
-    city.name.toLowerCase().includes(searchCity.toLowerCase())
+  const filteredCities: City[] = availableCities.filter((city) =>
+    city.name.toLowerCase().includes(searchCity.toLowerCase()),
   );
 
   // Handle city search
@@ -126,12 +136,14 @@ const ServicePageTemplate = () => {
     setShowSuggestions(false);
 
     const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set('city', cityName);
+    newSearchParams.set("city", cityName);
     navigate(`?${newSearchParams.toString()}`, { replace: true });
   };
 
   // Handle search input change
-  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleSearchInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ): void => {
     setSearchCity(e.target.value);
     setShowSuggestions(true);
   };
@@ -168,26 +180,26 @@ const ServicePageTemplate = () => {
       label: "Virtual Office",
       href: "/services/virtual-office",
       icon: Building,
-      description: "Professional business address solutions"
+      description: "Professional business address solutions",
     },
     {
       label: "Coworking Space",
       href: "/services/coworking-space",
       icon: Users,
-      description: "Flexible workspace solutions"
+      description: "Flexible workspace solutions",
     },
     {
       label: "On Demand",
       href: "/services/on-demand",
       icon: Phone,
-      description: "Meeting rooms & services"
+      description: "Meeting rooms & services",
     },
     {
       label: "Event Spaces",
       href: "/services/event-spaces",
       icon: MapPin,
-      description: "Premium event venues"
-    }
+      description: "Premium event venues",
+    },
   ];
 
   const handleNavigation = (href: string): void => {
@@ -196,19 +208,33 @@ const ServicePageTemplate = () => {
 
   // Resolve map center by selected city (fallback to Delhi)
   const resolvedCenter = useMemo(() => {
-    const cityKeyFromState = selectedCity.trim().toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
-    if (["ahmedabad", "amdavad"].includes(cityKeyFromState)) return cityCenters.ahmedabad;
-    if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
-    if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
-    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
-    if (["dharamshala", "dharamsala"].includes(cityKeyFromState)) return cityCenters.dharamshala;
-    if (["gurgaon", "gurugram"].includes(cityKeyFromState)) return cityCenters.gurgaon;
-    if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
+    const cityKeyFromState = selectedCity
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/-/g, "");
+    if (["ahmedabad", "amdavad"].includes(cityKeyFromState))
+      return cityCenters.ahmedabad;
+    if (["bangalore", "bengaluru"].includes(cityKeyFromState))
+      return cityCenters.bangalore;
+    if (["chennai", "madras"].includes(cityKeyFromState))
+      return cityCenters.chennai;
+    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState))
+      return cityCenters.delhi;
+    if (["dharamshala", "dharamsala"].includes(cityKeyFromState))
+      return cityCenters.dharamshala;
+    if (["gurgaon", "gurugram"].includes(cityKeyFromState))
+      return cityCenters.gurgaon;
+    if (["hyderabad", "hyd"].includes(cityKeyFromState))
+      return cityCenters.hyderabad;
     if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
     if (["jammu"].includes(cityKeyFromState)) return cityCenters.jammu;
-    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
-    if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
-    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
+    if (["mumbai", "bombay"].includes(cityKeyFromState))
+      return cityCenters.mumbai;
+    if (["pune", "punecity"].includes(cityKeyFromState))
+      return cityCenters.pune;
+    if (["kolkata", "calcutta"].includes(cityKeyFromState))
+      return cityCenters.kolkata;
     if (["lucknow"].includes(cityKeyFromState)) return cityCenters.lucknow;
     if (["surat"].includes(cityKeyFromState)) return cityCenters.surat;
     if (["noida"].includes(cityKeyFromState)) return cityCenters.noida;
@@ -243,22 +269,25 @@ const ServicePageTemplate = () => {
       {/* Main Content - Split Layout */}
       <div className="flex flex-1 overflow-hidden mt-20">
         {/* Left Side: Listings - Scrollable */}
-        <div
-          ref={scrollContainerRef}
-          className="w-1/2 overflow-y-auto"
-        >
+        <div ref={scrollContainerRef} className="w-1/2 overflow-y-auto">
           <div className="px-6 py-6">
             {/* Breadcrumb */}
-            <div className={`flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <div
+              className={`flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+            >
               <span>Home</span>
               <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
               <span>Your Service</span> {/* TODO: Update this */}
               <ChevronDown className="w-4 h-4 rotate-[-90deg]" />
-              <span className="text-gray-900 dark:text-white font-medium">{selectedCity}</span>
+              <span className="text-gray-900 dark:text-white font-medium">
+                {selectedCity}
+              </span>
             </div>
 
             {/* Page Title */}
-            <h1 className={`text-3xl font-bold text-gray-900 dark:text-white mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <h1
+              className={`text-3xl font-bold text-gray-900 dark:text-white mb-6 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+            >
               Your Service In {selectedCity} {/* TODO: Update this */}
             </h1>
 
@@ -279,10 +308,16 @@ const ServicePageTemplate = () => {
             />
 
             {/* Results Header */}
-            <div className={`flex items-center justify-between mb-6 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <div
+              className={`flex items-center justify-between mb-6 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+            >
               <div className="flex items-center gap-4">
                 <p className="text-gray-600 dark:text-gray-400">
-                  Showing <span className="font-semibold text-gray-900 dark:text-white">{items.length} result(s)</span> for your service in {selectedCity}
+                  Showing{" "}
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {items.length} result(s)
+                  </span>{" "}
+                  for your service in {selectedCity}
                 </p>
               </div>
 
@@ -309,7 +344,9 @@ const ServicePageTemplate = () => {
             </div>
 
             {/* Listing Cards Grid */}
-            <div className={`grid grid-cols-2 gap-4 mb-8 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            <div
+              className={`grid grid-cols-2 gap-4 mb-8 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+            >
               {loading ? (
                 <div className="col-span-full text-center py-12">
                   <p className="text-gray-600 dark:text-gray-400">Loading...</p>
@@ -320,16 +357,24 @@ const ServicePageTemplate = () => {
                 </div>
               ) : items.length === 0 ? (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-gray-600 dark:text-gray-400">No items found for {selectedCity}</p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    No items found for {selectedCity}
+                  </p>
                 </div>
-              ) : items.map((item) => (
-                <ListingCardModern
-                  key={item._id}
-                  item={item}
-                  onGetBestPrice={(itemId) => { /* console.log('Get best price for:', itemId) */ }}
-                  onToggleFavorite={(itemId) => { /* console.log('Toggle favorite for:', itemId) */ }}
-                />
-              ))}
+              ) : (
+                items.map((item) => (
+                  <ListingCardModern
+                    key={item._id}
+                    item={item}
+                    onGetBestPrice={(itemId) => {
+                      /* console.log('Get best price for:', itemId) */
+                    }}
+                    onToggleFavorite={(itemId) => {
+                      /* console.log('Toggle favorite for:', itemId) */
+                    }}
+                  />
+                ))
+              )}
             </div>
           </div>
         </div>
