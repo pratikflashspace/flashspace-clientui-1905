@@ -62,10 +62,8 @@ export const SignupForm = ({
       if (onSuccess) {
         onSuccess();
       }
-      // Small delay to let React state flush before navigation
-      setTimeout(() => {
-        navigate('/');
-      }, 100);
+       // Navigate to dashboard since user is now logged in
+      navigate('/dashboard');
     } catch (error) {
       console.error('Signup error:', error);
     }

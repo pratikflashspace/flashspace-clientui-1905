@@ -66,10 +66,7 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user
                         Already have an account?{' '}
                         {onLoginClick ? (
                             <button
-                                onClick={() => {
-                                    onClose();
-                                    onLoginClick();
-                                }}
+                                onClick={onLoginClick}
                                 className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200"
                             >
                                 Sign in
