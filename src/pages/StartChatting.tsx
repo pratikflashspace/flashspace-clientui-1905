@@ -862,14 +862,22 @@ const StartChatting = () => {
     setIsLoading(true);
 
     try {
+      const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      const sessionId = getSessionId();
+
       // Call backend chat endpoint (backend calls AI backend internally)
       const response = await fetch(BACKEND_CHAT_URL, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
-          message: userMessage.content
+          message: userMessage.content,
+          query: userMessage.content,
+          conversation_id: 'default',
+          session_id: sessionId
         })
       });
 
