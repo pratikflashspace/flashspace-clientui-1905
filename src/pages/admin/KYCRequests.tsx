@@ -517,9 +517,9 @@ export default function KYCRequests() {
     >
       <div className="space-y-8 animate-in fade-in duration-500">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="text-center md:text-left">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
               {viewMode === "user_partners" ? (
                 <>
                   Partners{" "}
@@ -540,7 +540,7 @@ export default function KYCRequests() {
                 </>
               )}
             </h1>
-            <p className="text-gray-500 mt-2 text-lg font-light">
+            <p className="text-sm md:text-lg text-gray-500 mt-2 font-light">
               {viewMode === "user_partners"
                 ? "Review partner applications for this user"
                 : viewMode === "user_business"
@@ -548,17 +548,17 @@ export default function KYCRequests() {
                   : "Review and approve identity documents"}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
             {(viewMode === "user_partners" || viewMode === "user_business") && (
               <button
                 onClick={handleBackToRequests}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-medium shadow-sm"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-gray-700 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-medium shadow-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Requests
               </button>
             )}
-            <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl border border-blue-200">
+            <div className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-50 text-blue-700 rounded-xl border border-blue-200">
               <AlertCircle className="w-4 h-4" />
               <span className="text-sm font-medium">
                 {viewMode === "user_partners"
@@ -573,34 +573,33 @@ export default function KYCRequests() {
           </div>
         </div>
 
-        {/* KPI Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
-            <h3 className="text-3xl font-extrabold tracking-tight text-yellow-600">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
+            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-yellow-600">
               {stats.pending}
             </h3>
-            <p className="text-gray-500 font-medium mt-1 text-sm">
-              Pending Review
+            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
+              Pending
             </p>
           </div>
-          <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
-            <h3 className="text-3xl font-extrabold tracking-tight text-green-600">
+          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
+            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-green-600">
               {stats.approved}
             </h3>
-            <p className="text-gray-500 font-medium mt-1 text-sm">Approved</p>
+            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">Approved</p>
           </div>
-          <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
-            <h3 className="text-3xl font-extrabold tracking-tight text-red-600">
+          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
+            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-red-600">
               {stats.rejected}
             </h3>
-            <p className="text-gray-500 font-medium mt-1 text-sm">Rejected</p>
+            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">Rejected</p>
           </div>
-          <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
-            <h3 className="text-3xl font-extrabold tracking-tight text-gray-900">
+          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
+            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
               {stats.total}
             </h3>
-            <p className="text-gray-500 font-medium mt-1 text-sm">
-              Total Requests
+            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
+              Total
             </p>
           </div>
         </div>
@@ -628,7 +627,7 @@ export default function KYCRequests() {
               </div>
             </div>
 
-            <div className="p-6">
+            <div className="p-4 md:p-6">
               {/* ... Existing Partner Grid ... */}
               {loadingPartnerRequests ? (
                 <div className="text-center py-12">
@@ -643,22 +642,22 @@ export default function KYCRequests() {
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {partnerRequests.map((partner) => (
                     <div
                       key={partner._id}
                       className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-6"
                     >
-                      <div className="flex justify-between items-start mb-4">
+                      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
                             <User className="w-5 h-5 text-orange-600" />
                           </div>
-                          <div>
-                            <h4 className="font-bold text-gray-900">
+                          <div className="min-w-0">
+                            <h4 className="font-bold text-gray-900 truncate">
                               {partner.fullName}
                             </h4>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 truncate">
                               {partner.email}
                             </p>
                           </div>
@@ -729,7 +728,7 @@ export default function KYCRequests() {
               </div>
             </div>
 
-            <div className="p-6">
+            <div className="p-4 md:p-6">
               {loadingBusinessInfo ? (
                 <div className="text-center py-12">
                   <div className="animate-spin w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
@@ -743,7 +742,7 @@ export default function KYCRequests() {
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {businessInfo.map((profile, index) => (
                     <div
                       key={profile._id || index}
@@ -855,18 +854,18 @@ export default function KYCRequests() {
               onValueChange={setActiveTab}
               className="space-y-6"
             >
-              <div className="flex justify-end">
-                <TabsList className="inline-flex h-10 items-center justify-center rounded-xl bg-gray-100/50 p-1 text-gray-500 border border-gray-200 shadow-sm">
+              <div className="flex justify-center md:justify-end">
+                <TabsList className="inline-flex w-full md:w-auto h-12 md:h-10 items-center justify-center rounded-xl bg-gray-100/50 p-1 text-gray-500 border border-gray-200 shadow-sm">
                   <TabsTrigger
                     value="users"
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-md"
+                    className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-md"
                   >
                     <User className="w-4 h-4 mr-2" />
                     Client KYC
                   </TabsTrigger>
                   <TabsTrigger
                     value="partners"
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-md"
+                    className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-md"
                   >
                     <Building2 className="w-4 h-4 mr-2" />
                     Partner KYC
@@ -905,7 +904,7 @@ export default function KYCRequests() {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {filteredRequests.map((request) => (
                       <div
                         key={request._id}
@@ -1448,20 +1447,21 @@ export default function KYCRequests() {
                 />
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => {
                     setShowRejectModal(false);
                     setRejectionReason("");
                     setSelectedRequest(null);
                   }}
-                  className="flex-1 py-3 px-4 rounded-xl border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors font-semibold"
+                  className="w-full sm:flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors order-2 sm:order-1"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleReject}
-                  className="flex-1 py-3 px-4 rounded-xl bg-red-600 text-white hover:bg-red-700 transition-colors font-semibold"
+                  disabled={!rejectionReason.trim()} // Assuming 'processing' state is not available here, keeping original logic for disabled
+                  className="w-full sm:flex-1 py-2.5 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors disabled:opacity-50 order-1 sm:order-2"
                 >
                   Reject KYC
                 </button>
@@ -1506,12 +1506,12 @@ export default function KYCRequests() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="group p-3 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
                       <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                         Email Address
                       </p>
-                      <p className="text-gray-900 font-medium break-words">
+                      <p className="text-gray-900 font-medium break-all md:break-words">
                         {selectedPersonalInfo.email || "N/A"}
                       </p>
                     </div>

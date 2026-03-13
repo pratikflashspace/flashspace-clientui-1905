@@ -155,54 +155,54 @@ const BalanceSheet = () => {
       portalDescription="Complete platform management"
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
             Balance <span className="text-primary italic">Sheet</span>
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm md:text-base text-muted-foreground mt-1">
             Complete financial summary and reports
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setFilterDialogOpen(true)}>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={() => setFilterDialogOpen(true)} className="flex-1 md:flex-none h-10 border-muted-foreground/20">
             <Calendar className="w-4 h-4 mr-2" />
-            Select Period
+            Period
           </Button>
-          <Button variant="outline" onClick={() => setFilterDialogOpen(true)}>
+          <Button variant="outline" size="sm" onClick={() => setFilterDialogOpen(true)} className="flex-1 md:flex-none h-10 border-muted-foreground/20">
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
-          <Button onClick={handleExportCSV}>
+          <Button size="sm" onClick={handleExportCSV} className="w-full md:w-auto h-10 shadow-lg shadow-primary/10">
             <Download className="w-4 h-4 mr-2" />
-            Export Report
+            Export CSV
           </Button>
         </div>
       </div>
 
       {/* Overall Summary */}
-      <div className="bg-background border border-border rounded-xl p-6 mb-8 shadow-sm">
-        <h2 className="font-semibold text-foreground mb-4">
+      <div className="bg-background border border-border rounded-xl p-4 md:p-6 mb-8 shadow-sm">
+        <h2 className="font-bold text-foreground text-base md:text-lg mb-4">
           FY {new Date().getFullYear()}-
           {(new Date().getFullYear() + 1).toString().slice(-2)} Summary
         </h2>
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {overallSummary.map((item, index) => (
             <div
               key={index}
-              className={`flex items-center justify-between p-4 rounded-lg transition-all ${
+              className={`flex flex-col p-4 rounded-xl transition-all ${
                 item.type === "profit"
-                  ? "bg-green-50 border border-green-100"
-                  : "bg-muted/30 border border-transparent"
+                  ? "bg-green-50/50 border border-green-200"
+                  : "bg-muted/30 border border-border/50"
               }`}
             >
               <span
-                className={`font-medium ${item.type === "profit" ? "text-green-700" : "text-foreground"}`}
+                className={`text-[10px] md:text-xs uppercase font-black tracking-widest mb-1 ${item.type === "profit" ? "text-green-700/70" : "text-muted-foreground"}`}
               >
                 {item.label}
               </span>
               <span
-                className={`font-bold text-xl ${
+                className={`font-black text-xl md:text-2xl ${
                   item.type === "credit"
                     ? "text-green-600"
                     : item.type === "profit"
@@ -223,112 +223,181 @@ const BalanceSheet = () => {
         onValueChange={setActiveTab}
         className="space-y-6"
       >
-        <TabsList className="bg-muted/50 p-1">
-          <TabsTrigger value="monthly">Monthly Breakdown</TabsTrigger>
-          <TabsTrigger value="city">City-wise</TabsTrigger>
-          <TabsTrigger value="partner">Partner-wise</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-1 -mx-2 px-2 scrollbar-none">
+          <TabsList className="h-auto p-1 bg-muted/50 rounded-lg inline-flex w-full md:w-auto">
+            <TabsTrigger value="monthly" className="px-5 py-2.5 text-sm">Monthly Breakdown</TabsTrigger>
+            <TabsTrigger value="city" className="px-5 py-2.5 text-sm">City-wise</TabsTrigger>
+            <TabsTrigger value="partner" className="px-5 py-2.5 text-sm">Partner-wise</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="monthly">
-          <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="text-left p-4 text-sm font-semibold text-foreground">
-                    Month
-                  </th>
-                  <th className="text-right p-4 text-sm font-semibold text-foreground">
-                    Revenue
-                  </th>
-                  <th className="text-right p-4 text-sm font-semibold text-foreground">
-                    Expenses
-                  </th>
-                  <th className="text-right p-4 text-sm font-semibold text-foreground">
-                    Net Profit
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {monthlyBreakdown.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
-                  >
-                    <td className="p-4 font-medium text-foreground">
-                      {item.month}
-                    </td>
-                    <td className="p-4 text-right text-green-600 font-semibold">
-                      {formatCurrency(item.revenue)}
-                    </td>
-                    <td className="p-4 text-right text-red-600 font-semibold">
-                      {formatCurrency(item.expenses)}
-                    </td>
-                    <td className="p-4 text-right text-foreground font-bold">
-                      {formatCurrency(item.profit)}
-                    </td>
+          <div className="space-y-4">
+            {/* Desktop View */}
+            <div className="hidden lg:block bg-background border border-border rounded-xl overflow-hidden shadow-sm">
+              <table className="w-full">
+                <thead className="bg-muted/50 border-b border-border">
+                  <tr>
+                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                      Month
+                    </th>
+                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                      Revenue
+                    </th>
+                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                      Expenses
+                    </th>
+                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                      Net Profit
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {monthlyBreakdown.map((item, index) => (
+                    <tr
+                      key={index}
+                      className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
+                    >
+                      <td className="p-4 font-medium text-foreground">
+                        {item.month}
+                      </td>
+                      <td className="p-4 text-right text-green-600 font-semibold">
+                        {formatCurrency(item.revenue)}
+                      </td>
+                      <td className="p-4 text-right text-red-600 font-semibold">
+                        {formatCurrency(item.expenses)}
+                      </td>
+                      <td className="p-4 text-right text-foreground font-bold">
+                        {formatCurrency(item.profit)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile View */}
+            <div className="lg:hidden grid gap-4 grid-cols-1 md:grid-cols-2">
+              {monthlyBreakdown.map((item, index) => (
+                <div key={index} className="bg-background border border-border rounded-xl p-4 space-y-4 shadow-sm">
+                  <div className="flex justify-between items-center border-b border-border/50 pb-2">
+                    <span className="font-bold text-foreground">{item.month}</span>
+                    <Badge className="bg-primary/10 text-primary border-0 font-bold px-3">Summary</Badge>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-center">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Revenue</p>
+                      <p className="text-sm font-bold text-green-600">{formatCurrency(item.revenue)}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Expense</p>
+                      <p className="text-sm font-bold text-red-600">{formatCurrency(item.expenses)}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Profit</p>
+                      <p className="text-sm font-black text-foreground">{formatCurrency(item.profit)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </TabsContent>
 
         <TabsContent value="city">
-          <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="text-left p-4 text-sm font-semibold text-foreground">
-                    City
-                  </th>
-                  <th className="text-right p-4 text-sm font-semibold text-foreground">
-                    Revenue
-                  </th>
-                  <th className="text-right p-4 text-sm font-semibold text-foreground">
-                    Expenses
-                  </th>
-                  <th className="text-right p-4 text-sm font-semibold text-foreground">
-                    Profit
-                  </th>
-                  <th className="text-right p-4 text-sm font-semibold text-foreground">
-                    Margin
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {cityBreakdown.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
-                  >
-                    <td className="p-4 font-medium text-foreground">
-                      {item.city}
-                    </td>
-                    <td className="p-4 text-right text-green-600 font-semibold">
-                      {formatCurrency(item.revenue)}
-                    </td>
-                    <td className="p-4 text-right text-red-600 font-semibold">
-                      {formatCurrency(item.expenses)}
-                    </td>
-                    <td className="p-4 text-right text-foreground font-bold">
-                      {formatCurrency(item.profit)}
-                    </td>
-                    <td className="p-4 text-right">
-                      <Badge
-                        className={`${
-                          parseInt(item.margin) >= 40
-                            ? "bg-green-100 text-green-700 hover:bg-green-200"
-                            : "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
-                        }`}
-                        variant="secondary"
-                      >
-                        {item.margin}
-                      </Badge>
-                    </td>
+          <div className="space-y-4">
+            {/* Desktop View */}
+            <div className="hidden lg:block bg-background border border-border rounded-xl overflow-hidden shadow-sm">
+              <table className="w-full">
+                <thead className="bg-muted/50 border-b border-border">
+                  <tr>
+                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                      City
+                    </th>
+                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                      Revenue
+                    </th>
+                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                      Expenses
+                    </th>
+                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                      Profit
+                    </th>
+                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                      Margin
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {cityBreakdown.map((item, index) => (
+                    <tr
+                      key={index}
+                      className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
+                    >
+                      <td className="p-4 font-medium text-foreground">
+                        {item.city}
+                      </td>
+                      <td className="p-4 text-right text-green-600 font-semibold">
+                        {formatCurrency(item.revenue)}
+                      </td>
+                      <td className="p-4 text-right text-red-600 font-semibold">
+                        {formatCurrency(item.expenses)}
+                      </td>
+                      <td className="p-4 text-right text-foreground font-bold">
+                        {formatCurrency(item.profit)}
+                      </td>
+                      <td className="p-4 text-right">
+                        <Badge
+                          className={`${
+                            parseInt(item.margin) >= 40
+                              ? "bg-green-100 text-green-700 hover:bg-green-200"
+                              : "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+                          }`}
+                          variant="secondary"
+                        >
+                          {item.margin}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile View */}
+            <div className="lg:hidden grid gap-4 grid-cols-1 md:grid-cols-2">
+              {cityBreakdown.map((item, index) => (
+                <div key={index} className="bg-background border border-border rounded-xl p-4 space-y-4 shadow-sm">
+                  <div className="flex justify-between items-center border-b border-border/50 pb-2">
+                    <span className="font-bold text-foreground">{item.city}</span>
+                    <Badge
+                      className={`${
+                        parseInt(item.margin) >= 40
+                          ? "bg-green-100 text-green-700 h-5 py-0 px-2 tracking-tight"
+                          : "bg-yellow-100 text-yellow-700 h-5 py-0 px-2 tracking-tight"
+                      }`}
+                      variant="outline"
+                    >
+                      {item.margin} Margin
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-center">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Revenue</p>
+                      <p className="text-sm font-bold text-green-600">{formatCurrency(item.revenue)}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Expense</p>
+                      <p className="text-sm font-bold text-red-600">{formatCurrency(item.expenses)}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Profit</p>
+                      <p className="text-sm font-black text-foreground">{formatCurrency(item.profit)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </TabsContent>
 

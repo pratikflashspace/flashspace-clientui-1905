@@ -291,53 +291,49 @@ export default function UserManagement() {
               Oversee, manage, and analyze user base.
             </p>
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setIsAddUserModalOpen(true)}
-              className="px-6 py-3 bg-gray-900 text-white border border-transparent rounded-2xl hover:bg-black transition-all shadow-lg shadow-gray-900/20 hover:shadow-xl hover:shadow-gray-900/30 hover:-translate-y-0.5 flex items-center gap-2 font-semibold"
-            >
-              <Plus className="w-5 h-5" />
-              Add User
-            </button>
-            {/* <button className="px-6 py-3 bg-white text-gray-700 border border-gray-200 rounded-2xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm hover:shadow-md flex items-center gap-2 font-semibold">
-                        <Download className="w-5 h-5" />
-                        Export
-                    </button> */}
-            <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-sm">
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+            <div className="flex bg-gray-100 p-1 rounded-xl w-full sm:w-auto">
               <button
                 onClick={() => setViewMode("active")}
-                className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   viewMode === "active"
-                    ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
                 }`}
               >
                 Active
               </button>
               <button
                 onClick={() => setViewMode("deleted")}
-                className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
+                className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                   viewMode === "deleted"
-                    ? "bg-white text-red-600 shadow-sm ring-1 ring-red-100"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+                    ? "bg-white text-red-600 shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
                 }`}
               >
                 <Trash2 className="w-4 h-4" />
                 Bin
               </button>
             </div>
+            <button
+              onClick={() => setIsAddUserModalOpen(true)}
+              className="w-full sm:w-auto px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-all shadow-lg flex items-center justify-center gap-2 font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              Add User
+            </button>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-medium text-gray-500">
                   {viewMode === "active" ? "Total Users" : "Deleted Users"}
                 </p>
-                <h3 className="text-3xl font-bold text-gray-900 mt-2">
+                <h3 className="text-3xl font-bold text-gray-900 mt-1">
                   {displayTotal}
                 </h3>
               </div>
@@ -346,11 +342,11 @@ export default function UserManagement() {
               </div>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-medium text-gray-500">Verified</p>
-                <h3 className="text-3xl font-bold text-gray-900 mt-2">
+                <h3 className="text-3xl font-bold text-gray-900 mt-1">
                   {verifiedUsersCount}
                 </h3>
               </div>
@@ -359,13 +355,13 @@ export default function UserManagement() {
               </div>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-medium text-gray-500">
                   New This Month
                 </p>
-                <h3 className="text-3xl font-bold text-gray-900 mt-2">
+                <h3 className="text-3xl font-bold text-gray-900 mt-1">
                   {newUsersCount}
                 </h3>
               </div>
@@ -377,26 +373,26 @@ export default function UserManagement() {
         </div>
 
         {/* Main Content Card */}
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Toolbar */}
-          <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row gap-4 justify-between items-center bg-white">
-            <div className="relative flex-1 w-full sm:max-w-md">
+          <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center bg-white">
+            <div className="relative flex-1 w-full md:max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-black/5 focus:bg-white transition-all text-gray-900 placeholder:text-gray-400"
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-black/5 transition-all text-sm font-medium text-gray-900"
               />
             </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-none rounded-xl">
-                <Filter className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-none rounded-xl w-full md:w-auto h-11">
+                <Filter className="w-5 h-5 text-gray-400" />
                 <select
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
-                  className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 cursor-pointer outline-none"
+                  className="bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 cursor-pointer outline-none w-full"
                 >
                   <option value="all">All Roles</option>
                   <option value="user">Clients</option>
@@ -409,231 +405,268 @@ export default function UserManagement() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-[800px] w-full text-left">
-            <thead className="bg-gray-50/50">
-              <tr>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  User Profile
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Joined Date
-                </th>
-                {/* <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th> */}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredUsers.map((user) => {
-                const roleBadge = getRoleBadge(user.role);
-                return (
-                  <tr
-                    key={user.id}
-                    className={`group hover:bg-gray-50 transition-colors duration-200 ${viewMode === "deleted" ? "opacity-70 grayscale-[0.3]" : ""}`}
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`w-12 h-12 rounded-full bg-gradient-to-br ${getRandomGradient(user.fullName)} flex items-center justify-center text-white font-bold text-sm shadow-md`}
-                        >
-                          {getInitials(user.fullName)}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-gray-900">
-                            {user.fullName}
-                          </p>
-                          <p className="text-sm text-gray-500">{user.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {viewMode === "active" ? (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger className="focus:outline-none">
-                            <span
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border hover:opacity-80 transition-opacity ${roleBadge.className}`}
-                            >
-                              {roleBadge.icon}
-                              {roleBadge.label}
-                              <ChevronDown className="w-3 h-3 ml-0.5 opacity-70" />
-                            </span>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="start"
-                            className="w-48 bg-white shadow-lg border border-gray-200 z-[60]"
+          {/* List Content */}
+          <div className="min-h-[400px]">
+            {filteredUsers.length === 0 ? (
+              <div className="px-6 py-20 text-center">
+                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                  {viewMode === "deleted" ? (
+                    <Trash2 className="w-8 h-8 text-gray-300" />
+                  ) : (
+                    <Users className="w-8 h-8 text-gray-300" />
+                  )}
+                </div>
+                <h3 className="text-lg font-black text-gray-900">
+                  {viewMode === "deleted" ? "Bin is empty" : "No users found"}
+                </h3>
+                <p className="text-gray-400 text-sm mt-1 font-medium max-w-xs mx-auto">
+                  {viewMode === "deleted"
+                    ? "Deleted users will appear here for 30 days before permanent removal."
+                    : "Try adjusting your search criteria or role filters."}
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Desktop view */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-100">
+                        <th className="px-6 py-4 text-sm font-semibold text-gray-900">User Profile</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-gray-900">Role</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-gray-900">Verification</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-gray-900">Joined Date</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-widest text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {filteredUsers.map((user) => {
+                        const roleBadge = getRoleBadge(user.role);
+                        return (
+                          <tr
+                            key={user.id}
+                            className={`group hover:bg-gray-50/50 transition-all duration-200 ${
+                              viewMode === "deleted" ? "opacity-75" : ""
+                            }`}
                           >
-                            <DropdownMenuLabel className="text-xs font-normal text-gray-500 px-2 py-1.5">
-                              Change Role
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => handleUpdateRole(user, "user")}
-                              className="cursor-pointer"
-                            >
-                              <span>Client</span>
-                              {user.role === "user" && (
-                                <span className="ml-auto w-2 h-2 rounded-full bg-blue-500"></span>
+                            <td className="px-6 py-5">
+                              <div className="flex items-center gap-4">
+                                <div className={`relative w-11 h-11 rounded-2xl bg-gradient-to-br ${getRandomGradient(user.fullName)} flex items-center justify-center text-white font-black text-xs shadow-lg group-hover:scale-110 transition-transform`}>
+                                  {getInitials(user.fullName)}
+                                  {user.isEmailVerified && (
+                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                                      <UserCheck className="w-2 h-2 text-white" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-extrabold text-gray-900 truncate max-w-[200px] leading-tight mb-0.5">{user.fullName}</p>
+                                  <p className="text-[11px] text-gray-400 font-bold truncate max-w-[200px]">{user.email}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-5">
+                              {viewMode === "active" ? (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger className="focus:outline-none">
+                                    <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black tracking-wider border uppercase transition-all hover:bg-white hover:shadow-md ${roleBadge.className}`}>
+                                      {roleBadge.icon}
+                                      {roleBadge.label}
+                                      <ChevronDown className="w-3 h-3 opacity-50" />
+                                    </span>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuPortal>
+                                    <DropdownMenuContent align="start" className="w-56 bg-white shadow-2xl border-0 rounded-2xl p-2 z-[100]">
+                                      <DropdownMenuLabel className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 py-3">Assign New Role</DropdownMenuLabel>
+                                      <DropdownMenuSeparator className="bg-gray-50 mx-2" />
+                                      {["user", "partner", "affiliate", "sales", "support", "admin"].map((r) => (
+                                        <DropdownMenuItem 
+                                          key={r}
+                                          onClick={() => handleUpdateRole(user, r)}
+                                          className="flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
+                                        >
+                                          <span className="text-xs font-bold capitalize">{r.replace("_", " ")}</span>
+                                          {user.role === r && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                                        </DropdownMenuItem>
+                                      ))}
+                                    </DropdownMenuContent>
+                                  </DropdownMenuPortal>
+                                </DropdownMenu>
+                              ) : (
+                                <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black tracking-wider border uppercase ${roleBadge.className}`}>
+                                  {roleBadge.icon}
+                                  {roleBadge.label}
+                                </span>
                               )}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleUpdateRole(user, "partner")}
-                              className="cursor-pointer"
-                            >
-                              <span>Space Partner</span>
-                              {user.role === "partner" && (
-                                <span className="ml-auto w-2 h-2 rounded-full bg-orange-500"></span>
+                            </td>
+                            <td className="px-6 py-5">
+                              {viewMode === "deleted" ? (
+                                <span className="inline-flex items-center gap-2 text-[10px] font-black text-red-600 uppercase tracking-widest bg-red-50 px-2 py-1 rounded-lg">Deleted</span>
+                              ) : user.isEmailVerified ? (
+                                <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-green-600 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">Verified</span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-amber-600 uppercase tracking-widest bg-amber-50 px-2 py-1 rounded-lg">Pending</span>
                               )}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleUpdateRole(user, "affiliate")
-                              }
-                              className="cursor-pointer"
-                            >
-                              <span>Affiliate Partner</span>
-                              {user.role === "affiliate" && (
-                                <span className="ml-auto w-2 h-2 rounded-full bg-cyan-500"></span>
-                              )}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleUpdateRole(user, "admin")}
-                              className="cursor-pointer"
-                            >
-                              <span>Admin</span>
-                              {user.role === "admin" && (
-                                <span className="ml-auto w-2 h-2 rounded-full bg-purple-500"></span>
-                              )}
-                            </DropdownMenuItem>
-                            {currentSessionUser?.role === "super_admin" && (
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleUpdateRole(user, "super_admin")
-                                }
-                                className="cursor-pointer"
-                              >
-                                <span>Super Admin</span>
-                                {user.role === "super_admin" && (
-                                  <span className="ml-auto w-2 h-2 rounded-full bg-red-500"></span>
-                                )}
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      ) : (
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${roleBadge.className}`}
-                        >
-                          {roleBadge.icon}
-                          {roleBadge.label}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      {viewMode === "deleted" ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-red-500" />
-                          <span className="text-sm font-medium text-red-600">
-                            Deleted
-                          </span>
-                        </div>
-                      ) : user.isEmailVerified ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                          <span className="text-sm font-medium text-gray-700">
-                            Verified
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                          <span className="text-sm font-medium text-gray-700">
-                            Pending
-                          </span>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600 font-medium">
-                        {new Date(user.createdAt).toLocaleDateString(
-                          undefined,
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          },
-                        )}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
+                            </td>
+                            <td className="px-6 py-5">
+                              <span className="text-[11px] text-gray-400 font-black uppercase tracking-widest">
+                                {new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 text-right whitespace-nowrap">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger className="p-2 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all border border-gray-100">
+                                  <MoreVertical className="w-5 h-5" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48 bg-white shadow-2xl border-0 rounded-2xl p-2 z-[60]">
+                                  {viewMode === "active" ? (
+                                    <DropdownMenuItem
+                                      onClick={() => handleDeleteUser(user)}
+                                      className="flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer text-red-600 hover:bg-red-50 focus:bg-red-50 transition-all font-black text-xs"
+                                    >
+                                      <Trash2 className="w-4 h-4 text-red-500" />
+                                      Move to Trash
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    <DropdownMenuItem
+                                      onClick={() => handleDeleteUser(user)}
+                                      className="flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer text-green-600 hover:bg-green-50 focus:bg-green-50 transition-all font-black text-xs"
+                                    >
+                                      <RotateCcw className="w-4 h-4 text-green-500" />
+                                      Restore User
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
 
-              {filteredUsers.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-16 text-center text-gray-500"
-                  >
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                        {viewMode === "deleted" ? (
-                          <Trash2 className="w-6 h-6 text-gray-400" />
-                        ) : (
-                          <Users className="w-6 h-6 text-gray-400" />
-                        )}
+                {/* Mobile/Small Screen Card View */}
+                <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50/30">
+                  {filteredUsers.map((user) => {
+                    const roleBadge = getRoleBadge(user.role);
+                    return (
+                      <div key={user.id} className="bg-white border border-gray-100 rounded-[24px] p-5 shadow-sm hover:shadow-md transition-all space-y-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${getRandomGradient(user.fullName)} flex items-center justify-center text-white font-black shadow-lg`}>
+                              {getInitials(user.fullName)}
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="font-black text-gray-900 truncate max-w-[140px] leading-tight">{user.fullName}</h3>
+                              <p className="text-[11px] text-gray-400 font-bold truncate max-w-[140px]">{user.email}</p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger className="p-2 bg-gray-50 rounded-xl text-gray-400">
+                                <MoreVertical className="w-5 h-5" />
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48 bg-white shadow-2xl border-0 rounded-2xl p-2 z-[60]">
+                                {viewMode === "active" ? (
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteUser(user)}
+                                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-red-600 font-black text-xs"
+                                  >
+                                    <Trash2 className="w-4 h-4" /> Move to Trash
+                                  </DropdownMenuItem>
+                                ) : (
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteUser(user)}
+                                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-green-600 font-black text-xs"
+                                  >
+                                    <RotateCcw className="w-4 h-4" /> Restore User
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 pt-2">
+                          <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-black tracking-wider border uppercase ${roleBadge.className}`}>
+                            {roleBadge.label}
+                          </span>
+                          {user.isEmailVerified ? (
+                            <span className="inline-flex items-center gap-1.5 text-[9px] font-black text-green-600 uppercase tracking-widest bg-green-50 px-3 py-1.5 rounded-xl border border-green-100">Verified</span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 text-[9px] font-black text-amber-600 uppercase tracking-widest bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100">Pending</span>
+                          )}
+                        </div>
+
+                        <div className="pt-3 border-t border-gray-50 flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                          <span>Joined {new Date(user.createdAt).toLocaleDateString(undefined, { year: '2-digit', month: 'short', day: 'numeric' })}</span>
+                          {viewMode === "active" && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger className="text-blue-500 hover:text-blue-600 font-extrabold flex items-center gap-1">
+                                Role Settings <ChevronDown className="w-3 h-3" />
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="w-56 bg-white shadow-2xl border-0 rounded-2xl p-2 z-[100]"
+                              >
+                                <DropdownMenuLabel className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 py-3">
+                                  Assign New Role
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-gray-50 mx-2" />
+                                {["user", "partner", "affiliate", "sales", "support", "admin"].map((r) => (
+                                  <DropdownMenuItem
+                                    key={r}
+                                    onClick={() => handleUpdateRole(user, r as any)}
+                                    className="px-3 py-3 rounded-xl text-xs font-bold capitalize cursor-pointer hover:bg-gray-50"
+                                  >
+                                    <span>{r.replace("_", " ")}</span>
+                                    {user.role === r && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                                  </DropdownMenuItem>
+                                ))}
+                                {currentSessionUser?.role === "super_admin" && (
+                                  <DropdownMenuItem
+                                    onClick={() => handleUpdateRole(user, "super_admin")}
+                                    className="px-3 py-3 rounded-xl text-xs font-black text-red-600 cursor-pointer hover:bg-red-50"
+                                  >
+                                    <span>Super Admin</span>
+                                    {user.role === "super_admin" && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-red-500" />}
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-lg font-medium text-gray-900">
-                        {viewMode === "deleted"
-                          ? "Recycle bin is empty"
-                          : "No users found"}
-                      </p>
-                      <p className="text-sm text-gray-400 mt-1">
-                        {viewMode === "deleted"
-                          ? "Deleted users will appear here."
-                          : "Try adjusting your search or filters."}
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-6 rounded-3xl border border-gray-100 shadow-sm gap-4">
-          <p className="text-sm text-gray-500 font-medium font-sans">
-            Showing page{" "}
-            <span className="text-gray-900 font-bold">{pagination.page}</span>{" "}
-            of{" "}
-            <span className="text-gray-900 font-bold">{pagination.pages}</span>
-            <span className="mx-2 text-gray-300">|</span>
-            Total{" "}
-            <span className="text-gray-900 font-bold">
-              {pagination.total}
-            </span>{" "}
-            users
+        <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-[24px] md:rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 gap-4">
+          <p className="text-[11px] md:text-xs text-gray-400 font-black uppercase tracking-widest text-center sm:text-left">
+            Showing Page <span className="text-gray-900 mx-1">{pagination.page}</span> 
+            of <span className="text-gray-900 mx-1">{pagination.pages}</span>
+            <span className="mx-3 opacity-20">|</span>
+            Total <span className="text-gray-900 mx-1">{pagination.total}</span> Results
           </p>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             <button
               disabled={pagination.page <= 1}
               onClick={() => fetchUsers(pagination.page - 1)}
-              className="px-5 py-2.5 bg-gray-50 text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold text-sm hover:border-gray-300"
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-white text-gray-700 border-2 border-gray-50 rounded-xl hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all font-black text-[10px] uppercase tracking-wider"
             >
               Previous
             </button>
             <button
               disabled={pagination.page >= pagination.pages}
               onClick={() => fetchUsers(pagination.page + 1)}
-              className="px-5 py-2.5 bg-gray-100 text-gray-900 border border-gray-200 rounded-xl hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold text-sm border-transparent hover:shadow-sm"
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition-all font-black text-[10px] uppercase tracking-wider shadow-lg shadow-gray-900/10"
             >
               Next
             </button>
@@ -642,27 +675,27 @@ export default function UserManagement() {
 
         {/* Add User Modal */}
         {isAddUserModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
-            <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-gray-100">
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+            <div className="bg-white rounded-t-[32px] sm:rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-300 border border-gray-100 max-h-[95vh] flex flex-col">
               {/* Header */}
-              <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-gray-50 to-white">
+              <div className="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-gray-50/50 to-white shrink-0">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+                  <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
                     Add New User
                   </h2>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-xs md:text-sm text-gray-500 font-medium mt-1">
                     Create a new account and assign permissions.
                   </p>
                 </div>
                 <button
                   onClick={() => setIsAddUserModalOpen(false)}
-                  className="text-gray-400 hover:text-gray-900 p-2 rounded-full hover:bg-white hover:shadow-md transition-all duration-200"
+                  className="text-gray-400 hover:text-gray-900 p-2.5 rounded-full hover:bg-white hover:shadow-md transition-all duration-200"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-6 h-6" />
                 </button>
               </div>
-
-              <form onSubmit={handleAddUser} className="p-8 space-y-6">
+ 
+              <form onSubmit={handleAddUser} className="p-6 md:p-8 space-y-6 overflow-y-auto scrollbar-none">
                 <div className="space-y-4">
                   {/* Full Name */}
                   <div className="space-y-1.5">
@@ -774,23 +807,23 @@ export default function UserManagement() {
                   </div>
                 </div>
 
-                <div className="pt-6 flex gap-4">
+                <div className="pt-6 flex flex-col-reverse sm:flex-row gap-4">
                   <button
                     type="button"
                     onClick={() => setIsAddUserModalOpen(false)}
-                    className="flex-1 px-6 py-3.5 bg-gray-50 text-gray-700 rounded-2xl hover:bg-gray-100 font-semibold transition-all duration-200 border border-transparent hover:border-gray-200"
+                    className="flex-1 px-6 py-4 bg-white border-2 border-gray-100 text-gray-700 rounded-2xl hover:bg-gray-50 hover:border-gray-200 font-extrabold transition-all duration-200"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 px-6 py-3.5 bg-black text-white rounded-2xl hover:bg-gray-800 font-semibold transition-all duration-200 shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center gap-2"
+                    className="flex-[2] px-6 py-4 bg-gray-900 text-white rounded-2xl hover:bg-black font-black transition-all duration-200 shadow-xl shadow-gray-900/10 hover:shadow-gray-900/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Creating...</span>
+                        <span>Creating User...</span>
                       </>
                     ) : (
                       <>
