@@ -175,8 +175,8 @@ const RevenueDashboard = () => {
                             {item.percentage ||
                               (totalRevenue > 0
                                 ? Math.round(
-                                    (item.revenue / totalRevenue) * 100,
-                                  )
+                                  (item.revenue / totalRevenue) * 100,
+                                )
                                 : 0)}
                             %
                           </span>
@@ -218,11 +218,10 @@ const RevenueDashboard = () => {
                         {categoryLabel(item.category)}
                       </h3>
                       <Badge
-                        className={`${
-                          share >= 30
+                        className={`${share >= 30
                             ? "bg-green-100 text-green-700 hover:bg-green-100"
                             : "bg-blue-100 text-blue-700 hover:bg-blue-100"
-                        }`}
+                          }`}
                       >
                         {share}% share
                       </Badge>
