@@ -67,11 +67,12 @@ export default function SpacePortalLayout() {
   >({});
 
   /**
-  * Notifications state — populated from API on mount,
-  * updated in real-time via Socket.io.
-  */
-   const [notifications, setNotifications] = useState<SpacePortalNotification[]>([]);
-  
+   * Notifications state — populated from API on mount,
+   * updated in real-time via Socket.io.
+   */
+  const [notifications, setNotifications] = useState<SpacePortalNotification[]>(
+    [],
+  );
   /**
    * Toast queue system (shows 1 toast at a time)
    */
@@ -143,28 +144,30 @@ export default function SpacePortalLayout() {
   /**
    * Search bar configuration per route.
    */
-  const searchConfig: Record<string, { showSearch: boolean; placeholder: string }> =
-    useMemo(
-      () => ({
-        "/spaceportal/dashboard": {
-          showSearch: true,
-          placeholder: "Search by ID, company, contact, space...",
-        },
-        "/spaceportal/clients": {
-          showSearch: true,
-          placeholder: "Search clients...",
-        },
-        "/spaceportal/tickets": {
-          showSearch: true,
-          placeholder: "Search tickets...",
-        },
-        "/spaceportal/space-management": {
-          showSearch: true,
-          placeholder: "Search spaces by name, city, id...",
-        },
-      }),
-      []
-    );
+  const searchConfig: Record<
+    string,
+    { showSearch: boolean; placeholder: string }
+  > = useMemo(
+    () => ({
+      "/spaceportal/dashboard": {
+        showSearch: true,
+        placeholder: "Search by ID, company, contact, space...",
+      },
+      "/spaceportal/clients": {
+        showSearch: true,
+        placeholder: "Search clients...",
+      },
+      "/spaceportal/tickets": {
+        showSearch: true,
+        placeholder: "Search tickets...",
+      },
+      "/spaceportal/space-management": {
+        showSearch: true,
+        placeholder: "Search spaces by name, city, id...",
+      },
+    }),
+    [],
+  );
 
   /**
    * Resolve route key for search.
@@ -229,7 +232,8 @@ export default function SpacePortalLayout() {
   const makeTitle = (lead: string, highlight?: string) =>
     highlight ? (
       <>
-        {lead} <span className="text-[#2D3F33] dark:text-[#FDE68A]">{highlight}</span>
+        {lead}{" "}
+        <span className="text-[#2D3F33] dark:text-[#FDE68A]">{highlight}</span>
       </>
     ) : (
       lead
@@ -238,76 +242,129 @@ export default function SpacePortalLayout() {
   /**
    * Page header config (title + subtitle)
    */
-  const pageHeaderMap: Record<string, { title: ReactNode; subtitle?: string }> =
-    useMemo(
-      () => ({
-        "/spaceportal/dashboard": {
-          title: makeTitle("Space", "Dashboard"),
-          subtitle:
-            "Complete control over clients, plans, and space performance.",
-        },
-        "/spaceportal/booking-analytics": {
-          title: makeTitle("Booking", "Analytics"),
-          subtitle:
-            "Monitor performance across plans, spaces, and revenue trends.",
-        },
-        "/spaceportal/booking-calendar": {
-          title: makeTitle("Booking", "Calendar"),
-          subtitle: "Plan schedules and manage booking requests.",
-        },
-        "/spaceportal/active-requests": {
-          title: makeTitle("Active", "Requests"),
-          subtitle: "Review and manage space booking requests.",
-        },
-        "/spaceportal/clients": {
-          title: makeTitle("My", "Clients"),
-          subtitle: "Manage all your client relationships",
-        },
-        "/spaceportal/client-enquiries": {
-          title: makeTitle("Client", "Enquiries"),
-          subtitle: "Manage new leads, ongoing conversations, and conversions.",
-        },
-        "/spaceportal/invoices-payments": {
-          title: makeTitle("Invoices and", "Payments"),
-          subtitle: "Submit new invoices, track payments received, and view dues.",
-        },
-        "/spaceportal/notifications": {
-          title: "Notifications",
-          subtitle: "All updates from clients, bookings, invoices, and support.",
-        },
-        "/spaceportal/profile": {
-          title: "Profile",
-          subtitle: "Manage your space partner profile and contact details.",
-        },
-        "/spaceportal/settings": {
-          title: "Settings",
-          subtitle: "Manage notification preferences and security details.",
-        },
-        "/spaceportal/tickets": {
-          title: makeTitle("Ticket", "System"),
-          subtitle:
-            "Track support requests raised by clients and manage resolutions.",
-        },
-        "/spaceportal/space-management": {
-          title: makeTitle("Space", "Management"),
-          subtitle:
-            "Manage your coworking spaces, availability, and operational status.",
-        },
-        "/spaceportal/space-management/add": {
-          title: makeTitle("Add", "Space"),
-          subtitle: "Create a new space listing for your portal.",
-        },
-        "/spaceportal/clients/:id": {
-          title: "Client Details",
-          subtitle: "Review client profile and plan details.",
-        },
-        "/spaceportal/feedback-nps": {
-          title: "Feedback",
-          subtitle: "Monitor client satisfaction",
-        },
-      }),
-      []
-    );
+  const pageHeaderMap: Record<
+    string,
+    {
+      title: ReactNode;
+      subtitle?: string;
+      hideTopBar?: boolean;
+      pageBg?: string;
+    }
+  > = useMemo(
+    () => ({
+      "/spaceportal/dashboard": {
+        title: makeTitle("Space", "Dashboard"),
+        subtitle:
+          "Complete control over clients, plans, and space performance.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/booking-analytics": {
+        title: makeTitle("Booking", "Analytics"),
+        subtitle:
+          "Monitor performance across plans, spaces, and revenue trends.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/booking-calendar": {
+        title: makeTitle("Booking", "Calendar"),
+        subtitle: "Plan schedules and manage booking requests.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/active-requests": {
+        title: makeTitle("Active", "Requests"),
+        subtitle: "Review and manage space booking requests.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/clients": {
+        title: makeTitle("My", "Clients"),
+        subtitle: "Manage all your client relationships",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/invoices-payments": {
+        title: makeTitle("Invoices and", "Payments"),
+        subtitle:
+          "Submit new invoices, track payments received, and view dues.",
+      },
+      "/spaceportal/notifications": {
+        title: "Notifications",
+        subtitle: "All updates from clients, bookings, invoices, and support.",
+      },
+      "/spaceportal/kyc-verification": {
+        title: makeTitle("KYC", "Verification"),
+        subtitle: "Manage your verification profiles for compliance",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/profile": {
+        title: "Profile",
+        subtitle: "Manage your space partner profile and contact details.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/settings": {
+        title: "Settings",
+        subtitle: "Manage notification preferences and security details.",
+      },
+      "/spaceportal/tickets": {
+        title: makeTitle("Ticket", "System"),
+        subtitle:
+          "Track support requests raised by clients and manage resolutions.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/space-management": {
+        title: makeTitle("My", "Spaces"),
+        subtitle: "Manage all your workspace listings",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/space-management/add": {
+        title: makeTitle("Add", "Space"),
+        subtitle: "Create a new space listing for your portal.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/clients/:id": {
+        title: "Client Details",
+        subtitle: "Review client profile and plan details.",
+      },
+      "/spaceportal/team-management": {
+        title: makeTitle("Team", "Members"),
+        subtitle: "Manage your team and their access permissions",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/tasks": {
+        title: makeTitle("Tickets &", "Tasks"),
+        subtitle: "Manage your client tickets and internal tasks",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/feedback-nps": {
+        title: makeTitle("Feedback &", "NPS"),
+        subtitle: "Monitor client satisfaction and feedback",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/client-enquiries": {
+        title: makeTitle("Client", "Enquiries"),
+        subtitle: "Manage and convert incoming client enquiries",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/mail-visits": {
+        title: makeTitle("Mail &", "Visits"),
+        subtitle: "Track client mail and visitor logs effectively",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+    }),
+    [],
+  );
 
   /**
    * Resolve header key for dynamic routes.
@@ -350,7 +407,7 @@ export default function SpacePortalLayout() {
 
     window.localStorage.setItem(
       "spaceportal.sidebar.collapsed",
-      String(isSidebarCollapsed)
+      String(isSidebarCollapsed),
     );
   }, [isSidebarCollapsed]);
 
@@ -375,11 +432,14 @@ export default function SpacePortalLayout() {
 
     if (newItems.length > 0) {
       setToastQueue((prev) => [...prev, ...newItems]);
-      triggerBrowserNotifications(newItems, hasRequestedNotificationPermissionRef);
+      triggerBrowserNotifications(
+        newItems,
+        hasRequestedNotificationPermissionRef,
+      );
     }
 
     prevNotificationIdsRef.current = new Set(
-      notifications.map((item) => item.id)
+      notifications.map((item) => item.id),
     );
   }, [notifications]);
 
@@ -440,10 +500,10 @@ export default function SpacePortalLayout() {
         }
       },
 
-    markRead: async (id: string) => {
+      markRead: async (id: string) => {
         setNotifications((prev) =>
-          prev.map((item) => (item.id === id ? { ...item, read: true } : item))
- );
+          prev.map((item) => (item.id === id ? { ...item, read: true } : item)),
+        );
         try {
           await fetch(`${base}/api/notifications/${id}/read`, {
             method: "PATCH",
@@ -457,7 +517,9 @@ export default function SpacePortalLayout() {
       // Mark unread is local-only (no backend PATCH for unread)
       markUnread: (id: string) =>
         setNotifications((prev) =>
-          prev.map((item) => (item.id === id ? { ...item, read: false } : item))
+          prev.map((item) =>
+            item.id === id ? { ...item, read: false } : item,
+          ),
         ),
 
       deleteNotification: async (id: string) => {
@@ -474,7 +536,7 @@ export default function SpacePortalLayout() {
 
       restoreNotification: (
         notification: SpacePortalNotification,
-        index: number
+        index: number,
       ) =>
         setNotifications((prev) => {
           if (prev.some((item) => item.id === notification.id)) {
@@ -485,11 +547,7 @@ export default function SpacePortalLayout() {
             return [notification, ...prev];
           }
 
-          return [
-            ...prev.slice(0, index),
-            notification,
-            ...prev.slice(index),
-          ];
+          return [...prev.slice(0, index), notification, ...prev.slice(index)];
         }),
 
       clearNotifications: async () => {
@@ -534,8 +592,9 @@ export default function SpacePortalLayout() {
 
           {/* Mobile Sidebar */}
           <div
-            className={`fixed inset-0 z-40 transition-opacity lg:hidden ${isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
-              }`}
+            className={`fixed inset-0 z-40 transition-opacity lg:hidden ${
+              isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
             aria-hidden={!isSidebarOpen}
           >
             <button
@@ -546,8 +605,9 @@ export default function SpacePortalLayout() {
             />
 
             <div
-              className={`absolute inset-y-0 left-0 w-72 transform bg-white shadow-2xl transition-transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-                }`}
+              className={`absolute inset-y-0 left-0 w-72 transform bg-white shadow-2xl transition-transform ${
+                isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+              }`}
             >
               <Sidebar onClose={() => setIsSidebarOpen(false)} />
             </div>
@@ -583,23 +643,28 @@ export default function SpacePortalLayout() {
           ) : null}
 
           {/* Main Content */}
-          <div className="flex min-w-0 flex-1 flex-col">
+          <div
+            className="flex min-w-0 flex-1 flex-col min-h-screen"
+            style={{ backgroundColor: headerConfig.pageBg || "" }}
+          >
             {/* Topbar */}
-            <div className="px-3 pt-3 sm:px-5 sm:pt-5 lg:px-8">
-              <TopBar
-                title={headerConfig.title}
-                subtitle={headerConfig.subtitle}
-                onMenuClick={() => setIsSidebarOpen(true)}
-                showSearch={searchMeta.showSearch}
-                searchValue={searchValue}
-                searchPlaceholder={searchMeta.placeholder}
-                onSearchChange={handleSearchChange}
-                onSearchSubmit={handleSearchSubmit}
-                notifications={notifications}
-                onProfileNavigate={() => navigate("/spaceportal/profile")}
-                onSettingsNavigate={() => navigate("/spaceportal/settings")}
-              />
-            </div>
+            {!headerConfig.hideTopBar && (
+              <div className="px-3 pt-3 sm:px-5 sm:pt-5 lg:px-8">
+                <TopBar
+                  title={headerConfig.title}
+                  subtitle={headerConfig.subtitle}
+                  onMenuClick={() => setIsSidebarOpen(true)}
+                  showSearch={searchMeta.showSearch}
+                  searchValue={searchValue}
+                  searchPlaceholder={searchMeta.placeholder}
+                  onSearchChange={handleSearchChange}
+                  onSearchSubmit={handleSearchSubmit}
+                  notifications={notifications}
+                  onProfileNavigate={() => navigate("/spaceportal/profile")}
+                  onSettingsNavigate={() => navigate("/spaceportal/settings")}
+                />
+              </div>
+            )}
 
             {/* Page Content */}
             <main className="relative mt-4 flex-1 px-3 pb-6 sm:mt-6 sm:px-5 lg:px-8">
@@ -625,7 +690,7 @@ export default function SpacePortalLayout() {
  */
 function triggerBrowserNotifications(
   newItems: SpacePortalNotification[],
-  permissionRequestedRef: React.MutableRefObject<boolean>
+  permissionRequestedRef: React.MutableRefObject<boolean>,
 ) {
   if (typeof window === "undefined" || !("Notification" in window)) return;
 
