@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axios";
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/visit`;
+const API_URL = "/api/visit";
 
 export interface VisitRecord {
   _id: string;
