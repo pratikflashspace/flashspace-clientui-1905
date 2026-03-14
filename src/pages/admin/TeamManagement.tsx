@@ -21,8 +21,6 @@ import {
   Headphones,
 } from "lucide-react";
 import { toast } from "sonner";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -302,12 +300,7 @@ export default function TeamManagement() {
   }
 
   return (
-    <DashboardLayout
-      portalName="FlashSpace Admin"
-      portalDescription="Complete platform management"
-      navItems={ADMIN_NAV_ITEMS}
-    >
-      <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
@@ -917,7 +910,6 @@ export default function TeamManagement() {
             </div>
           </div>
         )}
-      </div>
-    </DashboardLayout>
+    </div>
   );
 }
