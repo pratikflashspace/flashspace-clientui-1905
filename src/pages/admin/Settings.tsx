@@ -61,6 +61,7 @@ export default function AdminSettings() {
       const response = await authService.changePassword({
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
+        confirmPassword: passwordForm.confirmPassword,
       });
 
       if (response.success) {

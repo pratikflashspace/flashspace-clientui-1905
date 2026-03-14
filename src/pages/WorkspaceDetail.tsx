@@ -765,7 +765,17 @@ const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
       <MeetingBookingModal
         isOpen={isMeetingModalOpen}
         onClose={() => setIsMeetingModalOpen(false)}
-        item={{ name: data.name, address: address }}
+        item={{
+          ...data,
+          _id: data._id || id,
+          name: data.name,
+          address: address,
+          area: data.area || data.city || "",
+          price: data.price || "N/A",
+          rating: data.rating || data.avgRating || 0,
+          reviews: data.reviews || data.totalReviews || 0,
+          features: data.features || data.amenities || [],
+        } as any}
       />
       <Footer />
     </div>
