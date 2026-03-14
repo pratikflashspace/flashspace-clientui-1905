@@ -138,23 +138,23 @@ export default function Notifications() {
       navItems={ADMIN_NAV_ITEMS}
     >
       <div className="space-y-6 animate-in fade-in duration-500">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-[Poppins]">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight font-[Poppins]">
               Notifications
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-sm md:text-base text-gray-500 mt-1">
               Stay updated with system activities and alerts.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="px-3 py-1 rounded-full">
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <Badge variant="secondary" className="px-4 py-1.5 rounded-full font-bold text-blue-700 bg-blue-50 border-blue-100 flex-1 md:flex-none justify-center">
               {notifications.filter((n) => !n.read).length} Unread
             </Badge>
             <button
               onClick={handleClearAll}
               disabled={notifications.length === 0}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-all disabled:opacity-50 border border-red-50 flex-1 md:flex-none"
             >
               <Trash2 className="w-4 h-4" />
               Clear All
@@ -163,7 +163,7 @@ export default function Notifications() {
         </div>
 
         {/* Search & Filters */}
-        <div className="flex flex-col md:flex-row gap-4 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex flex-col md:flex-row gap-4 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm sticky top-0 z-10 md:static">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -171,18 +171,18 @@ export default function Notifications() {
               placeholder="Search notifications..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 bg-transparent rounded-xl focus:outline-none placeholder:text-gray-400 text-sm"
+              className="w-full pl-11 pr-4 py-2.5 bg-gray-50/50 md:bg-transparent rounded-xl focus:outline-none placeholder:text-gray-400 text-sm font-medium"
             />
           </div>
-          <div className="flex bg-gray-50 p-1 rounded-xl gap-1">
+          <div className="flex bg-gray-50 p-1 rounded-xl gap-1 overflow-x-auto scrollbar-none">
             {(["all", "unread", "read"] as const).map((type) => (
               <button
                 key={type}
                 onClick={() => setFilterType(type)}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
+                className={`flex-1 md:flex-none min-w-[80px] px-4 py-2 rounded-lg text-xs font-bold capitalize transition-all ${
                   filterType === type
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "bg-white text-gray-900 shadow-sm ring-1 ring-gray-100"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                 }`}
               >
                 {type}
@@ -224,12 +224,12 @@ export default function Notifications() {
                       handleMarkAsRead(notification._id, {} as any);
                     setSelectedNotification(notification);
                   }}
-                  className={`p-5 hover:bg-gray-50/50 transition-all group flex gap-5 cursor-pointer items-center ${
-                    !notification.read ? "bg-blue-50/20" : ""
+                  className={`p-4 md:p-5 hover:bg-gray-50/50 transition-all group flex gap-3 md:gap-5 cursor-pointer items-start md:items-center ${
+                    !notification.read ? "bg-blue-50/10 border-l-4 border-l-blue-500" : "border-l-4 border-l-transparent"
                   }`}
                 >
                   <div
-                    className={`p-3 rounded-2xl border h-fit transition-transform group-hover:scale-110 ${
+                    className={`p-2.5 md:p-3 rounded-xl md:rounded-2xl border h-fit transition-all group-hover:scale-105 shrink-0 ${
                       !notification.read
                         ? "bg-white border-blue-100 shadow-sm"
                         : "bg-gray-50/50 border-gray-100"
@@ -237,12 +237,12 @@ export default function Notifications() {
                   >
                     {getIcon(notification.type)}
                   </div>
-
+ 
                   <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start gap-4 mb-1">
-                      <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-start md:gap-4 gap-1 mb-1">
+                      <div className="flex flex-wrap items-center gap-2 md:gap-3 min-w-0">
                         <h3
-                          className={`font-bold truncate ${
+                          className={`font-bold text-sm md:text-base truncate max-w-full ${
                             !notification.read
                               ? "text-gray-900"
                               : "text-gray-600"
@@ -255,14 +255,14 @@ export default function Notifications() {
                         )}
                         <Badge
                           variant="outline"
-                          className={`hidden sm:inline-flex text-[10px] uppercase tracking-wider font-bold h-5 ${getCategoryColor(
+                          className={`text-[9px] md:text-[10px] uppercase tracking-wider font-extrabold h-4 md:h-5 px-1.5 ${getCategoryColor(
                             notification.type,
                           )}`}
                         >
                           {notification.type.replace(/_/g, " ")}
                         </Badge>
                       </div>
-                      <span className="text-[11px] text-gray-400 whitespace-nowrap font-medium flex items-center gap-1.5">
+                      <span className="text-[10px] md:text-[11px] text-gray-400 whitespace-nowrap font-medium flex items-center gap-1.5">
                         <Clock className="w-3 h-3" />
                         {format(
                           new Date(notification.createdAt),
@@ -270,29 +270,31 @@ export default function Notifications() {
                         )}
                       </span>
                     </div>
-                    <p className="text-gray-500 text-sm line-clamp-1 pr-10">
+                    <p className="text-gray-500 text-xs md:text-sm line-clamp-1 pr-6 md:pr-10">
                       {notification.message}
                     </p>
                   </div>
-
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0">
-                    {!notification.read && (
+ 
+                  <div className="flex items-center gap-1 opacity-0 md:group-hover:opacity-100 transition-all md:-translate-x-2 md:group-hover:translate-x-0">
+                    <div className="hidden md:flex gap-1">
+                      {!notification.read && (
+                        <button
+                          onClick={(e) => handleMarkAsRead(notification._id, e)}
+                          className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                          title="Mark as read"
+                        >
+                          <MailOpen className="w-4 h-4" />
+                        </button>
+                      )}
                       <button
-                        onClick={(e) => handleMarkAsRead(notification._id, e)}
-                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                        title="Mark as read"
+                        onClick={(e) => handleDelete(notification._id, e)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
                       >
-                        <MailOpen className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
-                    )}
-                    <button
-                      onClick={(e) => handleDelete(notification._id, e)}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                    <ChevronRight className="w-5 h-5 text-gray-300 ml-1" />
+                    </div>
+                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-300 ml-1 shrink-0" />
                   </div>
                 </div>
               ))}
@@ -311,10 +313,10 @@ export default function Notifications() {
             className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-in zoom-in-95 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-8 pb-4 flex justify-between items-start">
-              <div className="flex items-center gap-4">
+            <div className="p-6 md:p-8 pb-4 flex justify-between items-start">
+              <div className="flex items-center gap-3 md:gap-4">
                 <div
-                  className={`p-4 rounded-2xl border ${getCategoryColor(
+                  className={`p-3 md:p-4 rounded-xl md:rounded-2xl border ${getCategoryColor(
                     selectedNotification.type,
                   )}`}
                 >
@@ -323,16 +325,16 @@ export default function Notifications() {
                 <div>
                   <Badge
                     variant="outline"
-                    className={`mb-1 text-[10px] uppercase font-bold ${getCategoryColor(
+                    className={`mb-1 text-[9px] md:text-[10px] uppercase font-black tracking-widest ${getCategoryColor(
                       selectedNotification.type,
                     )}`}
                   >
                     {selectedNotification.type.replace(/_/g, " ")}
                   </Badge>
-                  <p className="text-sm text-gray-400 font-medium">
+                  <p className="text-[11px] md:text-sm text-gray-400 font-bold">
                     {format(
                       new Date(selectedNotification.createdAt),
-                      "MMMM d, yyyy • h:mm a",
+                      "MMM d, yyyy • h:mm a",
                     )}
                   </p>
                 </div>
@@ -341,35 +343,35 @@ export default function Notifications() {
                 onClick={() => setSelectedNotification(null)}
                 className="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-all"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
 
-            <div className="p-8 pt-4">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 leading-tight">
+            <div className="p-6 md:p-8 pt-4">
+              <h3 className="text-xl md:text-2xl font-black text-gray-900 mb-4 leading-tight">
                 {selectedNotification.title}
               </h3>
-              <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-8">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <div className="bg-gray-50 rounded-2xl p-4 md:p-5 border border-gray-100 mb-6 md:mb-8">
+                <p className="text-sm md:text-base text-gray-700 leading-relaxed whitespace-pre-wrap">
                   {selectedNotification.message}
                 </p>
               </div>
-
-              <div className="flex gap-4">
+ 
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => setSelectedNotification(null)}
-                  className="flex-1 py-3 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl active:scale-95"
+                  className="flex-1 py-3.5 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
                 >
-                  Close
+                  Dismiss
                 </button>
                 <button
                   onClick={(e) => {
                     handleDelete(selectedNotification._id, e);
                     setSelectedNotification(null);
                   }}
-                  className="px-6 py-3 border-2 border-red-100 text-red-600 font-bold rounded-2xl hover:bg-red-50 transition-all active:scale-95"
+                  className="px-6 py-3.5 border-2 border-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-50 transition-all active:scale-[0.98]"
                 >
-                  Delete
+                  Delete Notification
                 </button>
               </div>
             </div>

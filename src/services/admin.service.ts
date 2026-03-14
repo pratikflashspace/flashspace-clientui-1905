@@ -107,6 +107,9 @@ export interface KYCData {
     panNumber?: string;
     aadhaarNumber?: string;
     dateOfBirth?: string;
+    address?: string;
+    city?: string;
+    area?: string;
   };
   businessInfo?: {
     companyName?: string;
