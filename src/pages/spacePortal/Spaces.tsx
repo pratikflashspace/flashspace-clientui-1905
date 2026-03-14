@@ -38,7 +38,6 @@ const getStatusBadge = (status: string) => {
   const s = status.toLowerCase();
   switch (s) {
     case "active":
-    case "active":
       return (
         <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
           Active
