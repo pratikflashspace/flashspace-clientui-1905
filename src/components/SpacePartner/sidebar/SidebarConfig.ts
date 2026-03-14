@@ -12,6 +12,7 @@ import {
   Mail,
   UserPlus,
   Settings,
+  ShieldCheck,
 } from "lucide-react";
 
 export const sidebarConfig = [
@@ -19,6 +20,11 @@ export const sidebarConfig = [
     label: "Dashboard",
     path: "/spaceportal/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    label: "KYC Compliance",
+    path: "/spaceportal/kyc-verification",
+    icon: ShieldCheck,
   },
   {
     label: "Booking Analytics",

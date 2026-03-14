@@ -288,6 +288,8 @@ export default function SpacePortalLayout() {
         title: makeTitle("Invoices and", "Payments"),
         subtitle:
           "Submit new invoices, track payments received, and view dues.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
       },
       "/spaceportal/notifications": {
         title: "Notifications",
@@ -362,6 +364,12 @@ export default function SpacePortalLayout() {
         hideTopBar: true,
         pageBg: "#f3f4f3",
       },
+      "/spaceportal/space-management/:id": {
+        title: "Property Details",
+        subtitle: "Review your property performance and inventory.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
     }),
     [],
   );
@@ -372,6 +380,12 @@ export default function SpacePortalLayout() {
   const headerKey = useMemo(() => {
     if (location.pathname.startsWith("/spaceportal/clients/")) {
       return "/spaceportal/clients/:id";
+    }
+    if (
+      location.pathname.startsWith("/spaceportal/space-management/") &&
+      location.pathname !== "/spaceportal/space-management/add"
+    ) {
+      return "/spaceportal/space-management/:id";
     }
     return location.pathname;
   }, [location.pathname]);

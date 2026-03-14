@@ -16,6 +16,10 @@ import {
   Send,
   AlertCircle,
   TrendingUp,
+  Filter,
+  Search,
+  Plus,
+  ArrowUpRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -28,6 +32,8 @@ import { axiosInstance } from "../../lib/axios";
 import { toast } from "sonner";
 import LogInvoiceModal from "../../components/SpacePartner/LogInvoiceModal";
 import LogPaymentModal from "../../components/SpacePartner/LogPaymentModal";
+import { motion, AnimatePresence } from "framer-motion";
+import { Badge } from "../../components/ui/badge";
 
 interface InvoiceRecord {
   _id: string;
@@ -70,6 +76,7 @@ const InvoicesAndPayments = () => {
   const [loading, setLoading] = useState(true);
   const [isLogInvoiceModalOpen, setIsLogInvoiceModalOpen] = useState(false);
   const [isLogPaymentModalOpen, setIsLogPaymentModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchInvoices = async () => {
     try {
@@ -86,7 +93,6 @@ const InvoicesAndPayments = () => {
       }
     } catch (error) {
       console.error("Failed to fetch invoices", error);
-      toast.error("Failed to fetch invoice records");
     }
   };
 
@@ -105,7 +111,6 @@ const InvoicesAndPayments = () => {
       }
     } catch (error) {
       console.error("Failed to fetch payments", error);
-      toast.error("Failed to fetch payment records");
     }
   };
 
@@ -147,7 +152,6 @@ const InvoicesAndPayments = () => {
     0,
   );
 
-  // Helper to format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
@@ -164,273 +168,409 @@ const InvoicesAndPayments = () => {
     }).format(amount);
   };
 
-  const getInvoiceStatusStyle = (status: string) => {
+  const getInvoiceStatusProps = (status: string) => {
     switch (status) {
       case "Pending":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+        return {
+          color: "text-amber-600 bg-amber-50 border-amber-100",
+          icon: <Clock className="w-3 h-3" />,
+        };
       case "Paid":
-        return "bg-green-100 text-green-700 border-green-200";
+        return {
+          color: "text-emerald-600 bg-emerald-50 border-emerald-100",
+          icon: <CheckCircle2 className="w-3 h-3" />,
+        };
       case "Overdue":
-        return "bg-red-100 text-red-700 border-red-200";
+        return {
+          color: "text-rose-600 bg-rose-50 border-rose-100",
+          icon: <AlertCircle className="w-3 h-3" />,
+        };
       case "Cancelled":
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return {
+          color: "text-slate-600 bg-slate-50 border-slate-100",
+          icon: null,
+        };
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return {
+          color: "text-slate-600 bg-slate-50 border-slate-100",
+          icon: null,
+        };
     }
   };
 
   const handleSendReminder = (id: string) => {
     toast.success(
       `Reminder sent to client for invoice #${id.slice(-6).toUpperCase()}`,
+      {
+        icon: <Send className="w-4 h-4" />,
+      },
     );
   };
 
+  const filteredInvoices = invoiceRecords.filter(
+    (i) =>
+      i.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      i.invoiceId?.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const filteredPayments = paymentRecords.filter(
+    (p) =>
+      p.client.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.paymentId?.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.4,
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="p-8 max-w-7xl mx-auto animate-in fade-in duration-500">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div className="flex-1 space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-[Poppins]">
-            Invoices & <span className="text-teal-600">Payments</span>
+          <h1 className="text-4xl">
+            Invoices & <span className="text-primary italic">Payments</span>
           </h1>
-          <p className="text-gray-500 text-lg mt-1">
-            Manage financial records for your spaces
+          <p className="text-muted-foreground mt-1">
+            Track your payments, manage invoices, and monitor revenue growth.
           </p>
         </div>
-        <button
-          onClick={() =>
-            activeTab === "invoices"
-              ? setIsLogInvoiceModalOpen(true)
-              : setIsLogPaymentModalOpen(true)
-          }
-          className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-        >
-          <LogIn className="w-5 h-5" />
-          {activeTab === "invoices" ? "Create Invoice" : "Create Payment"}
-        </button>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <input
+              type="text"
+              placeholder="Search records..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-4 py-2 bg-background border border-input rounded-xl w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+            />
+          </div>
+          <Button
+            onClick={() =>
+              activeTab === "invoices"
+                ? setIsLogInvoiceModalOpen(true)
+                : setIsLogPaymentModalOpen(true)
+            }
+            className="rounded-xl font-bold shadow-sm flex items-center gap-2 h-10 px-6"
+          >
+            <Plus className="w-4 h-4" />
+            {activeTab === "invoices" ? "Create Invoice" : "Log Payment"}
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
-          <div className="p-3 bg-green-50 rounded-xl">
-            <TrendingUp className="w-6 h-6 text-green-600" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">
-              {formatCurrency(thisMonthRevenue)}
-            </h3>
-            <p className="text-gray-500 text-sm">This Month</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
-          <div className="p-3 bg-yellow-50 rounded-xl">
-            <Clock className="w-6 h-6 text-yellow-600" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">
-              {formatCurrency(pendingAmount)}
-            </h3>
-            <p className="text-gray-500 text-sm">Pending</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
-          <div className="p-3 bg-red-50 rounded-xl">
-            <AlertCircle className="w-6 h-6 text-red-600" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">
-              {formatCurrency(overdueAmount)}
-            </h3>
-            <p className="text-gray-500 text-sm">Overdue</p>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
-          <div className="p-3 bg-teal-50 rounded-xl">
-            <CreditCard className="w-6 h-6 text-teal-600" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">
-              {formatCurrency(totalCommission)}
-            </h3>
-            <p className="text-gray-500 text-sm">Commission Earned</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Custom Tabs */}
-      <div className="flex items-center gap-2 mb-8">
-        <button
-          onClick={() => setActiveTab("invoices")}
-          className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all ${
-            activeTab === "invoices"
-              ? "bg-white text-gray-900 shadow-sm border border-gray-200"
-              : "bg-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-          }`}
-        >
-          Pending Invoices
-        </button>
-        <button
-          onClick={() => setActiveTab("payments")}
-          className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-all ${
-            activeTab === "payments"
-              ? "bg-white text-gray-900 shadow-sm border border-gray-200"
-              : "bg-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-          }`}
-        >
-          Payment History
-        </button>
-      </div>
-
-      {/* Content */}
-      <div className="min-h-[400px]">
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
-          </div>
-        ) : activeTab === "invoices" ? (
-          /* Invoices List View */
-          <div className="space-y-4">
-            {invoiceRecords.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
-                <FileText className="w-12 h-12 mb-2 mx-auto opacity-20" />
-                <p>No invoices found</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          {
+            label: "This Month",
+            value: thisMonthRevenue,
+            sub: "Revenue received",
+            icon: <TrendingUp className="w-5 h-5" />,
+            color: "emerald",
+            trend: "up",
+          },
+          {
+            label: "Pending",
+            value: pendingAmount,
+            sub: "Waiting for client",
+            icon: <Clock className="w-5 h-5" />,
+            color: "amber",
+            trend: "neutral",
+          },
+          {
+            label: "Overdue",
+            value: overdueAmount,
+            sub: "Needs attention",
+            icon: <AlertCircle className="w-5 h-5" />,
+            color: "rose",
+            trend: "down",
+          },
+          {
+            label: "Total Earned",
+            value: totalCommission,
+            sub: "Life-time revenue",
+            icon: <CreditCard className="w-5 h-5" />,
+            color: "primary",
+            trend: "neutral",
+          },
+        ].map((stat, idx) => (
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: idx * 0.1 }}
+            className="bg-background border border-border p-5 rounded-2xl shadow-sm relative overflow-hidden group hover:border-primary/20 transition-all"
+          >
+            <div
+              className={`absolute -right-4 -bottom-4 w-24 h-24 bg-${stat.color === "primary" ? "primary" : stat.color + "-500"}/5 rounded-full group-hover:scale-150 transition-transform duration-500`}
+            />
+            <div className="flex flex-col gap-3 relative">
+              <div
+                className={`p-2.5 bg-${stat.color === "primary" ? "primary" : stat.color + "-500"}/10 rounded-xl w-fit text-${stat.color === "primary" ? "primary" : stat.color + "-600"}`}
+              >
+                {stat.icon}
               </div>
-            ) : (
-              invoiceRecords.map((invoice) => (
-                <div
-                  key={invoice._id}
-                  className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  {stat.label}
+                </p>
+                <h3 className="text-2xl font-bold text-foreground">
+                  {formatCurrency(stat.value)}
+                </h3>
+                <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 font-medium">
+                  {stat.sub}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Main Content Area */}
+      <div className="space-y-4">
+        {/* Custom Nav-like Tabs */}
+        <div className="bg-muted/50 p-1 rounded-xl w-fit flex items-center border border-border">
+          <button
+            onClick={() => setActiveTab("invoices")}
+            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+              activeTab === "invoices"
+                ? "bg-background text-primary shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Invoices
+          </button>
+          <button
+            onClick={() => setActiveTab("payments")}
+            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
+              activeTab === "payments"
+                ? "bg-background text-primary shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Payments
+          </button>
+        </div>
+
+        {/* Content Box */}
+        <div className="bg-background border border-border rounded-2xl shadow-sm overflow-hidden min-h-[450px]">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center h-[450px] gap-3">
+              <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+              <p className="text-sm text-muted-foreground font-medium animate-pulse">
+                Updating Ledger...
+              </p>
+            </div>
+          ) : (
+            <AnimatePresence mode="wait">
+              {activeTab === "invoices" ? (
+                <motion.div
+                  key="invoices"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="p-6"
                 >
-                  <div className="space-y-3 w-full md:w-auto">
-                    <div className="flex items-center gap-3">
-                      <span className="text-gray-500 font-medium">
-                        {invoice.invoiceId ||
-                          `#${invoice._id.slice(-6).toUpperCase()}`}
-                      </span>
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border flex items-center gap-1.5 ${getInvoiceStatusStyle(invoice.status)}`}
-                      >
-                        {invoice.status === "Pending" && (
-                          <Clock className="w-3 h-3" />
-                        )}
-                        {invoice.status === "Overdue" && (
-                          <AlertCircle className="w-3 h-3" />
-                        )}
-                        {invoice.status}
-                      </span>
+                  {filteredInvoices.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-[350px] text-center">
+                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                        <FileText className="w-8 h-8 text-muted-foreground opacity-30" />
+                      </div>
+                      <h3 className="text-lg font-bold">No Invoices</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        There are no matching invoices to display.
+                      </p>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">
-                      {invoice.client}
-                    </h3>
-                    <p className="text-gray-500 text-sm">
-                      Due: {formatDate(invoice.dueDate)}
-                    </p>
-                  </div>
-                  <div className="flex flex-row md:flex-col items-center md:items-end gap-4 md:gap-2 w-full md:w-auto justify-between md:justify-end">
-                    <div className="text-2xl font-bold text-gray-900">
-                      {formatCurrency(invoice.amount)}
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="text-gray-600 border-gray-200 hover:text-teal-600 hover:border-teal-600 hover:bg-teal-50 gap-2"
-                      onClick={() => handleSendReminder(invoice._id)}
-                    >
-                      Send Reminder
-                    </Button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        ) : (
-          /* Payments Table View */
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            {paymentRecords.length === 0 ? (
-              <div className="p-12 text-center text-gray-400">
-                <CreditCard className="w-12 h-12 mb-2 mx-auto opacity-20" />
-                <p>No payment records found</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-white border-b border-gray-100">
-                    <tr>
-                      <th className="px-6 py-4 text-sm font-bold text-gray-900">
-                        Payment ID
-                      </th>
-                      <th className="px-6 py-4 text-sm font-bold text-gray-900">
-                        Invoice
-                      </th>
-                      <th className="px-6 py-4 text-sm font-bold text-gray-900">
-                        Client
-                      </th>
-                      <th className="px-6 py-4 text-sm font-bold text-gray-900">
-                        Amount
-                      </th>
-                      <th className="px-6 py-4 text-sm font-bold text-gray-900">
-                        Date
-                      </th>
-                      <th className="px-6 py-4 text-sm font-bold text-gray-900">
-                        Method
-                      </th>
-                      <th className="px-6 py-4 text-sm font-bold text-gray-900">
-                        Commission
-                      </th>
-                      <th className="px-6 py-4 text-sm font-bold text-gray-900 text-right">
-                        Receipt
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {paymentRecords.map((record) => (
-                      <tr
-                        key={record._id}
-                        className="hover:bg-gray-50/50 transition-colors"
-                      >
-                        <td className="px-6 py-5 text-sm font-bold text-gray-900">
-                          {record.paymentId}
-                        </td>
-                        <td className="px-6 py-5 text-sm font-medium text-teal-600">
-                          {record.invoiceId || "—"}
-                        </td>
-                        <td className="px-6 py-5 text-sm text-gray-500">
-                          {record.client}
-                        </td>
-                        <td className="px-6 py-5 text-sm font-bold text-gray-900">
-                          {formatCurrency(record.amount)}
-                        </td>
-                        <td className="px-6 py-5 text-sm text-gray-400">
-                          {formatDate(record.date)}
-                        </td>
-                        <td className="px-6 py-5 text-sm text-gray-500">
-                          {record.method}
-                        </td>
-                        <td className="px-6 py-5 text-sm font-medium text-green-600">
-                          {record.commission
-                            ? formatCurrency(record.commission)
-                            : "—"}
-                        </td>
-                        <td className="px-6 py-5 text-right">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-gray-400 hover:text-gray-600"
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredInvoices.map((invoice, idx) => {
+                        const status = getInvoiceStatusProps(invoice.status);
+                        return (
+                          <motion.div
+                            key={invoice._id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.05 }}
+                            className="bg-background border border-border p-5 rounded-2xl hover:border-primary/30 transition-all group flex flex-col justify-between"
                           >
-                            <Download className="w-4 h-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
+                            <div className="space-y-4">
+                              <div className="flex justify-between items-start">
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded uppercase">
+                                      #
+                                      {invoice.invoiceId ||
+                                        invoice._id.slice(-6).toUpperCase()}
+                                    </span>
+                                    <span
+                                      className={`text-[10px] font-bold px-2 py-0.5 rounded border ${status.color}`}
+                                    >
+                                      {invoice.status}
+                                    </span>
+                                  </div>
+                                  <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">
+                                    {invoice.client}
+                                  </h4>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-lg font-bold text-foreground">
+                                    {formatCurrency(invoice.amount)}
+                                  </p>
+                                  <p className="text-[10px] text-muted-foreground font-medium">
+                                    Created {formatDate(invoice.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <MapPin className="w-3 h-3" />
+                                {invoice.space}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 mt-6 pt-4 border-t border-border">
+                              <Button
+                                size="sm"
+                                onClick={() => handleSendReminder(invoice._id)}
+                                className="flex-1 rounded-xl h-9"
+                              >
+                                <Send className="w-3 h-3 mr-2" />
+                                Reminder
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-9 h-9 p-0 rounded-xl"
+                              >
+                                <Download className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="payments"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {filteredPayments.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-[450px] text-center">
+                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                        <CreditCard className="w-8 h-8 text-muted-foreground opacity-30" />
+                      </div>
+                      <h3 className="text-lg font-bold">No Payments</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Transaction history is currently empty.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-border bg-muted/30">
+                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                              Reference
+                            </th>
+                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                              Client
+                            </th>
+                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                              Method
+                            </th>
+                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase text-right">
+                              Amount
+                            </th>
+                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase text-center">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {filteredPayments.map((record, idx) => (
+                            <motion.tr
+                              key={record._id}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: idx * 0.03 }}
+                              className="group hover:bg-muted/30 transition-colors"
+                            >
+                              <td className="px-6 py-4">
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-foreground">
+                                    {record.paymentId ||
+                                      record._id.slice(-8).toUpperCase()}
+                                  </span>
+                                  <span className="text-[10px] text-muted-foreground font-medium uppercase mt-0.5">
+                                    {formatDate(record.date)}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold">
+                                    {record.client.charAt(0)}
+                                  </div>
+                                  <span className="font-semibold text-foreground text-sm">
+                                    {record.client}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4">
+                                <Badge
+                                  variant="secondary"
+                                  className="font-bold text-[10px] uppercase"
+                                >
+                                  {record.method}
+                                </Badge>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <span className="font-bold text-foreground">
+                                  {formatCurrency(record.amount)}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="flex justify-center">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary"
+                                  >
+                                    <Download className="w-3.5 h-3.5" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </motion.tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
+        </div>
       </div>
 
       <LogInvoiceModal
