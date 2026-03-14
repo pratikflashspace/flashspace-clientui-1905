@@ -208,6 +208,8 @@ class ReviewService {
 }
 
 export const reviewService = new ReviewService();
+export const getReviewsBySpaceId = (spaceId: string) => reviewService.getSpaceReviews(spaceId).then(res => res.data?.reviews || []);
+export type { Review } from "@/types/review";
 export const ReviewServiceLegacy = {
   getAllReviews: () => reviewService.getAllReviews(),
   getNpsStats: () => reviewService.getNpsStats(),

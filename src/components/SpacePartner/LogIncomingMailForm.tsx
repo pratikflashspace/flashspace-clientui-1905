@@ -169,14 +169,13 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden font-[Inter] flex flex-col max-h-[90vh]">
-      <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-8 py-6 text-white shrink-0">
-        <h2 className="text-2xl font-bold tracking-tight">
-          Log Incoming Mail & Deliveries
+    <div className="w-full max-w-4xl mx-auto bg-background rounded-2xl shadow-2xl border border-border overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-[#2D3F33] px-8 py-8 text-[#FDE68A] shrink-0 border-b border-border">
+        <h2 className="text-3xl font-extrabold tracking-tight uppercase">
+          Log Incoming <span className="italic text-primary">Mail</span>
         </h2>
-        <p className="text-slate-300 mt-1 text-sm">
-          Record a new package or letter received at your space and notify the
-          client.
+        <p className="text-muted-foreground mt-2 font-medium">
+          Record a new package or letter received and notify the client.
         </p>
       </div>
 
@@ -450,7 +449,7 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
         </section>
 
         {/* SECTION 4: Actions (Sticky Footer Effect) */}
-        <div className="pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6 shrink-0 mt-auto">
+        <div className="pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-6 shrink-0 mt-auto px-8 pb-8 bg-muted/20">
           <label className="flex items-center gap-3 cursor-pointer group">
             <div className="relative">
               <input
@@ -461,7 +460,7 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
                 onChange={handleChange}
               />
               <div
-                className={`block w-12 h-7 rounded-full transition-colors ${formData.notifyClient ? "bg-blue-600" : "bg-gray-200"}`}
+                className={`block w-12 h-7 rounded-full transition-colors ${formData.notifyClient ? "bg-primary" : "bg-muted"}`}
               ></div>
               <div
                 className={`absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition-transform ${formData.notifyClient ? "transform translate-x-5" : ""}`}
@@ -469,13 +468,13 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
             </div>
             <div className="flex items-center gap-2">
               <Bell
-                className={`w-4 h-4 ${formData.notifyClient ? "text-blue-600" : "text-gray-400"}`}
+                className={`w-4 h-4 ${formData.notifyClient ? "text-primary" : "text-muted-foreground"}`}
               />
               <div>
-                <span className="block text-sm font-medium text-gray-900 group-hover:text-blue-700 transition-colors">
+                <span className="block text-sm font-bold text-foreground group-hover:text-primary transition-colors">
                   Notify client via email
                 </span>
-                <span className="block text-xs text-gray-500">
+                <span className="block text-xs text-muted-foreground">
                   Sends an automated alert immediately
                 </span>
               </div>
@@ -487,7 +486,7 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-6 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition-colors w-full sm:w-auto"
+                className="px-6 py-3 rounded-xl border border-border text-foreground font-bold hover:bg-muted transition-all active:scale-95 w-full sm:w-auto"
               >
                 Cancel
               </button>
@@ -495,7 +494,7 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="px-8 py-3 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed w-full sm:w-auto"
+              className="px-8 py-3 rounded-xl bg-[#2D3F33] text-[#FDE68A] font-bold hover:bg-[#2D3F33]/90 shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed w-full sm:w-auto"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               {!loading && <CheckCircle2 className="w-4 h-4" />}

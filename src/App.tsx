@@ -10,7 +10,6 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { ChatProvider } from "@/contexts/ChatContext";
-import TeamManagement from "./pages/spacePortal/teamManagement";
 
 import Index from "./pages/Index";
 import Services from "./pages/Services";
@@ -117,8 +116,10 @@ import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
 import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import MailAndVisits from "./pages/spacePortal/MailAndVisits";
+// import TeamManagement from "./pages/spacePortal/TeamManagement";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 import { AffiliateRoute } from "./components/auth/AffiliateRoute";
+// import TeamManagement from "./pages/spacePortal/TeamManagement";
 
 // Affiliate Portal
 
@@ -151,7 +152,9 @@ import AffiliateClientManagement from "./pages/affiliatePortal/AffiliateClientMa
 import SpaceComponent from "./components/Spaces/SpaceComponent";
 import CoworkingSpaceComponent from "./components/Spaces/CoworkingSpaceComponent";
 import MeetingRoomSpaceComponent from "./components/Spaces/MeetingRoomSpaceComponent";
-
+import TeamManagement from "./pages/spacePortal/TeamManagement.tsx";
+// import TeamManagement from "./pages/admin/TeamManagement";
+//hello
 // --- React Query setup ---
 const queryClient = new QueryClient();
 
@@ -480,10 +483,7 @@ const App = () => (
                           path="space-management/:id"
                           element={<PropertyDetails />}
                         />
-                        <Route
-                          path="team-management"
-                          element={<TeamManagement />}
-                        />
+
                         <Route path="tickets" element={<Tickets />} />
                         <Route
                           path="feedback-nps"
@@ -494,6 +494,10 @@ const App = () => (
                           element={<SpacePortalTicketAndTasks />}
                         />
                         <Route path="mail-visits" element={<MailAndVisits />} />
+                        <Route
+                          path="team-management"
+                          element={<TeamManagement />}
+                        />
                       </Route>
                     </Route>
 

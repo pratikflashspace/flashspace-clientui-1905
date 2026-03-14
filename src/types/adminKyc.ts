@@ -9,6 +9,8 @@ export interface KYCPersonalInfo {
   fullName?: string;
   email?: string;
   phone?: string;
+  panNumber?: string;
+  aadhaarNumber?: string;
 }
 
 export interface KYCBusinessInfo {

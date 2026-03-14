@@ -392,6 +392,9 @@ export interface PersonalInfo {
   aadhaarLast4?: string;
   aadhaarNumber?: string;
   panNumber?: string;
+  address?: string;
+  city?: string;
+  area?: string;
 }
 
 export interface BusinessInfo {
@@ -675,6 +678,8 @@ export interface AuthUser {
   email: string;
   role: "user" | "admin" | "support";
   fullName?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 // ============ NOTIFICATION TYPES ============

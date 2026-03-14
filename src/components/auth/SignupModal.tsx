@@ -45,7 +45,7 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user
                         <X className="w-5 h-5" />
                     </button>
 
-                {/* Content of the Signup Card */}
+                    {/* Content of the Signup Card */}
                     <div className="text-center mb-8">
                         <img
                             src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
@@ -60,9 +60,9 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user
                         </p>
                     </div>
 
-                <SignupForm initialRole={initialRole} onSuccess={onClose} />
+                    <SignupForm initialRole={initialRole} onSuccess={onClose} />
 
-                 <div className="mt-6 text-center">
+                    <div className="mt-6 text-center">
                         <p className="text-sm text-slate-600">
                             Already have an account?{' '}
                             {onLoginClick ? (

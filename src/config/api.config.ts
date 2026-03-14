@@ -97,6 +97,10 @@ export const API_ENDPOINTS = {
     // Partner
     PARTNER_CLIENTS: "/api/user/partner/clients",
     PARTNER_CLIENT_DETAILS: (id: string) => `/api/user/partner/clients/${id}`,
+    PARTNER_DASHBOARD: "/api/user/partner/dashboard",
+    PARTNER_ACTIVE_REQUESTS: "/api/user/partner/active-requests",
+    PARTNER_ANALYTICS: "/api/user/partner/analytics",
+    PARTNER_SPACES: "/api/user/partner/spaces",
   },
 
   // Admin endpoints

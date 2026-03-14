@@ -1,4 +1,14 @@
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, format, isSameMonth, isToday, isSameDay } from "date-fns";
+import {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  format,
+  isSameMonth,
+  isToday,
+  isSameDay,
+} from "date-fns";
 import { useMemo } from "react";
 
 type Meeting = {
@@ -12,7 +22,11 @@ type MeetingMonthViewProps = {
   onDateClick: (date: Date) => void;
 };
 
-export default function MeetingMonthView({ currentDate, meetings, onDateClick }: MeetingMonthViewProps) {
+export default function MeetingMonthView({
+  currentDate,
+  meetings,
+  onDateClick,
+}: MeetingMonthViewProps) {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
   const startDate = startOfWeek(monthStart);
@@ -36,14 +50,17 @@ export default function MeetingMonthView({ currentDate, meetings, onDateClick }:
 
   // Count meetings per day
   const getDailyCount = (day: Date) => {
-    return meetings.filter(m => isSameDay(new Date(m.startTime), day)).length;
+    return meetings.filter((m) => isSameDay(new Date(m.startTime), day)).length;
   };
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
         {weekDays.map((day) => (
-          <div key={day} className="py-3 text-center text-xs font-semibold text-slate-500">
+          <div
+            key={day}
+            className="py-3 text-center text-xs font-semibold text-slate-500"
+          >
             {day}
           </div>
         ))}
@@ -70,8 +87,8 @@ export default function MeetingMonthView({ currentDate, meetings, onDateClick }:
                       isDayToday
                         ? "bg-indigo-600 text-white"
                         : !isCurrentMonth
-                        ? "text-slate-400"
-                        : "text-slate-700"
+                          ? "text-slate-400"
+                          : "text-slate-700"
                     }`}
                   >
                     {format(day, "d")}
@@ -79,9 +96,9 @@ export default function MeetingMonthView({ currentDate, meetings, onDateClick }:
 
                   {count > 0 && (
                     <div className="mt-2 flex flex-col gap-1">
-                        <div className="rounded-md bg-indigo-100 px-2 py-1 text-center text-xs font-bold text-indigo-700">
-                            {count} {count === 1 ? 'Meeting' : 'Meetings'}
-                        </div>
+                      <div className="rounded-md bg-indigo-100 px-2 py-1 text-center text-xs font-bold text-indigo-700">
+                        {count} {count === 1 ? "Meeting" : "Meetings"}
+                      </div>
                     </div>
                   )}
                 </div>

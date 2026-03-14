@@ -5,10 +5,12 @@ export type ClientPlan = string;
 
 export type Client = {
   id: string;
-  userId: string;
+  userId?: string;
 
   companyName: string;
   contactName: string;
+  email?: string;
+  phone?: string;
 
   plan: ClientPlan;
 
@@ -19,4 +21,7 @@ export type Client = {
 
   status: ClientStatus;
   kycStatus: KycStatus;
+
+  dealValue?: number;
+  createdAt?: string;
 };

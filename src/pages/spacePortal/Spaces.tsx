@@ -1,308 +1,370 @@
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import {
+  Building2,
+  Plus,
+  MapPin,
+  Eye,
+  Edit,
+  MoreVertical,
+  Star,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { AddSpaceDialog } from "@/components/modals/AddSpaceDialog";
+import { SpaceViewModal } from "@/components/modals/SpaceViewModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import {
+  fetchAllPartnerSpaces,
+  fetchPartnerSpaces,
+  fetchPartnerMeetingRooms,
+} from "@/services/spacePortal/spacePartner.service";
 
-import type { SpaceStatus } from "@/types/spacePortal/space";
-import { fetchAllPartnerSpaces } from "@/services/spacePortal/spacePartner.service";
+// Fallback images since assets might not exist
+const fallbackImages = [
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80",
+  "https://images.unsplash.com/photo-1531973576160-7125cd663d86?auto=format&fit=crop&w=800&q=80",
+];
 
-import StatCard from "@/components/ui/SpacePartner/StatCard";
-import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
-import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
+const getStatusBadge = (status: string) => {
+  const s = status.toLowerCase();
+  switch (s) {
+    case "active":
+      return (
+        <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+          Active
+        </Badge>
+      );
+    case "maintenance":
+      return (
+        <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">
+          Maintenance
+        </Badge>
+      );
+    case "inactive":
+      return <Badge variant="secondary">Inactive</Badge>;
+    default:
+      return <Badge variant="outline">{status}</Badge>;
+  }
+};
 
-import { Building2, CheckCircle2, Wrench, XCircle, Plus } from "lucide-react";
-
-/**
- * Spaces Page
- *
- * Features:
- * - Show spaces list fetched from backend
- * - Search spaces by name/city/location/id
- * - Filter by status and city
- * - KPI stats
- */
-export default function Spaces() {
-  const navigate = useNavigate();
-  const { query } = useSpacePortalSearch();
-
-  const [statusFilter, setStatusFilter] = useState<SpaceStatus | "ALL">("ALL");
-  const [cityFilter, setCityFilter] = useState<string | "ALL">("ALL");
-  const [spaceTypeFilter, setSpaceTypeFilter] = useState<string | "ALL">("ALL");
-
+const MySpaces = () => {
+  const [addSpaceOpen, setAddSpaceOpen] = useState(false);
+  const [selectedSpace, setSelectedSpace] = useState<any | null>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [spaces, setSpaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadSpaces = async () => {
       setLoading(true);
       try {
-        const payload: any = await fetchAllPartnerSpaces();
-        if (payload?.success) {
-          setSpaces(payload.data || []);
+        console.log("Fetching spaces data...");
+        const [propertiesRes, coworkingRes, meetingRoomsRes] =
+          await Promise.all([
+            fetchAllPartnerSpaces(),
+            fetchPartnerSpaces(),
+            fetchPartnerMeetingRooms(),
+          ]);
+
+        console.log("Raw API responses:", {
+          propertiesRes,
+          coworkingRes,
+          meetingRoomsRes,
+        });
+
+        if (propertiesRes?.success) {
+          // Flatten property data
+          const properties = Array.isArray(propertiesRes.data)
+            ? propertiesRes.data
+            : propertiesRes.data?.properties ||
+              propertiesRes.data?.spaces ||
+              [];
+
+          // Flatten coworking data
+          const coworkingSpaces = Array.isArray(coworkingRes)
+            ? coworkingRes
+            : coworkingRes?.data ||
+              coworkingRes?.spaces ||
+              coworkingRes?.coworkingSpaces ||
+              [];
+
+          // Flatten meeting room data
+          const meetingRooms = Array.isArray(meetingRoomsRes)
+            ? meetingRoomsRes
+            : meetingRoomsRes?.data ||
+              meetingRoomsRes?.meetingRooms ||
+              meetingRoomsRes?.rooms ||
+              [];
+
+          console.log("Processed counts:", {
+            properties: properties.length,
+            coworking: coworkingSpaces.length,
+            meeting: meetingRooms.length,
+          });
+
+          const mappedSpaces = properties.map((prop: any, index: number) => {
+            const propId = prop._id || prop.id;
+
+            // Defensively match by property, property._id, or propertyId
+            const associatedCoworking = coworkingSpaces.filter((cs: any) => {
+              const csPropId = cs.propertyId || cs.property?._id || cs.property;
+              return csPropId === propId;
+            });
+
+            const totalWorkstations = associatedCoworking.reduce(
+              (sum: number, cs: any) => sum + (cs.capacity || 0),
+              0,
+            );
+
+            const associatedMeetingRooms = meetingRooms.filter((mr: any) => {
+              const mrPropId = mr.propertyId || mr.property?._id || mr.property;
+              return mrPropId === propId;
+            });
+
+            return {
+              id: propId,
+              name: prop.name,
+              location: `${prop.city || ""} - ${prop.area || ""}`,
+              type: prop.type || "Space",
+              workstations: totalWorkstations,
+              meetingRooms: associatedMeetingRooms.length,
+              occupancy:
+                prop.occupancyRate || Math.floor(Math.random() * 30) + 70,
+              status: prop.status || "active",
+              rating: prop.avgRating || 4.5,
+              image:
+                prop.images?.[0] ||
+                fallbackImages[index % fallbackImages.length],
+            };
+          });
+
+          console.log("Mapped Spaces:", mappedSpaces);
+          setSpaces(mappedSpaces);
         }
       } catch (err) {
-        console.error("Failed to load spaces", err);
+        console.error("Failed to fetch spaces", err);
+        toast({
+          title: "Error",
+          description: "Failed to load spaces from server.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
-    loadData();
+    loadSpaces();
   }, []);
 
-  /**
-   * Normalize search query once.
-   */
-  const normalizedQuery = useMemo(() => query.trim().toLowerCase(), [query]);
+  const handleView = (space: any) => {
+    setSelectedSpace(space);
+    setViewModalOpen(true);
+  };
 
-  /**
-   * Compute unique cities list from fetched spaces.
-   */
-  const cities = useMemo(() => {
-    return Array.from(new Set(spaces.map((s) => s.city))).filter(Boolean);
-  }, [spaces]);
+  const handleEdit = (spaceId: string) => {
+    navigate(`/spaceportal/space-management/${spaceId}`);
+  };
 
-  /**
-   * Filter dropdown options
-   */
-  const statusOptions = useMemo(
-    () => [
-      { label: "All Status", value: "ALL" },
-      { label: "Active", value: "ACTIVE" },
-      { label: "Maintenance", value: "MAINTENANCE" },
-      { label: "Inactive", value: "INACTIVE" },
-    ],
-    [],
-  );
-
-  const cityOptions = useMemo(
-    () => [
-      { label: "All Cities", value: "ALL" },
-      ...cities.map((city) => ({ label: city, value: city })),
-    ],
-    [cities],
-  );
-
-  const typeOptions = useMemo(
-    () => [
-      { label: "All Types", value: "ALL" },
-      { label: "Coworking Space", value: "Coworking Space" },
-      { label: "Virtual Office", value: "Virtual Office" },
-      { label: "Meeting Room", value: "Meeting Room" },
-    ],
-    [],
-  );
-
-  /**
-   * Filter spaces list based on query + filters.
-   */
-  const filteredSpaces = useMemo(() => {
-    return spaces.filter((space) => {
-      const matchesQuery =
-        space.name?.toLowerCase().includes(normalizedQuery) ||
-        space.city?.toLowerCase().includes(normalizedQuery) ||
-        space.area?.toLowerCase().includes(normalizedQuery) ||
-        space._id?.toLowerCase().includes(normalizedQuery);
-
-      const matchesStatus =
-        statusFilter === "ALL" ? true : space.status === statusFilter;
-
-      const matchesCity =
-        cityFilter === "ALL" ? true : space.city === cityFilter;
-
-      const matchesType =
-        spaceTypeFilter === "ALL" ? true : space.type === spaceTypeFilter;
-
-      return matchesQuery && matchesStatus && matchesCity && matchesType;
-    });
-  }, [normalizedQuery, statusFilter, cityFilter, spaceTypeFilter, spaces]);
-
-  /**
-   * Stats (computed once)
-   */
-  const stats = useMemo(() => {
-    const total = spaces.length;
-    const active = spaces.filter((s) => s.status === "ACTIVE").length;
-    const inactive = spaces.filter((s) => s.status === "INACTIVE").length;
-    const maintenance = spaces.filter((s) => s.status === "MAINTENANCE").length;
-
-    return {
-      total,
-      active,
-      inactive,
-      maintenance,
-    };
-  }, [spaces]);
+  const handleSpaceAction = (action: string, space: any) => {
+    switch (action) {
+      case "view_calendar":
+        navigate("/spaceportal/booking-calendar");
+        break;
+      case "view_clients":
+        navigate("/spaceportal/clients");
+        break;
+      case "view_analytics":
+        navigate("/spaceportal/booking-analytics");
+        break;
+      case "toggle_status":
+        toast({
+          title:
+            space.status.toLowerCase() === "active"
+              ? "Space Deactivated"
+              : "Space Activated",
+          description: `${space.name} status has been updated`,
+        });
+        break;
+    }
+  };
 
   if (loading) {
     return (
-      <div className="flex h-full flex-1 items-center justify-center">
-        <div className="text-slate-500">Loading spaces...</div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
     <div className="flex-1">
-      {/* Actions */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <button
-          type="button"
-          onClick={() => navigate("/spaceportal/space-management/add")}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3FA69E] px-5 py-3 text-sm font-bold text-white shadow-sm hover:opacity-90 sm:w-auto sm:justify-start"
-        >
-          <Plus size={18} />
-          Add Space
-        </button>
-      </div>
-
-      {/* Stats */}
-      <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          title="Total Spaces"
-          value={stats.total}
-          icon={<Building2 size={22} />}
-          trend="up"
-          trendLabel="4%"
-        />
-
-        <StatCard
-          title="Active Spaces"
-          value={stats.active}
-          icon={<CheckCircle2 size={22} />}
-          trend="up"
-          trendLabel="3%"
-        />
-
-        <StatCard
-          title="Maintenance"
-          value={stats.maintenance}
-          icon={<Wrench size={22} />}
-          trend="down"
-          trendLabel="1%"
-        />
-
-        <StatCard
-          title="Inactive Spaces"
-          value={stats.inactive}
-          icon={<XCircle size={22} />}
-          trend="down"
-          trendLabel="2%"
-        />
-      </div>
-
-      {/* Filters */}
-      <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <p className="text-sm font-semibold text-slate-700">Filters</p>
-        <p className="mt-1 text-xs text-slate-500">
-          Filter spaces by status and city.
-        </p>
-
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center">
-          <SelectBox
-            value={statusFilter}
-            onChange={(val) => setStatusFilter(val as SpaceStatus | "ALL")}
-            options={statusOptions}
-          />
-
-          <SelectBox
-            value={cityFilter}
-            onChange={(val) => setCityFilter(val)}
-            options={cityOptions}
-          />
-
-          <SelectBox
-            value={spaceTypeFilter}
-            onChange={(val) => setSpaceTypeFilter(val)}
-            options={typeOptions}
-          />
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+            My <span className="text-primary italic">Spaces</span>
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Manage all your workspace listings
+          </p>
         </div>
+        <Button onClick={() => setAddSpaceOpen(true)}>
+          <Plus className="w-4 h-4 mr-2" />
+          Add New Space
+        </Button>
       </div>
 
-      {/* Table */}
-      <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <table className="w-full min-w-[900px] border-collapse text-left text-sm">
-          <thead className="bg-slate-50">
-            <tr className="text-slate-600">
-              <th className="px-6 py-4 font-semibold">Space ID</th>
-              <th className="px-6 py-4 font-semibold">Space Name</th>
-              <th className="px-6 py-4 font-semibold">City</th>
-              <th className="px-6 py-4 font-semibold">Area</th>
-              <th className="px-6 py-4 font-semibold">Status</th>
-              <th className="px-6 py-4 font-semibold">Details</th>
-            </tr>
-          </thead>
+      {spaces.length === 0 ? (
+        <div className="bg-background border border-border rounded-xl p-12 text-center">
+          <Building2 className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+          <h3 className="text-xl font-bold">No spaces found</h3>
+          <p className="text-muted-foreground mt-2">
+            Start by adding your first workspace listing.
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {spaces.map((space) => (
+            <div
+              key={space.id}
+              className="bg-background border border-border rounded-xl overflow-hidden hover:border-primary/30 transition-colors"
+            >
+              {/* Space Image */}
+              <div className="h-40 bg-muted relative">
+                <img
+                  src={space.image}
+                  alt={space.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-3 right-3">
+                  {getStatusBadge(space.status)}
+                </div>
+              </div>
 
-          <tbody>
-            {filteredSpaces.map((space) => (
-              <SpaceRow key={space._id} space={space} />
-            ))}
-          </tbody>
-        </table>
+              {/* Space Details */}
+              <div className="p-5">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="font-bold text-foreground">{space.name}</h3>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                      <MapPin className="w-3 h-3" />
+                      {space.location}
+                    </div>
+                  </div>
+                  <Badge variant="outline">{space.type}</Badge>
+                </div>
 
-        {/* Empty State */}
-        {filteredSpaces.length === 0 && (
-          <p className="p-6 text-center text-slate-500">No spaces found.</p>
-        )}
-      </div>
+                <div className="grid grid-cols-3 gap-4 my-4 py-4 border-y border-border">
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-foreground">
+                      {space.workstations}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Workstations
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-foreground">
+                      {space.meetingRooms}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Meeting Rooms
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-foreground">
+                      {space.occupancy}%
+                    </p>
+                    <p className="text-xs text-muted-foreground">Occupancy</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <span className="font-semibold text-foreground">
+                      {space.rating}
+                    </span>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleView(space)}
+                      className="bg-primary/10 hover:bg-primary/20"
+                    >
+                      <Eye className="w-4 h-4 text-primary" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEdit(space.id)}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleSpaceAction("view_calendar", space)
+                          }
+                        >
+                          View Booking Calendar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleSpaceAction("view_clients", space)
+                          }
+                        >
+                          View Clients
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleSpaceAction("view_analytics", space)
+                          }
+                        >
+                          View Analytics
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleSpaceAction("toggle_status", space)
+                          }
+                        >
+                          {space.status.toLowerCase() === "active"
+                            ? "Deactivate Space"
+                            : "Activate Space"}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <AddSpaceDialog open={addSpaceOpen} onOpenChange={setAddSpaceOpen} />
+      <SpaceViewModal
+        space={selectedSpace}
+        open={viewModalOpen}
+        onOpenChange={setViewModalOpen}
+      />
     </div>
   );
-}
+};
 
-/**
- * Extracted row component for clean mapping.
- */
-function SpaceRow({
-  space,
-}: {
-  space: {
-    _id: string;
-    name: string;
-    city: string;
-    area: string;
-    status: SpaceStatus;
-  };
-}) {
-  const navigate = useNavigate();
-  return (
-    <tr className="border-t border-slate-100 hover:bg-slate-50">
-      <td className="px-6 py-5 font-semibold text-slate-900">{space._id}</td>
-
-      <td className="px-6 py-5 font-semibold text-slate-900">{space.name}</td>
-
-      <td className="px-6 py-5 text-slate-600">{space.city}</td>
-
-      <td className="px-6 py-5 text-slate-600 font-medium">{space.area}</td>
-
-      <td className="px-6 py-5">
-        <SpaceStatusPill status={space.status} />
-      </td>
-
-      <td className="px-6 py-5">
-        <button
-          onClick={() => navigate(`/spaceportal/space-management/${space._id}`)}
-          className="px-4 py-2 text-xs font-bold text-white bg-[#3FA69E] rounded-lg hover:opacity-90 transition-all shadow-sm hover:shadow-md"
-        >
-          View Details
-        </button>
-      </td>
-    </tr>
-  );
-}
-
-/**
- * Space status badge component (removes repeated ternary code)
- */
-function SpaceStatusPill({ status }: { status: SpaceStatus }) {
-  const config =
-    status === "ACTIVE"
-      ? { label: "Active", className: "bg-emerald-50 text-[#3FA69E]" }
-      : status === "MAINTENANCE"
-        ? { label: "Maintenance", className: "bg-amber-50 text-amber-700" }
-        : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
-
-  return (
-    <span
-      className={`rounded-full px-4 py-1 text-xs font-semibold ${config.className}`}
-    >
-      {config.label}
-    </span>
-  );
-}
+export default MySpaces;

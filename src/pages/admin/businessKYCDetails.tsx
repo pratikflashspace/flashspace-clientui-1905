@@ -17,7 +17,7 @@ export default function BusinessKYCDetails() {
 		const fetchById = async () => {
 			setLoading(true);
 			try {
-				const res = await adminService.getKYCById(id);
+				const res = await adminService.getKYCDetails(id);
 				if (res.success && res.data) {
 					setRequest(res.data as unknown as KYCRequest);
 				} else {
