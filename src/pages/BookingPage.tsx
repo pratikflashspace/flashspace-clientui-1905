@@ -28,8 +28,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { getVirtualOfficeById } from "@/services/virtualOffice.service";
+import { getCoworkingSpaceById } from "@/services/coworkingSpace.service";
 import { VirtualOfficeItem } from "@/types/services";
-import { getVirtualOfficePricing, PlanDetails } from "@/utils/priceUtils";
+import { getVirtualOfficePricing, parsePrice, PlanDetails } from "@/utils/priceUtils";
 import { BookingPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { useAuth } from "@/contexts/AuthContext";
 import hotToast from "react-hot-toast";
@@ -147,9 +148,6 @@ const BookingPage = () => {
         const type = searchParams.get("type");
 
         if (type === "coworking") {
-          const { getCoworkingSpaceById } =
-            await import("@/services/coworkingSpace.service");
-          const { parsePrice } = await import("@/utils/priceUtils");
           const data = await getCoworkingSpaceById(id);
           if (!data) {
             setError("Space not found");

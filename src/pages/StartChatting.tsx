@@ -259,11 +259,13 @@ const UpdatesPopup = ({
   return createPortal(
     <div
       onClick={(e) => e.stopPropagation()}
-      className={`fixed top-0 left-0 z-[13000] h-screen transition-transform duration-400 ease-[cubic-bezier(.7,.22,.26,.98)] ${open ? "translate-x-0" : "translate-x-[120%]"
+      className={`fixed top-0 left-0 z-[13000] h-screen transition-transform ${open ? "translate-x-0" : "translate-x-[120%]"
         }`}
       style={{
         width: UPDATES_WIDTH,
         left: menuWidth,
+        transitionDuration: '400ms',
+        transitionTimingFunction: 'cubic-bezier(.7,.22,.26,.98)',
       }}
     >
       <div

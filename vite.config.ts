@@ -32,5 +32,14 @@ export default defineConfig({
       include: [/maplibre-gl/, /node_modules/],
       transformMixedEsModules: true,
     },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui': ['lucide-react', 'gsap', 'framer-motion'],
+          'vendor-heavy': ['maplibre-gl', 'html2canvas', 'dompurify'],
+        },
+      },
+    },
   },
 })

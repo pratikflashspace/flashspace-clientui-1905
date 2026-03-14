@@ -146,7 +146,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
 
     return (
       <div
-        className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-all duration-[250ms] ease-out shadow-sm hover:shadow-md h-full flex flex-col"
+        className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-all duration-200 ease-out shadow-sm hover:shadow-md h-full flex flex-col"
         onClick={handleCardClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

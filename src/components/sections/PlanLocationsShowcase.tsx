@@ -220,10 +220,10 @@ export const PlanLocationsShowcase = () => {
                                         initial={{ opacity: 0, y: 24 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.08, duration: 0.5 }}
-                                        className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-transform duration-[250ms] ease-out shadow-sm hover:shadow-md"
+                                        className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-transform duration-200 ease-out shadow-sm hover:shadow-md"
                                     >
                                         <div className="relative aspect-[16/10] overflow-hidden">
-                                            <img src={(loc as any).image} alt={loc.name} className="w-full h-full object-cover transition-transform duration-[250ms] ease-out group-hover:scale-105" />
+                                            <img src={(loc as any).image} alt={loc.name} className="w-full h-full object-cover transition-transform duration-200 ease-out group-hover:scale-105" />
                                             <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-normal px-2.5 py-1 rounded-full z-10">
                                                 Available Now
                                             </span>

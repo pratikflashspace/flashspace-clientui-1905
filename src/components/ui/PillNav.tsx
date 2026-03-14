@@ -403,12 +403,12 @@ const PillNav: React.FC<PillNavProps> = ({
           }}
         >
           <span
-            className="hamburger-line w-4 h-0.5 rounded origin-center transition-all duration-[10ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]"
-            style={{ background: 'var(--pill-bg, #fff)' }}
+            className="hamburger-line w-4 h-0.5 rounded origin-center transition-all duration-0"
+            style={{ background: 'var(--pill-bg, #fff)', transitionTimingFunction: 'cubic-bezier(0.25,0.1,0.25,1)' }}
           />
           <span
-            className="hamburger-line w-4 h-0.5 rounded origin-center transition-all duration-[10ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]"
-            style={{ background: 'var(--pill-bg, #fff)' }}
+            className="hamburger-line w-4 h-0.5 rounded origin-center transition-all duration-0"
+            style={{ background: 'var(--pill-bg, #fff)', transitionTimingFunction: 'cubic-bezier(0.25,0.1,0.25,1)' }}
           />
         </button>
       </nav>
@@ -437,7 +437,7 @@ const PillNav: React.FC<PillNavProps> = ({
             };
 
             const linkClasses =
-              'block py-3 px-4 text-[16px] font-medium rounded-[50px] transition-all duration-200 ease-[cubic-bezier(0.25,0.1,0.25,1)]';
+              'block py-3 px-4 text-[16px] font-medium rounded-[50px] transition-all duration-200';
 
             return (
               <li key={item.href}>

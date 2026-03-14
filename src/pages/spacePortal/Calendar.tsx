@@ -88,28 +88,37 @@ export default function BookingCalendar() {
           case "COWORKING":
           case "DAY_PASS":
             rawData = await fetchPartnerSpaces();
-            rawData = Array.isArray(rawData) ? rawData : (rawData?.spaces || rawData?.data || rawData || []);
-            defaultType = propertyType === "COWORKING" ? "Coworking Space" : "Hot Desk";
+            rawData = Array.isArray(rawData)
+              ? rawData
+              : rawData?.spaces || rawData?.data || rawData || [];
+            defaultType =
+              propertyType === "COWORKING" ? "Coworking Space" : "Hot Desk";
             break;
           case "VIRTUAL_OFFICE":
             rawData = await fetchPartnerVirtualOffices();
-            rawData = Array.isArray(rawData) ? rawData : (rawData?.offices || rawData?.data || rawData || []);
+            rawData = Array.isArray(rawData)
+              ? rawData
+              : rawData?.offices || rawData?.data || rawData || [];
             defaultType = "Virtual Office";
             break;
           case "MEETING_ROOM":
             rawData = await fetchPartnerMeetingRooms().catch(() => []);
-            rawData = Array.isArray(rawData) ? rawData : (rawData?.rooms || rawData?.data || rawData || []);
+            rawData = Array.isArray(rawData)
+              ? rawData
+              : rawData?.rooms || rawData?.data || rawData || [];
             defaultType = "Meeting Room";
             break;
           default:
             rawData = [];
         }
 
-        const processed = (Array.isArray(rawData) ? rawData : []).map((p: any) => ({
-          ...p,
-          type: p.type || defaultType
-        }));
-        
+        const processed = (Array.isArray(rawData) ? rawData : []).map(
+          (p: any) => ({
+            ...p,
+            type: p.type || defaultType,
+          }),
+        );
+
         setProperties(processed);
       } catch (error) {
         console.error("Failed to fetch properties", error);
@@ -131,9 +140,12 @@ export default function BookingCalendar() {
           type.includes("shared") ||
           type.includes("dedicated")
         );
-      if (propertyType === "VIRTUAL_OFFICE") return true; 
+      if (propertyType === "VIRTUAL_OFFICE") return true;
       if (propertyType === "MEETING_ROOM") return true;
-      if (propertyType === "DAY_PASS") return type.includes("hot") || type.includes("pass") || type.includes("day");
+      if (propertyType === "DAY_PASS")
+        return (
+          type.includes("hot") || type.includes("pass") || type.includes("day")
+        );
       return true;
     });
   }, [properties, propertyType]);
@@ -293,7 +305,6 @@ export default function BookingCalendar() {
     return format(currentDate, "MMMM yyyy");
   }, [currentDate, viewMode]);
 
-
   /**
    * Approve a booking request:
    */
@@ -322,17 +333,42 @@ export default function BookingCalendar() {
               <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
                 <Building2 className="w-4 h-4" />
               </div>
-              <h3 className="text-xs font-extrabold text-[#2D3F33] uppercase tracking-widest">Asset Category</h3>
+              <h3 className="text-xs font-extrabold text-[#2D3F33] uppercase tracking-widest">
+                Asset Category
+              </h3>
             </div>
-            <Select value={propertyType} onValueChange={(val: any) => setPropertyType(val)}>
+            <Select
+              value={propertyType}
+              onValueChange={(val: any) => setPropertyType(val)}
+            >
               <SelectTrigger className="w-full h-12 rounded-2xl bg-muted/30 border-border/50 font-bold focus:ring-primary/20 transition-all">
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-border/50 shadow-2xl">
-                <SelectItem value="COWORKING" className="font-bold py-3 px-4 focus:bg-primary/10 rounded-xl">Coworking Space</SelectItem>
-                <SelectItem value="VIRTUAL_OFFICE" className="font-bold py-3 px-4 focus:bg-primary/10 rounded-xl">Virtual Office</SelectItem>
-                <SelectItem value="DAY_PASS" className="font-bold py-3 px-4 focus:bg-primary/10 rounded-xl">Day Pass (Meeting Rooms)</SelectItem>
-                <SelectItem value="MEETING_ROOM" className="font-bold py-3 px-4 focus:bg-primary/10 rounded-xl">Meeting Room</SelectItem>
+                <SelectItem
+                  value="COWORKING"
+                  className="font-bold py-3 px-4 focus:bg-primary/10 rounded-xl"
+                >
+                  Coworking Space
+                </SelectItem>
+                <SelectItem
+                  value="VIRTUAL_OFFICE"
+                  className="font-bold py-3 px-4 focus:bg-primary/10 rounded-xl"
+                >
+                  Virtual Office
+                </SelectItem>
+                <SelectItem
+                  value="DAY_PASS"
+                  className="font-bold py-3 px-4 focus:bg-primary/10 rounded-xl"
+                >
+                  Day Pass (Meeting Rooms)
+                </SelectItem>
+                <SelectItem
+                  value="MEETING_ROOM"
+                  className="font-bold py-3 px-4 focus:bg-primary/10 rounded-xl"
+                >
+                  Meeting Room
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -342,10 +378,12 @@ export default function BookingCalendar() {
               <div className="p-1.5 rounded-lg bg-[#3FA69E]/10 text-[#3FA69E]">
                 <MapPin className="w-4 h-4" />
               </div>
-              <h3 className="text-xs font-extrabold text-[#2D3F33] uppercase tracking-widest">Select Location</h3>
+              <h3 className="text-xs font-extrabold text-[#2D3F33] uppercase tracking-widest">
+                Select Location
+              </h3>
             </div>
-            <Select 
-              value={selectedPropertyId} 
+            <Select
+              value={selectedPropertyId}
               onValueChange={setSelectedPropertyId}
             >
               <SelectTrigger className="w-full h-12 rounded-2xl bg-muted/30 border-border/50 font-bold focus:ring-[#3FA69E]/20 transition-all">
@@ -353,14 +391,16 @@ export default function BookingCalendar() {
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-border/50 shadow-2xl max-h-[300px]">
                 {filteredProperties.map((p) => (
-                  <SelectItem 
-                    key={p._id} 
-                    value={p._id} 
+                  <SelectItem
+                    key={p._id}
+                    value={p._id}
                     className="font-bold py-3 px-4 focus:bg-[#3FA69E]/10 rounded-xl"
                   >
                     <div className="flex flex-col items-start">
                       <span>{p.name}</span>
-                      <span className="text-[10px] text-muted-foreground font-medium truncate max-w-[200px]">{p.address}</span>
+                      <span className="text-[10px] text-muted-foreground font-medium truncate max-w-[200px]">
+                        {p.address}
+                      </span>
                     </div>
                   </SelectItem>
                 ))}
@@ -376,7 +416,9 @@ export default function BookingCalendar() {
 
         <div className="w-full lg:w-auto space-y-3 relative z-10">
           <div className="flex items-center gap-2 lg:justify-end">
-            <h3 className="text-xs font-extrabold text-[#2D3F33] uppercase tracking-widest">View Mode</h3>
+            <h3 className="text-xs font-extrabold text-[#2D3F33] uppercase tracking-widest">
+              View Mode
+            </h3>
             <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
               <CalendarDays className="w-4 h-4" />
             </div>
@@ -387,7 +429,9 @@ export default function BookingCalendar() {
               <button
                 onClick={() => setViewMode("YEAR")}
                 className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${
-                  viewMode === "YEAR" ? "bg-white text-primary shadow-sm ring-1 ring-border/5" : "text-muted-foreground hover:text-foreground"
+                  viewMode === "YEAR"
+                    ? "bg-white text-primary shadow-sm ring-1 ring-border/5"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 Year
@@ -396,7 +440,9 @@ export default function BookingCalendar() {
             <button
               onClick={() => setViewMode("MONTH")}
               className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${
-                viewMode === "MONTH" ? "bg-white text-primary shadow-sm ring-1 ring-border/5" : "text-muted-foreground hover:text-foreground"
+                viewMode === "MONTH"
+                  ? "bg-white text-primary shadow-sm ring-1 ring-border/5"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Month
@@ -404,7 +450,9 @@ export default function BookingCalendar() {
             <button
               onClick={() => setViewMode("MONTH_DATES")}
               className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${
-                viewMode === "MONTH_DATES" ? "bg-white text-primary shadow-sm ring-1 ring-border/5" : "text-muted-foreground hover:text-foreground"
+                viewMode === "MONTH_DATES"
+                  ? "bg-white text-primary shadow-sm ring-1 ring-border/5"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Timeline
@@ -421,13 +469,15 @@ export default function BookingCalendar() {
           onNext={handleNext}
           onToday={handleToday}
         />
-        
+
         {/* Calendar Content Area */}
         <div className="p-1 sm:p-2 bg-muted/40 min-h-[500px]">
           {isLoadingBookings ? (
             <div className="flex flex-col items-center justify-center h-[500px]">
               <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
-              <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Updating Schedules...</p>
+              <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+                Updating Schedules...
+              </p>
             </div>
           ) : (
             <div className="animate-in fade-in duration-500">
@@ -466,7 +516,10 @@ export default function BookingCalendar() {
                   )}
 
                   {viewMode === "MONTH_DATES" && (
-                    <MonthDatesView currentDate={currentDate} bookings={bookings} />
+                    <MonthDatesView
+                      currentDate={currentDate}
+                      bookings={bookings}
+                    />
                   )}
                 </>
               )}
