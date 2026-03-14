@@ -63,6 +63,9 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user
                 <SignupForm initialRole={initialRole} onSuccess={onClose} />
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5351d03 (scroll)
                  <div className="mt-6 text-center">
                         <p className="text-sm text-slate-600">
                             Already have an account?{' '}
@@ -80,6 +83,7 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user
                             )}
                         </p>
                     </div>
+<<<<<<< HEAD
 =======
                 <div className="mt-6 text-center">
                     <p className="text-sm text-slate-600">
@@ -98,6 +102,8 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user
                         )}
                     </p>
 >>>>>>> 6fcdb63 (signup)
+=======
+>>>>>>> 5351d03 (scroll)
                 </div>
             </div>
         </div>
