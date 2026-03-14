@@ -1098,9 +1098,9 @@ export default function AddSpace() {
 
     return (
       <div className="space-y-8 animate-in fade-in duration-500">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 p-4 bg-blue-50 text-blue-700 rounded-2xl border border-blue-100">
-            <Info className="w-5 h-5 flex-shrink-0" />
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 p-4 bg-primary/5 text-primary rounded-2xl border border-primary/10">
+            <Shield className="w-5 h-5 flex-shrink-0" />
             <p className="text-sm font-medium">
               Please upload clear documents for property verification. This
               helps in faster approval of your listing.
@@ -1117,19 +1117,19 @@ export default function AddSpace() {
                   key={docType.id}
                   className={`flex flex-col md:flex-row md:items-center justify-between p-6 rounded-2xl border transition-all group ${
                     doc?.status === "rejected"
-                      ? "border-red-200 bg-red-50/30"
-                      : "border-slate-200 bg-white hover:border-[#3FA69E]"
+                      ? "border-destructive/20 bg-destructive/5"
+                      : "border-border bg-background hover:border-primary/30"
                   }`}
                 >
                   <div className="flex items-center gap-4 flex-1">
                     <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
                         doc?.status === "rejected"
-                          ? "bg-red-100 text-red-600"
+                          ? "bg-destructive/10 text-destructive"
                           : doc
-                            ? "bg-teal-50 text-[#3FA69E]"
-                            : "bg-slate-50 text-slate-400"
-                      } group-hover:scale-110 transition-transform`}
+                            ? "bg-primary/10 text-primary"
+                            : "bg-muted text-muted-foreground/40"
+                      } group-hover:scale-110`}
                     >
                       {doc?.status === "rejected" ? (
                         <AlertCircle className="w-6 h-6" />
@@ -1138,46 +1138,46 @@ export default function AddSpace() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-bold text-slate-900">
+                      <h4 className="font-bold text-foreground">
                         {docType.label}
                         {docType.required && (
-                          <span className="text-red-500 ml-1">*</span>
+                          <span className="text-destructive ml-1">*</span>
                         )}
                       </h4>
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                           {doc
                             ? `Uploaded: ${new Date(doc.uploadedAt as string).toLocaleDateString()}`
                             : "Not uploaded yet"}
                         </p>
                         {doc?.status === "rejected" && (
-                          <p className="text-xs font-bold text-red-600">
-                            Rejection Reason: {doc.rejectionReason}
+                          <p className="text-xs font-bold text-destructive">
+                             Rejection Reason: {doc.rejectionReason}
                           </p>
                         )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 mt-4 md:mt-0">
-                    {doc ? (
-                      <>
-                        <a
-                          href={doc.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 px-4 py-2 text-[#3FA69E] bg-teal-50 rounded-xl text-sm font-bold hover:bg-teal-100 transition-colors"
-                        >
-                          <ExternalLink className="w-4 h-4" /> View
-                        </a>
-                        <button
-                          onClick={() => handlePropertyDocDelete(docType.id)}
-                          className="p-2 text-red-500 bg-red-50 rounded-xl hover:bg-red-100 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </>
-                    ) : (
+                    <div className="flex items-center gap-3 mt-4 md:mt-0">
+                      {doc ? (
+                        <>
+                          <a
+                            href={doc.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 px-4 py-2 text-primary bg-primary/5 rounded-xl text-sm font-bold hover:bg-primary/10 transition-colors"
+                          >
+                            <ExternalLink className="w-4 h-4" /> View
+                          </a>
+                          <button
+                            onClick={() => handlePropertyDocDelete(docType.id)}
+                            className="p-2 text-destructive bg-destructive/5 rounded-xl hover:bg-destructive/10 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      ) : (
                       <label className="cursor-pointer relative overflow-hidden">
                         <input
                           type="file"
@@ -1189,16 +1189,16 @@ export default function AddSpace() {
                           }}
                           disabled={isUploading}
                         />
-                        <div
-                          className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${isUploading ? "bg-slate-100 text-slate-400" : "bg-[#3FA69E] text-white hover:shadow-lg hover:shadow-teal-100"}`}
-                        >
-                          {isUploading ? (
-                            <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin" />
-                          ) : (
-                            <Upload className="w-4 h-4" />
-                          )}
-                          {isUploading ? "Uploading..." : "Upload File"}
-                        </div>
+                          <div
+                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${isUploading ? "bg-muted text-muted-foreground" : "bg-primary text-white hover:shadow-lg hover:shadow-primary/10"}`}
+                          >
+                            {isUploading ? (
+                              <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                            ) : (
+                              <Upload className="w-4 h-4" />
+                            )}
+                            {isUploading ? "Uploading..." : "Upload File"}
+                          </div>
                       </label>
                     )}
                   </div>
@@ -1208,10 +1208,10 @@ export default function AddSpace() {
           </div>
         </div>
 
-        <div className="flex justify-between items-center pt-8 border-t border-slate-100">
+        <div className="flex justify-between items-center pt-8 border-t border-border/50">
           <button
             onClick={() => setCurrentStep("property")}
-            className="flex items-center gap-2 px-6 py-3 text-slate-500 font-semibold hover:text-slate-700 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 text-muted-foreground font-semibold hover:text-foreground transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             Back to Details
@@ -1231,7 +1231,7 @@ export default function AddSpace() {
               }
               setCurrentStep("selection");
             }}
-            className="flex items-center gap-2 px-8 py-3 bg-[#3FA69E] text-white rounded-xl font-bold shadow-lg shadow-teal-100 hover:translate-y-[-2px] transition-all"
+            className="flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/10 hover:translate-y-[-2px] transition-all"
           >
             Continue to Services
             <ChevronRight className="w-5 h-5" />

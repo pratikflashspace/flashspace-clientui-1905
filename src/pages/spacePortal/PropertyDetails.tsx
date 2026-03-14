@@ -338,14 +338,6 @@ export default function PropertyDetails() {
                 Performance over the last 6 months
               </p>
             </div>
-            <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
-              <button className="px-3 py-1.5 text-[10px] font-bold bg-white text-[#0A2A1E] rounded-lg shadow-sm">
-                Revenue
-              </button>
-              <button className="px-3 py-1.5 text-[10px] font-bold text-slate-400 hover:text-slate-600 transition-colors">
-                Usage
-              </button>
-            </div>
           </div>
 
           <div className="h-[300px] w-full">
@@ -467,12 +459,6 @@ export default function PropertyDetails() {
                   </span>
                 ))}
               </div>
-            </div>
-
-            <div className="pt-4">
-              <button className="w-full py-4 rounded-2xl bg-[#3FA69E] text-white font-black text-sm shadow-xl hover:bg-[#349189] transition-all flex items-center justify-center gap-2 group-hover:gap-3">
-                Download Property Profile <ExternalLink size={16} />
-              </button>
             </div>
           </div>
         </motion.div>
@@ -796,9 +782,6 @@ export default function PropertyDetails() {
               Tracking {bookings.length} active engagements
             </p>
           </div>
-          <button className="px-6 py-2.5 rounded-xl border border-slate-200 text-xs font-black text-[#0A2A1E] hover:bg-slate-50 transition-colors">
-            View Expanded Log
-          </button>
         </div>
 
         <div className="overflow-x-auto">
