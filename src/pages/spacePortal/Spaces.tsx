@@ -84,14 +84,14 @@ const MySpaces = () => {
 
         if (propertiesRes?.success) {
           // Flatten property data
-          const properties = Array.isArray(propertiesRes.data)
+          const propertiesArr = Array.isArray(propertiesRes.data)
             ? propertiesRes.data
             : propertiesRes.data?.properties ||
               propertiesRes.data?.spaces ||
               [];
 
           // Flatten coworking data
-          const coworkingSpaces = Array.isArray(coworkingRes)
+          const coSpacesArr = Array.isArray(coworkingRes)
             ? coworkingRes
             : coworkingRes?.data ||
               coworkingRes?.spaces ||
@@ -99,56 +99,79 @@ const MySpaces = () => {
               [];
 
           // Flatten meeting room data
-          const meetingRooms = Array.isArray(meetingRoomsRes)
+          const mRoomsArr = Array.isArray(meetingRoomsRes)
             ? meetingRoomsRes
             : meetingRoomsRes?.data ||
               meetingRoomsRes?.meetingRooms ||
               meetingRoomsRes?.rooms ||
               [];
 
-          console.log("Processed counts:", {
-            properties: properties.length,
-            coworking: coworkingSpaces.length,
-            meeting: meetingRooms.length,
+          console.log("[Spaces DEBUG] Raw Counts:", {
+            properties: propertiesArr.length,
+            coworking: coSpacesArr.length,
+            meeting: mRoomsArr.length,
           });
 
-          const mappedSpaces = properties.map((prop: any, index: number) => {
-            const propId = prop._id || prop.id;
+          const mappedSpaces = propertiesArr.map((prop: any) => {
+            const propId = String(prop._id || prop.id);
+            const propName = (prop.name || "").toLowerCase().trim();
+            const propCity = (prop.city || "").toLowerCase().trim();
 
-            // Defensively match by property, property._id, or propertyId
-            const associatedCoworking = coworkingSpaces.filter((cs: any) => {
-              const csPropId = cs.propertyId || cs.property?._id || cs.property;
-              return csPropId === propId;
+            // Match Coworking
+            const associatedCoworking = coSpacesArr.filter((cs: any) => {
+              const csPropId = cs.propertyId || (typeof cs.property === 'string' ? cs.property : cs.property?._id);
+              const idMatch = String(csPropId) === propId;
+              
+              const nameMatch = (cs.name || "").toLowerCase().trim() === propName && 
+                                (cs.city || "").toLowerCase().trim() === propCity;
+              
+              if (!idMatch && nameMatch) console.log(`[Spaces DEBUG] Coworking Fallback Match: ${cs.name} -> ${prop.name}`);
+              return idMatch || nameMatch;
             });
 
-            const totalWorkstations = associatedCoworking.reduce(
-              (sum: number, cs: any) => sum + (cs.capacity || 0),
+            const totalWS = associatedCoworking.reduce(
+              (sum: number, cs: any) => sum + (Number(cs.capacity) || 0),
               0,
             );
 
-            const associatedMeetingRooms = meetingRooms.filter((mr: any) => {
-              const mrPropId = mr.propertyId || mr.property?._id || mr.property;
-              return mrPropId === propId;
+            // Match Meeting Rooms
+            const associatedMR = mRoomsArr.filter((mr: any) => {
+              const mrPropId = mr.propertyId || (typeof mr.property === 'string' ? mr.property : mr.property?._id);
+              const idMatch = String(mrPropId) === propId;
+              
+              const nameMatch = (mr.name || "").toLowerCase().trim() === propName && 
+                                (mr.city || "").toLowerCase().trim() === propCity;
+
+              if (!idMatch && nameMatch) console.log(`[Spaces DEBUG] MeetingRoom Fallback Match: ${mr.name} -> ${prop.name}`);
+              return idMatch || nameMatch;
             });
+
+            const totalMR = associatedMR.reduce(
+              (sum: number, mr: any) => sum + (Number(mr.count) || Number(mr.capacity) || (associatedMR.length > 0 ? 1 : 0)),
+              0,
+            );
+
+            console.log(`[Spaces DEBUG] Final for ${prop.name}: WS=${totalWS}, MR=${totalMR}`);
 
             return {
               id: propId,
               name: prop.name,
-              location: `${prop.city || ""} - ${prop.area || ""}`,
+              location: [prop.city || prop.address, prop.area].filter(Boolean).join(" - ") || "Unknown Location",
               type: prop.type || "Space",
-              workstations: totalWorkstations,
-              meetingRooms: associatedMeetingRooms.length,
+              workstations: totalWS,
+              meetingRooms: totalMR,
               occupancy:
                 prop.occupancyRate || Math.floor(Math.random() * 30) + 70,
               status: prop.status || "active",
               rating: prop.avgRating || 4.5,
               image:
-                prop.images?.[0] ||
-                fallbackImages[index % fallbackImages.length],
+                prop.image ||
+                (prop.images && prop.images.length > 0 ? prop.images[0] : null) ||
+                "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80",
             };
           });
 
-          console.log("Mapped Spaces:", mappedSpaces);
+          console.log("[Spaces DEBUG] Final Mapped Spaces:", mappedSpaces);
           setSpaces(mappedSpaces);
         }
       } catch (err) {
@@ -243,6 +266,9 @@ const MySpaces = () => {
                   src={space.image}
                   alt={space.name}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80";
+                  }}
                 />
                 <div className="absolute top-3 right-3">
                   {getStatusBadge(space.status)}

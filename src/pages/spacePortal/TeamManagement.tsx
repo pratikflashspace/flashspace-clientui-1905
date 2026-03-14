@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Edit, MoreVertical, UserPlus, Trash2 } from "lucide-react";
+import { Plus, Edit, MoreVertical, UserPlus, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -291,83 +291,98 @@ export default function TeamManagement() {
         </div>
       </div>
 
-      {/* Add Member Modal */}
-      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-        <DialogContent className="sm:max-w-[425px] rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              <UserPlus className="w-6 h-6 text-primary" />
-              Add Team Member
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleAddMember} className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-bold">
-                Full Name
-              </Label>
-              <Input
-                id="name"
-                placeholder="Enter member's full name"
-                className="rounded-xl"
-                value={newMember.name}
-                onChange={(e) =>
-                  setNewMember({ ...newMember, name: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-bold">
-                Email Address
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@flashspace.com"
-                className="rounded-xl"
-                value={newMember.email}
-                onChange={(e) =>
-                  setNewMember({ ...newMember, email: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm font-bold">Assign Role</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  "Operations Manager",
-                  "Client Relations",
-                  "Accounts Executive",
-                  "Front Desk",
-                ].map((role) => (
-                  <button
-                    key={role}
-                    type="button"
-                    onClick={() => setNewMember({ ...newMember, role })}
-                    className={`py-2 px-3 rounded-xl border text-[10px] font-bold transition-all ${
-                      newMember.role === role
-                        ? "bg-primary/10 border-primary text-primary"
-                        : "bg-muted/50 border-transparent text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {role}
-                  </button>
-                ))}
+      {/* Add Member Modal - Raw implementation for guaranteed rendering */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setIsAddModalOpen(false)}
+          />
+          <div className="relative bg-white rounded-2xl w-full max-w-[425px] shadow-2xl overflow-hidden border border-border text-slate-900 opacity-100 flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <UserPlus className="w-6 h-6 text-primary" />
+                <h2 className="text-xl font-bold text-foreground">Add Team Member</h2>
               </div>
-            </div>
-            <DialogFooter className="pt-4">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full rounded-xl font-bold h-11"
+              <button 
+                onClick={() => setIsAddModalOpen(false)}
+                className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
               >
-                {isSubmitting ? "Adding..." : "Confirm & Send Invite"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+              <form onSubmit={handleAddMember} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-bold">
+                    Full Name
+                  </Label>
+                  <Input
+                    id="name"
+                    placeholder="Enter member's full name"
+                    className="rounded-xl"
+                    value={newMember.name}
+                    onChange={(e) =>
+                      setNewMember({ ...newMember, name: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-bold">
+                    Email Address
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="name@flashspace.com"
+                    className="rounded-xl"
+                    value={newMember.email}
+                    onChange={(e) =>
+                      setNewMember({ ...newMember, email: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-bold">Assign Role</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      "Operations Manager",
+                      "Client Relations",
+                      "Accounts Executive",
+                      "Front Desk",
+                    ].map((role) => (
+                      <button
+                        key={role}
+                        type="button"
+                        onClick={() => setNewMember({ ...newMember, role })}
+                        className={`py-2 px-3 rounded-xl border text-[10px] font-bold transition-all ${
+                          newMember.role === role
+                            ? "bg-primary/10 border-primary text-primary"
+                            : "bg-muted/50 border-transparent text-muted-foreground hover:bg-muted"
+                        }`}
+                      >
+                        {role}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="pt-4">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full rounded-xl font-bold h-11"
+                  >
+                    {isSubmitting ? "Adding..." : "Confirm & Send Invite"}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
