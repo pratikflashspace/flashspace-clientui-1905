@@ -5,6 +5,8 @@ export interface User {
   id?: string; // Optional for backward compatibility
   email: string;
   fullName: string;
+  firstName?: string;
+  lastName?: string;
   phoneNumber?: string;
   role: 'user' | 'super_admin' | 'admin' | 'vendor' | 'partner' | 'space_manager' | 'sales' | 'affiliate_manager' | 'space_partner_manager' | 'support' | 'affiliate';
   isEmailVerified: boolean;

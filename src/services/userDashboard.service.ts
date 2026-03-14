@@ -26,7 +26,15 @@ import {
   VisitRecord,
 } from "@/types/services";
 
-export type { KYCData, DashboardData };
+export type { 
+  KYCData, 
+  DashboardData, 
+  Invoice, 
+  InvoicesResponse, 
+  SupportTicket, 
+  MailRecord, 
+  VisitRecord 
+};
 
 // ============ SERVICE CLASS ============
 

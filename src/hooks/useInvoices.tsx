@@ -36,7 +36,7 @@ export const useInvoices = (options: UseInvoicesOptions = {}) => {
     setError(null);
 
     try {
-      const response = await userDashboardService.getInvoices(filters);
+      const response = await userDashboardService.getInvoices(filters as any);
 
       if (response.success && response.data) {
         setInvoicesData(response.data);

@@ -269,7 +269,7 @@ export default function AdminDashboard() {
       <FeatureSection
         title="Sales Management"
         description="Comprehensive tools for managing sales"
-        icon={Target}
+        icon={<Target className="w-6 h-6 text-primary" />}
         features={salesFeatures}
       />
 
@@ -286,7 +286,7 @@ export default function AdminDashboard() {
       <FeatureSection
         title="Support Operations"
         description="Manage tickets and client support"
-        icon={Headphones}
+        icon={<Headphones className="w-6 h-6 text-primary" />}
         features={supportFeatures}
       />
 
@@ -303,7 +303,7 @@ export default function AdminDashboard() {
       <FeatureSection
         title="Financial Management"
         description="Complete financial control and reporting"
-        icon={Wallet}
+        icon={<Wallet className="w-6 h-6 text-primary" />}
         features={financeFeatures}
       />
     </DashboardLayout>
