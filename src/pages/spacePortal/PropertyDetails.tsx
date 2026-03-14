@@ -338,7 +338,6 @@ export default function PropertyDetails() {
                 Performance over the last 6 months
               </p>
             </div>
-
           </div>
 
           <div className="h-[300px] w-full">
@@ -461,8 +460,6 @@ export default function PropertyDetails() {
                 ))}
               </div>
             </div>
-
-
           </div>
         </motion.div>
       </div>
@@ -785,7 +782,6 @@ export default function PropertyDetails() {
               Tracking {bookings.length} active engagements
             </p>
           </div>
-
         </div>
 
         <div className="overflow-x-auto">
