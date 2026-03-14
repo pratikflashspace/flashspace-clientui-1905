@@ -44,6 +44,7 @@ export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: L
   if (!isOpen) return null;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   return (
     <div className="fixed inset-0 z-[200]">
       {/* Backdrop */}
@@ -126,6 +127,28 @@ export const LoginModal = ({ isOpen, onClose, onSignupClick, onLoginSuccess }: L
                         <X className="w-5 h-5" />
                     </button>
 
+=======
+    return (
+        <div className="fixed inset-0 z-[200]">
+            {/* Backdrop */}
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-all animate-in fade-in duration-200" onClick={onClose} />
+
+            {/* Center Container */}
+            <div className="fixed inset-0 flex items-center justify-center p-4">
+                <div
+                    className="relative w-full max-w-[440px] bg-white rounded-2xl shadow-xl p-8 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh] scrollbar-hide"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ fontFamily: '"Inner Tight", system-ui, sans-serif' }}
+                    data-lenis-prevent
+                >
+                <button
+                        onClick={onClose}
+                        className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100 z-10"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+
+>>>>>>> 64eb8e842b9419fba892815329ccbe9773d3d473
                     {/* Content of the Login Card */}
                     <div className="text-center mb-6">
                         <img
