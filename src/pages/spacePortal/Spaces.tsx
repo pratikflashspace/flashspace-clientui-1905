@@ -288,8 +288,8 @@ const MySpaces = () => {
                   <Badge variant="outline">{space.type}</Badge>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 my-4 py-4 border-y border-border">
-                  <div className="text-center">
+                <div className="grid grid-cols-2 gap-4 my-4 py-4 border-y border-border">
+                  <div className="text-center border-r border-border">
                     <p className="text-lg font-bold text-foreground">
                       {space.workstations}
                     </p>
@@ -304,12 +304,6 @@ const MySpaces = () => {
                     <p className="text-xs text-muted-foreground">
                       Meeting Rooms
                     </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-lg font-bold text-foreground">
-                      {space.occupancy}%
-                    </p>
-                    <p className="text-xs text-muted-foreground">Occupancy</p>
                   </div>
                 </div>
 
