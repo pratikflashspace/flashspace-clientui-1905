@@ -152,7 +152,7 @@ import AffiliateClientManagement from "./pages/affiliatePortal/AffiliateClientMa
 import SpaceComponent from "./components/Spaces/SpaceComponent";
 import CoworkingSpaceComponent from "./components/Spaces/CoworkingSpaceComponent";
 import MeetingRoomSpaceComponent from "./components/Spaces/MeetingRoomSpaceComponent";
-import TeamManagement from "./pages/spacePortal/TeamManagement";
+import TeamManagement from "./pages/spacePortal/TeamManagement.tsx";
 // import TeamManagement from "./pages/admin/TeamManagement";
 //hello
 // --- React Query setup ---
