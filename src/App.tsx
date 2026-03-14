@@ -119,7 +119,7 @@ import MailAndVisits from "./pages/spacePortal/MailAndVisits";
 // import TeamManagement from "./pages/spacePortal/TeamManagement";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 import { AffiliateRoute } from "./components/auth/AffiliateRoute";
-import TeamManagement from "./pages/spacePortal/TeamManagement";
+// import TeamManagement from "./pages/spacePortal/TeamManagement";
 
 // Affiliate Portal
 
@@ -152,7 +152,9 @@ import AffiliateClientManagement from "./pages/affiliatePortal/AffiliateClientMa
 import SpaceComponent from "./components/Spaces/SpaceComponent";
 import CoworkingSpaceComponent from "./components/Spaces/CoworkingSpaceComponent";
 import MeetingRoomSpaceComponent from "./components/Spaces/MeetingRoomSpaceComponent";
-
+import TeamManagement from "./pages/spacePortal/TeamManagement";
+// import TeamManagement from "./pages/admin/TeamManagement";
+//hello
 // --- React Query setup ---
 const queryClient = new QueryClient();
 
