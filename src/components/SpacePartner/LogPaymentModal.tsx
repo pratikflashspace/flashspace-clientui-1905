@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { X, Loader2, Calendar, User, FileText, IndianRupee, Layout, CreditCard } from 'lucide-react';
+import { X, Loader2, Calendar, User, FileText, IndianRupee, Layout, CreditCard, CheckCircle2 } from 'lucide-react';
 import { axiosInstance } from '../../lib/axios';
+import { Button } from '../ui/button';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface LogPaymentModalProps {
     isOpen: boolean;
@@ -20,8 +22,6 @@ const LogPaymentModal = ({ isOpen, onClose, onSuccess }: LogPaymentModalProps) =
         invoiceId: '',
         commission: ''
     });
-
-    if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -45,181 +45,239 @@ const LogPaymentModal = ({ isOpen, onClose, onSuccess }: LogPaymentModalProps) =
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl w-full max-w-lg mx-4 shadow-2xl animate-in zoom-in-95 duration-200">
-                <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900">Log Payment</h2>
-                        <p className="text-sm text-gray-500 mt-1">Record a new payment manually</p>
-                    </div>
-                    <button
+        <AnimatePresence>
+            {isOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500"
+                        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+                    />
+
+                    {/* Modal Content */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                        className="relative bg-background rounded-[2.5rem] w-full max-w-2xl shadow-2xl overflow-hidden border border-border lg:p-2"
                     >
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    {/* Transaction Details */}
-                    <div>
-                        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                            <CreditCard className="w-4 h-4 text-teal-600" />
-                            Transaction Details
-                        </h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Payment ID
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={formData.paymentId}
-                                    onChange={(e) => setFormData({ ...formData, paymentId: e.target.value })}
-                                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all bg-gray-50/50 focus:bg-white"
-                                    placeholder="e.g. PAY-2024-001"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Amount
-                                </label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
-                                    <input
-                                        type="number"
-                                        required
-                                        value={formData.amount}
-                                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                        className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
-                                        placeholder="0.00"
-                                    />
+                        {/* Header */}
+                        <div className="relative p-8 pb-4">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <h2 className="text-3xl font-black text-foreground tracking-tight">
+                                        Log <span className="text-primary italic">Payment</span>
+                                    </h2>
+                                    <p className="text-muted-foreground font-medium">Record a new manual transaction into the ledger.</p>
                                 </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Method
-                                </label>
-                                <select
-                                    value={formData.method}
-                                    onChange={(e) => setFormData({ ...formData, method: e.target.value })}
-                                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all bg-white"
+                                <button
+                                    onClick={onClose}
+                                    className="p-3 hover:bg-muted rounded-2xl transition-all text-muted-foreground hover:text-foreground active:scale-95"
                                 >
-                                    <option value="Cash">Cash</option>
-                                    <option value="UPI">UPI</option>
-                                    <option value="Transfer">Bank Transfer</option>
-                                    <option value="Cheque">Cheque</option>
-                                </select>
+                                    <X className="w-6 h-6" />
+                                </button>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Commission
-                                </label>
-                                <div className="relative">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
-                                    <input
-                                        type="number"
-                                        value={formData.commission}
-                                        onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
-                                        className="w-full pl-8 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
-                                        placeholder="0.00"
-                                    />
+                        </div>
+
+                        {/* Form Area with Scrollbar */}
+                        <form onSubmit={handleSubmit}>
+                            <div className="max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar p-8 pt-4 space-y-8">
+                                {/* Transaction Details */}
+                                <div className="space-y-5">
+                                    <div className="flex items-center gap-3 pb-2 border-b border-border">
+                                        <div className="p-2 bg-primary/10 text-primary rounded-lg">
+                                            <CreditCard className="w-4 h-4" />
+                                        </div>
+                                        <h3 className="text-sm font-black text-foreground uppercase tracking-widest">
+                                            Transaction Base
+                                        </h3>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                                                Payment Reference
+                                            </label>
+                                            <div className="relative group">
+                                                <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={formData.paymentId}
+                                                    onChange={(e) => setFormData({ ...formData, paymentId: e.target.value })}
+                                                    className="w-full pl-11 pr-4 py-3 bg-muted/30 border border-border rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground/60"
+                                                    placeholder="PAY-2024-XXX"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                                                Total Amount
+                                            </label>
+                                            <div className="relative group">
+                                                <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                                                <input
+                                                    type="number"
+                                                    required
+                                                    value={formData.amount}
+                                                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                                    className="w-full pl-11 pr-4 py-3 bg-muted/30 border border-border rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-bold text-foreground placeholder:text-muted-foreground/60"
+                                                    placeholder="0.00"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                                                Method
+                                            </label>
+                                            <div className="relative group">
+                                                <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors pointer-events-none" />
+                                                <select
+                                                    value={formData.method}
+                                                    onChange={(e) => setFormData({ ...formData, method: e.target.value })}
+                                                    className="w-full pl-11 pr-4 py-3 bg-muted/30 border border-border rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-bold text-foreground appearance-none bg-no-repeat bg-[right_1rem_center] cursor-pointer"
+                                                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='hsl(var(--primary))'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundSize: '1rem' }}
+                                                >
+                                                    <option value="Cash">Cash Settlement</option>
+                                                    <option value="UPI">UPI Digital Payment</option>
+                                                    <option value="Transfer">Bank IMPS/RTGS</option>
+                                                    <option value="Cheque">Physical Cheque</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                                                Platform Commission
+                                            </label>
+                                            <div className="relative group">
+                                                <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                                                <input
+                                                    type="number"
+                                                    value={formData.commission}
+                                                    onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
+                                                    className="w-full pl-11 pr-4 py-3 bg-muted/30 border border-border rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground/60"
+                                                    placeholder="0.00"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Client & Space Details */}
+                                <div className="space-y-5">
+                                    <div className="flex items-center gap-3 pb-2 border-b border-border">
+                                        <div className="p-2 bg-primary/10 text-primary rounded-lg">
+                                            <User className="w-4 h-4" />
+                                        </div>
+                                        <h3 className="text-sm font-black text-foreground uppercase tracking-widest">
+                                            Client Association
+                                        </h3>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                        <div className="space-y-2 sm:col-span-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                                                Client Full Name
+                                            </label>
+                                            <div className="relative group">
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={formData.client}
+                                                    onChange={(e) => setFormData({ ...formData, client: e.target.value })}
+                                                    className="w-full pl-11 pr-4 py-3 bg-muted/30 border border-border rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground/60"
+                                                    placeholder="Enter client's legal name"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                                                Property / Space
+                                            </label>
+                                            <div className="relative group">
+                                                <Layout className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={formData.space}
+                                                    onChange={(e) => setFormData({ ...formData, space: e.target.value })}
+                                                    className="w-full pl-11 pr-4 py-3 bg-muted/30 border border-border rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground/60"
+                                                    placeholder="Workspace Name"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                                                Linked Invoice Ref
+                                            </label>
+                                            <div className="relative group">
+                                                <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                                                <input
+                                                    type="text"
+                                                    value={formData.invoiceId}
+                                                    onChange={(e) => setFormData({ ...formData, invoiceId: e.target.value })}
+                                                    className="w-full pl-11 pr-4 py-3 bg-muted/30 border border-border rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground/60"
+                                                    placeholder="INV-..."
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2 pt-2">
+                                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                                            Payment Purpose / Remarks
+                                        </label>
+                                        <div className="relative group">
+                                            <FileText className="absolute left-4 top-4 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                                            <textarea
+                                                required
+                                                value={formData.purpose}
+                                                onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+                                                className="w-full pl-11 pr-4 py-3 bg-muted/30 border border-border rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground/60 min-h-[100px] resize-none"
+                                                placeholder="Describe the purpose of this payment (e.g., Security Deposit, Furniture Upgrade)"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div className="h-px bg-gray-100" />
-
-                    {/* Client & Space Details */}
-                    <div>
-                        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                            <User className="w-4 h-4 text-teal-600" />
-                            Client & Space
-                        </h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2 col-span-2">
-                                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Client Name
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={formData.client}
-                                    onChange={(e) => setFormData({ ...formData, client: e.target.value })}
-                                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
-                                    placeholder="Enter client name"
-                                />
+                            {/* Fixed Footer */}
+                            <div className="p-8 border-t border-border flex gap-4 bg-muted/20 rounded-b-[2.5rem]">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={onClose}
+                                    className="flex-1 h-14 rounded-xl border-border text-foreground font-bold hover:bg-muted transition-all text-base"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="flex-1 h-14 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold transition-all text-base shadow-lg shadow-primary/10 active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 flex items-center justify-center gap-2"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            Recording...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <CheckCircle2 className="w-5 h-5" />
+                                            Confirm Payment
+                                        </>
+                                    )}
+                                </Button>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Space
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={formData.space}
-                                    onChange={(e) => setFormData({ ...formData, space: e.target.value })}
-                                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
-                                    placeholder="Space Name"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Invoice Ref (Optional)
-                                </label>
-                                <input
-                                    type="text"
-                                    value={formData.invoiceId}
-                                    onChange={(e) => setFormData({ ...formData, invoiceId: e.target.value })}
-                                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
-                                    placeholder="INV-..."
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Purpose / Notes
-                        </label>
-                        <input
-                            type="text"
-                            required
-                            value={formData.purpose}
-                            onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
-                            placeholder="e.g. Monthly Rent, Security Deposit"
-                        />
-                    </div>
-
-                    <div className="pt-2 flex gap-3">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex-1 px-4 py-3 rounded-xl bg-teal-600 text-white font-medium hover:bg-teal-700 transition-all shadow-lg hover:shadow-teal-600/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                        >
-                            {loading ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    Recording...
-                                </>
-                            ) : (
-                                'Confirm Payment'
-                            )}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                        </form>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
     );
 };
 
