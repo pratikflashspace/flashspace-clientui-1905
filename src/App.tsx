@@ -10,7 +10,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { ChatProvider } from "@/contexts/ChatContext";
-import TeamManagement from "./pages/spacePortal/teamManagement";
+import TeamManagement from "./pages/spacePortal/TeamManagement";
 
 import Index from "./pages/Index";
 import Services from "./pages/Services";
@@ -480,10 +480,7 @@ const App = () => (
                           path="space-management/:id"
                           element={<PropertyDetails />}
                         />
-                        <Route
-                          path="team-management"
-                          element={<TeamManagement />}
-                        />
+
                         <Route path="tickets" element={<Tickets />} />
                         <Route
                           path="feedback-nps"
@@ -494,6 +491,10 @@ const App = () => (
                           element={<SpacePortalTicketAndTasks />}
                         />
                         <Route path="mail-visits" element={<MailAndVisits />} />
+                        <Route
+                          path="team-management"
+                          element={<TeamManagement />}
+                        />
                       </Route>
                     </Route>
 

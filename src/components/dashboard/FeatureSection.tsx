@@ -15,24 +15,24 @@ interface Feature {
 interface FeatureSectionProps {
   title: string;
   description?: string;
-  icon?: LucideIcon;
-  features: Feature[];
+  icon?: React.ReactNode;
+  features?: Feature[];
+  children?: React.ReactNode;
   className?: string;
 }
 
 export const FeatureSection = ({
   title,
   description,
-  icon: Icon,
+  icon,
   features,
+  children,
   className,
 }: FeatureSectionProps) => {
   const navigate = useNavigate();
 
   const handleFeatureClick = (feature: Feature) => {
     if (feature.isAI) {
-      // setSelectedAIFeature(feature.title);
-      // setAiModalOpen(true);
       console.log("AI Feature clicked:", feature.title);
     } else if (feature.href) {
       navigate(feature.href);
@@ -40,26 +40,28 @@ export const FeatureSection = ({
   };
 
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={cn("mb-8", className)}
-      >
-        <div className="flex items-center gap-3 mb-4">
-          {Icon && (
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Icon className="w-5 h-5 text-primary" />
-            </div>
-          )}
-          <div>
-            <h2 className="text-xl font-bold text-foreground">{title}</h2>
-            {description && (
-              <p className="text-sm text-muted-foreground">{description}</p>
-            )}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={cn("mb-8", className)}
+    >
+      <div className="flex items-center gap-3 mb-6">
+        {icon && (
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            {icon}
           </div>
+        )}
+        <div>
+          <h2 className="text-xl font-bold text-foreground">{title}</h2>
+          {description && (
+            <p className="text-sm text-muted-foreground">{description}</p>
+          )}
         </div>
+      </div>
 
+      {children ? (
+        children
+      ) : features ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
             <motion.div
@@ -69,9 +71,9 @@ export const FeatureSection = ({
               transition={{ delay: index * 0.05 }}
               onClick={() => handleFeatureClick(feature)}
               className={cn(
-                "bg-background border border-border rounded-xl p-5 transition-all text-left",
+                "bg-muted/30 border border-border rounded-xl p-5 transition-all text-left",
                 (feature.isAI || feature.href) &&
-                  "cursor-pointer hover:border-primary/50 hover:shadow-md",
+                  "cursor-pointer hover:border-primary/50 hover:shadow-md hover:bg-background",
               )}
             >
               <div className="flex items-start justify-between mb-2">
@@ -94,7 +96,7 @@ export const FeatureSection = ({
             </motion.div>
           ))}
         </div>
-      </motion.div>
-    </>
+      ) : null}
+    </motion.div>
   );
 };

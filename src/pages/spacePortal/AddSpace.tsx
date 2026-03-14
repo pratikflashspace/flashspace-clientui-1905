@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -19,7 +19,25 @@ import {
   AlertCircle,
   ExternalLink,
   X as CloseIcon,
+  Shield,
+  Clock,
+  Layout,
+  Briefcase,
+  Star,
+  Settings,
+  AlertTriangle,
+  Check,
+  Send,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
 
 import propertyService from "@/services/property.service";
 import { getMySpaceUserKyc } from "@/Api/spacePartnerKyc.service";
@@ -111,6 +129,16 @@ export default function AddSpace() {
   const [propertyId, setPropertyId] = useState<string | null>(editId);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const steps = useMemo<{ id: Step; label: string; icon: any }[]>(() => [
+    { id: "property", label: "Property", icon: Building2 },
+    { id: "property_kyc", label: "KYC", icon: Shield },
+    { id: "selection", label: "Services", icon: Layout },
+    { id: "coworking", label: "Coworking", icon: Briefcase },
+    { id: "virtual", label: "Virtual", icon: Monitor },
+    { id: "meeting", label: "On-Demand", icon: Users },
+    { id: "review", label: "Review", icon: CheckCircle2 },
+  ], []);
 
   // --- Step 1: Property Data ---
   const [propertyData, setPropertyData] = useState({
@@ -563,8 +591,8 @@ export default function AddSpace() {
         await updateCoworkingSpace((coworkingData as any)._id, data);
       } else {
         const resp = await createCoworkingSpace(data);
-        if (resp.success && resp.data?._id) {
-          setCoworkingData((prev) => ({ ...prev, _id: resp.data._id }));
+        if (resp && resp._id) {
+          setCoworkingData((prev) => ({ ...prev, _id: resp._id }));
         }
       }
 
@@ -611,8 +639,8 @@ export default function AddSpace() {
         await updateVirtualOffice((virtualData as any)._id, data);
       } else {
         const resp = await createVirtualOffice(data);
-        if (resp.success && resp.data?._id) {
-          setVirtualData((prev) => ({ ...prev, _id: resp.data._id }));
+        if (resp && resp._id) {
+          setVirtualData((prev) => ({ ...prev, _id: resp._id }));
         }
       }
 
@@ -650,7 +678,7 @@ export default function AddSpace() {
       const allRoomsPayload = meetingData.rooms.map((room) => ({
         _id: room.ids && room.ids.length > 0 ? room.ids[0] : undefined,
         type: room.type,
-        capacity: room.capacity.toString(),
+        capacity: room.capacity,
         count: room.count,
         pricePerHour: room.pricePerHour,
         amenities: propertyData.features || [],
@@ -684,7 +712,7 @@ export default function AddSpace() {
     setLoading(true);
     try {
       await propertyService.updateProperty(propertyId, {
-        kycStatus: "pending" as any,
+        kycStatus: "pending",
       });
       toast.success("Property submitted for admin review!");
       navigate(-1);
@@ -698,122 +726,108 @@ export default function AddSpace() {
   // --- Renderers ---
 
   const renderStepper = () => {
-    const steps: { id: Step; label: string }[] = [
-      { id: "property", label: "Property" },
-      { id: "property_kyc", label: "Property KYC" },
-      { id: "selection", label: "Services" },
-      { id: "coworking", label: "Coworking" },
-      { id: "virtual", label: "Virtual" },
-      { id: "meeting", label: "On-Demand" },
-      { id: "review", label: "Review" },
-    ];
-
-    const currentIdx = steps.findIndex((s) => s.id === currentStep);
-
     return (
-      <div className="flex items-center justify-between mb-8 overflow-x-auto pb-4">
-        {steps.map((step, idx) => {
-          const isCompleted =
-            steps.findIndex((s) => s.id === currentStep) > idx;
-          const isActive = currentStep === step.id;
-          const isVisible =
-            step.id === "property" ||
-            step.id === "property_kyc" ||
-            step.id === "selection" ||
-            step.id === "review" ||
-            selectedTypes.includes(step.id);
+      <div className="bg-background border border-border rounded-2xl p-4 mb-8 shadow-sm overflow-x-auto">
+        <div className="flex items-center min-w-[800px] justify-between px-4">
+          {steps.map((step, idx) => {
+            const isCompleted =
+              steps.findIndex((s) => s.id === currentStep) > idx;
+            const isActive = currentStep === step.id;
+            const isVisible =
+              step.id === "property" ||
+              step.id === "property_kyc" ||
+              step.id === "selection" ||
+              step.id === "review" ||
+              selectedTypes.includes(step.id);
 
-          if (!isVisible) return null;
+            if (!isVisible) return null;
 
-          return (
-            <div
-              key={step.id}
-              className={`flex items-center flex-1 last:flex-none ${editId ? "cursor-pointer" : ""}`}
-              onClick={() => {
-                if (editId && isVisible) {
-                  setCurrentStep(step.id);
-                }
-              }}
-            >
-              <div className="flex flex-col items-center relative gap-2">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
-                    isCompleted
-                      ? "bg-[#3FA69E] border-[#3FA69E] text-white"
-                      : isActive
-                        ? "border-[#3FA69E] text-[#3FA69E] font-bold"
+            return (
+              <div
+                key={step.id}
+                className={`flex items-center flex-1 last:flex-none`}
+                onClick={() => {
+                  if (editId && isVisible) {
+                    setCurrentStep(step.id as Step);
+                  }
+                }}
+              >
+                <div className={`flex flex-col items-center gap-2 relative group focus:outline-none ${editId ? "cursor-pointer" : ""}`}>
+                  <div
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center border-2 transition-all duration-300 ${
+                      isCompleted
+                        ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                        : isActive
+                          ? "bg-background border-primary text-primary shadow-xl scale-110"
+                          : step.id === "property_kyc" &&
+                              propertyKycStatus === "rejected"
+                            ? "border-destructive text-destructive bg-destructive/5 animate-pulse"
+                            : "border-muted text-muted-foreground bg-muted/20"
+                    }`}
+                  >
+                    {isCompleted ? (
+                      <CheckCircle2 className="w-5 h-5" />
+                    ) : (
+                      <step.icon className="w-5 h-5" />
+                    )}
+                  </div>
+                  <span
+                    className={`text-[10px] uppercase tracking-wider font-extrabold whitespace-nowrap transition-colors ${
+                      isActive
+                        ? "text-primary"
                         : step.id === "property_kyc" &&
                             propertyKycStatus === "rejected"
-                          ? "border-red-500 text-red-500 bg-red-50 animate-pulse"
-                          : "border-slate-200 text-slate-400"
-                  }`}
-                >
-                  {isCompleted ? (
-                    <CheckCircle2 className="w-6 h-6" />
-                  ) : step.id === "property_kyc" &&
-                    propertyKycStatus === "rejected" ? (
-                    <AlertCircle className="w-6 h-6" />
-                  ) : (
-                    idx + 1
+                          ? "text-destructive"
+                          : "text-muted-foreground/60"
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+                  
+                  {isActive && (
+                    <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full" />
                   )}
                 </div>
-                <span
-                  className={`text-xs font-semibold whitespace-nowrap ${
-                    isActive
-                      ? "text-[#3FA69E]"
-                      : step.id === "property_kyc" &&
-                          propertyKycStatus === "rejected"
-                        ? "text-red-500"
-                        : "text-slate-500"
-                  }`}
-                >
-                  {step.label}
-                </span>
+                {idx < steps.length - 1 && steps[idx+1].id !== "review" && (
+                  <div
+                    className={`h-[1px] mx-4 flex-1 min-w-[20px] ${isCompleted ? "bg-primary" : "bg-muted"}`}
+                  />
+                )}
               </div>
-              {idx < steps.length - 1 && (
-                <div
-                  className={`h-[2px] mx-4 flex-1 min-w-[30px] ${isCompleted ? "bg-[#3FA69E]" : "bg-slate-200"}`}
-                />
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     );
   };
 
   const renderPropertyStep = () => (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <InputField
-          label="Property Name *"
-          placeholder="e.g. Flashspace Hub BKC"
-          value={propertyData.name}
-          onChange={(e: any) => {
-            setPropertyData({ ...propertyData, name: e.target.value });
-            clearError("name");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value.trim()) {
-              setErrors((prev) => ({ ...prev, name: true }));
-            }
-          }}
-          error={errors.name}
-        />
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-2">
-          <label
-            className={`text-xs font-bold uppercase tracking-wider ${
-              errors.city ? "text-red-500" : "text-slate-500"
-            }`}
-          >
-            City *
-          </label>
+           <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Property Name *</label>
+           <Input
+             placeholder="e.g. Flashspace Hub BKC"
+             value={propertyData.name}
+             onChange={(e) => {
+               setPropertyData({ ...propertyData, name: e.target.value });
+               clearError("name");
+             }}
+             onBlur={(e) => {
+               if (!e.target.value.trim()) {
+                 setErrors((prev) => ({ ...prev, name: true }));
+               }
+             }}
+             className={errors.name ? "border-destructive ring-destructive" : ""}
+           />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">City *</label>
           <select
-            className={`w-full h-12 rounded-xl border ${
-              errors.city
-                ? "border-red-500 bg-red-50/30 ring-1 ring-red-500"
-                : "border-slate-200 bg-white"
-            } px-4 text-sm font-semibold text-slate-700 shadow-sm focus:border-[#3FA69E] focus:ring-1 focus:ring-[#3FA69E] focus:outline-none transition-all outline-none`}
+            className={`w-full h-12 rounded-xl border bg-background px-4 text-sm font-semibold shadow-sm focus:ring-1 focus:ring-primary focus:outline-none transition-all outline-none ${
+              errors.city ? "border-destructive" : "border-border"
+            }`}
             value={propertyData.city}
             onChange={(e) => {
               setPropertyData({ ...propertyData, city: e.target.value });
@@ -833,50 +847,52 @@ export default function AddSpace() {
             ))}
           </select>
         </div>
-        <InputField
-          label="Area *"
-          placeholder="Bandra Kurla Complex"
-          value={propertyData.area}
-          onChange={(e: any) => {
-            setPropertyData({ ...propertyData, area: e.target.value });
-            clearError("area");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value.trim()) {
-              setErrors((prev) => ({ ...prev, area: true }));
-            }
-          }}
-          error={errors.area}
-        />
-        <InputField
-          label="Full Address *"
-          placeholder="Plot No. C-XXXX, G Block..."
-          value={propertyData.address}
-          onChange={(e: any) => {
-            setPropertyData({ ...propertyData, address: e.target.value });
-            clearError("address");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value.trim()) {
-              setErrors((prev) => ({ ...prev, address: true }));
-            }
-          }}
-          error={errors.address}
-        />
+
+        <div className="space-y-2">
+           <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Area *</label>
+           <Input
+             placeholder="Bandra Kurla Complex"
+             value={propertyData.area}
+             onChange={(e) => {
+               setPropertyData({ ...propertyData, area: e.target.value });
+               clearError("area");
+             }}
+             onBlur={(e) => {
+               if (!e.target.value.trim()) {
+                 setErrors((prev) => ({ ...prev, area: true }));
+               }
+             }}
+             className={errors.area ? "border-destructive ring-destructive" : ""}
+           />
+        </div>
+
+        <div className="space-y-2">
+           <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Full Address *</label>
+           <Input
+             placeholder="Plot No. C-XXXX, G Block..."
+             value={propertyData.address}
+             onChange={(e) => {
+               setPropertyData({ ...propertyData, address: e.target.value });
+               clearError("address");
+             }}
+             onBlur={(e) => {
+               if (!e.target.value.trim()) {
+                 setErrors((prev) => ({ ...prev, address: true }));
+               }
+             }}
+             className={errors.address ? "border-destructive ring-destructive" : ""}
+           />
+        </div>
       </div>
 
-      <div className="space-y-3">
-        <label
-          className={`text-sm font-semibold ${
-            errors.features ? "text-red-500" : "text-slate-700"
-          }`}
-        >
+      <div className="space-y-4">
+        <label className={`text-[10px] uppercase tracking-widest font-black ml-1 ${errors.features ? "text-destructive" : "text-muted-foreground"}`}>
           Property Features (Amenities) *
         </label>
-        <div className="flex flex-col gap-3">
-          <div className="flex gap-2">
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-3">
             <select
-              className="flex-1 h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm focus:border-[#3FA69E] focus:outline-none"
+              className="flex-1 h-12 rounded-xl border border-border bg-background px-4 text-sm font-semibold shadow-sm focus:ring-1 focus:ring-primary focus:outline-none transition-all"
               value={selectedAmenity}
               onChange={(e) => {
                 setSelectedAmenity(e.target.value);
@@ -902,7 +918,7 @@ export default function AddSpace() {
               <option value="Tea & Coffee">Tea & Coffee</option>
               <option value="Other">Other (Specify below)</option>
             </select>
-            <button
+            <Button
               type="button"
               onClick={() => {
                 if (
@@ -918,19 +934,17 @@ export default function AddSpace() {
                   clearError("features");
                 }
               }}
-              className="px-4 bg-[#3FA69E] text-white rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center shrink-0"
+              className="h-12 w-12 rounded-xl p-0"
             >
               <Plus className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
           {selectedAmenity === "Other" && (
-            <input
-              type="text"
-              className="w-full h-11 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm focus:border-[#3FA69E] focus:outline-none"
+            <Input
               placeholder="Type custom amenity here..."
               value={featureInput}
               onChange={(e) => setFeatureInput(e.target.value)}
-              onKeyPress={(e) => {
+              onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   if (
@@ -950,48 +964,58 @@ export default function AddSpace() {
             />
           )}
         </div>
-        <div className="flex flex-wrap gap-2 mt-2">
+        <div className="flex flex-wrap gap-2">
           {propertyData.features.map((f) => (
-            <span
+            <Badge
               key={f}
-              className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 text-slate-700 rounded-full text-xs font-medium border border-slate-200"
+              variant="secondary"
+              className="pl-3 pr-1 py-1 gap-1 border-primary/10 bg-primary/5 text-primary hover:bg-primary/10 transition-colors rounded-full font-bold text-[11px]"
             >
               {f}
-              <button
-                type="button"
+              <Button
+                variant="ghost" 
+                size="icon"
                 onClick={() => removeFeature(f)}
-                className="hover:text-red-500 transition-colors"
+                className="h-5 w-5 rounded-full hover:bg-primary/20 hover:text-primary text-primary/60"
               >
                 <CloseIcon className="w-3 h-3" />
-              </button>
-            </span>
+              </Button>
+            </Badge>
           ))}
         </div>
       </div>
 
-      <div className="space-y-3">
-        <label className="text-sm font-semibold text-slate-700">
+      <div className="space-y-4">
+        <label className={`text-[10px] uppercase tracking-widest font-black ml-1 ${errors.images ? "text-destructive" : "text-muted-foreground"}`}>
           Property Images *
         </label>
         <div className="flex items-center justify-center w-full">
           <label
             htmlFor="image-upload"
-            className={`flex flex-col items-center justify-center w-full h-32 border-2 ${
-              errors.images ? "border-red-500" : "border-slate-300"
-            } border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors`}
+            className={`flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed rounded-3xl cursor-pointer transition-all duration-300 ${
+              errors.images 
+                ? "border-destructive bg-destructive/5" 
+                : "border-border bg-muted/20 hover:bg-muted/30 hover:border-primary/50 group"
+            }`}
           >
-            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              {uploadingImages ? (
-                <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mb-2" />
-              ) : (
-                <Upload className="w-8 h-8 text-slate-400 mb-2" />
-              )}
-              <p className="text-sm text-slate-500 font-medium">
+            <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 ${
+                uploadingImages ? "bg-primary/10" : "bg-primary/10"
+              }`}>
+                {uploadingImages ? (
+                  <div className="w-6 h-6 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Upload className="w-6 h-6 text-primary" />
+                )}
+              </div>
+              <p className="text-sm font-extrabold text-foreground mb-1">
                 {uploadingImages
-                  ? "Uploading..."
-                  : "Click to upload property images"}
+                  ? "Processing Images..."
+                  : "Drop files here or click to upload"}
               </p>
-              <p className="text-xs text-slate-400">PNG, JPG or JPEG</p>
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
+                Support PNG, JPG or JPEG (Max 10MB each)
+              </p>
             </div>
             <input
               type="file"
@@ -1007,41 +1031,50 @@ export default function AddSpace() {
             />
           </label>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
-          {propertyData.images.map((img, i) => (
-            <div
-              key={i}
-              className="relative aspect-video rounded-xl overflow-hidden group shadow-sm"
-            >
-              <img
-                src={
-                  img.startsWith("/")
-                    ? `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${img}`
-                    : img
-                }
-                className="w-full h-full object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => handleRemoveImage(i)}
-                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+        
+        {propertyData.images.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6">
+            {propertyData.images.map((img, i) => (
+              <div
+                key={i}
+                className="relative aspect-video rounded-2xl overflow-hidden group shadow-md border border-border"
               >
-                <Trash2 className="w-3 h-3" />
-              </button>
-            </div>
-          ))}
-        </div>
+                <img
+                  src={
+                    img.startsWith("/")
+                      ? `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${img}`
+                      : img
+                  }
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => handleRemoveImage(i)}
+                    className="h-10 w-10 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-transform duration-300"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="flex justify-end pt-4">
-        <button
+      <div className="flex justify-end pt-10 sticky bottom-0 bg-background/80 backdrop-blur-sm -mx-10 px-10 pb-6 mt-10 border-t border-border/50">
+        <Button
           onClick={saveProperty}
           disabled={loading}
-          className="flex items-center gap-2 px-8 py-3 bg-[#3FA69E] text-white rounded-xl font-bold shadow-lg shadow-teal-100 hover:translate-y-[-2px] transition-all disabled:opacity-50"
+          className="h-14 px-10 rounded-2xl font-black text-lg shadow-xl shadow-primary/25 group overflow-hidden relative"
         >
-          {loading ? "Saving..." : "Save & Next"}
-          <ChevronRight className="w-5 h-5" />
-        </button>
+          <span className="relative z-10 flex items-center gap-3">
+            {loading ? "Saving Progress..." : editId ? "Update Property" : "Save & Continue"}
+            <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </Button>
       </div>
     </div>
   );
@@ -1209,18 +1242,17 @@ export default function AddSpace() {
   };
 
   const renderSelectionStep = () => (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center max-w-2xl mx-auto space-y-2">
-        <h2 className="text-xl font-bold text-slate-900">
-          What services are available at this property?
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      <div className="text-center max-w-2xl mx-auto space-y-4">
+        <h2 className="text-3xl font-black text-foreground tracking-tight">
+          What <span className="text-primary italic">services</span> are available?
         </h2>
-        <p className="text-slate-500 text-sm">
-          Select all that apply. We'll capture specific details for each in the
-          next steps.
+        <p className="text-muted-foreground font-medium text-sm leading-relaxed">
+          Select the service types you provide at this property. We'll capture specific details for each in the next steps.
         </p>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+ 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
           {
             id: "coworking",
@@ -1252,49 +1284,50 @@ export default function AddSpace() {
                     : [...prev, type.id],
                 );
               }}
-              className={`relative flex flex-col items-center p-8 rounded-3xl border-2 transition-all group ${
+              className={`relative flex flex-col items-center text-center p-10 rounded-[32px] border-2 transition-all duration-500 overflow-hidden group ${
                 isSelected
-                  ? "border-[#3FA69E] bg-teal-50/50 shadow-md shadow-teal-100"
-                  : "border-slate-100 bg-white hover:border-[#3FA69E] hover:bg-slate-50"
+                  ? "border-primary bg-primary/5 shadow-2xl shadow-primary/10 -translate-y-2"
+                  : "border-border bg-background hover:border-primary/30 hover:bg-muted/50"
               }`}
             >
               <div
-                className={`p-4 rounded-2xl mb-4 transition-colors ${
+                className={`w-20 h-20 rounded-3xl mb-6 flex items-center justify-center transition-all duration-500 ${
                   isSelected
-                    ? "bg-[#3FA69E] text-white"
-                    : "bg-slate-100 text-slate-500 group-hover:bg-teal-100 group-hover:text-[#3FA69E]"
+                    ? "bg-primary text-white scale-110 shadow-lg shadow-primary/20"
+                    : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary group-hover:scale-105"
                 }`}
               >
-                <type.icon className="w-8 h-8" />
+                <type.icon className="w-10 h-10" />
               </div>
               <h3
-                className={`font-bold mb-2 ${isSelected ? "text-[#3FA69E]" : "text-slate-800"}`}
+                className={`font-black text-lg mb-3 tracking-tight transition-colors ${isSelected ? "text-primary" : "text-foreground"}`}
               >
                 {type.label}
               </h3>
-              <p className="text-xs text-center text-slate-500 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed font-medium">
                 {type.desc}
               </p>
-
+ 
               {isSelected && (
-                <div className="absolute top-4 right-4 text-[#3FA69E]">
-                  <CheckCircle2 className="w-6 h-6 fill-teal-50" />
+                <div className="absolute top-6 right-6 p-1.5 bg-primary rounded-full text-white shadow-lg animate-in zoom-in duration-300">
+                  <CheckCircle2 className="w-4 h-4" />
                 </div>
               )}
             </button>
           );
         })}
       </div>
-
-      <div className="flex justify-between items-center pt-8">
-        <button
+ 
+      <div className="flex items-center justify-between gap-4 pt-10 border-t border-border/50">
+        <Button
+          variant="ghost" 
           onClick={() => setCurrentStep("property_kyc")}
-          className="flex items-center gap-2 px-6 py-3 text-slate-500 font-semibold hover:text-slate-700 transition-colors"
+          className="rounded-2xl px-8 font-bold text-muted-foreground hover:text-foreground h-14"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-5 h-5 mr-2" />
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => {
             if (selectedTypes.length === 0) {
               toast.error("Please select at least one service type");
@@ -1302,51 +1335,75 @@ export default function AddSpace() {
             }
             setCurrentStep(getNextStep("selection"));
           }}
-          className="flex items-center gap-2 px-8 py-3 bg-[#3FA69E] text-white rounded-xl font-bold shadow-lg shadow-teal-100 hover:translate-y-[-2px] transition-all"
+          className="h-14 px-12 rounded-2xl font-black text-lg shadow-xl shadow-primary/25 group overflow-hidden relative"
         >
-          Continue
-          <ChevronRight className="w-5 h-5" />
-        </button>
+          <span className="relative z-10 flex items-center gap-3">
+            Continue
+            <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </Button>
       </div>
     </div>
   );
 
   const renderCoworkingStep = () => (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-3">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest px-1">
             Total Capacity (Auto-calculated)
           </label>
-          <div className="w-full h-12 rounded-xl border border-slate-100 bg-slate-50 px-4 flex items-center text-sm font-bold text-[#3FA69E] shadow-inner">
-            {coworkingData.capacity} Seats
+          <div className="w-full h-14 rounded-2xl border-2 border-primary/10 bg-primary/5 px-6 flex items-center justify-between text-lg font-black text-primary shadow-sm group transition-all hover:border-primary/20">
+            <div className="flex items-center gap-3">
+               <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <Users className="w-4 h-4" />
+               </div>
+               <span>{coworkingData.capacity} <span className="text-sm font-bold opacity-60 italic">Total Seats</span></span>
+            </div>
+            <Badge variant="outline" className="bg-background text-[10px] font-black uppercase">Live Count</Badge>
           </div>
         </div>
-        <InputField
-          label="Price per Month (Partner Price)"
-          type="number"
-          placeholder="e.g. 5000"
-          value={coworkingData.pricePerMonth}
-          onChange={(e: any) => {
-            setCoworkingData({
-              ...coworkingData,
-              pricePerMonth: Number(e.target.value),
-            });
-            clearError("pricePerMonth");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value || Number(e.target.value) <= 0) {
-              setErrors((prev) => ({ ...prev, pricePerMonth: true }));
-            }
-          }}
-          error={errors.pricePerMonth}
-        />
+        <div className="space-y-3">
+          <label className="text-xs font-black text-muted-foreground uppercase tracking-widest px-1">
+            Monthly Subscription <span className="text-primary italic">(Per Seat)</span>
+          </label>
+          <div className="relative group">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary font-black z-10 transition-transform group-focus-within:scale-110">
+              ₹
+            </div>
+            <Input
+              type="number"
+              placeholder="e.g. 5000"
+              className="pl-14 h-14 rounded-2xl border-2 hover:border-primary/30 focus:border-primary transition-all text-lg font-black"
+              value={coworkingData.pricePerMonth}
+              onChange={(e: any) => {
+                setCoworkingData({
+                  ...coworkingData,
+                  pricePerMonth: Number(e.target.value),
+                });
+                clearError("pricePerMonth");
+              }}
+              onBlur={(e: any) => {
+                if (!e.target.value || Number(e.target.value) <= 0) {
+                  setErrors((prev) => ({ ...prev, pricePerMonth: true }));
+                }
+              }}
+            />
+          </div>
+          {errors.pricePerMonth && <p className="text-[10px] font-black text-destructive uppercase tracking-tighter px-2">Valid price is required</p>}
+        </div>
       </div>
-
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-slate-900">Floor & Seat Map</h3>
-          <button
+ 
+      <div className="space-y-6">
+        <div className="flex items-center justify-between px-1">
+          <div className="space-y-1">
+             <h3 className="text-xl font-black text-foreground tracking-tight">Floor & Inventory Map</h3>
+             <p className="text-xs text-muted-foreground font-medium italic">Configure individual floors and table clusters</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() =>
               setCoworkingData({
                 ...coworkingData,
@@ -1356,163 +1413,170 @@ export default function AddSpace() {
                 ],
               })
             }
-            className="flex items-center gap-1 text-sm font-bold text-[#3FA69E] hover:underline"
+            className="rounded-xl border-2 font-black border-primary/20 hover:border-primary text-primary hover:bg-primary/5 h-10 px-4 transition-all"
           >
-            <Plus className="w-4 h-4" /> Add Floor
-          </button>
+            <Plus className="w-4 h-4 mr-2" /> Add Level
+          </Button>
         </div>
-
-        {coworkingData.floors.map((floor, fIdx) => (
-          <div
-            key={fIdx}
-            className="p-6 rounded-2xl border border-slate-200 bg-slate-50 space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <h4 className="font-bold text-slate-800 text-sm italic">
-                Floor {floor.floorNumber}
-              </h4>
-              <button
-                onClick={() => addTable(fIdx)}
-                className="px-3 py-1.5 bg-white border border-teal-100 text-[#3FA69E] text-xs font-bold rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-1"
-              >
-                <Plus className="w-3 h-3" /> Add Table
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {floor.tables.map((table, tIdx) => (
-                <div
-                  key={tIdx}
-                  className={`bg-white p-4 rounded-xl border ${
-                    errors[`floor_${fIdx}_table_${tIdx}`]
-                      ? "border-red-500 ring-1 ring-red-500"
-                      : "border-slate-200"
-                  } shadow-sm space-y-3`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-500 uppercase">
-                      {table.tableNumber}
-                    </span>
-                    <input
-                      type="number"
-                      min="1"
-                      className={`w-16 h-8 text-xs font-bold ${
-                        errors[`floor_${fIdx}_table_${tIdx}`]
-                          ? "text-red-600 border-red-300 ring-1 ring-red-500"
-                          : "text-[#3FA69E] border-slate-200"
-                      } border rounded-lg px-2 focus:outline-none focus:border-[#3FA69E]`}
-                      value={table.numberOfSeats || 1}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value) || 1;
-                        const newFloors = [...coworkingData.floors];
-                        newFloors[fIdx].tables[tIdx].numberOfSeats = val;
-                        setCoworkingData({
-                          ...coworkingData,
-                          floors: newFloors,
-                        });
-                        clearError(`floor_${fIdx}_table_${tIdx}`);
-                      }}
-                      onBlur={(e) => {
-                        if (!e.target.value || parseInt(e.target.value) <= 0) {
-                          setErrors((prev) => ({
-                            ...prev,
-                            [`floor_${fIdx}_table_${tIdx}`]: true,
-                          }));
-                        }
-                      }}
-                    />
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-medium">
-                    {table.numberOfSeats || 1} Seats total
-                  </div>
+ 
+        <div className="grid gap-8">
+          {coworkingData.floors.map((floor, fIdx) => (
+            <div
+              key={fIdx}
+              className="p-8 rounded-[32px] border-2 border-border bg-muted/30 space-y-6 relative group transition-all hover:bg-muted/50 hover:border-primary/20"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 bg-background rounded-xl border-2 border-primary/10 flex items-center justify-center font-black text-primary shadow-sm group-hover:scale-110 transition-transform">
+                      {floor.floorNumber}
+                   </div>
+                   <div>
+                      <h4 className="font-black text-foreground uppercase tracking-widest text-xs">Level Configuration</h4>
+                      <p className="text-[10px] text-muted-foreground font-bold italic">Cluster management for this floor</p>
+                   </div>
                 </div>
-              ))}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => addTable(fIdx)}
+                  className="rounded-lg font-black text-[10px] uppercase tracking-wider h-8 px-4 shadow-sm hover:shadow-md transition-all bg-background border border-primary/10 hover:border-primary/30"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1.5" /> Deploy Table
+                </Button>
+              </div>
+ 
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {floor.tables.map((table, tIdx) => (
+                  <div
+                    key={tIdx}
+                    className={`bg-background p-5 rounded-2xl border-2 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
+                      errors[`floor_${fIdx}_table_${tIdx}`]
+                        ? "border-destructive shadow-destructive/10"
+                        : "border-border hover:border-primary/20"
+                    } shadow-lg shadow-black/[0.02] space-y-4`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <Badge variant="secondary" className="font-black tracking-tighter text-[10px] bg-muted/50 rounded-lg">
+                        {table.tableNumber}
+                      </Badge>
+                      <div className="relative w-20">
+                         <input
+                           type="number"
+                           min="1"
+                           className={`w-full h-9 text-right font-black ${
+                             errors[`floor_${fIdx}_table_${tIdx}`]
+                               ? "text-destructive"
+                               : "text-primary"
+                           } bg-muted/30 rounded-lg px-3 focus:outline-none transition-colors border-none group-focus-within:bg-muted`}
+                           value={table.numberOfSeats || 1}
+                           onChange={(e) => {
+                             const val = parseInt(e.target.value) || 1;
+                             const newFloors = [...coworkingData.floors];
+                             newFloors[fIdx].tables[tIdx].numberOfSeats = val;
+                             setCoworkingData({
+                               ...coworkingData,
+                               floors: newFloors,
+                             });
+                             clearError(`floor_${fIdx}_table_${tIdx}`);
+                           }}
+                         />
+                         <div className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground/50 pointer-events-none uppercase">QTY</div>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-dashed border-border flex items-center justify-between">
+                       <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Inventory</span>
+                       <span className="text-xs font-black text-foreground">{table.numberOfSeats || 1} <span className="opacity-50 text-[10px] uppercase ml-0.5">Seats</span></span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-
-      <div className="flex justify-between items-center pt-8">
-        <button
+ 
+      <div className="flex justify-between items-center pt-10 border-t border-border mt-12">
+        <Button
+          variant="ghost"
           onClick={() => setCurrentStep("selection")}
-          className="flex items-center gap-2 px-6 py-3 text-slate-500 font-semibold hover:text-slate-700 transition-colors"
+          className="rounded-2xl px-8 font-bold text-muted-foreground hover:text-foreground h-14"
         >
-          <ChevronLeft className="w-5 h-5" />
-          Back
-        </button>
-        <button
+          <ChevronLeft className="w-5 h-5 mr-2" />
+          Back to Selection
+        </Button>
+        <Button
           onClick={saveCoworking}
           disabled={loading}
-          className="flex items-center gap-2 px-8 py-3 bg-[#3FA69E] text-white rounded-xl font-bold shadow-lg shadow-teal-100 hover:translate-y-[-2px] transition-all disabled:opacity-50"
+          className="h-14 px-12 rounded-2xl font-black text-lg shadow-xl shadow-primary/25 group overflow-hidden relative"
         >
-          {loading ? "Saving..." : "Save & Next"}
-          <ChevronRight className="w-5 h-5" />
-        </button>
+          <span className="relative z-10 flex items-center gap-3">
+             {loading ? "Optimizing Assets..." : "Save & Continue"}
+             <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </Button>
       </div>
     </div>
   );
 
   const renderVirtualStep = () => (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <InputField
-          label="GST Plan Price (₹/Yr) *"
-          type="number"
-          value={virtualData.finalGstPricePerYear}
-          onChange={(e: any) => {
-            setVirtualData({
-              ...virtualData,
-              finalGstPricePerYear: Number(e.target.value),
-            });
-            clearError("gstPrice");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value || Number(e.target.value) <= 0) {
-              setErrors((prev) => ({ ...prev, gstPrice: true }));
-            }
-          }}
-          error={errors.gstPrice}
-        />
-        <InputField
-          label="Mailing Plan Price (₹/Yr) *"
-          type="number"
-          value={virtualData.finalMailingPricePerYear}
-          onChange={(e: any) => {
-            setVirtualData({
-              ...virtualData,
-              finalMailingPricePerYear: Number(e.target.value),
-            });
-            clearError("mailingPrice");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value || Number(e.target.value) <= 0) {
-              setErrors((prev) => ({ ...prev, mailingPrice: true }));
-            }
-          }}
-          error={errors.mailingPrice}
-        />
-        <InputField
-          label="BR Plan Price (₹/Yr) *"
-          type="number"
-          value={virtualData.finalBrPricePerYear}
-          onChange={(e: any) => {
-            setVirtualData({
-              ...virtualData,
-              finalBrPricePerYear: Number(e.target.value),
-            });
-            clearError("brPrice");
-          }}
-          onBlur={(e: any) => {
-            if (!e.target.value || Number(e.target.value) <= 0) {
-              setErrors((prev) => ({ ...prev, brPrice: true }));
-            }
-          }}
-          error={errors.brPrice}
-        />
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      <div className="text-center max-w-2xl mx-auto space-y-4">
+        <h2 className="text-3xl font-black text-foreground tracking-tight">
+          Virtual <span className="text-primary italic">Office</span> Plans
+        </h2>
+        <p className="text-muted-foreground font-medium text-sm leading-relaxed">
+          Configure yearly pricing for your virtual office packages. All plans are required to provide a complete listing.
+        </p>
       </div>
-
-      <div className="flex justify-between items-center pt-8">
-        <button
+ 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          { id: "gstPrice", label: "GST Registration", field: "finalGstPricePerYear", desc: "For companies needing a registered address for GST." },
+          { id: "mailingPrice", label: "Mailing Address", field: "finalMailingPricePerYear", desc: "For business correspondence and mailing services." },
+          { id: "brPrice", label: "Business Representation", field: "finalBrPricePerYear", desc: "Complete business representation and address services." },
+        ].map((plan) => (
+          <div key={plan.id} className={`p-8 rounded-[32px] border-2 transition-all duration-300 bg-background ${
+            errors[plan.id] ? "border-destructive bg-destructive/5 shadow-inner" : "border-border hover:border-primary/20 hover:shadow-2xl group"
+          }`}>
+             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 ${
+               errors[plan.id] ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary group-hover:scale-110"
+             }`}>
+                <Monitor className="w-7 h-7" />
+             </div>
+             <h4 className="text-lg font-black text-foreground mb-1 tracking-tight">{plan.label}</h4>
+             <p className="text-xs text-muted-foreground font-medium mb-8 leading-relaxed">{plan.desc}</p>
+             
+             <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Price per Year (₹) *</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-black">₹</span>
+                  <Input
+                    type="number"
+                    className={`pl-8 h-14 rounded-2xl font-black text-lg ${errors[plan.id] ? "border-destructive focus:ring-destructive" : "border-primary/30 focus:ring-primary"}`}
+                    value={(virtualData as any)[plan.field]}
+                    onChange={(e) => {
+                      setVirtualData({
+                        ...virtualData,
+                        [plan.field]: Number(e.target.value),
+                      });
+                      clearError(plan.id);
+                    }}
+                    onBlur={(e) => {
+                      if (!e.target.value || Number(e.target.value) <= 0) {
+                        setErrors((prev) => ({ ...prev, [plan.id]: true }));
+                      }
+                    }}
+                  />
+                </div>
+             </div>
+          </div>
+        ))}
+      </div>
+ 
+      <div className="flex items-center justify-between gap-4 pt-10 sticky bottom-0 bg-background/80 backdrop-blur-sm -mx-10 px-10 pb-6 mt-10 border-t border-border/50">
+        <Button
+          variant="ghost" 
           onClick={() => {
             const idx = selectedTypes.indexOf("virtual");
             if (idx > 0) {
@@ -1521,164 +1585,174 @@ export default function AddSpace() {
               setCurrentStep("selection");
             }
           }}
-          className="flex items-center gap-2 px-6 py-3 text-slate-500 font-semibold hover:text-slate-700 transition-colors"
+          className="rounded-2xl px-8 font-bold text-muted-foreground hover:text-foreground h-14"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-5 h-5 mr-2" />
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={saveVirtual}
           disabled={loading}
-          className="flex items-center gap-2 px-8 py-3 bg-[#3FA69E] text-white rounded-xl font-bold shadow-lg shadow-teal-100 hover:translate-y-[-2px] transition-all disabled:opacity-50"
+          className="h-14 px-12 rounded-2xl font-black text-lg shadow-xl shadow-primary/25 group overflow-hidden relative"
         >
-          {loading ? "Saving..." : "Save & Next"}
-          <ChevronRight className="w-5 h-5" />
-        </button>
+          <span className="relative z-10 flex items-center gap-3">
+            {loading ? "Saving Plans..." : "Save & Continue"}
+            <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </Button>
       </div>
     </div>
   );
 
   const renderMeetingStep = () => (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-slate-900">On-Demand Rooms</h3>
-          <button
-            onClick={() =>
-              setMeetingData({
-                ...meetingData,
-                rooms: [
-                  ...meetingData.rooms,
-                  {
-                    type: "meeting_room",
-                    capacity: 0,
-                    pricePerHour: 0,
-                    count: 0,
-                    ids: [], // New rooms have no IDs
-                  },
-                ],
-              })
-            }
-            className="flex items-center gap-1 text-sm font-bold text-[#3FA69E] hover:underline"
-          >
-            <Plus className="w-4 h-4" /> Add Room
-          </button>
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
+      <div className="flex items-center justify-between px-2">
+        <div className="space-y-1">
+          <h2 className="text-3xl font-black text-foreground tracking-tight">
+            On-Demand <span className="text-primary italic">Spaces</span>
+          </h2>
+          <p className="text-muted-foreground font-medium text-sm">Configure meeting rooms, board rooms, and other bookable spaces.</p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {meetingData.rooms.map((room, idx) => (
-            <div
-              key={idx}
-              className={`p-6 rounded-2xl border ${
-                errors[`meeting_room_${idx}`]
-                  ? "border-red-500 ring-1 ring-red-500"
-                  : "border-slate-200"
-              } bg-slate-50 space-y-4 relative group`}
+        <Button
+          onClick={() =>
+            setMeetingData({
+              ...meetingData,
+              rooms: [
+                ...meetingData.rooms,
+                {
+                  type: "meeting_room",
+                  capacity: 0,
+                  pricePerHour: 0,
+                  count: 0,
+                  ids: [],
+                },
+              ],
+            })
+          }
+          className="rounded-2xl px-6 font-black gap-2 h-14 shadow-xl shadow-primary/20"
+        >
+          <Plus className="w-5 h-5" /> Add New Room
+        </Button>
+      </div>
+ 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {meetingData.rooms.map((room, idx) => (
+          <div
+            key={idx}
+            className={`group relative p-8 rounded-[32px] border-2 transition-all duration-300 bg-background ${
+              errors[`meeting_room_${idx}`]
+                ? "border-destructive bg-destructive/5 shadow-inner"
+                : "border-border hover:border-primary/20 hover:shadow-2xl"
+            }`}
+          >
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={() => {
+                const newRooms = [...meetingData.rooms];
+                newRooms.splice(idx, 1);
+                setMeetingData({ rooms: newRooms });
+                clearError(`meeting_room_${idx}`);
+              }}
+              className="absolute -top-3 -right-3 h-10 w-10 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100"
             >
-              <button
-                onClick={() => {
-                  const newRooms = [...meetingData.rooms];
-                  newRooms.splice(idx, 1);
-                  setMeetingData({ rooms: newRooms });
-                  clearError(`meeting_room_${idx}`);
-                }}
-                className="absolute top-4 right-4 text-red-500 opacity-100 p-2 rounded-lg transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase">
-                  Room Type
-                </label>
-                <select
-                  className={`w-full h-12 rounded-xl border ${
-                    errors[`meeting_room_${idx}`] && !room.capacity
-                      ? "border-red-500"
-                      : "border-slate-200"
-                  } bg-white px-4 text-sm focus:outline-none focus:border-[#3FA69E] transition-colors`}
-                  value={room.type}
-                  onChange={(e) => {
-                    const newRooms = [...meetingData.rooms];
-                    newRooms[idx].type = e.target.value;
-                    setMeetingData({ rooms: newRooms });
-                    clearError(`meeting_room_${idx}`);
-                  }}
-                >
-                  <option value="meeting_room">Meeting Room</option>
-                  <option value="conference_room">Conference Room</option>
-                  <option value="board_room">Board Room</option>
-                  <option value="other">Training Room / Other</option>
-                </select>
+              <Trash2 className="w-5 h-5" />
+            </Button>
+ 
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 mb-2">
+                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+                    <Monitor className="w-6 h-6 text-primary" />
+                 </div>
+                 <div className="flex-1">
+                    <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Room Type</label>
+                    <select
+                      className="w-full h-10 bg-transparent font-black text-lg focus:outline-none focus:text-primary transition-colors cursor-pointer appearance-none"
+                      value={room.type}
+                      onChange={(e) => {
+                        const newRooms = [...meetingData.rooms];
+                        newRooms[idx].type = e.target.value;
+                        setMeetingData({ rooms: newRooms });
+                        clearError(`meeting_room_${idx}`);
+                      }}
+                    >
+                      <option value="meeting_room">Meeting Room</option>
+                      <option value="conference_room">Conference Room</option>
+                      <option value="board_room">Board Room</option>
+                      <option value="other">Training Room / Other</option>
+                    </select>
+                 </div>
               </div>
+ 
               <div className="grid grid-cols-3 gap-4">
-                <InputField
-                  label="Capacity"
-                  type="number"
-                  value={room.capacity}
-                  onChange={(e: any) => {
-                    const newRooms = [...meetingData.rooms];
-                    newRooms[idx].capacity = Number(e.target.value);
-                    setMeetingData({ rooms: newRooms });
-                    clearError(`meeting_room_${idx}`);
-                  }}
-                  onBlur={(e: any) => {
-                    if (!e.target.value || Number(e.target.value) <= 0) {
-                      setErrors((prev) => ({
-                        ...prev,
-                        [`meeting_room_${idx}`]: true,
-                      }));
-                    }
-                  }}
-                  error={errors[`meeting_room_${idx}`] && !room.capacity}
-                />
-                <InputField
-                  label="Price/Hr (₹)"
-                  type="number"
-                  value={room.pricePerHour}
-                  onChange={(e: any) => {
-                    const newRooms = [...meetingData.rooms];
-                    newRooms[idx].pricePerHour = Number(e.target.value);
-                    setMeetingData({ rooms: newRooms });
-                    clearError(`meeting_room_${idx}`);
-                  }}
-                  onBlur={(e: any) => {
-                    if (!e.target.value || Number(e.target.value) <= 0) {
-                      setErrors((prev) => ({
-                        ...prev,
-                        [`meeting_room_${idx}`]: true,
-                      }));
-                    }
-                  }}
-                  error={errors[`meeting_room_${idx}`] && !room.pricePerHour}
-                />
-                <InputField
-                  label="Count"
-                  type="number"
-                  value={room.count}
-                  onChange={(e: any) => {
-                    const newRooms = [...meetingData.rooms];
-                    newRooms[idx].count = Number(e.target.value);
-                    setMeetingData({ rooms: newRooms });
-                    clearError(`meeting_room_${idx}`);
-                  }}
-                  onBlur={(e: any) => {
-                    if (!e.target.value || Number(e.target.value) <= 0) {
-                      setErrors((prev) => ({
-                        ...prev,
-                        [`meeting_room_${idx}`]: true,
-                      }));
-                    }
-                  }}
-                  error={errors[`meeting_room_${idx}`] && !room.count}
-                />
+                <div className="space-y-2">
+                   <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Capacity</label>
+                   <Input
+                     type="number"
+                     placeholder="0"
+                     className="h-12 rounded-xl font-black text-center border-primary/20"
+                     value={room.capacity || ""}
+                     onChange={(e) => {
+                       const newRooms = [...meetingData.rooms];
+                       newRooms[idx].capacity = Number(e.target.value);
+                       setMeetingData({ rooms: newRooms });
+                       clearError(`meeting_room_${idx}`);
+                     }}
+                   />
+                </div>
+                <div className="space-y-2">
+                   <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Count</label>
+                   <Input
+                     type="number"
+                     placeholder="0"
+                     className="h-12 rounded-xl font-black text-center border-primary/20"
+                     value={room.count || ""}
+                     onChange={(e) => {
+                       const newRooms = [...meetingData.rooms];
+                       newRooms[idx].count = Number(e.target.value);
+                       setMeetingData({ rooms: newRooms });
+                       clearError(`meeting_room_${idx}`);
+                     }}
+                   />
+                </div>
+                <div className="space-y-2">
+                   <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Price/Hr</label>
+                   <div className="relative">
+                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-primary">₹</span>
+                     <Input
+                       type="number"
+                       placeholder="0"
+                       className="h-12 pl-6 rounded-xl font-black text-center border-primary/20"
+                       value={room.pricePerHour || ""}
+                       onChange={(e) => {
+                         const newRooms = [...meetingData.rooms];
+                         newRooms[idx].pricePerHour = Number(e.target.value);
+                         setMeetingData({ rooms: newRooms });
+                         clearError(`meeting_room_${idx}`);
+                       }}
+                     />
+                   </div>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+ 
+        {meetingData.rooms.length === 0 && (
+          <div className="col-span-full py-20 flex flex-col items-center justify-center text-center bg-muted/5 rounded-[40px] border-2 border-dashed border-border">
+             <div className="w-20 h-20 bg-muted rounded-3xl flex items-center justify-center mb-6">
+                <Layers className="w-10 h-10 text-muted-foreground/30" />
+             </div>
+             <h3 className="text-xl font-black text-foreground mb-2">No Rooms Added</h3>
+             <p className="text-muted-foreground font-medium max-w-xs mx-auto">Click the button in the top right to add your first on-demand room.</p>
+          </div>
+        )}
       </div>
-
-      <div className="flex justify-between items-center pt-8">
-        <button
+ 
+      <div className="flex items-center justify-between gap-4 pt-10 sticky bottom-0 bg-background/80 backdrop-blur-sm -mx-10 px-10 pb-6 mt-10 border-t border-border/50">
+        <Button
+          variant="ghost" 
           onClick={() => {
             const idx = selectedTypes.indexOf("meeting");
             if (idx > 0) {
@@ -1687,19 +1761,22 @@ export default function AddSpace() {
               setCurrentStep("selection");
             }
           }}
-          className="flex items-center gap-2 px-6 py-3 text-slate-500 font-semibold hover:text-slate-700 transition-colors"
+          className="rounded-2xl px-8 font-bold text-muted-foreground hover:text-foreground h-14"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-5 h-5 mr-2" />
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={saveMeeting}
           disabled={loading}
-          className="flex items-center gap-2 px-8 py-3 bg-[#3FA69E] text-white rounded-xl font-bold shadow-lg shadow-teal-100 hover:translate-y-[-2px] transition-all disabled:opacity-50"
+          className="h-14 px-12 rounded-2xl font-black text-lg shadow-xl shadow-primary/25 group overflow-hidden relative"
         >
-          {loading ? "Saving..." : "Save & Next"}
-          <ChevronRight className="w-5 h-5" />
-        </button>
+          <span className="relative z-10 flex items-center gap-3">
+            {loading ? "Saving Spaces..." : "Save & Continue"}
+            <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </Button>
       </div>
     </div>
   );
@@ -1709,128 +1786,113 @@ export default function AddSpace() {
     const isPropertyKycPending = propertyKycStatus === "pending";
     const isPropertyKycRejected = propertyKycStatus === "rejected";
     const isPartnerKycApproved = partnerKycStatus === "approved";
-
+ 
     return (
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
         <div className="text-center max-w-2xl mx-auto space-y-4">
-          <div className="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center mx-auto text-[#3FA69E]">
-            <CheckCircle2 className="w-10 h-10" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900">All Set!</h2>
-          <p className="text-slate-500">
-            Your property and service details have been captured successfully.
+          <Badge variant="outline" className="px-4 py-1.5 rounded-full border-primary/20 bg-primary/5 text-primary font-black uppercase tracking-widest text-[10px]">
+             Final Verification
+          </Badge>
+          <h2 className="text-3xl font-black text-foreground tracking-tight">
+            Review & <span className="text-primary italic">Submit</span>
+          </h2>
+          <p className="text-muted-foreground font-medium text-sm">
+            Please review your space details carefully. Once submitted, our team will verify the information before making the listing live.
           </p>
         </div>
-
-        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
-          <div className="space-y-2">
-            <h3 className="text-lg font-bold text-slate-900">Final Review</h3>
-            <p className="text-sm text-slate-500">
-              Please review all entries before submitting. Once submitted, your
-              property will be listed for admin approval.
-            </p>
-          </div>
-
-          {!isPartnerKycApproved && (
-            <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
-              <div>
-                <h4 className="text-sm font-bold text-amber-900">
-                  Partner Identity KYC Not Complete
-                </h4>
-                <p className="text-xs text-amber-700">
-                  Please complete your personal KYC to enable property
-                  submission.
-                </p>
-                <button
-                  onClick={() => navigate("/spaceportal/kyc-verification")}
-                  className="mt-2 text-xs font-bold text-[#3FA69E] hover:underline flex items-center gap-1"
-                >
-                  Complete Personal KYC <ExternalLink className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Property KYC Status Summary */}
+ 
+        <div className="max-w-3xl mx-auto space-y-8">
           <div
-            className={`p-6 rounded-2xl border ${
+            className={`p-10 rounded-[40px] border-2 transition-all duration-500 shadow-sm ${
               isPropertyKycApproved
-                ? "bg-emerald-50 border-emerald-100"
+                ? "bg-emerald-50/50 border-emerald-200"
                 : isPropertyKycPending
-                  ? "bg-blue-50 border-blue-100"
+                  ? "bg-blue-50/50 border-blue-200"
                   : isPropertyKycRejected
-                    ? "bg-red-50 border-red-100"
-                    : "bg-slate-50 border-slate-200"
+                    ? "bg-destructive/5 border-destructive/20"
+                    : "bg-muted/30 border-border"
             }`}
           >
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                className={`w-20 h-20 rounded-[28px] flex items-center justify-center shadow-lg transition-transform duration-500 hover:scale-110 ${
                   isPropertyKycApproved
-                    ? "bg-emerald-100 text-emerald-600"
+                    ? "bg-emerald-500 text-white"
                     : isPropertyKycPending
-                      ? "bg-blue-100 text-blue-600"
+                      ? "bg-blue-500 text-white"
                       : isPropertyKycRejected
-                        ? "bg-red-100 text-red-600"
-                        : "bg-slate-200 text-slate-600"
+                        ? "bg-destructive text-white"
+                        : "bg-muted text-muted-foreground"
                 }`}
               >
                 {isPropertyKycApproved ? (
-                  <CheckCircle2 className="w-6 h-6" />
+                  <CheckCircle2 className="w-10 h-10" />
                 ) : isPropertyKycPending ? (
-                  <Monitor className="w-6 h-6 animate-pulse" />
+                  <Clock className="w-10 h-10 animate-[spin_3s_linear_infinite]" />
                 ) : isPropertyKycRejected ? (
-                  <AlertCircle className="w-6 h-6" />
+                  <AlertCircle className="w-10 h-10" />
                 ) : (
-                  <FileType className="w-6 h-6" />
+                  <FileType className="w-10 h-10" />
                 )}
               </div>
-              <div>
-                <h4 className="font-bold text-slate-900">
-                  Property Verification:{" "}
-                  <span className="capitalize">
+              <div className="flex-1 space-y-2">
+                <h4 className="text-2xl font-black text-foreground tracking-tight">
+                  Status: <span className="text-primary italic capitalize">
                     {propertyKycStatus.replace("_", " ")}
                   </span>
                 </h4>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground font-medium leading-relaxed max-w-md">
                   {isPropertyKycApproved
-                    ? "This property is verified and active."
+                    ? "Congratulations! Your property has been verified and is now ready for listings."
                     : isPropertyKycPending
-                      ? "Property details are under review by our admin team."
+                      ? "Hang tight! Our experts are currently reviewing your property details and documents."
                       : isPropertyKycRejected
-                        ? "There are issues with this property submission."
-                        : "This property is currently a draft and has not been submitted."}
+                        ? "There are some inconsistencies in your submission that need your attention."
+                        : "You haven't submitted this property for verification yet. Complete all steps to proceed."}
                 </p>
               </div>
             </div>
-
+ 
             {isPropertyKycRejected && propertyKycRejectionReason && (
-              <div className="mt-3 p-3 bg-white/50 rounded-lg border border-red-100 text-sm text-red-600 font-medium">
-                Rejection Reason: {propertyKycRejectionReason}
+              <div className="mt-10 p-6 bg-destructive/10 rounded-2xl border-2 border-destructive/20 text-sm text-destructive font-black flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <span>Rejection Feedback: {propertyKycRejectionReason}</span>
               </div>
             )}
           </div>
-
-          <div className="flex items-start gap-3 p-4 bg-teal-50/50 rounded-2xl border border-teal-100">
-            <input
-              type="checkbox"
-              id="policy"
-              className="mt-1 w-4 h-4 text-[#3FA69E] border-slate-300 rounded focus:ring-[#3FA69E]"
-              checked={policyAccepted}
-              onChange={(e) => setPolicyAccepted(e.target.checked)}
-            />
-            <label
-              htmlFor="policy"
-              className="text-sm text-slate-700 font-medium"
-            >
-              I hereby confirm that all provided information is accurate and I
-              accept FlashSpace's partner policies and terms of service.
-            </label>
+ 
+          {!isPartnerKycApproved && (
+            <div className="p-6 bg-amber-50 rounded-[24px] border-2 border-amber-100 flex items-start gap-4">
+               <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6 text-amber-600" />
+               </div>
+               <div>
+                  <h4 className="font-black text-amber-900 leading-tight">Identity Verification Required</h4>
+                  <p className="text-xs text-amber-700 font-medium mt-1">Please complete your personal KYC to enable property submission.</p>
+                  <Button
+                    variant="link"
+                    onClick={() => navigate("/spaceportal/kyc-verification")}
+                    className="p-0 h-auto text-amber-900 font-black mt-2 underline decoration-2 underline-offset-4"
+                  >
+                    Complete Personal KYC <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
+                  </Button>
+               </div>
+            </div>
+          )}
+ 
+          <div className="flex items-start gap-4 p-8 bg-primary/5 rounded-[32px] border-2 border-primary/10 transition-all hover:bg-primary/[0.08] cursor-pointer group" onClick={() => setPolicyAccepted(!policyAccepted)}>
+            <div className="mt-1">
+              <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${policyAccepted ? "bg-primary border-primary shadow-lg shadow-primary/30" : "border-primary/30 bg-background"}`}>
+                {policyAccepted && <Check className="w-4 h-4 text-white font-black" />}
+              </div>
+            </div>
+            <p className="text-sm text-foreground font-bold leading-relaxed">
+              I certify that all information provided is accurate and I agree to <span className="text-primary underline decoration-2 underline-offset-4 decoration-primary/30">FlashSpace Partner Terms</span>, including listing & commission policies.
+            </p>
           </div>
-
-          <div className="space-y-3">
-            <button
+ 
+          <div className="space-y-6 pt-4">
+            <Button
               onClick={submitPropertyForReview}
               disabled={
                 !policyAccepted ||
@@ -1838,39 +1900,42 @@ export default function AddSpace() {
                 !isPartnerKycApproved ||
                 loading
               }
-              className="w-full py-4 bg-[#3FA69E] text-white rounded-2xl font-bold shadow-xl shadow-teal-100 disabled:opacity-50 disabled:grayscale disabled:shadow-none hover:scale-[1.01] transition-all"
+              className="w-full h-20 rounded-[28px] font-black text-xl shadow-2xl shadow-primary/30 relative overflow-hidden group disabled:opacity-50 disabled:grayscale"
             >
-              {loading
-                ? "Submitting..."
-                : isPropertyKycRejected
-                  ? "Resubmit Property for Review"
-                  : isPropertyKycPending
-                    ? "Currently Under Review"
-                    : "Submit Property for Admin Review"}
-            </button>
-
+              <span className="relative z-10 flex items-center justify-center gap-3 tracking-tight">
+                {loading
+                  ? "Verifying Submission..."
+                  : isPropertyKycRejected
+                    ? "Resubmit for Internal Review"
+                    : isPropertyKycPending
+                      ? "Submission in Progress"
+                      : "Submit Portfolio for Admin Review"}
+                {!loading && !isPropertyKycPending && <Send className="w-6 h-6 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform" />}
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </Button>
+ 
             {isPropertyKycPending && (
-              <p className="text-center text-xs text-blue-600 font-semibold">
-                * Our team is reviewing your property. Changes are locked during
-                review.
-              </p>
+              <div className="flex items-center justify-center gap-2 text-xs text-blue-600 font-black uppercase tracking-widest bg-blue-50 py-3 rounded-xl border border-blue-100">
+                <Clock className="w-4 h-4" />
+                Data review locked until verification complete
+              </div>
             )}
-
+ 
             {!isPartnerKycApproved && (
-              <p className="text-center text-xs text-amber-600 font-semibold">
-                * Please complete Personal KYC to enable submission.
-              </p>
+              <div className="flex items-center justify-center gap-2 text-xs text-amber-600 font-black uppercase tracking-widest bg-amber-50 py-3 rounded-xl border border-amber-100 italic">
+                <AlertTriangle className="w-4 h-4" />
+                Personal Identity Verification Required
+              </div>
             )}
+            
+            <button
+               onClick={handleFinish}
+               className="w-full text-center text-sm font-black text-muted-foreground hover:text-primary transition-colors py-2 group underline decoration-2 underline-offset-8 decoration-transparent hover:decoration-primary/30"
+            >
+               I'll complete this review later <span className="group-hover:translate-x-1 inline-block transition-transform">→</span>
+            </button>
           </div>
-        </div>
-
-        <div className="flex justify-center pt-4">
-          <button
-            onClick={handleFinish}
-            className="text-slate-400 font-semibold hover:text-slate-600 transition-colors"
-          >
-            I'll do it later, take me to dashboard
-          </button>
         </div>
       </div>
     );
@@ -1889,18 +1954,18 @@ export default function AddSpace() {
   });
 
   return (
-    <div className="flex-1 max-w-5xl mx-auto p-4 md:p-8">
+    <div className="flex-1 max-w-7xl mx-auto p-4 md:p-8 animate-in fade-in duration-700">
       {propertyKycStatus === "not_started" && (
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 shadow-sm">
+        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 mb-8 shadow-sm">
           <div className="flex gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <Info className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+              <Info className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-blue-900 mb-1">
+              <h3 className="text-lg font-extrabold text-foreground mb-1 tracking-tight">
                 Complete Property Verification
               </h3>
-              <p className="text-blue-700/80 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 To ensure a smooth onboarding process, please provide accurate
                 property information and clear document uploads. Verification
                 typically takes 24-48 hours once submitted.
@@ -1911,28 +1976,28 @@ export default function AddSpace() {
       )}
 
       {propertyKycStatus === "rejected" && (
-        <div className="bg-red-50 border border-red-100 rounded-2xl p-6 mb-8 shadow-sm">
+        <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-6 mb-8 shadow-sm">
           <div className="flex gap-4">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <AlertCircle className="w-6 h-6 text-red-600" />
+            <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-6 h-6 text-destructive" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-red-900 mb-1">
+              <h3 className="text-lg font-extrabold text-destructive mb-1 tracking-tight">
                 Verification Issues Found
               </h3>
-              <p className="text-red-700/80 text-sm leading-relaxed mb-4">
+              <p className="text-destructive/80 text-sm leading-relaxed mb-4">
                 {propertyKycRejectionReason ||
                   "Please review the issues highlighted below and update the necessary documents."}
               </p>
 
               {rejectedDocNames.length > 0 && (
-                <div className="text-sm text-red-800 bg-red-100/50 p-4 rounded-xl border border-red-100">
-                  <strong className="block mb-2 text-red-900">
+                <div className="text-sm text-destructive bg-destructive/10 p-4 rounded-xl border border-destructive/10">
+                  <strong className="block mb-2 text-destructive font-extrabold uppercase text-[10px] tracking-widest">
                     Action Required For:
                   </strong>
                   <ul className="list-disc pl-5 space-y-1">
                     {rejectedDocNames.map((name, idx) => (
-                      <li key={idx} className="font-medium">
+                      <li key={idx} className="font-bold">
                         {name}
                       </li>
                     ))}
@@ -1944,35 +2009,48 @@ export default function AddSpace() {
         </div>
       )}
 
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-slate-500 hover:text-slate-700 transition-colors mb-4 group"
-      >
-        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
-          <ChevronLeft className="w-5 h-5" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <Button
+            variant="ghost" 
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="group px-0 hover:bg-transparent text-muted-foreground hover:text-foreground mb-2"
+          >
+            <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            Back to Portal
+          </Button>
+          <h1 className="text-4xl font-black text-foreground tracking-tighter">
+            Add New <span className="text-primary italic">Space</span>
+          </h1>
+          <p className="text-muted-foreground font-medium">
+            Capture property details and list across multiple services.
+          </p>
         </div>
-        <span className="font-semibold text-sm">Back to Portal</span>
-      </button>
-
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900 font-[Poppins]">
-          Add New Space
-        </h1>
-        <p className="text-slate-500">
-          Capture property details and list across multiple services.
-        </p>
+        
+        <div className="flex items-center gap-3">
+           <Badge variant="outline" className="px-4 py-1.5 rounded-full border-primary/20 bg-primary/5 text-primary font-bold">
+             Step {steps.findIndex(s => s.id === currentStep) + 1} of {steps.length}
+           </Badge>
+        </div>
       </div>
 
       {renderStepper()}
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
-        {currentStep === "property" && renderPropertyStep()}
-        {currentStep === "property_kyc" && renderPropertyKYCStep()}
-        {currentStep === "selection" && renderSelectionStep()}
-        {currentStep === "coworking" && renderCoworkingStep()}
-        {currentStep === "virtual" && renderVirtualStep()}
-        {currentStep === "meeting" && renderMeetingStep()}
-        {currentStep === "review" && renderReviewStep()}
+      <div className="bg-background rounded-3xl border border-border shadow-2xl p-6 md:p-10 min-h-[600px] relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full -ml-32 -mb-32 blur-3xl pointer-events-none" />
+        
+        <div className="relative z-10">
+          {currentStep === "property" && renderPropertyStep()}
+          {currentStep === "property_kyc" && renderPropertyKYCStep()}
+          {currentStep === "selection" && renderSelectionStep()}
+          {currentStep === "coworking" && renderCoworkingStep()}
+          {currentStep === "virtual" && renderVirtualStep()}
+          {currentStep === "meeting" && renderMeetingStep()}
+          {currentStep === "review" && renderReviewStep()}
+        </div>
       </div>
     </div>
   );
@@ -1988,26 +2066,31 @@ function InputField({
   error,
 }: any) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 group">
       <label
-        className={`text-xs font-bold uppercase tracking-wider ${
-          error ? "text-red-500" : "text-slate-500"
+        className={`text-[10px] font-black uppercase tracking-widest px-1 transition-colors ${
+          error ? "text-destructive" : "text-muted-foreground group-focus-within:text-primary"
         }`}
       >
         {label}
       </label>
       <input
         type={type}
-        className={`w-full h-12 rounded-xl border ${
+        className={`w-full h-14 rounded-2xl border-2 transition-all duration-300 px-6 text-sm font-black ${
           error
-            ? "border-red-500 bg-red-50/30 ring-1 ring-red-500"
-            : "border-slate-200 bg-white"
-        } px-4 text-sm font-semibold text-slate-700 shadow-sm focus:border-[#3FA69E] focus:ring-1 focus:ring-[#3FA69E] focus:outline-none transition-all`}
+            ? "border-destructive/50 bg-destructive/5 text-destructive placeholder:text-destructive/40 focus:border-destructive focus:ring-4 focus:ring-destructive/10"
+            : "border-border bg-background text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-4 focus:ring-primary/10"
+        } focus:outline-none shadow-sm hover:border-primary/20`}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
         onBlur={onBlur}
       />
+      {error && (
+        <p className="text-[10px] font-black text-destructive uppercase tracking-tighter px-2 animate-in fade-in slide-in-from-top-1">
+          This field is required
+        </p>
+      )}
     </div>
   );
 }
