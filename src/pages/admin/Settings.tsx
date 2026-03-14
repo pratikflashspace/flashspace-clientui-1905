@@ -87,86 +87,110 @@ export default function AdminSettings() {
   };
 
   const renderAccountTab = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-      <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <User className="w-5 h-5 text-gray-500" />
-          Profile Information
-        </h3>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-100/50">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl">
+            <User className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">Profile Information</h3>
+            {/* <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-0.5">Global Admin Profile</p> */}
+          </div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
               First Name
             </label>
             <input
               disabled
               value={user?.firstName || ""}
-              className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
+              className="w-full px-5 py-3 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-500 font-bold text-sm"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
               Last Name
             </label>
             <input
               disabled
               value={user?.lastName || ""}
-              className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
+              className="w-full px-5 py-3 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-500 font-bold text-sm"
             />
           </div>
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-medium text-gray-700">
+          <div className="space-y-2 sm:col-span-2">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
               Email Address
             </label>
             <input
               disabled
               value={user?.email || ""}
-              className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
+              className="w-full px-5 py-3 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-500 font-bold text-sm"
             />
-            <p className="text-xs text-gray-400 mt-1">
-              Contact support to update your email address.
+            <p className="text-[10px] text-gray-400 font-bold ml-1 flex items-center gap-1.5 mt-2">
+              <Mail className="w-3 h-3" />
+              Contact support to update your global ID.
             </p>
           </div>
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-medium text-gray-700">Role</label>
-            <div className="inline-flex px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-medium capitalize">
-              {user?.role || "Admin"}
+          <div className="space-y-2 sm:col-span-2">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Current Role</label>
+            <div className="flex">
+              <div className="inline-flex px-6 py-2 rounded-xl bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest">
+                <Shield className="w-3 h-3 mr-2" />
+                {user?.role || "Admin"}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-red-50 p-6 rounded-xl border border-red-100">
-        <h3 className="text-lg font-semibold text-red-700 mb-2">Danger Zone</h3>
-        <p className="text-red-600 mb-4 text-sm">
-          Sign out of your admin account on this device.
+      <div className="bg-white p-6 md:p-8 rounded-[32px] border border-red-100 shadow-xl shadow-red-500/5 group transition-all hover:shadow-red-500/10">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="p-3 bg-red-50 text-red-600 rounded-2xl group-hover:scale-110 transition-transform">
+            <LogOut className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-red-900 tracking-tight">Danger Zone</h3>
+            <p className="text-xs text-red-400 font-bold uppercase tracking-widest mt-0.5">Sensitive Actions</p>
+          </div>
+        </div>
+
+        <p className="text-sm text-gray-500 mb-6 font-medium leading-relaxed">
+          Sign out of your administrative session on this device. This will end all current platform operations for this account.
         </p>
+
         <button
           onClick={() => logout()}
-          className="flex items-center gap-2 px-4 py-2 bg-white text-red-600 border border-red-200 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors font-medium shadow-sm"
+          className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-all font-black text-[10px] uppercase tracking-widest shadow-xl shadow-red-600/20 hover:shadow-red-600/30 hover:-translate-y-0.5"
         >
           <LogOut className="w-4 h-4" />
-          Sign Out
+          End Session
         </button>
       </div>
     </div>
   );
 
   const renderSecurityTab = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-      <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Lock className="w-5 h-5 text-gray-500" />
-          Change Password
-        </h3>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-100/50">
+        <div className="flex items-center gap-4 mb-10">
+          <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
+            <Lock className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 tracking-tight">Change Password</h3>
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-0.5">Secure Credentials</p>
+          </div>
+        </div>
 
-        <form onSubmit={handlePasswordChange} className="space-y-4 max-w-md">
+        <form onSubmit={handlePasswordChange} className="space-y-6 max-w-lg">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
               Current Password
             </label>
-            <div className="relative">
+            <div className="relative group">
               <input
                 type={showPasswords.current ? "text" : "password"}
                 value={passwordForm.currentPassword}
@@ -176,8 +200,8 @@ export default function AdminSettings() {
                     currentPassword: e.target.value,
                   }))
                 }
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:outline-none"
-                placeholder="Enter current password"
+                className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-black/5 focus:ring-4 focus:ring-black/5 outline-none transition-all font-bold text-sm h-14"
+                placeholder="••••••••"
                 required
               />
               <button
@@ -188,94 +212,96 @@ export default function AdminSettings() {
                     current: !prev.current,
                   }))
                 }
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-black transition-colors"
               >
                 {showPasswords.current ? (
-                  <EyeOff className="w-4 h-4" />
+                  <EyeOff className="w-5 h-5" />
                 ) : (
-                  <Eye className="w-4 h-4" />
+                  <Eye className="w-5 h-5" />
                 )}
               </button>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              New Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPasswords.new ? "text" : "password"}
-                value={passwordForm.newPassword}
-                onChange={(e) =>
-                  setPasswordForm((prev) => ({
-                    ...prev,
-                    newPassword: e.target.value,
-                  }))
-                }
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:outline-none"
-                placeholder="Enter new password"
-                minLength={6}
-                required
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  setShowPasswords((prev) => ({ ...prev, new: !prev.new }))
-                }
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showPasswords.new ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                New Password
+              </label>
+              <div className="relative group">
+                <input
+                  type={showPasswords.new ? "text" : "password"}
+                  value={passwordForm.newPassword}
+                  onChange={(e) =>
+                    setPasswordForm((prev) => ({
+                      ...prev,
+                      newPassword: e.target.value,
+                    }))
+                  }
+                  className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-black/5 focus:ring-4 focus:ring-black/5 outline-none transition-all font-bold text-sm h-14"
+                  placeholder="••••••••"
+                  minLength={6}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPasswords((prev) => ({ ...prev, new: !prev.new }))
+                  }
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-black transition-colors"
+                >
+                  {showPasswords.new ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                Confirm New Password
+              </label>
+              <div className="relative group">
+                <input
+                  type={showPasswords.confirm ? "text" : "password"}
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) =>
+                    setPasswordForm((prev) => ({
+                      ...prev,
+                      confirmPassword: e.target.value,
+                    }))
+                  }
+                  className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-black/5 focus:ring-4 focus:ring-black/5 outline-none transition-all font-bold text-sm h-14"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPasswords((prev) => ({
+                      ...prev,
+                      confirm: !prev.confirm,
+                    }))
+                  }
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-black transition-colors"
+                >
+                  {showPasswords.confirm ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Confirm New Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPasswords.confirm ? "text" : "password"}
-                value={passwordForm.confirmPassword}
-                onChange={(e) =>
-                  setPasswordForm((prev) => ({
-                    ...prev,
-                    confirmPassword: e.target.value,
-                  }))
-                }
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:outline-none"
-                placeholder="Confirm new password"
-                required
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  setShowPasswords((prev) => ({
-                    ...prev,
-                    confirm: !prev.confirm,
-                  }))
-                }
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showPasswords.confirm ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </div>
-
-          <div className="pt-4">
+          <div className="pt-6">
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium flex items-center gap-2"
+              className="w-full sm:w-auto px-10 py-4 bg-gray-900 text-white rounded-2xl hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-all font-black text-[10px] uppercase tracking-widest shadow-xl shadow-gray-900/10 hover:shadow-gray-900/20 hover:-translate-y-0.5 flex items-center justify-center gap-3"
             >
               {isLoading ? (
                 <>
@@ -296,73 +322,44 @@ export default function AdminSettings() {
   );
 
   const renderNotificationsTab = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-      <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <Bell className="w-5 h-5 text-gray-500" />
-          Notification Preferences
-        </h3>
-
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <div className="font-medium text-gray-900 flex items-center gap-2">
-                <Mail className="w-4 h-4 text-gray-400" />
-                Booking Emails
-              </div>
-              <p className="text-sm text-gray-500">
-                Receive emails for new bookings and payments.
-              </p>
-            </div>
-            <button
-              onClick={() => toggleNotification("email_bookings")}
-              className={`w-12 h-6 rounded-full transition-colors relative ${notifications.email_bookings ? "bg-green-500" : "bg-gray-200"}`}
-            >
-              <span
-                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${notifications.email_bookings ? "translate-x-6" : "translate-x-0"}`}
-              />
-            </button>
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-100/50">
+        <div className="flex items-center gap-4 mb-10">
+          <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">
+            <Bell className="w-6 h-6" />
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <div className="font-medium text-gray-900 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-gray-400" />
-                Security Alerts
-              </div>
-              <p className="text-sm text-gray-500">
-                Receive alerts about suspicious login attempts.
-              </p>
-            </div>
-            <button
-              onClick={() => toggleNotification("email_security")}
-              className={`w-12 h-6 rounded-full transition-colors relative ${notifications.email_security ? "bg-green-500" : "bg-gray-200"}`}
-            >
-              <span
-                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${notifications.email_security ? "translate-x-6" : "translate-x-0"}`}
-              />
-            </button>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 tracking-tight">Notification Preferences</h3>
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-0.5">Alert Configuration</p>
           </div>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <div className="font-medium text-gray-900 flex items-center gap-2">
-                <Smartphone className="w-4 h-4 text-gray-400" />
-                New User Push (Desktop)
+        <div className="space-y-10">
+          {[
+            { id: "email_bookings", label: "Booking Emails", desc: "Receive automated alerts for new bookings and payments.", icon: Mail },
+            { id: "email_security", label: "Security Alerts", desc: "Get notified about suspicious login attempts and security updates.", icon: Shield },
+            { id: "push_new_users", label: "New User Push", desc: "Receive real-time desktop notifications for new user registrations.", icon: Smartphone }
+          ].map((item) => (
+            <div key={item.id} className="flex items-center justify-between gap-6">
+              <div className="space-y-1">
+                <div className="font-extrabold text-gray-900 flex items-center gap-2.5">
+                  <item.icon className="w-4 h-4 text-gray-400" />
+                  {item.label}
+                </div>
+                <p className="text-sm text-gray-500 font-medium leading-relaxed max-w-md">
+                  {item.desc}
+                </p>
               </div>
-              <p className="text-sm text-gray-500">
-                Get notified when a new user registers.
-              </p>
+              <button
+                onClick={() => toggleNotification(item.id as any)}
+                className={`w-14 h-7 rounded-full transition-all relative shrink-0 ${notifications[item.id as keyof typeof notifications] ? "bg-black shadow-lg shadow-black/10" : "bg-gray-100"}`}
+              >
+                <span
+                  className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${notifications[item.id as keyof typeof notifications] ? "translate-x-7" : "translate-x-0"}`}
+                />
+              </button>
             </div>
-            <button
-              onClick={() => toggleNotification("push_new_users")}
-              className={`w-12 h-6 rounded-full transition-colors relative ${notifications.push_new_users ? "bg-green-500" : "bg-gray-200"}`}
-            >
-              <span
-                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${notifications.push_new_users ? "translate-x-6" : "translate-x-0"}`}
-              />
-            </button>
-          </div>
+          ))}
         </div>
       </div>
     </div>
@@ -374,56 +371,40 @@ export default function AdminSettings() {
       portalDescription="Complete platform management"
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-[Poppins]">
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-2">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight font-[Poppins]">
             Settings
           </h1>
-          <p className="text-gray-500 mt-2 text-lg">
+          <p className="text-sm md:text-base text-gray-500 font-medium max-w-2xl">
             Manage your account and platform preferences.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
-          <div className="w-full lg:w-64 flex-none space-y-2">
-            <button
-              onClick={() => setActiveTab("account")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                activeTab === "account"
-                  ? "bg-gray-900 text-white shadow-md"
-                  : "bg-white text-gray-600 hover:bg-gray-50 border border-transparent hover:border-gray-200"
-              }`}
-            >
-              <User className="w-4 h-4" />
-              Account
-            </button>
-            <button
-              onClick={() => setActiveTab("security")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                activeTab === "security"
-                  ? "bg-gray-900 text-white shadow-md"
-                  : "bg-white text-gray-600 hover:bg-gray-50 border border-transparent hover:border-gray-200"
-              }`}
-            >
-              <Shield className="w-4 h-4" />
-              Security
-            </button>
-            <button
-              onClick={() => setActiveTab("notifications")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                activeTab === "notifications"
-                  ? "bg-gray-900 text-white shadow-md"
-                  : "bg-white text-gray-600 hover:bg-gray-50 border border-transparent hover:border-gray-200"
-              }`}
-            >
-              <Bell className="w-4 h-4" />
-              Notifications
-            </button>
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          {/* Sidebar Navigation - Responsive */}
+          <div className="w-full lg:w-72 flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 no-scrollbar sticky top-0 bg-gray-50 lg:bg-transparent z-10 -mx-4 px-4 lg:mx-0 lg:px-0">
+            {[
+              { id: "account", label: "Account", icon: User },
+              { id: "security", label: "Security", icon: Shield },
+              { id: "notifications", label: "Notifications", icon: Bell },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-3 px-6 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:w-full border-2 ${activeTab === tab.id
+                    ? "bg-gray-900 text-white shadow-xl shadow-gray-900/10 border-transparent"
+                    : "bg-white text-gray-400 hover:text-gray-900 border-gray-50 hover:border-gray-100"
+                  }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            ))}
           </div>
 
           {/* Content Area */}
-          <div className="flex-1">
+          <div className="flex-1 w-full max-w-4xl">
             {activeTab === "account" && renderAccountTab()}
             {activeTab === "security" && renderSecurityTab()}
             {activeTab === "notifications" && renderNotificationsTab()}
