@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TicketViewModal } from "@/components/modals/TicketViewModal";
-import { CreateTicketModal } from "@/components/modals/CreateTicketModal";
+
 import { toast } from "@/hooks/use-toast";
 
 import {
@@ -37,7 +37,7 @@ export default function TicketSystem() {
     null,
   );
   const [modalOpen, setModalOpen] = useState(false);
-  const [createTicketModalOpen, setCreateTicketModalOpen] = useState(false);
+
 
   // Original states
   const [activeTab, setActiveTab] = useState("all");
@@ -119,7 +119,7 @@ export default function TicketSystem() {
           const exists = prev.messages.some(
             (m) =>
               new Date(m.createdAt).getTime() ===
-                new Date(data.message.createdAt).getTime() &&
+              new Date(data.message.createdAt).getTime() &&
               m.message === data.message.message,
           );
           if (exists) return prev;
@@ -176,9 +176,6 @@ export default function TicketSystem() {
     };
   }, [socket]);
 
-  const handleCreateTicket = () => {
-    setCreateTicketModalOpen(true);
-  };
 
   const handleViewTicket = (ticket: AdminTicketData) => {
     setSelectedTicket(ticket);
@@ -479,10 +476,6 @@ export default function TicketSystem() {
             Manage and resolve support tickets
           </p>
         </div>
-        <Button onClick={handleCreateTicket}>
-          <Plus className="w-4 h-4 mr-2" />
-          Create Ticket
-        </Button>
       </div>
 
       {/* Stats */}
@@ -568,18 +561,6 @@ export default function TicketSystem() {
         handleReply={handleReply}
       />
 
-      <CreateTicketModal
-        open={createTicketModalOpen}
-        onOpenChange={setCreateTicketModalOpen}
-        onSuccess={(newTicket) => {
-          fetchTickets(false); // Background refresh
-          fetchStats();
-          if (newTicket) {
-            setSelectedTicket(newTicket);
-            setModalOpen(true);
-          }
-        }}
-      />
     </DashboardLayout>
   );
 }
