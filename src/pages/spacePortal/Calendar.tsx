@@ -24,7 +24,7 @@ import {
 
 import CalendarHeader from "@/components/SpacePartner/calendar/CalendarHeader";
 import WeeklyCalendarGrid from "@/components/SpacePartner/calendar/WeeklyCalendarGrid";
-import PendingRequestsPanel from "@/components/SpacePartner/calendar/PendingRequestPanel";
+import PendingRequestsPanel from "@/components/SpacePartner/calendar/PendingRequestsPanel";
 import YearView from "@/components/SpacePartner/calendar/YearView";
 import MonthView from "@/components/SpacePartner/calendar/MonthView";
 import MonthDatesView from "@/components/SpacePartner/calendar/MonthDatesView";
