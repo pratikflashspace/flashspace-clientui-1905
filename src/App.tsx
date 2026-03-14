@@ -116,9 +116,10 @@ import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
 import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import MailAndVisits from "./pages/spacePortal/MailAndVisits";
-import TeamManagement from "./pages/spacePortal/TeamManagement";
+// import TeamManagement from "./pages/spacePortal/TeamManagement";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 import { AffiliateRoute } from "./components/auth/AffiliateRoute";
+import TeamManagement from "./pages/spacePortal/TeamManagement";
 
 // Affiliate Portal
 
