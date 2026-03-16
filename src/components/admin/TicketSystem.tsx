@@ -17,6 +17,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TicketViewModal } from "@/components/modals/TicketViewModal";
 import { CreateTicketModal } from "@/components/modals/CreateTicketModal";
+<<<<<<< HEAD
+=======
+
+>>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
 import { toast } from "@/hooks/use-toast";
 
 import {
@@ -37,6 +41,7 @@ export default function TicketSystem() {
     null,
   );
   const [modalOpen, setModalOpen] = useState(false);
+<<<<<<< HEAD
   const [createTicketModalOpen, setCreateTicketModalOpen] = useState(false);
 
   // Original states
@@ -65,6 +70,37 @@ export default function TicketSystem() {
         limit?: number;
       } = {};
 
+=======
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
+
+  // Original states
+  const [activeTab, setActiveTab] = useState("all");
+  const [tickets, setTickets] = useState<AdminTicketData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState<TicketStats>({
+    open: 0,
+    in_progress: 0,
+    escalated: 0,
+    resolved: 0,
+    closed: 0,
+    avgResolution: "4.2 hrs",
+    resolvedThisMonth: 0,
+    totalTickets: 0,
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const fetchTickets = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    try {
+      const filters: {
+        status?: string;
+        search?: string;
+        page?: number;
+        limit?: number;
+      } = {};
+
+>>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
       if (activeTab !== "all") {
         filters.status = activeTab.toLowerCase();
       }
@@ -119,7 +155,11 @@ export default function TicketSystem() {
           const exists = prev.messages.some(
             (m) =>
               new Date(m.createdAt).getTime() ===
+<<<<<<< HEAD
                 new Date(data.message.createdAt).getTime() &&
+=======
+              new Date(data.message.createdAt).getTime() &&
+>>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
               m.message === data.message.message,
           );
           if (exists) return prev;
@@ -176,15 +216,25 @@ export default function TicketSystem() {
     };
   }, [socket]);
 
+<<<<<<< HEAD
   const handleCreateTicket = () => {
     setCreateTicketModalOpen(true);
   };
+=======
+>>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
 
   const handleViewTicket = (ticket: AdminTicketData) => {
     setSelectedTicket(ticket);
     setModalOpen(true);
   };
 
+<<<<<<< HEAD
+=======
+  const handleCreateTicket = () => {
+    setCreateModalOpen(true);
+  };
+
+>>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
   const handleAssignTicket = async (ticketId: string) => {
     try {
       if (user?._id || user?.id) {
@@ -654,6 +704,7 @@ export default function TicketSystem() {
       />
 
       <CreateTicketModal
+<<<<<<< HEAD
         open={createTicketModalOpen}
         onOpenChange={setCreateTicketModalOpen}
         onSuccess={(newTicket) => {
@@ -665,6 +716,17 @@ export default function TicketSystem() {
           }
         }}
       />
+=======
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+        onSuccess={() => {
+          setCreateModalOpen(false);
+          fetchTickets();
+          fetchStats();
+        }}
+      />
+
+>>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
     </DashboardLayout>
   );
 }

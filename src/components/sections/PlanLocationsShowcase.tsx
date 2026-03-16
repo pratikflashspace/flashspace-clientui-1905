@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ListingCardModern from "@/components/services/ListingCardModern";
-import { getAllVirtualOffices } from "@/services/virtualOffice.service";
-import { VirtualOfficeItem } from "@/types/services";
+import { getAllCoworkingSpaces } from "@/services/coworkingSpace.service";
+import { CoworkingSpaceItem } from "@/types/services";
 
 // Using local high-quality assets from the public folder
 const spaceHsr = "/card-koramangala.jpg";
@@ -59,14 +59,19 @@ const CARDS_PER_PAGE = 3;
 export const PlanLocationsShowcase = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [slideIndex, setSlideIndex] = useState(0);
-    const [dynamicSpaces, setDynamicSpaces] = useState<VirtualOfficeItem[]>([]);
+    const [dynamicSpaces, setDynamicSpaces] = useState<CoworkingSpaceItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleGetBestPrice = (item: any, isDynamic: boolean) => {
         if (isDynamic) {
+<<<<<<< HEAD
             // Navigate to the workspace detail page to show images, details & pricing
             navigate(`/space/${item._id}`);
+=======
+            // Navigate to the coworking space detail page
+            navigate(`/coworking-space/${item._id}`);
+>>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
         } else {
             // For static registrations, take to the virtual office solutions page
             navigate(`/Solutions/virtual-office`);
@@ -77,16 +82,16 @@ export const PlanLocationsShowcase = () => {
         const fetchSpaces = async () => {
             setIsLoading(true);
             try {
-                const offices = await getAllVirtualOffices();
+                const spaces = await getAllCoworkingSpaces();
                 // Sort by popular first, then rating
-                const sortedOffices = [...offices].sort((a, b) => {
+                const sortedSpaces = [...spaces].sort((a, b) => {
                     if (a.popular && !b.popular) return -1;
                     if (!a.popular && b.popular) return 1;
                     return (b.rating || 0) - (a.rating || 0);
                 });
-                setDynamicSpaces(sortedOffices.slice(0, 3));
+                setDynamicSpaces(sortedSpaces.slice(0, 3));
             } catch (error) {
-                console.error("Error fetching workspaces for showcase:", error);
+                console.error("Error fetching coworking spaces for showcase:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -205,7 +210,11 @@ export const PlanLocationsShowcase = () => {
                                             transition={{ delay: i * 0.08, duration: 0.5 }}
                                         >
                                             <ListingCardModern
+<<<<<<< HEAD
                                                 item={loc as VirtualOfficeItem}
+=======
+                                                item={loc as CoworkingSpaceItem}
+>>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
                                                 onGetBestPrice={() => handleGetBestPrice(loc, true)}
                                                 onClick={() => handleGetBestPrice(loc, true)}
                                             />

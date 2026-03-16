@@ -138,11 +138,9 @@ const ListingCardModern = memo<ListingCardModernProps>(
       }).format(amount);
     };
 
-    // Get rating and reviews from new (avgRating/totalReviews) or legacy (rating/reviews)
-    const displayRating =
-      "avgRating" in item ? item.avgRating : item.rating || 0;
-    const displayReviews =
-      "totalReviews" in item ? item.totalReviews : item.reviews || 0;
+    // Get rating and reviews — prefer whichever field is non-zero
+    const displayRating = item.avgRating || item.rating || 0;
+    const displayReviews = item.totalReviews || item.reviews || 0;
 
     return (
       <div
