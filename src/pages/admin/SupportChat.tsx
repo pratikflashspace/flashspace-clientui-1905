@@ -189,6 +189,20 @@ export default function SupportChat() {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "open":
+        return "bg-red-50 text-red-600 border-red-200";
+      case "in_progress":
+        return "bg-blue-50 text-blue-600 border-blue-200";
+      case "resolved":
+      case "closed":
+        return "bg-green-50 text-green-600 border-green-200";
+      default:
+        return "bg-gray-50 text-gray-600 border-gray-200";
+    }
+  };
+
   const activeChatsCount = tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length;
   const waitingCount = tickets.filter(t => t.status === 'open' && !takenOverTickets.has(t._id)).length;
 
@@ -208,7 +222,6 @@ export default function SupportChat() {
     if (sender === 'partner') return 'partner@flashspace.io';
     return 'AI · flashspace.io';
   };
-  // ────────────────────────────────────────────────────────────────
 
   if (loading) {
     return (
@@ -250,7 +263,7 @@ export default function SupportChat() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-4 h-[600px]">
+      <div className="grid gap-6 lg:grid-cols-4 h-[700px]">
         {/* Chat List */}
         <div className="bg-background border border-border rounded-xl overflow-hidden flex flex-col shadow-sm">
           <div className="p-4 border-b border-border">
@@ -264,74 +277,54 @@ export default function SupportChat() {
               />
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {filteredTickets.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
-                No active chats
-              </div>
-            ) : (
-              filteredTickets.map((ticket) => (
-                <div
-                  key={ticket._id}
-                  onClick={() => setActiveTicketId(ticket._id)}
-                  className={`p-4 rounded-xl cursor-pointer transition-all ${activeTicketId === ticket._id
-                    ? "bg-teal-50 border border-teal-100 shadow-sm"
-                    : "hover:bg-gray-50 border border-transparent"
+          <ScrollArea className="flex-1">
+            <div className="p-4 space-y-2">
+              {filteredTickets.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  No active chats
+                </div>
+              ) : (
+                filteredTickets.map((ticket) => (
+                  <div
+                    key={ticket._id}
+                    onClick={() => setActiveTicketId(ticket._id)}
+                    className={`p-4 rounded-xl cursor-pointer transition-all border ${
+                      activeTicketId === ticket._id
+                        ? "bg-teal-50 border-teal-100 shadow-sm"
+                        : "hover:bg-gray-50 border-transparent"
                     }`}
-                >
-                  <div className="flex justify-between items-start mb-1">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold bg-gray-100 text-gray-600`}
-                      >
-                        {ticket.user?.fullName?.substring(0, 2).toUpperCase() ||
-                          "US"}
+                  >
+                    <div className="flex justify-between items-start mb-1">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold bg-gray-100 text-gray-600">
+                          {ticket.user?.fullName?.substring(0, 2).toUpperCase() || "US"}
+                        </div>
+                        <div className="overflow-hidden">
+                          <h4 className={`text-sm font-bold truncate ${
+                            activeTicketId === ticket._id ? "text-teal-900" : "text-gray-900"
+                          }`}>
+                            {ticket.user?.fullName || "Unknown User"}
+                          </h4>
+                          <p className={`text-xs truncate max-w-[140px] mt-0.5 ${
+                            activeTicketId === ticket._id ? "text-teal-600" : "text-gray-500"
+                          }`}>
+                            {ticket.subject}
+                          </p>
+                        </div>
                       </div>
-                      <div className="overflow-hidden">
-                        <h4
-                          className={`text-sm font-bold truncate ${activeTicketId === ticket._id ? "text-teal-900" : "text-gray-900"}`}
-                        >
-                          {ticket.user?.fullName || "Unknown User"}
-                        </h4>
-                        <p
-                          className={`text-xs truncate max-w-[140px] mt-0.5 ${activeTicketId === ticket._id ? "text-teal-600" : "text-gray-500"}`}
-                        >
-                          {ticket.subject}
-                        </p>
-                      </div>
+                      <span className="text-[10px] text-gray-400 font-medium ml-2 shrink-0">
+                        {format(new Date(ticket.updatedAt || ticket.createdAt), "h:mm a")}
+                      </span>
                     </div>
-                    <span className="text-[10px] text-gray-400 font-medium ml-2 shrink-0">
-                      {format(
-                        new Date(ticket.updatedAt || ticket.createdAt),
-                        "h:mm a",
-                      )}
-                    </span>
+                    <div className="flex justify-between items-center mt-3 pl-[52px]">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border ${getStatusColor(ticket.status)}`}>
+                        {ticket.status.replace("_", " ")}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center mt-3 pl-[52px]">
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border ${getStatusColor(ticket.status)}`}
-                    >
-                      {ticket.status.replace("_", " ")}
-                    </span>
-                  </div>
-                  {/* Unread dot placeholder could go here */}
-                </div>
-                <p className="text-xs text-muted-foreground truncate italic">"{ticket.subject}"</p>
-                <div className="flex items-center justify-between mt-3">
-                  <span className="text-[10px] text-muted-foreground">
-                    {format(new Date(ticket.updatedAt || ticket.createdAt), "h:mm a")}
-                  </span>
-                  <Badge variant={getStatusVariant(ticket.status)} className="text-[10px] px-1.5 py-0">
-                    {ticket.status.replace("_", " ")}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-            {filteredTickets.length === 0 && (
-              <div className="p-8 text-center text-muted-foreground text-sm">
-                No active chats
-              </div>
-            )}
+                ))
+              )}
+            </div>
           </ScrollArea>
         </div>
 
@@ -377,78 +370,67 @@ export default function SupportChat() {
                 </div>
               </div>
 
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-gray-50/50">
-                {activeTicket.messages.length === 0 && (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                    <MessageSquare className="w-12 h-12 mb-2 opacity-20" />
-                    <p>No messages yet.</p>
-                  </div>
-                )}
+              {/* Messages Area */}
+              <ScrollArea className="flex-1 p-8 bg-gray-50/50">
+                <div className="space-y-6">
+                  {activeTicket.messages.length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 mt-20">
+                      <MessageSquare className="w-12 h-12 mb-2 opacity-20" />
+                      <p>No messages yet.</p>
+                    </div>
+                  )}
 
-                {activeTicket.messages.map((msg, idx) => {
-                  const isAdmin = msg.sender === "admin";
-                  const isSupport = msg.sender === "support";
-                  const isUser = msg.sender === "user";
-                  const isMine = isAdmin || isSupport;
-                  const badge = ROLE_BADGE[msg.sender] || ROLE_BADGE.support;
-                  const identifier = getMsgIdentifier(msg.sender, activeTicket, user?.email);
+                  {activeTicket.messages.map((msg, idx) => {
+                    const isAdmin = msg.sender === "admin";
+                    const isSupport = msg.sender === "support";
+                    const isMine = msg.sender === "admin" || msg.sender === "support";
+                    const badge = ROLE_BADGE[msg.sender] || ROLE_BADGE.support;
+                    const identifier = getMsgIdentifier(msg.sender, activeTicket, user?.email);
 
-                  return (
-                    <div
-                      key={idx}
-                      className={`flex ${isMine ? "justify-end" : "justify-start"}`}
-                    >
-                      <div className="max-w-[80%]">
-                        <div
-                          className={`p-4 rounded-2xl shadow-sm relative group
-                                ${isAdmin
-                              ? "bg-teal-600 text-white rounded-tr-none"
-                              : isSupport
-                               ? "bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none"
-                                : msg.sender === 'affiliate'
-                                  ? "bg-orange-50 text-gray-800 border border-orange-200 rounded-tl-none"
-                                  : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
-                            }
-                          `}
-                        >
-                          {/* Role badge + identifier */}
-                          <div className={`flex items-center gap-1.5 mb-2 ${isMine ? 'flex-row-reverse' : ''}`}>
-                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider
-                              ${isAdmin ? 'bg-white/20 text-white' : isSupport ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                              <span className={`w-1 h-1 rounded-full shrink-0 ${isAdmin ? 'bg-white' : badge.dot}`} />
-                              {badge.label}
-                            </span>
-                            {identifier && (
-                              <span className={`text-[10px] font-medium truncate max-w-[140px] ${isAdmin ? 'text-white/60' : isSupport ? 'text-purple-400' : 'text-gray-400'}`}>
-                                {identifier}
+                    return (
+                      <div
+                        key={idx}
+                        className={`flex ${isMine ? "justify-end" : "justify-start"}`}
+                      >
+                        <div className="max-w-[80%]">
+                          <div
+                            className={`p-4 rounded-2xl shadow-sm relative group ${
+                              isAdmin
+                                ? "bg-teal-600 text-white rounded-tr-none"
+                                : isSupport
+                                ? "bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none"
+                                : msg.sender === "affiliate"
+                                ? "bg-orange-50 text-gray-800 border border-orange-200 rounded-tl-none"
+                                : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
+                            }`}
+                          >
+                            <div className={`flex items-center gap-1.5 mb-2 ${isMine ? "flex-row-reverse" : ""}`}>
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                                isAdmin
+                                  ? "bg-white/20 text-white"
+                                  : isSupport
+                                  ? "bg-purple-100 text-purple-700"
+                                  : "bg-blue-100 text-blue-700"
+                              }`}>
+                                <span className={`w-1 h-1 rounded-full shrink-0 ${isAdmin ? "bg-white" : badge.dot}`} />
+                                {badge.label}
                               </span>
-                            )}
+                              {identifier && (
+                                <span className={`text-[10px] font-medium truncate max-w-[140px] ${
+                                  isAdmin ? "text-white/60" : isSupport ? "text-purple-400" : "text-gray-400"
+                                }`}>
+                                  {identifier}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                              {msg.message}
+                            </p>
                           </div>
-
-                          {isSupport && (
-                            <div className="absolute -right-10 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
-                                <Bot className="w-4 h-4" />
-                              </div>
-                            </div>
-                          )}
-
-                          {isAdmin && (
-                            <div className="absolute -right-10 top-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <div className="w-8 h-8 bg-teal-50 rounded-full flex items-center justify-center text-teal-600">
-                                <Headphones className="w-4 h-4" />
-                              </div>
-                            </div>
-                          )}
-
-                           <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                            {msg.message}
-                          </p>
+                          <span className={`text-[10px] text-gray-400 mt-1 block px-2 ${isMine ? "text-right" : ""}`}>
+                            {format(new Date(msg.createdAt), "h:mm a")}
+                          </span>
                         </div>
-                         <span className={`text-[10px] text-gray-400 mt-1 block px-2 ${isMine ? 'text-right' : ''}`}>
-                          {format(new Date(msg.createdAt), "h:mm a")}
-                        </span>
                       </div>
                     );
                   })}
@@ -458,7 +440,7 @@ export default function SupportChat() {
 
               {/* Input Area */}
               {activeTicket.status !== "resolved" &&
-                activeTicket.status !== "closed" ? (
+              activeTicket.status !== "closed" ? (
                 hasTakenOver ? (
                   <div className="p-4 border-t border-border bg-white">
                     <div className="flex gap-2">
