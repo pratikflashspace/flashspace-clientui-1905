@@ -3,12 +3,12 @@ import type { SpacePortalNotification } from "@/types/spacePortal/notification";
 
 type SpacePortalNotificationsContextValue = {
   notifications: SpacePortalNotification[];
-  markAllRead: () => void;
-  markRead: (id: string) => void;
-  markUnread: (id: string) => void;
-  deleteNotification: (id: string) => void;
+  markAllRead: () => void | Promise<void>;
+  markRead: (id: string) => void | Promise<void>;
+  markUnread: (id: string) => void | Promise<void>;
+  deleteNotification: (id: string) => void | Promise<void>;
   restoreNotification: (notification: SpacePortalNotification, index?: number) => void;
-  clearNotifications: () => void;
+   clearNotifications: () => void | Promise<void>;
   addNotification: (notification: SpacePortalNotification) => void;
 };
 

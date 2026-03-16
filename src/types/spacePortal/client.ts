@@ -4,8 +4,9 @@ export type KycStatus = "VERIFIED" | "PENDING";
 export type ClientPlan = string;
 
 export type Client = {
-  id: string;
-  userId?: string;
+ id: string;       // bookingNumber
+  bookingId?: string; // raw MongoDB _id of the booking (for ticket lookups)
+  userId: string;
 
   companyName: string;
   contactName: string;

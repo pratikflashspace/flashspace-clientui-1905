@@ -1,10 +1,11 @@
 
 
 import React, { useState } from 'react';
-import { MessageSquare, Ticket, HelpCircle, Phone, Mail, Clock, Book, ShieldCheck, PlayCircle, ChevronRight } from "lucide-react";
+import { MessageSquare, Ticket, HelpCircle, Phone, Mail, Clock, Book, ShieldCheck, PlayCircle, ChevronRight, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SupportChat from '@/components/affiliatePortal/SupportChat';
 import SupportTickets from '@/components/affiliatePortal/SupportTickets';
+import AffiliateClientChat from '@/components/affiliatePortal/AffiliateClientChat';
 
 // Define the Message type here so it's accessible
 export interface Message {
@@ -19,7 +20,7 @@ const Support = () => {
     {
       role: 'bot',
       text: "Hello! I'm your FlashSpace AI assistant. How can I help you today?",
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
     }
   ]);
 
@@ -32,6 +33,9 @@ const Support = () => {
         <TabsList className="bg-gray-100/50 p-1 mb-8">
           <TabsTrigger value="chat" className="gap-2">
             <MessageSquare className="w-4 h-4" /> AI Chat
+          </TabsTrigger>
+          <TabsTrigger value="support_chat" className="gap-2">
+            <Users className="w-4 h-4" /> Support Chat
           </TabsTrigger>
           <TabsTrigger value="chat_tickets" className="gap-2">
             <Ticket className="w-4 h-4" /> My Tickets
@@ -116,6 +120,19 @@ const Support = () => {
           <div className="max-w-5xl mx-auto">
             <SupportTickets />
           </div>
+        </TabsContent>
+
+{/* --- SUPPORT CHAT TAB (tickets linked to affiliate's coupon) --- */}
+        <TabsContent value="support_chat" className="outline-none animate-slide-up">
+          <div className="mb-4">
+            <h2 className="text-xl font-bold text-gray-900">
+              Client <span className="text-amber-500 italic">Conversations</span>
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Queries from clients who booked using your coupon code. Tap In to join.
+            </p>
+          </div>
+          <AffiliateClientChat />
         </TabsContent>
 
         {/* --- FAQ TAB --- */}
