@@ -20,7 +20,7 @@ const Support = () => {
     {
       role: 'bot',
       text: "Hello! I'm your FlashSpace AI assistant. How can I help you today?",
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
 

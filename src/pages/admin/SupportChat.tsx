@@ -140,7 +140,10 @@ export default function SupportChat() {
       "Hi, I'm taking over this chat. Let me review your request...";
     try {
       // Use the new tap-in endpoint which also sends a system message
-      await adminService.replyToTicket(activeTicketId, "[Admin joined the conversation]");
+      await adminService.replyToTicket(
+        activeTicketId,
+        "[Admin joined the conversation]",
+      );
       setTakenOverTickets((prev) => new Set(prev).add(activeTicketId));
       toast.success("You have tapped in to the chat");
     } catch (error) {
@@ -217,29 +220,68 @@ export default function SupportChat() {
       case "resolved":
       case "closed":
         return "bg-green-50 text-green-600 border-green-200";
+      case "escalated":
+        return "bg-orange-50 text-orange-600 border-orange-200";
       default:
         return "bg-gray-50 text-gray-600 border-gray-200";
     }
   };
 
-  const activeChatsCount = tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length;
-  const waitingCount = tickets.filter(t => t.status === 'open' && !takenOverTickets.has(t._id)).length;
+  const activeChatsCount = tickets.filter(
+    (t) => t.status === "open" || t.status === "in_progress",
+  ).length;
+  const waitingCount = tickets.filter(
+    (t) => t.status === "open" && !takenOverTickets.has(t._id),
+  ).length;
 
   // ── Role badge config ────────────────────────────────────────────
-  const ROLE_BADGE: Record<string, { bg: string; text: string; label: string; dot: string }> = {
-    user: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Client', dot: 'bg-blue-400' },
-    admin: { bg: 'bg-teal-100', text: 'text-teal-700', label: 'Admin', dot: 'bg-teal-400' },
-    partner: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Space Partner', dot: 'bg-amber-400' },
-    affiliate: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Affiliate', dot: 'bg-orange-400' },
-    support: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'AI Support', dot: 'bg-purple-400' },
+  const ROLE_BADGE: Record<
+    string,
+    { bg: string; text: string; label: string; dot: string }
+  > = {
+    user: {
+      bg: "bg-blue-100",
+      text: "text-blue-700",
+      label: "Client",
+      dot: "bg-blue-400",
+    },
+    admin: {
+      bg: "bg-teal-100",
+      text: "text-teal-700",
+      label: "Admin",
+      dot: "bg-teal-400",
+    },
+    partner: {
+      bg: "bg-amber-100",
+      text: "text-amber-700",
+      label: "Space Partner",
+      dot: "bg-amber-400",
+    },
+    affiliate: {
+      bg: "bg-orange-100",
+      text: "text-orange-700",
+      label: "Affiliate",
+      dot: "bg-orange-400",
+    },
+    support: {
+      bg: "bg-purple-100",
+      text: "text-purple-700",
+      label: "AI Support",
+      dot: "bg-purple-400",
+    },
   };
 
-  const getMsgIdentifier = (sender: string, ticket: AdminTicketData, adminEmail?: string): string => {
-    if (sender === 'user') return ticket.user?.email || ticket.user?.fullName || '';
-    if (sender === 'admin') return adminEmail || 'admin@flashspace.io';
-     if (sender === 'affiliate') return 'affiliate@flashspace.io';
-    if (sender === 'partner') return 'partner@flashspace.io';
-    return 'AI · flashspace.io';
+  const getMsgIdentifier = (
+    sender: string,
+    ticket: AdminTicketData,
+    adminEmail?: string,
+  ): string => {
+    if (sender === "user")
+      return ticket.user?.email || ticket.user?.fullName || "";
+    if (sender === "admin") return adminEmail || "admin@flashspace.io";
+    if (sender === "affiliate") return "affiliate@flashspace.io";
+    if (sender === "partner") return "partner@flashspace.io";
+    return "AI · flashspace.io";
   };
 
   if (loading) {
@@ -323,27 +365,42 @@ export default function SupportChat() {
                     <div className="flex justify-between items-start mb-1">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold bg-gray-100 text-gray-600">
-                          {ticket.user?.fullName?.substring(0, 2).toUpperCase() || "US"}
+                          {ticket.user?.fullName
+                            ?.substring(0, 2)
+                            .toUpperCase() || "US"}
                         </div>
                         <div className="overflow-hidden">
-                          <h4 className={`text-sm font-bold truncate ${
-                            activeTicketId === ticket._id ? "text-teal-900" : "text-gray-900"
-                          }`}>
+                          <h4
+                            className={`text-sm font-bold truncate ${
+                              activeTicketId === ticket._id
+                                ? "text-teal-900"
+                                : "text-gray-900"
+                            }`}
+                          >
                             {ticket.user?.fullName || "Unknown User"}
                           </h4>
-                          <p className={`text-xs truncate max-w-[140px] mt-0.5 ${
-                            activeTicketId === ticket._id ? "text-teal-600" : "text-gray-500"
-                          }`}>
+                          <p
+                            className={`text-xs truncate max-w-[140px] mt-0.5 ${
+                              activeTicketId === ticket._id
+                                ? "text-teal-600"
+                                : "text-gray-500"
+                            }`}
+                          >
                             {ticket.subject}
                           </p>
                         </div>
                       </div>
                       <span className="text-[10px] text-gray-400 font-medium ml-2 shrink-0">
-                        {format(new Date(ticket.updatedAt || ticket.createdAt), "h:mm a")}
+                        {format(
+                          new Date(ticket.updatedAt || ticket.createdAt),
+                          "h:mm a",
+                        )}
                       </span>
                     </div>
                     <div className="flex justify-between items-center mt-3 pl-[52px]">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border ${getStatusColor(ticket.status)}`}>
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border ${getStatusColor(ticket.status)}`}
+                      >
                         {ticket.status.replace("_", " ")}
                       </span>
                     </div>
@@ -413,9 +470,14 @@ export default function SupportChat() {
                   {activeTicket.messages.map((msg, idx) => {
                     const isAdmin = msg.sender === "admin";
                     const isSupport = msg.sender === "support";
-                    const isMine = msg.sender === "admin" || msg.sender === "support";
+                    const isMine =
+                      msg.sender === "admin" || msg.sender === "support";
                     const badge = ROLE_BADGE[msg.sender] || ROLE_BADGE.support;
-                    const identifier = getMsgIdentifier(msg.sender, activeTicket, user?.email);
+                    const identifier = getMsgIdentifier(
+                      msg.sender,
+                      activeTicket,
+                      user?.email,
+                    );
 
                     return (
                       <div
@@ -428,27 +490,39 @@ export default function SupportChat() {
                               isAdmin
                                 ? "bg-teal-600 text-white rounded-tr-none"
                                 : isSupport
-                                ? "bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none"
-                                : msg.sender === "affiliate"
-                                ? "bg-orange-50 text-gray-800 border border-orange-200 rounded-tl-none"
-                                : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
+                                  ? "bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none"
+                                  : msg.sender === "affiliate"
+                                    ? "bg-orange-50 text-gray-800 border border-orange-200 rounded-tl-none"
+                                    : "bg-white text-gray-800 border border-gray-200 rounded-tl-none"
                             }`}
                           >
-                            <div className={`flex items-center gap-1.5 mb-2 ${isMine ? "flex-row-reverse" : ""}`}>
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                                isAdmin
-                                  ? "bg-white/20 text-white"
-                                  : isSupport
-                                  ? "bg-purple-100 text-purple-700"
-                                  : "bg-blue-100 text-blue-700"
-                              }`}>
-                                <span className={`w-1 h-1 rounded-full shrink-0 ${isAdmin ? "bg-white" : badge.dot}`} />
+                            <div
+                              className={`flex items-center gap-1.5 mb-2 ${isMine ? "flex-row-reverse" : ""}`}
+                            >
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                                  isAdmin
+                                    ? "bg-white/20 text-white"
+                                    : isSupport
+                                      ? "bg-purple-100 text-purple-700"
+                                      : "bg-blue-100 text-blue-700"
+                                }`}
+                              >
+                                <span
+                                  className={`w-1 h-1 rounded-full shrink-0 ${isAdmin ? "bg-white" : badge.dot}`}
+                                />
                                 {badge.label}
                               </span>
                               {identifier && (
-                                <span className={`text-[10px] font-medium truncate max-w-[140px] ${
-                                  isAdmin ? "text-white/60" : isSupport ? "text-purple-400" : "text-gray-400"
-                                }`}>
+                                <span
+                                  className={`text-[10px] font-medium truncate max-w-[140px] ${
+                                    isAdmin
+                                      ? "text-white/60"
+                                      : isSupport
+                                        ? "text-purple-400"
+                                        : "text-gray-400"
+                                  }`}
+                                >
                                   {identifier}
                                 </span>
                               )}
@@ -457,7 +531,9 @@ export default function SupportChat() {
                               {msg.message}
                             </p>
                           </div>
-                          <span className={`text-[10px] text-gray-400 mt-1 block px-2 ${isMine ? "text-right" : ""}`}>
+                          <span
+                            className={`text-[10px] text-gray-400 mt-1 block px-2 ${isMine ? "text-right" : ""}`}
+                          >
                             {format(new Date(msg.createdAt), "h:mm a")}
                           </span>
                         </div>

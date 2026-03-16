@@ -111,6 +111,7 @@ export default function TicketsAndTasks() {
         setTickets(ticketRes.data.tickets);
       }
 
+
       const taskRes: any = await fetchPartnerActiveRequests();
       if (taskRes?.success) {
         setTasks(taskRes.data);

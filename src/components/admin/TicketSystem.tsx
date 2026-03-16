@@ -179,6 +179,7 @@ export default function TicketSystem() {
   }, [socket]);
 
 
+
   const handleViewTicket = (ticket: AdminTicketData) => {
     setSelectedTicket(ticket);
     setModalOpen(true);

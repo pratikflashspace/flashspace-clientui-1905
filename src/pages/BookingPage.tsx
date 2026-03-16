@@ -1081,7 +1081,7 @@ const BookingPage = () => {
                             setSelectedTenure(option.years as 1 | 2 | 3)
                           }
                           className={`relative border-2 rounded-2xl p-5 cursor-pointer transition-all duration-300
-                              ${selectedTenure === option.years
+                               ${selectedTenure === option.years
                               ? "border-teal-500 bg-teal-50 shadow-lg scale-[1.02]"
                               : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md"
                             }`}

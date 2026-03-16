@@ -38,9 +38,9 @@ function mapNotification(raw: any): SpacePortalNotification {
     createdAt: raw.createdAt ?? undefined,
     time: raw.createdAt
       ? new Date(raw.createdAt).toLocaleString("en-IN", {
-        dateStyle: "medium",
-        timeStyle: "short",
-      })
+          dateStyle: "medium",
+          timeStyle: "short",
+        })
       : undefined,
   };
 }
@@ -108,7 +108,8 @@ export default function SpacePortalLayout() {
         });
         const data = await res.json();
         if (data.success && Array.isArray(data.data)) {
-          const mapped: SpacePortalNotification[] = data.data.map(mapNotification);
+          const mapped: SpacePortalNotification[] =
+            data.data.map(mapNotification);
           setNotifications(mapped);
           // Seed the set so existing notifications don't re-toast
           prevNotificationIdsRef.current = new Set(mapped.map((n) => n.id));
