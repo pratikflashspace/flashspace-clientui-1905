@@ -202,7 +202,7 @@ interface SidebarMenuItem {
 // [NEW] Constants for the popup
 const SIDEBAR_WIDTH_ICON = 80; // Your sidebar is 80px (w-20)
 const UPDATES_WIDTH = 420;
-const HEADER_OFFSET = '6rem'; // Keeps sidebar clear of the fixed header (~96px)
+const HEADER_OFFSET = '4.5rem'; // Match global header height (~72px)
 
 // [NEW] Copied the UpdatesPopup component from your other file
 // ------------------------------------------------

@@ -1,4 +1,3 @@
-import Footer from "@/components/Footer";
 import {
   LayoutDashboard,
   Calendar,
@@ -57,7 +56,6 @@ const menuItems = [
 ];
 
 export default function ClientDashboard() {
-  const [showFooter, setShowFooter] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { user } = useAuth();
@@ -80,7 +78,6 @@ export default function ClientDashboard() {
   }, []);
   const location = useLocation();
   const navigate = useNavigate();
-  const showFooterRef = useRef(false);
 
   // Determine active index based on current URL path
   const activeIndex = useMemo(() => {
@@ -98,19 +95,6 @@ export default function ClientDashboard() {
     }
     setIsMobileMenuOpen(false);
   };
-
-  useEffect(() => {
-    function handleScroll() {
-      const shouldShow = window.scrollY > 0;
-      // Only update state if value actually changed
-      if (showFooterRef.current !== shouldShow) {
-        showFooterRef.current = shouldShow;
-        setShowFooter(shouldShow);
-      }
-    }
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Memoize the main content to prevent re-renders on scroll
   const mainContent = useMemo(() => {
@@ -149,9 +133,9 @@ export default function ClientDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      <div className="flex">
+      <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
-        <aside className={`hidden lg:flex flex-col min-h-screen bg-white border-r border-gray-200 sticky top-0 transition-all duration-200 ${isSidebarCollapsed ? "w-[72px] px-2 py-6" : "w-72 p-6"}`}>
+        <aside className={`hidden lg:flex flex-col h-screen bg-white border-r border-gray-200 sticky top-0 transition-all duration-200 ${isSidebarCollapsed ? "w-[72px] px-2 py-6" : "w-72 p-6"}`}>
 
           {/* Logo */}
           <div
@@ -322,12 +306,13 @@ export default function ClientDashboard() {
         )}
 
         {/* Main Content */}
-        <main className="relative flex-1 min-w-0 overflow-x-hidden min-h-screen">
+        <main
+          className="relative flex-1 min-w-0 h-full overflow-x-hidden overflow-y-auto touch-pan-y scroll-smooth"
+          data-lenis-prevent
+        >
           {mainContent}
         </main>
       </div>
-
-      {showFooter && <Footer />}
     </div>
   );
 }
