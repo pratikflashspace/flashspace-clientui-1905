@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ListingCardModern from "@/components/services/ListingCardModern";
-import { getAllVirtualOffices } from "@/services/virtualOffice.service";
-import { VirtualOfficeItem } from "@/types/services";
+import { getAllCoworkingSpaces } from "@/services/coworkingSpace.service";
+import { CoworkingSpaceItem } from "@/types/services";
 
 // Using local high-quality assets from the public folder
 const spaceHsr = "/card-koramangala.jpg";
@@ -59,14 +59,14 @@ const CARDS_PER_PAGE = 3;
 export const PlanLocationsShowcase = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [slideIndex, setSlideIndex] = useState(0);
-    const [dynamicSpaces, setDynamicSpaces] = useState<VirtualOfficeItem[]>([]);
+    const [dynamicSpaces, setDynamicSpaces] = useState<CoworkingSpaceItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleGetBestPrice = (item: any, isDynamic: boolean) => {
         if (isDynamic) {
-            // Navigate to the workspace detail page to show images, details & pricing
-            navigate(`/space/${item._id}`);
+            // Navigate to the coworking space detail page
+            navigate(`/coworking-space/${item._id}`);
         } else {
             // For static registrations, take to the virtual office solutions page
             navigate(`/Solutions/virtual-office`);
@@ -77,16 +77,16 @@ export const PlanLocationsShowcase = () => {
         const fetchSpaces = async () => {
             setIsLoading(true);
             try {
-                const offices = await getAllVirtualOffices();
+                const spaces = await getAllCoworkingSpaces();
                 // Sort by popular first, then rating
-                const sortedOffices = [...offices].sort((a, b) => {
+                const sortedSpaces = [...spaces].sort((a, b) => {
                     if (a.popular && !b.popular) return -1;
                     if (!a.popular && b.popular) return 1;
                     return (b.rating || 0) - (a.rating || 0);
                 });
-                setDynamicSpaces(sortedOffices.slice(0, 3));
+                setDynamicSpaces(sortedSpaces.slice(0, 3));
             } catch (error) {
-                console.error("Error fetching workspaces for showcase:", error);
+                console.error("Error fetching coworking spaces for showcase:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -205,7 +205,7 @@ export const PlanLocationsShowcase = () => {
                                             transition={{ delay: i * 0.08, duration: 0.5 }}
                                         >
                                             <ListingCardModern
-                                                item={loc as VirtualOfficeItem}
+                                                item={loc as CoworkingSpaceItem}
                                                 onGetBestPrice={() => handleGetBestPrice(loc, true)}
                                                 onClick={() => handleGetBestPrice(loc, true)}
                                             />
@@ -220,10 +220,10 @@ export const PlanLocationsShowcase = () => {
                                         initial={{ opacity: 0, y: 24 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.08, duration: 0.5 }}
-                                        className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-transform duration-[250ms] ease-out shadow-sm hover:shadow-md"
+                                        className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-transform duration-200 ease-out shadow-sm hover:shadow-md"
                                     >
                                         <div className="relative aspect-[16/10] overflow-hidden">
-                                            <img src={(loc as any).image} alt={loc.name} className="w-full h-full object-cover transition-transform duration-[250ms] ease-out group-hover:scale-105" />
+                                            <img src={(loc as any).image} alt={loc.name} className="w-full h-full object-cover transition-transform duration-200 ease-out group-hover:scale-105" />
                                             <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-normal px-2.5 py-1 rounded-full z-10">
                                                 Available Now
                                             </span>

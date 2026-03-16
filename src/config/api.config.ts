@@ -97,6 +97,10 @@ export const API_ENDPOINTS = {
     // Partner
     PARTNER_CLIENTS: "/api/user/partner/clients",
     PARTNER_CLIENT_DETAILS: (id: string) => `/api/user/partner/clients/${id}`,
+    PARTNER_DASHBOARD: "/api/user/partner/dashboard",
+    PARTNER_ACTIVE_REQUESTS: "/api/user/partner/active-requests",
+    PARTNER_ANALYTICS: "/api/user/partner/analytics",
+    PARTNER_SPACES: "/api/user/partner/spaces",
   },
 
   // Admin endpoints
@@ -120,8 +124,8 @@ export const API_ENDPOINTS = {
     LEADERBOARD: "/api/affiliate/leaderboard",
     DASHBOARD_STATS: "/api/affiliate/dashboard/stats",
     DASHBOARD_INSIGHTS: "/api/affiliate/dashboard/insights",
-    COUPON_GENERATE: "/api/coupon/affiliate/generate",
-    MY_COUPON: "/api/coupon/affiliate/my-coupon",
+    COUPON_GENERATE: "/api/coupons/affiliate/generate",
+    MY_COUPON: "/api/coupons/affiliate/my-coupon",
     AVAILABLE_SPACES: "/api/affiliate/spaces",
     INVOICES: "/api/affiliate/invoices",
     INVOICE_BY_ID: (id: string) => `/api/affiliate/invoices/${id}`,

@@ -26,7 +26,15 @@ import {
   VisitRecord,
 } from "@/types/services";
 
-export type { KYCData, DashboardData };
+export type { 
+  KYCData, 
+  DashboardData, 
+  Invoice, 
+  InvoicesResponse, 
+  SupportTicket, 
+  MailRecord, 
+  VisitRecord 
+};
 
 // ============ SERVICE CLASS ============
 
@@ -572,6 +580,42 @@ class UserDashboardService {
         error instanceof Error
           ? error.message
           : "Failed to fetch client details";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  async getPartnerActiveRequests(): Promise<ApiResponse<any[]>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any[]>>(
+        API_ENDPOINTS.USER.PARTNER_ACTIVE_REQUESTS,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch active requests";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  async getPartnerAnalytics(): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        API_ENDPOINTS.USER.PARTNER_ANALYTICS,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch analytics";
       return {
         success: false,
         message: errorMessage,

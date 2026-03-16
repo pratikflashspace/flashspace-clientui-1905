@@ -25,8 +25,8 @@ export default function ModernFlairButton({
         if (!buttonRef.current || !flairRef.current) return;
 
         // Initialize GSAP quickSetters
-        xSetRef.current = gsap.quickSetter(flairRef.current, "xPercent");
-        ySetRef.current = gsap.quickSetter(flairRef.current, "yPercent");
+        xSetRef.current = gsap.quickSetter(flairRef.current, "xPercent") as (value: number) => void;
+        ySetRef.current = gsap.quickSetter(flairRef.current, "yPercent") as (value: number) => void;
 
         const getXY = (e: MouseEvent) => {
             if (!buttonRef.current) return { x: 0, y: 0 };

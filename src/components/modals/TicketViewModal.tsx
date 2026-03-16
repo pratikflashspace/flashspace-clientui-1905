@@ -97,42 +97,44 @@ export const TicketViewModal = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-4xl bg-white rounded-3xl border-0 shadow-2xl p-0 overflow-hidden">
-        <DialogHeader className="px-6 py-5 border-b border-gray-100">
+        <DialogHeader className="px-4 md:px-6 py-5 border-b border-gray-100">
           <div>
-            <DialogTitle className="text-2xl font-bold text-gray-900 pr-10">
+            <DialogTitle className="text-xl md:text-2xl font-bold text-gray-900 pr-10">
               {ticket.subject}
             </DialogTitle>
-            <p className="text-sm text-gray-500 mt-1">{ticket.ticketNumber}</p>
+            <p className="text-xs md:text-sm text-gray-500 mt-1">{ticket.ticketNumber}</p>
           </div>
         </DialogHeader>
 
-        <div className="p-6 max-h-[70vh] overflow-y-auto">
+        <div className="p-4 md:p-6 max-h-[80vh] md:max-h-[70vh] overflow-y-auto">
           {/* Ticket Info */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-gray-50 p-4 rounded-xl">
-              <p className="text-sm text-gray-500">Client</p>
-              <p className="font-medium">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
+            <div className="bg-gray-50 p-3 md:p-4 rounded-xl">
+              <p className="text-xs md:text-sm text-gray-500 uppercase font-bold tracking-wider">Client</p>
+              <p className="font-semibold text-sm md:text-base">
                 {ticket.user?.fullName || "Unknown"}
               </p>
-              <p className="text-xs text-gray-400">{ticket.user?.email}</p>
+              <p className="text-[10px] md:text-xs text-gray-400 truncate">{ticket.user?.email}</p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-xl">
-              <p className="text-sm text-gray-500">Status</p>
-              <span
-                className={`inline-block px-2 py-0.5 mt-1 rounded-full text-xs font-bold ${getStatusStyle(ticket.status)}`}
-              >
-                {formatStatus(ticket.status)}
-              </span>
+            <div className="bg-gray-50 p-3 md:p-4 rounded-xl">
+              <p className="text-xs md:text-sm text-gray-500 uppercase font-bold tracking-wider">Status</p>
+              <div className="mt-1">
+                <span
+                  className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] md:text-xs font-bold ${getStatusStyle(ticket.status)}`}
+                >
+                  {formatStatus(ticket.status)}
+                </span>
+              </div>
             </div>
-            <div className="bg-gray-50 p-4 rounded-xl">
-              <p className="text-sm text-gray-500">Category</p>
-              <p className="font-medium mt-1">
+            <div className="bg-gray-50 p-3 md:p-4 rounded-xl">
+              <p className="text-xs md:text-sm text-gray-500 uppercase font-bold tracking-wider">Category</p>
+              <p className="font-semibold text-sm md:text-base mt-1">
                 {formatCategory(ticket.category)}
               </p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-xl">
-              <p className="text-sm text-gray-500">Assignee</p>
-              <p className="font-medium mt-1">
+            <div className="bg-gray-50 p-3 md:p-4 rounded-xl">
+              <p className="text-xs md:text-sm text-gray-500 uppercase font-bold tracking-wider">Assignee</p>
+              <p className="font-semibold text-sm md:text-base mt-1">
                 {ticket.assignee?.fullName || "Unassigned"}
               </p>
             </div>
@@ -154,10 +156,10 @@ export const TicketViewModal = ({
               <MessageSquare className="w-4 h-4 text-teal-500" />
               Conversation ({ticket.messages?.length || 0} messages)
             </h3>
-            <div className="bg-gray-50 rounded-2xl p-5 max-h-96 overflow-y-auto space-y-4 border border-gray-100 scrollbar-thin scrollbar-thumb-gray-300">
+            <div className="bg-gray-50 rounded-2xl p-3 md:p-5 max-h-[400px] overflow-y-auto space-y-4 border border-gray-100 scrollbar-thin scrollbar-thumb-gray-300">
               {ticket.messages?.length === 0 ? (
-                <div className="text-center py-12">
-                  <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <div className="text-center py-10 md:py-12">
+                  <MessageSquare className="w-10 h-10 md:w-12 md:h-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-gray-400 font-medium">No messages yet</p>
                   <p className="text-gray-400 text-sm">
                     Start the conversation below!
@@ -170,22 +172,22 @@ export const TicketViewModal = ({
                     className={`flex ${msg.sender === "admin" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[75%] px-4 py-3 rounded-2xl shadow-sm ${
+                      className={`max-w-[85%] md:max-w-[75%] px-3 md:px-4 py-2.5 md:py-3 rounded-2xl shadow-sm ${
                         msg.sender === "admin"
                           ? "bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-br-sm"
                           : "bg-white border border-gray-200 text-gray-800 rounded-bl-sm"
                       }`}
                     >
-                      <div className="flex items-center gap-2 mb-1.5">
+                      <div className="flex items-center gap-2 mb-1">
                         <span
-                          className={`text-xs font-semibold ${msg.sender === "admin" ? "text-teal-100" : "text-gray-500"}`}
+                          className={`text-[10px] md:text-xs font-bold uppercase tracking-tight ${msg.sender === "admin" ? "text-teal-100" : "text-gray-500"}`}
                         >
                           {msg.sender === "user"
                             ? ticket.user?.fullName
                             : "You (Support)"}
                         </span>
                         <span
-                          className={`text-xs ${msg.sender === "admin" ? "text-teal-200" : "text-gray-400"}`}
+                          className={`text-[10px] md:text-xs ${msg.sender === "admin" ? "text-teal-200" : "text-gray-400"}`}
                         >
                           {new Date(msg.createdAt).toLocaleTimeString("en-IN", {
                             hour: "2-digit",
@@ -249,12 +251,12 @@ export const TicketViewModal = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 md:pt-3 border-t border-gray-100">
                 <div className="flex gap-2">
                   {ticket.status !== "escalated" && (
                     <button
                       onClick={() => handleEscalateTicket(ticket._id)}
-                      className="px-4 py-2 bg-orange-100 text-orange-600 rounded-lg text-sm font-medium hover:bg-orange-200 transition-colors border border-orange-200"
+                      className="flex-1 md:flex-none px-4 py-2 bg-orange-100 text-orange-600 rounded-lg text-sm font-medium hover:bg-orange-200 transition-colors border border-orange-200"
                     >
                       <AlertCircle className="w-4 h-4 inline mr-1" />
                       Escalate
@@ -263,10 +265,10 @@ export const TicketViewModal = ({
                   {ticket.status === "open" && (
                     <button
                       onClick={() => handleAssignTicket(ticket._id)}
-                      className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors border border-blue-200"
+                      className="flex-1 md:flex-none px-4 py-2 bg-blue-100 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors border border-blue-200"
                     >
                       <User className="w-4 h-4 inline mr-1" />
-                      Assign to Me
+                      Assign
                     </button>
                   )}
                 </div>
@@ -274,7 +276,7 @@ export const TicketViewModal = ({
                 {/* Prominent Resolve Button */}
                 <button
                   onClick={() => handleResolveTicket(ticket._id)}
-                  className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-200 flex items-center gap-2"
+                  className="w-full md:w-auto px-6 py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-200 flex items-center justify-center gap-2"
                 >
                   <CheckCircle className="w-5 h-5" />
                   Resolve Now

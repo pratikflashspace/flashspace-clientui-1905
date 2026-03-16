@@ -5,7 +5,7 @@ import {
   Ticket,
   Building2,
 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 function SidebarItem({
@@ -74,4 +74,3 @@ export default function Sidebar() {
     </aside>
   );
 }
-export { default } from "@/components/SpacePartner/sidebar/Sidebar";

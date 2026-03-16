@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axios";
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/mail`;
+const API_URL = "/api/mail";
 
 export interface MailRecord {
   _id: string;

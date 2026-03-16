@@ -210,7 +210,7 @@ const propertyService = {
   updateProperty,
   getPropertyById,
   getPropertySpaces,
-  getParameterProperties: getPartnerProperties,
+  getPartnerProperties: getPartnerProperties,
   getPropertyBookingsForPartner,
   deleteProperty,
   uploadPropertyImage,

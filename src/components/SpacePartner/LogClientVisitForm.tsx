@@ -134,12 +134,13 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden font-[Inter] flex flex-col max-h-[90vh]">
-      <div className="bg-gradient-to-r from-teal-700 to-teal-600 px-8 py-6 text-white text-center shrink-0">
-        <h2 className="text-2xl font-bold tracking-tight">Log Client Visit</h2>
-        <p className="text-teal-100 mt-1 text-sm max-w-md mx-auto">
-          Record a client's physical presence at the coworking space. Set the
-          date, time, and location of the visit.
+    <div className="w-full max-w-2xl mx-auto bg-background rounded-2xl shadow-2xl border border-border overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-[#2D3F33] px-8 py-8 text-[#FDE68A] text-center shrink-0 border-b border-border">
+        <h2 className="text-3xl font-extrabold tracking-tight uppercase">
+          Log Client <span className="italic text-primary">Visit</span>
+        </h2>
+        <p className="text-muted-foreground mt-2 font-medium">
+          Record a client's physical presence at the coworking space. 
         </p>
       </div>
 
@@ -325,12 +326,12 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="pt-6 border-t border-gray-100 flex items-center justify-end gap-3 shrink-0 mt-auto">
+        <div className="pt-6 border-t border-border flex items-center justify-end gap-3 shrink-0 mt-auto px-8 pb-8 bg-muted/20">
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
-              className="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+              className="px-6 py-2.5 rounded-xl border border-border text-foreground font-bold hover:bg-muted transition-all active:scale-95"
             >
               Cancel
             </button>
@@ -338,7 +339,7 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 rounded-xl bg-teal-600 text-white font-semibold hover:bg-teal-700 shadow-md hover:shadow-lg hover:shadow-teal-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed min-w-[150px]"
+            className="px-8 py-2.5 rounded-xl bg-[#2D3F33] text-[#FDE68A] font-bold hover:bg-[#2D3F33]/90 shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed min-w-[150px]"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
