@@ -38,9 +38,9 @@ function mapNotification(raw: any): SpacePortalNotification {
     createdAt: raw.createdAt ?? undefined,
     time: raw.createdAt
       ? new Date(raw.createdAt).toLocaleString("en-IN", {
-        dateStyle: "medium",
-        timeStyle: "short",
-      })
+          dateStyle: "medium",
+          timeStyle: "short",
+        })
       : undefined,
   };
 }
@@ -68,21 +68,12 @@ export default function SpacePortalLayout() {
   >({});
 
   /**
-<<<<<<< HEAD
-   * Notifications state — populated from API on mount,
-   * updated in real-time via Socket.io.
-   */
-  const [notifications, setNotifications] = useState<SpacePortalNotification[]>(
-    [],
-  );
-=======
    * Notifications state (currently using mock data)
    */
   const [notifications, setNotifications] = useState(
     SPACE_PORTAL_NOTIFICATIONS,
   );
 
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
   /**
    * Toast queue system (shows 1 toast at a time)
    */
@@ -117,7 +108,8 @@ export default function SpacePortalLayout() {
         });
         const data = await res.json();
         if (data.success && Array.isArray(data.data)) {
-          const mapped: SpacePortalNotification[] = data.data.map(mapNotification);
+          const mapped: SpacePortalNotification[] =
+            data.data.map(mapNotification);
           setNotifications(mapped);
           // Seed the set so existing notifications don't re-toast
           prevNotificationIdsRef.current = new Set(mapped.map((n) => n.id));
@@ -514,38 +506,10 @@ export default function SpacePortalLayout() {
     return {
       notifications,
 
-<<<<<<< HEAD
-      markAllRead: async () => {
-        setNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
-        try {
-          await fetch(`${base}/api/notifications/read-all`, {
-            method: "PATCH",
-            credentials: "include",
-          });
-        } catch (err) {
-          console.error("[SpacePortal] markAllRead failed:", err);
-        }
-      },
-
-      markRead: async (id: string) => {
-        setNotifications((prev) =>
-          prev.map((item) => (item.id === id ? { ...item, read: true } : item)),
-        );
-        try {
-          await fetch(`${base}/api/notifications/${id}/read`, {
-            method: "PATCH",
-            credentials: "include",
-          });
-        } catch (err) {
-          console.error("[SpacePortal] markRead failed:", err);
-        }
-      },
-=======
       markAllRead: () =>
         setNotifications((prev) =>
           prev.map((item) => ({ ...item, read: true })),
         ),
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
 
       markRead: (id: string) => {
         setNotifications((prev) =>
