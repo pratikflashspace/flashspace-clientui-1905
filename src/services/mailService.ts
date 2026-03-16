@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axios";
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/mail`;
+const API_URL = "/api/mail";
 
 export interface MailRecord {
   _id: string;
@@ -9,6 +9,7 @@ export interface MailRecord {
   sender: string;
   type: string;
   space: string;
+  documentUrl?: string;
   received: string;
   status: "Pending Action" | "Forwarded" | "Collected";
   createdAt: string;
@@ -32,11 +33,28 @@ export const mailService = {
     return response.data;
   },
 
-  create: async (data: CreateMailData) => {
+  create: async (data: CreateMailData, file?: File) => {
+    const payload = file
+      ? (() => {
+          const formData = new FormData();
+          formData.append("client", data.client);
+          formData.append("email", data.email);
+          formData.append("sender", data.sender);
+          formData.append("type", data.type);
+          formData.append("space", data.space);
+          formData.append("file", file);
+          return formData;
+        })()
+      : data;
+
     const response = await axiosInstance.post<{
       success: boolean;
       data: MailRecord;
-    }>(API_URL, data);
+    }>(API_URL, payload, file ? {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    } : undefined);
     return response.data;
   },
 

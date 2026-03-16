@@ -26,7 +26,15 @@ import {
   VisitRecord,
 } from "@/types/services";
 
-export type { KYCData, DashboardData };
+export type { 
+  KYCData, 
+  DashboardData, 
+  Invoice, 
+  InvoicesResponse, 
+  SupportTicket, 
+  MailRecord, 
+  VisitRecord 
+};
 
 // ============ SERVICE CLASS ============
 
@@ -273,6 +281,23 @@ class UserDashboardService {
         success: false,
         message:
           error.response?.data?.message || "Failed to submit KYC for review",
+      };
+    }
+  }
+
+  // Delete KYC Profile
+  async deleteKYCProfile(profileId: string): Promise<ApiResponse<void>> {
+    try {
+      const response = await axiosInstance.delete<ApiResponse<void>>(
+        `/api/user/kyc/profile/${profileId}`,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete profile";
+      return {
+        success: false,
+        message: errorMessage,
       };
     }
   }
@@ -555,6 +580,42 @@ class UserDashboardService {
         error instanceof Error
           ? error.message
           : "Failed to fetch client details";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  async getPartnerActiveRequests(): Promise<ApiResponse<any[]>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any[]>>(
+        API_ENDPOINTS.USER.PARTNER_ACTIVE_REQUESTS,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch active requests";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  async getPartnerAnalytics(): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any>>(
+        API_ENDPOINTS.USER.PARTNER_ANALYTICS,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch analytics";
       return {
         success: false,
         message: errorMessage,

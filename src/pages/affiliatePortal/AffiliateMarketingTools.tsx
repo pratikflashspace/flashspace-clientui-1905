@@ -60,7 +60,7 @@ const MarketingTools = () => {
         toast.success("Shared successfully!");
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
-             toast.error("Failed to share.");
+          toast.error("Failed to share.");
         }
       }
     } else {
@@ -71,7 +71,7 @@ const MarketingTools = () => {
   return (
     <div className="mx-auto w-full p-6 lg:p-10 pb-2 lg:pb-4 space-y-8 animate-in fade-in duration-500">
       {/* Header */}
-{/* Header Removed */}
+      {/* Header Removed */}
 
       <Tabs defaultValue="referral" className="w-full">
         <TabsList className="bg-gray-100/50 p-1 mb-8">
@@ -82,22 +82,22 @@ const MarketingTools = () => {
 
         {/* --- REFERRAL LINKS TAB --- */}
         <TabsContent value="referral" className="space-y-8 outline-none animate-slide-up">
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+          <div className="bg-[#f8f8f8] p-6 rounded-2xl border border-gray-200 shadow space-y-6">
             <h3 className="font-bold text-gray-800 text-lg">Your Unique Referral Link</h3>
             <div className="flex flex-col xl:flex-row gap-4">
               <div className="flex-1 bg-gray-50/80 px-4 py-3.5 rounded-xl border border-gray-100 font-mono text-sm text-gray-600 flex items-center min-w-0">
                 <span className="truncate">{referralLink}</span>
               </div>
               <div className="flex flex-wrap md:flex-nowrap gap-2">
-                <Button 
-                    variant="outline" 
-                    className="flex-1 md:w-auto gap-2 border-gray-200 hover:bg-gray-50 text-gray-700"
-                    onClick={() => handleCopy(referralLink, 'main')}
+                <Button
+                  variant="outline"
+                  className="flex-1 md:w-auto gap-2 border-gray-200 hover:bg-gray-50 text-gray-700"
+                  onClick={() => handleCopy(referralLink, 'main')}
                 >
-                  {copiedId === 'main' ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />} 
+                  {copiedId === 'main' ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
                   {copiedId === 'main' ? "Copied!" : "Copy"}
                 </Button>
-                
+
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="flex-1 md:w-auto gap-2 border-gray-200 hover:bg-gray-50 text-gray-700">
@@ -112,31 +112,31 @@ const MarketingTools = () => {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="flex flex-col items-center justify-center p-6 space-y-4">
-                       <div className="bg-white p-4 rounded-xl border-2 border-dashed border-gray-200 shadow-sm">
-                         {/* Dynamic QR Code */}
-                         <QRCodeSVG 
-                            value={referralLink} 
-                            size={192} 
-                            level="H" 
-                            className="w-48 h-48"
-                         />
-                       </div>
-                       <div className="text-center space-y-1">
-                           <p className="text-xs text-gray-400 font-mono break-all px-8">{referralLink}</p>
-                           <Button variant="link" className="text-[#5bb09c] text-xs h-auto p-0" onClick={() => handleCopy(referralLink, 'qr-modal')}>Copy Link</Button>
-                       </div>
+                      <div className="bg-[#f8f8f8] p-4 rounded-xl border-2 border-dashed border-gray-200 shadow-sm">
+                        {/* Dynamic QR Code */}
+                        <QRCodeSVG
+                          value={referralLink}
+                          size={192}
+                          level="H"
+                          className="w-48 h-48"
+                        />
+                      </div>
+                      <div className="text-center space-y-1">
+                        <p className="text-xs text-gray-400 font-mono break-all px-8">{referralLink}</p>
+                        <Button variant="link" className="text-[#5bb09c] text-xs h-auto p-0" onClick={() => handleCopy(referralLink, 'qr-modal')}>Copy Link</Button>
+                      </div>
                     </div>
                     <div className="flex justify-center">
-                        <Button className="w-full bg-[#5bb09c] hover:bg-[#4a9b89]" onClick={() => toast.success("QR Code downloaded! (Simulation)")}>
-                            <Download className="w-4 h-4 mr-2" /> Download PNG
-                        </Button>
+                      <Button className="w-full bg-[#5bb09c] hover:bg-[#4a9b89]" onClick={() => toast.success("QR Code downloaded! (Simulation)")}>
+                        <Download className="w-4 h-4 mr-2" /> Download PNG
+                      </Button>
                     </div>
                   </DialogContent>
                 </Dialog>
 
-                <Button 
-                    className="flex-[2] md:w-auto bg-[#5bb09c] hover:bg-[#4a9b89] text-white gap-2 shadow-sm"
-                    onClick={() => handleShare(referralLink, 'Join FlashSpace', 'main-share')}
+                <Button
+                  className="flex-[2] md:w-auto bg-[#5bb09c] hover:bg-[#4a9b89] text-white gap-2 shadow-sm"
+                  onClick={() => handleShare(referralLink, 'Join FlashSpace', 'main-share')}
                 >
                   <Share2 className="w-4 h-4" /> Share
                 </Button>
@@ -144,7 +144,7 @@ const MarketingTools = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="bg-[#f8f8f8] rounded-2xl border border-gray-200 shadow overflow-hidden">
             <div className="p-6 border-b border-gray-50">
               <h3 className="font-bold text-gray-800 text-lg">Link Performance</h3>
             </div>
@@ -174,23 +174,23 @@ const MarketingTools = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <div className="flex items-center justify-end gap-2">
-                            <button 
-                                onClick={() => handleCopy(`https://${item.link}`, `row-${idx}`)}
-                                className="p-2 bg-[#5bb09c]/10 text-[#5bb09c] rounded-lg hover:bg-[#5bb09c]/20 transition-colors" 
-                                title="Copy Link"
-                            >
-                                {copiedId === `row-${idx}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                            </button>
-                            <button 
-                                onClick={() => handleShare(`https://${item.link}`, item.name, `share-${idx}`)}
-                                className="p-2 bg-[#5bb09c]/10 text-[#5bb09c] rounded-lg hover:bg-[#5bb09c]/20 transition-colors" 
-                                title="Share Link"
-                            >
-                                <Share2 className="w-4 h-4" />
-                            </button>
-                            <button className="p-2 text-gray-400 hover:text-[#5bb09c] transition-colors hover:bg-gray-50 rounded-lg">
-                                <BarChart3 className="w-4 h-4" />
-                            </button>
+                          <button
+                            onClick={() => handleCopy(`https://${item.link}`, `row-${idx}`)}
+                            className="p-2 bg-[#5bb09c]/10 text-[#5bb09c] rounded-lg hover:bg-[#5bb09c]/20 transition-colors"
+                            title="Copy Link"
+                          >
+                            {copiedId === `row-${idx}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                          </button>
+                          <button
+                            onClick={() => handleShare(`https://${item.link}`, item.name, `share-${idx}`)}
+                            className="p-2 bg-[#5bb09c]/10 text-[#5bb09c] rounded-lg hover:bg-[#5bb09c]/20 transition-colors"
+                            title="Share Link"
+                          >
+                            <Share2 className="w-4 h-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 hover:text-[#5bb09c] transition-colors hover:bg-gray-50 rounded-lg">
+                            <BarChart3 className="w-4 h-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -205,9 +205,9 @@ const MarketingTools = () => {
         <TabsContent value="assets" className="outline-none">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-up">
             {ASSETS_DATA.map((asset, idx) => (
-              <div 
-                key={idx} 
-                className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between group hover:border-[#5bb09c]/30 transition-all"
+              <div
+                key={idx}
+                className="bg-[#f8f8f8] p-6 rounded-2xl border border-gray-200 shadow flex flex-col justify-between group transition-all"
               >
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
@@ -238,20 +238,20 @@ const MarketingTools = () => {
           {/* Increased grid columns from 3 to 4 for smaller cards on desktop */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fade-in-up">
             {QR_CODES_DATA.map((qr, idx) => (
-              <div 
-                key={idx} 
-                className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center group hover:border-[#5bb09c]/30 transition-all"
+              <div
+                key={idx}
+                className="bg-[#f8f8f8] p-5 rounded-xl border border-gray-200 shadow flex flex-col items-center group transition-all"
               >
-                
+
                 {/* QR Code Container (Reduced padding) */}
                 <div className="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center mb-4 p-6">
-                  <div className="w-full h-full bg-white rounded shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden">
-                    <QRCodeSVG 
-                        id={`qr-${idx}`}
-                        value={qr.link} 
-                        size={128} 
-                        level="H" 
-                        className="w-full h-full" 
+                  <div className="w-full h-full bg-[#f8f8f8] rounded shadow-sm border border-gray-100 flex items-center justify-center overflow-hidden">
+                    <QRCodeSVG
+                      id={`qr-${idx}`}
+                      value={qr.link}
+                      size={128}
+                      level="H"
+                      className="w-full h-full"
                     />
                   </div>
                 </div>
@@ -262,8 +262,8 @@ const MarketingTools = () => {
                 </div>
 
                 {/* Download Button (Reduced py) */}
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full gap-2 border-gray-200 hover:border-[#5bb09c] hover:text-[#5bb09c] hover:bg-teal-50/30 transition-all py-2 h-auto text-xs"
                   onClick={() => {
                     const canvas = document.createElement("canvas");
@@ -273,7 +273,7 @@ const MarketingTools = () => {
                       const svg64 = btoa(xml);
                       const b64Start = 'data:image/svg+xml;base64,';
                       const image64 = b64Start + svg64;
-                      
+
                       const img = new Image();
                       img.onload = () => {
                         canvas.width = img.width;
@@ -291,7 +291,7 @@ const MarketingTools = () => {
                       };
                       img.src = image64;
                     } else {
-                        toast.error("Could not find QR Code element.");
+                      toast.error("Could not find QR Code element.");
                     }
                   }}
                 >

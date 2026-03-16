@@ -27,7 +27,7 @@ const Support = () => {
   return (
     <div className=" mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-500">
       {/* Header */}
-{/* Header Removed */}
+      {/* Header Removed */}
 
       <Tabs defaultValue="chat" className="w-full">
         <TabsList className="bg-gray-100/50 p-1 mb-8">
@@ -50,16 +50,16 @@ const Support = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Chat Interface - Passing state and setter as props */}
             <div className="lg:col-span-8 animate-slide-up">
-              <SupportChat 
-                messages={chatMessages} 
-                setMessages={setChatMessages} 
+              <SupportChat
+                messages={chatMessages}
+                setMessages={setChatMessages}
               />
             </div>
 
             {/* Sidebar: Only visible in Chat Tab */}
             <div className="lg:col-span-4 space-y-6 animate-slide-up">
               {/* Contact Us Card */}
-              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+              <div className="bg-[#f8f8f8] p-6 rounded-2xl border border-gray-200 shadow space-y-6">
                 <h3 className="font-bold text-gray-800">Contact Us</h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-4 group cursor-pointer">
@@ -93,7 +93,7 @@ const Support = () => {
               </div>
 
               {/* Quick Links Card */}
-              <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+              <div className="bg-[#f8f8f8] p-6 rounded-2xl border border-gray-200 shadow space-y-6">
                 <h3 className="font-bold text-gray-800">Quick Links</h3>
                 <div className="space-y-2">
                   {[
@@ -144,9 +144,9 @@ const Support = () => {
               { q: "How do I track my referrals?", a: "You can track all your referrals in the Booking Management section with real-time status updates." },
               { q: "Can I get custom marketing materials?", a: "Yes! Visit the Marketing Tools section to request custom branded materials." }
             ].map((item, i) => (
-              <div 
-                key={i} 
-                className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-3 group hover:border-[#5bb09c]/30 transition-all"
+              <div
+                key={i}
+                className="bg-[#f8f8f8] p-6 rounded-2xl border border-gray-200 shadow space-y-3 group hover:border-[#5bb09c]/30 transition-all"
               >
                 <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-[#5bb09c] group-hover:bg-teal-50 transition-colors">
                   <HelpCircle className="w-5 h-5" />

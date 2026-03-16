@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_CONFIG } from "@/config/api.config";
 import {
   getAllSpacePartnerKyc,
   SpaceUserKycResponse,
@@ -154,8 +155,19 @@ export default function SpacePartnerKycRequest({
 
   const getFullUrl = (url?: string) => {
     if (!url) return "";
-    if (url.startsWith("http")) return url;
-    return `${import.meta.env.VITE_API_DOMAIN || "http://localhost:5000"}${url}`;
+    
+    let cleanUrl = url;
+    if (cleanUrl.includes("localhost:5000")) {
+      cleanUrl = cleanUrl.replace(/https?:\/\/localhost:5000(\/api)?/, "");
+    }
+    
+    if (cleanUrl.startsWith("http")) return cleanUrl;
+    
+    const baseUrl = API_CONFIG.BASE_URL.endsWith("/")
+      ? API_CONFIG.BASE_URL.slice(0, -1)
+      : API_CONFIG.BASE_URL;
+    const path = cleanUrl.startsWith("/") ? cleanUrl : `/${cleanUrl}`;
+    return `${baseUrl}${path}`;
   };
 
   const isImageFile = (url?: string) =>

@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect as useEffectReact, useState as useStateReact } from "react";
+import userDashboardService from "@/services/userDashboard.service";
 
 // Remove this type definition if useAuth already provides the correct user type
 // type User = {
@@ -61,14 +61,13 @@ export default function ClientDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { user } = useAuth();
-  const [kycStatus, setKycStatus] = useStateReact<string | null>(null);
+  const [kycStatus, setKycStatus] = useState<string | null>(null);
 
   // Fetch KYC status for indicator
-  useEffectReact(() => {
+  useEffect(() => {
     async function fetchKycStatus() {
       try {
-        const res = await import("@/services/userDashboard.service");
-        const kycResponse = await res.default.getKYC();
+        const kycResponse = await userDashboardService.getKYC();
         if (kycResponse.success && kycResponse.data) {
           const kyc = Array.isArray(kycResponse.data) ? kycResponse.data[0] : kycResponse.data;
           setKycStatus(kyc?.overallStatus || null);

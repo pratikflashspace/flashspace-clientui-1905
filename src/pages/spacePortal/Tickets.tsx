@@ -1,227 +1,250 @@
-import { useMemo, useState } from "react";
-import { TICKETS } from "@/data/spacePortal/ticket";
-import type {
-  Ticket,
-  TicketPriority,
-  TicketStatus,
-} from "@/types/spacePortal/ticket";
-
+import { useState, useEffect, useMemo } from "react";
 import { Eye, MoreVertical } from "lucide-react";
-import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import partnerTicketService, {
+  PartnerTicketData,
+} from "@/services/spacePortal/partnerTicket.service";
+import SearchBar from "@/components/ui/SpacePartner/SearchBar";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
 
-/**
- * Tickets Page
- *
- * Features:
- * - Search tickets by title/client/space/id
- * - Filter by status + priority
- * - Display tickets in a table
- *
- * Backend-ready:
- * - Replace TICKETS mock data with API response.
- * - Add view details route when backend is ready.
- */
 export default function Tickets() {
-  const { query } = useSpacePortalSearch();
+  const [tickets, setTickets] = useState<PartnerTicketData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [priorityFilter, setPriorityFilter] = useState("ALL");
 
-  const [statusFilter, setStatusFilter] = useState<TicketStatus | "ALL">("ALL");
-  const [priorityFilter, setPriorityFilter] = useState<TicketPriority | "ALL">(
-    "ALL",
-  );
+  useEffect(() => {
+    const fetchTickets = async () => {
+      setLoading(true);
+      try {
+        const res = await partnerTicketService.getPartnerTickets(1, 100);
+        if (res.success && res.data) {
+          setTickets(res.data.tickets);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tickets", error);
+        toast.error("Failed to load tickets");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTickets();
+  }, []);
 
-  /**
-   * Normalize search query once.
-   */
-  const normalizedQuery = useMemo(() => query.trim().toLowerCase(), [query]);
-
-  /**
-   * Dropdown options extracted to avoid inline repetition.
-   */
-  const statusOptions = useMemo(
-    () => [
-      { label: "All Status", value: "ALL" },
-      { label: "Open", value: "OPEN" },
-      { label: "In Progress", value: "IN_PROGRESS" },
-      { label: "Resolved", value: "RESOLVED" },
-      { label: "Closed", value: "CLOSED" },
-    ],
-    [],
-  );
-
-  const priorityOptions = useMemo(
-    () => [
-      { label: "All Priority", value: "ALL" },
-      { label: "Low", value: "LOW" },
-      { label: "Medium", value: "MEDIUM" },
-      { label: "High", value: "HIGH" },
-      { label: "Urgent", value: "URGENT" },
-    ],
-    [],
-  );
-
-  /**
-   * Filter tickets based on search + filters.
-   */
   const filteredTickets = useMemo(() => {
-    return TICKETS.filter((t) => {
+    return tickets.filter((t) => {
+      const q = query.toLowerCase();
       const matchesQuery =
-        t.title.toLowerCase().includes(normalizedQuery) ||
-        t.clientName.toLowerCase().includes(normalizedQuery) ||
-        t.space.toLowerCase().includes(normalizedQuery) ||
-        t.id.toLowerCase().includes(normalizedQuery);
+        t.subject.toLowerCase().includes(q) ||
+        t.ticketNumber.toLowerCase().includes(q) ||
+        t.user?.fullName.toLowerCase().includes(q);
 
       const matchesStatus =
         statusFilter === "ALL" ? true : t.status === statusFilter;
-
       const matchesPriority =
         priorityFilter === "ALL" ? true : t.priority === priorityFilter;
 
       return matchesQuery && matchesStatus && matchesPriority;
     });
-  }, [normalizedQuery, statusFilter, priorityFilter]);
+  }, [tickets, query, statusFilter, priorityFilter]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-4" />
+        <p className="text-muted-foreground font-medium">
+          Loading ticket system...
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex-1">
-      {/* Filters */}
-      <div className="mt-6 flex flex-nowrap items-center gap-3">
-        <SelectBox
-          value={statusFilter}
-          onChange={(val) => setStatusFilter(val as TicketStatus | "ALL")}
-          options={statusOptions}
-          triggerClassName="w-36 sm:w-52"
-        />
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl">
+          Support <span className="text-primary italic">Tickets</span>
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          Review and resolve support requests from your clients
+        </p>
+      </div>
 
-        <SelectBox
-          value={priorityFilter}
-          onChange={(val) => setPriorityFilter(val as TicketPriority | "ALL")}
-          options={priorityOptions}
-          triggerClassName="w-36 sm:w-52"
+      {/* Controls */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <SearchBar
+          value={query}
+          onChange={setQuery}
+          placeholder="Search by ID, subject, or client name..."
         />
+        <div className="flex gap-3">
+          <SelectBox
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { label: "All Status", value: "ALL" },
+              { label: "Open", value: "OPEN" },
+              { label: "In Progress", value: "IN_PROGRESS" },
+              { label: "Resolved", value: "RESOLVED" },
+              { label: "Closed", value: "CLOSED" },
+            ]}
+          />
+          <SelectBox
+            value={priorityFilter}
+            onChange={setPriorityFilter}
+            options={[
+              { label: "All Priority", value: "ALL" },
+              { label: "Low", value: "LOW" },
+              { label: "Medium", value: "MEDIUM" },
+              { label: "High", value: "HIGH" },
+              { label: "Urgent", value: "URGENT" },
+            ]}
+          />
+        </div>
       </div>
 
       {/* Table */}
-      <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <table className="w-full min-w-[900px] border-collapse text-left text-sm">
-          <thead className="bg-slate-50">
-            <tr className="text-slate-600">
-              <th className="px-6 py-4 font-semibold">Ticket ID</th>
-              <th className="px-6 py-4 font-semibold">Title</th>
-              <th className="px-6 py-4 font-semibold">Client</th>
-              <th className="px-6 py-4 font-semibold">Space</th>
-              <th className="px-6 py-4 font-semibold">Priority</th>
-              <th className="px-6 py-4 font-semibold">Status</th>
-              <th className="px-6 py-4 font-semibold">Assigned</th>
-              <th className="px-6 py-4 text-center font-semibold">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredTickets.map((ticket) => (
-              <TicketRow key={ticket.id} ticket={ticket} />
-            ))}
-          </tbody>
-        </table>
-
-        {/* Empty State */}
-        {filteredTickets.length === 0 && (
-          <p className="p-6 text-center text-slate-500">No tickets found.</p>
-        )}
+      <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-muted/50 border-b border-border">
+              <tr>
+                <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                  Ticket
+                </th>
+                <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                  Client
+                </th>
+                <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                  Priority
+                </th>
+                <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="text-right p-4 text-xs font-extrabold text-foreground uppercase tracking-wider pr-6">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {filteredTickets.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="p-12 text-center text-muted-foreground italic"
+                  >
+                    No support tickets found
+                  </td>
+                </tr>
+              ) : (
+                filteredTickets.map((ticket) => (
+                  <tr
+                    key={ticket._id}
+                    className="hover:bg-muted/30 transition-colors"
+                  >
+                    <td className="p-4">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-primary font-bold mb-1 opacity-70">
+                          #{ticket.ticketNumber}
+                        </span>
+                        <p className="text-sm font-bold text-foreground line-clamp-1 max-w-[240px]">
+                          {ticket.subject}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-7 w-7 border border-border">
+                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
+                            {ticket.user?.fullName?.[0] || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium text-foreground">
+                          {ticket.user?.fullName}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <PriorityBadge priority={ticket.priority} />
+                    </td>
+                    <td className="p-4 text-xs font-medium text-muted-foreground whitespace-nowrap">
+                      {format(new Date(ticket.createdAt), "MMM d, yyyy")}
+                    </td>
+                    <td className="p-4">
+                      <StatusBadge status={ticket.status} />
+                    </td>
+                    <td className="p-4 text-right pr-6">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 rounded-lg"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
 
-/**
- * Single ticket row component
- * Extracted for readability.
- */
-function TicketRow({ ticket }: { ticket: Ticket }) {
+function PriorityBadge({ priority }: { priority: string }) {
+  const p = priority?.toLowerCase();
+  const styles =
+    {
+      urgent: "bg-rose-100 text-rose-700",
+      high: "bg-orange-100 text-orange-700",
+      medium: "bg-amber-100 text-amber-700",
+      low: "bg-slate-100 text-slate-700",
+    }[p] || "bg-slate-100 text-slate-700";
+
   return (
-    <tr className="border-t border-slate-100 hover:bg-slate-50">
-      <td className="px-6 py-5 font-semibold text-slate-900">{ticket.id}</td>
-
-      <td className="px-6 py-5">
-        <p className="font-semibold text-slate-900">{ticket.title}</p>
-        <p className="line-clamp-1 text-xs text-slate-500">
-          {ticket.description}
-        </p>
-      </td>
-
-      <td className="px-6 py-5 font-semibold text-slate-700">
-        {ticket.clientName}
-      </td>
-
-      <td className="px-6 py-5 text-slate-600">{ticket.space}</td>
-
-      <td className="px-6 py-5">
-        <PriorityPill priority={ticket.priority} />
-      </td>
-
-      <td className="px-6 py-5">
-        <StatusPill status={ticket.status} />
-      </td>
-
-      <td className="px-6 py-5 text-slate-600">
-        {ticket.assignedTo || "Unassigned"}
-      </td>
-
-      <td className="px-6 py-5">
-        <div className="flex items-center justify-center gap-4 text-slate-500">
-          {/* type="button" prevents accidental form submission bugs */}
-          <button type="button" className="hover:text-slate-900">
-            <Eye size={18} />
-          </button>
-
-          <button type="button" className="hover:text-slate-900">
-            <MoreVertical size={18} />
-          </button>
-        </div>
-      </td>
-    </tr>
+    <Badge
+      className={`${styles} border-none font-extrabold text-[10px] uppercase px-2 py-0.5 rounded-full`}
+    >
+      {priority}
+    </Badge>
   );
 }
 
-/**
- * Ticket Status Pill (UI badge)
- */
-function StatusPill({ status }: { status: TicketStatus }) {
-  const config =
-    status === "OPEN"
-      ? { label: "Open", className: "bg-blue-50 text-blue-700" }
-      : status === "IN_PROGRESS"
-        ? { label: "In Progress", className: "bg-amber-50 text-amber-700" }
-        : status === "RESOLVED"
-          ? { label: "Resolved", className: "bg-emerald-50 text-emerald-700" }
-          : { label: "Closed", className: "bg-slate-100 text-slate-700" };
+function StatusBadge({ status }: { status: string }) {
+  const s = status?.toLowerCase();
+  const styles =
+    {
+      open: "bg-blue-100 text-blue-700",
+      in_progress: "bg-indigo-100 text-indigo-700",
+      resolved: "bg-emerald-100 text-emerald-700",
+      closed: "bg-slate-100 text-slate-700",
+    }[s] || "bg-slate-100 text-slate-700";
 
   return (
-    <span
-      className={`rounded-full px-4 py-1 text-xs font-semibold ${config.className}`}
+    <Badge
+      className={`${styles} border-none font-extrabold text-[10px] uppercase px-2 py-0.5 rounded-full`}
     >
-      {config.label}
-    </span>
-  );
-}
-
-/**
- * Ticket Priority Pill (UI badge)
- */
-function PriorityPill({ priority }: { priority: TicketPriority }) {
-  const config =
-    priority === "LOW"
-      ? { label: "Low", className: "bg-slate-100 text-slate-700" }
-      : priority === "MEDIUM"
-        ? { label: "Medium", className: "bg-amber-50 text-amber-700" }
-        : priority === "HIGH"
-          ? { label: "High", className: "bg-rose-50 text-rose-700" }
-          : { label: "Urgent", className: "bg-red-100 text-red-700" };
-
-  return (
-    <span
-      className={`rounded-full px-4 py-1 text-xs font-semibold ${config.className}`}
-    >
-      {config.label}
-    </span>
+      {status?.replace("_", " ")}
+    </Badge>
   );
 }

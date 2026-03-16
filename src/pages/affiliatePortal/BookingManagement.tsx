@@ -188,7 +188,7 @@ const StatCard = ({
     delay: number;
 }) => (
     <div
-        className="bg-white px-8 py-7 rounded-2xl border border-gray-100/60 shadow-sm transition-all duration-300 animate-fade-in-up"
+        className="bg-[#f8f8f8] px-8 py-7 rounded-2xl border border-gray-200 shadow transition-all duration-300 animate-fade-in-up"
         style={{ animationDelay: `${delay}ms` }}
     >
         <h3 className={`text-[2rem] font-black ${colorClass} leading-none mb-2`} style={{ fontFamily: "'Inter Tight', sans-serif" }}>{value}</h3>
@@ -495,7 +495,7 @@ const BookingManagement = () => {
     }, [activeBookings, pendingBookings, renewalBookings]);
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] p-8 lg:p-12 font-sans w-full relative">
+        <div className="min-h-screen bg-[#f7f7f6] p-8 lg:p-12 font-sans w-full relative">
             {/* Modal Injection */}
             {selectedBooking && (
                 <BookingDetailsModal
@@ -545,16 +545,16 @@ const BookingManagement = () => {
 
                 {/* Filter & Tabs */}
                 <div className="space-y-4">
-                    <div className="flex bg-[#f1f5f9]/60 p-1 rounded-xl w-fit mb-6">
+                    <div className="flex bg-[#f4f5f0] p-1.5 rounded-xl w-fit mb-6">
                         {(["active", "pending", "renewals"] as const).map(
                             (tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
                                     className={`
-                    px-5 py-2 rounded-lg text-[13px] font-bold transition-all duration-300 capitalize whitespace-nowrap
+                    px-6 py-2.5 rounded-lg text-[13px] font-bold transition-all duration-300 capitalize whitespace-nowrap
                     ${activeTab === tab
-                                            ? "bg-white text-[#1a2d1d] shadow-sm"
+                                            ? "bg-[#f8f8f8] text-[#1a2d1d] shadow-sm ring-1 ring-black/5"
                                             : "text-[#64748b] hover:text-[#1a2d1d]"
                                         }
                   `}
@@ -570,11 +570,11 @@ const BookingManagement = () => {
                     </div>
 
                     {/* Table */}
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-slide-up">
+                    <div className="bg-[#f8f8f8] rounded-2xl border-[3px] border-[#f1f2ed] shadow overflow-hidden animate-slide-up">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="border-b border-gray-50">
+                                    <tr className="border-b-[3px] border-[#f1f2ed] bg-[#f6f6f4]">
                                         {[
                                             "Booking ID",
                                             "Company",
@@ -594,12 +594,12 @@ const BookingManagement = () => {
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50/80">
+                                <tbody className="divide-y-[3px] divide-[#f1f2ed]">
                                     {filteredData.length > 0 ? (
                                         filteredData.map((booking, idx) => (
                                             <tr
                                                 key={booking.id}
-                                                className="group hover:bg-[#fafafa] transition-colors duration-150"
+                                                className="group hover:bg-[#f7f7f6] transition-colors duration-150"
                                                 style={{
                                                     animationDelay: `${idx * 50}ms`,
                                                 }}

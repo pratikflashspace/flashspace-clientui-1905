@@ -10,7 +10,6 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { ChatProvider } from "@/contexts/ChatContext";
-import TeamManagement from "./pages/spacePortal/teamManagement";
 
 import Index from "./pages/Index";
 import Services from "./pages/Services";
@@ -88,6 +87,8 @@ import AdminNotifications from "./pages/admin/Notifications";
 import AdminPropertyDetails from "./pages/admin/PropertyDetailsAdmin";
 import PropertyManagement from "./pages/admin/PropertyManagement";
 import AdminInvoices from "./pages/admin/Invoices";
+import ReceivablePayable from "./pages/admin/ReceivablePayable";
+import BalanceSheet from "./pages/admin/BalanceSheet";
 
 import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
@@ -115,8 +116,10 @@ import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
 import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
 import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import MailAndVisits from "./pages/spacePortal/MailAndVisits";
+// import TeamManagement from "./pages/spacePortal/TeamManagement";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
 import { AffiliateRoute } from "./components/auth/AffiliateRoute";
+// import TeamManagement from "./pages/spacePortal/TeamManagement";
 
 // Affiliate Portal
 
@@ -149,7 +152,9 @@ import AffiliateClientManagement from "./pages/affiliatePortal/AffiliateClientMa
 import SpaceComponent from "./components/Spaces/SpaceComponent";
 import CoworkingSpaceComponent from "./components/Spaces/CoworkingSpaceComponent";
 import MeetingRoomSpaceComponent from "./components/Spaces/MeetingRoomSpaceComponent";
-
+import TeamManagement from "./pages/spacePortal/TeamManagement.tsx";
+// import TeamManagement from "./pages/admin/TeamManagement";
+//hello
 // --- React Query setup ---
 const queryClient = new QueryClient();
 
@@ -394,21 +399,20 @@ const App = () => (
                         <Route path="coupons" element={<Coupons />} />
                         <Route path="learning-hub" element={<LearningHub />} />
                         <Route
-                          path="booking-analysis"
+                          path="sales-analytics"
                           element={<SalesAnalytics />}
                         />
                         <Route path="leaderboard" element={<Leaderboard />} />
                         <Route path="support" element={<SupportChat />} />
-                        <Route
-                          path="revenue-dashboard"
-                          element={<RevenueDashboard />}
-                        />
+                        <Route path="revenue" element={<RevenueDashboard />} />
                         <Route path="tickets" element={<TicketSystem />} />
                         <Route
                           path="notifications"
                           element={<AdminNotifications />}
                         />
                         <Route path="invoices" element={<AdminInvoices />} />
+                        <Route path="finance" element={<ReceivablePayable />} />
+                        <Route path="balance" element={<BalanceSheet />} />
                         <Route path="leads" element={<LeadManagement />} />
                         <Route
                           path="affiliates"
@@ -479,10 +483,7 @@ const App = () => (
                           path="space-management/:id"
                           element={<PropertyDetails />}
                         />
-                        <Route
-                          path="team-management"
-                          element={<TeamManagement />}
-                        />
+
                         <Route path="tickets" element={<Tickets />} />
                         <Route
                           path="feedback-nps"
@@ -493,6 +494,10 @@ const App = () => (
                           element={<SpacePortalTicketAndTasks />}
                         />
                         <Route path="mail-visits" element={<MailAndVisits />} />
+                        <Route
+                          path="team-management"
+                          element={<TeamManagement />}
+                        />
                       </Route>
                     </Route>
 

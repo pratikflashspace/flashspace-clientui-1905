@@ -75,13 +75,22 @@ const isVideoFile = (url?: string) => {
   return ["mp4", "webm", "mov", "avi", "mkv"].includes(ext);
 };
 
+import { API_CONFIG } from "@/config/api.config";
+// ... (rest of imports)
+
+// ...
+
 // Set your backend API base URL here
-const API_BASE_URL = "http://localhost:5000"; // Change this if your backend runs elsewhere
+const API_BASE_URL = API_CONFIG.BASE_URL;
 const getFullUrl = (url?: string) => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
   // Prepend API base URL for relative paths (e.g., /uploads/...)
-  return `${API_BASE_URL}${url}`;
+  const baseUrl = API_BASE_URL.endsWith("/")
+    ? API_BASE_URL.slice(0, -1)
+    : API_BASE_URL;
+  const path = url.startsWith("/") ? url : `/${url}`;
+  return `${baseUrl}${path}`;
 };
 
 export default function SpacePartnerKycDetails() {
@@ -311,7 +320,7 @@ export default function SpacePartnerKycDetails() {
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-8 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
+      <div className="max-w-7xl mx-auto mb-8 px-4 md:px-0">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-gray-500 hover:text-gray-900 transition-colors mb-4"
@@ -319,38 +328,40 @@ export default function SpacePartnerKycDetails() {
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to KYC Requests
         </button>
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold text-gray-900">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="text-center md:text-left">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
               KYC <span className="text-teal-500 italic">Verification</span>
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-gray-500 mt-2 text-sm md:text-base">
               {propertyId
                 ? `Reviewing property: ${focusedProperty?.name || "..."}`
                 : "Review all details, documents, and take an approval decision."}
             </p>
           </div>
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col items-center md:items-end gap-2 bg-white md:bg-transparent p-4 md:p-0 rounded-2xl md:rounded-none border md:border-0 border-gray-100 shadow-sm md:shadow-none">
             {getStatusBadge(
               propertyId
                 ? focusedProperty?.kycStatus
                 : request.kycStatus || request.overallStatus,
             )}
-            <span className="text-xs text-gray-500">
-              Progress: {allDocsApproved ? "100" : "80"}%
-            </span>
-            <span className="text-xs text-gray-400">
-              Submitted:{" "}
-              {request.createdAt
-                ? new Date(request.createdAt).toLocaleString()
-                : "-"}
-            </span>
+            <div className="flex flex-col items-center md:items-end">
+              <span className="text-xs text-gray-500 font-medium">
+                Progress: {allDocsApproved ? "100" : "80"}%
+              </span>
+              <span className="text-[10px] md:text-xs text-gray-400">
+                Submitted:{" "}
+                {request.createdAt
+                  ? new Date(request.createdAt).toLocaleString()
+                  : "-"}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main layout */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-0 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
         {/* Left Column: User & Business Info */}
         <div className="space-y-6">
           {!propertyId ? (
@@ -381,34 +392,34 @@ export default function SpacePartnerKycDetails() {
                   <User className="w-5 h-5 text-blue-500" />
                   <h3 className="font-bold text-gray-900">Personal Info</h3>
                 </div>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Name:</span>
-                    <span className="font-medium text-gray-900">
+                <div className="space-y-4 text-sm">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-gray-500 text-xs sm:text-sm">Name:</span>
+                    <span className="font-bold text-gray-900">
                       {request.fullName}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Phone:</span>
-                    <span className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-gray-500 text-xs sm:text-sm">Phone:</span>
+                    <span className="font-bold text-gray-900 font-mono">
                       {request.phoneNumber || "N/A"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Email:</span>
-                    <span className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-gray-500 text-xs sm:text-sm">Email:</span>
+                    <span className="font-bold text-gray-900 break-all sm:break-normal">
                       {request.email || "N/A"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Pan Number:</span>
-                    <span className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-gray-500 text-xs sm:text-sm">Pan Number:</span>
+                    <span className="font-bold text-gray-900 font-mono">
                       {request.panNumber || "N/A"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">Aadhaar Number:</span>
-                    <span className="font-medium text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-gray-500 text-xs sm:text-sm">Aadhaar Number:</span>
+                    <span className="font-bold text-gray-900 font-mono">
                       {request.aadhaarNumber || "N/A"}
                     </span>
                   </div>
@@ -527,46 +538,56 @@ export default function SpacePartnerKycDetails() {
                       key={idx}
                       className="group border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all bg-gray-50/50"
                     >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
+                        <div className="flex items-center gap-4 w-full sm:w-auto">
+                          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                             <FileText className="w-6 h-6 text-blue-600" />
                           </div>
-                          <div>
-                            <h4 className="font-bold text-gray-900 capitalize truncate max-w-[200px]">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-bold text-gray-900 capitalize truncate">
                               {doc.type.replace(/_/g, " ")}
                             </h4>
-                            <p className="text-xs text-gray-500 truncate max-w-[200px]">
+                            <p className="text-xs text-gray-500 truncate mt-0.5">
                               {doc.fileUrl?.split("/").pop() || "No file name"}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <div className="mr-2">
+                        <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                          <div className="sm:mr-2">
                             <span
-                              className={`text-xs font-semibold px-2 py-1 rounded ${
+                              className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border ${
                                 doc.status === "approved"
-                                  ? "text-green-600 bg-green-50"
+                                  ? "text-green-600 bg-green-50 border-green-100"
                                   : doc.status === "rejected"
-                                    ? "text-red-600 bg-red-50"
-                                    : "text-yellow-600 bg-yellow-50"
+                                    ? "text-red-600 bg-red-50 border-red-100"
+                                    : "text-yellow-600 bg-yellow-50 border-yellow-100"
                               }`}
                             >
-                              {doc.status || "Pending"}
+                              {doc.status ? (
+                                <>
+                                  {doc.status === "approved" ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                                  {doc.status.toUpperCase()}
+                                </>
+                              ) : (
+                                <>
+                                  <Clock className="w-3 h-3" /> PENDING
+                                </>
+                              )}
                             </span>
                           </div>
 
-                          <div className="flex gap-1">
+                          <div className="flex gap-1.5 shrink-0">
                             {doc.status !== "approved" && (
                               <button
                                 onClick={() =>
                                   handlePropertyDocAction(doc.type, "approved")
                                 }
+                                title="Approve"
                                 disabled={submitting}
-                                className="p-2 px-3 bg-white border border-green-200 text-green-600 hover:bg-green-50 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                className="p-2.5 bg-white border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm"
                               >
-                                <CheckCircle2 className="w-3 h-3" /> Accept
+                                <CheckCircle2 className="w-4 h-4" />
                               </button>
                             )}
 
@@ -578,10 +599,11 @@ export default function SpacePartnerKycDetails() {
                                     action: "rejected",
                                   })
                                 }
+                                title="Reject"
                                 disabled={submitting}
-                                className="p-2 px-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                className="p-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"
                               >
-                                <XCircle className="w-3 h-3" /> Reject
+                                <XCircle className="w-4 h-4" />
                               </button>
                             )}
 
@@ -590,9 +612,10 @@ export default function SpacePartnerKycDetails() {
                                 setSelectedDocument(doc.fileUrl || null);
                                 window.scrollTo({ top: 0, behavior: "smooth" });
                               }}
-                              className="p-2 px-3 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                              className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all flex items-center gap-2 font-medium text-xs px-4"
                             >
-                              <Eye className="w-3 h-3" /> View
+                              <Eye className="w-4 h-4" />
+                              <span className="hidden sm:inline">View</span>
                             </button>
                           </div>
                         </div>
@@ -632,46 +655,56 @@ export default function SpacePartnerKycDetails() {
                         key={doc.id}
                         className="group border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all bg-gray-50/50"
                       >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
+                          <div className="flex items-center gap-4 w-full sm:w-auto">
+                            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                               <FileText className="w-6 h-6 text-blue-600" />
                             </div>
-                            <div>
-                              <h4 className="font-bold text-gray-900 capitalize truncate max-w-[200px]">
+                            <div className="min-w-0 flex-1">
+                              <h4 className="font-bold text-gray-900 capitalize truncate">
                                 {doc.title}
                               </h4>
-                              <p className="text-xs text-gray-500 truncate max-w-[200px]">
+                              <p className="text-xs text-gray-500 truncate mt-0.5">
                                 {url.split("/").pop()}
                               </p>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2">
-                            <div className="mr-2">
+                          <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                            <div className="sm:mr-2">
                               <span
-                                className={`text-xs font-semibold px-2 py-1 rounded ${
+                                className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border ${
                                   status === "approved"
-                                    ? "text-green-600 bg-green-50"
+                                    ? "text-green-600 bg-green-50 border-green-100"
                                     : status === "rejected"
-                                      ? "text-red-600 bg-red-50"
-                                      : "text-yellow-600 bg-yellow-50"
+                                      ? "text-red-600 bg-red-50 border-red-100"
+                                      : "text-yellow-600 bg-yellow-50 border-yellow-100"
                                 }`}
                               >
-                                {status || "Pending"}
+                                {status ? (
+                                  <>
+                                    {status === "approved" ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                                    {status.toUpperCase()}
+                                  </>
+                                ) : (
+                                  <>
+                                    <Clock className="w-3 h-3" /> PENDING
+                                  </>
+                                )}
                               </span>
                             </div>
 
-                            <div className="flex gap-1">
+                            <div className="flex gap-1.5 shrink-0">
                               {status !== "approved" && (
                                 <button
                                   onClick={() =>
                                     handleDocAction(doc.docType, "approved")
                                   }
+                                  title="Approve"
                                   disabled={submitting}
-                                  className="p-2 px-3 bg-white border border-green-200 text-green-600 hover:bg-green-50 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                  className="p-2.5 bg-white border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm"
                                 >
-                                  <CheckCircle2 className="w-3 h-3" /> Accept
+                                  <CheckCircle2 className="w-4 h-4" />
                                 </button>
                               )}
 
@@ -683,10 +716,11 @@ export default function SpacePartnerKycDetails() {
                                       action: "rejected",
                                     })
                                   }
+                                  title="Reject"
                                   disabled={submitting}
-                                  className="p-2 px-3 bg-white border border-red-200 text-red-600 hover:bg-red-50 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                  className="p-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"
                                 >
-                                  <XCircle className="w-3 h-3" /> Reject
+                                  <XCircle className="w-4 h-4" />
                                 </button>
                               )}
 
@@ -698,9 +732,10 @@ export default function SpacePartnerKycDetails() {
                                     behavior: "smooth",
                                   });
                                 }}
-                                className="p-2 px-3 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all flex items-center gap-2 font-medium text-xs px-4"
                               >
-                                <Eye className="w-3 h-3" /> View
+                                <Eye className="w-4 h-4" />
+                                <span className="hidden sm:inline">View</span>
                               </button>
                             </div>
                           </div>

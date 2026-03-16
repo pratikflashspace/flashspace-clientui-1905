@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import chatService from '@/services/chat.service';
 import { useDarkMode } from '@/contexts/DarkModeContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from "@/lib/utils";
 import {
@@ -31,16 +31,27 @@ import { LoginModal } from '@/components/auth/LoginModal'; // [NEW]
 import { SignupModal } from '@/components/auth/SignupModal'; // [NEW]
 import ContactModal from '@/components/ui/ContactModal'; // [NEW]
 import { API_CONFIG } from '@/config/api.config'; // [NEW] Import API Config
+import Header from "@/components/Header";
 
 // [NEW] Custom Text Formatter to handle bold text, URLs, Images, and PDFs
 const formatMessage = (text: string) => {
   if (!text) return null;
 
+  // Normalize common HTML-like tags returned by AI backend into plain readable text.
+  const normalizedText = text
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<details>\s*<summary>([\s\S]*?)<\/summary>\s*([\s\S]*?)<\/details>/gi, '\n$1\n$2\n')
+    .replace(/<\/?summary>/gi, '')
+    .replace(/<\/?details>/gi, '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
   // URL regex pattern
   const urlRegex = /(https?:\/\/[^\s]+)/g;
 
   // Split by bold markers first
-  const parts = text.split(/(\*\*.*?\*\*)/g);
+  const parts = normalizedText.split(/(\*\*.*?\*\*)/g);
 
   return parts.map((part, index) => {
     // Handle Bold
@@ -176,11 +187,10 @@ interface ContactForm {
 }
 
 // ChatMessage now comes from ChatContext
-import { useChat } from "@/contexts/ChatContext";
+import { useChat, ChatMessage } from "@/contexts/ChatContext";
 
-// n8n Webhook Configuration
-// Use proxy in development to avoid CORS issues
-const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || '/api/webhook/b8d3444c-ca76-4796-a0b7-a8c0b9c320c2';
+// Backend chat endpoint (backend calls AI backend internally)
+const BACKEND_CHAT_URL = "/api/chat/send";
 
 interface SidebarMenuItem {
   label: string;
@@ -249,11 +259,13 @@ const UpdatesPopup = ({
   return createPortal(
     <div
       onClick={(e) => e.stopPropagation()}
-      className={`fixed top-0 left-0 z-[13000] h-screen transition-transform duration-400 ease-[cubic-bezier(.7,.22,.26,.98)] ${open ? "translate-x-0" : "translate-x-[120%]"
+      className={`fixed top-0 left-0 z-[13000] h-screen transition-transform ${open ? "translate-x-0" : "translate-x-[120%]"
         }`}
       style={{
         width: UPDATES_WIDTH,
         left: menuWidth,
+        transitionDuration: '400ms',
+        transitionTimingFunction: 'cubic-bezier(.7,.22,.26,.98)',
       }}
     >
       <div
@@ -361,6 +373,7 @@ const UpdatesPopup = ({
 
 const StartChatting = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [message, setMessage] = useState('');
@@ -368,34 +381,10 @@ const StartChatting = () => {
   const [activeChatId, setActiveChatId] = useState<string | null>(() => sessionStorage.getItem('flashspace_activeChatId'));
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // [NEW] User menu state
   const [showUpdates, setShowUpdates] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false); // [NEW] Contact form state
-  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
-  const countries = [
-    { code: "IND", name: "India", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_India_Flat_Round-128x128.png" },
-    { code: "USA", name: "United States", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_States_Flat_Round-128x128.png" },
-    { code: "UK", name: "United Kingdom", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Kingdom_Flat_Round-128x128.png" },
-    { code: "UAE", name: "United Arab Emirates", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_United_Arab_Emirates_Flat_Round-128x128.png" },
-    { code: "CAN", name: "Canada", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Canada_Flat_Round-128x128.png" },
-    { code: "AUS", name: "Australia", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Australia_Flat_Round-128x128.png" },
-    { code: "GER", name: "Germany", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Germany_Flat_Round-128x128.png" },
-    { code: "FRA", name: "France", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_France_Flat_Round-128x128.png" },
-    { code: "JPN", name: "Japan", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Japan_Flat_Round-128x128.png" },
-    { code: "SGP", name: "Singapore", flag: "https://flagdownload.com/wp-content/uploads/Flag_of_Singapore_Flat_Round-128x128.png" },
-  ];
-  const [selectedCountry, setSelectedCountry] = useState(countries[0]);
-  const countryRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // Close country dropdown on outside click
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (countryRef.current && !countryRef.current.contains(event.target as Node)) {
-        setCountryDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const [contactForm, setContactForm] = useState<ContactForm>({
     name: '',
@@ -700,39 +689,6 @@ const StartChatting = () => {
     }
   };
 
-  const popularSpaces: PopularSpace[] = [
-    { name: 'Connaught Place Hub', location: 'CP, New Delhi', type: 'Premium', image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80&fit=crop&crop=entropy&auto=format' },
-    { name: 'Nehru Place Tech', location: 'Nehru Place, Delhi', type: 'Startup', image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&q=80&fit=crop&crop=entropy&auto=format' },
-    { name: 'Saket Business', location: 'Saket, New Delhi', type: 'Premium', image: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600&q=80&fit=crop&crop=entropy&auto=format' },
-    { name: 'Dwarka Workspace', location: 'Dwarka, Delhi', type: 'Startup', image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=80&fit=crop&crop=entropy&auto=format' }
-  ];
-
-  const inspirationCards = [
-    {
-      title: 'Ultimate Workspace Guide',
-      description: 'Everything you need to know about choosing the perfect workspace',
-      image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=400&q=80&fit=crop'
-    },
-    {
-      title: 'Startup Success Stories',
-      description: 'How Indian startups scaled with the right workspace solutions',
-      image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&q=80&fit=crop'
-    },
-    {
-      title: 'Workspace Trends 2025',
-      description: 'Latest trends shaping the future of flexible workspaces',
-      image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&q=80&fit=crop'
-    }
-  ];
-
-  const complianceServices: string[] = [
-    'GST Registration',
-    'Company Formation',
-    'FSSAI License',
-    'Trade License',
-    'Professional Tax',
-    'Labour License'
-  ];
 
 
   const sidebarMenuItems: SidebarMenuItem[] = [
@@ -882,8 +838,9 @@ const StartChatting = () => {
     };
   }, []);
 
-  const handleSendMessage = async () => {
-    if (!message.trim() || isLoading) return;
+  const handleSendMessage = async (text?: string) => {
+    const messageContent = text || message;
+    if (!messageContent.trim() || isLoading) return;
 
     // [NEW] Guest Chat Limit Check
     if (!isAuthenticated) {
@@ -899,27 +856,32 @@ const StartChatting = () => {
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: message.trim(),
+      content: messageContent.trim(),
       timestamp: new Date()
     };
 
     // Add user message to chat
     setChatMessages(prev => [...prev, userMessage]);
-    setMessage('');
+    if (!text) setMessage('');
     setIsLoading(true);
 
     try {
-      // Call n8n webhook
-      const response = await fetch(N8N_WEBHOOK_URL, {
+      const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      const sessionId = getSessionId();
+
+      // Call backend chat endpoint (backend calls AI backend internally)
+      const response = await fetch(BACKEND_CHAT_URL, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
           message: userMessage.content,
-          // response: userMessage.content,
-          sessionId: getSessionId(),
-          timestamp: userMessage.timestamp.toISOString()
+          query: userMessage.content,
+          conversation_id: 'default',
+          session_id: sessionId
         })
       });
 
@@ -931,21 +893,9 @@ const StartChatting = () => {
       }
 
       const data = await response.json();
-      // console.log('n8n response:', data); // Debug log
 
-      // Try multiple possible response formats from n8n
-      let aiResponseText = '';
-
-      if (Array.isArray(data)) {
-        // If response is an array, get first item
-        const firstItem = data[0];
-        aiResponseText = firstItem?.output || firstItem?.response || firstItem?.text || firstItem?.message || JSON.stringify(firstItem);
-      } else if (typeof data === 'object') {
-        // Try different possible field names
-        aiResponseText = data.Response || data.output || data.response || data.text || data.message || data.result || data.answer || JSON.stringify(data);
-      } else {
-        aiResponseText = String(data);
-      }
+      // Backend returns reply directly from AI backend
+      const aiResponseText = data.reply || data.message || 'I apologize, but I encountered an error. Please try again.';
 
       // Add AI response to chat
       const assistantMessage: ChatMessage = {
@@ -958,7 +908,7 @@ const StartChatting = () => {
 
       setChatMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Error sending message to n8n:', error);
+      console.error('Error sending message to backend:', error);
 
       // Add error message
       const errorMessage: ChatMessage = {
@@ -974,6 +924,18 @@ const StartChatting = () => {
       setIsLoading(false);
     }
   };
+
+  // [NEW] Handle message from landing page
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get('q');
+    if (query) {
+      // Clear the search params and keep current path
+      navigate(location.pathname, { replace: true });
+      // Send the message
+      handleSendMessage(query);
+    }
+  }, [location.search, location.pathname, navigate, handleSendMessage]);
 
   // Generate or retrieve session ID for conversation tracking
   const getSessionId = () => {
@@ -991,6 +953,24 @@ const StartChatting = () => {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [chatMessages]);
+
+  // Keep native wheel scrolling reliable inside chat panel when Lenis is enabled globally.
+  useEffect(() => {
+    const scrollContainer = chatContainerRef.current;
+    if (!scrollContainer) return;
+
+    scrollContainer.setAttribute('data-lenis-prevent', 'true');
+
+    const preventLenisWheel = (event: WheelEvent) => {
+      event.stopPropagation();
+    };
+
+    scrollContainer.addEventListener('wheel', preventLenisWheel, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener('wheel', preventLenisWheel);
+    };
+  }, []);
 
   const handleContactSubmit = () => {
     // console.log('Contact form submitted:', contactForm);
@@ -1012,222 +992,7 @@ const StartChatting = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0B1120] dark:text-gray-100 flex flex-col overflow-x-hidden font-grotesk">
-      {/* Header */}
-      <header className={`fixed top-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50 transition-all duration-300 ${isSidebarOpen ? 'left-[260px]' : 'left-[60px]'}`}>
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {/* Mobile Back Button */}
-            <button
-              onClick={() => navigate(-1)}
-              className="lg:hidden p-2 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </button>
-            {/* Main Text Logo */}
-            <img
-              src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
-              alt="FlashSpace Logo"
-              className="h-7 w-auto cursor-pointer dark:invert"
-              onClick={() => handleNavigation('/')}
-            />
-          </div>
-
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
-            {/* Solutions / Get Workspaces */}
-            <div className="relative group">
-              <button
-                className="flex items-center gap-1.5 text-sm font-bold text-[#164e4e] dark:text-white hover:text-[#D96832] transition-colors py-2"
-              >
-                Get Workspace
-                <ChevronDown className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300" />
-              </button>
-              {/* Dropdown */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[600px] bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-2xl shadow-2xl p-6 z-[200] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="bg-[#f8faf9] dark:bg-white/5 rounded-xl p-5 border border-border/50">
-                    <div
-                      className="flex items-center gap-2 mb-2 cursor-pointer hover:text-[#D96832] transition-colors"
-                      onClick={() => handleNavigation('/Solutions/on-demand')}
-                    >
-                      <Zap className="w-4 h-4 text-[#D96832]" />
-                      <h4 className="text-sm font-bold text-[#164e4e] dark:text-white">On-Demand</h4>
-                    </div>
-                    <p className="text-xs text-[#164e4e]/60 dark:text-gray-400 mb-4">Book by the hour or day</p>
-                    <div className="space-y-2">
-                      {[
-                        { label: 'Event Space', href: '/Solutions/eventspace' },
-                        { label: 'Day Offices', href: '/Solutions/day-office' },
-                      ].map(item => (
-                        <button
-                          key={item.href}
-                          onClick={() => handleNavigation(item.href)}
-                          className="w-full flex items-center justify-between text-sm px-4 py-3 bg-white dark:bg-gray-800 rounded-lg hover:shadow-md transition-all text-[#164e4e] dark:text-white"
-                        >
-                          {item.label}
-                          <ArrowRight className="w-4 h-4 opacity-40" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    {[
-                      { icon: Building2, title: 'Virtual Office', desc: 'Business address & mail', href: '/Solutions/virtual-office' },
-                      { icon: Users, title: 'Coworking Space', desc: 'Flexible desk solutions', href: '/Solutions/coworking-space' },
-                      { icon: FileText, title: 'Business Setup', desc: 'GST & registration support', href: '/Solutions/business-setup' },
-                    ].map(({ icon: Icon, title, desc, href }) => (
-                      <button
-                        key={title}
-                        onClick={() => handleNavigation(href)}
-                        className="w-full text-left p-3 rounded-xl hover:bg-[#D96832]/5 group/item transition-colors"
-                      >
-                        <div className="flex items-start gap-3">
-                          <Icon className="w-5 h-5 text-[#D96832] mt-0.5" />
-                          <div>
-                            <h5 className="text-sm font-bold text-[#164e4e] dark:text-white group-hover/item:text-[#D96832] transition-colors">{title}</h5>
-                            <p className="text-xs text-[#164e4e]/60 dark:text-gray-400">{desc}</p>
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Partner with Us */}
-            <button
-              onClick={() => handleNavigation('/partner')}
-              className="text-sm font-bold text-[#164e4e] dark:text-white hover:text-[#D96832] transition-colors"
-            >
-              Partner with Us
-            </button>
-
-            {/* About Us */}
-            <button
-              onClick={() => handleNavigation('/about')}
-              className="text-sm font-bold text-[#164e4e] dark:text-white hover:text-[#D96832] transition-colors"
-            >
-              About Us
-            </button>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            {/* Country Selector */}
-            <div ref={countryRef} className="hidden xl:block relative">
-              <button
-                className="flex items-center px-3 py-2 rounded-full border border-gray-200 dark:border-white/10 text-[#164e4e] dark:text-white gap-2 bg-white dark:bg-black/50 hover:bg-white dark:hover:bg-white/10 transition-all"
-                onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
-              >
-                <img src={selectedCountry.flag} alt={selectedCountry.code} className="h-5 w-5 rounded-full object-cover" />
-                <span className="text-sm font-medium">{selectedCountry.code}</span>
-                <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", countryDropdownOpen && "rotate-180")} />
-              </button>
-              {countryDropdownOpen && (
-                <ul className="absolute right-0 top-full mt-2 bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-xl shadow-2xl py-2 z-50 min-w-[120px]">
-                  {countries.map((country) => (
-                    <button
-                      key={country.code}
-                      className="flex items-center w-full px-4 py-2 hover:bg-black/5 dark:hover:bg-white/5 gap-3 text-sm text-[#164e4e] dark:text-gray-200 transition-colors"
-                      onClick={() => { setSelectedCountry(country); setCountryDropdownOpen(false); }}
-                    >
-                      <img src={country.flag} alt={country.code} className="h-4 w-4 rounded-full" />
-                      <span>{country.code}</span>
-                    </button>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            {/* Log in Button or User Profile */}
-            {isAuthenticated ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-2 group"
-                >
-                  {/* User Avatar */}
-                  <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#164e4e] text-white flex items-center justify-center font-bold text-sm shadow-sm group-hover:shadow-md transition-all">
-                    {user?.fullName?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                  <ChevronDown className={cn("w-4 h-4 text-[#164e4e]/60 transition-transform", isUserMenuOpen && "rotate-180")} />
-                </button>
-
-                {/* Dropdown Menu */}
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-[#0a0a0a] border border-border dark:border-white/10 rounded-2xl shadow-2xl py-3 z-50 overflow-hidden">
-                    {/* User Info Header */}
-                    <div className="px-5 py-3 border-b border-border/50 dark:border-white/10 mb-2">
-                      <p className="text-sm font-bold text-[#164e4e] dark:text-white truncate">
-                        {user?.fullName}
-                      </p>
-                      <p className="text-xs text-[#164e4e]/60 dark:text-gray-400 truncate">
-                        {user?.email}
-                      </p>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div className="px-2 space-y-1">
-                      <button
-                        onClick={() => {
-                          handleNavigation("/dashboard");
-                          setIsUserMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#164e4e] dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
-                      >
-                        <LayoutDashboard className="w-4 h-4" />
-                        Dashboard
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          handleNavigation("/settings");
-                          setIsUserMenuOpen(false);
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-[#164e4e] dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors"
-                      >
-                        <Settings className="w-4 h-4" />
-                        Settings
-                      </button>
-
-                      <hr className="my-2 border-border/50 dark:border-white/10" />
-
-                      <button
-                        onClick={async () => {
-                          await logout();
-                          setIsUserMenuOpen(false);
-                          handleNavigation("/");
-                        }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsLoginOpen(true)}
-                className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all mr-2"
-              >
-                Sign in
-              </button>
-            )}
-
-            {/* Get in Touch Button */}
-            <div
-              onClick={() => setIsContactModalOpen(true)}
-              className="inline-flex group px-6 py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
-            >
-              <span className="relative">
-                Get in Touch
-              </span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header openLogin={isLoginOpen} openSignup={isSignupOpen} />
 
       {showUpdates && (
         <div
@@ -1254,7 +1019,7 @@ const StartChatting = () => {
       )}
       {/* Mini Sidebar — visible when full sidebar is collapsed */}
       {!isSidebarOpen && (
-        <div className="fixed top-0 left-0 h-screen w-[60px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[60] flex flex-col items-center pt-4 gap-4">
+        <div className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-[60px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[60] flex flex-col items-center pt-4 gap-4">
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -1277,7 +1042,7 @@ const StartChatting = () => {
       {/* Fixed Left Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ width: '260px' }}
       >
         {/* New Chat + Collapse button row */}
@@ -1293,7 +1058,7 @@ const StartChatting = () => {
         </div>
 
         {/* Main Nav */}
-        <nav className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5">
           <button
             onClick={handleNewChat}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
@@ -1361,12 +1126,12 @@ const StartChatting = () => {
                         setChatMessages(session.messages);
                         setActiveChatId(sessionKey);
                       }}
-                      className={`flex-1 text-left px-3 py-2 text-sm font-${isActive ? 'semibold' : 'normal'}`}
+                      className={`flex-1 text-left px-3 py-2 text-sm min-w-0 font-${isActive ? 'semibold' : 'normal'}`}
                       style={{ color: isActive ? 'white' : '#677e73' }}
                       title={session.title}
                     >
-                      <div className="truncate">{session.title}</div>
-                      <div className="text-[10px] mt-0.5" style={{ opacity: isActive ? 0.7 : 0.55 }}>{session.date}</div>
+                      <div className="truncate w-full">{session.title}</div>
+                      <div className="text-[10px] mt-0.5 truncate" style={{ opacity: isActive ? 0.7 : 0.55 }}>{session.date}</div>
                     </button>
 
                     <button
@@ -1413,8 +1178,9 @@ const StartChatting = () => {
             {/* Chat Content */}
             <div
               ref={chatContainerRef}
-              className="flex-1 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth"
+              className="chat-container custom-scrollbar flex-1 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth"
               style={{ height: '100%' }}
+              data-lenis-prevent
               tabIndex={0}
               role="region"
               aria-label="Chat messages"
@@ -1562,7 +1328,7 @@ const StartChatting = () => {
                     <Mic className={`w-5 h-5 ${isListening ? 'fill-current' : ''}`} />
                   </button>
                   <button
-                    onClick={handleSendMessage}
+                    onClick={() => handleSendMessage()}
                     className="p-3 bg-[#35503F] text-white rounded-xl shadow-sm hover:bg-[#2d4435] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!message.trim() || isLoading}
                   >
@@ -1611,28 +1377,6 @@ const StartChatting = () => {
           </div>
         </div>
       )}
-      {/* Auth Modals */}
-      <LoginModal
-        isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}
-        onSignupClick={() => {
-          setIsLoginOpen(false);
-          setIsSignupOpen(true);
-        }}
-        onLoginSuccess={() => setIsLoginOpen(false)}
-      />
-      <SignupModal
-        isOpen={isSignupOpen}
-        onClose={() => setIsSignupOpen(false)}
-        onLoginClick={() => {
-          setIsSignupOpen(false);
-          setIsLoginOpen(true);
-        }}
-      />
-      <ContactModal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-      />
     </div>
   );
 };

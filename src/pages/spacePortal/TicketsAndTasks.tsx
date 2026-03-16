@@ -1,295 +1,367 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  Search,
-  Send,
-  Headphones,
-  MessageSquare,
-  Bot,
-} from 'lucide-react';
-import partnerTicketService, { PartnerTicketData } from '@/services/spacePortal/partnerTicket.service';
-import { useAuth } from '@/contexts/AuthContext';
-import { useSocket } from '@/contexts/SocketContext';
-import { format } from 'date-fns';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import { Plus, Clock, CheckCircle, AlertCircle, Eye, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import partnerTicketService, {
+  PartnerTicketData,
+} from "@/services/spacePortal/partnerTicket.service";
+import { fetchPartnerActiveRequests } from "@/services/spacePortal/spacePartner.service";
+import { format } from "date-fns";
+import { toast } from "@/hooks/use-toast";
 
-export default function TicketsAndTasksPage() {
-  const { user } = useAuth();
-  const { socket } = useSocket();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTicketId, setActiveTicketId] = useState<string | null>(null);
+const getPriorityBadge = (priority: string) => {
+  const p = (priority || "low").toLowerCase();
+  switch (p) {
+    case "high":
+    case "urgent":
+      return <Badge variant="destructive">High</Badge>;
+    case "medium":
+      return (
+        <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-yellow-200">
+          Medium
+        </Badge>
+      );
+    case "low":
+    default:
+      return (
+        <Badge
+          variant="secondary"
+          className="bg-slate-100 text-slate-600 border-slate-200"
+        >
+          Low
+        </Badge>
+      );
+  }
+};
+
+const getStatusBadge = (status: string) => {
+  const s = (status || "open").toLowerCase();
+  switch (s) {
+    case "open":
+    case "pending":
+      return (
+        <Badge variant="outline" className="text-red-600 border-red-200">
+          <AlertCircle className="w-3 h-3 mr-1" />
+          Pending
+        </Badge>
+      );
+    case "in_progress":
+    case "escalated":
+      return (
+        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200">
+          <Clock className="w-3 h-3 mr-1" />
+          In Progress
+        </Badge>
+      );
+    case "resolved":
+    case "completed":
+    case "closed":
+    case "accepted":
+      return (
+        <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
+          <CheckCircle className="w-3 h-3 mr-1" />
+          Completed
+        </Badge>
+      );
+    default:
+      return <Badge variant="outline">{status}</Badge>;
+  }
+};
+
+export default function TicketsAndTasks() {
   const [tickets, setTickets] = useState<PartnerTicketData[]>([]);
+  const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [messageInput, setMessageInput] = useState('');
-  const [takenOverTickets, setTakenOverTickets] = useState<Set<string>>(new Set());
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const activeTicket = tickets.find(t => t._id === activeTicketId);
-
-  // Partner has "taken over" if they clicked Take Over OR if there's already a partner message
-  const hasTakenOver = activeTicketId ? (
-    takenOverTickets.has(activeTicketId) ||
-    (activeTicket?.messages?.some(m => m.sender === 'partner') ?? false)
-  ) : false;
-
-  const fetchTickets = async () => {
+  const loadData = async () => {
+    setLoading(true);
     try {
-      const response = await partnerTicketService.getPartnerTickets(1, 100);
-      if (response.success && response.data) {
-        setTickets(response.data.tickets);
-        if (!activeTicketId && response.data.tickets.length > 0) {
-          setActiveTicketId(response.data.tickets[0]._id);
-        }
+      // Load Tickets
+      const ticketRes = await partnerTicketService.getPartnerTickets(1, 100);
+      if (ticketRes.success && ticketRes.data) {
+        setTickets(ticketRes.data.tickets);
+      }
+
+      // Load Tasks (Active Requests)
+      const taskRes: any = await fetchPartnerActiveRequests();
+      if (taskRes?.success) {
+        setTasks(taskRes.data);
       }
     } catch (error) {
-      console.error("Failed to fetch tickets", error);
+      console.error("Failed to fetch data", error);
+      toast({
+        title: "Error",
+        description: "Failed to load tickets and tasks",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTickets();
+    loadData();
   }, []);
 
-  // Socket Listener
-  useEffect(() => {
-    if (!socket) return;
-
-    if (activeTicketId) {
-      socket.emit('join_ticket', activeTicketId);
-    }
-
-    const handleNewMessage = (data: { ticketId: string, message: any }) => {
-      setTickets(prev => prev.map(t => {
-        if (t._id === data.ticketId) {
-          const exists = t.messages.some(m =>
-            new Date(m.createdAt).getTime() === new Date(data.message.createdAt).getTime() &&
-            m.message === data.message.message
-          );
-          if (exists) return t;
-
-          return {
-            ...t,
-            messages: [...t.messages, data.message],
-            updatedAt: new Date().toISOString()
-          };
-        }
-        return t;
-      }));
-
-      if (activeTicketId === data.ticketId) {
-        scrollToBottom();
-      }
-    };
-
-    const handleTicketUpdated = (data: { ticketId: string, ticket: any }) => {
-      setTickets(prev => prev.map(t => t._id === data.ticketId ? data.ticket : t));
-    };
-
-     const handlePartnerNewTicket = (data: { ticket: any }) => {
-      // Check if this ticket belongs to us (it will appear in our list if it does)
-      toast.success(`New query from a client: "${data.ticket?.subject || 'New Query'}"`, {
-        icon: '🔔',
-        duration: 5000,
-      });
-      // Refresh the ticket list to show the new ticket
-      fetchTickets();
-    };
-
-    socket.on('new_message', handleNewMessage);
-    socket.on('ticket_updated', handleTicketUpdated);
-    socket.on('partner_new_ticket', handlePartnerNewTicket);
-
-    return () => {
-      socket.off('new_message', handleNewMessage);
-      socket.off('ticket_updated', handleTicketUpdated);
-      socket.off('partner_new_ticket', handlePartnerNewTicket);
-    };
-  }, [socket, activeTicketId]);
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [activeTicketId, activeTicket?.messages]);
-
-  const handleTakeOver = async () => {
-    if (!activeTicketId) return;
-    const takeoverMessage = "Hi! I'm the space partner. I'll help you with your query.";
-    try {
-      await partnerTicketService.replyToTicket(activeTicketId, takeoverMessage);
-      setTakenOverTickets(prev => new Set(prev).add(activeTicketId));
-      toast.success("You have taken over the chat");
-    } catch (error) {
-      console.error("Failed to take over", error);
-      toast.error("Failed to take over chat");
-    }
-  };
-
-  const handleSendMessage = async () => {
-    if (!activeTicketId || !messageInput.trim()) return;
-    try {
-      await partnerTicketService.replyToTicket(activeTicketId, messageInput);
-      setMessageInput('');
-    } catch (error) {
-      console.error("Failed to send message", error);
-      toast.error("Failed to send message");
-    }
-  };
-
-  const handleResolve = async () => {
-    if (!activeTicketId) return;
-    try {
-      await partnerTicketService.closeTicket(activeTicketId);
-      toast.success("Query closed");
-    } catch (error) {
-      console.error("Failed to close", error);
-      toast.error("Failed to close query");
-    }
-  };
-
-  // Filter tickets based on search
-  const filteredTickets = tickets.filter(t =>
-    t.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.ticketNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.bookingId?.spaceSnapshot?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open': return 'bg-red-50 text-red-600 border-red-100';
-      case 'in_progress': return 'bg-blue-50 text-blue-600 border-blue-100';
-      case 'escalated': return 'bg-orange-50 text-orange-600 border-orange-100';
-      case 'resolved': return 'bg-green-50 text-green-600 border-green-100';
-      case 'closed': return 'bg-gray-50 text-gray-500 border-gray-100';
-      default: return 'bg-gray-50 text-gray-500 border-gray-100';
-    }
-  };
-
-  // Sort tickets: Open/In Progress first, then by date
-  filteredTickets.sort((a, b) => {
-    const score = (status: string) => {
-      if (status === 'open') return 3;
-      if (status === 'in_progress') return 2;
-      if (status === 'escalated') return 2;
-      return 0;
-    };
-    const scoreDiff = score(b.status) - score(a.status);
-    if (scoreDiff !== 0) return scoreDiff;
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
-
   if (loading) {
-    return <div className="p-12 text-center text-gray-500">Loading queries...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-transparent p-8 space-y-8 font-sans animate-in fade-in duration-500 pb-12">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-          Client <span className="text-teal-500 italic">Queries</span>
-        </h1>
-        <p className="text-gray-500 mt-2 text-lg font-light">
-          Manage queries from users who booked your listings
-        </p>
+    <div className="animate-in fade-in duration-500">
+      {/* Header section with same color as workspace */}
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl">
+            Tickets & <span className="text-primary italic">Tasks</span>
+          </h1>
+          <p className="text-[#164e4e]/70 dark:text-gray-400 mt-1">
+            Manage your support tickets and daily team tasks
+          </p>
+        </div>
+        <Button
+          onClick={() =>
+            toast({
+              title: "Coming Soon",
+              description: "This feature will be available shortly.",
+            })
+          }
+          className="bg-[#2D3F33] hover:bg-[#2D3F33]/90 text-[#FDE68A] font-bold rounded-xl shadow-lg transition-all active:scale-95 px-6"
+        >
+          <Plus className="w-5 h-5 mr-1" />
+          Create Task
+        </Button>
       </div>
 
-      {tickets.length === 0 && !loading ? (
-        <div className="bg-white rounded-[24px] border border-gray-100 p-16 text-center shadow-sm">
-          <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-gray-600 mb-2">No queries yet</h3>
-          <p className="text-gray-400">When users raise queries about your listings, they'll appear here.</p>
+      {/* Stats Section with matching border-radius and shadows */}
+      <div className="grid gap-5 sm:grid-cols-4 mb-10">
+        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
+          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
+            {
+              tickets.filter((t) => (t.status || "").toLowerCase() === "open")
+                .length
+            }
+          </p>
+          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
+            Open Tickets
+          </p>
         </div>
-      ) : (
-        /* Chat Interface */
-        <div className="flex flex-col lg:flex-row gap-6 h-[700px]">
-          {/* Chat List */}
-          <div className="w-full lg:w-1/3 bg-white rounded-[24px] border border-gray-100 flex flex-col shadow-sm">
-            <div className="p-6 border-b border-gray-100">
-              <div className="relative">
-                <Search className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search queries..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-100 transition-all text-sm"
-                />
-              </div>
+        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
+          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
+            {
+              tickets.filter((t) =>
+                ["in_progress", "escalated"].includes(
+                  (t.status || "").toLowerCase(),
+                ),
+              ).length
+            }
+          </p>
+          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
+            In Progress
+          </p>
+        </div>
+        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
+          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
+            {tasks.length}
+          </p>
+          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
+            Pending Tasks
+          </p>
+        </div>
+        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
+          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
+            4.2 hrs
+          </p>
+          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
+            Avg Response
+          </p>
+        </div>
+      </div>
+
+      <Tabs defaultValue="tickets" className="space-y-6">
+        <TabsList className="bg-[#2D3F33]/10 dark:bg-white/5 p-1 rounded-xl w-fit">
+          <TabsTrigger
+            value="tickets"
+            className="rounded-lg px-6 py-2 font-bold data-[state=active]:bg-[#2D3F33] data-[state=active]:text-[#FDE68A] data-[state=active]:shadow-sm transition-all"
+          >
+            Client Tickets
+          </TabsTrigger>
+          <TabsTrigger
+            value="tasks"
+            className="rounded-lg px-6 py-2 font-bold data-[state=active]:bg-[#2D3F33] data-[state=active]:text-[#FDE68A] data-[state=active]:shadow-sm transition-all"
+          >
+            Team Tasks
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent
+          value="tickets"
+          className="animate-in fade-in slide-in-from-bottom-2 duration-300"
+        >
+          <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-[#fafafa] dark:bg-white/5 border-b border-[#2D3F33]/5 dark:border-white/10">
+                  <tr>
+                    <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
+                      Ticket
+                    </th>
+                    <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
+                      Client
+                    </th>
+                    <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
+                      Priority
+                    </th>
+                    <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
+                      Assignee
+                    </th>
+                    <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
+                      Date
+                    </th>
+                    <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
+                      Status
+                    </th>
+                    <th className="text-right p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#2D3F33]/5 dark:divide-white/10">
+                  {tickets.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={7}
+                        className="p-12 text-center text-[#164e4e]/50 dark:text-gray-500 italic"
+                      >
+                        No support tickets found
+                      </td>
+                    </tr>
+                  ) : (
+                    tickets.map((ticket) => (
+                      <tr
+                        key={ticket._id}
+                        className="hover:bg-[#fcfcfc] dark:hover:bg-white/5 transition-colors"
+                      >
+                        <td className="p-5">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-[#164e4e]/50 dark:text-gray-500 font-bold mb-1">
+                              #{ticket.ticketNumber}
+                            </span>
+                            <p className="text-sm font-bold text-[#164e4e] dark:text-white truncate max-w-[200px]">
+                              {ticket.subject}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="p-5 text-sm text-[#164e4e]/80 dark:text-gray-300 font-medium">
+                          {ticket.user?.fullName}
+                        </td>
+                        <td className="p-5">
+                          {getPriorityBadge(ticket.priority)}
+                        </td>
+                        <td className="p-5">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-8 h-8 border border-[#2D3F33]/10">
+                              <AvatarFallback className="text-[10px] bg-[#2D3F33]/10 text-[#2D3F33] dark:text-[#FDE68A] font-bold uppercase">
+                                {ticket.user?.fullName
+                                  ?.split(" ")
+                                  .map((n) => n[0])
+                                  .join("") || "U"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-xs text-[#164e4e]/70 dark:text-gray-400 font-semibold">
+                              Partner
+                            </span>
+                          </div>
+                        </td>
+                        <td className="p-5 text-sm text-[#164e4e]/70 dark:text-gray-400 font-medium">
+                          {format(new Date(ticket.createdAt), "MMM d, yyyy")}
+                        </td>
+                        <td className="p-5">{getStatusBadge(ticket.status)}</td>
+                        <td className="p-5 text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="rounded-xl text-[#2D3F33] dark:text-[#FDE68A] hover:bg-[#2D3F33]/5 dark:hover:bg-white/5"
+                          >
+                            <Eye className="w-5 h-5" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-            <div className="flex-1 overflow-y-auto p-4 space-y-2">
-              {filteredTickets.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">No matching queries</div>
-              ) : (
-                filteredTickets.map((ticket) => (
-                  <div
-                    key={ticket._id}
-                    onClick={() => setActiveTicketId(ticket._id)}
-                    className={`p-4 rounded-xl cursor-pointer transition-all ${activeTicketId === ticket._id
-                      ? 'bg-teal-50 border border-teal-100 shadow-sm'
-                      : 'hover:bg-gray-50 border border-transparent'
-                      }`}
-                  >
-                    <div className="flex justify-between items-start mb-1">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold bg-gray-100 text-gray-600`}>
-                          {ticket.user?.fullName?.substring(0, 2).toUpperCase() || 'US'}
-                        </div>
-                        <div className="overflow-hidden">
-                          <h4 className={`text-sm font-bold truncate ${activeTicketId === ticket._id ? 'text-teal-900' : 'text-gray-900'}`}>
-                            {ticket.user?.fullName || 'Unknown User'}
-                          </h4>
-                          <p className={`text-xs truncate max-w-[140px] mt-0.5 ${activeTicketId === ticket._id ? 'text-teal-600' : 'text-gray-500'}`}>
-                            {ticket.subject}
+          </div>
+        </TabsContent>
+
+        <TabsContent
+          value="tasks"
+          className="animate-in fade-in slide-in-from-bottom-2 duration-300"
+        >
+          <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+            {tasks.length === 0 ? (
+              <div className="col-span-full py-20 text-center bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl">
+                <p className="text-[#164e4e]/50 dark:text-gray-500 italic">
+                  No pending tasks or requests
+                </p>
+              </div>
+            ) : (
+              tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 flex flex-col gap-5 shadow-sm hover:shadow-md transition-all group"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-[#2D3F33]/5 dark:bg-white/5 flex items-center justify-center text-[#2D3F33] dark:text-[#FDE68A] group-hover:bg-[#2D3F33] group-hover:text-[#FDE68A] transition-colors">
+                        <Clock className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-[#164e4e] dark:text-white leading-tight mb-1">
+                          {task.space || "Space Booking Request"}
+                        </h4>
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100 text-[8px] font-bold text-slate-600">
+                            {task.user?.avatar || "U"}
+                          </div>
+                          <p className="text-xs text-[#164e4e]/60 dark:text-gray-400 font-bold">
+                            Requested by: {task.user?.name || "Client"}
                           </p>
                         </div>
                       </div>
-                      <span className="text-[10px] text-gray-400 font-medium ml-2 shrink-0">
-                        {format(new Date(ticket.updatedAt || ticket.createdAt), 'h:mm a')}
-                      </span>
                     </div>
-                    {/* Booking badge */}
-                    {ticket.bookingId?.spaceSnapshot?.name && (
-                      <p className="text-[10px] text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full w-fit mt-1 ml-[52px] font-medium truncate max-w-[180px]">
-                        {ticket.bookingId.spaceSnapshot.name}
-                      </p>
-                    )}
-                    <div className="flex justify-between items-center mt-2 pl-[52px]">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border ${getStatusColor(ticket.status)}`}>
-                        {ticket.status.replace('_', ' ')}
-                      </span>
-                    </div>
+                    {getStatusBadge(task.status)}
                   </div>
-                ))
-              )}
-            </div>
-          </div>
 
-          {/* Chat Window */}
-          <div className="w-full lg:w-2/3 bg-white rounded-[24px] border border-gray-100 flex flex-col shadow-sm overflow-hidden">
-            {activeTicket ? (
-              <>
-                {/* Header */}
-                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold bg-teal-100 text-teal-700`}>
-                      {activeTicket.user?.fullName?.substring(0, 2).toUpperCase() || 'US'}
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-bold text-gray-900">{activeTicket.user?.fullName || 'Unknown User'}</h2>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {activeTicket.ticketNumber}
-                        {activeTicket.bookingId?.spaceSnapshot?.name && (
-                          <span className="text-teal-600"> • {activeTicket.bookingId.spaceSnapshot.name}</span>
-                        )}
+                  <div className="flex items-center justify-between pt-4 border-t border-[#2D3F33]/5 dark:border-white/5">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-[#164e4e]/50 dark:text-gray-500 font-bold uppercase tracking-widest mb-1">
+                        Due Date
+                      </span>
+                      <p className="text-xs font-bold text-[#164e4e] dark:text-white">
+                        {task.date || "TBD"}
                       </p>
                     </div>
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        toast({
+                          title: "Coming Soon",
+                          description:
+                            "Reviewing requests for this space category will be enabled in the next update.",
+                        })
+                      }
+                      className="bg-[#2D3F33] hover:bg-[#2D3F33]/90 text-[#FDE68A] rounded-xl h-8 text-xs font-bold px-4"
+                    >
+                      Review Request
+                    </Button>
                   </div>
                   <div className="flex gap-3">
                     {activeTicket.status !== 'resolved' && activeTicket.status !== 'closed' && !hasTakenOver && (
@@ -435,8 +507,8 @@ export default function TicketsAndTasksPage() {
               </div>
             )}
           </div>
-        </div>
-      )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

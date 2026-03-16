@@ -28,8 +28,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { getVirtualOfficeById } from "@/services/virtualOffice.service";
+import { getCoworkingSpaceById } from "@/services/coworkingSpace.service";
 import { VirtualOfficeItem } from "@/types/services";
-import { getVirtualOfficePricing, PlanDetails } from "@/utils/priceUtils";
+import { getVirtualOfficePricing, parsePrice, PlanDetails } from "@/utils/priceUtils";
 import { BookingPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { useAuth } from "@/contexts/AuthContext";
 import hotToast from "react-hot-toast";
@@ -147,9 +148,6 @@ const BookingPage = () => {
         const type = searchParams.get("type");
 
         if (type === "coworking") {
-          const { getCoworkingSpaceById } =
-            await import("@/services/coworkingSpace.service");
-          const { parsePrice } = await import("@/utils/priceUtils");
           const data = await getCoworkingSpaceById(id);
           if (!data) {
             setError("Space not found");
@@ -252,7 +250,11 @@ const BookingPage = () => {
           // 2. Fallback: Search user holdings to find an active one for this space
           const response = await axiosInstance.get<any>("/seat-bookings/user");
           if (response.data?.success && response.data?.data) {
-            const activeBooking = response.data.data.find((b: any) => {
+            const bookings = Array.isArray(response.data.data)
+              ? response.data.data
+              : response.data.data.bookings || [];
+
+            const activeBooking = bookings.find((b: any) => {
               const matchId =
                 typeof b.space === "object" && b.space !== null
                   ? b.space._id === id
@@ -468,7 +470,7 @@ const BookingPage = () => {
     try {
       setPaymentLoading(true);
       const orderData = await createPaymentOrder({
-        userId: user.id,
+        userId: user.id || (user as any)._id,
         userEmail: user.email,
         userName: user.fullName || user.email.split("@")[0],
         userPhone: (user as any).phoneNumber,
@@ -620,7 +622,7 @@ const BookingPage = () => {
     try {
       setPaymentLoading(true);
       const orderData = await createPaymentOrder({
-        userId: user.id,
+        userId: user.id || (user as any)._id,
         userEmail: user.email,
         userName: user.fullName || user.email.split("@")[0],
         userPhone: (user as any).phoneNumber,

@@ -83,7 +83,7 @@ const Notifications: React.FC = () => {
     };
 
     return (
-        <div className="p-6 lg:p-10 bg-gray-50/50 min-h-full">
+        <div className="p-6 lg:p-10 bg-[#f7f7f6] min-h-full">
             <div className="max-w-[1200px] mx-auto space-y-6">
 
                 {/* Header */}
@@ -120,7 +120,7 @@ const Notifications: React.FC = () => {
                 </div>
 
                 {/* List Container */}
-                <div className="bg-white rounded-xl border border-gray-100 shadow-sm mt-4">
+                <div className="bg-[#f8f8f8] rounded-xl border border-gray-200 shadow mt-4">
 
                     {/* Action Bar */}
                     <div className="flex items-center justify-between py-1.5 px-3 border-b border-gray-100 bg-[#fcfcfc] rounded-t-xl">

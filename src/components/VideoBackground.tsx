@@ -78,7 +78,7 @@ const VideoBackground = () => {
       {imagesLoaded && (
         <>
           <div 
-            className={`absolute inset-0 transition-all duration-[2000ms] ease-in-out transform ${
+            className={`absolute inset-0 transition-all ease-in-out transform ${
               isVisible ? 'opacity-100 scale-100' : 'opacity-60 scale-[1.02]'
             }`}
             style={{
@@ -87,6 +87,7 @@ const VideoBackground = () => {
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
               filter: 'brightness(0.9) contrast(1.2) saturate(1.1)',
+              transitionDuration: '2000ms',
             }}
           />
           

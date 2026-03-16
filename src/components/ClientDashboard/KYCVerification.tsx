@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import userDashboardService, {
@@ -55,6 +55,8 @@ export default function KYCVerification() {
     searchParams.get("linkBookingId") || searchParams.get("bookingId");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pendingStepRef = useRef<VerificationStep | null>(null);
+  const pendingKycTypeRef = useRef<KYCType | null>(null);
   const [activeStep, setActiveStep] = useState<VerificationStep>("personal");
   const [kycType, setKycType] = useState<KYCType>("individual");
   const [kycData, setKycData] = useState<KYCData | null>(null);
@@ -103,7 +105,7 @@ export default function KYCVerification() {
   } | null>(null);
 
 
-  const fetchKYC = async () => {
+  const fetchKYC = async (preserveState = false) => {
     setLoading(true);
     setError(null);
     try {
@@ -212,7 +214,10 @@ export default function KYCVerification() {
             };
           });
 
-          if (data.kycType) {
+          if (pendingKycTypeRef.current) {
+            setKycType(pendingKycTypeRef.current);
+            pendingKycTypeRef.current = null;
+          } else if (!preserveState && data.kycType) {
             setKycType(data.kycType as KYCType);
           }
         } else {
@@ -294,11 +299,16 @@ export default function KYCVerification() {
   };
 
   useEffect(() => {
-    setActiveStep("personal");
+    if (pendingStepRef.current) {
+      setActiveStep(pendingStepRef.current);
+      pendingStepRef.current = null;
+    } else {
+      setActiveStep("personal");
+    }
     fetchKYC();
   }, [profileId]);
 
-  const handleSaveBusinessInfo = async () => {
+  const handleSaveBusinessInfo = async (): Promise<boolean> => {
     setSaving(true);
     try {
       // Intercept for New Partner Creation
@@ -343,7 +353,7 @@ export default function KYCVerification() {
         } else {
           setError(partnerResponse.message || "Failed to add partner");
           setSaving(false);
-          return;
+          return false;
         }
       }
 
@@ -367,15 +377,23 @@ export default function KYCVerification() {
         if (profileId === "new" && response.data._id) {
           // New profile created, redirect to it
           const newProfileId = response.data._id;
+          // Preserve kycType so tabs render correctly after reload
+          pendingKycTypeRef.current = kycType;
+          pendingStepRef.current = kycType === "business" ? "business" : "video";
           setProfileId(newProfileId);
           setSearchParams((params) => {
             params.set("profileId", newProfileId);
             return params;
           });
         }
+        // Refresh data to ensure server-side flags like isBusinessInfoSaved are true
+        fetchKYC(true);
+        return true;
       }
+      return false;
     } catch (err) {
       console.error("Failed to save business info", err);
+      return false;
     } finally {
       setSaving(false);
     }
@@ -392,7 +410,7 @@ export default function KYCVerification() {
         profileId,
       );
       if (response.success) {
-        fetchKYC();
+        fetchKYC(true);
       } else {
         alert(response.message || "Failed to delete document");
       }
@@ -401,6 +419,33 @@ export default function KYCVerification() {
       alert("Failed to delete document");
     } finally {
       setDeleting(null);
+    }
+  };
+
+  const handleDeleteProfile = async (targetProfileId: string, profileName: string) => {
+    if (!confirm(`Are you sure you want to delete the business profile "${profileName || "this profile"}"? This action cannot be undone.`)) return;
+
+    setLoading(true);
+    try {
+      const resp = await userDashboardService.deleteKYCProfile(targetProfileId);
+      if (resp.success) {
+        toast.success("Profile deleted successfully");
+        if (profileId === targetProfileId) {
+          setProfileId(null);
+          setSearchParams((params) => {
+            params.delete("profileId");
+            return params;
+          });
+        }
+        fetchKYC();
+      } else {
+        toast.error(resp.message || "Failed to delete profile");
+      }
+    } catch (err) {
+      console.error("Delete profile error:", err);
+      toast.error("An error occurred while deleting the profile");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -419,7 +464,7 @@ export default function KYCVerification() {
         profileId,
       );
       if (response.success) {
-        fetchKYC();
+        fetchKYC(true);
       } else {
         alert(response.message || "Failed to upload document");
       }
@@ -542,13 +587,7 @@ export default function KYCVerification() {
 
   const isBusinessInfoComplete = () => {
     if (kycType !== "business") return true;
-    return !!(
-      businessForm.companyName &&
-      businessForm.companyType &&
-      businessForm.industry &&
-      businessForm.gstNumber &&
-      businessForm.registeredAddress
-    );
+    return !!businessForm.companyName;
   };
 
   const isVideoKYCComplete = () => {
@@ -558,45 +597,48 @@ export default function KYCVerification() {
   // Check if data is saved to server (for navigation locking)
   const isPersonalInfoSaved = () => {
     return !!(
-      kycData?.personalInfo?.phone &&
-      kycData?.personalInfo?.dateOfBirth &&
-      kycData?.personalInfo?.aadhaarNumber &&
-      kycData?.personalInfo?.panNumber
+      (kycData?.personalInfo?.phone || personalForm.phone) &&
+      (kycData?.personalInfo?.dateOfBirth || personalForm.dateOfBirth) &&
+      (kycData?.personalInfo?.aadhaarNumber || personalForm.aadhaar) &&
+      (kycData?.personalInfo?.panNumber || personalForm.pan)
     );
   };
 
   const isBusinessInfoSaved = () => {
     if (kycType !== "business" || isPartnerMode) return true;
-    return !!(
-      kycData?.businessInfo?.companyName &&
-      kycData?.businessInfo?.companyType &&
-      kycData?.businessInfo?.industry &&
-      kycData?.businessInfo?.gstNumber &&
-      kycData?.businessInfo?.registeredAddress
-    );
+    return !!kycData?.businessInfo?.companyName;
   };
 
   const isStepAccessible = (step: VerificationStep) => {
     if (step === "personal") return true;
 
-    // Business tab - only accessible after personal info is saved
+    // Check if personal info is filled (form state OR saved on server)
+    const personalReady = isPersonalInfoSaved() || isPersonalInfoComplete();
+
+    // Business tab - accessible after personal info is filled
     if (step === "business") {
-      return isPersonalInfoSaved();
+      return personalReady;
     }
 
-    // Video KYC - accessible after business info is saved
+    // Check if business info is filled (form state OR saved on server)
+    const businessReady = isBusinessInfoSaved() || isBusinessInfoComplete();
+
+    // Video KYC - accessible after personal (individual) or business (business) is filled
     if (step === "video") {
-      return isPersonalInfoSaved() && isBusinessInfoSaved();
+      if (kycType === "business") return personalReady && businessReady;
+      return personalReady;
     }
 
-    // Documents - accessible after previous steps are saved
+    // Documents - accessible after previous steps are filled
     if (step === "documents") {
-      return isPersonalInfoSaved() && isBusinessInfoSaved();
+      if (kycType === "business") return personalReady && businessReady && isVideoKYCComplete();
+      return personalReady && isVideoKYCComplete();
     }
 
-    // Review - accessible after all previous steps including documents
+    // Review - accessible after all previous steps
     if (step === "review") {
-      return isPersonalInfoSaved() && isBusinessInfoSaved();
+      if (kycType === "business") return personalReady && businessReady && isVideoKYCComplete();
+      return personalReady && isVideoKYCComplete();
     }
 
     return false;
@@ -753,7 +795,7 @@ export default function KYCVerification() {
           <p className="text-gray-700 font-medium mb-2">{error}</p>
           <div className="flex gap-2 justify-center">
             <button
-              onClick={fetchKYC}
+              onClick={() => fetchKYC()}
               className="px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2"
             >
               <RefreshCw className="w-4 h-4" /> Try Again
@@ -1013,15 +1055,27 @@ export default function KYCVerification() {
                           <span className="font-medium text-gray-900">{biz.businessInfo?.companyType || "-"}</span>
                         </div>
                       </div>
-                      <button
-                        onClick={() => {
-                          setProfileId(biz._id || null);
-                          setSearchParams({ profileId: biz._id || "" });
-                        }}
-                        className="w-full py-2 bg-gray-50 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
-                      >
-                        View Details
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setProfileId(biz._id || null);
+                            setSearchParams({ profileId: biz._id || "" });
+                          }}
+                          className="flex-1 py-2 bg-gray-50 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                          View Details
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteProfile(biz._id!, biz.businessInfo?.companyName || "this profile");
+                          }}
+                          className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors border border-red-100"
+                          title="Delete Profile"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1118,7 +1172,7 @@ export default function KYCVerification() {
             </div>
           )}
 
-          {profileId !== "new" && (
+          {(
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2">
               <div className="flex gap-1">
                 {steps.map((step) => {
@@ -1156,33 +1210,8 @@ export default function KYCVerification() {
             </div>
           )}
 
-          {profileId === "new" && !isPartnerMode ? (
-            <div className="space-y-6 text-center py-8">
-              <div className="max-w-md mx-auto space-y-4">
-                <h2 className="text-xl font-bold ">
-                  Start New Verification
-                </h2>
-                <p className="text-gray-500">
-                  Provide a name for this profile and select the type to
-                  begin.
-                </p>
-                <button
-                  onClick={handleSaveBusinessInfo}
-                  disabled={saving || !businessForm.profileName}
-                  className="w-full py-3 bg-[#35503F] text-[#FEF8C3] rounded-lg font-bold hover:bg-[#35503F]/90 transition-colors disabled:opacity-50"
-                >
-                  {saving ? (
-                    <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-                  ) : (
-                    "Begin Verification"
-                  )}
-                </button>
-              </div>
-            </div>
-          ) : null}
-
-          {/* Display Forms if Profile ID is set OR (Profile ID is New AND Is Partner Mode) */}
-          {(profileId !== "new" || isPartnerMode) && (
+          {/* Display Forms */}
+          {(profileId !== "new" || isPartnerMode || kycType === "business" || kycType === "individual") && (
             <>
               {activeStep === "personal" && (
                 <div className="space-y-6">
@@ -1341,12 +1370,9 @@ export default function KYCVerification() {
                   <div className="mt-6 flex justify-end">
                     <button
                       onClick={async () => {
-                        await handleSaveBusinessInfo();
-                        // Navigate based on profile type
-                        if (kycType === "business") {
-                          setActiveStep("business");
-                        } else {
-                          setActiveStep("video"); // Everyone goes to video now
+                        const success = await handleSaveBusinessInfo();
+                        if (success && profileId !== "new") {
+                          setActiveStep(kycType === "business" ? "business" : "video");
                         }
                       }}
                       disabled={
@@ -1569,8 +1595,10 @@ export default function KYCVerification() {
                   <div className="mt-6 flex justify-end">
                     <button
                       onClick={async () => {
-                        await handleSaveBusinessInfo();
-                        setActiveStep(isPartnerMode ? "documents" : "video");
+                        const success = await handleSaveBusinessInfo();
+                        if (success) {
+                          setActiveStep(isPartnerMode ? "documents" : "video");
+                        }
                       }}
                       disabled={
                         saving ||
@@ -1908,7 +1936,8 @@ export default function KYCVerification() {
                   <div className="mt-6 flex justify-end">
                     <button
                       onClick={() => setActiveStep("review")}
-                      className="px-6 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2"
+                      disabled={!areAllRequiredDocsUploaded()}
+                      className="px-6 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg font-medium hover:bg-[#35503F]/90 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Proceed to Review <ChevronRight className="w-4 h-4" />
                     </button>

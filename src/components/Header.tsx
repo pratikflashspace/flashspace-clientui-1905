@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, ReactNode } from "react";
+import { useState, useEffect, useRef, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -107,29 +107,29 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         <>
             <header
                 className={cn(
-                    "fixed top-0 w-full z-[100] transition-all duration-300 bg-white dark:bg-[#0a0a0a] border-b border-border dark:border-white/10 shadow-sm py-2"
+                    "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 bg-white dark:bg-[#0a0a0a] border-b border-border dark:border-white/10 shadow-sm py-2"
                 )}
                 style={{ fontFamily: "'Inter Tight', sans-serif", fontWeight: 500 }}
             >
-                <div className="w-full px-4 md:px-10">
-                    <div className="flex items-center justify-between h-14 md:h-16">
+                <div className="w-full px-3 md:px-10">
+                    <div className="flex items-center justify-between h-14 md:h-20">
                         {/* LEFT: Hamburger + Logo */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 md:gap-4">
                             <button
                                 onClick={() => setIsMenuOpen(true)}
-                                className="p-2 -ml-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 rounded-lg"
+                                className="p-1.5 md:p-2 -ml-1 md:-ml-2 text-foreground hover:bg-black/5 dark:hover:bg-white/5 rounded-lg"
                                 aria-label="Open menu"
                             >
-                                <Menu className="w-6 h-6 dark:text-white" />
+                                <Menu className="w-5 h-5 md:w-6 md:h-6 dark:text-white" />
                             </button>
                             <div
-                                className="cursor-pointer"
+                                className="cursor-pointer flex items-center"
                                 onClick={() => handleNavigation("/")}
                             >
                                 <img
                                     src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
                                     alt="FlashSpace Logo"
-                                    className="h-5 md:h-8 w-auto dark:invert"
+                                    className="h-6 md:h-9 w-auto dark:invert"
                                 />
                             </div>
                         </div>
@@ -141,7 +141,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 <button
                                     onMouseEnter={() => setIsSolutionsOpen(true)}
                                     className={cn(
-                                        "flex items-center gap-1.5 text-sm font-medium transition-colors py-2",
+                                        "flex items-center gap-1.5 text-sm font-medium transition-all duration-300 py-2 px-4 rounded-xl hover:bg-black/10 dark:hover:bg-white/5 hover:shadow-[0_8px_30px_rgba(51,77,61,0.12)]",
                                         scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white",
                                         "hover:text-[#2D3F33] dark:hover:text-[#FDE68A]"
                                     )}
@@ -159,7 +159,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 >
                                     {[
                                         { title: "Virtual Office", href: "/solutions/virtual-office" },
-                                        { title: "Coworking Space", href: "/solutions/coworking-space" },
+                                        { title: "Coworking Space", href: "/services/coworking-space" },
                                         { title: "Business Setup", href: "/solutions/business-setup" },
                                     ].map((item) => (
                                         <button
@@ -197,7 +197,16 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                         </nav>
 
                         {/* RIGHT: Actions */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <div
+                                onClick={() => setIsContactOpen(true)}
+                                className="inline-flex group px-4 sm:px-6 py-2 sm:py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-xs sm:text-sm font-medium rounded-xl sm:rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
+                            >
+                                <span className="relative">
+                                    Get in Touch
+                                </span>
+                            </div>
+
                             {/* User Authentication */}
                             {isAuthenticated ? (
                                 <div ref={userMenuRef} className="relative">
@@ -234,22 +243,12 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 </div>
                             ) : (
                                 <button
-                                    onClick={() => setIsLoginOpen(true)}
-                                    className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all mr-2"
+                                   onClick={() => navigate('/login')}
+                                    className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all"
                                 >
                                     Sign in
                                 </button>
                             )}
-
-                            <div
-                                onClick={() => setIsContactOpen(true)}
-                                className="inline-flex group px-6 py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
-
-                            >
-                                <span className="relative">
-                                    Get in Touch
-                                </span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -257,12 +256,26 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 <SidebarMenu
                     isOpen={isMenuOpen}
                     onClose={() => setIsMenuOpen(false)}
-                    onOpenLogin={() => setIsLoginOpen(true)}
+                    onOpenLogin={() => navigate('/login')}
+                    onOpenContact={() => setIsContactOpen(true)}
                 />
             </header>
 
-            <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
-            <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} initialRole={signupRole} />
+            <LoginModal
+                isOpen={isLoginOpen}
+                onClose={() => navigate('/')}
+                onSignupClick={() => {
+                    navigate('/signup');
+                }}
+            />
+            <SignupModal
+                isOpen={isSignupOpen}
+                onClose={() => navigate('/')}
+                initialRole={signupRole}
+                onLoginClick={() => {
+                    navigate('/login');
+                }}
+            />
             <PartnerChoiceModal isOpen={isPartnerChoiceOpen} onClose={() => setIsPartnerChoiceOpen(false)} onSelect={openPartnerSignup} />
             <GetInTouchModal open={isContactOpen} onClose={() => setIsContactOpen(false)} />
         </>

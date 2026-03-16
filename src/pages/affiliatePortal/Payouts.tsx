@@ -81,7 +81,7 @@ const StatCard = ({
     delay: number;
 }) => (
     <div
-        className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group animate-fade-in-up"
+        className="bg-[#f8f8f8] p-7 rounded-[2rem] border border-gray-200 shadow transition-all duration-300 group animate-fade-in-up"
         style={{ animationDelay: `${delay}ms` }}
     >
         <h3 className={`text-3xl font-bold ${colorClass} mb-1 flex items-baseline gap-1`}>
@@ -160,8 +160,8 @@ const Payouts = () => {
 
     // Derived Data
     const validInvoices = invoices.filter(inv => inv.commission && inv.commission > 0);
-    const pendingInvoices = validInvoices.filter(inv => !paidInvoiceIds.includes(inv.id || inv.invoiceNumber));
-    const completedInvoices = validInvoices.filter(inv => paidInvoiceIds.includes(inv.id || inv.invoiceNumber));
+    const pendingInvoices = validInvoices.filter(inv => !paidInvoiceIds.includes(inv._id || inv.invoiceNumber));
+    const completedInvoices = validInvoices.filter(inv => paidInvoiceIds.includes(inv._id || inv.invoiceNumber));
 
     const totalEarned = validInvoices.reduce((sum, inv) => sum + inv.commission, 0);
     const totalPaid = completedInvoices.reduce((sum, inv) => sum + inv.commission, 0);
@@ -174,7 +174,7 @@ const Payouts = () => {
 
     const handleConfirmPayout = () => {
         if (selectedPayout) {
-            const idToMark = selectedPayout.id || selectedPayout.invoiceNumber;
+            const idToMark = selectedPayout._id || selectedPayout.invoiceNumber;
             const newPaidIds = [...paidInvoiceIds, idToMark];
             setPaidInvoiceIds(newPaidIds);
             localStorage.setItem("affiliate_paid_payouts", JSON.stringify(newPaidIds));
@@ -196,7 +196,7 @@ const Payouts = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#fafafa] p-6 lg:p-10 font-sans w-full relative">
+        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans w-full relative">
             <div className="w-full space-y-8 animate-fade-in">
                 {/* 1. Header */}
                 <div className="space-y-2">
@@ -241,14 +241,14 @@ const Payouts = () => {
                 {/* 3. Main Content Section */}
                 <div className="space-y-6">
                     {/* Tabs */}
-                    <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1 w-max">
+                    <div className="flex bg-[#f4f5f0] p-1.5 rounded-xl w-fit mb-6">
                         <button
                             onClick={() => setActiveTab("pending")}
                             className={`
-                px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-300
+                px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300
                 ${activeTab === "pending"
-                                    ? "bg-white text-slate-900 shadow-sm ring-1 ring-gray-200"
-                                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                                    ? "bg-[#f8f8f8] text-[#1a2d1d] shadow-sm ring-1 ring-black/5"
+                                    : "text-[#64748b] hover:text-[#1a2d1d]"
                                 }
               `}
                         >
@@ -257,10 +257,10 @@ const Payouts = () => {
                         <button
                             onClick={() => setActiveTab("completed")}
                             className={`
-                px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-300
+                px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300
                 ${activeTab === "completed"
-                                    ? "bg-white text-slate-900 shadow-sm ring-1 ring-gray-200"
-                                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                                    ? "bg-[#f8f8f8] text-[#1a2d1d] shadow-sm ring-1 ring-black/5"
+                                    : "text-[#64748b] hover:text-[#1a2d1d]"
                                 }
               `}
                         >
@@ -280,8 +280,8 @@ const Payouts = () => {
                             <div className="space-y-4">
                                 {pendingInvoices.length > 0 ? pendingInvoices.map((item, idx) => (
                                     <div
-                                        key={item.id || item.invoiceNumber}
-                                        className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+                                        key={item._id || item.invoiceNumber}
+                                        className="bg-[#f8f8f8] rounded-2xl border border-gray-200 p-6 shadow hover:shadow-md transition-all duration-300 group flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
                                         style={{
                                             animationDelay: `${idx * 100}ms`,
                                         }}
@@ -313,7 +313,7 @@ const Payouts = () => {
                                         </div>
                                     </div>
                                 )) : (
-                                    <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm">
+                                    <div className="bg-[#f8f8f8] rounded-2xl border border-gray-200 p-12 text-center shadow">
                                         <p className="text-gray-500 text-lg">No pending payouts available.</p>
                                     </div>
                                 )}
@@ -346,7 +346,7 @@ const Payouts = () => {
                                             {completedInvoices.length > 0 ? completedInvoices.map(
                                                 (payout, idx) => (
                                                     <tr
-                                                        key={payout.id || payout.invoiceNumber}
+                                                        key={payout._id || payout.invoiceNumber}
                                                         className="group hover:bg-[#fafafa] transition-colors duration-150"
                                                     >
                                                         <td className="px-6 py-4 text-sm font-medium text-slate-900 whitespace-nowrap font-mono">

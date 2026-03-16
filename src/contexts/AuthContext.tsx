@@ -108,15 +108,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       const response = await authService.signup(data);
+      console.log('Signup full response:', JSON.stringify(response));
 
       if (response.success) {
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error: null,
-        }));
+        // If the backend returns user data (direct signup), log them in immediately
+        if (response.data?.user) {
+          const userData = response.data.user;
+          console.log('User data from signup:', JSON.stringify(userData));
 
-        toast.success('Signed up successfully');
+          setState({
+            user: userData,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+
+          toast.success('Account created successfully. Welcome!');
+        } else {
+          // No user data in response - try to verify via cookies
+          console.log('No user data in signup response, checking auth via cookies...');
+          await checkAuthStatus();
+          toast.success('Account created successfully');
+        }
       } else {
         throw new Error(response.message || 'Signup failed');
       }

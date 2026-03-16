@@ -32,7 +32,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
 
         // Initialize socket connection
-        const socketInstance = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+        const socketBaseUrl =
+            import.meta.env.VITE_API_URL ||
+            (import.meta.env.DEV ? 'http://localhost:5000' : window.location.origin);
+
+        const socketInstance = io(socketBaseUrl, {
             withCredentials: true,
             // transports: ['websocket', 'polling'], // Try websocket first - Commented out to allow default negotiation (polling -> websocket)
         });

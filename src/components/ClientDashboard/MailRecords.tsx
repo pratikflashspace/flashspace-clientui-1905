@@ -13,8 +13,10 @@ import {
   MapPin,
   CheckCircle2,
   Navigation,
+  ExternalLink,
 } from "lucide-react";
 import { format } from "date-fns";
+import { API_CONFIG } from "@/config/api.config";
 
 export default function MailRecords() {
   const [mails, setMails] = useState<MailRecord[]>([]);
@@ -73,6 +75,18 @@ export default function MailRecords() {
 
   const formatDate = (dateStr: string) => {
     return format(new Date(dateStr), "MMM dd, yyyy");
+  };
+
+  const resolveDocumentUrl = (documentUrl?: string) => {
+    if (!documentUrl) return "";
+    if (documentUrl.startsWith("http://") || documentUrl.startsWith("https://")) {
+      return documentUrl;
+    }
+    const baseUrl = API_CONFIG.BASE_URL.replace(/\/$/, "");
+    const normalizedPath = documentUrl.startsWith("/")
+      ? documentUrl
+      : `/${documentUrl}`;
+    return `${baseUrl}${normalizedPath}`;
   };
 
   if (loading) {
@@ -232,6 +246,18 @@ export default function MailRecords() {
                       </div>
                     </div>
                   </div>
+
+                  {mail.documentUrl && (
+                    <a
+                      href={resolveDocumentUrl(mail.documentUrl)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#35503F] hover:underline"
+                    >
+                      View Uploaded Document
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
 
                   <div className="h-px bg-gray-100 my-4" />
 

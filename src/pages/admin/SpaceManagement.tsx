@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { adminService } from "@/services/admin.service";
 import { Search, MapPin, Star, Plus, Trash2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import EditSpaceModal from "@/components/admin/EditSpaceModal";
 import AddSpaceModal from "@/components/admin/AddSpaceModal";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 
 interface Space {
   _id: string;
@@ -147,289 +148,307 @@ export default function SpaceManagement() {
   });
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto animate-in fade-in duration-500">
-      {/* Header Section */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-            Space <span className="text-primary italic">Management</span>
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage and organize all your office listings in one place.
-          </p>
-        </div>
-        <Button onClick={() => setIsAddModalOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add New Space
-        </Button>
-      </div>
-
-      {/* Controls & Filters */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
-        {/* Search */}
-        <div className="relative flex-1 w-full md:max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search spaces by name, city, or area..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-transparent rounded-xl focus:outline-none placeholder:text-gray-400 text-gray-900"
-          />
-        </div>
-
-        {/* View Toggles & Other Filters */}
-        <div className="flex flex-wrap gap-3 items-center">
-          {/* City Filter */}
-          <select
-            value={cityFilter}
-            onChange={(e) => setCityFilter(e.target.value)}
-            className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-black/5"
-          >
-            <option value="all">All Cities</option>
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
-
-          {/* Type Filter */}
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value as any)}
-            className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-black/5"
-          >
-            <option value="all">All Types</option>
-            <option value="virtual-office">Virtual Office</option>
-            <option value="coworking-space">Coworking</option>
-          </select>
-
-          <div className="h-6 w-px bg-gray-200 mx-1 hidden md:block" />
-
-          <div className="flex bg-gray-100 p-1 rounded-xl">
-            <button
-              onClick={() => setViewMode("active")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${viewMode === "active"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+    <DashboardLayout
+      portalName="FlashSpace Admin"
+      portalDescription="Complete platform management"
+      navItems={ADMIN_NAV_ITEMS}
+    >
+      <div className="space-y-8 animate-in fade-in duration-500">
+        {/* Header Section */}
+        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight font-[Poppins]">
+              Space Management
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 font-medium">
+              Manage and organize all your office listings in one place.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
+             <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-sm w-full sm:w-auto">
+              <button
+                onClick={() => setViewMode("active")}
+                className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
+                  viewMode === "active"
+                    ? "bg-white text-gray-900 shadow-lg ring-1 ring-black/5"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
                 }`}
-            >
-              Active Listings
-            </button>
-            <button
-              onClick={() => setViewMode("deleted")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${viewMode === "deleted"
-                ? "bg-white text-red-600 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+              >
+                Active
+              </button>
+              <button
+                onClick={() => setViewMode("deleted")}
+                className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${
+                  viewMode === "deleted"
+                    ? "bg-white text-red-600 shadow-lg ring-1 ring-red-100"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
                 }`}
+              >
+                <Trash2 className="w-4 h-4" />
+                Bin
+              </button>
+            </div>
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="w-full sm:w-auto px-6 py-3 bg-gray-900 text-white border border-transparent rounded-2xl hover:bg-black transition-all shadow-lg shadow-gray-900/10 hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center gap-2 font-bold whitespace-nowrap"
             >
-              <Trash2 className="w-4 h-4" />
-              Recycle Bin
+              <Plus className="w-5 h-5" />
+              Add New Space
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Loading State */}
-      {loading && (
-        <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        {/* Controls & Filters */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 overflow-visible">
+          <div className="p-4 md:p-6 flex flex-col lg:flex-row gap-4 justify-between items-center">
+            {/* Search */}
+            <div className="relative flex-1 w-full lg:max-w-md">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search spaces by name, city, or area..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border-none rounded-xl focus:ring-4 focus:ring-black/5 focus:bg-white transition-all text-sm font-medium text-gray-900 placeholder:text-gray-400 h-11"
+              />
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 border-none rounded-xl w-full sm:flex-1 lg:w-auto h-11">
+                <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                <select
+                  value={cityFilter}
+                  onChange={(e) => setCityFilter(e.target.value)}
+                  className="bg-transparent border-none focus:ring-0 text-xs font-bold text-gray-700 cursor-pointer outline-none w-full"
+                >
+                  <option value="all">All Cities</option>
+                  {cities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 border-none rounded-xl w-full sm:flex-1 lg:w-auto h-11">
+                <Star className="w-3.5 h-3.5 text-gray-400" />
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value as any)}
+                  className="bg-transparent border-none focus:ring-0 text-xs font-bold text-gray-700 cursor-pointer outline-none w-full"
+                >
+                  <option value="all">All Types</option>
+                  <option value="virtual-office">Virtual Office</option>
+                  <option value="coworking-space">Coworking</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* Spaces Grid */}
-      {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {filteredSpaces.map((space) => (
-            <div
-              key={space._id}
-              className={`group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col ${viewMode === "deleted"
-                ? "opacity-80 hover:opacity-100 grayscale-[0.3] hover:grayscale-0"
-                : ""
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+          </div>
+        )}
+
+        {/* Spaces Grid */}
+        {!loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+            {filteredSpaces.map((space) => (
+              <div
+                key={space._id}
+                className={`group bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-100/50 hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 overflow-hidden flex flex-col ${
+                  viewMode === "deleted"
+                    ? "opacity-80 grayscale-[0.3]"
+                    : ""
                 }`}
-            >
-              {/* Image Header */}
-              <div className="h-56 relative overflow-hidden">
-                {space.image ? (
-                  <img
-                    src={space.image}
-                    alt={space.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
-                    No Image Available
-                  </div>
-                )}
-
-                {/* Overlay Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
-
-                {/* Top Badges */}
-                <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
-                  <div className="bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg text-xs font-bold text-gray-900 shadow-sm flex items-center gap-1.5">
-                    <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                    {space.rating}{" "}
-                    <span className="text-gray-400 font-normal">
-                      ({space.reviews})
-                    </span>
-                  </div>
-                  <span
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm backdrop-blur-md text-white border border-white/10 ${space.type === "virtual-office"
-                      ? "bg-blue-600/90"
-                      : "bg-indigo-600/90"
-                      }`}
-                  >
-                    {space.type === "virtual-office"
-                      ? "Virtual Office"
-                      : "Coworking"}
-                  </span>
-                </div>
-
-                {/* Unavailable Badge */}
-                {space.availability === "Unavailable" &&
-                  viewMode === "active" && (
-                    <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                      Unavailable
+              >
+                {/* Image Header */}
+                <div className="h-48 sm:h-56 relative overflow-hidden">
+                  {space.image ? (
+                    <img
+                      src={space.image}
+                      alt={space.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 font-bold uppercase tracking-widest text-[10px]">
+                      No Image Available
                     </div>
                   )}
 
-                {viewMode === "deleted" && (
-                  <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1.5">
-                    <Trash2 className="w-3 h-3" />
-                    In Trash
-                  </div>
-                )}
+                  {/* Overlay Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
 
-                {/* Bottom Content on Image */}
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <h3 className="font-bold text-xl leading-tight mb-1 drop-shadow-md">
-                    {space.name}
-                  </h3>
-                  <div className="flex items-center gap-1.5 text-sm text-gray-100 drop-shadow-sm">
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span className="line-clamp-1">
-                      {space.city}, {space.area}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-6 flex-1 flex flex-col">
-                {/* Features */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {(space.features || []).slice(0, 3).map((feature, i) => (
+                  {/* Top Badges */}
+                  <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
+                    <div className="bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl text-[10px] font-black text-gray-900 shadow-xl flex items-center gap-1.5 border border-white/20">
+                      <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                      {space.rating}{" "}
+                      <span className="text-gray-400 font-bold">
+                        ({space.reviews})
+                      </span>
+                    </div>
                     <span
-                      key={i}
-                      className="px-2.5 py-1 bg-gray-50 text-xs font-medium text-gray-600 rounded-md border border-gray-100"
+                      className={`px-2.5 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider shadow-xl backdrop-blur-md text-white border border-white/20 ${
+                        space.type === "virtual-office"
+                          ? "bg-blue-600/90"
+                          : "bg-indigo-600/90"
+                      }`}
                     >
-                      {feature}
+                      {space.type === "virtual-office"
+                        ? "Virtual Office"
+                        : "Coworking"}
                     </span>
-                  ))}
-                  {(space.features || []).length > 3 && (
-                    <span className="px-2.5 py-1 bg-gray-50 text-xs font-medium text-gray-400 rounded-md border border-gray-100">
-                      +{(space.features || []).length - 3}
-                    </span>
+                  </div>
+
+                  {/* Unavailable Badge */}
+                  {space.availability === "Unavailable" &&
+                    viewMode === "active" && (
+                      <div className="absolute top-4 left-4 bg-red-500/90 backdrop-blur-md text-white px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5 border border-red-400/20">
+                        <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                        Unavailable
+                      </div>
+                    )}
+
+                  {viewMode === "deleted" && (
+                    <div className="absolute top-4 left-4 bg-red-600/90 backdrop-blur-md text-white px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5 border border-red-500/20">
+                      <Trash2 className="w-3 h-3" />
+                      In Trash
+                    </div>
                   )}
+
+                  {/* Bottom Content on Image */}
+                  <div className="absolute bottom-5 left-5 right-5 text-white">
+                    <h3 className="font-extrabold text-lg sm:text-xl leading-snug mb-1 drop-shadow-2xl">
+                      {space.name}
+                    </h3>
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-100/90 drop-shadow-md">
+                      <MapPin className="w-3 h-3" />
+                      <span className="truncate">
+                        {space.city}, {space.area}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Actions - Variable based on View Mode */}
-                <div className="flex gap-3 mt-auto pt-6 border-t border-gray-50">
-                  {viewMode === "active" ? (
-                    <>
-                      <button
-                        onClick={() => handleEditClick(space)}
-                        className="flex-1 py-2.5 bg-gray-50 hover:bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all text-sm"
+                {/* Card Body */}
+                <div className="p-5 sm:p-6 flex-1 flex flex-col">
+                  {/* Features */}
+                  <div className="flex flex-wrap gap-1.5 mb-6">
+                    {(space.features || []).slice(0, 3).map((feature, i) => (
+                      <span
+                        key={i}
+                        className="px-2 py-1 bg-gray-50 text-[10px] font-black uppercase tracking-wider text-gray-500 rounded-lg border border-gray-100"
                       >
-                        Edit
-                      </button>
+                        {feature}
+                      </span>
+                    ))}
+                    {(space.features || []).length > 3 && (
+                      <span className="px-2 py-1 bg-gray-50 text-[10px] font-black text-gray-300 rounded-lg border border-gray-100">
+                        +{(space.features || []).length - 3} More
+                      </span>
+                    )}
+                  </div>
 
-                      <button
-                        onClick={async () => {
-                          const isUnavailable =
-                            space.availability === "Unavailable";
-                          await handleSaveSpace(space._id, space.type, {
-                            availability: isUnavailable
-                              ? "Available Now"
-                              : "Unavailable",
-                          });
-                        }}
-                        className={`flex-1 py-2.5 font-semibold rounded-xl border transition-all text-sm whitespace-nowrap px-2 ${space.availability === "Unavailable"
-                          ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                          : "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100"
+                  {/* Actions */}
+                  <div className="flex items-center gap-3 mt-auto pt-5 border-t border-gray-50">
+                    {viewMode === "active" ? (
+                      <>
+                        <button
+                          onClick={() => handleEditClick(space)}
+                          className="flex-1 py-3 bg-white text-gray-700 font-extrabold rounded-2xl border-2 border-gray-50 hover:bg-gray-50 hover:border-gray-100 transition-all text-xs uppercase tracking-widest"
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          onClick={async () => {
+                            const isUnavailable =
+                              space.availability === "Unavailable";
+                            await handleSaveSpace(space._id, space.type, {
+                              availability: isUnavailable
+                                ? "Available Now"
+                                : "Unavailable",
+                            });
+                          }}
+                          className={`flex-[1.5] py-3 font-extrabold rounded-2xl border-2 transition-all text-xs uppercase tracking-widest whitespace-nowrap px-4 ${
+                            space.availability === "Unavailable"
+                              ? "bg-green-50 text-green-700 border-green-100/50 hover:bg-green-100 hover:border-green-200"
+                              : "bg-orange-50 text-orange-700 border-orange-100/50 hover:bg-orange-100 hover:border-orange-200"
                           }`}
-                      >
-                        {space.availability === "Unavailable"
-                          ? "Make Available"
-                          : "Mark Unavailable"}
-                      </button>
+                        >
+                          {space.availability === "Unavailable"
+                            ? "Make Available"
+                            : "Unavailable"}
+                        </button>
 
-                      <button
-                        onClick={() => handleDeleteSpace(space)}
-                        className="p-2.5 bg-white text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl border border-gray-200 hover:border-red-200 transition-all"
-                        title="Move to Trash"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </>
-                  ) : (
-                    // Deleted View Actions
-                    <>
-                      <div className="flex-1 text-xs text-gray-400 flex items-center">
-                        Select 'Restore' to make active
-                      </div>
-                      <button
-                        onClick={() => handleRestoreSpace(space)}
-                        className="flex-none px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 hover:shadow-lg transition-all text-sm flex items-center gap-2"
-                      >
-                        <RotateCcw className="w-4 h-4" />
-                        Restore Space
-                      </button>
-                    </>
-                  )}
+                        <button
+                          onClick={() => handleDeleteSpace(space)}
+                          className="p-3 bg-white text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl border-2 border-gray-50 hover:border-red-100 transition-all flex items-center justify-center"
+                          title="Move to Trash"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex-1 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                          Restore to activate
+                        </div>
+                        <button
+                          onClick={() => handleRestoreSpace(space)}
+                          className="px-6 py-3 bg-gray-900 text-white font-black rounded-2xl hover:bg-black shadow-lg shadow-gray-900/10 hover:shadow-xl transition-all text-xs uppercase tracking-widest flex items-center gap-2"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                          Restore
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {filteredSpaces.length === 0 && !loading && (
-        <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-4">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-            {viewMode === "deleted" ? (
-              <Trash2 className="w-8 h-8 text-gray-300" />
-            ) : (
-              <Search className="w-8 h-8 text-gray-300" />
-            )}
+            ))}
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">
-            {viewMode === "deleted" ? "Trash is empty" : "No spaces found"}
-          </h3>
-          <p className="text-gray-500 max-w-sm">
-            {viewMode === "deleted"
-              ? "There are no spaces in the recycle bin."
-              : `We couldn't find any spaces matching "${searchTerm}".`}
-          </p>
-        </div>
-      )}
+        )}
 
-      <EditSpaceModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onSave={handleSaveSpace}
-        space={selectedSpace}
-      />
+        {/* Empty State */}
+        {filteredSpaces.length === 0 && !loading && (
+          <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-4">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              {viewMode === "deleted" ? (
+                <Trash2 className="w-8 h-8 text-gray-300" />
+              ) : (
+                <Search className="w-8 h-8 text-gray-300" />
+              )}
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              {viewMode === "deleted" ? "Trash is empty" : "No spaces found"}
+            </h3>
+            <p className="text-gray-500 max-w-sm">
+              {viewMode === "deleted"
+                ? "There are no spaces in the recycle bin."
+                : `We couldn't find any spaces matching "${searchTerm}".`}
+            </p>
+          </div>
+        )}
 
-      <AddSpaceModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSave={handleCreateSpace}
-      />
-    </div>
+        <EditSpaceModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleSaveSpace}
+          space={selectedSpace}
+        />
+
+        <AddSpaceModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onSave={handleCreateSpace}
+        />
+      </div>
+    </DashboardLayout>
   );
 }

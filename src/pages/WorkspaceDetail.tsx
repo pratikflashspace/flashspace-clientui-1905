@@ -563,7 +563,7 @@ const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
             <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
               {data.name}
             </h1>
-            <span className="bg-primary/10 text-primary-foreground bg-primary px-3 py-1 rounded-full text-xs font-semibold">
+            <span className="bg-primary text-primary-foreground bg-[#2D3F33] px-3 py-1 rounded-full text-xs font-semibold">
               {type.replace("-", " ").toUpperCase()}
             </span>
           </div>
@@ -765,7 +765,17 @@ const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
       <MeetingBookingModal
         isOpen={isMeetingModalOpen}
         onClose={() => setIsMeetingModalOpen(false)}
-        item={{ name: data.name, address: address }}
+        item={{
+          ...data,
+          _id: data._id || id,
+          name: data.name,
+          address: address,
+          area: data.area || data.city || "",
+          price: data.price || "N/A",
+          rating: data.rating || data.avgRating || 0,
+          reviews: data.reviews || data.totalReviews || 0,
+          features: data.features || data.amenities || [],
+        } as any}
       />
       <Footer />
     </div>

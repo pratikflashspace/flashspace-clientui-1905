@@ -1,27 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import {
-  Search,
   Send,
   User,
-  Headphones,
-  MessageSquare,
-  Clock,
-  CheckCircle,
-  AlertCircle,
   Bot,
-  MoreHorizontal,
-  Loader2
+  Search,
+  MessageSquare,
+  Headphones,
 } from "lucide-react";
-import { adminService, AdminTicketData } from "@/services/admin.service";
-import { useAuth } from "@/contexts/AuthContext";
-import { useSocket } from "@/contexts/SocketContext";
-import { format } from "date-fns";
-import toast from "react-hot-toast";
+import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+import { adminService, AdminTicketData } from "@/services/admin.service";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSocket } from "@/contexts/SocketContext";
+import { format } from "date-fns";
+import toast from "react-hot-toast";
 
 export default function SupportChat() {
   const { user } = useAuth();
@@ -41,7 +39,10 @@ export default function SupportChat() {
   // Admin has taken over if they explicitly clicked Take Over OR if there's already an admin message in the chat
   const hasTakenOver = activeTicketId
     ? takenOverTickets.has(activeTicketId) ||
-    (activeTicket?.messages?.some((m) => m.sender === "admin") ?? false)
+      (activeTicket?.messages?.some(
+        (m) => m.sender === "admin" || m.sender === "support",
+      ) ??
+        false)
     : false;
 
   const fetchTickets = async () => {
@@ -81,7 +82,7 @@ export default function SupportChat() {
             const exists = t.messages.some(
               (m) =>
                 new Date(m.createdAt).getTime() ===
-                new Date(data.message.createdAt).getTime() &&
+                  new Date(data.message.createdAt).getTime() &&
                 m.message === data.message.message,
             );
             if (exists) return t;
@@ -135,6 +136,8 @@ export default function SupportChat() {
 
   const handleTakeOver = async () => {
     if (!activeTicketId) return;
+    const takeoverMessage =
+      "Hi, I'm taking over this chat. Let me review your request...";
     try {
       // Use the new tap-in endpoint which also sends a system message
       await adminService.replyToTicket(activeTicketId, "[Admin joined the conversation]");
@@ -168,6 +171,7 @@ export default function SupportChat() {
     }
   };
 
+  // Filter tickets based on search
   const filteredTickets = tickets.filter(
     (t) =>
       t.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -175,17 +179,32 @@ export default function SupportChat() {
       t.ticketNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+  // Sort tickets: Open/In Progress first, then by date
+  filteredTickets.sort((a, b) => {
+    const score = (status: string) => {
+      if (status === "open") return 3;
+      if (status === "in_progress") return 2;
+      if (status === "escalated") return 2;
+      return 0;
+    };
+    const scoreDiff = score(b.status) - score(a.status);
+    if (scoreDiff !== 0) return scoreDiff;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  const getStatusVariant = (status: string) => {
     switch (status) {
       case "open":
-        return "destructive";
       case "in_progress":
+      case "escalated":
+        return "destructive";
+      case "active":
         return "default";
       case "resolved":
       case "closed":
         return "secondary";
       default:
-        return "outline";
+        return "secondary";
     }
   };
 
@@ -232,9 +251,12 @@ export default function SupportChat() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent space-y-8 font-sans animate-in fade-in duration-500 pb-12">
-      {/* Header */}
-      <div>
+    <DashboardLayout
+      portalName="FlashSpace Admin"
+      portalDescription="Complete platform management"
+      navItems={ADMIN_NAV_ITEMS}
+    >
+      <div className="mb-6">
         <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
           Support <span className="text-primary italic">Chats</span>
         </h1>
@@ -243,21 +265,25 @@ export default function SupportChat() {
         </p>
       </div>
 
-      {/* Stats Row */}
+      {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-4 mb-6">
-        <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
-          <p className="text-xl font-extrabold text-foreground">{activeChatsCount}</p>
+        <div className="bg-background border border-border rounded-xl p-4">
+          <p className="text-xl font-extrabold text-foreground">
+            {tickets.length}
+          </p>
           <p className="text-sm text-muted-foreground">Active Chats</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
-          <p className="text-xl font-extrabold text-yellow-600">{waitingCount}</p>
+        <div className="bg-background border border-border rounded-xl p-4">
+          <p className="text-xl font-extrabold text-yellow-600">
+            {waitingCount}
+          </p>
           <p className="text-sm text-muted-foreground">Waiting</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+        <div className="bg-background border border-border rounded-xl p-4">
           <p className="text-xl font-extrabold text-green-600">89%</p>
           <p className="text-sm text-muted-foreground">AI Resolution</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-4 shadow-sm">
+        <div className="bg-background border border-border rounded-xl p-4">
           <p className="text-xl font-extrabold text-foreground">2.3 min</p>
           <p className="text-sm text-muted-foreground">Avg Response</p>
         </div>
@@ -265,7 +291,7 @@ export default function SupportChat() {
 
       <div className="grid gap-6 lg:grid-cols-4 h-[700px]">
         {/* Chat List */}
-        <div className="bg-background border border-border rounded-xl overflow-hidden flex flex-col shadow-sm">
+        <div className="bg-background border border-border rounded-xl overflow-hidden flex flex-col">
           <div className="p-4 border-b border-border">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -329,22 +355,26 @@ export default function SupportChat() {
         </div>
 
         {/* Chat Window */}
-        <div className="lg:col-span-3 bg-background border border-border rounded-xl overflow-hidden flex flex-col shadow-sm">
+        <div className="lg:col-span-3 bg-background border border-border rounded-xl overflow-hidden flex flex-col">
           {activeTicket ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 border-b border-border flex items-center justify-between bg-muted/10">
+              <div className="p-4 border-b border-border flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar>
                     <AvatarFallback className="bg-primary/10 text-primary">
-                      {activeTicket.user?.fullName?.substring(0, 2).toUpperCase() || "US"}
+                      {activeTicket.user?.fullName
+                        ?.substring(0, 2)
+                        .toUpperCase() || "US"}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="font-semibold text-foreground text-base">
+                    <h3 className="font-semibold text-foreground">
                       {activeTicket.user?.fullName || "Unknown User"}
                     </h3>
-                    <p className="text-xs text-muted-foreground">Ticket: #{activeTicket.ticketNumber}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Client ID: {activeTicket.ticketNumber}
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -442,16 +472,21 @@ export default function SupportChat() {
               {activeTicket.status !== "resolved" &&
               activeTicket.status !== "closed" ? (
                 hasTakenOver ? (
-                  <div className="p-4 border-t border-border bg-white">
+                  <div className="p-4 border-t border-border">
                     <div className="flex gap-2">
                       <Input
                         placeholder="Type your message..."
                         value={messageInput}
                         onChange={(e) => setMessageInput(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && handleSendMessage()
+                        }
                         className="flex-1"
                       />
-                      <Button onClick={handleSendMessage} disabled={!messageInput.trim()}>
+                      <Button
+                        onClick={handleSendMessage}
+                        disabled={!messageInput.trim()}
+                      >
                         <Send className="w-4 h-4" />
                       </Button>
                     </div>
@@ -463,20 +498,20 @@ export default function SupportChat() {
                   </div>
                 )
               ) : (
-                <div className="p-4 bg-gray-50 border-t border-gray-100 text-center text-gray-400 text-sm">
+                <div className="p-4 bg-muted border-t border-border text-center text-muted-foreground text-sm">
                   This ticket is closed.
                 </div>
               )}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-muted-foreground bg-muted/5">
-              <MessageSquare className="w-16 h-16 mb-4 opacity-10" />
+            <div className="flex flex-col items-center justify-center p-12 h-full text-muted-foreground">
+              <Headphones className="w-16 h-16 mb-4 opacity-20" />
               <h3 className="text-xl font-bold">Select a chat</h3>
-              <p className="text-sm">Choose a ticket from the left to start chatting</p>
+              <p>Choose a ticket from the left to start chatting</p>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

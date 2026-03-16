@@ -10,16 +10,29 @@ import type {
 } from "@/types/spacePortal/client";
 
 import {
-  MapPin,
-  Eye,
-  MessageSquare,
-  MoreVertical,
+  Search,
   Filter,
+  Eye,
+  MoreVertical,
+  MapPin,
+  MessageSquare,
   Loader2,
   X,
   Send,
 } from "lucide-react";
-
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ClientViewModal as PartnerClientViewModal } from "@/components/modals/ClientViewModal";
+import { ClientChatModal as PartnerClientChatModal } from "@/components/modals/ClientChatModal";
+import { toast } from "@/hooks/use-toast";
 import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
 import { userDashboardService } from "@/services/userDashboard.service";
@@ -31,6 +44,9 @@ export default function Clients() {
 
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [chatModalOpen, setChatModalOpen] = useState(false);
 
   // The client currently targeted for the message form
   const [messageTarget, setMessageTarget] = useState<Client | null>(null);
@@ -49,6 +65,11 @@ export default function Clients() {
         }
       } catch (error) {
         console.error("Failed to fetch clients:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load clients.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
@@ -92,12 +113,42 @@ export default function Clients() {
     filter === "ALL" ? true : filter === value;
 
   const filteredClients = useMemo(() => {
-    return clients.filter((client) => {
-      const matchesQuery =
-        client.companyName.toLowerCase().includes(normalizedQuery) ||
-        client.contactName.toLowerCase().includes(normalizedQuery) ||
-        client.id.toLowerCase().includes(normalizedQuery) ||
-        client.space.toLowerCase().includes(normalizedQuery);
+    const normalizedQuery = query.toLowerCase().trim();
+    if (!normalizedQuery) return clients;
+    return clients.filter(
+      (c) =>
+        c.companyName.toLowerCase().includes(normalizedQuery) ||
+        c.contactName.toLowerCase().includes(normalizedQuery) ||
+        c.id.toLowerCase().includes(normalizedQuery) ||
+        c.space.toLowerCase().includes(normalizedQuery),
+    );
+  }, [clients, query]);
+
+  const handleViewClient = (client: Client) => {
+    // Map backend client to modal expected structure
+    const mappedClient = {
+      ...client,
+      name: client.companyName,
+      contact: client.contactName,
+      initials: client.companyName
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase(),
+      status:
+        client.status === "ACTIVE"
+          ? "Active"
+          : client.status === "EXPIRING_SOON"
+            ? "At Risk"
+            : "Expired",
+      revenue: `\u20B9${client.dealValue?.toLocaleString() || "0"}`,
+      renewal: client.endDate,
+      healthScore: client.status === "ACTIVE" ? 95 : 45,
+    };
+    setSelectedClient(mappedClient);
+    setViewModalOpen(true);
+  };
 
       return (
         matchesQuery &&
@@ -136,6 +187,10 @@ export default function Clients() {
             options={kycOptions}
           />
         </div>
+        <Button variant="outline" className="rounded-xl">
+          <Filter className="w-4 h-4 mr-2" />
+          Filter
+        </Button>
       </div>
 
       {/* Table */}
@@ -432,14 +487,24 @@ function StatusPill({ status }: { status: ClientStatus }) {
         ? { label: "Expiring Soon", className: "bg-amber-50 text-amber-700" }
         : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
 
-  return (
-    <span
-      className={`inline-flex items-center justify-center rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap ${config.className}`}
-    >
-      {config.label}
-    </span>
+      {/* Modals */}
+      <PartnerClientViewModal
+        client={selectedClient}
+        open={viewModalOpen}
+        onOpenChange={setViewModalOpen}
+        onOpenChat={() => {
+          setViewModalOpen(false);
+          setChatModalOpen(true);
+        }}
+      />
+      <PartnerClientChatModal
+        client={selectedClient}
+        open={chatModalOpen}
+        onOpenChange={setChatModalOpen}
+      />
+    </div>
   );
-}
+};
 
 function KycPill({ status }: { status: KycStatus }) {
   const config =

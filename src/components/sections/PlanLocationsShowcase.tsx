@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import ListingCardModern from "@/components/services/ListingCardModern";
-import { getAllVirtualOffices } from "@/services/virtualOffice.service";
-import { VirtualOfficeItem } from "@/types/services";
+import { getAllCoworkingSpaces } from "@/services/coworkingSpace.service";
+import { CoworkingSpaceItem } from "@/types/services";
 
 // Using local high-quality assets from the public folder
 const spaceHsr = "/card-koramangala.jpg";
@@ -58,23 +59,34 @@ const CARDS_PER_PAGE = 3;
 export const PlanLocationsShowcase = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [slideIndex, setSlideIndex] = useState(0);
-    const [dynamicSpaces, setDynamicSpaces] = useState<VirtualOfficeItem[]>([]);
+    const [dynamicSpaces, setDynamicSpaces] = useState<CoworkingSpaceItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const handleGetBestPrice = (item: any, isDynamic: boolean) => {
+        if (isDynamic) {
+            // Navigate to the coworking space detail page
+            navigate(`/coworking-space/${item._id}`);
+        } else {
+            // For static registrations, take to the virtual office solutions page
+            navigate(`/Solutions/virtual-office`);
+        }
+    };
 
     useEffect(() => {
         const fetchSpaces = async () => {
             setIsLoading(true);
             try {
-                const offices = await getAllVirtualOffices();
+                const spaces = await getAllCoworkingSpaces();
                 // Sort by popular first, then rating
-                const sortedOffices = [...offices].sort((a, b) => {
+                const sortedSpaces = [...spaces].sort((a, b) => {
                     if (a.popular && !b.popular) return -1;
                     if (!a.popular && b.popular) return 1;
                     return (b.rating || 0) - (a.rating || 0);
                 });
-                setDynamicSpaces(sortedOffices.slice(0, 3));
+                setDynamicSpaces(sortedSpaces.slice(0, 3));
             } catch (error) {
-                console.error("Error fetching workspaces for showcase:", error);
+                console.error("Error fetching coworking spaces for showcase:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -101,33 +113,33 @@ export const PlanLocationsShowcase = () => {
     const canNext = slideIndex < totalPages - 1;
 
     return (
-        <section className="py-[100px] bg-muted/30">
+        <section className="py-16 sm:py-20 lg:py-[100px] bg-muted/30 overflow-hidden">
             <div className="container mx-auto px-4 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="mb-12 text-center"
+                    className="mb-8 sm:mb-12 text-center"
                 >
-                    <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-3">
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-3 px-2">
                         Everything Your Business Needs, Pan India
                     </h2>
-                    <p className="text-muted-foreground max-w-lg mx-auto">
+                    <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto px-4">
                         Flexible workspace and business solutions tailored to your needs.
                     </p>
                 </motion.div>
 
                 {/* Tabs + Slider arrows */}
-                <div className="flex items-center justify-between mb-10 flex-wrap gap-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-10 gap-6">
                     <div className="hidden lg:block w-32" />
-                    <div className="bg-[#F4F4F2] rounded-[14px] px-6 py-4 inline-block">
+                    <div className="bg-[#F4F4F2] rounded-xl sm:rounded-[14px] px-4 sm:px-6 py-3 sm:py-4 inline-block max-w-full overflow-x-auto">
                         <div className="relative">
-                            <div className="flex gap-9">
+                            <div className="flex gap-6 sm:gap-9 whitespace-nowrap">
                                 {services.map((s, i) => (
                                     <button
                                         key={s.name}
                                         onClick={() => { setActiveIndex(i); setSlideIndex(0); }}
-                                        className={`relative pb-3 text-[15px] transition-colors duration-250 ease-out cursor-pointer border-none outline-none bg-transparent ${i === activeIndex
+                                        className={`relative pb-2 sm:pb-3 text-sm sm:text-[15px] transition-colors duration-250 ease-out cursor-pointer border-none outline-none bg-transparent ${i === activeIndex
                                             ? "font-medium text-foreground"
                                             : "font-normal text-muted-foreground hover:text-foreground/70"
                                             }`}
@@ -148,7 +160,7 @@ export const PlanLocationsShowcase = () => {
                     </div>
 
                     {/* Arrow buttons */}
-                    <div className="flex gap-2">
+                    <div className="hidden sm:flex gap-2">
                         <button
                             onClick={() => setSlideIndex((p) => Math.max(0, p - 1))}
                             disabled={!canPrev}
@@ -192,7 +204,11 @@ export const PlanLocationsShowcase = () => {
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: i * 0.08, duration: 0.5 }}
                                         >
-                                            <ListingCardModern item={loc as VirtualOfficeItem} />
+                                            <ListingCardModern
+                                                item={loc as CoworkingSpaceItem}
+                                                onGetBestPrice={() => handleGetBestPrice(loc, true)}
+                                                onClick={() => handleGetBestPrice(loc, true)}
+                                            />
                                         </motion.div>
                                     );
                                 }
@@ -204,11 +220,11 @@ export const PlanLocationsShowcase = () => {
                                         initial={{ opacity: 0, y: 24 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.08, duration: 0.5 }}
-                                        className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-transform duration-[250ms] ease-out shadow-sm hover:shadow-md"
+                                        className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-transform duration-200 ease-out shadow-sm hover:shadow-md"
                                     >
                                         <div className="relative aspect-[16/10] overflow-hidden">
-                                            <img src={(loc as any).image} alt={loc.name} className="w-full h-full object-cover transition-transform duration-[250ms] ease-out group-hover:scale-105" />
-                                            <span className="absolute bottom-3 left-3 bg-primary text-primary-foreground text-[10px] font-normal px-2.5 py-1 rounded-full">
+                                            <img src={(loc as any).image} alt={loc.name} className="w-full h-full object-cover transition-transform duration-200 ease-out group-hover:scale-105" />
+                                            <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-normal px-2.5 py-1 rounded-full z-10">
                                                 Available Now
                                             </span>
                                         </div>
@@ -229,10 +245,16 @@ export const PlanLocationsShowcase = () => {
                                                 Starting from <span className="font-bold text-foreground">{loc.startingFrom}</span>
                                             </p>
                                             <div className="flex gap-2">
-                                                <button className="flex-1 bg-primary text-primary-foreground text-sm font-normal py-2.5 rounded-xl hover:bg-primary/90 transition-colors">
+                                                <button
+                                                    onClick={() => handleGetBestPrice(loc, false)}
+                                                    className="flex-1 bg-primary text-primary-foreground text-sm font-normal py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
+                                                >
                                                     Get Best Price
                                                 </button>
-                                                <button className="flex-1 flex items-center justify-center gap-1.5 border border-border text-sm font-normal text-foreground py-2.5 rounded-xl hover:bg-muted/50 transition-colors">
+                                                <button
+                                                    onClick={() => navigate('/services/virtual-office')}
+                                                    className="flex-1 flex items-center justify-center gap-1.5 border border-border text-sm font-normal text-foreground py-2.5 rounded-xl hover:bg-muted/50 transition-colors"
+                                                >
                                                     Explore More
                                                 </button>
                                             </div>

@@ -1,5 +1,4 @@
 // Import the new UI component
-import { SpaceInformationStepStandalone } from "./spaceDetailUi";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -41,10 +40,13 @@ import toast from "react-hot-toast";
 import {
   createSpaceDetails,
   SpaceDetailsPayload,
-} from "../Api/spaceDetails.service";
+} from "@/Api/spaceDetails.service";
 import { getPartnerProperties } from "@/services/property.service";
 import { Property } from "@/types/services";
 import { MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 // Types
 type DocumentStatus = "pending" | "approved" | "rejected";
@@ -520,29 +522,29 @@ export default function KYCVerification() {
     switch (status) {
       case "approved":
         return {
-          bg: "bg-green-100",
-          text: "text-green-700",
+          bg: "bg-primary/10",
+          text: "text-primary",
           icon: CheckCircle2,
           label: "Verified",
         };
       case "pending":
         return {
-          bg: "bg-[#3FA69E]",
-          text: "text-white",
+          bg: "bg-muted",
+          text: "text-muted-foreground",
           icon: Clock,
           label: "Under Review",
         };
       case "rejected":
         return {
-          bg: "bg-red-100",
-          text: "text-red-700",
+          bg: "bg-destructive/10",
+          text: "text-destructive",
           icon: AlertCircle,
           label: "Rejected",
         };
       default:
         return {
-          bg: "bg-gray-100",
-          text: "text-gray-600",
+          bg: "bg-muted/50",
+          text: "text-muted-foreground/70",
           icon: Clock,
           label: "Pending",
         };
@@ -552,23 +554,27 @@ export default function KYCVerification() {
   const getOverallStatusConfig = (status: string) => {
     switch (status) {
       case "approved":
-        return { bg: "bg-green-500", text: "Verified", icon: CheckCircle2 };
+        return { bg: "bg-primary", text: "Verified", icon: CheckCircle2 };
       case "pending":
         return {
-          bg: "bg-[#3FA69E]",
+          bg: "bg-muted-foreground",
           text: "Verification in Progress",
           icon: Clock,
         };
       case "rejected":
-        return { bg: "bg-red-500", text: "Action Required", icon: AlertCircle };
+        return {
+          bg: "bg-destructive",
+          text: "Action Required",
+          icon: AlertCircle,
+        };
       case "resubmit":
         return {
-          bg: "bg-red-500",
+          bg: "bg-destructive",
           text: "Resubmission Required",
           icon: RefreshCw,
         };
       default:
-        return { bg: "bg-gray-500", text: "Not Started", icon: Info };
+        return { bg: "bg-muted", text: "Not Started", icon: Info };
     }
   };
 
@@ -775,9 +781,14 @@ export default function KYCVerification() {
   if (loading) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-10 h-10 text-[#3FA69E] animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading KYC data...</p>
+        <div className="text-center space-y-4">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto" />
+            <Shield className="w-6 h-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+          </div>
+          <p className="text-muted-foreground font-medium animate-pulse">
+            Loading KYC details...
+          </p>
         </div>
       </div>
     );
@@ -785,18 +796,26 @@ export default function KYCVerification() {
 
   if (error) {
     return (
-      <div className="min-h-[400px] minw-full flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <p className="text-gray-700 font-medium mb-2">{error}</p>
-          <div className="flex gap-2 justify-center">
-            <button
+      <div className="min-h-[60vh] flex items-center justify-center p-4">
+        <div className="text-center bg-background border border-border rounded-3xl p-12 shadow-2xl max-w-lg w-full">
+          <div className="bg-destructive/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-10 h-10 text-destructive" />
+          </div>
+          <h2 className="text-lg font-extrabold text-foreground mb-2">
+            Error Occurred
+          </h2>
+          <p className="text-muted-foreground font-medium mb-8 leading-relaxed">
+            {error}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button
               onClick={fetchKYC}
-              className="px-4 py-2 bg-[#3FA69E] text-black rounded-lg font-medium hover:bg-[#3FA69E] transition-colors flex items-center gap-2"
+              className="rounded-xl h-12 px-8 font-bold gap-2"
             >
               <RefreshCw className="w-4 h-4" /> Try Again
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => {
                 setProfileId(null);
                 setKycData(null);
@@ -806,10 +825,10 @@ export default function KYCVerification() {
                 });
                 setError(null);
               }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+              className="rounded-xl h-12 px-8 font-bold"
             >
               Go Back
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -832,7 +851,7 @@ export default function KYCVerification() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="animate-in fade-in duration-500 max-w-7xl mx-auto">
       <input
         ref={fileInputRef}
         type="file"
@@ -842,91 +861,26 @@ export default function KYCVerification() {
       />
 
       <div className="w-full space-y-6">
-        {/* Informative Note for Partners */}
-        {(!kycData ||
-          (kycData?.overallStatus !== "approved" &&
-            kycData?.overallStatus !== "rejected")) && (
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 shadow-sm">
-            <div className="flex gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Info className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-blue-900 mb-1">
-                  Complete Your Verification
-                </h3>
-                <p className="text-blue-700/80 text-sm leading-relaxed">
-                  To ensure a smooth onboarding process, please provide accurate
-                  information and clear document uploads. Verification typically
-                  takes 24-48 hours once submitted. You'll be notified via email
-                  once our team reviews your application.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {kycData?.overallStatus === "rejected" && (
-          <div className="bg-red-50 border border-red-100 rounded-2xl p-6 mb-8 shadow-sm animate-in fade-in slide-in-from-top-4">
-            <div className="flex gap-4">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <AlertCircle className="w-6 h-6 text-red-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-red-900 mb-1">
-                  Verification Issues Found
-                </h3>
-                <p className="text-red-700/80 text-sm leading-relaxed mb-4">
-                  Please review the issues highlighted below and update the
-                  necessary documents to proceed with your verification.
-                </p>
-
-                {rejectedDocNames.length > 0 && (
-                  <div className="text-sm text-red-800 bg-red-100/50 p-4 rounded-xl border border-red-100">
-                    <strong className="block mb-2 text-red-900">
-                      Action Required For:
-                    </strong>
-                    <ul className="list-disc pl-5 space-y-1">
-                      {rejectedDocNames.map((name, idx) => (
-                        <li key={idx} className="font-medium">
-                          {name}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {profileId && profileId !== "new" && (
-                  <button
-                    onClick={() => setActiveStep("documents")}
-                    className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition-colors flex items-center gap-2"
-                  >
-                    Update Documents <ChevronRight className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold font-[Poppins] text-gray-900">
-              {profileId ? "Profile" : "Space"}{" "}
-              <span className="text-[#3FA69E]">Verification</span>
+            <h1 className="text-4xl">
+              {profileId ? "KYC" : "Space"}{" "}
+              <span className="text-primary italic">Verification</span>
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-muted-foreground mt-2 text-base">
               {linkBookingId
-                ? "Select or create a business profile for your space"
-                : "Manage your business profiles for seamless verification"}
+                ? "Securely verify your identity to enable bookings"
+                : "Manage your verification profiles for compliance"}
             </p>
           </div>
           {profileId && profileId !== "new" && (
             <div
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-white ${overallStatus.bg}`}
+              className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-white shadow-lg ${overallStatus.bg}`}
             >
-              <overallStatus.icon className="w-4 h-4" />
-              <span className="font-medium">{overallStatus.text}</span>
+              <overallStatus.icon className="w-5 h-5" />
+              <span className="font-bold tracking-tight">
+                {overallStatus.text}
+              </span>
             </div>
           )}
         </div>
@@ -955,30 +909,33 @@ export default function KYCVerification() {
 
             {/* Section 1: Personal Identity */}
             <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">
-                1. Personal Identity (Mandatory)
-              </h2>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-8 w-1 bg-primary rounded-full" />
+                <h2 className="text-lg font-extrabold text-foreground tracking-tight">
+                  1. Personal{" "}
+                  <span className="text-primary italic">Identity</span>
+                </h2>
+              </div>
 
               {individualProfile ? (
-                // Existing Individual Logic
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-[#3FA69E]"></div>
-                  <div className="flex items-start justify-between mb-4 pl-2">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-[#80dad3bb] rounded-lg">
-                        <User className="w-6 h-6 text-[#3FA69E]" />
+                <div className="bg-background border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-primary/10 rounded-xl group-hover:scale-110 transition-transform">
+                        <User className="w-8 h-8 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">
-                          Personal Verification
+                        <h3 className="font-bold text-lg text-foreground">
+                          Personal Identity
                         </h3>
-                        <p className="text-sm text-gray-500">
-                          {individualProfile.profileName || "Individual"}
+                        <p className="text-sm text-muted-foreground">
+                          {individualProfile.profileName ||
+                            "Authorized Signatory"}
                         </p>
                       </div>
                     </div>
                     <span
-                      className={`text-xs px-3 py-1 rounded-full font-medium ${getStatusConfig(individualProfile.overallStatus as DocumentStatus).bg} ${getStatusConfig(individualProfile.overallStatus as DocumentStatus).text}`}
+                      className={`text-xs px-4 py-1.5 rounded-full font-bold shadow-sm ${getStatusConfig(individualProfile.overallStatus as DocumentStatus).bg} ${getStatusConfig(individualProfile.overallStatus as DocumentStatus).text}`}
                     >
                       {
                         getOverallStatusConfig(
@@ -988,8 +945,8 @@ export default function KYCVerification() {
                     </span>
                   </div>
 
-                  <div className="pl-2">
-                    <button
+                  <div className="mt-8">
+                    <Button
                       onClick={() => {
                         setProfileId(individualProfile._id!);
                         setSearchParams((params) => {
@@ -998,31 +955,32 @@ export default function KYCVerification() {
                         });
                         setKycData(individualProfile);
                       }}
-                      className="w-full sm:w-auto px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                      className="rounded-xl px-8 py-6 font-bold text-base shadow-lg hover:shadow-primary/20 transition-all active:scale-95 gap-2"
                     >
                       {individualProfile.overallStatus === "approved"
-                        ? "View Details"
-                        : "Continue Verification"}
-                    </button>
+                        ? "Review Profile"
+                        : "Complete Verification"}
+                      <ChevronRight className="w-5 h-5" />
+                    </Button>
                   </div>
                 </div>
               ) : (
                 // No Individual Profile -> Call to Action
-                <div className="bg-white rounded-xl shadow-sm border-2 border-dashed border-[#3FA69E] p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-[#80dad3bb] rounded-full">
-                      <User className="w-6 h-6 text-[#3FA69E]" />
+                <div className="bg-background border-2 border-dashed border-border rounded-xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 transition-all hover:border-primary group">
+                  <div className="flex items-center gap-6">
+                    <div className="p-4 bg-primary/10 rounded-xl group-hover:scale-110 transition-transform">
+                      <User className="w-10 h-10 text-primary" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">
-                        Start Personal Verification
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-bold text-foreground">
+                        Verify Your Identity
                       </h3>
-                      <p className="text-sm text-gray-500">
-                        You must verify your identity before adding a business.
+                      <p className="text-muted-foreground font-medium">
+                        Personal verification is required before listing spaces.
                       </p>
                     </div>
                   </div>
-                  <button
+                  <Button
                     onClick={() => {
                       setProfileId("new");
                       setKycType("individual");
@@ -1031,7 +989,7 @@ export default function KYCVerification() {
                       setBusinessForm({
                         profileName: user?.fullName
                           ? `${user.fullName} (Personal)`
-                          : "My Personal Profile",
+                          : "Primary KYC Profile",
                         companyName: "",
                         companyType: "",
                         gstNumber: "",
@@ -1041,10 +999,10 @@ export default function KYCVerification() {
                         partners: [],
                       });
                     }}
-                    className="px-6 py-2 bg-[#3FA69E] text-black rounded-lg font-medium hover:bg-[#3FA69E] shadow-sm whitespace-nowrap"
+                    className="rounded-xl px-10 py-6 font-bold text-base shadow-xl hover:shadow-primary/20 transition-all active:scale-95 whitespace-nowrap"
                   >
-                    Start Verification
-                  </button>
+                    Start Now
+                  </Button>
                 </div>
               )}
             </div>
@@ -1120,15 +1078,19 @@ export default function KYCVerification() {
             <div
               className={`space-y-4 transition-opacity duration-300 ${!individualProfile || individualProfile.overallStatus !== "approved" ? "opacity-50 grayscale-[0.5] pointer-events-none" : ""}`}
             >
-              <div className="flex items-center justify-between border-b pb-2">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  2. Space Information
-                </h2>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-1 bg-primary rounded-full" />
+                  <h2 className="text-lg font-extrabold text-foreground tracking-tight">
+                    2. Space{" "}
+                    <span className="text-primary italic">Information</span>
+                  </h2>
+                </div>
                 {(!individualProfile ||
                   individualProfile.overallStatus !== "approved") && (
-                  <span className="text-xs font-medium text-red-500 bg-red-50 px-2 py-1 rounded">
+                  <Badge variant="destructive" className="rounded-lg">
                     Locked until Personal Verification is Approved
-                  </span>
+                  </Badge>
                 )}
               </div>
 
@@ -1145,32 +1107,28 @@ export default function KYCVerification() {
                           `/spaceportal/space-management/add?id=${p._id}`,
                         )
                       }
-                      className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow cursor-pointer group"
+                      className="bg-background border border-border rounded-xl p-6 hover:shadow-xl transition-all cursor-pointer group flex flex-col justify-between min-h-[180px] shadow-sm"
                     >
                       <div className="flex items-start justify-between mb-4">
-                        <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-[#3FA69E]/10 transition-colors">
-                          <Building2 className="w-6 h-6 text-gray-600 group-hover:text-[#3FA69E]" />
+                        <div className="p-3 bg-primary/10 rounded-xl group-hover:scale-110 transition-transform">
+                          <Building2 className="w-8 h-8 text-primary" />
                         </div>
                         <span
-                          className={`text-xs px-2 py-1 rounded-full text-white ${status.bg}`}
+                          className={`text-xs px-4 py-1.5 rounded-full font-bold shadow-sm text-white ${status.bg}`}
                         >
                           {status.text}
                         </span>
                       </div>
-                      <h3 className="font-semibold text-gray-900 truncate mb-1">
-                        {p.name}
-                      </h3>
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-4">
-                        <MapPin className="w-3 h-3" />
-                        <span className="truncate">
-                          {p.area}, {p.city}
-                        </span>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <button className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
-                          Manage Space
-                        </button>
+                      <div className="space-y-1">
+                        <h3 className="font-bold text-lg text-foreground truncate">
+                          {p.name}
+                        </h3>
+                        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                          <MapPin className="w-4 h-4 text-primary/70" />
+                          <span className="truncate">
+                            {p.area}, {p.city}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   );
@@ -1180,19 +1138,22 @@ export default function KYCVerification() {
                   onClick={() => {
                     navigate("/spaceportal/space-management/add");
                   }}
-                  className="bg-white rounded-xl shadow-sm border-2 border-dashed border-gray-200 p-5 flex flex-col items-center justify-center text-gray-400 hover:border-[#3FA69E] hover:text-[#3FA69E] transition-all group min-h-[160px]"
+                  className="bg-background border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-foreground transition-all group min-h-[180px]"
                 >
-                  <div className="p-3 bg-gray-50 rounded-full group-hover:bg-[#80dad3bb] mb-3 transition-colors">
-                    <Building2 className="w-6 h-6" />
+                  <div className="p-5 bg-primary/10 rounded-full group-hover:scale-110 mb-3 transition-all">
+                    <Building2 className="w-10 h-10 text-primary" />
                   </div>
-                  <span className="font-medium">Add New Space</span>
+                  <span className="font-bold text-base">
+                    Register New Space
+                  </span>
                 </button>
               </div>
             </div>
           </div>
         ) : (
           <div className="space-y-6">
-            <button
+            <Button
+              variant="ghost"
               onClick={() => {
                 setProfileId(null);
                 setKycData(null);
@@ -1201,24 +1162,26 @@ export default function KYCVerification() {
                   return params;
                 });
               }}
-              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 font-medium"
+              className="px-0 group text-muted-foreground hover:text-foreground hover:bg-background"
             >
-              <ChevronRight className="w-4 h-4 rotate-180" /> Back to profiles
-            </button>
+              <ChevronRight className="w-4 h-4 rotate-180 group-hover:rotate-0 transition-transform" />
+              Back to profiles
+            </Button>
 
             {profileId !== "new" && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div className="bg-background border border-border rounded-xl p-8 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-semibold text-gray-900">
-                    Verification Progress
+                  <h2 className="text-lg font-extrabold text-foreground tracking-tight">
+                    Verification{" "}
+                    <span className="text-primary italic">Progress</span>
                   </h2>
-                  <span className="text-2xl font-bold text-[#3FA69E] transition-all duration-300">
+                  <span className="text-xl font-extrabold text-primary transition-all duration-300">
                     {completionPercentage}%
                   </span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-4 bg-muted rounded-full overflow-hidden border border-border">
                   <div
-                    className="h-full bg-gradient-to-r from-[#3FA69E] to-[#74bbb5] rounded-full transition-all duration-500 ease-out"
+                    className="h-full bg-primary rounded-full transition-all duration-500 ease-out shadow-[0_0_15px_rgba(var(--primary),0.3)]"
                     style={{ width: `${completionPercentage}%` }}
                   />
                 </div>
@@ -1227,16 +1190,16 @@ export default function KYCVerification() {
 
             {/* Profile Name Input (Hide for Partner Mode) */}
             {(profileId === "new" || editMode) && !isPartnerMode && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <label className="block text-xs font-semibold text-gray-400 uppercase mb-1">
+              <div className="bg-background border border-border rounded-xl p-6 shadow-sm space-y-4">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                  <div className="flex-1 space-y-2">
+                    <label className="text-sm font-semibold text-foreground">
                       Profile Name (Internal Reference){" "}
-                      <span className="text-red-500">*</span>
+                      <span className="text-destructive">*</span>
                     </label>
-                    <input
+                    <Input
                       type="text"
-                      placeholder="e.g. My Personal Profile"
+                      placeholder="e.g. Primary KYC Profile"
                       value={businessForm.profileName}
                       onChange={(e) =>
                         setBusinessForm({
@@ -1244,25 +1207,27 @@ export default function KYCVerification() {
                           profileName: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3FA69E] focus:outline-none"
+                      className="rounded-xl h-12"
                       required
                     />
                   </div>
-                  <div className="flex bg-gray-100 p-1 rounded-lg self-end h-min">
-                    <button
+                  <div className="flex bg-muted/50 p-1.5 rounded-xl border border-border h-12">
+                    <Button
+                      variant={kycType === "individual" ? "default" : "ghost"}
+                      size="sm"
                       onClick={() => setKycType("individual")}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${kycType === "individual" ? "bg-white text-black shadow-sm" : "text-gray-500"}`}
+                      className={`gap-2 rounded-lg font-bold px-6 ${kycType === "individual" ? "shadow-md" : "text-muted-foreground"}`}
                     >
                       <User className="w-4 h-4" /> Individual
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
             )}
 
             {profileId !== "new" && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2">
-                <div className="flex gap-1">
+              <div className="bg-muted/30 border border-border rounded-2xl p-2 shadow-inner">
+                <div className="flex gap-2">
                   {steps.map((step) => {
                     const isAccessible = isStepAccessible(
                       step.id as VerificationStep,
@@ -1276,21 +1241,23 @@ export default function KYCVerification() {
                           }
                         }}
                         disabled={!isAccessible}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors relative ${
+                        className={`flex-1 flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-sm font-bold transition-all relative ${
                           activeStep === step.id
-                            ? "bg-[#3FA69E] text-white"
+                            ? "bg-background text-primary shadow-lg ring-1 ring-border translate-y-[-2px]"
                             : isAccessible
-                              ? "text-gray-600 hover:bg-gray-100 cursor-pointer"
-                              : "text-gray-300 cursor-not-allowed opacity-50 bg-gray-50"
+                              ? "text-muted-foreground hover:bg-background/50 cursor-pointer"
+                              : "text-muted-foreground/30 cursor-not-allowed opacity-50 bg-muted/50"
                         }`}
                         title={
                           !isAccessible ? "Complete previous steps first" : ""
                         }
                       >
                         {!isAccessible && (
-                          <Lock className="w-3 h-3 absolute top-1 right-1" />
+                          <Lock className="w-3 h-3 absolute top-1.5 right-1.5" />
                         )}
-                        <step.icon className="w-4 h-4" />
+                        <step.icon
+                          className={`w-4 h-4 ${activeStep === step.id ? "text-primary" : ""}`}
+                        />
                         <span className="hidden sm:inline">{step.label}</span>
                       </button>
                     );
@@ -1300,28 +1267,32 @@ export default function KYCVerification() {
             )}
 
             {profileId === "new" && !isPartnerMode ? (
-              <div className="space-y-6 text-center py-8">
-                <div className="max-w-md mx-auto space-y-4">
-                  <h2 className="text-xl font-bold font-[Poppins]">
-                    Start New Verification
-                  </h2>
-                  <p className="text-gray-500">
-                    Provide a name for this profile and select the type to
-                    begin.
-                  </p>
-                  <button
+              <div className="space-y-6 text-center py-12 bg-background border border-dashed border-border rounded-xl">
+                <div className="max-w-md mx-auto space-y-6">
+                  <div className="space-y-2">
+                    <h2 className="text-lg font-extrabold text-foreground tracking-tight">
+                      Ready to Start{" "}
+                      <span className="text-primary italic">Verification?</span>
+                    </h2>
+                    <p className="text-muted-foreground">
+                      Provide a name for this profile and select the type to
+                      begin your KYC journey.
+                    </p>
+                  </div>
+                  <Button
                     onClick={() => {
                       setHasStartedNewProfile(true);
                     }}
                     disabled={saving || !businessForm.profileName}
-                    className="w-full py-3 bg-[#3FA69E] text-black rounded-lg font-bold hover:bg-[#3FA69E] transition-colors disabled:opacity-50"
+                    className="w-full h-16 rounded-xl font-bold text-base shadow-xl hover:shadow-primary/20 transition-all active:scale-95 gap-3"
                   >
                     {saving ? (
-                      <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                      <Loader2 className="w-6 h-6 animate-spin" />
                     ) : (
                       "Begin Verification"
                     )}
-                  </button>
+                    <ChevronRight className="w-5 h-5" />
+                  </Button>
                 </div>
               </div>
             ) : null}
@@ -1330,19 +1301,19 @@ export default function KYCVerification() {
             {(profileId !== "new" || isPartnerMode || hasStartedNewProfile) && (
               <>
                 {activeStep === "personal" && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                        <User className="w-5 h-5 text-[#3FA69E]" />{" "}
+                  <div className="bg-background border border-border rounded-xl p-8 shadow-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex items-center justify-between border-b border-border pb-4">
+                      <h2 className="text-lg font-extrabold text-foreground flex items-center gap-3">
+                        <User className="w-7 h-7 text-primary" />
                         {isPartnerMode
                           ? "Partner Personal Information"
                           : "Personal Information"}
                       </h2>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
-                          Full Name <span className="text-red-500">*</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
+                          Full Name <span className="text-destructive">*</span>
                         </label>
                         {isPartnerMode ||
                         (profileId !== "new" &&
@@ -1350,7 +1321,7 @@ export default function KYCVerification() {
                           kycData?.profileName !== user?.fullName &&
                           kycData?.personalInfo?.fullName !==
                             user?.fullName) ? (
-                          <input
+                          <Input
                             type="text"
                             placeholder="Partner Full Name"
                             value={personalForm.fullName}
@@ -1360,25 +1331,26 @@ export default function KYCVerification() {
                                 fullName: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E]"
+                            className="rounded-xl h-12"
                             required
                           />
                         ) : (
-                          <p className="text-gray-900 font-medium">
+                          <div className="h-12 flex items-center px-4 bg-muted/30 rounded-xl font-bold text-foreground">
                             {user?.fullName ||
                               kycData?.personalInfo?.fullName ||
                               "-"}
-                          </p>
+                          </div>
                         )}
                       </div>
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
-                          Email <span className="text-red-500">*</span>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
+                          Email Address{" "}
+                          <span className="text-destructive">*</span>
                         </label>
                         {isPartnerMode ? (
-                          <input
+                          <Input
                             type="email"
-                            placeholder="Partner Email"
+                            placeholder="partner@example.com"
                             value={personalForm.email}
                             onChange={(e) =>
                               setPersonalForm({
@@ -1386,25 +1358,25 @@ export default function KYCVerification() {
                                 email: e.target.value,
                               })
                             }
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E]"
+                            className="rounded-xl h-12"
                             required
                           />
                         ) : (
-                          <p className="text-gray-900">
+                          <div className="h-12 flex items-center px-4 bg-muted/30 rounded-xl font-bold text-foreground">
                             {user?.email || kycData?.personalInfo?.email || "-"}
-                          </p>
+                          </div>
                         )}
                       </div>
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
-                          Phone Number <span className="text-red-500">*</span>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
+                          Phone Number{" "}
+                          <span className="text-destructive">*</span>
                         </label>
-                        <input
+                        <Input
                           type="tel"
-                          placeholder="Enter 10-digit number"
+                          placeholder="10-digit mobile number"
                           value={personalForm.phone}
                           onChange={(e) => {
-                            // Allow only digits and enforce max length 10
                             const digitsOnly = e.target.value.replace(
                               /\D/g,
                               "",
@@ -1415,18 +1387,18 @@ export default function KYCVerification() {
                               phone: trimmed,
                             });
                           }}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E]"
+                          className="rounded-xl h-12"
                           required
                           minLength={10}
                           maxLength={10}
-                          pattern="[0-9]{10}"
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
-                          Date of Birth <span className="text-red-500">*</span>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
+                          Date of Birth{" "}
+                          <span className="text-destructive">*</span>
                         </label>
-                        <input
+                        <Input
                           type="date"
                           value={personalForm.dateOfBirth}
                           onChange={(e) =>
@@ -1435,20 +1407,20 @@ export default function KYCVerification() {
                               dateOfBirth: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E]"
+                          className="rounded-xl h-12"
                           required
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
-                          Aadhaar Number <span className="text-red-500">*</span>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
+                          Aadhaar Number{" "}
+                          <span className="text-destructive">*</span>
                         </label>
-                        <input
+                        <Input
                           type="text"
                           placeholder="12-digit Aadhaar Number"
                           value={personalForm.aadhaar}
                           onChange={(e) => {
-                            // Allow only digits and enforce max length 12
                             const digitsOnly = e.target.value.replace(
                               /\D/g,
                               "",
@@ -1459,23 +1431,21 @@ export default function KYCVerification() {
                               aadhaar: trimmed,
                             });
                           }}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E]"
+                          className="rounded-xl h-12"
                           required
                           minLength={12}
                           maxLength={12}
-                          pattern="[0-9]{12}"
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
-                          PAN Number <span className="text-red-500">*</span>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
+                          PAN Number <span className="text-destructive">*</span>
                         </label>
-                        <input
+                        <Input
                           type="text"
                           placeholder="10-character PAN"
                           value={personalForm.pan}
                           onChange={(e) => {
-                            // Allow only alphabets and numbers, enforce max length 10
                             const cleaned = e.target.value.replace(
                               /[^a-zA-Z0-9]/g,
                               "",
@@ -1483,20 +1453,18 @@ export default function KYCVerification() {
                             const trimmed = cleaned.slice(0, 10).toUpperCase();
                             setPersonalForm({ ...personalForm, pan: trimmed });
                           }}
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E] uppercase"
+                          className="rounded-xl h-12 uppercase"
                           required
                           minLength={10}
                           maxLength={10}
-                          pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
                         />
                       </div>
                     </div>
-                    <div className="mt-6 flex justify-end">
-                      <button
+                    <div className="mt-12 flex justify-end">
+                      <Button
                         onClick={async () => {
                           setSaving(true);
                           try {
-                            // Save personal info first
                             await upsertSpaceUserKyc({
                               fullName:
                                 personalForm.fullName || user?.fullName || "",
@@ -1522,33 +1490,36 @@ export default function KYCVerification() {
                           (isPartnerMode &&
                             (!personalForm.fullName || !personalForm.email))
                         }
-                        className="px-6 py-2 bg-[#3FA69E] text-white rounded-lg font-medium hover:bg-[#3FA69E] transition-colors flex items-center gap-2 disabled:opacity-50"
+                        className="rounded-xl h-14 px-10 font-bold text-base shadow-xl hover:shadow-primary/20 transition-all active:scale-95 gap-3"
                       >
                         {saving ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-6 h-6 animate-spin" />
                         ) : (
                           "Save & Continue"
                         )}
-                        {!saving && <ChevronRight className="w-4 h-4" />}
-                      </button>
+                        {!saving && (
+                          <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        )}
+                      </Button>
                     </div>
                   </div>
                 )}
 
                 {activeStep === "business" && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                        <Building2 className="w-5 h-5 text-[#3FA69E]" />{" "}
+                  <div className="bg-background border border-border rounded-xl p-8 shadow-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex items-center justify-between border-b border-border pb-4">
+                      <h2 className="text-lg font-extrabold text-foreground flex items-center gap-3">
+                        <Building2 className="w-7 h-7 text-primary" />
                         Business Information
                       </h2>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
-                          Company Name <span className="text-red-500">*</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
+                          Company Name{" "}
+                          <span className="text-destructive">*</span>
                         </label>
-                        <input
+                        <Input
                           type="text"
                           placeholder="Registered Company Name"
                           value={businessForm.companyName}
@@ -1558,13 +1529,14 @@ export default function KYCVerification() {
                               companyName: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E]"
+                          className="rounded-xl h-12"
                           required
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
-                          Company Type <span className="text-red-500">*</span>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
+                          Company Type{" "}
+                          <span className="text-destructive">*</span>
                         </label>
                         <select
                           value={businessForm.companyType}
@@ -1574,7 +1546,7 @@ export default function KYCVerification() {
                               companyType: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E] bg-white"
+                          className="w-full h-12 px-4 bg-background border border-input rounded-xl focus:ring-2 focus:ring-primary focus:outline-none transition-all"
                           required
                         >
                           <option value="">Select Type</option>
@@ -1587,11 +1559,11 @@ export default function KYCVerification() {
                           <option value="Public Limited">Public Limited</option>
                         </select>
                       </div>
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
-                          Industry <span className="text-red-500">*</span>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
+                          Industry <span className="text-destructive">*</span>
                         </label>
-                        <input
+                        <Input
                           type="text"
                           placeholder="e.g. Technology, Retail"
                           value={businessForm.industry}
@@ -1601,15 +1573,15 @@ export default function KYCVerification() {
                               industry: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E]"
+                          className="rounded-xl h-12"
                           required
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
-                          GST Number <span className="text-red-500">*</span>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
+                          GST Number <span className="text-destructive">*</span>
                         </label>
-                        <input
+                        <Input
                           type="text"
                           placeholder="15-digit GSTIN"
                           value={businessForm.gstNumber}
@@ -1619,17 +1591,17 @@ export default function KYCVerification() {
                               gstNumber: e.target.value.toUpperCase(),
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E] uppercase"
+                          className="rounded-xl h-12 uppercase"
                           required
                           minLength={15}
                           maxLength={15}
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm text-gray-500 mb-1">
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
                           CIN / Registration No.
                         </label>
-                        <input
+                        <Input
                           type="text"
                           placeholder="Corporate Identity Number"
                           value={businessForm.cinNumber}
@@ -1639,13 +1611,13 @@ export default function KYCVerification() {
                               cinNumber: e.target.value.toUpperCase(),
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E] uppercase"
+                          className="rounded-xl h-12 uppercase"
                         />
                       </div>
-                      <div className="md:col-span-2">
-                        <label className="block text-sm text-gray-500 mb-1">
+                      <div className="md:col-span-2 space-y-2">
+                        <label className="text-sm font-semibold text-foreground">
                           Registered Address{" "}
-                          <span className="text-red-500">*</span>
+                          <span className="text-destructive">*</span>
                         </label>
                         <textarea
                           rows={3}
@@ -1657,14 +1629,13 @@ export default function KYCVerification() {
                               registeredAddress: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3FA69E] resize-none"
+                          className="w-full px-4 py-3 bg-background border border-input rounded-xl focus:ring-2 focus:ring-primary focus:outline-none transition-all resize-none"
                           required
                         />
                       </div>
                     </div>
-
-                    <div className="mt-6 flex justify-end">
-                      <button
+                    <div className="mt-12 flex justify-end">
+                      <Button
                         onClick={async () => {
                           await handleSaveBusinessInfo();
                           setActiveStep("documents");
@@ -1677,28 +1648,30 @@ export default function KYCVerification() {
                           !businessForm.gstNumber ||
                           !businessForm.registeredAddress
                         }
-                        className="px-6 py-2 bg-[#3FA69E] text-black rounded-lg font-medium hover:bg-[#3FA69E] transition-colors flex items-center gap-2 disabled:opacity-50"
+                        className="rounded-xl h-14 px-10 font-bold text-base shadow-xl hover:shadow-primary/20 transition-all active:scale-95 gap-3"
                       >
                         {saving ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-6 h-6 animate-spin" />
                         ) : (
                           "Save & Continue"
                         )}
-                        {!saving && <ChevronRight className="w-4 h-4" />}
-                      </button>
+                        {!saving && (
+                          <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        )}
+                      </Button>
                     </div>
                   </div>
                 )}
 
                 {activeStep === "documents" && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-[#3FA69E]" /> Required
+                  <div className="bg-background border border-border rounded-xl p-8 shadow-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex items-center justify-between border-b border-border pb-4">
+                      <h2 className="text-lg font-extrabold text-foreground flex items-center gap-3">
+                        <FileText className="w-7 h-7 text-primary" /> Required
                         Documents
                       </h2>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                       {requiredDocTypes.map((docType) => {
                         const uploadedDoc = kycData?.documents?.find(
                           (d) => d.type === docType.type,
@@ -1711,33 +1684,36 @@ export default function KYCVerification() {
                         return (
                           <div
                             key={docType.type}
-                            className={`p-4 border rounded-xl transition-colors ${status === "rejected" ? "border-red-200 bg-red-50" : "border-gray-200 hover:border-[#3FA69E]"}`}
+                            className={`p-6 border rounded-2xl transition-all ${status === "rejected" ? "border-red-200 bg-red-50" : "border-border bg-muted/20 hover:border-primary/50"}`}
                           >
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-medium text-gray-900">
+                                  <h3 className="font-bold text-foreground">
                                     {docType.name}
                                   </h3>
                                   {docType.required && (
-                                    <span className="text-xs text-red-500">
-                                      *Required
-                                    </span>
+                                    <Badge
+                                      variant="destructive"
+                                      className="text-[10px] h-5"
+                                    >
+                                      Required
+                                    </Badge>
                                   )}
                                   {uploadedDoc && (
-                                    <span
-                                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}
+                                    <Badge
+                                      className={`gap-1 ${statusConfig.bg} ${statusConfig.text} border-none`}
                                     >
                                       <statusConfig.icon className="w-3 h-3" />
                                       {statusConfig.label}
-                                    </span>
+                                    </Badge>
                                   )}
                                 </div>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-muted-foreground">
                                   {docType.description}
                                 </p>
                                 {uploadedDoc?.name && (
-                                  <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                                  <p className="text-xs text-muted-foreground/70 mt-1 flex items-center gap-1">
                                     <FileText className="w-3.5 h-3.5" />
                                     <span
                                       className="truncate max-w-[150px] sm:max-w-[250px]"
@@ -1763,7 +1739,7 @@ export default function KYCVerification() {
                                   </p>
                                 )}
                                 {uploadedDoc?.rejectionReason && (
-                                  <p className="text-sm text-red-600 mt-2 flex items-start gap-1">
+                                  <p className="text-sm text-destructive mt-2 flex items-start gap-1 font-medium">
                                     <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                                     {uploadedDoc.rejectionReason}
                                   </p>
@@ -1771,7 +1747,9 @@ export default function KYCVerification() {
                               </div>
                               <div className="flex gap-2">
                                 {uploadedDoc?.fileUrl && (
-                                  <button
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
                                     onClick={() =>
                                       setPreviewDoc({
                                         url: uploadedDoc.fileUrl!,
@@ -1783,19 +1761,23 @@ export default function KYCVerification() {
                                           : "image/*",
                                       })
                                     }
-                                    className="flex items-center gap-1.5 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                                    className="h-9 gap-1.5"
                                   >
                                     <Eye className="w-4 h-4" /> View
-                                  </button>
+                                  </Button>
                                 )}
                                 {status !== "approved" && (
                                   <>
-                                    <button
+                                    <Button
+                                      size="sm"
+                                      variant={
+                                        uploadedDoc ? "outline" : "default"
+                                      }
                                       onClick={() =>
                                         triggerFileUpload(docType.type)
                                       }
                                       disabled={isUploading || !!deleting}
-                                      className={`flex items-center gap-1.5 px-3 py-2 ${uploadedDoc ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-[#3FA69E] text-black hover:bg-[#3FA69E]"} rounded-lg text-sm font-medium transition-colors disabled:opacity-50`}
+                                      className="h-9 gap-1.5"
                                     >
                                       {isUploading ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -1805,10 +1787,12 @@ export default function KYCVerification() {
                                         <Upload className="w-4 h-4" />
                                       )}
                                       {uploadedDoc ? "Replace" : "Upload"}
-                                    </button>
+                                    </Button>
 
                                     {uploadedDoc && (
-                                      <button
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
                                         onClick={() =>
                                           handleDeleteDocument(docType.type)
                                         }
@@ -1816,7 +1800,7 @@ export default function KYCVerification() {
                                           deleting === docType.type ||
                                           isUploading
                                         }
-                                        className="flex items-center justify-center px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 border border-red-100"
+                                        className="h-9 px-3 text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
                                         title="Delete Document"
                                       >
                                         {deleting === docType.type ? (
@@ -1824,7 +1808,7 @@ export default function KYCVerification() {
                                         ) : (
                                           <Trash2 className="w-4 h-4" />
                                         )}
-                                      </button>
+                                      </Button>
                                     )}
                                   </>
                                 )}
@@ -1834,91 +1818,79 @@ export default function KYCVerification() {
                         );
                       })}
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm text-gray-600">
-                        <strong>Accepted formats:</strong> PDF, JPG, PNG (Max
-                        5MB per file)
+                    <div className="bg-muted/50 rounded-xl p-4 border border-border">
+                      <p className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Info className="w-4 h-4" />
+                        <span>
+                          <strong>Accepted formats:</strong> PDF, JPG, PNG (Max
+                          5MB per file)
+                        </span>
                       </p>
                     </div>
 
-                    <div className="mt-6 flex justify-end">
-                      <button
+                    <div className="mt-8 flex justify-end">
+                      <Button
                         onClick={() => setActiveStep("review")}
-                        className="px-6 py-2 bg-[#3FA69E] text-white rounded-lg font-medium hover:bg-[#3FA69E] transition-colors flex items-center gap-2"
+                        className="rounded-xl h-14 px-10 font-bold text-base shadow-xl hover:shadow-primary/20 transition-all active:scale-95 gap-3"
                       >
-                        Proceed to Review <ChevronRight className="w-4 h-4" />
-                      </button>
+                        Proceed to Review <ChevronRight className="w-5 h-5" />
+                      </Button>
                     </div>
                   </div>
                 )}
 
                 {activeStep === "review" && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold font-[Poppins] text-gray-900 flex items-center gap-2">
-                        <Shield className="w-5 h-5 text-[#3FA69E]" /> Review &
+                  <div className="bg-background border border-border rounded-xl p-8 shadow-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex items-center justify-between border-b border-border pb-4">
+                      <h2 className="text-lg font-extrabold text-foreground flex items-center gap-3">
+                        <Shield className="w-7 h-7 text-primary" /> Review &
                         Submit
                       </h2>
                     </div>
-                    <div className="bg-[#3FA69E] border border-[#3FA69E] rounded-xl p-4">
-                      <p className="text-sm text-[#3FA69E]-800">
-                        Please review all your information before submitting.
-                        Once submitted, changes may require re-verification.
+                    <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
+                      <p className="text-foreground font-medium leading-relaxed">
+                        Please review all your information carefully before
+                        submitting. Once submitted, the details will be locked
+                        for verification by our compliance team.
                       </p>
                     </div>
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-xl">
                         <div className="flex items-center gap-3">
-                          <User className="w-5 h-5 text-gray-400" />
-                          <span className="font-medium text-gray-900">
+                          <User className="w-5 h-5 text-primary" />
+                          <span className="font-bold text-foreground">
                             Personal Information
                           </span>
                         </div>
                         {kycData?.personalInfo?.fullName &&
                         kycData?.personalInfo?.phone &&
                         kycData?.personalInfo?.aadhaarNumber ? (
-                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          <CheckCircle2 className="w-5 h-5 text-primary" />
                         ) : (
-                          <Clock className="w-5 h-5 text-[#3FA69E]" />
+                          <Clock className="w-5 h-5 text-muted-foreground" />
                         )}
                       </div>
 
                       {kycType === "business" && (
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-xl">
                           <div className="flex items-center gap-3">
-                            <Building2 className="w-5 h-5 text-gray-400" />
-                            <span className="font-medium text-gray-900">
+                            <Building2 className="w-5 h-5 text-primary" />
+                            <span className="font-bold text-foreground">
                               Business Information
                             </span>
                           </div>
                           {kycData?.businessInfo?.companyName ? (
-                            <CheckCircle2 className="w-5 h-5 text-green-500" />
+                            <CheckCircle2 className="w-5 h-5 text-primary" />
                           ) : (
-                            <Clock className="w-5 h-5 text-[#3FA69E]" />
+                            <Clock className="w-5 h-5 text-muted-foreground" />
                           )}
                         </div>
                       )}
 
-                      {!isPartnerMode && (
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <Building2 className="w-5 h-5 text-gray-400" />
-                            <span className="font-medium text-gray-900">
-                              Business Info
-                            </span>
-                          </div>
-                          {kycData?.businessInfo?.companyName ? (
-                            <CheckCircle2 className="w-5 h-5 text-green-500" />
-                          ) : (
-                            <Clock className="w-5 h-5 text-[#3FA69E]" />
-                          )}
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between p-4 bg-muted/20 border border-border rounded-xl">
                         <div className="flex items-center gap-3">
-                          <FileText className="w-5 h-5 text-gray-400" />
-                          <span className="font-medium text-gray-900">
+                          <FileText className="w-5 h-5 text-primary" />
+                          <span className="font-bold text-foreground">
                             Documents (
                             {kycData?.documents?.filter(
                               (d) =>
@@ -1934,33 +1906,36 @@ export default function KYCVerification() {
                           (d) => d.type !== "video_kyc",
                         ).length >=
                         requiredDocTypes.filter((d) => d.required).length ? (
-                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          <CheckCircle2 className="w-5 h-5 text-primary" />
                         ) : (
-                          <Clock className="w-5 h-5 text-[#3FA69E]" />
+                          <Clock className="w-5 h-5 text-muted-foreground" />
                         )}
                       </div>
                     </div>
-                    <div className="pt-4 border-t border-gray-100">
-                      <label className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={termsAccepted}
-                          onChange={(e) => setTermsAccepted(e.target.checked)}
-                          className="mt-1 w-4 h-4 text-[#3FA69E] rounded focus:ring-[#3FA69E]"
-                        />
-                        <span className="text-sm text-gray-600">
+
+                    <div className="pt-4 border-t border-border">
+                      <label className="flex items-start gap-3 cursor-pointer group">
+                        <div className="relative flex items-center mt-1">
+                          <input
+                            type="checkbox"
+                            checked={termsAccepted}
+                            onChange={(e) => setTermsAccepted(e.target.checked)}
+                            className="w-5 h-5 rounded border-border text-primary focus:ring-primary/20 transition-all cursor-pointer"
+                          />
+                        </div>
+                        <span className="text-sm text-muted-foreground leading-relaxed group-hover:text-foreground transition-colors">
                           I confirm that all the information provided is
                           accurate and I agree to FlashSpace{" "}
                           <a
                             href="/terms"
-                            className="text-[#3FA69E] hover:underline"
+                            className="text-primary font-semibold hover:underline"
                           >
                             Terms of Service
                           </a>{" "}
                           and{" "}
                           <a
                             href="/privacy"
-                            className="text-[#3FA69E] hover:underline"
+                            className="text-primary font-semibold hover:underline"
                           >
                             Privacy Policy
                           </a>
@@ -1968,117 +1943,37 @@ export default function KYCVerification() {
                         </span>
                       </label>
                     </div>
-
                     {/* Show warning if not ready to submit */}
                     {!isReadyForSubmission() &&
                       kycData?.overallStatus !== "approved" &&
                       kycData?.overallStatus !== "pending" && (
-                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                          <div className="text-sm text-amber-800 font-medium space-y-2">
-                            <div className="flex items-start gap-2">
-                              <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                              <span>
-                                Please complete all required steps before
-                                submitting:
-                              </span>
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+                          <div className="text-sm text-amber-900 space-y-3">
+                            <div className="flex items-center gap-2 font-bold">
+                              <AlertCircle className="w-5 h-5 text-amber-600" />
+                              <span>Complete Required Steps</span>
                             </div>
 
-                            <ul className="ml-6 space-y-2 list-disc">
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                               {!isPersonalInfoSaved() && (
-                                <li>
-                                  <span className="font-semibold underline">
-                                    Personal Information:
-                                  </span>
-                                  <div className="text-xs mt-0.5 text-amber-700 flex flex-wrap gap-1">
-                                    {!kycData?.personalInfo?.fullName && (
-                                      <span className="bg-amber-100 px-1.5 py-0.5 rounded">
-                                        Full Name
-                                      </span>
-                                    )}
-                                    {!kycData?.personalInfo?.phone && (
-                                      <span className="bg-amber-100 px-1.5 py-0.5 rounded">
-                                        Phone Number
-                                      </span>
-                                    )}
-                                    {!kycData?.personalInfo?.dateOfBirth && (
-                                      <span className="bg-amber-100 px-1.5 py-0.5 rounded">
-                                        Date of Birth
-                                      </span>
-                                    )}
-                                    {!kycData?.personalInfo?.aadhaarNumber && (
-                                      <span className="bg-amber-100 px-1.5 py-0.5 rounded">
-                                        Aadhaar Card
-                                      </span>
-                                    )}
-                                    {!kycData?.personalInfo?.panNumber && (
-                                      <span className="bg-amber-100 px-1.5 py-0.5 rounded">
-                                        PAN Card
-                                      </span>
-                                    )}
-                                  </div>
+                                <li className="flex items-center gap-2 bg-amber-100/50 p-2 rounded-lg">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+                                  Personal Information
                                 </li>
                               )}
 
                               {kycType === "business" &&
                                 !isBusinessInfoSaved() && (
-                                  <li>
-                                    <span className="font-semibold underline">
-                                      Business Information:
-                                    </span>
-                                    <div className="text-xs mt-0.5 text-amber-700 flex flex-wrap gap-1">
-                                      {!kycData?.businessInfo?.companyName && (
-                                        <span className="bg-amber-100 px-1.5 py-0.5 rounded">
-                                          Company Name
-                                        </span>
-                                      )}
-                                      {!kycData?.businessInfo?.companyType && (
-                                        <span className="bg-amber-100 px-1.5 py-0.5 rounded">
-                                          Company Type
-                                        </span>
-                                      )}
-                                      {!kycData?.businessInfo?.gstNumber && (
-                                        <span className="bg-amber-100 px-1.5 py-0.5 rounded">
-                                          GST Number
-                                        </span>
-                                      )}
-                                      {!kycData?.businessInfo
-                                        ?.registeredAddress && (
-                                        <span className="bg-amber-100 px-1.5 py-0.5 rounded">
-                                          Registered Address
-                                        </span>
-                                      )}
-                                      {!kycData?.businessInfo?.industry && (
-                                        <span className="bg-amber-100 px-1.5 py-0.5 rounded">
-                                          Industry
-                                        </span>
-                                      )}
-                                    </div>
+                                  <li className="flex items-center gap-2 bg-amber-100/50 p-2 rounded-lg">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+                                    Business Information
                                   </li>
                                 )}
 
                               {!areAllRequiredDocsUploaded() && (
-                                <li>
-                                  <span className="font-semibold underline">
-                                    Required Documents:
-                                  </span>
-                                  <div className="text-xs mt-0.5 text-amber-700 flex flex-wrap gap-1">
-                                    {requiredDocTypes
-                                      .filter(
-                                        (doc) =>
-                                          doc.required &&
-                                          !kycData?.documents?.find(
-                                            (d) => d.type === doc.type,
-                                          ),
-                                      )
-                                      .map((doc) => (
-                                        <span
-                                          key={doc.type}
-                                          className="bg-amber-100 px-1.5 py-0.5 rounded"
-                                        >
-                                          {doc.name}
-                                        </span>
-                                      ))}
-                                  </div>
+                                <li className="flex items-center gap-2 bg-amber-100/50 p-2 rounded-lg">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+                                  Required Documents
                                 </li>
                               )}
                             </ul>
@@ -2090,26 +1985,24 @@ export default function KYCVerification() {
                     {isReadyForSubmission() &&
                       kycData?.overallStatus !== "approved" &&
                       kycData?.overallStatus !== "pending" && (
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                          <p className="text-sm text-green-800 font-medium flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4" /> All
-                            requirements completed (100%)! You can now submit
-                            for verification.
+                        <div className="bg-primary/10 border border-primary/20 rounded-xl p-5">
+                          <p className="text-sm text-primary font-bold flex items-center gap-2">
+                            <CheckCircle2 className="w-5 h-5" />
+                            Requirements Complete! Ready for Submission.
                           </p>
                         </div>
                       )}
 
                     {linkBookingId && kycData?.overallStatus === "approved" && (
-                      <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
-                        <p className="text-sm text-green-800 font-medium flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4" /> This profile is
-                          verified! Click "Use for Booking" to activate your
-                          space.
+                      <div className="bg-primary/10 border border-primary/20 rounded-xl p-5 mb-4">
+                        <p className="text-sm text-primary font-bold flex items-center gap-2">
+                          <CheckCircle2 className="w-5 h-5" /> profile Verified!
+                          Use for Booking.
                         </p>
                       </div>
                     )}
 
-                    <button
+                    <Button
                       onClick={async () => {
                         if (
                           linkBookingId &&
@@ -2164,7 +2057,7 @@ export default function KYCVerification() {
                           kycData?.overallStatus !== "approved" &&
                           kycData?.overallStatus !== "pending")
                       }
-                      className="w-full py-3 bg-[#3FA69E] text-white rounded-xl font-semibold hover:bg-[#3FA69E] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full h-16 rounded-xl font-bold text-base shadow-xl hover:shadow-primary/20 transition-all active:scale-95 gap-3"
                     >
                       {saving ? (
                         <>
@@ -2182,72 +2075,72 @@ export default function KYCVerification() {
                         "Submit for Verification"
                       )}
                       {!saving && <ChevronRight className="w-5 h-5" />}
-                    </button>
+                    </Button>
                   </div>
                 )}
               </>
             )}
           </div>
         )}
-      </div>
 
-      {/* Document Preview Modal */}
-      {previewDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden relative">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="font-semibold text-lg">Document Preview</h3>
-              <button
-                onClick={() => setPreviewDoc(null)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-auto bg-gray-100 p-4 flex items-center justify-center">
-              {(() => {
-                const fullUrl = previewDoc.url;
+        {previewDoc && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-background border border-border rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden relative">
+              <div className="flex items-center justify-between p-6 border-b border-border">
+                <h3 className="font-extrabold text-lg text-foreground tracking-tight">
+                  Document Preview
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setPreviewDoc(null)}
+                  className="rounded-full hover:bg-muted"
+                  id="close-preview"
+                >
+                  <X className="w-6 h-6" />
+                </Button>
+              </div>
+              <div className="flex-1 overflow-auto bg-gray-50 dark:bg-black/20 p-6 flex items-center justify-center">
+                {(() => {
+                  const fullUrl = previewDoc.url;
 
-                if (previewDoc.mimeType === "application/pdf") {
-                  return (
-                    <iframe
-                      src={fullUrl}
-                      className="w-full h-full min-h-[60vh] rounded-lg border shadow-sm"
-                      title="PDF Preview"
-                    />
-                  );
-                } else if (
-                  previewDoc.mimeType === "video/mp4" ||
-                  previewDoc.type === "video_kyc"
-                ) {
-                  return (
-                    <video
-                      src={fullUrl}
-                      controls
-                      className="max-w-full max-h-[70vh] rounded-lg shadow-md"
-                      controlsList="nodownload"
-                      onError={(e) => {
-                        console.error("Video load error:", e);
-                        console.error("Video src:", fullUrl);
-                      }}
-                    >
-                      Your browser does not support the video tag.
-                    </video>
-                  );
-                } else {
-                  return (
-                    <img
-                      src={fullUrl}
-                      alt="Document Preview"
-                      className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-md"
-                    />
-                  );
-                }
-              })()}
+                  if (previewDoc.mimeType === "application/pdf") {
+                    return (
+                      <iframe
+                        src={fullUrl}
+                        className="w-full h-full min-h-[60vh] rounded-2xl border border-[#2D3F33]/10 shadow-sm"
+                        title="PDF Preview"
+                      />
+                    );
+                  } else if (
+                    previewDoc.mimeType === "video/mp4" ||
+                    previewDoc.type === "video_kyc"
+                  ) {
+                    return (
+                      <video
+                        src={fullUrl}
+                        controls
+                        className="max-w-full max-h-[70vh] rounded-2xl shadow-xl"
+                        controlsList="nodownload"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    );
+                  } else {
+                    return (
+                      <img
+                        src={fullUrl}
+                        alt="Document Preview"
+                        className="max-w-full max-h-[70vh] object-contain rounded-2xl shadow-xl"
+                      />
+                    );
+                  }
+                })()}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

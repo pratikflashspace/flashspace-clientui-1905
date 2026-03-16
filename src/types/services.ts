@@ -49,8 +49,8 @@ export interface VirtualOfficeItem {
   address: string;
   city: string;
   area: string;
-  price: string;
-  originalPrice: string;
+  price?: string;
+  originalPrice?: string;
 
   // Updated fields from Backend
   finalGstPricePerYear?: number;
@@ -76,8 +76,10 @@ export interface VirtualOfficeItem {
   reviews?: number; // legacy
 
   features: string[];
-  availability: string;
+  availability?: string;
   popular: boolean;
+  sponsored?: boolean;
+  approvalStatus?: string;
   image?: string; // legacy
   images: string[];
 
@@ -139,9 +141,9 @@ export interface CoworkingSpaceItem {
   address: string;
   city: string;
   area: string;
-  price: string;
+  price: string;         // always filled by service layer ("Price on request" fallback)
   priceYearly?: string;
-  originalPrice: string;
+  originalPrice?: string;
 
   // Updated from Backend
   partnerPricePerMonth?: number;
@@ -153,10 +155,13 @@ export interface CoworkingSpaceItem {
   avgRating?: number;
   totalReviews?: number;
 
-  type: string;
+  type?: string;         // not present on CoworkingSpace server model
   features: string[];
-  availability: string;
+  availability?: string; // not present on server model
   popular: boolean;
+  sponsored?: boolean;
+  approvalStatus?: string;
+  capacity?: number;
   image?: string;
   images?: string[];
   coordinates?: {
@@ -200,17 +205,19 @@ export interface MeetingRoomItem {
   rating: number;
   reviews: number;
 
-  type: string; // e.g. "Meeting Room", "Conference Room", "Cabin"
+  type: string; // MeetingRoomType enum value: "meeting_room", "board_room", "conference_room", "other"
   features: string[];
-  availability: string;
+  availability?: string; // not present on server model
   popular: boolean;
+  sponsored?: boolean;
+  approvalStatus?: string;
   image?: string;
   images?: string[];
   coordinates?: {
     lat: number;
     lng: number;
   };
-  capacity?: string;
+  capacity?: number;     // server model: capacity: number (not string)
   count?: number;
   isDeleted?: boolean;
   isActive?: boolean;
@@ -385,6 +392,9 @@ export interface PersonalInfo {
   aadhaarLast4?: string;
   aadhaarNumber?: string;
   panNumber?: string;
+  address?: string;
+  city?: string;
+  area?: string;
 }
 
 export interface BusinessInfo {
@@ -521,6 +531,7 @@ export interface MailRecord {
   sender: string;
   type: string;
   space: string;
+  documentUrl?: string;
   received: string;
   status: "Pending Action" | "Forwarded" | "Collected";
   createdAt: string;
@@ -667,6 +678,8 @@ export interface AuthUser {
   email: string;
   role: "user" | "admin" | "support";
   fullName?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 // ============ NOTIFICATION TYPES ============

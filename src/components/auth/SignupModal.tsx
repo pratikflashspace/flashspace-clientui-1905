@@ -14,72 +14,71 @@ export const SignupModal = ({ isOpen, onClose, onLoginClick, initialRole = 'user
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
-            document.documentElement.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
         }
         return () => {
             document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
         };
     }, [isOpen]);
 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all animate-in fade-in duration-200">
-            {/* Backdrop click to close */}
-            <div className="absolute inset-0 touch-none" onClick={onClose} />
+        <div className="fixed inset-0 z-[200]">
+            {/* Backdrop */}
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-all animate-in fade-in duration-200" onClick={onClose} />
 
-            <div
-                className="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl p-8 md:p-12 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh] overscroll-contain"
-                onClick={(e) => e.stopPropagation()}
-                style={{ fontFamily: 'Poppins' }}
-            >
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100 z-10"
+            {/* Center Container */}
+            <div className="fixed inset-0 flex items-center justify-center p-4">
+                <div
+                    className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 md:p-12 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh] scrollbar-hide"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ fontFamily: 'Poppins' }}
+                    data-lenis-prevent
                 >
-                    <X className="w-5 h-5" />
-                </button>
 
-                {/* Content of the Signup Card */}
-                <div className="text-center mb-8">
-                    <img
-                        src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
-                        alt="FlashSpace Logo"
-                        className="h-12 mx-auto mb-3"
-                    />
-                    <h2 className="text-2xl font-bold text-[#172A3A] mb-2">
-                        Create Account
-                    </h2>
-                    <p className="text-slate-600 text-base font-medium">
-                        Join thousands of businesses transforming their workspace
-                    </p>
-                </div>
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100 z-10"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
 
-                <SignupForm initialRole={initialRole} />
+                    {/* Content of the Signup Card */}
+                    <div className="text-center mb-8">
+                        <img
+                            src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
+                            alt="FlashSpace Logo"
+                            className="h-12 mx-auto mb-3"
+                        />
+                        <h2 className="text-2xl font-bold text-[#172A3A] mb-2">
+                            Create Account
+                        </h2>
+                        <p className="text-slate-600 text-base font-medium">
+                            Join thousands of businesses transforming their workspace
+                        </p>
+                    </div>
 
-                <div className="mt-6 text-center">
-                    <p className="text-sm text-slate-600">
-                        Already have an account?{' '}
-                        {onLoginClick ? (
-                            <button
-                                onClick={() => {
-                                    onClose();
-                                    onLoginClick();
-                                }}
-                                className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200"
-                            >
-                                Sign in
-                            </button>
-                        ) : (
-                            <Link to="/login" onClick={onClose} className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200">
-                                Sign in
-                            </Link>
-                        )}
-                    </p>
+                    <SignupForm initialRole={initialRole} onSuccess={onClose} />
+
+                    <div className="mt-6 text-center">
+                        <p className="text-sm text-slate-600">
+                            Already have an account?{' '}
+                            {onLoginClick ? (
+                                <button
+                                    onClick={onLoginClick}
+                                    className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200"
+                                >
+                                    Sign in
+                                </button>
+                            ) : (
+                                <Link to="/login" onClick={onClose} className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200">
+                                    Sign in
+                                </Link>
+                            )}
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

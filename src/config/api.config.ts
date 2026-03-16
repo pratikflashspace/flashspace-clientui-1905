@@ -1,6 +1,8 @@
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  BASE_URL:
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin),
   TIMEOUT: 30000,
   CREDENTIALS: "include" as RequestCredentials,
 };
@@ -97,6 +99,10 @@ export const API_ENDPOINTS = {
     // Partner
     PARTNER_CLIENTS: "/api/user/partner/clients",
     PARTNER_CLIENT_DETAILS: (id: string) => `/api/user/partner/clients/${id}`,
+    PARTNER_DASHBOARD: "/api/user/partner/dashboard",
+    PARTNER_ACTIVE_REQUESTS: "/api/user/partner/active-requests",
+    PARTNER_ANALYTICS: "/api/user/partner/analytics",
+    PARTNER_SPACES: "/api/user/partner/spaces",
   },
 
   // Admin endpoints
@@ -125,5 +131,15 @@ export const API_ENDPOINTS = {
     AVAILABLE_SPACES: "/api/affiliate/spaces",
     INVOICES: "/api/affiliate/invoices",
     INVOICE_BY_ID: (id: string) => `/api/affiliate/invoices/${id}`,
+  },
+
+  // Payment endpoints
+  PAYMENT: {
+    CREATE_ORDER: "/api/payment/create-order",
+    VERIFY: "/api/payment/verify",
+    FAILED: "/api/payment/failed",
+    STATUS: (orderId: string) => `/api/payment/status/${orderId}`,
+    USER_HISTORY: (userId: string) => `/api/payment/user/${userId}`,
+    BY_ID: (paymentId: string) => `/api/payment/${paymentId}`,
   },
 };

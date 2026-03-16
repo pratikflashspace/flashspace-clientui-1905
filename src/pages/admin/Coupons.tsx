@@ -13,13 +13,13 @@ import {
   CalendarDays,
   Percent,
   Check,
-  RefreshCw,
   ChevronsUpDown,
 } from "lucide-react";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -177,418 +177,506 @@ export default function Coupons() {
   });
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto animate-in fade-in duration-500">
-      {/* Header */}
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-            Coupons & <span className="text-primary italic">Vouchers</span>
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage discount coupons and promotional codes for your clients.
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={fetchCoupons}
-            className="rounded-xl h-12 border-border px-6 hover:bg-muted/50"
+    <DashboardLayout
+      portalName="FlashSpace Admin"
+      portalDescription="Complete platform management"
+      navItems={ADMIN_NAV_ITEMS}
+    >
+      <div className="space-y-8 animate-in fade-in duration-500">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight font-[Poppins]">
+              Coupons & Vouchers
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 font-medium">
+              Manage discount coupons for your clients.
+            </p>
+          </div>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="w-full md:w-auto px-6 py-3.5 bg-gray-900 text-white border border-transparent rounded-2xl hover:bg-black transition-all shadow-lg shadow-gray-900/10 hover:shadow-xl hover:-translate-y-0.5 flex justify-center items-center gap-2 font-bold"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh
-          </Button>
-          <Button onClick={() => setIsCreateModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-5 h-5" />
             Create Coupon
-          </Button>
+          </button>
         </div>
-      </div>
 
-      {/* Main Content Card */}
-      <div className="bg-background rounded-2xl border border-border shadow-sm overflow-visible">
-        {/* Toolbar */}
-        <div className="p-6 border-b border-border flex flex-col sm:flex-row gap-4 justify-between items-center">
-          <div className="relative flex-1 w-full sm:max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search by code..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-muted/30 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-background transition-all text-foreground placeholder:text-muted-foreground outline-none"
-            />
-          </div>
-
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="pl-10 pr-8 py-2.5 bg-muted/30 border border-border rounded-xl text-sm font-medium text-foreground focus:ring-2 focus:ring-primary/20 cursor-pointer hover:bg-muted/50 transition-colors appearance-none outline-none"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="used">Used</option>
-                <option value="expired">Expired</option>
-                <option value="disabled">Disabled</option>
-              </select>
+        {/* Main Content Card */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 overflow-visible">
+          {/* Toolbar */}
+          <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center bg-white rounded-t-3xl">
+            <div className="relative flex-1 w-full md:max-w-md">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by code..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border-none rounded-xl focus:ring-4 focus:ring-black/5 focus:bg-white transition-all text-sm font-medium text-gray-900 placeholder:text-gray-400 h-11"
+              />
             </div>
-          </div>
-        </div>
 
-        {/* Registry Table */}
-        <div className="overflow-x-auto min-h-[400px]">
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-40 gap-8">
-              <div className="w-20 h-20 bg-muted/20 rounded-[2rem] flex items-center justify-center border border-border/50">
-                <RefreshCw className="w-10 h-10 text-primary animate-spin opacity-40" />
+            <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+              <div className="relative flex-1 md:flex-none">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="w-full md:w-40 pl-9 pr-8 py-2.5 bg-gray-50 border-none rounded-xl text-xs font-bold text-gray-700 focus:ring-4 focus:ring-black/5 cursor-pointer hover:bg-gray-100 transition-all appearance-none h-11"
+                >
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="used">Used</option>
+                  <option value="expired">Expired</option>
+                  <option value="disabled">Disabled</option>
+                </select>
               </div>
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] animate-pulse">Syncing Cryptographic Data...</p>
             </div>
-          ) : (
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-muted/10 text-left border-b border-border/40">
-                  <th className="px-10 py-6 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Cryptographic Code</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Impact</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Operational State</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Assigned Associate</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Expiration</th>
-                  <th className="px-10 py-6 text-right text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Protocols</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/20">
-                {filteredCoupons.map((coupon) => {
-                  const client = clients.find(
-                    (c) => (c._id || c.id) === coupon.assignedClientId,
-                  );
-                  return (
-                    <tr
-                      key={coupon._id}
-                      className="group hover:bg-muted/30 transition-all duration-300"
-                    >
-                      <td className="px-10 py-6">
-                        <Badge variant="outline" className="font-mono font-black text-primary text-sm px-4 py-2 bg-primary/5 border-primary/20 shadow-sm">
-                          {coupon.code}
-                        </Badge>
-                      </td>
-                      <td className="px-10 py-6">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-indigo-500/10 rounded-lg">
-                            <Percent className="w-4 h-4 text-indigo-500" />
-                          </div>
-                          <span className="font-black text-foreground text-lg tracking-tighter">
-                            {coupon.discountValue}%
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-10 py-6">
-                        {getStatusBadge(coupon.status)}
-                      </td>
-                      <td className="px-10 py-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/10 flex items-center justify-center font-black text-xs text-primary shadow-sm">
-                            {client?.fullName?.[0] || 'U'}
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-black text-foreground uppercase tracking-tight text-sm">
-                              {client ? client.fullName : "Unknown Associate"}
-                            </span>
-                            <span className="text-[10px] font-bold text-muted-foreground font-mono uppercase opacity-40">
-                              {client?.email || "ID: UNKNOWN"}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-10 py-6">
-                        <div className="flex items-center gap-3 text-muted-foreground">
-                          <Calendar className="w-4 h-4 opacity-40" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-foreground/70">
-                            {(() => {
-                              try {
-                                const date = new Date(coupon.expiryDate);
-                                return isNaN(date.getTime())
-                                  ? "Invalid Date"
-                                  : format(date, "MMM dd, yyyy");
-                              } catch (e) {
-                                return "N/A";
-                              }
-                            })()}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-10 py-6 text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-muted group-hover:bg-background transition-colors">
-                              <MoreVertical className="w-5 h-5 text-muted-foreground" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className="w-56 bg-background/95 backdrop-blur-md shadow-2xl border border-border rounded-2xl p-2 z-[100]"
+          </div>
+
+          {/* Table */}
+          <div className="min-h-[400px]">
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+              </div>
+            ) : filteredCoupons.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-center p-8">
+                <Tag className="w-12 h-12 text-gray-200 mb-4" />
+                <p className="text-gray-500 font-bold">No coupons found.</p>
+                <p className="text-sm text-gray-400 mt-1">Try adjusting your filters or creating a new one.</p>
+              </div>
+            ) : (
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead className="bg-gray-50/50">
+                      <tr>
+                        <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-widest">
+                          Coupon Code
+                        </th>
+                        <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-widest">
+                          Discount
+                        </th>
+                        <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-widest">
+                          Status
+                        </th>
+                        <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-widest">
+                          Assigned To
+                        </th>
+                        <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-widest">
+                          Expiry
+                        </th>
+                        <th className="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-widest text-right px-8">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {filteredCoupons.map((coupon) => {
+                        const client = clients.find(
+                          (c) => (c._id || c.id) === coupon.assignedClientId,
+                        );
+                        return (
+                          <tr
+                            key={coupon._id}
+                            className="group hover:bg-gray-50 transition-all duration-200"
                           >
-                            <DropdownMenuLabel className="px-4 py-3 text-[9px] font-black text-muted-foreground uppercase tracking-widest">Protocol Authorization</DropdownMenuLabel>
-                            <DropdownMenuSeparator className="bg-border/40" />
-                            <DropdownMenuItem
-                              onClick={() => handleDeleteCoupon(coupon._id)}
-                              className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer rounded-xl h-12 gap-3 px-4 font-black text-[10px] uppercase tracking-widest"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              Revoke Authorization
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {filteredCoupons.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-10 py-40 text-center"
-                    >
-                      <div className="flex flex-col items-center gap-8">
-                        <div className="w-32 h-32 bg-muted/20 rounded-[3rem] flex items-center justify-center border border-border/50">
-                          <Tag className="w-16 h-16 text-muted-foreground opacity-10" />
+                            <td className="px-6 py-4">
+                              <div className="font-mono font-black text-xs text-gray-900 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200/50 inline-block shadow-sm">
+                                {coupon.code}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                <div className="p-1.5 bg-primary/5 rounded-md">
+                                  <Percent className="w-3.5 h-3.5 text-primary" />
+                                </div>
+                                <span className="font-black text-gray-900 text-base">
+                                  {coupon.discountValue}%
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              {getStatusBadge(coupon.status)}
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 border border-gray-200 group-hover:bg-white group-hover:shadow-md transition-all">
+                                  <UserIcon className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-bold text-gray-900 leading-none mb-1">
+                                    {client ? client.fullName : "Unknown Client"}
+                                  </p>
+                                  <p className="text-[10px] text-gray-400 font-medium">
+                                    {client ? client.email : "N/A"}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2 text-gray-600">
+                                <CalendarDays className="w-4 h-4 text-gray-400" />
+                                <span className="text-xs font-bold">
+                                  {(() => {
+                                    try {
+                                      const date = new Date(coupon.expiryDate);
+                                      return isNaN(date.getTime())
+                                        ? "—"
+                                        : format(date, "MMM dd, yyyy");
+                                    } catch (e) {
+                                      return "—";
+                                    }
+                                  })()}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-right px-8">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button className="p-2 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-white hover:shadow-md transition-all opacity-0 group-hover:opacity-100">
+                                    <MoreVertical className="w-5 h-5" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  align="end"
+                                  className="w-48 bg-white shadow-2xl border-0 rounded-2xl p-2 z-[60]"
+                                >
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteCoupon(coupon._id)}
+                                    className="text-red-600 focus:text-red-600 focus:bg-red-50 rounded-xl py-2.5 font-bold cursor-pointer transition-colors"
+                                  >
+                                    <Trash2 className="mr-3 h-4 w-4" />
+                                    Delete Coupon
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile/Tablet Card View */}
+                <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50/50 rounded-b-3xl">
+                  {filteredCoupons.map((coupon) => {
+                    const client = clients.find(
+                      (c) => (c._id || c.id) === coupon.assignedClientId,
+                    );
+                    return (
+                      <div
+                        key={coupon._id}
+                        className="bg-white border border-gray-100 rounded-3xl p-5 space-y-5 shadow-sm hover:shadow-md transition-all border-l-4 border-l-primary/10"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="font-mono font-black text-xs text-primary bg-primary/5 px-3 py-1.5 rounded-lg border border-primary/10 inline-block mb-3">
+                              {coupon.code}
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 shadow-sm">
+                                <UserIcon className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <h3 className="font-black text-gray-900 leading-none mb-1">
+                                  {client ? client.fullName : "Unknown Client"}
+                                </h3>
+                                <p className="text-[11px] text-gray-400 font-bold truncate max-w-[150px]">
+                                  {client ? client.email : "N/A"}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            {getStatusBadge(coupon.status)}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="p-2 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+                                  <MoreVertical className="w-5 h-5" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="w-48 bg-white shadow-2xl border-0 rounded-2xl p-2 z-[60]"
+                              >
+                                <DropdownMenuItem
+                                  onClick={() => handleDeleteCoupon(coupon._id)}
+                                  className="text-red-600 focus:text-red-600 focus:bg-red-50 rounded-xl py-3 font-black cursor-pointer transition-all"
+                                >
+                                  <Trash2 className="mr-3 h-4 w-4" />
+                                  Delete Coupon
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
-                        <div className="space-y-3">
-                          <h3 className="text-3xl font-black text-foreground uppercase tracking-tighter italic">No Incentive <span className="text-primary not-italic">Matches</span></h3>
-                          <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">Adjust your reconnaissance parameters.</p>
+
+                        <div className="grid grid-cols-2 gap-4 py-4 border-y border-gray-50">
+                          <div>
+                            <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-1.5">Discount</p>
+                            <div className="flex items-end gap-1">
+                              <span className="text-2xl font-black text-gray-900 leading-none">{coupon.discountValue}</span>
+                              <span className="text-sm font-bold text-primary mb-0.5">% OFF</span>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-1.5">Expires On</p>
+                            <div className="flex items-center justify-end gap-2 text-gray-900 font-bold">
+                              <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                              <span className="text-xs">
+                                {(() => {
+                                  try {
+                                    const date = new Date(coupon.expiryDate);
+                                    return isNaN(date.getTime()) ? "—" : format(date, "MMM dd, yyyy");
+                                  } catch (e) {
+                                    return "—";
+                                  }
+                                })()}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
-
-      {/* Create Modal Tier */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-xl animate-in fade-in duration-500">
-          <div className="bg-background rounded-[3rem] w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500 border border-border">
-            <div className="p-10 border-b border-border/40 flex justify-between items-center bg-muted/5 relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
-              <div className="space-y-1">
-                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg">
-                  Protocol: PROVISIONING
-                </Badge>
-                <h2 className="text-4xl font-black text-foreground tracking-tighter uppercase italic">
-                  Generate <span className="text-primary not-italic">Incentive</span>
-                </h2>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
-                  Generate a cryptographic discount for a specific associate.
-                </p>
-              </div>
-              <Button
-                variant="ghost"
-                onClick={() => setIsCreateModalOpen(false)}
-                className="w-14 h-14 rounded-2xl hover:bg-muted transition-all active:scale-90"
-              >
-                <X className="w-6 h-6 text-muted-foreground" />
-              </Button>
-            </div>
-
-            <form onSubmit={handleCreateCoupon} className="p-12 space-y-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div className="md:col-span-2 space-y-4">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] flex items-center gap-3">
-                    <UserIcon className="w-4 h-4 text-primary" />
-                    Target Associate Identity
-                  </label>
-                  <div className="relative group">
-                    <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={openCombobox}
-                          className="w-full justify-between h-20 px-8 bg-muted/20 border-border rounded-3xl hover:bg-muted/30 hover:border-primary/30 text-left font-black shadow-none transition-all"
-                        >
-                          {newCoupon.assignedClientId ? (
-                            (() => {
-                              const client = clients.find(
-                                (c) =>
-                                  (c._id || c.id) ===
-                                  newCoupon.assignedClientId,
-                              );
-                              return client ? (
-                                <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-black text-xs">
-                                    {client.fullName?.[0] || 'U'}
-                                  </div>
-                                  <div className="flex flex-col">
-                                    <span className="text-foreground uppercase tracking-tight text-sm">
-                                      {client.fullName}
-                                    </span>
-                                    <span className="text-[9px] text-muted-foreground font-mono uppercase opacity-40">
-                                      {client.email}
-                                    </span>
-                                  </div>
-                                </div>
-                              ) : (
-                                <span className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/40 italic">Lookup Associate Dossier…</span>
-                              );
-                            })()
-                          ) : (
-                            <span className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/40 italic">Lookup Associate Dossier…</span>
-                          )}
-                          <ChevronsUpDown className="ml-2 h-5 w-5 shrink-0 opacity-20" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-[--radix-popover-trigger-width] p-0 rounded-[2.5rem] shadow-[0_32px_96px_-12px_rgba(0,0,0,0.3)] border-border z-[200] bg-background/95 backdrop-blur-xl overflow-hidden"
-                        align="start"
-                      >
-                        <Command className="bg-transparent">
-                          <CommandInput
-                            placeholder="Identify by name or digital address…"
-                            className="bg-muted/10 h-16 border-none focus:ring-0 text-[11px] font-black uppercase tracking-widest px-8"
-                          />
-                          <CommandList className="max-h-[300px] overflow-y-auto custom-scrollbar">
-                            <CommandEmpty className="py-12 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-center opacity-40 italic">No Match Detected.</CommandEmpty>
-                            <CommandGroup className="p-2">
-                              {clients.map((client) => {
-                                const clientId = client._id || client.id;
-                                return (
-                                  <CommandItem
-                                    key={clientId}
-                                    value={`${client.fullName} ${client.email}`}
-                                    onSelect={() => {
-                                      setNewCoupon({
-                                        ...newCoupon,
-                                        assignedClientId: clientId,
-                                      });
-                                      setOpenCombobox(false);
-                                    }}
-                                    className="cursor-pointer h-16 hover:bg-muted/50 aria-selected:bg-muted/50 transition-all rounded-2xl px-6 mx-1 flex items-center gap-4"
-                                  >
-                                    <div className="w-10 h-10 rounded-xl bg-primary/5 text-primary border border-primary/10 flex items-center justify-center font-black text-xs group-aria-selected:scale-110 transition-transform">
-                                      {client.fullName?.[0] || 'U'}
-                                    </div>
-                                    <div className="flex flex-col flex-1">
-                                      <span className="font-black text-foreground uppercase tracking-tight text-sm">
-                                        {client.fullName}
-                                      </span>
-                                      <span className="text-[9px] font-bold text-muted-foreground font-mono uppercase opacity-40">
-                                        {client.email}
-                                      </span>
-                                    </div>
-                                    <Check
-                                      className={cn(
-                                        "ml-auto h-5 w-5 text-primary",
-                                        newCoupon.assignedClientId === clientId
-                                          ? "opacity-100"
-                                          : "opacity-0",
-                                      )}
-                                    />
-                                  </CommandItem>
-                                );
-                              })}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+                    );
+                  })}
                 </div>
-
-                <div className="space-y-4">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] flex items-center gap-3">
-                    <Tag className="w-4 h-4 text-primary" />
-                    Manual Hash Overlay (Opt)
-                  </label>
-                  <div className="relative group">
-                    <input
-                      type="text"
-                      placeholder="e.g. ALPHA2024"
-                      value={newCoupon.manualCode || ""}
-                      onChange={(e) =>
-                        setNewCoupon({
-                          ...newCoupon,
-                          manualCode: e.target.value.toUpperCase(),
-                        })
-                      }
-                      className="w-full h-20 px-8 bg-muted/20 border border-border rounded-3xl text-[11px] font-black uppercase tracking-[0.2em] focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30 transition-all placeholder:text-muted-foreground/20 font-mono shadow-inner"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] flex items-center gap-3">
-                    <Percent className="w-4 h-4 text-primary" />
-                    Impact Scaling (%)
-                  </label>
-                  <div className="relative group">
-                    <input
-                      type="number"
-                      min="1"
-                      max="100"
-                      required
-                      placeholder="0"
-                      value={newCoupon.discountValue}
-                      onChange={(e) =>
-                        setNewCoupon({
-                          ...newCoupon,
-                          discountValue: e.target.value,
-                        })
-                      }
-                      className="w-full h-20 px-8 bg-muted/20 border border-border rounded-3xl text-2xl font-black text-foreground focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30 transition-all shadow-inner"
-                    />
-                  </div>
-                </div>
-
-                <div className="md:col-span-2 space-y-4">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] flex items-center gap-3">
-                    <Calendar className="w-4 h-4 text-primary" />
-                    Operational Horizon
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    min={new Date().toISOString().split("T")[0]}
-                    value={newCoupon.expiryDate}
-                    onChange={(e) =>
-                      setNewCoupon({ ...newCoupon, expiryDate: e.target.value })
-                    }
-                    className="w-full h-20 px-8 bg-muted/20 border border-border rounded-3xl text-[11px] font-black uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30 transition-all shadow-inner"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-10 flex gap-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  className="flex-1 h-20 bg-background border-border text-foreground rounded-[2rem] hover:bg-muted font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 shadow-lg"
-                >
-                  Terminate Protocol
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 h-20 bg-primary text-primary-foreground rounded-[2rem] hover:bg-primary/90 font-black text-[10px] uppercase tracking-widest transition-all shadow-2xl shadow-primary/30 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
-                >
-                  {isSubmitting ? (
-                    <RefreshCw className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      <Tag className="w-5 h-5" />
-                      Commit Authorization
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
+              </>
+            )}
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Create Modal */}
+        {isCreateModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+            <div className="bg-white rounded-t-[32px] sm:rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-300 border border-gray-100 max-h-[90vh] flex flex-col">
+              <div className="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-gray-50/50 to-white shrink-0">
+                <div>
+                  <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
+                    Create New Coupon
+                  </h2>
+                  <p className="text-xs md:text-sm text-gray-500 font-medium">
+                    Generate a discount code for a client.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-900 p-2.5 rounded-full hover:bg-white hover:shadow-md transition-all duration-200"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+ 
+              <form onSubmit={handleCreateCoupon} className="p-6 md:p-8 space-y-6 overflow-y-auto scrollbar-none">
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 ml-1 flex items-center gap-2">
+                      <UserIcon className="w-4 h-4 text-gray-500" />
+                      Assign to Client
+                    </label>
+                    <div className="relative">
+                      <Popover
+                        open={openCombobox}
+                        onOpenChange={setOpenCombobox}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openCombobox}
+                            className="w-full justify-between px-4 py-6 bg-gray-50 border-gray-200 rounded-xl hover:bg-white hover:border-gray-300 text-left font-normal text-gray-900 shadow-none h-auto"
+                          >
+                            {newCoupon.assignedClientId ? (
+                              (() => {
+                                const client = clients.find(
+                                  (c) =>
+                                    (c._id || c.id) ===
+                                    newCoupon.assignedClientId,
+                                );
+                                return client ? (
+                                  <span className="flex items-center gap-2">
+                                    <span className="font-medium">
+                                      {client.fullName}
+                                    </span>
+                                    <span className="text-gray-500 text-xs">
+                                      ({client.email})
+                                    </span>
+                                  </span>
+                                ) : (
+                                  "Select client..."
+                                );
+                              })()
+                            ) : (
+                              <span className="text-gray-500">
+                                Select a client...
+                              </span>
+                            )}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-[--radix-popover-trigger-width] p-0 rounded-xl shadow-xl border-gray-100 z-[200] bg-white"
+                          align="start"
+                        >
+                          <Command className="rounded-xl border border-gray-100">
+                            <CommandInput
+                              placeholder="Search client by name or email..."
+                              className="rounded-t-xl"
+                            />
+                            <CommandList className="max-h-[200px] overflow-y-auto">
+                              <CommandEmpty>No client found.</CommandEmpty>
+                              <CommandGroup>
+                                {clients.map((client) => {
+                                  const clientId = client._id || client.id;
+                                  return (
+                                    <CommandItem
+                                      key={clientId}
+                                      value={`${client.fullName} ${client.email}`}
+                                      onSelect={() => {
+                                        setNewCoupon({
+                                          ...newCoupon,
+                                          assignedClientId: clientId,
+                                        });
+                                        setOpenCombobox(false);
+                                      }}
+                                      className="cursor-pointer py-3 aria-selected:bg-gray-100"
+                                    >
+                                      <UserIcon
+                                        className={cn(
+                                          "mr-2 h-4 w-4 text-gray-400",
+                                        )}
+                                      />
+                                      <div className="flex flex-col">
+                                        <span className="font-medium text-gray-900">
+                                          {client.fullName}
+                                        </span>
+                                        <span className="text-xs text-gray-500">
+                                          {client.email}
+                                        </span>
+                                      </div>
+                                      <Check
+                                        className={cn(
+                                          "ml-auto h-4 w-4 text-green-600",
+                                          newCoupon.assignedClientId ===
+                                            clientId
+                                            ? "opacity-100"
+                                            : "opacity-0",
+                                        )}
+                                      />
+                                    </CommandItem>
+                                  );
+                                })}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <p className="text-xs text-gray-500 ml-1">
+                      The coupon will be exclusive to this client.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 ml-1 flex items-center gap-2">
+                      <Tag className="w-4 h-4 text-gray-500" />
+                      Manual Code (Optional)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="e.g. SUMMER2026"
+                        value={newCoupon.manualCode || ""}
+                        onChange={(e) =>
+                          setNewCoupon({
+                            ...newCoupon,
+                            manualCode: e.target.value.toUpperCase(),
+                          })
+                        }
+                        className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-gray-300 focus:ring-4 focus:ring-gray-100 outline-none transition-all font-medium text-gray-900 placeholder:text-gray-400"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 ml-1">
+                      Leave blank to auto-generate.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 ml-1 flex items-center gap-2">
+                      <Percent className="w-4 h-4 text-gray-500" />
+                      Discount (%)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        required
+                        placeholder="0"
+                        value={newCoupon.discountValue}
+                        onChange={(e) =>
+                          setNewCoupon({
+                            ...newCoupon,
+                            discountValue: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-gray-300 focus:ring-4 focus:ring-gray-100 outline-none transition-all font-medium text-gray-900"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 ml-1 flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-gray-500" />
+                      Expiry Date
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      min={new Date().toISOString().split("T")[0]}
+                      value={newCoupon.expiryDate}
+                      onChange={(e) =>
+                        setNewCoupon({
+                          ...newCoupon,
+                          expiryDate: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-gray-300 focus:ring-4 focus:ring-gray-100 outline-none transition-all font-medium text-gray-900"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6 flex flex-col-reverse sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsCreateModalOpen(false)}
+                    className="flex-1 px-6 py-4 bg-white border-2 border-gray-100 text-gray-600 rounded-2xl hover:bg-gray-50 hover:border-gray-200 font-bold transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-[2] px-6 py-4 bg-gray-900 text-white rounded-2xl hover:bg-black font-black transition-all duration-200 shadow-xl shadow-gray-900/10 hover:shadow-gray-900/20 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <>Generating...</>
+                    ) : (
+                      <>
+                        <Tag className="w-4 h-4" />
+                        Generate Coupon
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    </DashboardLayout>
   );
 }
