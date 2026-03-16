@@ -98,17 +98,12 @@ const ServicePageTemplate = () => {
       setError("");
 
       try {
-<<<<<<< HEAD
-        const apiUrl =
-          import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-=======
         const rawBaseUrl =
           import.meta.env.VITE_API_URL ||
           (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
         const apiUrl = rawBaseUrl.endsWith("/api")
           ? rawBaseUrl
           : `${rawBaseUrl.replace(/\/$/, "")}/api`;
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
         // TODO: Update this endpoint based on your service type
         const response = await fetch(
           `${apiUrl}/yourService/getByCity/${selectedCity}`,

@@ -65,13 +65,8 @@ export const PlanLocationsShowcase = () => {
 
     const handleGetBestPrice = (item: any, isDynamic: boolean) => {
         if (isDynamic) {
-<<<<<<< HEAD
-            // Navigate to the workspace detail page to show images, details & pricing
-            navigate(`/space/${item._id}`);
-=======
             // Navigate to the coworking space detail page
             navigate(`/coworking-space/${item._id}`);
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
         } else {
             // For static registrations, take to the virtual office solutions page
             navigate(`/Solutions/virtual-office`);
@@ -210,11 +205,7 @@ export const PlanLocationsShowcase = () => {
                                             transition={{ delay: i * 0.08, duration: 0.5 }}
                                         >
                                             <ListingCardModern
-<<<<<<< HEAD
-                                                item={loc as VirtualOfficeItem}
-=======
                                                 item={loc as CoworkingSpaceItem}
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
                                                 onGetBestPrice={() => handleGetBestPrice(loc, true)}
                                                 onClick={() => handleGetBestPrice(loc, true)}
                                             />

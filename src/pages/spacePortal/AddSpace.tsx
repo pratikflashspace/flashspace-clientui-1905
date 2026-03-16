@@ -1042,11 +1042,7 @@ export default function AddSpace() {
                 <img
                   src={
                     img.startsWith("/")
-<<<<<<< HEAD
-                      ? `${import.meta.env.VITE_API_URL || "http://localhost:5000"}${img}`
-=======
                       ? `${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin)}${img}`
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
                       : img
                   }
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"

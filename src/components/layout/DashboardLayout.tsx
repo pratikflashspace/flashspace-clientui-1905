@@ -105,11 +105,7 @@ export const DashboardLayout = ({
           </div>
 
           {/* Navigation */}
-<<<<<<< HEAD
-          <ScrollArea className="flex-1 py-4">
-=======
           <ScrollArea className="flex-1 py-4 min-h-0" data-lenis-prevent>
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
             <nav className="px-3 space-y-1">
               {navItems.map((item) => (
                 <div key={item.href}>

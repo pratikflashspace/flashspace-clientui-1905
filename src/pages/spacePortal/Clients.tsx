@@ -1,37 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-import toast from "react-hot-toast";
-import {
-  Search,
-  Filter,
-  Eye,
-  MoreVertical,
-  MapPin,
-  MessageSquare,
-  Loader2,
-  X,
-  Send,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ClientViewModal as PartnerClientViewModal } from "@/components/modals/ClientViewModal";
-import { ClientChatModal as PartnerClientChatModal } from "@/components/modals/ClientChatModal";
-import { useSpacePortalSearch } from "@/contexts/SpacePortalSearchContext";
-import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
-import { userDashboardService } from "@/services/userDashboard.service";
-import partnerTicketService from "@/services/spacePortal/partnerTicket.service";
-=======
 import { toast as hotToast } from "react-hot-toast";
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
 
 import type {
   Client,
@@ -40,8 +9,6 @@ import type {
   KycStatus,
 } from "@/types/spacePortal/client";
 
-<<<<<<< HEAD
-=======
 import {
   Search,
   Filter,
@@ -71,7 +38,6 @@ import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
 import { userDashboardService } from "@/services/userDashboard.service";
 import partnerTicketService from "@/services/spacePortal/partnerTicket.service";
 
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
 export default function Clients() {
   const navigate = useNavigate();
   const { query, setQuery } = useSpacePortalSearch();
@@ -98,15 +64,11 @@ export default function Clients() {
         }
       } catch (error) {
         console.error("Failed to fetch clients:", error);
-<<<<<<< HEAD
-        toast.error("Failed to load clients.");
-=======
         toast({
           title: "Error",
           description: "Failed to load clients.",
           variant: "destructive",
         });
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
       } finally {
         setLoading(false);
       }
@@ -192,25 +154,7 @@ export default function Clients() {
     setViewModalOpen(true);
   };
 
-<<<<<<< HEAD
-  const handleChatClient = (client: Client) => {
-    const mappedClient = {
-      ...client,
-      name: client.companyName,
-      contact: client.contactName,
-      initials: client.companyName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase(),
-    };
-    setSelectedClient(mappedClient);
-    setChatModalOpen(true);
-  };
 
-=======
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
   return (
     <div className="flex-1 animate-in fade-in duration-500">
       <div className="mb-8">
@@ -335,22 +279,6 @@ export default function Clients() {
           onClose={() => setMessageTarget(null)}
         />
       )}
-
-      {/* Modals */}
-      <PartnerClientViewModal
-        client={selectedClient}
-        open={viewModalOpen}
-        onOpenChange={setViewModalOpen}
-        onOpenChat={() => {
-          setViewModalOpen(false);
-          setChatModalOpen(true);
-        }}
-      />
-      <PartnerClientChatModal
-        client={selectedClient}
-        open={chatModalOpen}
-        onOpenChange={setChatModalOpen}
-      />
     </div>
   );
 }
@@ -516,11 +444,7 @@ function SendMessageModal({
       });
 
       if (res.success) {
-<<<<<<< HEAD
-        toast.success("Message sent!");
-=======
         hotToast.success("Message sent! The client will see it in their support section.");
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
         onClose();
       } else {
         hotToast.error(res.message || "Failed to send message.");
@@ -580,138 +504,4 @@ function SendMessageModal({
     </div>
   );
 }
-<<<<<<< HEAD
-=======
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Table subcomponents
-// ─────────────────────────────────────────────────────────────────────────────
-
-function ClientRow({
-  client,
-  onView,
-  onMessage,
-}: {
-  client: Client;
-  onView: () => void;
-  onMessage: () => void;
-}) {
-  const initials = useMemo(() => {
-    return client.companyName
-      .split(" ")
-      .slice(0, 2)
-      .map((w) => w[0])
-      .join("")
-      .toUpperCase();
-  }, [client.companyName]);
-
-  return (
-    <tr className="border-t border-slate-100 hover:bg-slate-50">
-      <td className="px-6 py-5">
-        <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-[#3FA69E]">
-            {initials}
-          </div>
-          <div>
-            <p className="font-semibold text-slate-900">{client.companyName}</p>
-            <p className="text-sm text-slate-500">{client.contactName}</p>
-          </div>
-        </div>
-      </td>
-
-      <td className="px-6 py-5 font-semibold text-slate-800">{client.plan}</td>
-
-      <td className="px-6 py-5 text-slate-600">
-        <div className="flex items-center gap-2">
-          <MapPin size={16} className="text-slate-400" />
-          {client.space}
-        </div>
-      </td>
-
-      <td className="px-6 py-5 text-slate-600">
-        <p>{client.startDate}</p>
-        <p className="text-xs text-slate-400">to {client.endDate}</p>
-      </td>
-
-      <td className="px-6 py-5">
-        <StatusPill status={client.status} />
-      </td>
-
-      <td className="px-6 py-5">
-        <KycPill status={client.kycStatus} />
-      </td>
-
-      <td className="px-6 py-5">
-        <div className="flex items-center justify-center gap-4 text-slate-500">
-          <button
-            onClick={onView}
-            className="hover:text-slate-900"
-            aria-label="View Client"
-            type="button"
-          >
-            <Eye size={18} />
-          </button>
-
-          <button
-            onClick={onMessage}
-            className="hover:text-teal-600 transition-colors"
-            aria-label="Send message to client"
-            title="Send message"
-            type="button"
-          >
-            <MessageSquare size={18} />
-          </button>
-
-          <button
-            className="hover:text-slate-900"
-            aria-label="More options"
-            type="button"
-          >
-            <MoreVertical size={18} />
-          </button>
-
-          <button
-            onClick={onView}
-            className="rounded-lg bg-[#3FA69E] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
-            type="button"
-          >
-            View
-          </button>
-        </div>
-      </td>
-    </tr>
-  );
-}
-
-function StatusPill({ status }: { status: ClientStatus }) {
-  const config =
-    status === "ACTIVE"
-      ? { label: "Active", className: "bg-emerald-50 text-emerald-700" }
-      : status === "EXPIRING_SOON"
-        ? { label: "Expiring Soon", className: "bg-amber-50 text-amber-700" }
-        : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
-
-  return (
-    <span
-      className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-semibold ${config.className}`}
-    >
-      {config.label}
-    </span>
-  );
-}
-
-function KycPill({ status }: { status: KycStatus }) {
-  const config =
-    status === "VERIFIED"
-      ? { label: "KYC Verified", className: "bg-emerald-50 text-emerald-700" }
-      : { label: "KYC Pending", className: "bg-amber-50 text-amber-700" };
-
-  return (
-    <span
-      className={`inline-flex items-center justify-center rounded-full px-4 py-1.5 text-xs font-semibold whitespace-nowrap ${config.className}`}
-    >
-      {config.label}
-    </span>
-  );
-}
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954

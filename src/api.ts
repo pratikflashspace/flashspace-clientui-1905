@@ -1,12 +1,8 @@
 // Central API config (legacy consumers)
 // Normalized to use Vite env; endpoints already include '/api' prefix
-<<<<<<< HEAD
-const RAW_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
-=======
 const RAW_BASE =
   import.meta.env.VITE_API_URL ||
   (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
 const BASE = RAW_BASE.replace(/\/$/, "");
 
 export const API = {

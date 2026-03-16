@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-import { useState, useEffect } from "react";
-import { Plus, Clock, CheckCircle, AlertCircle, Eye, Headphones, MessageSquare, Send } from "lucide-react";
-=======
 import { useState, useEffect, useRef } from "react";
 import {
   Plus,
@@ -14,15 +10,11 @@ import {
   Send,
   Headphones,
 } from "lucide-react";
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-<<<<<<< HEAD
-=======
 import { useAuth } from "@/contexts/AuthContext";
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
 import partnerTicketService, {
   PartnerTicketData,
 } from "@/services/spacePortal/partnerTicket.service";
@@ -90,16 +82,6 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function TicketsAndTasks() {
-<<<<<<< HEAD
-  const [tickets, setTickets] = useState<PartnerTicketData[]>([]);
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      // Load Tickets
-=======
   const { user } = useAuth();
   const [tickets, setTickets] = useState<PartnerTicketData[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
@@ -124,16 +106,12 @@ export default function TicketsAndTasks() {
   const loadData = async () => {
     setLoading(true);
     try {
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
       const ticketRes = await partnerTicketService.getPartnerTickets(1, 100);
       if (ticketRes.success && ticketRes.data) {
         setTickets(ticketRes.data.tickets);
       }
 
-<<<<<<< HEAD
-      // Load Tasks (Active Requests)
-=======
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
+
       const taskRes: any = await fetchPartnerActiveRequests();
       if (taskRes?.success) {
         setTasks(taskRes.data);
@@ -154,8 +132,6 @@ export default function TicketsAndTasks() {
     loadData();
   }, []);
 
-<<<<<<< HEAD
-=======
   const handleTakeOver = () => {
     setHasTakenOver(true);
     toast({
@@ -218,7 +194,6 @@ export default function TicketsAndTasks() {
     }
   };
 
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -229,10 +204,7 @@ export default function TicketsAndTasks() {
 
   return (
     <div className="animate-in fade-in duration-500">
-<<<<<<< HEAD
-=======
       {/* Header */}
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-4xl">
@@ -256,28 +228,6 @@ export default function TicketsAndTasks() {
         </Button>
       </div>
 
-<<<<<<< HEAD
-      <div className="grid gap-5 sm:grid-cols-4 mb-10">
-        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
-            {tickets.filter((t) => (t.status || "").toLowerCase() === "open").length}
-          </p>
-          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">Open Tickets</p>
-        </div>
-        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
-            {tickets.filter((t) => ["in_progress", "escalated"].includes((t.status || "").toLowerCase())).length}
-          </p>
-          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">In Progress</p>
-        </div>
-        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">{tasks.length}</p>
-          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">Pending Tasks</p>
-        </div>
-        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">4.2 hrs</p>
-          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">Avg Response</p>
-=======
       {/* Stats */}
       <div className="grid gap-5 sm:grid-cols-4 mb-10">
         <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
@@ -320,7 +270,6 @@ export default function TicketsAndTasks() {
           <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
             Avg Response
           </p>
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
         </div>
       </div>
 
@@ -340,18 +289,12 @@ export default function TicketsAndTasks() {
           </TabsTrigger>
         </TabsList>
 
-<<<<<<< HEAD
-=======
         {/* ========== TICKETS TAB ========== */}
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
         <TabsContent
           value="tickets"
           className="animate-in fade-in slide-in-from-bottom-2 duration-300"
         >
-<<<<<<< HEAD
-=======
           {/* Tickets Table */}
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
           <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -435,10 +378,7 @@ export default function TicketsAndTasks() {
                           <Button
                             variant="ghost"
                             size="icon"
-<<<<<<< HEAD
-=======
                             onClick={() => setActiveTicket(ticket)}
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
                             className="rounded-xl text-[#2D3F33] dark:text-[#FDE68A] hover:bg-[#2D3F33]/5 dark:hover:bg-white/5"
                           >
                             <Eye className="w-5 h-5" />
@@ -451,10 +391,6 @@ export default function TicketsAndTasks() {
               </table>
             </div>
           </div>
-<<<<<<< HEAD
-        </TabsContent>
-
-=======
 
           {/* Chat Panel (only shown when a ticket is selected) */}
           {activeTicket ? (
@@ -697,7 +633,6 @@ export default function TicketsAndTasks() {
         </TabsContent>
 
         {/* ========== TASKS TAB ========== */}
->>>>>>> d436093f5f9e5cb7da399ed4fac96c7f2cde8954
         <TabsContent
           value="tasks"
           className="animate-in fade-in slide-in-from-bottom-2 duration-300"
