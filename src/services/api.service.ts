@@ -6,7 +6,9 @@ import axios from "axios";
  */
 
 // Ensure base URL always includes the '/api' prefix expected by the backend
-const RAW_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const RAW_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
 const API_BASE_URL = RAW_BASE_URL.endsWith("/api")
   ? RAW_BASE_URL
   : `${RAW_BASE_URL.replace(/\/$/, "")}/api`;

@@ -14,6 +14,9 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const apiBaseUrl =
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
 
   // Auto-scroll to bottom when messages update or loading state changes
   useEffect(() => {
@@ -43,7 +46,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
 
     try {
       // Local API Call simulation
-      const response = await fetch("http://localhost:5000/api/chat", {
+      const response = await fetch(`${apiBaseUrl}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: currentInput }),
