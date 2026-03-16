@@ -1,9 +1,20 @@
-import { useState, useEffect } from "react";
-import { Plus, Clock, CheckCircle, AlertCircle, Eye, User } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import {
+  Plus,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Eye,
+  User,
+  MessageSquare,
+  Send,
+  Headphones,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
 import partnerTicketService, {
   PartnerTicketData,
 } from "@/services/spacePortal/partnerTicket.service";
@@ -71,20 +82,35 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function TicketsAndTasks() {
+  const { user } = useAuth();
   const [tickets, setTickets] = useState<PartnerTicketData[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTicket, setActiveTicket] = useState<PartnerTicketData | null>(
+    null,
+  );
+  const [messageInput, setMessageInput] = useState("");
+  const [hasTakenOver, setHasTakenOver] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    if (activeTicket) {
+      scrollToBottom();
+    }
+  }, [activeTicket?.messages]);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      // Load Tickets
       const ticketRes = await partnerTicketService.getPartnerTickets(1, 100);
       if (ticketRes.success && ticketRes.data) {
         setTickets(ticketRes.data.tickets);
       }
 
-      // Load Tasks (Active Requests)
       const taskRes: any = await fetchPartnerActiveRequests();
       if (taskRes?.success) {
         setTasks(taskRes.data);
@@ -105,6 +131,68 @@ export default function TicketsAndTasks() {
     loadData();
   }, []);
 
+  const handleTakeOver = () => {
+    setHasTakenOver(true);
+    toast({
+      title: "Joined Chat",
+      description: "You have joined the conversation with the client.",
+    });
+  };
+
+  const handleResolve = async () => {
+    if (!activeTicket) return;
+    try {
+      const res = await partnerTicketService.closeTicket(activeTicket._id);
+      if (res.success) {
+        toast({ title: "Resolved", description: "Ticket marked as resolved." });
+        loadData();
+        setActiveTicket(null);
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to resolve ticket.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!activeTicket || !messageInput.trim()) return;
+    try {
+      const res = await partnerTicketService.replyToTicket(
+        activeTicket._id,
+        messageInput.trim(),
+      );
+      if (res.success) {
+        // Optimistically add the new message to the local active ticket
+        const newMessage = {
+          _id: Date.now().toString(), // temporary id
+          sender: "partner",
+          message: messageInput.trim(),
+          createdAt: new Date().toISOString(),
+        };
+        setActiveTicket((prev) =>
+          prev
+            ? {
+                ...prev,
+                messages: [...prev.messages, newMessage],
+              }
+            : null,
+        );
+        setMessageInput("");
+        // Refresh the ticket list in the background (optional)
+        loadData();
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to send message.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -115,7 +203,7 @@ export default function TicketsAndTasks() {
 
   return (
     <div className="animate-in fade-in duration-500">
-      {/* Header section with same color as workspace */}
+      {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-4xl">
@@ -139,7 +227,7 @@ export default function TicketsAndTasks() {
         </Button>
       </div>
 
-      {/* Stats Section with matching border-radius and shadows */}
+      {/* Stats */}
       <div className="grid gap-5 sm:grid-cols-4 mb-10">
         <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
           <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
@@ -200,10 +288,12 @@ export default function TicketsAndTasks() {
           </TabsTrigger>
         </TabsList>
 
+        {/* ========== TICKETS TAB ========== */}
         <TabsContent
           value="tickets"
           className="animate-in fade-in slide-in-from-bottom-2 duration-300"
         >
+          {/* Tickets Table */}
           <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -287,6 +377,7 @@ export default function TicketsAndTasks() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            onClick={() => setActiveTicket(ticket)}
                             className="rounded-xl text-[#2D3F33] dark:text-[#FDE68A] hover:bg-[#2D3F33]/5 dark:hover:bg-white/5"
                           >
                             <Eye className="w-5 h-5" />
@@ -299,8 +390,248 @@ export default function TicketsAndTasks() {
               </table>
             </div>
           </div>
+
+          {/* Chat Panel (only shown when a ticket is selected) */}
+          {activeTicket ? (
+            <div className="mt-8 bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col h-[600px]">
+              {/* Messages Header */}
+              <div className="p-4 border-b border-[#2D3F33]/5 dark:border-white/10 bg-gray-50/50 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Avatar>
+                    <AvatarFallback className="bg-[#2D3F33]/10 text-[#2D3F33]">
+                      {activeTicket.user?.fullName
+                        ?.substring(0, 2)
+                        .toUpperCase() || "US"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-bold text-[#164e4e]">
+                      {activeTicket.subject}
+                    </h3>
+                    <p className="text-xs text-[#164e4e]/60">
+                      {activeTicket.user?.fullName}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {activeTicket.status !== "resolved" &&
+                    activeTicket.status !== "closed" &&
+                    !hasTakenOver && (
+                      <Button
+                        size="sm"
+                        onClick={handleTakeOver}
+                        className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl"
+                      >
+                        🎯 Tap In
+                      </Button>
+                    )}
+                  {activeTicket.status !== "resolved" &&
+                    activeTicket.status !== "closed" && (
+                      <Button
+                        size="sm"
+                        onClick={handleResolve}
+                        className="bg-green-50 border border-green-200 text-green-700 hover:bg-green-100 rounded-xl"
+                      >
+                        Resolve
+                      </Button>
+                    )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setActiveTicket(null)}
+                    className="rounded-xl"
+                  >
+                    Close Chat
+                  </Button>
+                </div>
+              </div>
+
+              {/* Messages Body */}
+              <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-gray-50/50">
+                {activeTicket.messages.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                    <MessageSquare className="w-12 h-12 mb-2 opacity-20" />
+                    <p>No messages yet.</p>
+                  </div>
+                )}
+
+                {activeTicket.messages.map((msg, idx) => {
+                  const isPartner = msg.sender === "partner";
+                  const isAdmin = msg.sender === "admin";
+                  const isSupport = msg.sender === "support";
+                  const isAffiliate = msg.sender === "affiliate";
+                  const isRightSide = isPartner || isAdmin || isSupport;
+
+                  const ROLE_BADGE: Record<
+                    string,
+                    { bg: string; text: string; label: string; dot: string }
+                  > = {
+                    user: {
+                      bg: "bg-blue-100",
+                      text: "text-blue-700",
+                      label: "Client",
+                      dot: "bg-blue-400",
+                    },
+                    partner: {
+                      bg: "bg-[#2D3F33]/10",
+                      text: "text-[#2D3F33]",
+                      label: "You (Partner)",
+                      dot: "bg-[#2D3F33]",
+                    },
+                    admin: {
+                      bg: "bg-indigo-100",
+                      text: "text-indigo-700",
+                      label: "Admin",
+                      dot: "bg-indigo-400",
+                    },
+                    affiliate: {
+                      bg: "bg-amber-100",
+                      text: "text-amber-700",
+                      label: "Affiliate",
+                      dot: "bg-amber-400",
+                    },
+                    support: {
+                      bg: "bg-purple-100",
+                      text: "text-purple-700",
+                      label: "AI Support",
+                      dot: "bg-purple-400",
+                    },
+                  };
+
+                  const badge = ROLE_BADGE[msg.sender] || ROLE_BADGE.user;
+
+                  const getIdentifier = (): string => {
+                    if (msg.sender === "user")
+                      return (
+                        activeTicket.user?.email ||
+                        activeTicket.user?.fullName ||
+                        ""
+                      );
+                    if (msg.sender === "partner")
+                      return user?.email || "partner@flashspace.io";
+                    if (msg.sender === "admin") return "admin@flashspace.io";
+                    if (msg.sender === "affiliate")
+                      return "affiliate@flashspace.io";
+                    return "AI · flashspace.io";
+                  };
+
+                  const getBubble = (): string => {
+                    if (isPartner)
+                      return "bg-[#2D3F33] text-white rounded-tr-none";
+                    if (isAdmin)
+                      return "bg-indigo-50 text-gray-800 border border-indigo-100 rounded-tr-none";
+                    if (isSupport)
+                      return "bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none";
+                    if (isAffiliate)
+                      return "bg-amber-50 text-gray-800 border border-amber-200 rounded-tl-none";
+                    return "bg-white text-gray-800 border border-gray-200 rounded-tl-none";
+                  };
+
+                  const isSystem =
+                    msg.message.startsWith("[") && msg.message.endsWith("]");
+                  if (isSystem) {
+                    return (
+                      <div key={idx} className="flex justify-center">
+                        <span className="text-[10px] text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
+                          {msg.message.replace(/\[|\]/g, "")}
+                        </span>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      className={`flex ${isRightSide ? "justify-end" : "justify-start"}`}
+                    >
+                      <div className="max-w-[80%] space-y-1.5">
+                        <div
+                          className={`p-4 rounded-2xl shadow-sm ${getBubble()}`}
+                        >
+                          <div
+                            className={`flex items-center gap-1.5 mb-2 ${isRightSide ? "flex-row-reverse" : ""}`}
+                          >
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${badge.bg} ${badge.text}`}
+                            >
+                              <span
+                                className={`w-1 h-1 rounded-full shrink-0 ${badge.dot}`}
+                              />
+                              {badge.label}
+                            </span>
+                            <span
+                              className={`text-[10px] font-medium truncate max-w-[130px] ${isPartner ? "text-white/60" : "text-gray-400"}`}
+                            >
+                              {getIdentifier()}
+                            </span>
+                          </div>
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                            {msg.message}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-[10px] text-gray-400 block px-1 ${isRightSide ? "text-right" : ""}`}
+                        >
+                          {format(new Date(msg.createdAt), "h:mm a")}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Messages Input Area */}
+              {activeTicket.status !== "resolved" &&
+              activeTicket.status !== "closed" ? (
+                hasTakenOver ? (
+                  <div className="p-6 bg-white border-t border-gray-100">
+                    <div className="flex items-center gap-4 bg-gray-50 p-2 pr-2 rounded-2xl border border-gray-200 focus-within:ring-2 focus-within:ring-[#2D3F33]/10 transition-all">
+                      <input
+                        type="text"
+                        value={messageInput}
+                        onChange={(e) => setMessageInput(e.target.value)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && handleSendMessage()
+                        }
+                        placeholder="Type your reply..."
+                        className="flex-1 bg-transparent border-none focus:outline-none px-4 text-sm text-gray-700 placeholder:text-gray-400"
+                      />
+                      <Button
+                        onClick={handleSendMessage}
+                        disabled={!messageInput.trim()}
+                        className="bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90 rounded-xl"
+                      >
+                        <Send className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-6 bg-amber-50 border-t border-amber-100 text-center text-amber-700 text-sm font-medium">
+                    Click <strong>Tap In</strong> to start chatting with this
+                    user.
+                  </div>
+                )
+              ) : (
+                <div className="p-6 bg-gray-50 border-t border-gray-100 text-center text-gray-500 text-sm">
+                  This query is closed.
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="mt-8 bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-12 text-center text-gray-400 shadow-sm flex flex-col items-center">
+              <Headphones className="w-16 h-16 mb-4 opacity-20" />
+              <h3 className="text-xl font-bold text-gray-600">
+                Select a ticket
+              </h3>
+              <p>
+                Choose a ticket from the list to view details and start chatting
+              </p>
+            </div>
+          )}
         </TabsContent>
 
+        {/* ========== TASKS TAB ========== */}
         <TabsContent
           value="tasks"
           className="animate-in fade-in slide-in-from-bottom-2 duration-300"
@@ -363,148 +694,8 @@ export default function TicketsAndTasks() {
                       Review Request
                     </Button>
                   </div>
-                  <div className="flex gap-3">
-                    {activeTicket.status !== 'resolved' && activeTicket.status !== 'closed' && !hasTakenOver && (
-                      <button
-                        onClick={handleTakeOver}
-                        className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors shadow-sm"
-                      >
-                        🎯 Tap In
-                      </button>
-                    )}
-                    {activeTicket.status !== 'resolved' && activeTicket.status !== 'closed' && (
-                      <button
-                        onClick={handleResolve}
-                        className="px-4 py-2 bg-green-50 border border-green-200 text-green-700 rounded-xl text-xs font-bold hover:bg-green-100 transition-colors shadow-sm"
-                      >
-                        Resolve
-                      </button>
-                    )}
-                  </div>
                 </div>
-
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-gray-50/50">
-                  {activeTicket.messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                      <MessageSquare className="w-12 h-12 mb-2 opacity-20" />
-                      <p>No messages yet.</p>
-                    </div>
-                  )}
-
-                  {activeTicket.messages.map((msg, idx) => {
-                    const isPartner = msg.sender === 'partner';
-                    const isAdmin = msg.sender === 'admin';
-                    const isSupport = msg.sender === 'support';
-                    const isAffiliate = msg.sender === 'affiliate';
-                    const isRightSide = isPartner || isAdmin || isSupport;
-
-                    // ── Role badge config ────────────────────────────
-                    const ROLE_BADGE: Record<string, { bg: string; text: string; label: string; dot: string; bubbleDot?: string }> = {
-                      user: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Client', dot: 'bg-blue-400' },
-                      partner: { bg: 'bg-white/25', text: 'text-white', label: 'You (Partner)', dot: 'bg-white' },
-                      admin: { bg: 'bg-indigo-100', text: 'text-indigo-700', label: 'Admin', dot: 'bg-indigo-400' },
-                      affiliate: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Affiliate', dot: 'bg-amber-400' },
-                      support: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'AI Support', dot: 'bg-purple-400' },
-                    };
-
-                    const badge = ROLE_BADGE[msg.sender] || ROLE_BADGE.user;
-
-                    // Email/identifier shown under the badge
-                    const getIdentifier = (): string => {
-                      if (msg.sender === 'user') return activeTicket.user?.email || activeTicket.user?.fullName || '';
-                      if (msg.sender === 'partner') return user?.email || 'partner@flashspace.io';
-                      if (msg.sender === 'admin') return 'admin@flashspace.io';
-                      if (msg.sender === 'affiliate') return 'affiliate@flashspace.io';
-                      return 'AI · flashspace.io';
-                    };
-
-                    // Bubble background
-                    const getBubble = (): string => {
-                      if (isPartner) return 'bg-teal-600 text-white rounded-tr-none';
-                      if (isAdmin) return 'bg-indigo-50 text-gray-800 border border-indigo-100 rounded-tr-none';
-                      if (isSupport) return 'bg-purple-50 text-gray-800 border border-purple-100 rounded-tr-none';
-                      if (isAffiliate) return 'bg-amber-50 text-gray-800 border border-amber-200 rounded-tl-none';
-                      return 'bg-white text-gray-800 border border-gray-200 rounded-tl-none';
-                    };
-
-                    // System messages (join announcements)
-                    const isSystem = msg.message.startsWith('[') && msg.message.endsWith(']');
-                    if (isSystem) {
-                      return (
-                        <div key={idx} className="flex justify-center">
-                          <span className="text-[10px] text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
-                            {msg.message.replace(/\[|\]/g, '')}
-                          </span>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div key={idx} className={`flex ${isRightSide ? 'justify-end' : 'justify-start'}`}>
-                        <div className="max-w-[80%] space-y-1.5">
-                          <div className={`p-4 rounded-2xl shadow-sm ${getBubble()}`}>
-                            {/* Role badge row */}
-                            <div className={`flex items-center gap-1.5 mb-2 ${isRightSide ? 'flex-row-reverse' : ''}`}>
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${badge.bg} ${badge.text}`}>
-                                <span className={`w-1 h-1 rounded-full shrink-0 ${badge.dot}`} />
-                                {badge.label}
-                              </span>
-                              <span className={`text-[10px] font-medium truncate max-w-[130px] ${isPartner ? 'text-white/60' : 'text-gray-400'}`}>
-                                {getIdentifier()}
-                              </span>
-                            </div>
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</p>
-                          </div>
-                          <span className={`text-[10px] text-gray-400 block px-1 ${isRightSide ? 'text-right' : ''}`}>
-                            {format(new Date(msg.createdAt), 'h:mm a')}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <div ref={messagesEndRef} />
-                </div>
-
-                {/* Input Area */}
-                {(activeTicket.status !== 'resolved' && activeTicket.status !== 'closed') ? (
-                  hasTakenOver ? (
-                    <div className="p-6 bg-white border-t border-gray-100">
-                      <div className="flex items-center gap-4 bg-gray-50 p-2 pr-2 rounded-2xl border border-gray-200 focus-within:ring-2 focus-within:ring-teal-100 focus-within:border-teal-200 transition-all">
-                        <input
-                          type="text"
-                          value={messageInput}
-                          onChange={(e) => setMessageInput(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                          placeholder="Type your reply..."
-                          className="flex-1 bg-transparent border-none focus:outline-none px-4 text-sm text-gray-700 placeholder:text-gray-400"
-                        />
-                        <button
-                          onClick={handleSendMessage}
-                          disabled={!messageInput.trim()}
-                          className="p-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors shadow-md shadow-teal-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <Send className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-6 bg-amber-50 border-t border-amber-100 text-center text-amber-700 text-sm font-medium">
-                      Click <strong>Tap In</strong> to start chatting with this user.
-                    </div>
-                  )
-                ) : (
-                  <div className="p-6 bg-gray-50 border-t border-gray-100 text-center text-gray-500 text-sm">
-                    This query is closed.
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                <Headphones className="w-16 h-16 mb-4 opacity-20" />
-                <h3 className="text-xl font-bold text-gray-600">Select a query</h3>
-                <p>Choose a query from the left to start chatting</p>
-              </div>
+              ))
             )}
           </div>
         </TabsContent>

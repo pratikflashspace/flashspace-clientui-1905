@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { API_CONFIG } from "@/config/api.config";
 
 import type { SpacePortalNotification } from "@/types/spacePortal/notification";
+import { SPACE_PORTAL_NOTIFICATIONS } from "@/data/spacePortal/notifications";
 
 /**
  * SpacePortalLayout
@@ -22,8 +23,8 @@ import type { SpacePortalNotification } from "@/types/spacePortal/notification";
  * - Search query persistence per route
  * - Notification context provider (real-time via Socket.io + REST API)
  * - Toast queue handling
- * /
- /**
+ */
+/**
  * Map a raw backend INotification to SpacePortalNotification.
  */
 function mapNotification(raw: any): SpacePortalNotification {
@@ -94,9 +95,9 @@ export default function SpacePortalLayout() {
    */
   const hasRequestedNotificationPermissionRef = useRef(false);
 
-  // ───────────────────────────────────────────────
+  // ---
   // 1. Fetch notifications from API on mount
-  // ───────────────────────────────────────────────
+  // ---
   useEffect(() => {
     if (!user) return;
 
@@ -120,9 +121,9 @@ export default function SpacePortalLayout() {
     fetchNotifications();
   }, [user]);
 
-  // ───────────────────────────────────────────────
+  // ---
   // 2. Subscribe to real-time notifications via Socket.io
-  // ───────────────────────────────────────────────
+  // ---
   useEffect(() => {
     if (!socket || !user) return;
 
@@ -495,11 +496,11 @@ export default function SpacePortalLayout() {
   };
 
   /**
-   * Notification provider value — all mutations are optimistic
+   * Notification provider value ? all mutations are optimistic
    * (local state updates immediately; API call follows async).
    */
   const notificationsProviderValue = useMemo(() => {
-     const base = API_CONFIG.BASE_URL;
+    const base = API_CONFIG.BASE_URL;
 
     return {
       notifications,
@@ -509,11 +510,11 @@ export default function SpacePortalLayout() {
           prev.map((item) => ({ ...item, read: true })),
         ),
 
-    markRead: async (id: string) => {
+      markRead: (id: string) => {
         setNotifications((prev) =>
           prev.map((item) => (item.id === id ? { ...item, read: true } : item)),
-        ),
-
+        );
+      },
       // Mark unread is local-only (no backend PATCH for unread)
       markUnread: (id: string) =>
         setNotifications((prev) =>

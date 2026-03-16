@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { toast as hotToast } from "react-hot-toast";
 
 import type {
   Client,
@@ -113,16 +113,21 @@ export default function Clients() {
     filter === "ALL" ? true : filter === value;
 
   const filteredClients = useMemo(() => {
-    const normalizedQuery = query.toLowerCase().trim();
-    if (!normalizedQuery) return clients;
-    return clients.filter(
-      (c) =>
-        c.companyName.toLowerCase().includes(normalizedQuery) ||
-        c.contactName.toLowerCase().includes(normalizedQuery) ||
-        c.id.toLowerCase().includes(normalizedQuery) ||
-        c.space.toLowerCase().includes(normalizedQuery),
-    );
-  }, [clients, query]);
+    return clients.filter((client) => {
+      const matchesQuery =
+        client.companyName.toLowerCase().includes(normalizedQuery) ||
+        client.contactName.toLowerCase().includes(normalizedQuery) ||
+        client.id.toLowerCase().includes(normalizedQuery) ||
+        client.space.toLowerCase().includes(normalizedQuery);
+
+      return (
+        matchesQuery &&
+        matchesFilter(statusFilter, client.status) &&
+        matchesFilter(planFilter, client.plan) &&
+        matchesFilter(kycFilter, client.kycStatus)
+      );
+    });
+  }, [clients, normalizedQuery, statusFilter, planFilter, kycFilter]);
 
   const handleViewClient = (client: Client) => {
     // Map backend client to modal expected structure
@@ -149,15 +154,6 @@ export default function Clients() {
     setSelectedClient(mappedClient);
     setViewModalOpen(true);
   };
-
-      return (
-        matchesQuery &&
-        matchesFilter(statusFilter, client.status) &&
-        matchesFilter(planFilter, client.plan) &&
-        matchesFilter(kycFilter, client.kycStatus)
-      );
-    });
-  }, [clients, normalizedQuery, statusFilter, planFilter, kycFilter]);
 
   return (
     <div className="flex-1">
@@ -237,6 +233,22 @@ export default function Clients() {
           onClose={() => setMessageTarget(null)}
         />
       )}
+
+      {/* Modals */}
+      <PartnerClientViewModal
+        client={selectedClient}
+        open={viewModalOpen}
+        onOpenChange={setViewModalOpen}
+        onOpenChat={() => {
+          setViewModalOpen(false);
+          setChatModalOpen(true);
+        }}
+      />
+      <PartnerClientChatModal
+        client={selectedClient}
+        open={chatModalOpen}
+        onOpenChange={setChatModalOpen}
+      />
     </div>
   );
 }
@@ -265,11 +277,11 @@ function SendMessageModal({
 
   const handleSend = async () => {
     if (!subject.trim() || !message.trim()) {
-      toast.error("Please fill in both fields.");
+      hotToast.error("Please fill in both fields.");
       return;
     }
     if (!client.bookingId) {
-      toast.error("Cannot identify booking for this client.");
+      hotToast.error("Cannot identify booking for this client.");
       return;
     }
     setSending(true);
@@ -282,13 +294,13 @@ function SendMessageModal({
       });
 
       if (res.success) {
-        toast.success("Message sent! The client will see it in their support section.");
+        hotToast.success("Message sent! The client will see it in their support section.");
         onClose();
       } else {
-        toast.error(res.message || "Failed to send message.");
+        hotToast.error(res.message || "Failed to send message.");
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Something went wrong.");
+      hotToast.error(err?.response?.data?.message || "Something went wrong.");
     } finally {
       setSending(false);
     }
@@ -487,24 +499,14 @@ function StatusPill({ status }: { status: ClientStatus }) {
         ? { label: "Expiring Soon", className: "bg-amber-50 text-amber-700" }
         : { label: "Inactive", className: "bg-rose-50 text-rose-700" };
 
-      {/* Modals */}
-      <PartnerClientViewModal
-        client={selectedClient}
-        open={viewModalOpen}
-        onOpenChange={setViewModalOpen}
-        onOpenChat={() => {
-          setViewModalOpen(false);
-          setChatModalOpen(true);
-        }}
-      />
-      <PartnerClientChatModal
-        client={selectedClient}
-        open={chatModalOpen}
-        onOpenChange={setChatModalOpen}
-      />
-    </div>
+  return (
+    <span
+      className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-semibold ${config.className}`}
+    >
+      {config.label}
+    </span>
   );
-};
+}
 
 function KycPill({ status }: { status: KycStatus }) {
   const config =
