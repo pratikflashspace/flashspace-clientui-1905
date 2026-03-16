@@ -107,12 +107,12 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         <>
             <header
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 bg-white dark:bg-[#0a0a0a] border-b border-border dark:border-white/10 shadow-sm py-2"
+                    "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 bg-white dark:bg-[#0a0a0a] border-b border-border dark:border-white/10 shadow-sm py-1"
                 )}
                 style={{ fontFamily: "'Inter Tight', sans-serif", fontWeight: 500 }}
             >
                 <div className="w-full px-3 md:px-10">
-                    <div className="flex items-center justify-between h-14 md:h-20">
+                    <div className="flex items-center justify-between h-16 md:h-16">
                         {/* LEFT: Hamburger + Logo */}
                         <div className="flex items-center gap-2 md:gap-4">
                             <button
