@@ -43,6 +43,7 @@ import {
   SortBy,
   VirtualOfficeItem, // Or use CoworkingSpaceItem, EventSpaceItem based on your service
 } from "@/types/services";
+import { useLocationMetadata } from "@/hooks/useLocationMetadata";
 import ListingCardModern from "./ListingCardModern";
 
 // Type alias for better code readability
@@ -206,40 +207,12 @@ const ServicePageTemplate = () => {
     navigate(href);
   };
 
+  const { resolveCoordinates } = useLocationMetadata();
+
   // Resolve map center by selected city (fallback to Delhi)
   const resolvedCenter = useMemo(() => {
-    const cityKeyFromState = selectedCity
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "")
-      .replace(/-/g, "");
-    if (["ahmedabad", "amdavad"].includes(cityKeyFromState))
-      return cityCenters.ahmedabad;
-    if (["bangalore", "bengaluru"].includes(cityKeyFromState))
-      return cityCenters.bangalore;
-    if (["chennai", "madras"].includes(cityKeyFromState))
-      return cityCenters.chennai;
-    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState))
-      return cityCenters.delhi;
-    if (["dharamshala", "dharamsala"].includes(cityKeyFromState))
-      return cityCenters.dharamshala;
-    if (["gurgaon", "gurugram"].includes(cityKeyFromState))
-      return cityCenters.gurgaon;
-    if (["hyderabad", "hyd"].includes(cityKeyFromState))
-      return cityCenters.hyderabad;
-    if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
-    if (["jammu"].includes(cityKeyFromState)) return cityCenters.jammu;
-    if (["mumbai", "bombay"].includes(cityKeyFromState))
-      return cityCenters.mumbai;
-    if (["pune", "punecity"].includes(cityKeyFromState))
-      return cityCenters.pune;
-    if (["kolkata", "calcutta"].includes(cityKeyFromState))
-      return cityCenters.kolkata;
-    if (["lucknow"].includes(cityKeyFromState)) return cityCenters.lucknow;
-    if (["surat"].includes(cityKeyFromState)) return cityCenters.surat;
-    if (["noida"].includes(cityKeyFromState)) return cityCenters.noida;
-    return cityCenters.delhi;
-  }, [selectedCity]);
+    return resolveCoordinates(selectedCity);
+  }, [selectedCity, resolveCoordinates]);
 
   // Prepare marker data - Memoized for performance
   const mapMarkers = useMemo(() => {

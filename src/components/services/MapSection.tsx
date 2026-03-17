@@ -1,22 +1,17 @@
 import { memo } from 'react';
-import MapLibreMap from '@/components/Map/MapLibreMap';
+import MapLibreMap, { MapMarker, MapStyle } from '../Map/MapLibreMap';
+export type { MapMarker, MapStyle };
 
-export interface MapMarker {
-  position: { lat: number; lng: number };
-  title: string;
-  address: string;
-  price: string;
-  rating: number;
-  reviews: number;
-  image?: string;
-  features: string[];
-}
-
-interface MapSectionProps {
+export interface MapSectionProps {
   center: { lat: number; lng: number };
   markers: MapMarker[];
   zoom?: number;
   height?: string;
+  mapStyle?: MapStyle;
+  showStyleSelector?: boolean;
+  focusMarkers?: Array<{
+    position: { lat: number; lng: number };
+  }>;
 }
 
 /**
@@ -29,7 +24,10 @@ const MapSection = memo<MapSectionProps>(({
   center,
   markers,
   zoom = 11,
-  height = "100%"
+  height = "100%",
+  mapStyle,
+  showStyleSelector,
+  focusMarkers,
 }) => {
   return (
     <div className="w-full h-full relative" style={{ overflow: 'hidden', maxHeight: '100%' }}>
@@ -39,20 +37,22 @@ const MapSection = memo<MapSectionProps>(({
         height="100%"
         className="w-full h-full"
         markers={markers}
+        mapStyle={mapStyle}
+        showStyleSelector={showStyleSelector}
+        focusMarkers={focusMarkers}
       />
     </div>
   );
 }, (prevProps, nextProps) => {
   // Custom comparison function for better performance
   // Only re-render if center coordinates, markers data, or zoom change
-  // Deep comparison for markers array to prevent unnecessary re-renders
-  const centerUnchanged = 
+  const centerUnchanged =
     prevProps.center.lat === nextProps.center.lat &&
     prevProps.center.lng === nextProps.center.lng;
-  
+
   const zoomUnchanged = prevProps.zoom === nextProps.zoom;
-  
-  const markersUnchanged = 
+
+  const markersUnchanged =
     prevProps.markers.length === nextProps.markers.length &&
     prevProps.markers.every((marker, idx) => {
       const nextMarker = nextProps.markers[idx];
@@ -62,9 +62,12 @@ const MapSection = memo<MapSectionProps>(({
         marker.title === nextMarker.title
       );
     });
-  
+
+  const focusMarkersUnchanged =
+    (prevProps.focusMarkers?.length || 0) === (nextProps.focusMarkers?.length || 0);
+
   // Return true if nothing changed (prevents re-render)
-  return centerUnchanged && zoomUnchanged && markersUnchanged;
+  return centerUnchanged && zoomUnchanged && markersUnchanged && focusMarkersUnchanged;
 });
 
 MapSection.displayName = 'MapSection';
