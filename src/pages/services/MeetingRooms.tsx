@@ -18,6 +18,7 @@ import {
     ViewMode,
     SortBy
 } from "@/types/services";
+import { useLocationMetadata } from "@/hooks/useLocationMetadata";
 
 const MeetingRooms = () => {
     const [searchParams] = useSearchParams();
@@ -156,23 +157,11 @@ const MeetingRooms = () => {
 
 
 
-    const resolvedCenter = (() => {
-        const cityKeyFromState = selectedCity.trim().toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
-        // Extended mapping for new cities
-        if (["ahmedabad", "amdavad"].includes(cityKeyFromState)) return cityCenters.ahmedabad;
-        if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
-        if (["chandigarh", "zirakpur"].includes(cityKeyFromState)) return { lat: 30.7333, lng: 76.7794 }; // Chandigarh coords
-        if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
-        if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
-        if (["gurgaon", "gurugram"].includes(cityKeyFromState)) return cityCenters.gurgaon;
-        if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
-        if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
-        if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
-        if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
-        if (["ranchi"].includes(cityKeyFromState)) return { lat: 23.3441, lng: 85.3096 }; // Ranchi coords
+    const { resolveCoordinates } = useLocationMetadata();
 
-        return cityCenters.delhi;
-    })();
+    const resolvedCenter = useMemo(() => {
+        return resolveCoordinates(selectedCity);
+    }, [selectedCity, resolveCoordinates]);
 
     const generateRandomCoordinates = (center: { lat: number; lng: number }, index: number) => {
         const seed = index + 1;

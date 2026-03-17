@@ -17,12 +17,9 @@ import SearchHeader from "@/components/services/SearchHeader";
 import ListingCardModern from "@/components/services/ListingCardModern";
 import ResizableMapLayout from "@/components/services/ResizableMapLayout";
 import {
-  City,
-  BusinessSolution,
-  ServiceItem,
-  ViewMode,
   SortBy
 } from "@/types/services";
+import { useLocationMetadata } from "@/hooks/useLocationMetadata";
 
 // Define EventSpaceItem locally since it's used in this file
 interface EventSpaceItem {
@@ -254,26 +251,12 @@ const EventSpaces = () => {
   const areas = [...new Set(citySpaces.map((space: any) => space.area))];
   const types = [...new Set(citySpaces.map((space: any) => space.type))];
 
-  // Resolve map center by selected city (fallback to Delhi)
+  const { resolveCoordinates } = useLocationMetadata();
+
+  // Resolve map center dynamically (fallback to hardcoded if necessary)
   const resolvedCenter = useMemo(() => {
-    const cityKeyFromState = selectedCity.trim().toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
-    if (["ahmedabad", "amdavad"].includes(cityKeyFromState)) return cityCenters.ahmedabad;
-    if (["bangalore", "bengaluru"].includes(cityKeyFromState)) return cityCenters.bangalore;
-    if (["chennai", "madras"].includes(cityKeyFromState)) return cityCenters.chennai;
-    if (["delhi", "newdelhi", "delh", "dilli"].includes(cityKeyFromState)) return cityCenters.delhi;
-    if (["dharamshala", "dharamsala"].includes(cityKeyFromState)) return cityCenters.dharamshala;
-    if (["gurgaon", "gurugram"].includes(cityKeyFromState)) return cityCenters.gurgaon;
-    if (["hyderabad", "hyd"].includes(cityKeyFromState)) return cityCenters.hyderabad;
-    if (["jaipur"].includes(cityKeyFromState)) return cityCenters.jaipur;
-    if (["jammu"].includes(cityKeyFromState)) return cityCenters.jammu;
-    if (["mumbai", "bombay"].includes(cityKeyFromState)) return cityCenters.mumbai;
-    if (["pune", "punecity"].includes(cityKeyFromState)) return cityCenters.pune;
-    if (["kolkata", "calcutta"].includes(cityKeyFromState)) return cityCenters.kolkata;
-    if (["lucknow"].includes(cityKeyFromState)) return cityCenters.lucknow;
-    if (["surat"].includes(cityKeyFromState)) return cityCenters.surat;
-    if (["noida"].includes(cityKeyFromState)) return cityCenters.noida;
-    return cityCenters.delhi;
-  }, [selectedCity]);
+    return resolveCoordinates(selectedCity);
+  }, [selectedCity, resolveCoordinates]);
 
   // Prepare marker data from event spaces with full details
   // Memoize to prevent unnecessary recalculations
@@ -337,8 +320,8 @@ const EventSpaces = () => {
 
               {/* City Search Section - This stays focused */}
               <div className={`bg-white rounded-lg border p-4 mb-4 relative z-50 transition-all duration-300 ${isSearchFocused
-                  ? 'border-primary shadow-2xl shadow-primary/20 bg-white'
-                  : 'border-gray-200 shadow-sm'
+                ? 'border-primary shadow-2xl shadow-primary/20 bg-white'
+                : 'border-gray-200 shadow-sm'
                 }`}>
                 <div className="flex items-center gap-4">
                   <div className={`flex items-center gap-2 text-sm font-medium transition-colors duration-300 ${isSearchFocused ? 'text-primary' : 'text-gray-700'
@@ -358,8 +341,8 @@ const EventSpaces = () => {
                         onBlur={handleSearchBlur}
                         placeholder="Search for a city..."
                         className={`pr-10 transition-all duration-300 ${isSearchFocused
-                            ? 'border-primary ring-2 ring-primary/20 focus:ring-primary/30'
-                            : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent'
+                          ? 'border-primary ring-2 ring-primary/20 focus:ring-primary/30'
+                          : 'border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent'
                           }`}
                       />
                       <Button

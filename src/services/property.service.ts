@@ -205,6 +205,22 @@ export const deletePropertyDocument = async (
   }
 };
 
+export const getSearchMetadata = async (): Promise<any> => {
+  try {
+    const response = await axiosInstance.get("/property/available-cities");
+    const responseData = response.data as ApiResponse<any>;
+
+    if (response.status === 200 && responseData.success && responseData.data) {
+      return responseData.data;
+    }
+
+    throw new Error(responseData.message || "Failed to fetch search metadata");
+  } catch (error: any) {
+    console.error("Error fetching search metadata:", error);
+    throw error;
+  }
+};
+
 const propertyService = {
   createProperty,
   updateProperty,
@@ -216,6 +232,7 @@ const propertyService = {
   uploadPropertyImage,
   uploadPropertyDocument,
   deletePropertyDocument,
+  getSearchMetadata,
 };
 
 export default propertyService;

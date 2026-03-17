@@ -2,7 +2,27 @@
 import { Review } from "./review";
 export interface City {
   name: string;
-  key: string;
+  key?: string;
+  coordinates?: { lat: number; lng: number };
+}
+
+export interface Area {
+  name: string;
+  city?: string;
+  coordinates?: { lat: number; lng: number };
+}
+
+export interface PropertyNameRecord {
+  name: string;
+  city: string;
+  area: string;
+  coordinates?: { lat: number; lng: number };
+}
+
+export interface SearchMetadata {
+  cities: City[];
+  areas: Area[];
+  propertyNames: PropertyNameRecord[];
 }
 
 export interface BusinessSolution {

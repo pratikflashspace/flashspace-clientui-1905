@@ -8,8 +8,8 @@ import {
   Send, Speech, Volume2, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, MessageCircle, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
-  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard, ChevronLeft, ChevronRight,
-  LogOut, Lock, Check, Tag, Zap, // [UPDATED] added notification icons
+  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
+  LogOut, Lock, Check, Tag, Zap, Map, ChevronRight, ChevronLeft, // [UPDATED] added Map and ChevronRight
   UserIcon, Trash2
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
@@ -24,14 +24,16 @@ import {
 } from "@/components/ui/popover";
 import MapSection, { MapMarker } from '@/components/services/MapSection';
 import ResizableMapLayout from '@/components/services/ResizableMapLayout';
-import { getVirtualOfficesByCity } from '@/services/virtualOffice.service';
-import { getCoworkingSpacesByCity } from '@/services/coworkingSpace.service';
+import { getVirtualOfficesByCity, getAvailableCities, getAllVirtualOffices } from '@/services/virtualOffice.service';
+import { getCoworkingSpacesByCity, getAllCoworkingSpaces } from '@/services/coworkingSpace.service';
+import { getSearchMetadata } from '@/services/property.service';
 import { cityCenters } from '@/components/Map/locationData.example';
 import { LoginModal } from '@/components/auth/LoginModal'; // [NEW]
 import { SignupModal } from '@/components/auth/SignupModal'; // [NEW]
 import ContactModal from '@/components/ui/ContactModal'; // [NEW]
 import { API_CONFIG } from '@/config/api.config'; // [NEW] Import API Config
 import Header from "@/components/Header";
+import { useLocationMetadata } from '@/hooks/useLocationMetadata';
 
 // [NEW] Custom Text Formatter to handle bold text, URLs, Images, and PDFs
 const formatMessage = (text: string) => {
@@ -373,6 +375,7 @@ const UpdatesPopup = ({
 
 
 const StartChatting = () => {
+  const { resolveCoordinates } = useLocationMetadata();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
@@ -399,12 +402,39 @@ const StartChatting = () => {
     setChatMessages,
     chatSessions,
     setChatSessions,
-    startNewChat,
     deleteChatSession,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    startNewChat,
   } = useChat();
+
+  // [NEW] Track the city actively searched by the user to prevent AI focus stealing
+  const lastTargetCity = useRef<string | null>(null);
   // Persist activeChatId to sessionStorage
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const metadata = await getSearchMetadata();
+        if (Array.isArray(metadata)) {
+          // Legacy/Stale Backend Fallback
+          setAvailableCities(metadata);
+          setSearchMetadata({
+            cities: metadata,
+            areas: [],
+            propertyNames: []
+          });
+        } else {
+          // New Metadata Response
+          setAvailableCities(metadata.cities || []);
+          setSearchMetadata(metadata);
+        }
+      } catch (error) {
+        console.error("Failed to fetch search metadata:", error);
+      }
+    };
+    fetchCities();
+  }, []);
+
   useEffect(() => {
     if (activeChatId) {
       sessionStorage.setItem('flashspace_activeChatId', activeChatId);
@@ -568,19 +598,76 @@ const StartChatting = () => {
 
   // [NEW] Map Integration State
   const [showMap, setShowMap] = useState(false);
+  const [mapWidth, setMapWidth] = useState(() => window.innerWidth * 0.45); // [UPDATED] Default to 45% of screen
+  const [isResizing, setIsResizing] = useState(false);
   const [mapMarkers, setMapMarkers] = useState<MapMarker[]>([]);
+  const [allMapMarkers, setAllMapMarkers] = useState<MapMarker[]>([]);
   const [selectedCity, setSelectedCity] = useState("Bangalore");
 
   // Initialize mapCenter as object { lat, lng }
-  const defaultCenter = cityCenters["Bangalore"] || [12.9716, 77.5946];
-  const [mapCenter, setMapCenter] = useState({ lat: defaultCenter[0], lng: defaultCenter[1] });
+  const defaultCenter = cityCenters["bangalore"] || { lat: 12.9716, lng: 77.5946 };
+  const [mapCenter, setMapCenter] = useState({ lat: defaultCenter.lat, lng: defaultCenter.lng });
 
   const [mapZoom, setMapZoom] = useState(11);
   const [isLoginOpen, setIsLoginOpen] = useState(false); // [NEW]
   const [isLimitPopupOpen, setIsLimitPopupOpen] = useState(false); // [NEW] Limit Reached Popup
   const [isSignupOpen, setIsSignupOpen] = useState(false); // [NEW]
   const [isMapLoading, setIsMapLoading] = useState(false);
+  const [availableCities, setAvailableCities] = useState<string[]>(["Delhi", "Bangalore"]);
+  const [searchMetadata, setSearchMetadata] = useState<{
+    cities: string[];
+    areas: { name: string; city: string | undefined }[];
+    propertyNames: { name: string; city: string; area: string; coordinates: { lat: number; lng: number } | undefined }[];
+  }>({ cities: [], areas: [], propertyNames: [] });
   const [mapTitle, setMapTitle] = useState('Popular Spaces');
+  const [hasLoadedGlobalMarkers, setHasLoadedGlobalMarkers] = useState(false);
+
+  // Constant list of major Indian hubs for robust offline detection
+  const MAJOR_HUBS = ["Delhi", "Bangalore"];
+
+  // [PHASE 9] Fetch all markers on mount for persistent global visibility
+  useEffect(() => {
+    const fetchGlobalMarkers = async () => {
+      if (hasLoadedGlobalMarkers) return;
+      try {
+        const [voRes, cwRes] = await Promise.all([
+          getAllVirtualOffices(),
+          getAllCoworkingSpaces()
+        ]);
+
+        const voMarkers = voRes.map(item => ({
+          position: item.coordinates || { lat: 0, lng: 0 },
+          title: item.name,
+          address: item.address,
+          image: item.image,
+          price: item.gstPlanPrice,
+          rating: item.rating,
+          reviews: item.reviews,
+          features: item.features || []
+        }));
+
+        const cwMarkers = cwRes.map(item => ({
+          position: item.coordinates || { lat: 0, lng: 0 },
+          title: item.name,
+          address: item.address,
+          image: item.image,
+          price: item.price,
+          rating: item.rating,
+          reviews: item.reviews,
+          features: item.features || []
+        }));
+
+        const all = [...voMarkers, ...cwMarkers].filter(m => m.position.lat !== 0);
+        setAllMapMarkers(all);
+        setHasLoadedGlobalMarkers(true);
+        console.log(`[MAP] Loaded ${all.length} global markers.`);
+      } catch (err) {
+        console.error("Failed to load global markers:", err);
+      }
+    };
+
+    fetchGlobalMarkers();
+  }, [hasLoadedGlobalMarkers]);
 
   // Helper: Generate random coordinates if missing (reuse from services pages)
   const generateRandomCoordinates = (center: { lat: number; lng: number }, index: number) => {
@@ -593,94 +680,184 @@ const StartChatting = () => {
     };
   };
 
-  // Helper: Detect City and Service from text
+  // Helper: Detect City, Area, or Property from text
   const detectIntents = (text: string) => {
     const textLower = text.toLowerCase();
 
-    // Extended City Parsing with Aliases
-    const cityMap: Record<string, { key: string; name: string; aliases: string[] }> = {
-      ahmedabad: { key: 'ahmedabad', name: 'Ahmedabad', aliases: ['ahmedabad', 'amdavad'] },
-      bangalore: { key: 'bangalore', name: 'Bangalore', aliases: ['bangalore', 'bengaluru', 'banglore'] },
-      chennai: { key: 'chennai', name: 'Chennai', aliases: ['chennai', 'madras'] },
-      delhi: { key: 'delhi', name: 'Delhi', aliases: ['delhi', 'new delhi', 'dilli', 'ncr'] },
-      dharamshala: { key: 'dharamshala', name: 'Dharamshala', aliases: ['dharamshala', 'dharamsala'] },
-      gurgaon: { key: 'gurgaon', name: 'Gurgaon', aliases: ['gurgaon', 'gurugram'] },
-      hyderabad: { key: 'hyderabad', name: 'Hyderabad', aliases: ['hyderabad', 'hyd'] },
-      jaipur: { key: 'jaipur', name: 'Jaipur', aliases: ['jaipur'] },
-      jammu: { key: 'jammu', name: 'Jammu', aliases: ['jammu'] },
-      noida: { key: 'delhi', name: 'Noida', aliases: ['noida'] }, // Fallback to Delhi for map center if needed
-    };
-
-    let foundCityKey: string | undefined;
     let foundCityName: string | undefined;
+    let foundAreaName: string | undefined;
+    let foundProperty: typeof searchMetadata.propertyNames[0] | undefined;
 
-    // Search for city aliases in text
-    for (const [_, data] of Object.entries(cityMap)) {
-      if (data.aliases.some(alias => textLower.includes(alias))) {
-        foundCityKey = data.key;
-        foundCityName = data.name;
-        break;
+    // 0. URGENT OVERRIDE: Prioritize major cities with high-robustness detection
+    if (textLower.includes('delhi') || textLower.includes('ncr') || textLower.includes('dilli')) {
+      foundCityName = 'Delhi';
+    } else if (textLower.includes('bangalore') || textLower.includes('bengaluru') || textLower.includes('blore')) {
+      foundCityName = 'Bangalore';
+    }
+
+    // 1. Check for specific property match (if city not locked by override)
+    if (!foundCityName) {
+      for (const prop of searchMetadata.propertyNames) {
+        if (textLower.includes(prop.name.toLowerCase())) {
+          foundProperty = prop;
+          foundCityName = prop.city;
+          foundAreaName = prop.area;
+          break;
+        }
       }
+    }
+
+    // 2. Check for area match (if no property or city found)
+    if (!foundProperty && !foundCityName) {
+      for (const area of searchMetadata.areas) {
+        if (textLower.includes(area.name.toLowerCase())) {
+          foundAreaName = area.name;
+          foundCityName = area.city;
+          break;
+        }
+      }
+    }
+
+    // 3. Check for city match in metadata (if still not found)
+    if (!foundCityName) {
+      const allCities = [...new Set([...availableCities, ...MAJOR_HUBS])];
+      for (const city of allCities) {
+        if (textLower.includes(city.toLowerCase())) {
+          foundCityName = city;
+          break;
+        }
+      }
+    }
+
+    // Normalize Gurgaon specifically
+    if (foundCityName?.toLowerCase() === 'gurugram') {
+      foundCityName = 'Gurgaon';
     }
 
     // Check for service type
     const services = [
       { type: 'virtual', keys: ['virtual', 'address', 'mail', 'gst', 'registration'] },
-      { type: 'coworking', keys: ['coworking', 'desk', 'office', 'space', 'workspace', 'seat', 'cabin'] },
+      { type: 'coworking', keys: ['coworking', 'desk', 'office', 'space', 'workspace', 'seat', 'cabin', 'on-demand', 'on demand', 'hot desk', 'hot-desk', 'meeting room', 'conference'] },
     ];
 
     const foundService = services.find(s => s.keys.some(k => textLower.includes(k)));
 
     return {
-      cityKey: foundCityKey, // e.g., 'delhi'
-      cityName: foundCityName, // e.g., 'Delhi'
+      cityName: foundCityName,
+      areaName: foundAreaName,
+      property: foundProperty,
       serviceType: foundService?.type // 'virtual' | 'coworking'
     };
   };
 
   // Helper: Fetch and Update Map
-  const updateMapForQuery = async (text: string) => {
-    const { cityKey, cityName, serviceType } = detectIntents(text);
+  const updateMapForQuery = async (text: string, isAIResponse: boolean = false, forcedServiceType?: 'virtual' | 'coworking') => {
+    const { cityName, areaName, property, serviceType: detectedServiceType } = detectIntents(text);
+    const serviceType = forcedServiceType || detectedServiceType;
 
-    if (cityKey && cityName && (serviceType || text.toLowerCase().includes('space'))) {
-      const type = serviceType || 'coworking'; // Default to coworking if ambiguous but city present
+    // [PHASE 5] Smart Update Logic:
+    // If this is an AI response suggesting a DIFFERENT city when we already have markers, IGNORE IT.
+    // Also ignore if it's different from what the user just intentionally searched.
+    if (isAIResponse && cityName) {
+      const target = lastTargetCity.current?.toLowerCase();
+      const currentCity = mapMarkers[0]?.address.toLowerCase();
+
+      if (target && !cityName.toLowerCase().includes(target)) {
+        console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on user-targeted ${lastTargetCity.current}`);
+        return;
+      }
+
+      if (mapMarkers.length > 0 && currentCity && !currentCity.includes(cityName.toLowerCase())) {
+        console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on current markers.`);
+        return;
+      }
+    }
+
+    if (cityName) {
+      if (!isAIResponse) {
+        lastTargetCity.current = cityName;
+      }
+      const type = serviceType || 'coworking';
       setIsMapLoading(true);
-      setMapTitle(`${type === 'virtual' ? 'Virtual Offices' : 'Coworking Spaces'} in ${cityName}`);
+
+      let displayTitle = '';
+      if (property && !isAIResponse) {
+        displayTitle = property.name;
+      } else if (areaName && !isAIResponse) {
+        displayTitle = `${type === 'virtual' ? 'Virtual Offices' : 'Coworking Spaces'} in ${areaName}`;
+      } else {
+        displayTitle = `${type === 'virtual' ? 'Virtual Offices' : 'Coworking Spaces'} in ${cityName}`;
+      }
+      setMapTitle(displayTitle);
 
       try {
         let markers: MapMarker[] = [];
-        const center = (cityCenters as any)[cityKey] || cityCenters.delhi;
+        const center = resolveCoordinates(cityName) || (property?.coordinates) || cityCenters.delhi;
         setMapCenter(center);
+        // setShowMap(true); // [MOVE] We now wait for results to avoid showing empty map
 
-        if (type === 'virtual') {
-          const items = await getVirtualOfficesByCity(cityName); // Service expects capitalized name typically or handles it
-          markers = items.map((item, index) => ({
-            position: item.coordinates || generateRandomCoordinates(center, index),
-            title: item.name,
-            address: item.address,
-            price: item.price,
-            rating: item.rating,
-            reviews: item.reviews,
-            image: item.image,
-            features: item.features,
-          }));
+        // [PHASE 3] Unified Fetching: Fetch both if not specified, or just requested type
+        const fetchVirtual = !serviceType || serviceType === 'virtual';
+        const fetchCoworking = !serviceType || serviceType === 'coworking';
+
+        const [virtualItems, coworkingItems] = await Promise.all([
+          fetchVirtual ? getVirtualOfficesByCity(cityName) : Promise.resolve([]),
+          fetchCoworking ? getCoworkingSpacesByCity(cityName) : Promise.resolve([])
+        ]);
+
+        const virtualMarkers = virtualItems.map((item) => ({
+          position: item.coordinates || generateRandomCoordinates(center, 0),
+          title: item.name,
+          address: item.address,
+          image: item.image,
+          price: item.gstPlanPrice,
+          rating: item.rating,
+          reviews: item.reviews,
+          features: item.features || []
+        }));
+
+        const coworkingMarkers = coworkingItems.map((item) => ({
+          position: item.coordinates || generateRandomCoordinates(center, 0),
+          title: item.name,
+          address: item.address,
+          image: item.image,
+          price: item.price,
+          rating: item.rating,
+          reviews: item.reviews,
+          features: item.features || []
+        }));
+
+        const results = [...virtualMarkers, ...coworkingMarkers];
+
+        // [PHASE 9] Jitter only the results to avoid global mess
+        const jitteredResults = results.map((m, idx) => {
+          const angle = (idx * 137.5) * (Math.PI / 180);
+          const r = 0.0003 + (Math.random() * 0.0002);
+          return {
+            ...m,
+            position: {
+              lat: m.position.lat + Math.cos(angle) * r,
+              lng: m.position.lng + Math.sin(angle) * r
+            }
+          };
+        });
+
+        // Update map results (focused set)
+        setMapMarkers(jitteredResults);
+
+        // [NEW] Only open the map if we actually found listings in the DB
+        if (jitteredResults.length > 0) {
+          setShowMap(true);
         } else {
-          const items = await getCoworkingSpacesByCity(cityName);
-          markers = items.map((item, index) => ({
-            position: item.coordinates || generateRandomCoordinates(center, index),
-            title: item.name,
-            address: item.address,
-            price: item.price,
-            rating: item.rating,
-            reviews: item.reviews,
-            image: item.image,
-            features: item.features,
-          }));
+          console.log(`[MAP] No listings found for ${cityName} in local DB. Keeping map closed.`);
         }
 
-        if (markers.length > 0) {
-          setMapMarkers(markers);
-          setShowMap(true);
+        // If we don't have all markers yet, update them too
+        if (allMapMarkers.length < 10) {
+          setAllMapMarkers(prev => {
+            // Merge logic to avoid duplicates if possible, or just append
+            return [...prev, ...jitteredResults];
+          });
         }
       } catch (error) {
         console.error("Failed to update map for query:", error);
@@ -758,6 +935,46 @@ const StartChatting = () => {
   const recognitionRef = useRef<any>(null);
 
   // [NEW] Handle Voice Input
+  // Handle Sidebar and Map Sync
+  useEffect(() => {
+    if (showMap) {
+      setIsSidebarOpen(false); // Auto-collapse sidebar when map opens
+    }
+  }, [showMap]);
+
+  // Handle Resize Logic
+  const startResizing = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  const stopResizing = () => {
+    setIsResizing(false);
+  };
+
+  const resize = (e: MouseEvent) => {
+    if (isResizing) {
+      const newWidth = window.innerWidth - e.clientX;
+      if (newWidth > 300 && newWidth < window.innerWidth * 0.7) {
+        setMapWidth(newWidth);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener('mousemove', resize);
+      window.addEventListener('mouseup', stopResizing);
+    } else {
+      window.removeEventListener('mousemove', resize);
+      window.removeEventListener('mouseup', stopResizing);
+    }
+    return () => {
+      window.removeEventListener('mousemove', resize);
+      window.removeEventListener('mouseup', stopResizing);
+    };
+  }, [isResizing]);
+
   const toggleVoiceInput = () => {
     if (isListening) {
       if (recognitionRef.current) {
@@ -886,6 +1103,9 @@ const StartChatting = () => {
         })
       });
 
+      // [NEW] Detect user intent once to share with AI update
+      const { serviceType: userServiceType } = detectIntents(userMessage.content);
+
       // [NEW] Trigger map update based on user message (optimistic update)
       updateMapForQuery(userMessage.content);
 
@@ -897,6 +1117,10 @@ const StartChatting = () => {
 
       // Backend returns reply directly from AI backend
       const aiResponseText = data.reply || data.message || 'I apologize, but I encountered an error. Please try again.';
+
+      // [NEW] Trigger map update based on AI response text (isAIResponse = true)
+      // Pass userServiceType to preserve the user's primary intent (e.g. coworking)
+      updateMapForQuery(aiResponseText, true, userServiceType as any);
 
       // Add AI response to chat
       const assistantMessage: ChatMessage = {
@@ -1175,16 +1399,29 @@ const StartChatting = () => {
       </div>
 
       {/* Main Content - Adjusted for wider sidebar */}
-      <div
-        className={`flex-1 flex flex-col lg:flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? 'ml-[260px]' : 'ml-[56px]'}`}
-        style={{ paddingTop: HEADER_OFFSET }}
-      >
-        <div
-          className="w-full bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col"
-          style={{ height: `calc(100dvh - ${HEADER_OFFSET})` }}
-        >
-          {/* Chat Interface - Full Width */}
+      <div className={`flex-1 pt-16 flex flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? 'ml-[260px]' : 'ml-[60px]'}`}>
+        <div className="flex-1 h-[calc(100dvh-4rem)] bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col min-w-0 transition-all duration-500">
+          {/* Chat Interface */}
           <div className="w-full h-full flex flex-col bg-white dark:bg-[#0B1120] relative">
+
+            {/* Chat Header with Map Toggle */}
+            <div className="flex items-center justify-end px-4 pt-3 pb-1 flex-shrink-0">
+              <button
+                onClick={() => setShowMap(prev => !prev)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border shadow-sm ${showMap
+                  ? 'bg-[#35503F] text-white border-[#35503F] shadow-[#35503F]/20'
+                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-[#35503F] hover:text-[#35503F]'
+                  }`}
+                title={showMap ? 'Hide map' : 'Show map'}
+              >
+                <Map className="w-3.5 h-3.5" />
+                <span>{showMap ? 'Hide Map' : 'Show Map'}</span>
+                {!showMap && mapMarkers.length > 0 && (
+                  <span className="w-2 h-2 rounded-full bg-[#35503F] animate-pulse ml-0.5" />
+                )}
+                <ChevronRight className={`w-3 h-3 transition-transform duration-200 ${showMap ? 'rotate-180' : ''}`} />
+              </button>
+            </div>
 
             {/* Chat Content */}
             <div
@@ -1352,6 +1589,70 @@ const StartChatting = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* [NEW] Sliding Map Panel */}
+        <div
+          className={`h-[calc(100dvh-4rem)] flex-shrink-0 bg-white dark:bg-[#0d1728] border-l border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden transition-all ${isResizing ? '' : 'duration-500'} ease-in-out relative`}
+          style={{
+            width: showMap ? `${mapWidth}px` : '0px',
+            opacity: showMap ? 1 : 0,
+            transform: showMap ? 'translateX(0)' : 'translateX(100%)',
+          }}
+        >
+          {showMap && (
+            <>
+              {/* Resize Handle */}
+              <div
+                onMouseDown={startResizing}
+                className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-[#35503F]/30 z-[100] transition-colors group"
+                title="Drag to resize"
+              >
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-8 bg-gray-300 dark:bg-gray-600 rounded-full group-hover:bg-[#35503F]" />
+              </div>
+
+              {/* Map Panel Header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800 flex-shrink-0 bg-white dark:bg-[#0d1728]">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-[#35503F]/10 flex items-center justify-center">
+                    <Map className="w-4 h-4 text-[#35503F]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white leading-tight">{mapTitle}</h3>
+                    {mapMarkers.length > 0 && (
+                      <p className="text-[10px] text-gray-400">{mapMarkers.length} location{mapMarkers.length !== 1 ? 's' : ''} found</p>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowMap(false)}
+                  className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  title="Close map"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Map Body */}
+              <div className="flex-1 relative overflow-hidden">
+                {isMapLoading && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 dark:bg-black/50 backdrop-blur-sm">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-8 h-8 border-2 border-[#35503F] border-t-transparent rounded-full animate-spin" />
+                      <p className="text-xs text-gray-500 font-medium">Loading locations...</p>
+                    </div>
+                  </div>
+                )}
+                <MapSection
+                  center={mapCenter}
+                  markers={allMapMarkers.length > 0 ? allMapMarkers : mapMarkers}
+                  focusMarkers={mapMarkers}
+                  zoom={mapZoom}
+                  height="100%"
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
 

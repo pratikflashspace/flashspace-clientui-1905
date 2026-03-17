@@ -85,10 +85,15 @@ export const virtualOfficeLocations = [
 export const cityCenters = {
   ahmedabad: { lat: 23.0225, lng: 72.5714 },    // Ahmedabad, Gujarat
   bangalore: { lat: 12.9716, lng: 77.5946 },    // Bengaluru, Karnataka
+  bengaluru: { lat: 12.9716, lng: 77.5946 },    // Alias for Bangalore
   chennai: { lat: 13.0827, lng: 80.2707 },      // Chennai, Tamil Nadu
   delhi: { lat: 28.6139, lng: 77.2090 },        // New Delhi
   dharamshala: { lat: 32.2190, lng: 76.3234 },  // Dharamshala, Himachal Pradesh
   gurgaon: { lat: 28.4595, lng: 77.0266 },      // Gurugram, Haryana
+  gurugram: { lat: 28.4595, lng: 77.0266 },     // Alias for Gurgaon
+  gururgram: { lat: 28.4595, lng: 77.0266 },    // Typo Alias
+  gurugarm: { lat: 28.4595, lng: 77.0266 },     // Typo Alias
+  gurgao: { lat: 28.4595, lng: 77.0266 },       // Typo Alias
   hyderabad: { lat: 17.3850, lng: 78.4867 },    // Hyderabad, Telangana
   jaipur: { lat: 26.9124, lng: 75.7873 },       // Jaipur, Rajasthan
   jammu: { lat: 32.7266, lng: 74.8570 },        // Jammu, J&K
@@ -98,4 +103,8 @@ export const cityCenters = {
   lucknow: { lat: 26.8467, lng: 80.9462 },      // Lucknow, Uttar Pradesh
   surat: { lat: 21.1702, lng: 72.8311 },        // Surat, Gujarat
   noida: { lat: 28.5355, lng: 77.3910 },        // Noida, Uttar Pradesh
+  chandigarh: { lat: 30.7333, lng: 76.7794 },   // Chandigarh
+  indore: { lat: 22.7196, lng: 75.8577 },       // Indore, Madhya Pradesh
+  kochi: { lat: 9.9312, lng: 76.2673 },         // Kochi, Kerala
+  coimbatore: { lat: 11.0168, lng: 76.9558 },    // Coimbatore, Tamil Nadu
 };

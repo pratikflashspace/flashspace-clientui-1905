@@ -84,26 +84,35 @@ export type MapStyle =
   | 'retro'
   | 'candy';
 
+export interface MapMarker {
+  id?: string;
+  position: { lat: number; lng: number };
+  title?: string;
+  info?: string;
+  image?: string;
+  price?: string;
+  rating?: number;
+  reviews?: number;
+  address?: string;
+  features?: string[];
+}
+
 interface MapLibreMapProps {
   center?: { lat: number; lng: number };
   zoom?: number;
   height?: string;
   width?: string;
   className?: string;
-  markers?: Array<{
-    id?: string;
-    position: { lat: number; lng: number };
-    title?: string;
-    info?: string;
-    image?: string;
-    price?: string;
-    rating?: number;
-    reviews?: number;
-    address?: string;
-    features?: string[];
-  }>;
+  markers?: MapMarker[];
   mapStyle?: MapStyle;
   showStyleSelector?: boolean;
+  bounds?: {
+    sw: { lat: number; lng: number };
+    ne: { lat: number; lng: number };
+  };
+  focusMarkers?: Array<{
+    position: { lat: number; lng: number };
+  }>;
 }
 
 // MapLibre-compatible open source map styles - Colorful & Vibrant
@@ -179,6 +188,8 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
   markers = [],
   mapStyle = 'retro',
   showStyleSelector = false,
+  bounds,
+  focusMarkers = [],
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
@@ -616,7 +627,42 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
       markersRef.current.push(marker);
     });
-  }, [markers, isLoaded]);
+
+    // [NEW] Fit map to markers bounds
+    if (map.current && isLoaded) {
+      if (bounds) {
+        // Use explicit bounds if provided
+        map.current.fitBounds(
+          [[bounds.sw.lng, bounds.sw.lat], [bounds.ne.lng, bounds.ne.lat]],
+          {
+            padding: { top: 70, bottom: 50, left: 50, right: 50 },
+            maxZoom: 15,
+            duration: 1200
+          }
+        );
+      } else if (focusMarkers.length > 0) {
+        // [PHASE 9] Focus on specific markers if provided
+        const focusBounds = new maplibregl.LngLatBounds();
+        focusMarkers.forEach(m => focusBounds.extend([m.position.lng, m.position.lat]));
+
+        map.current.fitBounds(focusBounds, {
+          padding: { top: 70, bottom: 50, left: 50, right: 50 },
+          maxZoom: 15,
+          duration: 1200
+        });
+      } else if (markers.length > 0 && markers.length < 50 && !bounds) {
+        // Legend: Automatic fitBounds only if no explicit focus and marker count is low
+        const markerBounds = new maplibregl.LngLatBounds();
+        markers.forEach(m => markerBounds.extend([m.position.lng, m.position.lat]));
+
+        map.current.fitBounds(markerBounds, {
+          padding: { top: 70, bottom: 50, left: 50, right: 50 },
+          maxZoom: 15,
+          duration: 1200
+        });
+      }
+    }
+  }, [markers, bounds, focusMarkers, isLoaded]);
 
   // Change map style
   const handleStyleChange = (style: MapStyle) => {
