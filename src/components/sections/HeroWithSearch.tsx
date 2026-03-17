@@ -80,7 +80,7 @@ export const HeroWithSearch = () => {
                     className="text-3xl xs:text-4xl sm:text-5xl lg:text-5xl font-bold text-foreground tracking-tight leading-[1.2] sm:leading-[1.15] mb-4"
                 >
                     World's #1 AI Enabled
-                    <br className="hidden xs:block" />
+                    <br />
                     <span className="text-primary italic">Business Solutions Platform.</span>
                 </motion.h1>
 
