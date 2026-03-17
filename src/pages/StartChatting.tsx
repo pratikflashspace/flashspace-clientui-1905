@@ -9,7 +9,7 @@ import {
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, MessageCircle, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
   Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
-  LogOut, Lock, Check, Tag, Zap, Map, ChevronRight, // [UPDATED] added Map and ChevronRight
+  LogOut, Lock, Check, Tag, Zap, Map, ChevronRight, ChevronLeft, // [UPDATED] added Map and ChevronRight
   UserIcon, Trash2
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
@@ -401,11 +401,14 @@ const StartChatting = () => {
     setChatMessages,
     chatSessions,
     setChatSessions,
-    startNewChat,
     deleteChatSession,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    startNewChat,
   } = useChat();
+
+  // [NEW] Track the city actively searched by the user to prevent AI focus stealing
+  const lastTargetCity = useRef<string | null>(null);
   // Persist activeChatId to sessionStorage
   useEffect(() => {
     const fetchCities = async () => {
@@ -609,7 +612,7 @@ const StartChatting = () => {
   const [isLimitPopupOpen, setIsLimitPopupOpen] = useState(false); // [NEW] Limit Reached Popup
   const [isSignupOpen, setIsSignupOpen] = useState(false); // [NEW]
   const [isMapLoading, setIsMapLoading] = useState(false);
-  const [availableCities, setAvailableCities] = useState<string[]>(["Delhi", "Gurgaon", "Noida", "Bangalore", "Mumbai", "Pune", "Hyderabad", "Chennai", "Kolkata", "Ahmedabad", "Jaipur", "Chandigarh"]);
+  const [availableCities, setAvailableCities] = useState<string[]>(["Delhi", "Bangalore"]);
   const [searchMetadata, setSearchMetadata] = useState<{
     cities: string[];
     areas: { name: string; city: string | undefined }[];
@@ -619,7 +622,7 @@ const StartChatting = () => {
   const [hasLoadedGlobalMarkers, setHasLoadedGlobalMarkers] = useState(false);
 
   // Constant list of major Indian hubs for robust offline detection
-  const MAJOR_HUBS = ["Delhi", "Gurgaon", "Gurugram", "Noida", "Bangalore", "Mumbai", "Pune", "Hyderabad", "Chennai", "Kolkata", "Ahmedabad", "Jaipur", "Chandigarh", "Lucknow", "Surat", "Indore", "Kochi", "Coimbatore"];
+  const MAJOR_HUBS = ["Delhi", "Bangalore"];
 
   // [PHASE 9] Fetch all markers on mount for persistent global visibility
   useEffect(() => {
@@ -685,16 +688,10 @@ const StartChatting = () => {
     let foundProperty: typeof searchMetadata.propertyNames[0] | undefined;
 
     // 0. URGENT OVERRIDE: Prioritize major cities with high-robustness detection
-    if (textLower.includes('gurgaon') || textLower.includes('gurug') || textLower.includes('gurugram') || textLower.includes('gururgram') || textLower.includes('gurugarm') || textLower.includes('gurgao')) {
-      foundCityName = 'Gurgaon';
-    } else if (textLower.includes('delhi') || textLower.includes('ncr') || textLower.includes('dilli')) {
+    if (textLower.includes('delhi') || textLower.includes('ncr') || textLower.includes('dilli')) {
       foundCityName = 'Delhi';
     } else if (textLower.includes('bangalore') || textLower.includes('bengaluru') || textLower.includes('blore')) {
       foundCityName = 'Bangalore';
-    } else if (textLower.includes('jaipur')) {
-      foundCityName = 'Jaipur';
-    } else if (textLower.includes('mumbai') || textLower.includes('bombay')) {
-      foundCityName = 'Mumbai';
     }
 
     // 1. Check for specific property match (if city not locked by override)
@@ -759,16 +756,26 @@ const StartChatting = () => {
 
     // [PHASE 5] Smart Update Logic:
     // If this is an AI response suggesting a DIFFERENT city when we already have markers, IGNORE IT.
-    // This prevents the map from "jumping" to suggestions like Delhi while viewing Bangalore.
-    if (isAIResponse && cityName && mapMarkers.length > 0) {
-      const currentCity = mapMarkers[0].address.toLowerCase();
-      if (!currentCity.includes(cityName.toLowerCase())) {
-        console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on current city markers.`);
+    // Also ignore if it's different from what the user just intentionally searched.
+    if (isAIResponse && cityName) {
+      const target = lastTargetCity.current?.toLowerCase();
+      const currentCity = mapMarkers[0]?.address.toLowerCase();
+
+      if (target && !cityName.toLowerCase().includes(target)) {
+        console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on user-targeted ${lastTargetCity.current}`);
+        return;
+      }
+
+      if (mapMarkers.length > 0 && currentCity && !currentCity.includes(cityName.toLowerCase())) {
+        console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on current markers.`);
         return;
       }
     }
 
     if (cityName) {
+      if (!isAIResponse) {
+        lastTargetCity.current = cityName;
+      }
       const type = serviceType || 'coworking';
       setIsMapLoading(true);
 
@@ -786,7 +793,7 @@ const StartChatting = () => {
         let markers: MapMarker[] = [];
         const center = resolveCoordinates(cityName) || (property?.coordinates) || cityCenters.delhi;
         setMapCenter(center);
-        setShowMap(true); // [FIX] Slide out immediately when city is identified
+        // setShowMap(true); // [MOVE] We now wait for results to avoid showing empty map
 
         // [PHASE 3] Unified Fetching: Fetch both if not specified, or just requested type
         const fetchVirtual = !serviceType || serviceType === 'virtual';
@@ -836,6 +843,13 @@ const StartChatting = () => {
 
         // Update map results (focused set)
         setMapMarkers(jitteredResults);
+
+        // [NEW] Only open the map if we actually found listings in the DB
+        if (jitteredResults.length > 0) {
+          setShowMap(true);
+        } else {
+          console.log(`[MAP] No listings found for ${cityName} in local DB. Keeping map closed.`);
+        }
 
         // If we don't have all markers yet, update them too
         if (allMapMarkers.length < 10) {
