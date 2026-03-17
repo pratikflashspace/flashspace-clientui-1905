@@ -76,7 +76,7 @@ export default function AffiliateClientChat() {
     const [messageInput, setMessageInput] = useState('');
     const [sending, setSending] = useState(false);
     const [tappingIn, setTappingIn] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     const activeTicket = tickets.find(t => t._id === activeTicketId);
     const isTappedIn = activeTicket ? activeTicket.tappedIn.includes(user?.id || '') : false;
@@ -117,7 +117,13 @@ export default function AffiliateClientChat() {
     useEffect(() => { fetchTickets(); }, []);
 
     useEffect(() => {
-        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+        const container = messagesContainerRef.current;
+        if (container) {
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
     }, [activeTicket?.messages]);
 
     // ─── Socket ───────────────────────────────────────────────────────────────
@@ -189,8 +195,6 @@ export default function AffiliateClientChat() {
             const res = await axiosInstance.post(`/api/tickets/affiliate/${activeTicketId}/reply`, { message: messageInput.trim() });
             if (res.data.success) {
                 setMessageInput('');
-                const newMsg: TicketMessage = { sender: 'affiliate', message: messageInput.trim(), createdAt: new Date().toISOString() };
-                setTickets(prev => prev.map(t => t._id === activeTicketId ? { ...t, messages: [...t.messages, newMsg], updatedAt: new Date().toISOString() } : t));
             }
         } catch (e: any) {
             toast.error(e.response?.data?.message || 'Failed to send message');
@@ -367,7 +371,10 @@ export default function AffiliateClientChat() {
                         )}
 
                         {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-gray-50/50">
+                        <div 
+                            ref={messagesContainerRef}
+                            className="flex-1 overflow-y-auto p-8 space-y-6 bg-gray-50/50 scroll-smooth"
+                        >
                             {activeTicket.messages.length === 0 && (
                                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                                     <MessageSquare className="w-12 h-12 mb-2 opacity-20" />
@@ -436,7 +443,6 @@ export default function AffiliateClientChat() {
                                     </div>
                                 );
                             })}
-                            <div ref={messagesEndRef} />
                         </div>
 
                         {/* Input */}

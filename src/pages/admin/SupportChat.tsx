@@ -7,6 +7,7 @@ import {
   Search,
   MessageSquare,
   Headphones,
+  Loader2,
 } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,7 @@ export default function SupportChat() {
   const [takenOverTickets, setTakenOverTickets] = useState<Set<string>>(
     new Set(),
   );
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const activeTicket = tickets.find((t) => t._id === activeTicketId);
 
@@ -125,9 +126,13 @@ export default function SupportChat() {
   }, [socket, activeTicketId]);
 
   const scrollToBottom = () => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    }
   };
 
   useEffect(() => {
@@ -458,7 +463,10 @@ export default function SupportChat() {
               </div>
 
               {/* Messages Area */}
-              <ScrollArea className="flex-1 p-8 bg-gray-50/50">
+              <div 
+                ref={messagesContainerRef}
+                className="flex-1 overflow-y-auto p-8 bg-gray-50/50 scroll-smooth"
+              >
                 <div className="space-y-6">
                   {activeTicket.messages.length === 0 && (
                     <div className="flex flex-col items-center justify-center h-full text-gray-400 mt-20">
@@ -540,9 +548,9 @@ export default function SupportChat() {
                       </div>
                     );
                   })}
-                  <div ref={messagesEndRef} />
+                  {/* Removed end ref as we use container scroll */}
                 </div>
-              </ScrollArea>
+              </div>
 
               {/* Input Area */}
               {activeTicket.status !== "resolved" &&

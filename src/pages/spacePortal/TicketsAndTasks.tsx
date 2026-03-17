@@ -169,7 +169,7 @@ export default function TicketsAndTasks() {
         // Optimistically add the new message to the local active ticket
         const newMessage = {
           _id: Date.now().toString(), // temporary id
-          sender: "partner",
+          sender: "partner" as const,
           message: messageInput.trim(),
           createdAt: new Date().toISOString(),
         };

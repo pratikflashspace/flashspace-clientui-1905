@@ -120,6 +120,20 @@ export const fetchBookingAnalytics = async () => {
 };
 
 /**
+ * Fetch analytics data for a specific property.
+ */
+export const fetchPropertyAnalytics = async (propertyId: string) => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/user/partner/property/${propertyId}/analytics`,
+    );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
  * --- documented API methods ---
  */
 

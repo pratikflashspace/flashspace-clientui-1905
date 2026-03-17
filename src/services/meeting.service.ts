@@ -31,6 +31,7 @@ export interface BookingRequest {
     email: string;
     phoneNumber: string;
     slotTime: string; // ISO string format
+    spaceId?: string;
     notes: string;
 }
 

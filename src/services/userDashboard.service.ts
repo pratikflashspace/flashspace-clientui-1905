@@ -605,6 +605,23 @@ class UserDashboardService {
     }
   }
 
+  async convertRequest(requestId: string, category: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        `/api/user/partner/requests/${requestId}/convert`,
+        { category },
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to convert request";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
   async getPartnerAnalytics(): Promise<ApiResponse<any>> {
     try {
       const response = await axiosInstance.get<ApiResponse<any>>(

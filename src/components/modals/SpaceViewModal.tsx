@@ -1,7 +1,10 @@
-import React from "react";
-import { X, MapPin, Star, Users, Calendar, BarChart2, Edit, DoorClosed, Percent } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { X, MapPin, Star, Users, Calendar, BarChart2, Edit, DoorClosed, Percent, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { fetchPropertyAnalytics } from "@/services/spacePortal/spacePartner.service";
+
+import { useNavigate } from "react-router-dom";
 
 interface SpaceViewModalProps {
     space: any;
@@ -14,6 +17,29 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
     open,
     onOpenChange,
 }) => {
+    const [analytics, setAnalytics] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (open && space?.id) {
+            const loadStats = async () => {
+                setLoading(true);
+                try {
+                    const res = await fetchPropertyAnalytics(space.id);
+                    if (res?.success) {
+                        setAnalytics(res.data);
+                    }
+                } catch (err) {
+                    console.error("Failed to load property stats", err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            loadStats();
+        }
+    }, [open, space?.id]);
+
     if (!space) return null;
 
     const onClose = () => onOpenChange(false);
@@ -39,7 +65,7 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
                             </h2>
                             <div className="flex items-center gap-3">
                                 <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-100 border-none font-bold px-3 py-1 rounded-full text-xs">
-                                    Active
+                                    {space.status || "Active"}
                                 </Badge>
                                 <button
                                     onClick={onClose}
@@ -72,7 +98,7 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
                                             {space.name}
                                         </h1>
                                         <Badge variant="outline" className="bg-slate-50 px-3 py-1 rounded-full text-slate-600 font-bold border-slate-200">
-                                            Premium
+                                            {space.type || "Premium"}
                                         </Badge>
                                     </div>
                                     
@@ -83,7 +109,7 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
                                         </div>
                                         <div className="flex items-center gap-2 text-slate-500">
                                             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                                            <span className="font-bold text-slate-700">{space.rating || 4.8}</span>
+                                            <span className="font-bold text-slate-700">{space.rating || analytics?.avgRating || 4.8}</span>
                                             <span className="font-medium text-slate-400">rating</span>
                                         </div>
                                     </div>
@@ -97,7 +123,7 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
                                         <Users className="w-6 h-6 mx-auto text-slate-400" />
                                         <div className="space-y-0.5">
                                             <p className="text-2xl font-bold text-slate-900">
-                                                {space.workstations || 50}
+                                                {space.workstations || 0}
                                             </p>
                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                                                 Workstations
@@ -108,7 +134,7 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
                                         <DoorClosed className="w-6 h-6 mx-auto text-slate-400" />
                                         <div className="space-y-0.5">
                                             <p className="text-2xl font-bold text-slate-900">
-                                                {space.meetingRooms || 4}
+                                                {space.meetingRooms || 0}
                                             </p>
                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                                                 Meeting Rooms
@@ -119,26 +145,37 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
 
                                 {/* Performance Section */}
                                 <div className="space-y-5">
-                                    <h3 className="text-sm font-bold text-slate-800">
-                                        This Month
-                                    </h3>
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-sm font-bold text-slate-800">
+                                            This Month
+                                        </h3>
+                                        {loading && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
+                                    </div>
                                     
                                     <div className="grid grid-cols-2 gap-x-12 gap-y-4">
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm font-medium text-slate-400">Bookings</span>
-                                            <span className="text-sm font-bold text-slate-800">23</span>
+                                            <span className="text-sm font-bold text-slate-800">
+                                                {loading ? "..." : (analytics?.monthlyBookings || 0)}
+                                            </span>
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm font-medium text-slate-400">Revenue</span>
-                                            <span className="text-sm font-bold text-emerald-500">₹1.2L</span>
+                                            <span className="text-sm font-bold text-emerald-500">
+                                                {loading ? "..." : `₹${((analytics?.monthlyRevenue || 0) / 1000).toFixed(1)}K`}
+                                            </span>
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm font-medium text-slate-400">New Clients</span>
-                                            <span className="text-sm font-bold text-slate-800">8</span>
+                                            <span className="text-sm font-bold text-slate-800">
+                                                {loading ? "..." : (analytics?.newClients || 0)}
+                                            </span>
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm font-medium text-slate-400">Avg Rating</span>
-                                            <span className="text-sm font-bold text-slate-800">4.8</span>
+                                            <span className="text-sm font-bold text-slate-800">
+                                                {loading ? "..." : (analytics?.avgRating || "N/A")}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -147,17 +184,29 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
                                 <div className="flex gap-4 pt-4">
                                     <Button
                                         variant="outline"
+                                        onClick={() => {
+                                            navigate(`/spaceportal/space-management/${space.id}`);
+                                            onOpenChange(false);
+                                        }}
                                         className="flex-1 h-12 rounded-xl border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center gap-2"
                                     >
                                         <Edit className="w-4 h-4" /> Edit
                                     </Button>
                                     <Button
                                         variant="outline"
+                                        onClick={() => {
+                                            navigate("/spaceportal/booking-calendar");
+                                            onOpenChange(false);
+                                        }}
                                         className="flex-1 h-12 rounded-xl border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center gap-2"
                                     >
                                         <Calendar className="w-4 h-4" /> Calendar
                                     </Button>
                                     <Button
+                                        onClick={() => {
+                                            navigate("/spaceportal/booking-analytics");
+                                            onOpenChange(false);
+                                        }}
                                         className="flex-1 h-12 rounded-xl bg-[#344b41] hover:bg-[#2a3c34] text-white font-bold transition-all shadow-lg shadow-slate-100 flex items-center gap-2"
                                     >
                                         <BarChart2 className="w-4 h-4" /> Analytics

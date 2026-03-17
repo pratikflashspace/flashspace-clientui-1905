@@ -44,6 +44,19 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         socketInstance.on('connect', () => {
             // console.log('Socket connected:', socketInstance.id);
             setIsConnected(true);
+
+            // Join user specific rooms for targeted notifications
+            if (user?.id || (user as any)?._id) {
+                const userId = user.id || (user as any)._id;
+                socketInstance.emit('join_user_feed', userId);
+                
+                // Also join specific feeds based on role
+                if (user.role === 'admin' || user.role === 'super_admin' || user.role === 'support') {
+                    socketInstance.emit('join_admin_feed');
+                } else if (user.role === 'affiliate') {
+                    socketInstance.emit('join_affiliate_feed', userId);
+                }
+            }
         });
 
         socketInstance.on('disconnect', () => {

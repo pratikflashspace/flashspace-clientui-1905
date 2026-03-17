@@ -118,7 +118,8 @@ export default function TicketSystem() {
       if (data.ticketId === selectedTicket._id) {
         setSelectedTicket((prev) => {
           if (!prev) return null;
-          const exists = prev.messages.some(
+          const currentMessages = prev.messages || [];
+          const exists = currentMessages.some(
             (m) =>
               new Date(m.createdAt).getTime() ===
               new Date(data.message.createdAt).getTime() &&
@@ -127,7 +128,7 @@ export default function TicketSystem() {
           if (exists) return prev;
           return {
             ...prev,
-            messages: [...prev.messages, data.message],
+            messages: [...currentMessages, data.message],
           };
         });
         fetchTickets();
@@ -181,7 +182,10 @@ export default function TicketSystem() {
 
 
   const handleViewTicket = (ticket: AdminTicketData) => {
-    setSelectedTicket(ticket);
+    setSelectedTicket({
+      ...ticket,
+      messages: ticket.messages || [],
+    });
     setModalOpen(true);
   };
 
