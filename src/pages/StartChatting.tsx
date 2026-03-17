@@ -425,7 +425,9 @@ const StartChatting = () => {
           });
         } else {
           // New Metadata Response
-          setAvailableCities(metadata.cities || []);
+          // [FIX] Extract only strings if the server returns city objects
+          const cityNames = (metadata.cities || []).map((c: any) => typeof c === 'string' ? c : c.name);
+          setAvailableCities(cityNames);
           setSearchMetadata(metadata);
         }
       } catch (error) {
@@ -722,7 +724,8 @@ const StartChatting = () => {
     if (!foundCityName) {
       const allCities = [...new Set([...availableCities, ...MAJOR_HUBS])];
       for (const city of allCities) {
-        if (textLower.includes(city.toLowerCase())) {
+        // [FIX] Defensive check to prevent crash if 'city' is somehow an object
+        if (typeof city === 'string' && textLower.includes(city.toLowerCase())) {
           foundCityName = city;
           break;
         }
