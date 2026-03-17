@@ -851,14 +851,6 @@ const StartChatting = () => {
         } else {
           console.log(`[MAP] No listings found for ${cityName} in local DB. Keeping map closed.`);
         }
-
-        // If we don't have all markers yet, update them too
-        if (allMapMarkers.length < 10) {
-          setAllMapMarkers(prev => {
-            // Merge logic to avoid duplicates if possible, or just append
-            return [...prev, ...jitteredResults];
-          });
-        }
       } catch (error) {
         console.error("Failed to update map for query:", error);
       } finally {
@@ -1645,7 +1637,7 @@ const StartChatting = () => {
                 )}
                 <MapSection
                   center={mapCenter}
-                  markers={allMapMarkers.length > 0 ? allMapMarkers : mapMarkers}
+                  markers={mapMarkers.length > 0 ? mapMarkers : allMapMarkers}
                   focusMarkers={mapMarkers}
                   zoom={mapZoom}
                   height="100%"
