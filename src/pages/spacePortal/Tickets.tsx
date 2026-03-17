@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Eye, MoreVertical } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import partnerTicketService, {
 } from "@/services/spacePortal/partnerTicket.service";
 import SearchBar from "@/components/ui/SpacePartner/SearchBar";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
+import { useSocket } from "@/contexts/SocketContext";
 
 export default function Tickets() {
   const [tickets, setTickets] = useState<PartnerTicketData[]>([]);
@@ -17,24 +18,45 @@ export default function Tickets() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [priorityFilter, setPriorityFilter] = useState("ALL");
+  const { socket } = useSocket();
+
+  const fetchTickets = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
+    try {
+      const res = await partnerTicketService.getPartnerTickets(1, 100);
+      if (res.success && res.data) {
+        setTickets(res.data.tickets);
+      }
+    } catch (error) {
+      console.error("Failed to fetch tickets", error);
+      if (!silent) toast.error("Failed to load tickets");
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchTickets = async () => {
-      setLoading(true);
-      try {
-        const res = await partnerTicketService.getPartnerTickets(1, 100);
-        if (res.success && res.data) {
-          setTickets(res.data.tickets);
-        }
-      } catch (error) {
-        console.error("Failed to fetch tickets", error);
-        toast.error("Failed to load tickets");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchTickets();
-  }, []);
+  }, [fetchTickets]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewTicket = (data: any) => {
+      // Add the new ticket to the list if it's not already there
+      setTickets(prev => {
+        const exists = prev.some(t => t._id === data.ticket._id);
+        if (exists) return prev;
+        return [data.ticket, ...prev];
+      });
+      toast.success(`New support ticket received: ${data.ticket.subject}`);
+    };
+
+    socket.on("partner_new_ticket", handleNewTicket);
+    return () => {
+      socket.off("partner_new_ticket", handleNewTicket);
+    };
+  }, [socket]);
 
   const filteredTickets = useMemo(() => {
     return tickets.filter((t) => {

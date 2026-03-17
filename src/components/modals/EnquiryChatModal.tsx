@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Send } from "lucide-react";
+import { MessageSquare, Send, Loader2, X } from "lucide-react";
+import partnerTicketService, { PartnerTicketMessage } from "@/services/spacePortal/partnerTicket.service";
+import { toast } from "@/hooks/use-toast";
+import { useSocket } from "@/contexts/SocketContext";
+import { format } from "date-fns";
 
 interface EnquiryChatModalProps {
   enquiry: any;
@@ -19,10 +23,146 @@ export const EnquiryChatModal = ({
   open,
   onOpenChange,
 }: EnquiryChatModalProps) => {
+  const [messages, setMessages] = useState<PartnerTicketMessage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [activeTicketId, setActiveTicketId] = useState<string | null>(null);
+  const [activeTicketStatus, setActiveTicketStatus] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    if (open && enquiry) {
+      loadMessages();
+    } else {
+      setMessages([]);
+      setActiveTicketId(null);
+      setActiveTicketStatus(null);
+    }
+  }, [open, enquiry]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Socket listener for new messages
+  useEffect(() => {
+    if (!socket || !activeTicketId) return;
+
+    const handleNewMessage = (data: any) => {
+      if (data.ticketId === activeTicketId) {
+        setMessages((prev) => {
+          const exists = prev.some(
+            (m) =>
+              new Date(m.createdAt).getTime() ===
+                new Date(data.message.createdAt).getTime() &&
+              m.message === data.message.message,
+          );
+          if (exists) return prev;
+          return [...prev, data.message];
+        });
+      }
+    };
+
+    socket.emit("join_ticket", activeTicketId);
+    socket.on("new_message", handleNewMessage);
+
+    return () => {
+      socket.off("new_message", handleNewMessage);
+      socket.emit("leave_ticket", activeTicketId);
+    };
+  }, [socket, activeTicketId]);
+
+  const loadMessages = async () => {
+    if (!enquiry) return;
+    setLoading(true);
+    try {
+      // Find ticket for this request
+      const allTicketsRes = await partnerTicketService.getPartnerTickets(1, 100);
+      if (allTicketsRes.success && allTicketsRes.data) {
+        // Find ticket where user matches and booking matches (if it's a booking)
+        const leadTicket = allTicketsRes.data.tickets.find((t: any) => {
+          // Normalize IDs for comparison (handle both populated objects and ID strings)
+          const tUserId = t.user?.id || t.user?._id || (typeof t.user === 'string' ? t.user : null);
+          const eUserId = enquiry.user?.id;
+          
+          const tBookingId = t.bookingId?.id || t.bookingId?._id || (typeof t.bookingId === 'string' ? t.bookingId : null);
+          const eInquiryId = enquiry.id;
+
+          const userMatch = eUserId && tUserId === eUserId;
+          const bookingMatch = eInquiryId && tBookingId === eInquiryId;
+
+          if (enquiry.category === "Booking") {
+            return userMatch && bookingMatch;
+          }
+          // For meetings/visits, match on either user OR the inquiry/booking ID
+          return bookingMatch || userMatch;
+        });
+
+        if (leadTicket) {
+          setMessages(leadTicket.messages || []);
+          setActiveTicketId(leadTicket._id);
+          setActiveTicketStatus(leadTicket.status);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load lead chat:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || !enquiry) return;
+    
+    setSending(true);
+    try {
+      if (activeTicketId) {
+        // Reply to existing ticket
+        const res = await partnerTicketService.replyToTicket(activeTicketId, inputValue);
+        if (res.success) {
+          // Message will be added via socket or we can add it manually if socket fails
+          setInputValue("");
+          // If socket is not active, refresh manually
+          if (!socket) loadMessages();
+        }
+      } else {
+        // Create new ticket for this lead
+        const res = await partnerTicketService.createTicketForClient({
+          clientUserId: enquiry.user?.id,
+          bookingId: enquiry.id, // Pass meeting/visit ID here for tracking
+          subject: `Inquiry: ${enquiry.space || "General"}`,
+          message: inputValue
+        });
+        if (res.success) {
+          setActiveTicketId(res.data._id);
+          setMessages(res.data.messages || []);
+          setInputValue("");
+          toast({
+            title: "Chat Initiated",
+            description: "Message sent to lead.",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send message.",
+        variant: "destructive",
+      });
+    } finally {
+      setSending(false);
+    }
+  };
+
   if (!enquiry) return null;
-  const name = enquiry.user?.name || enquiry.name || "Client";
-  const company = enquiry.user?.company || enquiry.company || "N/A";
-  const interest = enquiry.type || enquiry.interest || "Space";
+  const name = enquiry.user?.name || "Client";
+  const company = enquiry.user?.company || "N/A";
+  const interest = enquiry.space || enquiry.type || "Space";
 
   return (
     <>
@@ -32,48 +172,123 @@ export const EnquiryChatModal = ({
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => onOpenChange(false)}
           />
-          <div className="relative bg-white rounded-2xl w-full max-w-[500px] h-[600px] shadow-2xl overflow-hidden border border-border text-slate-900 opacity-100 flex flex-col">
-            <div className="p-6 border-b bg-white">
-              <div className="flex items-center justify-between">
+          <div className="relative bg-white rounded-2xl w-full max-w-[500px] h-[650px] shadow-2xl overflow-hidden border border-border text-slate-900 opacity-100 flex flex-col flex-nowrap">
+            {/* Header */}
+            <div className="p-6 border-b bg-white flex shrink-0 items-center justify-between">
+              <div>
                 <div className="flex items-center gap-2 text-xl font-bold">
                   <MessageSquare className="w-5 h-5 text-primary" />
                   Chat with {name}
+                  {activeTicketStatus === "resolved" && (
+                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium ml-1">
+                      Resolved
+                    </span>
+                  )}
                 </div>
-                <button
-                  onClick={() => onOpenChange(false)}
-                  className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
-                >
-                  <Send className="w-5 h-5 rotate-90" /> {/* Placeholder for Close X if needed, or just import X */}
-                </button>
+                <p className="text-sm text-muted-foreground">{company} • {interest}</p>
               </div>
-              <p className="text-sm text-muted-foreground">{company} • {interest}</p>
+              <button
+                onClick={() => onOpenChange(false)}
+                className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-muted/20">
-              <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
-                  <MessageSquare className="w-8 h-8 text-primary" />
+            {/* Chat Area */}
+            <div 
+              ref={scrollRef}
+              className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50 custom-scrollbar"
+            >
+              {loading ? (
+                <div className="flex flex-col items-center justify-center h-full space-y-2">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <p className="text-sm text-muted-foreground">Loading chat history...</p>
                 </div>
-                <div>
-                  <p className="font-bold text-lg text-foreground">Starting Conversation</p>
-                  <p className="text-sm text-muted-foreground mt-1 max-w-[280px] mx-auto">
-                    You're about to start a chat with {name} regarding their interest in {interest}.
-                  </p>
+              ) : messages.length > 0 ? (
+                messages.map((msg, i) => {
+                  const isPartner = msg.sender === "partner";
+                  const isUser = msg.sender === "user";
+                  const isAdmin = msg.sender === "admin";
+                  const isSupport = msg.sender === "support";
+                  
+                  return (
+                    <div 
+                      key={i}
+                      className={`flex flex-col ${isPartner ? "items-end" : "items-start"}`}
+                    >
+                      <div className={`flex items-center gap-1.5 mb-1 ${isPartner ? "flex-row-reverse" : ""}`}>
+                         <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${
+                           isPartner ? "bg-primary/10 text-primary" : 
+                           isUser ? "bg-blue-100 text-blue-700" :
+                           isAdmin ? "bg-amber-100 text-amber-700" :
+                           "bg-purple-100 text-purple-700"
+                         }`}>
+                           {isPartner ? "Space Partner" : isUser ? "Client" : isAdmin ? "Admin" : "AI Support"}
+                         </span>
+                         <span className="text-[10px] text-muted-foreground">
+                           {format(new Date(msg.createdAt), "h:mm a")}
+                         </span>
+                      </div>
+                      <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                        isPartner 
+                          ? "bg-primary text-white rounded-tr-none shadow-sm" 
+                          : isUser
+                            ? "bg-white text-slate-800 border border-slate-200 rounded-tl-none shadow-sm"
+                            : "bg-slate-100 text-slate-700 border border-slate-200 rounded-tl-none italic"
+                      }`}>
+                        {msg.message}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-center space-y-4 p-8">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <MessageSquare className="w-8 h-8 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-lg text-foreground">No messages yet</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Start a conversation with {name} about their inquiry for {interest}.
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            <div className="p-6 border-t bg-white">
-              <div className="relative">
+            {/* Input Area */}
+            <div className="p-6 border-t bg-white shrink-0">
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendMessage();
+                }}
+                className="relative"
+              >
                 <input
                   type="text"
-                  placeholder="Type your message..."
-                  className="w-full pl-4 pr-12 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 bg-muted/20"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={activeTicketStatus === "resolved" ? "This inquiry has been resolved" : "Type your message..."}
+                  disabled={sending || activeTicketStatus === "resolved"}
+                  className="w-full pl-4 pr-12 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 bg-muted/20 text-sm disabled:opacity-50"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey && activeTicketStatus !== "resolved") {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
                 />
-                <Button size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg">
-                  <Send className="w-4 h-4" />
+                <Button 
+                  type="submit"
+                  size="icon" 
+                  disabled={sending || !inputValue.trim() || activeTicketStatus === "resolved"}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg"
+                >
+                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </Button>
-              </div>
+              </form>
             </div>
           </div>
         </div>
