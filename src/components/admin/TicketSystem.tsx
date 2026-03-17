@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TicketViewModal } from "@/components/modals/TicketViewModal";
+import { CreateTicketModal } from "@/components/modals/CreateTicketModal";
 
 import { toast } from "@/hooks/use-toast";
 
@@ -37,6 +38,7 @@ export default function TicketSystem() {
     null,
   );
   const [modalOpen, setModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
 
   // Original states
@@ -177,9 +179,14 @@ export default function TicketSystem() {
   }, [socket]);
 
 
+
   const handleViewTicket = (ticket: AdminTicketData) => {
     setSelectedTicket(ticket);
     setModalOpen(true);
+  };
+
+  const handleCreateTicket = () => {
+    setCreateModalOpen(true);
   };
 
   const handleAssignTicket = async (ticketId: string) => {
@@ -648,6 +655,16 @@ export default function TicketSystem() {
         handleEscalateTicket={handleEscalateTicket}
         handleCloseTicket={handleCloseTicket}
         handleReply={handleReply}
+      />
+
+      <CreateTicketModal
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+        onSuccess={() => {
+          setCreateModalOpen(false);
+          fetchTickets();
+          fetchStats();
+        }}
       />
 
     </DashboardLayout>

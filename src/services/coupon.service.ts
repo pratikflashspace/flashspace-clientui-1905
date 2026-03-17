@@ -35,6 +35,6 @@ export const validateCoupon = async (code: string): Promise<ValidateCouponRespon
     }
 };
 
-export const markCouponUsed = async (code: string): Promise<void> => {
-    await axiosInstance.post(`${COUPON_BASE}/use`, { code });
+export const markCouponUsed = async (code: string, userId?: string): Promise<void> => {
+    await axiosInstance.post(`${COUPON_BASE}/use`, { code, userId });
 };

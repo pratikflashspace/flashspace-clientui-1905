@@ -8,7 +8,7 @@ import {
   Send, Speech, Volume2, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, MessageCircle, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
-  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
+  Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard, ChevronLeft, ChevronRight,
   LogOut, Lock, Check, Tag, Zap, // [UPDATED] added notification icons
   UserIcon, Trash2
 } from 'lucide-react';
@@ -202,6 +202,7 @@ interface SidebarMenuItem {
 // [NEW] Constants for the popup
 const SIDEBAR_WIDTH_ICON = 80; // Your sidebar is 80px (w-20)
 const UPDATES_WIDTH = 420;
+const HEADER_OFFSET = '4.5rem'; // Match global header height (~72px)
 
 // [NEW] Copied the UpdatesPopup component from your other file
 // ------------------------------------------------
@@ -1019,18 +1020,21 @@ const StartChatting = () => {
       )}
       {/* Mini Sidebar — visible when full sidebar is collapsed */}
       {!isSidebarOpen && (
-        <div className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-[60px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[60] flex flex-col items-center pt-4 gap-4">
+        <div
+          className="fixed left-0 w-[56px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[60] flex flex-col items-center pt-4 gap-3 shadow-sm"
+          style={{ top: HEADER_OFFSET, height: `calc(100vh - ${HEADER_OFFSET})` }}
+        >
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            title="Open sidebar"
+            className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+            title="Expand sidebar"
             style={{ color: '#677e73' }}
           >
-            <MenuIcon className="w-5 h-5" />
+            <ChevronRight className="w-5 h-5" />
           </button>
           <button
             onClick={handleNewChat}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
             title="New chat"
             style={{ color: '#677e73' }}
           >
@@ -1042,18 +1046,19 @@ const StartChatting = () => {
       {/* Fixed Left Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-        style={{ width: '260px' }}
+        className={`fixed left-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ width: '260px', top: HEADER_OFFSET, height: `calc(100vh - ${HEADER_OFFSET})` }}
       >
         {/* New Chat + Collapse button row */}
         <div className="h-16 flex items-center justify-between px-4 flex-shrink-0">
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center gap-2 text-sm font-semibold"
             title="Collapse sidebar"
             style={{ color: '#677e73' }}
           >
-            ☰
+            <ChevronLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Collapse</span>
           </button>
         </div>
 
@@ -1170,8 +1175,14 @@ const StartChatting = () => {
       </div>
 
       {/* Main Content - Adjusted for wider sidebar */}
-      <div className={`flex-1 pt-16 flex flex-col lg:flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? 'ml-[260px]' : 'ml-[60px]'}`}>
-        <div className="w-full h-[calc(100dvh-4rem)] bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col">
+      <div
+        className={`flex-1 flex flex-col lg:flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? 'ml-[260px]' : 'ml-[56px]'}`}
+        style={{ paddingTop: HEADER_OFFSET }}
+      >
+        <div
+          className="w-full bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col"
+          style={{ height: `calc(100dvh - ${HEADER_OFFSET})` }}
+        >
           {/* Chat Interface - Full Width */}
           <div className="w-full h-full flex flex-col bg-white dark:bg-[#0B1120] relative">
 

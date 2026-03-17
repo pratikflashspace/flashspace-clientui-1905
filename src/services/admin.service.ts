@@ -42,16 +42,16 @@ export interface UserData {
   email: string;
   phoneNumber?: string;
   role:
-    | "user"
-    | "super_admin"
-    | "admin"
-    | "affiliate_manager"
-    | "space_partner_manager"
-    | "support"
-    | "partner"
-    | "space_manager"
-    | "sales"
-    | "affiliate";
+  | "user"
+  | "super_admin"
+  | "admin"
+  | "affiliate_manager"
+  | "space_partner_manager"
+  | "support"
+  | "partner"
+  | "space_manager"
+  | "sales"
+  | "affiliate";
   status: "active" | "inactive" | "pending";
   isEmailVerified?: boolean;
   createdAt: string;
@@ -74,11 +74,11 @@ export interface BookingData {
   };
   type: "virtual_office" | "coworking_space";
   status:
-    | "pending_payment"
-    | "pending_kyc"
-    | "active"
-    | "expired"
-    | "cancelled";
+  | "pending_payment"
+  | "pending_kyc"
+  | "active"
+  | "expired"
+  | "cancelled";
   plan: {
     name: string;
     price: number;
@@ -121,11 +121,11 @@ export interface KYCData {
     partners?: string[];
   };
   overallStatus:
-    | "not_started"
-    | "pending"
-    | "approved"
-    | "rejected"
-    | "resubmit";
+  | "not_started"
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "resubmit";
   documents: Array<{
     type: string;
     name: string;
@@ -189,7 +189,7 @@ export interface AdminTicketData {
   updatedAt: string;
   deadline?: string;
   messages: Array<{
-    sender: "user" | "support" | "admin" | "bot";
+    sender: "user" | "support" | "admin" | "partner" | "affiliate";
     message: string;
     createdAt: string;
   }>;
