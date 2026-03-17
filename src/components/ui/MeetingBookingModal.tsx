@@ -145,6 +145,7 @@ export default function MeetingBookingModal({
         email,
         phoneNumber,
         slotTime,
+        spaceId: item._id,
         notes: `${item.name} - ${item.address}`,
       });
 

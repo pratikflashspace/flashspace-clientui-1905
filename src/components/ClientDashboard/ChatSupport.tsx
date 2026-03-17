@@ -50,7 +50,7 @@ export default function ChatSupport() {
     const [loading, setLoading] = useState(true);
     const [messageInput, setMessageInput] = useState('');
     const [sending, setSending] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     const activeTicket = tickets.find(t => t._id === activeTicketId);
 
@@ -80,9 +80,13 @@ export default function ChatSupport() {
 
     // Scroll to bottom when messages change
     useEffect(() => {
-        setTimeout(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+        const container = messagesContainerRef.current;
+        if (container) {
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
     }, [activeTicket?.messages]);
 
     // Socket: join the active ticket room and listen for new messages
@@ -132,17 +136,6 @@ export default function ChatSupport() {
             });
             if (res.data.success) {
                 setMessageInput('');
-                // Optimistic update
-                const newMsg: TicketMessage = {
-                    sender: 'user',
-                    message: messageInput.trim(),
-                    createdAt: new Date().toISOString(),
-                };
-                setTickets(prev => prev.map(t =>
-                    t._id === activeTicketId
-                        ? { ...t, messages: [...t.messages, newMsg], updatedAt: new Date().toISOString() }
-                        : t
-                ));
             } else {
                 toast.error('Failed to send message');
             }
@@ -273,7 +266,10 @@ export default function ChatSupport() {
                                     </div>
 
                                     {/* Messages */}
-                                    <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-gray-50/50">
+                                    <div 
+                                        ref={messagesContainerRef}
+                                        className="flex-1 overflow-y-auto p-6 space-y-5 bg-gray-50/50 scroll-smooth"
+                                    >
                                         {activeTicket.messages.length === 0 && (
                                             <div className="flex flex-col items-center justify-center h-full text-gray-400">
                                                 <MessageSquare className="w-10 h-10 mb-2 opacity-20" />
@@ -309,7 +305,6 @@ export default function ChatSupport() {
                                                 </div>
                                             );
                                         })}
-                                        <div ref={messagesEndRef} />
                                     </div>
 
                                     {/* Input */}

@@ -45,7 +45,8 @@ export const TicketViewModal = ({
   if (!ticket) return null;
 
   const getStatusStyle = (status: string) => {
-    switch (status) {
+    if (!status) return "bg-gray-50 text-gray-600 border-gray-100";
+    switch (status.toLowerCase()) {
       case "open":
         return "bg-white border-gray-200 text-gray-700";
       case "in_progress":
@@ -62,7 +63,8 @@ export const TicketViewModal = ({
   };
 
   const formatStatus = (status: string) => {
-    switch (status) {
+    if (!status) return "Unknown";
+    switch (status.toLowerCase()) {
       case "in_progress":
         return "In Progress";
       case "escalated":
@@ -82,6 +84,7 @@ export const TicketViewModal = ({
   };
 
   const formatCategory = (category: string) => {
+    if (!category) return "General";
     return category
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -96,7 +99,7 @@ export const TicketViewModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl bg-white rounded-3xl border-0 shadow-2xl p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-4xl bg-white rounded-3xl border border-gray-100 shadow-2xl overflow-hidden min-h-[200px]">
         <DialogHeader className="px-4 md:px-6 py-5 border-b border-gray-100">
           <div>
             <DialogTitle className="text-xl md:text-2xl font-bold text-gray-900 pr-10">
@@ -169,34 +172,34 @@ export const TicketViewModal = ({
                 ticket.messages?.map((msg, idx) => (
                   <div
                     key={idx}
-                    className={`flex ${msg.sender === "admin" ? "justify-end" : "justify-start"}`}
+                    className={`flex ${["admin", "support"].includes(msg.sender) ? "justify-end" : "justify-start"}`}
                   >
                     <div
                       className={`max-w-[85%] md:max-w-[75%] px-3 md:px-4 py-2.5 md:py-3 rounded-2xl shadow-sm ${
-                        msg.sender === "admin"
+                        ["admin", "support"].includes(msg.sender)
                           ? "bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-br-sm"
                           : "bg-white border border-gray-200 text-gray-800 rounded-bl-sm"
                       }`}
                     >
                       <div className="flex items-center gap-2 mb-1">
                         <span
-                          className={`text-[10px] md:text-xs font-bold uppercase tracking-tight ${msg.sender === "admin" ? "text-teal-100" : "text-gray-500"}`}
+                          className={`text-[10px] md:text-xs font-bold uppercase tracking-tight ${["admin", "support"].includes(msg.sender) ? "text-teal-100" : "text-gray-500"}`}
                         >
                           {msg.sender === "user"
                             ? ticket.user?.fullName
-                            : "You (Support)"}
+                            : (msg.sender === "admin" || msg.sender === "support") ? "You (Support)" : msg.sender}
                         </span>
                         <span
-                          className={`text-[10px] md:text-xs ${msg.sender === "admin" ? "text-teal-200" : "text-gray-400"}`}
+                          className={`text-[10px] md:text-xs ${["admin", "support"].includes(msg.sender) ? "text-teal-200" : "text-gray-400"}`}
                         >
-                          {new Date(msg.createdAt).toLocaleTimeString("en-IN", {
+                          {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString("en-IN", {
                             hour: "2-digit",
                             minute: "2-digit",
-                          })}
+                          }) : ""}
                         </span>
                       </div>
                       <p
-                        className={`text-sm leading-relaxed ${msg.sender === "admin" ? "text-white" : "text-gray-700"}`}
+                        className={`text-sm leading-relaxed ${["admin", "support"].includes(msg.sender) ? "text-white" : "text-gray-700"}`}
                       >
                         {msg.message}
                       </p>

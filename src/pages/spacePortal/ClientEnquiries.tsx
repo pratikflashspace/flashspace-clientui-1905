@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EnquiryChatModal } from "@/components/modals/EnquiryChatModal";
 import { toast } from "@/hooks/use-toast";
 import userDashboardService from "@/services/userDashboard.service";
+import { useSocket } from "@/contexts/SocketContext";
 
 const getStatusBadge = (status: string) => {
   switch (status.toLowerCase()) {
@@ -42,15 +43,32 @@ const getStatusBadge = (status: string) => {
       );
     case "active":
     case "converted":
+    case "completed":
       return (
-        <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+        <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">
           Converted
         </Badge>
       );
     case "lost":
-      return <Badge variant="secondary">Lost</Badge>;
+    case "cancelled":
+      return (
+        <Badge variant="secondary" className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">
+          Lost
+        </Badge>
+      );
+    case "scheduled":
+    case "pending":
+      return (
+        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">
+          New
+        </Badge>
+      );
     default:
-      return <Badge variant="outline">{status}</Badge>;
+      return (
+        <Badge variant="outline" className="px-3 py-1 rounded-full text-[11px] font-bold tracking-wider">
+          {status}
+        </Badge>
+      );
   }
 };
 
@@ -61,38 +79,56 @@ const ClientEnquiries = () => {
   const [loading, setLoading] = useState(true);
   const [selectedEnquiry, setSelectedEnquiry] = useState<any>(null);
   const [chatModalOpen, setChatModalOpen] = useState(false);
+  const { socket } = useSocket();
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [requestsRes, clientsRes, analyticsRes] = await Promise.all([
+        userDashboardService.getPartnerActiveRequests(),
+        userDashboardService.getPartnerClients(),
+        userDashboardService.getPartnerAnalytics(),
+      ]);
+
+      if (requestsRes.success) setActiveRequests(requestsRes.data || []);
+      if (clientsRes.success) {
+        // Filter out inactive ones for the converted list if needed,
+        // but usually clients returned here are already converted.
+        setConvertedClients(clientsRes.data || []);
+      }
+      if (analyticsRes.success) setAnalytics(analyticsRes.data);
+    } catch (error) {
+      console.error("Error fetching enquiries data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load enquiries data.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [requestsRes, clientsRes, analyticsRes] = await Promise.all([
-          userDashboardService.getPartnerActiveRequests(),
-          userDashboardService.getPartnerClients(),
-          userDashboardService.getPartnerAnalytics(),
-        ]);
-
-        if (requestsRes.success) setActiveRequests(requestsRes.data || []);
-        if (clientsRes.success) {
-          // Filter out inactive ones for the converted list if needed,
-          // but usually clients returned here are already converted.
-          setConvertedClients(clientsRes.data || []);
-        }
-        if (analyticsRes.success) setAnalytics(analyticsRes.data);
-      } catch (error) {
-        console.error("Error fetching enquiries data:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load enquiries data.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewEnquiry = (data: any) => {
+      toast({
+        title: "New Lead Received",
+        description: `A new inquiry has been raised for ${data.ticket?.subject || "your space"}.`,
+      });
+      fetchData();
+    };
+
+    socket.on("partner_new_ticket", handleNewEnquiry);
+    return () => {
+      socket.off("partner_new_ticket", handleNewEnquiry);
+    };
+  }, [socket, fetchData]);
 
   const handleStartChat = (enquiry: any) => {
     setSelectedEnquiry(enquiry);
@@ -115,11 +151,34 @@ const ClientEnquiries = () => {
     });
   };
 
-  const handleMarkConverted = (enquiry: any) => {
-    toast({
-      title: "Enquiry Converted",
-      description: `${enquiry.companyName || enquiry.user?.name} has been marked as converted.`,
-    });
+  const handleMarkConverted = async (enquiry: any) => {
+    try {
+      const res = await userDashboardService.convertRequest(enquiry.id, enquiry.category);
+      if (res.success) {
+        toast({
+          title: "Success",
+          description: `${enquiry.user?.name} has been marked as converted.`,
+        });
+        // Refresh data
+        const requestsRes = await userDashboardService.getPartnerActiveRequests();
+        const clientsRes = await userDashboardService.getPartnerClients();
+        if (requestsRes.success) setActiveRequests(requestsRes.data || []);
+        if (clientsRes.success) setConvertedClients(clientsRes.data || []);
+      } else {
+        toast({
+          title: "Error",
+          description: res.message || "Failed to convert enquiry.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error converting enquiry:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
