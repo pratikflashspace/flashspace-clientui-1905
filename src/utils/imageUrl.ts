@@ -1,23 +1,46 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
+const getBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/api$/, "").replace(/\/$/, "");
+  }
+  
+  // In development, if no env is set, default to localhost:5000
+  if (import.meta.env.DEV) {
+    return "http://localhost:5000";
+  }
+  
+  // In production, use the current origin
+  return window.location.origin;
+};
 
-// Ensure we have a clean base URL without /api suffix for uploads
-const BASE_URL = API_BASE_URL.replace(/\/api$/, "").replace(/\/$/, "");
+const BASE_URL = getBaseUrl();
+
+/**
+ * Checks if a URL is a known placeholder, invalid string, or empty.
+ */
+export const isInvalidImageUrl = (url?: string): boolean => {
+  if (!url) return true;
+  const val = String(url).trim().toLowerCase();
+  return (
+    val === "" ||
+    val === "null" ||
+    val === "undefined" ||
+    val === "image.jpg" ||
+    val === "placeholder.png" ||
+    val === "img1.jpg" ||
+    val === "url1.jpg" ||
+    val === "url" ||
+    val.includes("shorturl.at") ||
+    val.includes("tinyurl.com")
+  );
+};
 
 /**
  * Safely formats an image URL.
- * Handles:
- * 1. Full URLs (http/https)
- * 2. Absolute paths (/uploads/...)
- * 3. Relative paths (uploads/...)
- * 4. Invalid/Empty values (returns fallback)
  */
 export const getSafeImageUrl = (url?: string, fallback: string = "/hero-illustrated.jpg"): string => {
-  if (!url) return fallback;
+  if (!url || isInvalidImageUrl(url)) return fallback;
   
   const trimmedUrl = url.trim();
-  if (trimmedUrl === "" || trimmedUrl === "null" || trimmedUrl === "undefined") {
-    return fallback;
-  }
 
   // If it's already a full URL, return it
   if (trimmedUrl.startsWith("http://") || trimmedUrl.startsWith("https://") || trimmedUrl.startsWith("data:")) {

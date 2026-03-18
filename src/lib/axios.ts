@@ -17,7 +17,11 @@ export const axiosInstance = axios.create({
 // Request interceptor - cookies are automatically included by the browser
 axiosInstance.interceptors.request.use(
   (config: any) => {
-    // No need to manually add Authorization header
+    // Automatically prepend /api to relative URLs if not already present
+    if (config.url && config.url.startsWith('/') && !config.url.startsWith('/api')) {
+      config.url = `/api${config.url}`;
+    }
+    
     // Cookies are automatically sent by the browser when withCredentials is true
     return config;
   },

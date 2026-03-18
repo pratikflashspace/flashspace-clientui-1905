@@ -1,27 +1,6 @@
 import axiosInstance from "./api.service";
 import { MeetingRoomItem, ApiResponse } from "@/types/services";
 
-const isBadImageUrl = (url?: string) => {
-  if (!url) return true;
-  const value = String(url).trim().toLowerCase();
-  return (
-    value.length === 0 ||
-    value.startsWith("url") ||
-    value === "img1.jpg" ||
-    value === "url1.jpg" ||
-    value.includes("shorturl.at") ||
-    value.includes("tinyurl.com")
-  );
-};
-
-const pickBestImage = (item: any) => {
-  const firstArrayImage = Array.isArray(item.images)
-    ? item.images.find((img: string) => !isBadImageUrl(img))
-    : undefined;
-  if (firstArrayImage) return firstArrayImage;
-  if (!isBadImageUrl(item.image)) return item.image;
-  return "/hero-illustrated.jpg";
-};
 
 const toNumber = (value: any) => {
   const numberValue = Number(value);
@@ -57,13 +36,6 @@ export const getMeetingRoomsByCity = async (
           r.price ||
           formatHourPrice(r.pricePerHour || r.finalPricePerHour) ||
           "Price on request",
-        image: pickBestImage(r),
-        images:
-          Array.isArray(r.images) && r.images.length > 0
-            ? r.images.filter((img: string) => !isBadImageUrl(img))
-            : !isBadImageUrl(r.image)
-              ? [r.image]
-              : ["/hero-illustrated.jpg"],
         rating: toNumber(r.rating) || toNumber(r.avgRating),
         reviews: toNumber(r.reviews) || toNumber(r.totalReviews),
       }));
@@ -97,13 +69,6 @@ export const getAllMeetingRooms = async (): Promise<MeetingRoomItem[]> => {
           r.price ||
           formatHourPrice(r.pricePerHour || r.finalPricePerHour) ||
           "Price on request",
-        image: pickBestImage(r),
-        images:
-          Array.isArray(r.images) && r.images.length > 0
-            ? r.images.filter((img: string) => !isBadImageUrl(img))
-            : !isBadImageUrl(r.image)
-              ? [r.image]
-              : ["/hero-illustrated.jpg"],
         rating: toNumber(r.rating) || toNumber(r.avgRating),
         reviews: toNumber(r.reviews) || toNumber(r.totalReviews),
       }));
@@ -136,13 +101,6 @@ export const getMeetingRoomById = async (
         price: r.finalPricePerHour
           ? `₹${Number(r.finalPricePerHour).toLocaleString()}/hr`
           : "Price on request",
-        image: pickBestImage(r),
-        images:
-          Array.isArray(r.images) && r.images.length > 0
-            ? r.images.filter((img: string) => !isBadImageUrl(img))
-            : !isBadImageUrl(r.image)
-              ? [r.image]
-              : ["/hero-illustrated.jpg"],
         rating: toNumber(r.rating) || toNumber(r.avgRating),
         reviews: toNumber(r.reviews) || toNumber(r.totalReviews),
       };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, Save, Plus, Building2, Briefcase } from "lucide-react";
+import { getSafeImageUrl } from "@/utils/imageUrl";
 
 interface AddSpaceModalProps {
   isOpen: boolean;
@@ -454,11 +455,11 @@ export default function AddSpaceModal({
                 {formData.image && (
                   <div className="mt-2 h-40 w-full bg-gray-100 rounded-xl overflow-hidden border">
                     <img
-                      src={formData.image || "/hero-illustrated.jpg"}
+                      src={getSafeImageUrl(formData.image)}
                       alt="Cover Preview"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80";
+                        (e.target as HTMLImageElement).src = "/hero-illustrated.jpg";
                       }}
                     />
                   </div>
@@ -486,9 +487,12 @@ export default function AddSpaceModal({
                       className="h-24 relative group rounded-xl overflow-hidden border"
                     >
                       <img
-                        src={url}
+                        src={getSafeImageUrl(url)}
                         alt={`Gallery ${index}`}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "/hero-illustrated.jpg";
+                        }}
                       />
                       <button
                         type="button"

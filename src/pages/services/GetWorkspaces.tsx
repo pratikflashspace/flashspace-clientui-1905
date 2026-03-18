@@ -33,6 +33,7 @@ import { getCoworkingSpacesByCity } from "@/services/coworkingSpace.service";
 import { getMeetingRoomsByCity } from "@/services/meetingRoom.service";
 import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
 import { ListingItem } from "@/components/services/ListingCardModern";
+import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 
 // Static placeholders for fallback/missing data
 // import connaughtPlace1 from "@/assets/connaught-place-1.png";
@@ -58,18 +59,6 @@ interface UnifiedWorkspace {
   lng: number;
 }
 
-const getValidImage = (img: string | undefined, defaultImg: string) => {
-  if (
-    !img ||
-    img.startsWith("url") ||
-    img.trim() === "img1.jpg" ||
-    img.trim() === "url1.jpg" ||
-    img.includes("shorturl.at") ||
-    img.includes("tinyurl.com")
-  )
-    return defaultImg;
-  return img;
-};
 
 const DEFAULT_WORKSPACE_IMAGE = "/hero-illustrated.jpg";
 
@@ -119,9 +108,11 @@ const WorkspaceCard = ({
   };
 
   const rawImages = ws.images && ws.images.length > 0 ? ws.images : [ws.image];
-  const images = rawImages.map((img) =>
-    getValidImage(img, DEFAULT_WORKSPACE_IMAGE),
-  );
+  const images = rawImages
+    .filter((img) => !isInvalidImageUrl(img))
+    .map((img) => getSafeImageUrl(img));
+  
+  if (images.length === 0) images.push(DEFAULT_WORKSPACE_IMAGE);
 
   const bookingItem: ListingItem = {
     _id: ws.id,

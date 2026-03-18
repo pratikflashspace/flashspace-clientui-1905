@@ -434,18 +434,20 @@ export default function AddSpace() {
     if (propertyId) {
       setUploadingImages(true);
       try {
-        for (const file of files) {
-          const resp = await propertyService.uploadPropertyImage(
-            propertyId,
-            file,
-          );
+        const resp = await propertyService.uploadMultiplePropertyImages(
+          propertyId,
+          files,
+        );
+        
+        if (resp.data?.urls) {
           setPropertyData((prev) => ({
             ...prev,
-            images: [...prev.images, resp.data.url],
+            images: [...prev.images, ...resp.data.urls],
           }));
         }
-        toast.success("Images uploaded successfully");
+        toast.success(`${files.length} images uploaded successfully`);
       } catch (err) {
+        console.error("Upload error:", err);
         toast.error("Failed to upload images");
       } finally {
         setUploadingImages(false);

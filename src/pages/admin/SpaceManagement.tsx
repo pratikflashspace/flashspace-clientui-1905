@@ -5,7 +5,7 @@ import { Search, MapPin, Star, Plus, Trash2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
-import { getSafeImageUrl } from "@/utils/imageUrl";
+import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 
 const FALLBACK_IMAGE = "/hero-illustrated.jpg";
 const SECONDARY_FALLBACK =
@@ -31,21 +31,6 @@ interface Space {
   propertyId?: string;
 }
 
-// Improved checker for bad/placeholder image URLs
-const isInvalidImageUrl = (url?: string) => {
-  if (!url) return true;
-  const val = String(url).trim().toLowerCase();
-  return (
-    val === "" ||
-    val === "null" ||
-    val === "undefined" ||
-    val === "image.jpg" ||
-    val === "placeholder.png" ||
-    val.startsWith("url") ||
-    val.includes("shorturl.at") ||
-    val.includes("tinyurl.com")
-  );
-};
 
 // Helper to get the best available image from a space
 const getSpaceImage = (space: Space): string => {
