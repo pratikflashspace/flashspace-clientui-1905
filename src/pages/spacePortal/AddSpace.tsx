@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/tabs";
 
 import propertyService from "@/services/property.service";
+import { useAuth } from "@/contexts/AuthContext";
 import { getMySpaceUserKyc } from "@/Api/spacePartnerKyc.service";
 import {
   createCoworkingSpace,
@@ -129,6 +130,8 @@ export default function AddSpace() {
   const [propertyId, setPropertyId] = useState<string | null>(editId);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
 
   const steps = useMemo<{ id: Step; label: string; icon: any }[]>(() => [
     { id: "property", label: "Property", icon: Building2 },
@@ -711,13 +714,39 @@ export default function AddSpace() {
 
     setLoading(true);
     try {
-      await propertyService.updateProperty(propertyId, {
-        kycStatus: "pending",
-      });
-      toast.success("Property submitted for admin review!");
+      if (isAdmin) {
+        // Direct Publish for Admins
+        await propertyService.updateProperty(propertyId, {
+          kycStatus: "approved",
+          isActive: true,
+          status: "active",
+        });
+
+        // Also activate all associated spaces
+        const spaces = await propertyService.getPropertySpaces(propertyId);
+        
+        if (spaces.coworkingSpaces && spaces.coworkingSpaces.length > 0) {
+          for (const cs of spaces.coworkingSpaces) {
+            await updateCoworkingSpace(cs._id, { isActive: true, availability: "Available Now" });
+          }
+        }
+        
+        if (spaces.virtualOffices && spaces.virtualOffices.length > 0) {
+          for (const vo of spaces.virtualOffices) {
+            await updateVirtualOffice(vo._id, { isActive: true, availability: "Available Now" });
+          }
+        }
+
+        toast.success("Property published successfully!");
+      } else {
+        await propertyService.updateProperty(propertyId, {
+          kycStatus: "pending",
+        });
+        toast.success("Property submitted for admin review!");
+      }
       navigate(-1);
     } catch (err) {
-      toast.error("Failed to submit property for review");
+      toast.error(isAdmin ? "Failed to publish property" : "Failed to submit property for review");
     } finally {
       setLoading(false);
     }
@@ -1797,71 +1826,75 @@ export default function AddSpace() {
             Review & <span className="text-primary italic">Submit</span>
           </h2>
           <p className="text-muted-foreground font-medium text-sm">
-            Please review your space details carefully. Once submitted, our team will verify the information before making the listing live.
+            {isAdmin 
+              ? "Review the property details below. As an administrator, you can publish this listing directly to the platform."
+              : "Please review your space details carefully. Once submitted, our team will verify the information before making the listing live."}
           </p>
         </div>
  
         <div className="max-w-3xl mx-auto space-y-8">
-          <div
-            className={`p-10 rounded-[40px] border-2 transition-all duration-500 shadow-sm ${
-              isPropertyKycApproved
-                ? "bg-emerald-50/50 border-emerald-200"
-                : isPropertyKycPending
-                  ? "bg-blue-50/50 border-blue-200"
-                  : isPropertyKycRejected
-                    ? "bg-destructive/5 border-destructive/20"
-                    : "bg-muted/30 border-border"
-            }`}
-          >
-            <div className="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
-              <div
-                className={`w-20 h-20 rounded-[28px] flex items-center justify-center shadow-lg transition-transform duration-500 hover:scale-110 ${
-                  isPropertyKycApproved
-                    ? "bg-emerald-500 text-white"
-                    : isPropertyKycPending
-                      ? "bg-blue-500 text-white"
-                      : isPropertyKycRejected
-                        ? "bg-destructive text-white"
-                        : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {isPropertyKycApproved ? (
-                  <CheckCircle2 className="w-10 h-10" />
-                ) : isPropertyKycPending ? (
-                  <Clock className="w-10 h-10 animate-[spin_3s_linear_infinite]" />
-                ) : isPropertyKycRejected ? (
-                  <AlertCircle className="w-10 h-10" />
-                ) : (
-                  <FileType className="w-10 h-10" />
-                )}
+          {!isAdmin && (
+            <div
+              className={`p-10 rounded-[40px] border-2 transition-all duration-500 shadow-sm ${
+                isPropertyKycApproved
+                  ? "bg-emerald-50/50 border-emerald-200"
+                  : isPropertyKycPending
+                    ? "bg-blue-50/50 border-blue-200"
+                    : isPropertyKycRejected
+                      ? "bg-destructive/5 border-destructive/20"
+                      : "bg-muted/30 border-border"
+              }`}
+            >
+              <div className="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
+                <div
+                  className={`w-20 h-20 rounded-[28px] flex items-center justify-center shadow-lg transition-transform duration-500 hover:scale-110 ${
+                    isPropertyKycApproved
+                      ? "bg-emerald-500 text-white"
+                      : isPropertyKycPending
+                        ? "bg-blue-500 text-white"
+                        : isPropertyKycRejected
+                          ? "bg-destructive text-white"
+                          : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {isPropertyKycApproved ? (
+                    <CheckCircle2 className="w-10 h-10" />
+                  ) : isPropertyKycPending ? (
+                    <Clock className="w-10 h-10 animate-[spin_3s_linear_infinite]" />
+                  ) : isPropertyKycRejected ? (
+                    <AlertCircle className="w-10 h-10" />
+                  ) : (
+                    <FileType className="w-10 h-10" />
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <h4 className="text-2xl font-black text-foreground tracking-tight">
+                    Status: <span className="text-primary italic capitalize">
+                      {propertyKycStatus.replace("_", " ")}
+                    </span>
+                  </h4>
+                  <p className="text-sm text-muted-foreground font-medium leading-relaxed max-w-md">
+                    {isPropertyKycApproved
+                      ? "Congratulations! Your property has been verified and is now ready for listings."
+                      : isPropertyKycPending
+                        ? "Hang tight! Our experts are currently reviewing your property details and documents."
+                        : isPropertyKycRejected
+                          ? "There are some inconsistencies in your submission that need your attention."
+                          : "You haven't submitted this property for verification yet. Complete all steps to proceed."}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 space-y-2">
-                <h4 className="text-2xl font-black text-foreground tracking-tight">
-                  Status: <span className="text-primary italic capitalize">
-                    {propertyKycStatus.replace("_", " ")}
-                  </span>
-                </h4>
-                <p className="text-sm text-muted-foreground font-medium leading-relaxed max-w-md">
-                  {isPropertyKycApproved
-                    ? "Congratulations! Your property has been verified and is now ready for listings."
-                    : isPropertyKycPending
-                      ? "Hang tight! Our experts are currently reviewing your property details and documents."
-                      : isPropertyKycRejected
-                        ? "There are some inconsistencies in your submission that need your attention."
-                        : "You haven't submitted this property for verification yet. Complete all steps to proceed."}
-                </p>
-              </div>
+  
+              {isPropertyKycRejected && propertyKycRejectionReason && (
+                <div className="mt-10 p-6 bg-destructive/10 rounded-2xl border-2 border-destructive/20 text-sm text-destructive font-black flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <span>Rejection Feedback: {propertyKycRejectionReason}</span>
+                </div>
+              )}
             </div>
- 
-            {isPropertyKycRejected && propertyKycRejectionReason && (
-              <div className="mt-10 p-6 bg-destructive/10 rounded-2xl border-2 border-destructive/20 text-sm text-destructive font-black flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <span>Rejection Feedback: {propertyKycRejectionReason}</span>
-              </div>
-            )}
-          </div>
- 
-          {!isPartnerKycApproved && (
+          )}
+
+          {!isAdmin && !isPartnerKycApproved && (
             <div className="p-6 bg-amber-50 rounded-[24px] border-2 border-amber-100 flex items-start gap-4">
                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
                   <AlertTriangle className="w-6 h-6 text-amber-600" />
@@ -1896,33 +1929,34 @@ export default function AddSpace() {
               onClick={submitPropertyForReview}
               disabled={
                 !policyAccepted ||
-                isPropertyKycPending ||
-                !isPartnerKycApproved ||
+                (!isAdmin && (isPropertyKycPending || !isPartnerKycApproved)) ||
                 loading
               }
               className="w-full h-20 rounded-[28px] font-black text-xl shadow-2xl shadow-primary/30 relative overflow-hidden group disabled:opacity-50 disabled:grayscale"
             >
               <span className="relative z-10 flex items-center justify-center gap-3 tracking-tight">
                 {loading
-                  ? "Verifying Submission..."
-                  : isPropertyKycRejected
-                    ? "Resubmit for Internal Review"
-                    : isPropertyKycPending
-                      ? "Submission in Progress"
-                      : "Submit Portfolio for Admin Review"}
-                {!loading && !isPropertyKycPending && <Send className="w-6 h-6 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform" />}
+                  ? (isAdmin ? "Publishing listing..." : "Verifying Submission...")
+                  : isAdmin 
+                    ? "Publish Property Now"
+                    : isPropertyKycRejected
+                      ? "Resubmit for Internal Review"
+                      : isPropertyKycPending
+                        ? "Submission in Progress"
+                        : "Submit Portfolio for Admin Review"}
+                {!loading && (isAdmin || !isPropertyKycPending) && <Send className="w-6 h-6 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform" />}
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Button>
  
-            {isPropertyKycPending && (
+            {!isAdmin && isPropertyKycPending && (
               <div className="flex items-center justify-center gap-2 text-xs text-blue-600 font-black uppercase tracking-widest bg-blue-50 py-3 rounded-xl border border-blue-100">
                 <Clock className="w-4 h-4" />
                 Data review locked until verification complete
               </div>
             )}
  
-            {!isPartnerKycApproved && (
+            {!isAdmin && !isPartnerKycApproved && (
               <div className="flex items-center justify-center gap-2 text-xs text-amber-600 font-black uppercase tracking-widest bg-amber-50 py-3 rounded-xl border border-amber-100 italic">
                 <AlertTriangle className="w-4 h-4" />
                 Personal Identity Verification Required
@@ -1955,7 +1989,7 @@ export default function AddSpace() {
 
   return (
     <div className="flex-1 max-w-7xl mx-auto p-4 md:p-8 animate-in fade-in duration-700">
-      {propertyKycStatus === "not_started" && (
+      {!isAdmin && propertyKycStatus === "not_started" && (
         <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 mb-8 shadow-sm">
           <div className="flex gap-4">
             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
@@ -2021,7 +2055,7 @@ export default function AddSpace() {
             Back to Portal
           </Button>
           <h1 className="text-4xl font-black text-foreground tracking-tighter">
-            Add New <span className="text-primary italic">Space</span>
+            {editId ? "Edit" : "Add New"} <span className="text-primary italic">Space</span>
           </h1>
           <p className="text-muted-foreground font-medium">
             Capture property details and list across multiple services.

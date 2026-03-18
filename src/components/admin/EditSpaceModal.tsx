@@ -466,9 +466,12 @@ export default function EditSpaceModal({
                 {formData.image && (
                   <div className="mt-2 h-40 w-full bg-gray-100 rounded-xl overflow-hidden border">
                     <img
-                      src={formData.image}
+                      src={formData.image || "/hero-illustrated.jpg"}
                       alt="Cover Preview"
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80";
+                      }}
                     />
                   </div>
                 )}
