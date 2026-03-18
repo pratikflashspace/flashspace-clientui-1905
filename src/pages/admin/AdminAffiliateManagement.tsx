@@ -20,6 +20,7 @@ import {
   AlertCircle,
   UserCheck,
 } from "lucide-react";
+import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 
@@ -308,8 +309,27 @@ const AffiliateDetailPanel = ({
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+            <div className="px-8 py-4 space-y-3 animate-pulse">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 h-32 flex flex-col gap-3">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                       <div className="h-4 w-40 bg-gray-200 rounded" />
+                       <div className="h-3 w-56 bg-gray-100 rounded" />
+                    </div>
+                    <div className="h-4 w-20 bg-emerald-100/50 rounded" />
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="h-3 w-full bg-gray-50 rounded" />
+                    <div className="h-3 w-full bg-gray-50 rounded" />
+                    <div className="h-3 w-full bg-gray-50 rounded" />
+                  </div>
+                  <div className="flex justify-between mt-auto">
+                    <div className="h-4 w-24 bg-gray-100 rounded" />
+                    <div className="h-3 w-20 bg-gray-50 rounded" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
@@ -487,8 +507,8 @@ export default function AdminAffiliateManagement() {
 
           {/* Table */}
           {loading ? (
-            <div className="flex items-center justify-center py-24">
-              <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+            <div className="p-8">
+              <AdminPageSkeleton hideHeader hideStats />
             </div>
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-20 text-red-500 gap-3">

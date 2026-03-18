@@ -35,6 +35,9 @@ import {
   MapPin,
   Building2,
 } from "lucide-react";
+import { KYCDetailSkeleton } from "@/components/ui/skeleton-loaders";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 
 const getStatusBadge = (status?: string) => {
   switch (status) {
@@ -311,14 +314,23 @@ export default function SpacePartnerKycDetails() {
 
   if (loading || !request) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <DashboardLayout
+        portalName="FlashSpace Admin"
+        portalDescription="Complete platform management"
+        navItems={ADMIN_NAV_ITEMS}
+      >
+        <KYCDetailSkeleton />
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-8 animate-in fade-in duration-500">
+    <DashboardLayout
+      portalName="FlashSpace Admin"
+      portalDescription="Complete platform management"
+      navItems={ADMIN_NAV_ITEMS}
+    >
+      <div className="min-h-screen bg-transparent p-6 md:p-8 animate-in fade-in duration-500">
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8 px-4 md:px-0">
         <button
@@ -970,6 +982,7 @@ export default function SpacePartnerKycDetails() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }

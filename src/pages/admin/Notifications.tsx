@@ -18,6 +18,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { format } from "date-fns";
+import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
@@ -194,10 +195,7 @@ export default function Notifications() {
         {/* List Container */}
         <div className="bg-white rounded-3xl border border-gray-100 shadow-md overflow-hidden">
           {loading ? (
-            <div className="p-20 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading notifications...</p>
-            </div>
+            <AdminPageSkeleton />
           ) : filteredNotifications.length === 0 ? (
             <div className="p-20 text-center text-gray-400 flex flex-col items-center gap-4">
               <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">

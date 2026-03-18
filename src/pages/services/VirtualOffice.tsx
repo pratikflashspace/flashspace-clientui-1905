@@ -453,7 +453,7 @@ const VirtualOffice = () => {
                 className={`grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
               >
                 {loading ? (
-                  <SkeletonCardGrid count={6} />
+                  <SkeletonCardGrid count={6} view={viewMode} />
                 ) : error ? (
                   <div className="col-span-full text-center py-8 sm:py-12">
                     <p className="text-sm sm:text-base text-red-600">{error}</p>

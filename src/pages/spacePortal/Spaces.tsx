@@ -8,6 +8,7 @@ import {
   MoreVertical,
   Star,
 } from "lucide-react";
+import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AddSpaceDialog } from "@/components/modals/AddSpaceDialog";
@@ -222,8 +223,17 @@ const MySpaces = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex-1">
+        <div className="mb-8 flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-10 w-64 bg-gray-200 rounded" />
+            <div className="h-4 w-96 bg-gray-100 rounded" />
+          </div>
+          <div className="h-11 w-40 bg-gray-100 rounded-xl" />
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <SkeletonCardGrid count={6} />
+        </div>
       </div>
     );
   }

@@ -4,6 +4,7 @@ import { Search, MapPin, Star, Plus, Trash2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import EditSpaceModal from "@/components/admin/EditSpaceModal";
 import AddSpaceModal from "@/components/admin/AddSpaceModal";
+import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 
@@ -249,8 +250,8 @@ export default function SpaceManagement() {
 
         {/* Loading State */}
         {loading && (
-          <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+            <SkeletonCardGrid count={6} />
           </div>
         )}
 

@@ -13,6 +13,7 @@ import {
   XCircle,
   ShieldCheck,
 } from "lucide-react";
+import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { toast } from "sonner";
@@ -126,9 +127,13 @@ export default function AdminPropertyDetails() {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-slate-500">Loading property details...</div>
-      </div>
+      <DashboardLayout
+        portalName="FlashSpace Admin"
+        portalDescription="Complete platform management"
+        navItems={ADMIN_NAV_ITEMS}
+      >
+        <AdminPageSkeleton />
+      </DashboardLayout>
     );
   }
 

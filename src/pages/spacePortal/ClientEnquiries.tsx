@@ -17,6 +17,7 @@ import {
   Settings,
   Loader2,
 } from "lucide-react";
+import { StatsSkeleton, TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -183,11 +184,15 @@ const ClientEnquiries = () => {
 
   if (loading) {
     return (
-      <div className="flex h-[400px] flex-col items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground font-medium">
-          Loading enquiries data...
-        </p>
+      <div className="space-y-8">
+        <div className="space-y-2">
+          <div className="h-10 w-64 bg-gray-200 rounded" />
+          <div className="h-4 w-96 bg-gray-100 rounded" />
+        </div>
+        <StatsSkeleton count={4} />
+        <div className="bg-background border border-border rounded-xl p-4">
+          <TableSkeleton rows={8} cols={6} />
+        </div>
       </div>
     );
   }
