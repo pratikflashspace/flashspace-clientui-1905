@@ -8,7 +8,8 @@ import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { getSafeImageUrl } from "@/utils/imageUrl";
 
 const FALLBACK_IMAGE = "/hero-illustrated.jpg";
-const SECONDARY_FALLBACK = "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80";
+const SECONDARY_FALLBACK =
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80";
 
 interface Space {
   _id: string;
@@ -50,12 +51,12 @@ const isInvalidImageUrl = (url?: string) => {
 const getSpaceImage = (space: Space): string => {
   // Try images array first
   if (space.images && Array.isArray(space.images) && space.images.length > 0) {
-    const validImg = space.images.find(img => !isInvalidImageUrl(img));
+    const validImg = space.images.find((img) => !isInvalidImageUrl(img));
     if (validImg) return getSafeImageUrl(validImg, FALLBACK_IMAGE);
   }
   // Try photos array
   if (space.photos && Array.isArray(space.photos) && space.photos.length > 0) {
-    const validImg = space.photos.find(img => !isInvalidImageUrl(img));
+    const validImg = space.photos.find((img) => !isInvalidImageUrl(img));
     if (validImg) return getSafeImageUrl(validImg, FALLBACK_IMAGE);
   }
   // Try legacy single image field
@@ -126,8 +127,7 @@ export default function SpaceManagement() {
 
   const handleEditClick = (space: Space) => {
     const propertyId = space.propertyId || space._id;
-    const step = space.type === "virtual-office" ? "virtual" : "coworking";
-    navigate(`/admin/spaces/add?id=${propertyId}&step=${step}`);
+    navigate(`/admin/spaces/add?id=${propertyId}`);
   };
 
   const handleSaveSpace = async (
@@ -228,7 +228,7 @@ export default function SpaceManagement() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
-             <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-sm w-full sm:w-auto">
+            <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-sm w-full sm:w-auto">
               <button
                 onClick={() => setViewMode("active")}
                 className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
@@ -324,9 +324,7 @@ export default function SpaceManagement() {
               <div
                 key={space._id}
                 className={`group bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-100/50 hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 overflow-hidden flex flex-col ${
-                  viewMode === "deleted"
-                    ? "opacity-80 grayscale-[0.3]"
-                    : ""
+                  viewMode === "deleted" ? "opacity-80 grayscale-[0.3]" : ""
                 }`}
               >
                 {/* Image Header */}
@@ -434,9 +432,7 @@ export default function SpaceManagement() {
                               : "bg-orange-50 text-orange-700 border-orange-100/50 hover:bg-orange-100 hover:border-orange-200"
                           }`}
                         >
-                          {!space.isActive
-                            ? "Make Available"
-                            : "Unavailable"}
+                          {!space.isActive ? "Make Available" : "Unavailable"}
                         </button>
 
                         <button
@@ -488,7 +484,6 @@ export default function SpaceManagement() {
             </p>
           </div>
         )}
-
       </div>
     </DashboardLayout>
   );
