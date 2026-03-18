@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useState, useMemo } from "react";
 import {
   MapPin,
   Star,
@@ -14,6 +14,7 @@ import {
   MeetingRoomItem,
 } from "@/types/services";
 import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
+import { getSafeImageUrl } from "@/utils/imageUrl";
 
 // Union type that works with all service types
 export type ListingItem = (
@@ -89,12 +90,15 @@ const ListingCardModern = memo<ListingCardModernProps>(
     const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
 
     // Priority: item.images (array) -> item.image (legacy string) -> placeholders
-    const images =
-      item.images && item.images.length > 0
-        ? item.images
-        : item.image
-          ? [item.image, ...PLACEHOLDER_IMAGES.slice(1)]
-          : PLACEHOLDER_IMAGES;
+    const images = useMemo(() => {
+      if (item.images && item.images.length > 0) {
+        return item.images.map(img => getSafeImageUrl(img));
+      }
+      if (item.image) {
+        return [getSafeImageUrl(item.image), ...PLACEHOLDER_IMAGES.slice(1)];
+      }
+      return PLACEHOLDER_IMAGES;
+    }, [item.images, item.image]);
 
     const handlePrevImage = (e: React.MouseEvent) => {
       e.stopPropagation();

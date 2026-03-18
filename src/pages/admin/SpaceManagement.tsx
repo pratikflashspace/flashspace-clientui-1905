@@ -5,6 +5,7 @@ import { Search, MapPin, Star, Plus, Trash2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
+import { getSafeImageUrl } from "@/utils/imageUrl";
 
 const FALLBACK_IMAGE = "/hero-illustrated.jpg";
 const SECONDARY_FALLBACK = "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80";
@@ -50,16 +51,16 @@ const getSpaceImage = (space: Space): string => {
   // Try images array first
   if (space.images && Array.isArray(space.images) && space.images.length > 0) {
     const validImg = space.images.find(img => !isInvalidImageUrl(img));
-    if (validImg) return validImg;
+    if (validImg) return getSafeImageUrl(validImg, FALLBACK_IMAGE);
   }
   // Try photos array
   if (space.photos && Array.isArray(space.photos) && space.photos.length > 0) {
     const validImg = space.photos.find(img => !isInvalidImageUrl(img));
-    if (validImg) return validImg;
+    if (validImg) return getSafeImageUrl(validImg, FALLBACK_IMAGE);
   }
   // Try legacy single image field
   if (!isInvalidImageUrl(space.image)) {
-    return space.image!;
+    return getSafeImageUrl(space.image, FALLBACK_IMAGE);
   }
   return FALLBACK_IMAGE;
 };

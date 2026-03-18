@@ -42,6 +42,7 @@ import {
 import propertyService from "@/services/property.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { getMySpaceUserKyc } from "@/Api/spacePartnerKyc.service";
+import { getSafeImageUrl } from "@/utils/imageUrl";
 import {
   createCoworkingSpace,
   updateCoworkingSpace,
@@ -1069,11 +1070,7 @@ export default function AddSpace() {
                 className="relative aspect-video rounded-2xl overflow-hidden group shadow-md border border-border"
               >
                 <img
-                  src={
-                    img.startsWith("/")
-                      ? `${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin)}${img}`
-                      : img
-                  }
+                  src={getSafeImageUrl(img)}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
