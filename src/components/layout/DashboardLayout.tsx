@@ -33,33 +33,10 @@ export const DashboardLayout = ({
 
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background border-b border-border z-50 flex items-center justify-between px-4">
-        <Link to="/" className="flex items-baseline">
-          <span className="text-xl font-extrabold tracking-tight text-foreground">
-            flash
-          </span>
-          <span className="text-lg font-extrabold tracking-tight text-primary italic">
-            space
-          </span>
-        </Link>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? (
-            <X className="w-5 h-5" />
-          ) : (
-            <Menu className="w-5 h-5" />
-          )}
-        </Button>
-      </div>
-
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Overlay (keeping as overlay but removing fixed height dependencies) */}
       {mobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
@@ -67,7 +44,7 @@ export const DashboardLayout = ({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-full bg-background border-r border-border z-50 transition-all duration-300",
+          "fixed top-0 left-0 h-full bg-background border-r border-border z-50 transition-all duration-300 shadow-sm",
           collapsed ? "w-20" : "w-72",
           mobileMenuOpen
             ? "translate-x-0"
@@ -146,22 +123,10 @@ export const DashboardLayout = ({
             </nav>
           </ScrollArea>
 
-          {/* Collapse Toggle */}
-          <div className="p-4 border-t border-border hidden lg:block">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-center"
-              onClick={() => setCollapsed(!collapsed)}
-            >
-              {collapsed ? (
-                <ChevronRight className="w-4 h-4" />
-              ) : (
-                <>
-                  <ChevronLeft className="w-4 h-4 mr-2" />
-                  <span>Collapse</span>
-                </>
-              )}
+          {/* Sidebar Header for Mobile only when open */}
+          <div className="lg:hidden p-4 border-b flex justify-end">
+            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
+              <X className="w-5 h-5" />
             </Button>
           </div>
 
@@ -181,14 +146,50 @@ export const DashboardLayout = ({
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <main
         className={cn(
-          "transition-all duration-300 pt-16 lg:pt-0",
+          "transition-all duration-300 min-h-screen flex flex-col",
           collapsed ? "lg:ml-20" : "lg:ml-72",
         )}
       >
-        <div className="p-4 md:p-6 lg:p-8">{children}</div>
+        {/* Persistent Top Bar (Dashboard Portal Style) */}
+        <header className="h-16 lg:h-20 bg-white/80 backdrop-blur-md border-b border-border sticky top-0 z-30 flex items-center justify-between px-4 lg:px-8">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight">
+              <span className="text-foreground">flash</span>
+              <span className="text-primary italic">space</span>
+            </div>
+            <p className="hidden sm:block text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest">
+              {portalName}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 md:gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hidden lg:flex"
+              onClick={() => setCollapsed(!collapsed)}
+            >
+              {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+            </Button>
+            {/* Can add search, notifications, or user profile buttons here like in AdminLayout */}
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden">
+          {children}
+        </div>
       </main>
     </div>
   );
