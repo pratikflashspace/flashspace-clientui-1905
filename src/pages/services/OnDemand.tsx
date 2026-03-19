@@ -99,6 +99,26 @@ const OnDemand = () => {
         navigate(`?${newSearchParams.toString()}`, { replace: true });
     };
 
+    // Disable Lenis smooth scroll for this specific container
+    useEffect(() => {
+        const scrollContainer = scrollContainerRef.current;
+        if (!scrollContainer) return;
+
+        // Add data attribute to tell Lenis to ignore this element
+        scrollContainer.setAttribute("data-lenis-prevent", "true");
+
+        // Also prevent Lenis from handling wheel events on this container
+        const preventLenis = (e: WheelEvent) => {
+            e.stopPropagation();
+        };
+
+        scrollContainer.addEventListener("wheel", preventLenis, { passive: false });
+
+        return () => {
+            scrollContainer.removeEventListener("wheel", preventLenis);
+        };
+    }, []);
+
     const handleSearchChange = (value: string): void => {
         setSearchCity(value);
         setShowSuggestions(true);
@@ -199,12 +219,12 @@ const OnDemand = () => {
     }, [meetingRooms, resolvedCenter]);
 
     return (
-        <div className="flex flex-col h-screen bg-white">
+        <div className="flex flex-col h-screen bg-white overflow-hidden pt-16 md:pt-20">
             <div className="flex-shrink-0">
                 <Header />
             </div>
 
-            <div className="flex overflow-hidden mt-16 md:mt-20" style={{ height: 'calc(100vh - 4rem)' }}>
+            <div className="flex-1 min-h-0 flex overflow-hidden">
                 <ResizableMapLayout
                     defaultListingWidth={50}
                     mapContent={

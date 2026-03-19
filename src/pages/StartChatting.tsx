@@ -425,7 +425,9 @@ const StartChatting = () => {
           });
         } else {
           // New Metadata Response
-          setAvailableCities(metadata.cities || []);
+          // [FIX] Extract only strings if the server returns city objects
+          const cityNames = (metadata.cities || []).map((c: any) => typeof c === 'string' ? c : c.name);
+          setAvailableCities(cityNames);
           setSearchMetadata(metadata);
         }
       } catch (error) {
@@ -722,7 +724,8 @@ const StartChatting = () => {
     if (!foundCityName) {
       const allCities = [...new Set([...availableCities, ...MAJOR_HUBS])];
       for (const city of allCities) {
-        if (textLower.includes(city.toLowerCase())) {
+        // [FIX] Defensive check to prevent crash if 'city' is somehow an object
+        if (typeof city === 'string' && textLower.includes(city.toLowerCase())) {
           foundCityName = city;
           break;
         }
@@ -850,14 +853,6 @@ const StartChatting = () => {
           setShowMap(true);
         } else {
           console.log(`[MAP] No listings found for ${cityName} in local DB. Keeping map closed.`);
-        }
-
-        // If we don't have all markers yet, update them too
-        if (allMapMarkers.length < 10) {
-          setAllMapMarkers(prev => {
-            // Merge logic to avoid duplicates if possible, or just append
-            return [...prev, ...jitteredResults];
-          });
         }
       } catch (error) {
         console.error("Failed to update map for query:", error);
@@ -1645,7 +1640,7 @@ const StartChatting = () => {
                 )}
                 <MapSection
                   center={mapCenter}
-                  markers={allMapMarkers.length > 0 ? allMapMarkers : mapMarkers}
+                  markers={mapMarkers.length > 0 ? mapMarkers : allMapMarkers}
                   focusMarkers={mapMarkers}
                   zoom={mapZoom}
                   height="100%"
