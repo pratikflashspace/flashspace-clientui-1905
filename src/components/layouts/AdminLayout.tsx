@@ -433,7 +433,7 @@ export default function AdminLayout() {
         ) : (
           <>
             {/* Topbar - Simplified to match clean style */}
-            <header className="h-20 bg-transparent flex items-center justify-between px-8 md:px-12 pt-6">
+            <header className="h-20 bg-transparent flex items-center justify-between px-4 md:px-12 pt-6">
               <div className="flex items-center gap-4">
                 <button
                   className="md:hidden p-2 hover:bg-gray-100 rounded-lg text-gray-500"
@@ -446,7 +446,7 @@ export default function AdminLayout() {
             </header>
 
             {/* Page Content */}
-            <main className="flex-1 px-8 md:px-12 py-6">
+            <main className="flex-1 px-4 md:px-12 py-6">
               <div className="max-w-7xl mx-auto">
                 <Outlet />
               </div>

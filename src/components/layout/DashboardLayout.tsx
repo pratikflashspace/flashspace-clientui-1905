@@ -188,7 +188,7 @@ export const DashboardLayout = ({
           collapsed ? "lg:ml-20" : "lg:ml-72",
         )}
       >
-        <div className="p-6 lg:p-8">{children}</div>
+        <div className="p-4 md:p-6 lg:p-8">{children}</div>
       </main>
     </div>
   );
