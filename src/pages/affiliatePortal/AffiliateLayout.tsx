@@ -95,8 +95,8 @@ const AffiliateLayout = () => {
 
             {/* 2. Main Content Wrapper */}
             <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden relative transition-all duration-300">
-                {/* --- Header (Mobile Only) --- */}
-                <header className="lg:hidden bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 shrink-0 z-30 relative">
+                {/* --- Header (Mobile/Tablet/Laptop Only) --- */}
+                <header className="xl:hidden bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 shrink-0 z-30 relative shadow-sm">
                     <div className="flex items-center gap-2 font-bold text-xl">
                         <span className="text-slate-900">flash</span>
                         <span className="text-[#5aa39c]">space</span>

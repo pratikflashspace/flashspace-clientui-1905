@@ -134,15 +134,15 @@ const Sidebar: React.FC<SidebarProps> = ({
     fixed top-0 left-0 z-50 h-screen bg-[#f8f8f8] shadow-xl border-r border-[#edede6] flex flex-col transition-all duration-300 ease-in-out
     w-72 
     ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-    lg:relative lg:translate-x-0 lg:shadow-none lg:h-full overflow-hidden
-    ${isDesktopCollapsed ? "lg:w-20" : "lg:w-72"}
+    xl:relative xl:translate-x-0 xl:shadow-none xl:h-full overflow-hidden
+    ${isDesktopCollapsed ? "xl:w-20" : "xl:w-72"}
   `;
 
     return (
         <>
             {isMobileOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+                    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm xl:hidden"
                     onClick={() => setIsMobileOpen(false)}
                 />
             )}
@@ -166,7 +166,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         </div>
                         <button
                             onClick={() => setIsMobileOpen(false)}
-                            className="lg:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                            className="xl:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
                         >
                             <X size={24} />
                         </button>
@@ -234,7 +234,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <button
                         onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
                         className={`
-              hidden lg:flex items-center transition-colors text-[#677e73] hover:text-[#1a2d1d] py-2 mx-auto
+              hidden xl:flex items-center transition-colors text-[#677e73] hover:text-[#1a2d1d] py-2 mx-auto
               ${isDesktopCollapsed ? "justify-center w-full" : "justify-center gap-3 w-[255px] h-[36px] px-[12px]"}
             `}
                     >

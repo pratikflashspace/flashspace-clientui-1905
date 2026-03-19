@@ -85,12 +85,12 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
   };
 
   return (
-    <div className="flex flex-col h-[650px] bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
+    <div className="flex flex-col h-[600px] md:h-[650px] lg:h-[700px] bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
       {/* Chat Header */}
-      <div className=" bg-[#f8f8f8] p-6 border-b border-gray-100 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-[#f9fafb] rounded-2xl flex items-center justify-center text-[#2d5a4c] ring-1 ring-black/5">
-            <Bot className="w-6 h-6" />
+      <div className="bg-[#f8f8f8] p-4 md:p-6 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-[#f9fafb] rounded-xl md:rounded-2xl flex items-center justify-center text-[#2d5a4c] ring-1 ring-black/5">
+            <Bot className="w-5 h-5 md:w-6 md:h-6" />
           </div>
           <div>
             <h4 className="font-black text-[#1a1a1a]">
@@ -102,7 +102,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 px-4 py-1.5 bg-[#2d5a4c] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
+        <div className="hidden xs:flex items-center gap-1.5 px-3 md:px-4 py-1.5 bg-[#2d5a4c] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
           <Sparkles className="w-3 h-3 fill-white" />
           AI Powered
         </div>
@@ -111,7 +111,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
       {/* Messages Area */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar scroll-smooth"
+        className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 custom-scrollbar scroll-smooth"
       >
         {messages.map((msg, i) => (
           <div
@@ -128,10 +128,10 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
               )}
             </div>
             <div
-              className={`max-w-[75%] space-y-2 ${msg.role === "user" ? "text-right" : ""}`}
+              className={`max-w-[85%] md:max-w-[75%] space-y-2 ${msg.role === "user" ? "text-right" : ""}`}
             >
               <div
-                className={`p-4 rounded-[1.5rem] text-sm font-medium leading-relaxed shadow-sm ${
+                className={`p-3 md:p-4 rounded-[1.2rem] md:rounded-[1.5rem] text-sm font-medium leading-relaxed shadow-sm ${
                   msg.role === "user"
                     ? "bg-[#2d5a4c] text-white rounded-tr-none"
                     : "bg-[#f9fafb] text-[#1a1a1a] rounded-tl-none ring-1 ring-black/5"
@@ -160,7 +160,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
       {/* Input Area */}
       <form
         onSubmit={handleSendMessage}
-        className="p-6 bg-[#f8f8f8] border-t border-gray-100"
+        className="p-4 md:p-6 bg-[#f8f8f8] border-t border-gray-100"
       >
         <div className="flex gap-3">
           <Input
