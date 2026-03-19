@@ -52,9 +52,9 @@ export const FeatureSection = ({
           </div>
         )}
         <div>
-          <h2 className="text-xl font-bold text-foreground">{title}</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-foreground">{title}</h2>
           {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{description}</p>
           )}
         </div>
       </div>
@@ -73,7 +73,7 @@ export const FeatureSection = ({
               className={cn(
                 "bg-muted/30 border border-border rounded-xl p-5 transition-all text-left",
                 (feature.isAI || feature.href) &&
-                  "cursor-pointer hover:border-primary/50 hover:shadow-md hover:bg-background",
+                "cursor-pointer hover:border-primary/50 hover:shadow-md hover:bg-background",
               )}
             >
               <div className="flex items-start justify-between mb-2">

@@ -49,6 +49,21 @@ export default function Sidebar({
 }: SidebarProps) {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const menuEl = menuRef.current;
+    if (!menuEl) return;
+
+    const preventLenis = (e: WheelEvent) => {
+      e.stopPropagation();
+    };
+
+    menuEl.addEventListener("wheel", preventLenis, { passive: false });
+    return () => {
+      menuEl.removeEventListener("wheel", preventLenis);
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -56,8 +71,9 @@ export default function Sidebar({
   };
   return (
     <aside
-      className={`flex min-h-screen flex-col overflow-hidden border-r border-[#2D3F33]/10 dark:border-white/10 bg-[#f3f4f3] dark:bg-[#0f0f0f] py-6 transition-[width,padding] duration-200 ${isCollapsed ? "w-20 px-3" : "w-72 px-4"
+      className={`flex h-full flex-shrink-0 flex-col overflow-hidden border-r border-[#2D3F33]/10 dark:border-white/10 bg-[#f3f4f3] dark:bg-[#0f0f0f] py-6 transition-[width,padding] duration-200 ${isCollapsed ? "w-20 px-3" : "w-72 px-4"
         }`}
+      data-lenis-prevent
     >
       {/* Logo */}
       {isCollapsed ? (
@@ -102,16 +118,6 @@ export default function Sidebar({
           </NavLink>
 
           <div className="flex items-center gap-2">
-            {onToggleCollapse ? (
-              <button
-                type="button"
-                onClick={onToggleCollapse}
-                aria-label="Collapse sidebar"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D3F33]/20 dark:border-white/10 text-[#164e4e] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5"
-              >
-                <ChevronLeft size={18} />
-              </button>
-            ) : null}
 
             {onClose ? (
               <button
@@ -128,7 +134,11 @@ export default function Sidebar({
       )}
 
       {/* Menu */}
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+      <div
+        ref={menuRef}
+        className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto touch-pan-y"
+        data-lenis-prevent
+      >
         {sidebarConfig.map((item) => (
           <SidebarItem
             key={item.path}
@@ -140,48 +150,38 @@ export default function Sidebar({
         ))}
       </div>
 
-      {onToggleCollapse && isCollapsed ? (
-        <button
-          type="button"
-          onClick={onToggleCollapse}
-          aria-label="Expand sidebar"
-          className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-xl border border-[#2D3F33]/20 dark:border-white/10 text-[#164e4e] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5"
-        >
-          <ChevronRight size={18} />
-        </button>
-      ) : null}
 
 
       {/* Bottom */}
-      <div className="mt-auto pt-6 flex flex-col gap-2">
-        {!isCollapsed && (
-          <>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#2D3F33]/10 border border-[#2D3F33]/20 dark:border-white/10 px-4 py-3 font-semibold text-[#2D3F33] dark:text-[#FDE68A] hover:bg-[#2D3F33]/15 transition-colors"
-            >
-              <LayoutDashboard size={16} className="text-[#2D3F33] dark:text-[#FDE68A]" />
-              <span>User Dashboard</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/')}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#2D3F33]/20 dark:border-white/10 px-4 py-3 font-semibold text-[#164e4e] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 transition-colors"
-            >
-              <Home size={16} />
-              <span>Back to Home</span>
-            </button>
-          </>
+      <div className="mt-auto pt-6 flex flex-col gap-2 border-t border-[#2D3F33]/10 dark:border-white/10">
+        {onToggleCollapse && (
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-[#7a8682] hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 transition-colors ${isCollapsed ? "justify-center" : ""}`}
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            <ChevronLeft
+              size={20}
+              className={`transition-transform duration-300 ${isCollapsed ? "rotate-180" : ""}`}
+            />
+            {!isCollapsed && (
+              <span className="text-xs font-medium uppercase tracking-wider text-[#7a8682]">
+                Collapse
+              </span>
+            )}
+          </button>
         )}
 
         <button
-          onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 font-semibold text-red-500 hover:bg-red-50 transition-colors"
+          onClick={() => navigate('/')}
+          className={`flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-[#485753] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 transition-colors ${isCollapsed ? "justify-center" : ""}`}
+          title="Back to Home"
         >
-          <LogOut size={16} />
-          {!isCollapsed && <span>Logout</span>}
+          <Home className="w-5 h-5" />
+          {!isCollapsed && <span className="font-medium text-sm">Back to Home</span>}
         </button>
       </div>
-    </aside>
+    </aside >
   );
 }

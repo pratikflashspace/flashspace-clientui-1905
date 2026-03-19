@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Menu } from "lucide-react";
 
 import Sidebar from "@/components/SpacePartner/sidebar/Sidebar";
 import TopBar from "@/components/SpacePartner/topbar/Topbar";
@@ -10,6 +11,7 @@ import { SpacePortalNotificationsProvider } from "@/contexts/SpacePortalNotifica
 import { useSocket } from "@/contexts/SocketContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { API_CONFIG } from "@/config/api.config";
+import { getLenis } from "@/lib/lenis";
 
 import type { SpacePortalNotification } from "@/types/spacePortal/notification";
 import { SPACE_PORTAL_NOTIFICATIONS } from "@/data/spacePortal/notifications";
@@ -38,9 +40,9 @@ function mapNotification(raw: any): SpacePortalNotification {
     createdAt: raw.createdAt ?? undefined,
     time: raw.createdAt
       ? new Date(raw.createdAt).toLocaleString("en-IN", {
-          dateStyle: "medium",
-          timeStyle: "short",
-        })
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
       : undefined,
   };
 }
@@ -429,13 +431,20 @@ export default function SpacePortalLayout() {
     );
   }, [isSidebarCollapsed]);
 
-  /**
-   * Prevent body scrolling when mobile sidebar is open.
-   */
   useEffect(() => {
-    document.body.style.overflow = isSidebarOpen ? "hidden" : "";
+    const lenis = getLenis();
+    if (!lenis) return;
+
+    if (isSidebarOpen) {
+      lenis.stop();
+      document.body.style.overflow = "hidden";
+    } else {
+      lenis.start();
+      document.body.style.overflow = "";
+    }
 
     return () => {
+      lenis.start();
       document.body.style.overflow = "";
     };
   }, [isSidebarOpen]);
@@ -583,9 +592,11 @@ export default function SpacePortalLayout() {
   return (
     <SpacePortalNotificationsProvider value={notificationsProviderValue}>
       <SpacePortalSearchProvider value={searchProviderValue}>
-        <div className="flex min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-slate-50 flex">
           {/* Desktop Sidebar */}
-          <div className="hidden lg:flex">
+          <div
+            className={`fixed inset-y-0 left-0 z-30 transition-all duration-300 hidden lg:block ${isSidebarCollapsed ? "w-20" : "w-72"}`}
+          >
             <Sidebar
               isCollapsed={isSidebarCollapsed}
               onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
@@ -593,27 +604,27 @@ export default function SpacePortalLayout() {
           </div>
 
           {/* Mobile Sidebar */}
-          <div
-            className={`fixed inset-0 z-40 transition-opacity lg:hidden ${
-              isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
-            }`}
-            aria-hidden={!isSidebarOpen}
-          >
-            <button
-              type="button"
-              aria-label="Close sidebar"
-              onClick={() => setIsSidebarOpen(false)}
-              className="absolute inset-0 bg-black/40"
-            />
-
+          {isSidebarOpen && (
             <div
-              className={`absolute inset-y-0 left-0 w-72 transform bg-white shadow-2xl transition-transform ${
-                isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-              }`}
+              className="fixed inset-0 z-50 lg:hidden"
+              data-lenis-prevent
             >
-              <Sidebar onClose={() => setIsSidebarOpen(false)} />
+              {/* Backdrop */}
+              <div
+                className="absolute inset-0 bg-black/40 animate-in fade-in duration-300"
+                onClick={() => setIsSidebarOpen(false)}
+                onWheel={(e) => e.stopPropagation()}
+              />
+
+              {/* Sidebar Panel */}
+              <div
+                className="absolute inset-y-0 left-0 w-72 transform bg-white shadow-2xl transition-transform duration-300 ease-in-out animate-in slide-in-from-left"
+                data-lenis-prevent
+              >
+                <Sidebar onClose={() => setIsSidebarOpen(false)} />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Toast */}
           {activeToast ? (
@@ -646,11 +657,11 @@ export default function SpacePortalLayout() {
 
           {/* Main Content */}
           <div
-            className="flex min-w-0 flex-1 flex-col min-h-screen"
+            className={`flex min-w-0 flex-1 flex-col min-h-screen transition-all duration-300 ${isSidebarCollapsed ? "lg:ml-20" : "lg:ml-72"} ${isSidebarOpen ? 'overflow-hidden lg:overflow-visible' : ''}`}
             style={{ backgroundColor: headerConfig.pageBg || "" }}
           >
             {/* Topbar */}
-            {!headerConfig.hideTopBar && (
+            {!headerConfig.hideTopBar ? (
               <div className="px-3 pt-3 sm:px-5 sm:pt-5 lg:px-8">
                 <TopBar
                   title={headerConfig.title}
@@ -665,6 +676,17 @@ export default function SpacePortalLayout() {
                   onProfileNavigate={() => navigate("/spaceportal/profile")}
                   onSettingsNavigate={() => navigate("/spaceportal/settings")}
                 />
+              </div>
+            ) : (
+              /* If TopBar is hidden, we still need a way to open sidebar on mobile */
+              <div className="flex items-center justify-end px-4 pt-4 lg:hidden">
+                <button
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#2D3F33]/20 bg-white shadow-sm text-[#164e4e] hover:bg-[#FDE68A] hover:border-[#FDE68A]/50 transition-colors"
+                  title="Open sidebar"
+                >
+                  <Menu size={22} />
+                </button>
               </div>
             )}
 

@@ -21,7 +21,7 @@ export default function CalendarHeader({
         </div>
         <div>
           <h2 className="text-xl font-extrabold text-[#FDE68A] tracking-tight uppercase">
-            Schedule <span className="italic text-primary">Overview</span>
+            Schedule <span className="italic text-[#3FA69E]">Overview</span>
           </h2>
           <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-0.5">
             Real-time management for all assets
@@ -37,7 +37,7 @@ export default function CalendarHeader({
           >
             <ChevronLeft size={18} />
           </button>
-          
+
           <button
             onClick={onToday}
             className="px-6 py-2 rounded-lg text-xs font-bold text-[#FDE68A] hover:bg-white/5 transition-all active:scale-95 uppercase tracking-wider"
