@@ -57,11 +57,11 @@ export const DashboardLayout = ({
             <Link to="/" className="flex items-baseline mb-4">
               <span
                 className={cn(
-                  "font-extrabold tracking-tight text-foreground transition-all",
+                  "font-extrabold tracking-tight text-foreground transition-all uppercase",
                   collapsed ? "text-xl" : "text-2xl",
                 )}
               >
-                {collapsed ? "f" : "flash"}
+                {collapsed ? "f" : "FLASH"}
               </span>
               {!collapsed && (
                 <span className="text-xl font-extrabold tracking-tight text-primary italic">
@@ -130,16 +130,29 @@ export const DashboardLayout = ({
             </Button>
           </div>
 
+          {/* Collapse Toggle (Desktop) */}
+          <div className="p-4 border-t border-border hidden lg:block">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCollapsed(!collapsed)}
+              className={cn("w-full flex items-center gap-3 justify-start text-muted-foreground hover:bg-muted hover:text-foreground", collapsed && "justify-center")}
+            >
+              <ChevronLeft className={cn("w-5 h-5 transition-transform duration-300", collapsed && "rotate-180")} />
+              {!collapsed && <span className="font-semibold text-xs uppercase tracking-wider">Collapse</span>}
+            </Button>
+          </div>
+
           {/* Back to Home */}
           <div className="p-4 border-t border-border">
             <Link to="/">
               <Button
                 variant="outline"
                 size="sm"
-                className={cn("w-full", collapsed && "px-2")}
+                className={cn("w-full flex items-center justify-start gap-3", collapsed && "justify-center px-2")}
               >
                 <Home className="w-4 h-4" />
-                {!collapsed && <span className="ml-2">Back to Home</span>}
+                {!collapsed && <span className="font-medium text-xs uppercase tracking-wider">Home</span>}
               </Button>
             </Link>
           </div>
@@ -156,9 +169,9 @@ export const DashboardLayout = ({
         {/* Mobile Top Bar (Only visible when sidebar needs toggle) */}
         <header className="lg:hidden h-16 bg-white/80 backdrop-blur-md border-b border-border sticky top-0 z-30 flex items-center justify-between px-4 shrink-0">
           <div className="flex flex-col">
-            <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight">
-              <span className="text-foreground">flash</span>
-              <span className="text-primary italic">space</span>
+            <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight uppercase">
+              <span className="text-foreground">FLASH</span>
+              <span className="text-primary italic lowercase">space</span>
             </div>
             <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest leading-none">
               {portalName}

@@ -148,9 +148,9 @@ export default function ClientDashboard() {
         {/* Sidebar */}
         <aside
           className={cn(
-            "fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 lg:flex lg:flex-col lg:shadow-none",
-            isSidebarCollapsed ? "lg:w-[72px]" : "lg:w-72",
-            isMobileMenuOpen ? "translate-x-0 w-72" : "-translate-x-full lg:w-72"
+            "fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out shadow-sm",
+            isSidebarCollapsed ? "w-[72px]" : "w-72",
+            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
           )}
         >
           <div className={`flex flex-col h-full ${isSidebarCollapsed ? "px-2 py-6" : "p-6"}`}>
@@ -211,15 +211,18 @@ export default function ClientDashboard() {
 
           {/* Bottom Actions */}
           <div className="mt-auto pt-4 border-t border-gray-100 space-y-2">
-            {/* Collapse Toggle */}
+            {/* Collapse Toggle (Desktop) */}
             <button
-              onClick={() => setIsSidebarCollapsed(prev => !prev)}
-              title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-[#fef8c3] transition-all ${isSidebarCollapsed ? "justify-center" : ""
-                }`}
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className={cn(
+                "hidden lg:flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-gray-400 hover:bg-gray-50 transition-colors",
+                isSidebarCollapsed && "justify-center"
+              )}
             >
-              {isSidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-              {!isSidebarCollapsed && <span>Collapse</span>}
+              <ChevronLeft className={cn("w-5 h-5 transition-transform", isSidebarCollapsed && "rotate-180")} />
+              {!isSidebarCollapsed && (
+                <span className="font-medium text-xs uppercase tracking-wider">Collapse</span>
+              )}
             </button>
 
             {!isSidebarCollapsed ? (
@@ -279,15 +282,27 @@ export default function ClientDashboard() {
 
         {/* Main Content */}
         <main
-          className="relative flex-1 min-w-0 h-full overflow-x-hidden overflow-y-auto touch-pan-y scroll-smooth flex flex-col"
+          className={cn(
+            "relative flex-1 min-w-0 h-full overflow-x-hidden overflow-y-auto touch-pan-y scroll-smooth flex flex-col transition-all duration-300",
+            isSidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-72"
+          )}
           data-lenis-prevent
         >
           {/* Mobile Top Bar (Only visible when sidebar needs toggle) */}
           <header className="lg:hidden h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 flex items-center justify-between px-4 shrink-0">
             <div className="flex flex-col">
-              <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight">
-                <span className="text-gray-900">flash</span>
-                <span className="text-primary italic">space</span>
+              <div className="flex items-baseline gap-0.5">
+                <span className={cn(
+                  "font-extrabold tracking-tight text-gray-900 transition-all uppercase",
+                  isSidebarCollapsed ? "text-xl" : "text-2xl"
+                )}>
+                  {isSidebarCollapsed ? "F" : "FLASH"}
+                </span>
+                {!isSidebarCollapsed && (
+                  <span className="text-xl font-extrabold tracking-tight text-primary italic lowercase">
+                    space
+                  </span>
+                )}
               </div>
               <p className="text-[10px] text-gray-400 mt-0.5 font-bold uppercase tracking-widest leading-none">
                 {menuItems[activeIndex]?.name || "Dashboard"}
