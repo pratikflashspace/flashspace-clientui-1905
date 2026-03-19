@@ -242,7 +242,7 @@ const InvoicesAndPayments = () => {
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl">
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
             Invoices & <span className="text-primary italic">Payments</span>
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -251,14 +251,14 @@ const InvoicesAndPayments = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="relative group">
+          <div className="relative group flex-1 sm:flex-initial">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               type="text"
               placeholder="Search records..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-background border border-input rounded-xl w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+              className="pl-9 pr-4 py-2.5 bg-background border border-input rounded-xl w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm text-sm"
             />
           </div>
           <Button
@@ -267,7 +267,7 @@ const InvoicesAndPayments = () => {
                 ? setIsLogInvoiceModalOpen(true)
                 : setIsLogPaymentModalOpen(true)
             }
-            className="rounded-xl font-bold shadow-sm flex items-center gap-2 h-10 px-6"
+            className="rounded-xl font-bold shadow-sm flex items-center gap-2 h-11 px-6 w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
             {activeTab === "invoices" ? "Create Invoice" : "Log Payment"}
@@ -319,7 +319,7 @@ const InvoicesAndPayments = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-background border border-border p-5 rounded-2xl shadow-sm relative overflow-hidden group hover:border-primary/20 transition-all"
+              className="bg-background border border-border p-4 sm:p-5 rounded-2xl shadow-sm relative overflow-hidden group hover:border-primary/20 transition-all"
             >
               <div
                 className={`absolute -right-4 -bottom-4 w-24 h-24 bg-${stat.color === "primary" ? "primary" : stat.color + "-500"}/5 rounded-full group-hover:scale-150 transition-transform duration-500`}
@@ -334,7 +334,7 @@ const InvoicesAndPayments = () => {
                   <p className="text-sm font-medium text-muted-foreground">
                     {stat.label}
                   </p>
-                  <h3 className="text-2xl font-bold text-foreground">
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">
                     {formatCurrency(stat.value)}
                   </h3>
                   <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 font-medium">
@@ -353,21 +353,19 @@ const InvoicesAndPayments = () => {
         <div className="bg-muted/50 p-1 rounded-xl w-fit flex items-center border border-border">
           <button
             onClick={() => setActiveTab("invoices")}
-            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
-              activeTab === "invoices"
+            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "invoices"
                 ? "bg-background text-primary shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             Invoices
           </button>
           <button
             onClick={() => setActiveTab("payments")}
-            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${
-              activeTab === "payments"
+            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "payments"
                 ? "bg-background text-primary shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             Payments
           </button>

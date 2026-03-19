@@ -42,6 +42,7 @@ export default function ActiveRequests() {
   const [requests, setRequests] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     const loadRequests = async () => {
@@ -74,12 +75,18 @@ export default function ActiveRequests() {
     toast.info("Message sent to the user");
   };
 
-  const filteredRequests = requests.filter(
-    (req) =>
+  const filteredRequests = requests.filter((req) => {
+    const matchesSearch =
       req.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       req.space?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      req.id?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+      req.id?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      req.status?.toLowerCase() === statusFilter.toLowerCase();
+
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -152,13 +159,63 @@ export default function ActiveRequests() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-11 w-11 rounded-xl bg-background/50 backdrop-blur-sm"
-          >
-            <Filter className="w-4 h-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant={statusFilter !== "all" ? "default" : "outline"}
+                size="icon"
+                className="h-11 w-11 rounded-xl bg-background/50 backdrop-blur-sm relative"
+              >
+                <Filter className="w-4 h-4" />
+                {statusFilter !== "all" && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background" />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 rounded-xl p-2">
+              <div className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                Status
+              </div>
+              <DropdownMenuItem
+                onClick={() => setStatusFilter("all")}
+                className={`rounded-lg cursor-pointer ${statusFilter === "all" ? "bg-primary/10 text-primary font-bold" : ""}`}
+              >
+                All Statuses
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setStatusFilter("verified")}
+                className={`rounded-lg cursor-pointer ${statusFilter === "verified" ? "bg-primary/10 text-primary font-bold" : ""}`}
+              >
+                Verified
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setStatusFilter("pending")}
+                className={`rounded-lg cursor-pointer ${statusFilter === "pending" ? "bg-primary/10 text-primary font-bold" : ""}`}
+              >
+                Pending
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setStatusFilter("rejected")}
+                className={`rounded-lg cursor-pointer ${statusFilter === "rejected" ? "bg-primary/10 text-primary font-bold" : ""}`}
+              >
+                Rejected
+              </DropdownMenuItem>
+
+              {statusFilter !== "all" && (
+                <>
+                  <div className="h-px bg-border my-2" />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setStatusFilter("all");
+                    }}
+                    className="rounded-lg cursor-pointer text-rose-600 focus:text-rose-600 focus:bg-rose-50 font-bold justify-center"
+                  >
+                    Clear All Filters
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
