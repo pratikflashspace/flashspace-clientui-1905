@@ -432,19 +432,19 @@ export default function AdminLayout() {
           <Outlet />
         ) : (
           <>
-            <header className="h-20 bg-transparent flex items-center justify-between px-4 md:px-12 pt-6 transition-all duration-300">
+            <header className="lg:hidden h-20 bg-transparent flex items-center justify-between px-4 md:px-12 pt-6 transition-all duration-300">
               <div className="flex flex-col">
                 <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight">
                   <span className="text-foreground">flash</span>
                   <span className="text-primary italic">space</span>
                 </div>
-                <p className="hidden sm:block text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest">
+                <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest leading-none">
                   Admin Portal
                 </p>
               </div>
               <div className="flex items-center gap-6">
                 <button
-                  className="md:hidden p-2.5 bg-white shadow-sm border border-gray-100 hover:bg-gray-50 rounded-xl text-gray-600 transition-all hover:scale-105 active:scale-95"
+                  className="p-2.5 bg-white shadow-sm border border-gray-100 hover:bg-gray-50 rounded-xl text-gray-600 transition-all hover:scale-105 active:scale-95"
                   onClick={() => setIsMobileOpen(true)}
                 >
                   <Menu className="w-6 h-6" />

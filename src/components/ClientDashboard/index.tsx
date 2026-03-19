@@ -282,35 +282,24 @@ export default function ClientDashboard() {
           className="relative flex-1 min-w-0 h-full overflow-x-hidden overflow-y-auto touch-pan-y scroll-smooth flex flex-col"
           data-lenis-prevent
         >
-          {/* Top Bar (Mobile & Desktop) */}
-          <header className="h-16 lg:h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 flex items-center justify-between px-4 lg:px-8 shrink-0">
+          {/* Mobile Top Bar (Only visible when sidebar needs toggle) */}
+          <header className="lg:hidden h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 flex items-center justify-between px-4 shrink-0">
             <div className="flex flex-col">
               <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight">
                 <span className="text-gray-900">flash</span>
                 <span className="text-primary italic">space</span>
               </div>
-              <p className="hidden sm:block text-[10px] text-gray-400 mt-0.5 font-bold uppercase tracking-widest">
+              <p className="text-[10px] text-gray-400 mt-0.5 font-bold uppercase tracking-widest leading-none">
                 {menuItems[activeIndex]?.name || "Dashboard"}
               </p>
             </div>
 
-            <div className="flex items-center gap-2 md:gap-4">
-              <div className="hidden sm:flex flex-col items-end mr-2">
-                <span className="text-xs font-bold text-gray-900">{user?.fullName || "User"}</span>
-                <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{user?.role?.replace('_', ' ')}</span>
-              </div>
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <Menu className="w-6 h-6" />
-              </button>
-              <button
-                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                className="hidden lg:flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-              >
-                {isSidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
               </button>
             </div>
           </header>

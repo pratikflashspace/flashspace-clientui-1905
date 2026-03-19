@@ -153,36 +153,26 @@ export const DashboardLayout = ({
           collapsed ? "lg:ml-20" : "lg:ml-72",
         )}
       >
-        {/* Persistent Top Bar (Dashboard Portal Style) */}
-        <header className="h-16 lg:h-20 bg-white/80 backdrop-blur-md border-b border-border sticky top-0 z-30 flex items-center justify-between px-4 lg:px-8">
+        {/* Mobile Top Bar (Only visible when sidebar needs toggle) */}
+        <header className="lg:hidden h-16 bg-white/80 backdrop-blur-md border-b border-border sticky top-0 z-30 flex items-center justify-between px-4 shrink-0">
           <div className="flex flex-col">
             <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight">
               <span className="text-foreground">flash</span>
               <span className="text-primary italic">space</span>
             </div>
-            <p className="hidden sm:block text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest">
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest leading-none">
               {portalName}
             </p>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
               onClick={() => setMobileMenuOpen(true)}
             >
               <Menu className="w-5 h-5" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden lg:flex"
-              onClick={() => setCollapsed(!collapsed)}
-            >
-              {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-            </Button>
-            {/* Can add search, notifications, or user profile buttons here like in AdminLayout */}
           </div>
         </header>
 
