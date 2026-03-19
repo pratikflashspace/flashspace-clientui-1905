@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
+import { TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { toast } from "sonner";
 import partnerTicketService, {
   PartnerTicketData,
@@ -77,11 +78,15 @@ export default function Tickets() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-4" />
-        <p className="text-muted-foreground font-medium">
-          Loading ticket system...
-        </p>
+      <div className="space-y-8">
+        <div className="space-y-2">
+          <div className="h-12 w-64 bg-gray-200 rounded" />
+          <div className="h-4 w-96 bg-gray-100 rounded" />
+        </div>
+        <div className="h-10 w-full bg-gray-50 rounded-xl" />
+        <div className="bg-background border border-border rounded-xl p-4">
+          <TableSkeleton rows={10} cols={6} />
+        </div>
       </div>
     );
   }

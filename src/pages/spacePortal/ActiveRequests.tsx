@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Info,
 } from "lucide-react";
+import { TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -114,17 +115,15 @@ export default function ActiveRequests() {
 
   if (isLoading) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center">
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full border-4 border-primary/20 animate-ping"></div>
-          <Loader2 className="h-12 w-12 animate-spin text-primary relative z-10" />
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-7xl mx-auto space-y-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <div className="h-10 w-64 bg-gray-200 rounded" />
+            <div className="h-4 w-96 bg-gray-100 rounded" />
+          </div>
+          <div className="h-11 w-64 bg-gray-100 rounded-xl" />
         </div>
-        <p className="mt-6 font-semibold text-foreground animate-pulse">
-          Synchronizing requests...
-        </p>
-        <p className="text-sm text-muted-foreground mt-1">
-          Please wait a moment
-        </p>
+        <TableSkeleton rows={8} cols={5} />
       </div>
     );
   }

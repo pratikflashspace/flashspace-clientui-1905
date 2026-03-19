@@ -21,6 +21,7 @@ import {
   Plus,
   ArrowUpRight,
 } from "lucide-react";
+import { StatsSkeleton, TableSkeleton } from "@/components/ui/skeleton-loaders";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -275,72 +276,76 @@ const InvoicesAndPayments = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          {
-            label: "This Month",
-            value: thisMonthRevenue,
-            sub: "Revenue received",
-            icon: <TrendingUp className="w-5 h-5" />,
-            color: "emerald",
-            trend: "up",
-          },
-          {
-            label: "Pending",
-            value: pendingAmount,
-            sub: "Waiting for client",
-            icon: <Clock className="w-5 h-5" />,
-            color: "amber",
-            trend: "neutral",
-          },
-          {
-            label: "Overdue",
-            value: overdueAmount,
-            sub: "Needs attention",
-            icon: <AlertCircle className="w-5 h-5" />,
-            color: "rose",
-            trend: "down",
-          },
-          {
-            label: "Total Earned",
-            value: totalCommission,
-            sub: "Life-time revenue",
-            icon: <CreditCard className="w-5 h-5" />,
-            color: "primary",
-            trend: "neutral",
-          },
-        ].map((stat, idx) => (
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: idx * 0.1 }}
-            className="bg-background border border-border p-5 rounded-2xl shadow-sm relative overflow-hidden group hover:border-primary/20 transition-all"
-          >
-            <div
-              className={`absolute -right-4 -bottom-4 w-24 h-24 bg-${stat.color === "primary" ? "primary" : stat.color + "-500"}/5 rounded-full group-hover:scale-150 transition-transform duration-500`}
-            />
-            <div className="flex flex-col gap-3 relative">
+      {loading ? (
+        <StatsSkeleton count={4} />
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            {
+              label: "This Month",
+              value: thisMonthRevenue,
+              sub: "Revenue received",
+              icon: <TrendingUp className="w-5 h-5" />,
+              color: "emerald",
+              trend: "up",
+            },
+            {
+              label: "Pending",
+              value: pendingAmount,
+              sub: "Waiting for client",
+              icon: <Clock className="w-5 h-5" />,
+              color: "amber",
+              trend: "neutral",
+            },
+            {
+              label: "Overdue",
+              value: overdueAmount,
+              sub: "Needs attention",
+              icon: <AlertCircle className="w-5 h-5" />,
+              color: "rose",
+              trend: "down",
+            },
+            {
+              label: "Total Earned",
+              value: totalCommission,
+              sub: "Life-time revenue",
+              icon: <CreditCard className="w-5 h-5" />,
+              color: "primary",
+              trend: "neutral",
+            },
+          ].map((stat, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-background border border-border p-5 rounded-2xl shadow-sm relative overflow-hidden group hover:border-primary/20 transition-all"
+            >
               <div
-                className={`p-2.5 bg-${stat.color === "primary" ? "primary" : stat.color + "-500"}/10 rounded-xl w-fit text-${stat.color === "primary" ? "primary" : stat.color + "-600"}`}
-              >
-                {stat.icon}
+                className={`absolute -right-4 -bottom-4 w-24 h-24 bg-${stat.color === "primary" ? "primary" : stat.color + "-500"}/5 rounded-full group-hover:scale-150 transition-transform duration-500`}
+              />
+              <div className="flex flex-col gap-3 relative">
+                <div
+                  className={`p-2.5 bg-${stat.color === "primary" ? "primary" : stat.color + "-500"}/10 rounded-xl w-fit text-${stat.color === "primary" ? "primary" : stat.color + "-600"}`}
+                >
+                  {stat.icon}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {stat.label}
+                  </p>
+                  <h3 className="text-2xl font-bold text-foreground">
+                    {formatCurrency(stat.value)}
+                  </h3>
+                  <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 font-medium">
+                    {stat.sub}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  {stat.label}
-                </p>
-                <h3 className="text-2xl font-bold text-foreground">
-                  {formatCurrency(stat.value)}
-                </h3>
-                <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 font-medium">
-                  {stat.sub}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* Main Content Area */}
       <div className="space-y-4">
@@ -371,11 +376,8 @@ const InvoicesAndPayments = () => {
         {/* Content Box */}
         <div className="bg-background border border-border rounded-2xl shadow-sm overflow-hidden min-h-[450px]">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-[450px] gap-3">
-              <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-              <p className="text-sm text-muted-foreground font-medium animate-pulse">
-                Updating Ledger...
-              </p>
+            <div className="p-8">
+              <TableSkeleton rows={8} cols={5} />
             </div>
           ) : (
             <AnimatePresence mode="wait">

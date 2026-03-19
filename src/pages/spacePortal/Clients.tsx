@@ -19,7 +19,9 @@ import {
   Loader2,
   X,
   Send,
+  Briefcase,
 } from "lucide-react";
+import { TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -214,47 +216,42 @@ export default function Clients() {
 
       {/* Table */}
       <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <table className="w-full min-w-[900px] border-collapse text-left text-sm">
-          <thead className="bg-slate-50">
-            <tr className="text-slate-600">
-              <th className="px-6 py-4 font-semibold">Client</th>
-              <th className="px-6 py-4 font-semibold">Plan</th>
-              <th className="px-6 py-4 font-semibold">Space</th>
-              <th className="px-6 py-4 font-semibold">Duration</th>
-              <th className="px-6 py-4 font-semibold">Status</th>
-              <th className="px-6 py-4 font-semibold">KYC</th>
-              <th className="px-6 py-4 text-center font-semibold">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {loading ? (
-              <tr>
-                <td colSpan={7} className="p-12 text-center">
-                  <div className="flex flex-col items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="mt-2 text-sm text-slate-500">Loading clients...</p>
-                  </div>
-                </td>
+        {loading ? (
+          <TableSkeleton rows={8} cols={7} />
+        ) : (
+          <table className="w-full min-w-[900px] border-collapse text-left text-sm">
+            <thead className="bg-slate-50">
+              <tr className="text-slate-600">
+                <th className="px-6 py-4 font-semibold">Client</th>
+                <th className="px-6 py-4 font-semibold">Plan</th>
+                <th className="px-6 py-4 font-semibold">Space</th>
+                <th className="px-6 py-4 font-semibold">Duration</th>
+                <th className="px-6 py-4 font-semibold">Status</th>
+                <th className="px-6 py-4 font-semibold">KYC</th>
+                <th className="px-6 py-4 text-center font-semibold">Actions</th>
               </tr>
-            ) : filteredClients.length > 0 ? (
-              filteredClients.map((client) => (
-                <ClientRow
-                  key={client.id}
-                  client={client}
-                  onView={() => handleViewClient(client)}
-                  onMessage={() => setMessageTarget(client)}
-                  onNavigate={() => navigate(`/spaceportal/clients/${client.userId}`)}
-                />
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7} className="p-12 text-center text-slate-500">
-                  No clients found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredClients.length > 0 ? (
+                filteredClients.map((client) => (
+                  <ClientRow
+                    key={client.id}
+                    client={client}
+                    onView={() => handleViewClient(client)}
+                    onMessage={() => setMessageTarget(client)}
+                    onNavigate={() => navigate(`/spaceportal/clients/${client.userId}`)}
+                  />
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="p-12 text-center text-slate-500">
+                    No clients found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Modals */}

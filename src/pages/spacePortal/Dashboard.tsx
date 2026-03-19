@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { FeatureSection } from "@/components/dashboard/FeatureSection";
+import { StatsSkeleton, FeatureSectionSkeleton } from "@/components/ui/skeleton-loaders";
 import { AddSpaceDialog } from "@/components/modals/AddSpaceDialog";
 import {
   fetchPartnerDashboard,
@@ -191,11 +192,18 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 font-bold text-foreground animate-pulse">
-          Analyzing portal performance...
-        </p>
+      <div className="animate-pulse">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="h-10 w-80 bg-gray-200 rounded mb-3" />
+          <div className="h-4 w-96 bg-gray-100 rounded" />
+        </div>
+
+        <StatsSkeleton count={4} />
+
+        <FeatureSectionSkeleton count={4} />
+        <FeatureSectionSkeleton count={3} />
+        <FeatureSectionSkeleton count={3} />
       </div>
     );
   }

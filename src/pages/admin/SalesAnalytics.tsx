@@ -24,6 +24,7 @@ import {
   X,
   Loader2,
 } from "lucide-react";
+import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { Badge } from "@/components/ui/badge";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
@@ -156,9 +157,7 @@ export default function BookingAnalysis() {
         portalDescription="Complete platform management"
         navItems={ADMIN_NAV_ITEMS}
       >
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
+        <AdminPageSkeleton />
       </DashboardLayout>
     );
   }

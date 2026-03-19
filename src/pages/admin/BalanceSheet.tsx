@@ -16,6 +16,7 @@ import {
   Filter,
 } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
+import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -142,9 +143,7 @@ const BalanceSheet = () => {
         portalDescription="Complete platform management"
         navItems={ADMIN_NAV_ITEMS}
       >
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Loading financial data...</p>
-        </div>
+        <AdminPageSkeleton />
       </DashboardLayout>
     );
   }

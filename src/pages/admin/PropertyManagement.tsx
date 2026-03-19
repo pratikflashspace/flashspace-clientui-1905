@@ -16,6 +16,7 @@ import {
   User,
   Plus,
 } from "lucide-react";
+import { AdminPageSkeleton, TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
@@ -378,9 +379,13 @@ export default function PropertyManagement() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
-      </div>
+      <DashboardLayout
+        portalName="FlashSpace Admin"
+        portalDescription="Complete platform management"
+        navItems={ADMIN_NAV_ITEMS}
+      >
+        <AdminPageSkeleton />
+      </DashboardLayout>
     );
   }
 
@@ -628,12 +633,7 @@ export default function PropertyManagement() {
           </div>
 
           {spacesLoading ? (
-            <div className="py-20 text-center">
-              <div className="animate-spin w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-slate-500 font-medium italic">
-                Loading spaces...
-              </p>
-            </div>
+            <TableSkeleton rows={3} cols={4} />
           ) : activeCategory === "coworking" && spaces.length > 0 ? (
             /* Coworking Management Form */
             <div className="max-w-4xl mx-auto">
