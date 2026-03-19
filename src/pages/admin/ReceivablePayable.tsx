@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { adminService } from "@/services/admin.service";
+import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 
@@ -137,6 +138,18 @@ const ReceivablePayable = () => {
       description: `Payout of ${formatINR(p.amount)} to ${p.partner} initiated.`,
     });
   };
+
+  if (loading) {
+    return (
+      <DashboardLayout
+        portalName="FlashSpace Admin"
+        portalDescription="Complete platform management"
+        navItems={ADMIN_NAV_ITEMS}
+      >
+        <AdminPageSkeleton />
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout

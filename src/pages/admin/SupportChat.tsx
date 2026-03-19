@@ -9,6 +9,7 @@ import {
   Headphones,
   Loader2,
 } from "lucide-react";
+import { ChatSkeleton } from "@/components/ui/skeleton-loaders";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -291,9 +292,22 @@ export default function SupportChat() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <DashboardLayout
+        portalName="FlashSpace Admin"
+        portalDescription="Complete platform management"
+        navItems={ADMIN_NAV_ITEMS}
+      >
+        <div className="mb-6">
+          <div className="h-10 w-64 bg-gray-200 rounded mb-2" />
+          <div className="h-4 w-96 bg-gray-100 rounded" />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-4 mb-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-24 bg-white border border-gray-100 rounded-xl" />
+          ))}
+        </div>
+        <ChatSkeleton />
+      </DashboardLayout>
     );
   }
 

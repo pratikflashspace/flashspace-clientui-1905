@@ -12,6 +12,7 @@ import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { adminService } from "@/services/admin.service";
+import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import toast from "react-hot-toast";
 
 /** Format a raw rupee amount (e.g. 4850000) to "₹48.5L" or "₹4.2Cr" */
@@ -70,6 +71,18 @@ const RevenueDashboard = () => {
     };
     fetch();
   }, []);
+
+  if (loading) {
+    return (
+      <DashboardLayout
+        portalName="FlashSpace Admin"
+        portalDescription="Complete platform management"
+        navItems={ADMIN_NAV_ITEMS}
+      >
+        <AdminPageSkeleton />
+      </DashboardLayout>
+    );
+  }
 
   const totalRevenue = metrics.totalRevenue;
 

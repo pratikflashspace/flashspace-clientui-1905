@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
+import { KYCDetailSkeleton } from "@/components/ui/skeleton-loaders";
 
 export default function KYCDetail() {
   const { id } = useParams<{ id: string }>();
@@ -226,9 +227,13 @@ export default function KYCDetail() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <DashboardLayout
+        portalName="FlashSpace Admin"
+        portalDescription="Complete platform management"
+        navItems={ADMIN_NAV_ITEMS}
+      >
+        <KYCDetailSkeleton />
+      </DashboardLayout>
     );
   }
 

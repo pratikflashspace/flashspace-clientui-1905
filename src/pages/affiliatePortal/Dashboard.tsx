@@ -13,6 +13,7 @@ import {
     ArrowUpRight,
     Loader2,
 } from "lucide-react";
+import { StatsSkeleton, FeatureSectionSkeleton } from "@/components/ui/skeleton-loaders";
 import { useNavigate } from "react-router-dom";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
@@ -275,8 +276,15 @@ const Dashboard = () => {
 
     if (isLoading) {
         return (
-            <div className="flex h-screen items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-[#334D3D]" />
+            <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans space-y-10">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-2">
+                        <div className="h-10 w-64 bg-gray-200 rounded" />
+                        <div className="h-6 w-96 bg-gray-100 rounded" />
+                    </div>
+                </div>
+                <StatsSkeleton count={3} />
+                <FeatureSectionSkeleton />
             </div>
         );
     }

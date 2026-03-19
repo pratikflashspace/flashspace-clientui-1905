@@ -24,6 +24,7 @@ import {
   Flame,
   Map,
 } from "lucide-react";
+import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import MapLibreMap from "@/components/Map/MapLibreMap";
 import {
   getVirtualOfficesByCity,
@@ -882,10 +883,14 @@ const GetWorkspaces = () => {
               </div>
             </div>
             {loading ? (
-              <div className="py-16 text-center text-muted-foreground">
-                <p className="text-base font-medium animate-pulse">
-                  Loading spaces...
-                </p>
+              <div
+                className={
+                  viewMode === "grid"
+                    ? `grid gap-4 pb-8 ${mapCollapsed ? "grid-cols-1 min-[700px]:grid-cols-2 min-[1100px]:grid-cols-3 min-[1500px]:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
+                    : "flex flex-col gap-4 pb-8"
+                }
+              >
+                <SkeletonCardGrid count={6} view={viewMode} />
               </div>
             ) : (
               <div
@@ -968,10 +973,14 @@ const GetWorkspaces = () => {
       <div className="lg:hidden flex-1 relative">
         <div className="px-4 py-3">
           {loading ? (
-            <div className="py-16 text-center text-muted-foreground">
-              <p className="text-base font-medium animate-pulse">
-                Loading spaces...
-              </p>
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 min-[500px]:grid-cols-2 gap-4 pb-8"
+                  : "flex flex-col gap-3 pb-8"
+              }
+            >
+              <SkeletonCardGrid count={4} view={viewMode} />
             </div>
           ) : (
             <div

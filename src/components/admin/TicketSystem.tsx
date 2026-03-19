@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TicketViewModal } from "@/components/modals/TicketViewModal";
 import { CreateTicketModal } from "@/components/modals/CreateTicketModal";
+import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 
 import { toast } from "@/hooks/use-toast";
 
@@ -536,24 +537,29 @@ export default function TicketSystem() {
 
       {tickets.length === 0 && (
         <div className="p-12 text-center text-muted-foreground flex flex-col justify-center items-center bg-background border border-border rounded-xl">
-          {loading ? (
-            <>
-              <RefreshCw className="w-8 h-8 animate-spin mb-4 text-primary" />
-              <p className="font-medium">Loading tickets...</p>
-            </>
-          ) : (
-            <div className="space-y-2">
-              <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-6 h-6 text-muted-foreground" />
-              </div>
-              <p className="font-medium text-foreground">No tickets found</p>
-              <p className="text-sm">Try adjusting your filters or search term</p>
+          <div className="space-y-2">
+            <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-6 h-6 text-muted-foreground" />
             </div>
-          )}
+            <p className="font-medium text-foreground">No tickets found</p>
+            <p className="text-sm">Try adjusting your filters or search term</p>
+          </div>
         </div>
       )}
     </div>
   );
+
+  if (loading && tickets.length === 0) {
+    return (
+      <DashboardLayout
+        portalName="FlashSpace Admin"
+        portalDescription="Complete platform management"
+        navItems={ADMIN_NAV_ITEMS}
+      >
+        <AdminPageSkeleton />
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout
