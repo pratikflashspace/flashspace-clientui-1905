@@ -97,9 +97,14 @@ const AffiliateLayout = () => {
             <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden relative transition-all duration-300">
                 {/* --- Header (Mobile/Tablet/Laptop Only) --- */}
                 <header className="xl:hidden bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 shrink-0 z-30 relative shadow-sm">
-                    <div className="flex items-center gap-2 font-bold text-xl">
-                        <span className="text-slate-900">flash</span>
-                        <span className="text-[#5aa39c]">space</span>
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight">
+                            <span className="text-slate-900">flash</span>
+                            <span className="text-primary italic">space</span>
+                        </div>
+                        <p className="hidden sm:block text-[10px] text-gray-400 mt-0.5 font-bold uppercase tracking-widest leading-none">
+                            Affiliate Portal
+                        </p>
                     </div>
 <button
                         onClick={() => setIsMobileOpen(true)}

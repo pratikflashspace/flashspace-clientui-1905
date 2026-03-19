@@ -16,7 +16,10 @@ import {
   HelpCircle,
   Home,
   AlertCircle,
+  Menu,
+  X,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import userDashboardService from "@/services/userDashboard.service";
@@ -133,22 +136,42 @@ export default function ClientDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      <div className="flex h-screen overflow-hidden">
-        {/* Sidebar */}
-        <aside className={`hidden lg:flex flex-col h-screen bg-white border-r border-gray-200 sticky top-0 transition-all duration-200 ${isSidebarCollapsed ? "w-[72px] px-2 py-6" : "w-72 p-6"}`}>
-
-          {/* Logo */}
+      <div className="flex h-screen overflow-hidden relative">
+        {/* Mobile Sidebar Overlay Backdrop */}
+        {isMobileMenuOpen && (
           <div
-            className={`flex items-center gap-2 mb-6 cursor-pointer ${isSidebarCollapsed ? "justify-center" : ""}`}
-            onClick={() => navigate("/")}
-            title="Back to Home"
-          >
-            <img
-              src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
-              alt="FlashSpace Logo"
-              className={`w-auto object-contain ${isSidebarCollapsed ? "h-7" : "h-8"}`}
-            />
-          </div>
+            className="lg:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+
+        {/* Sidebar */}
+        <aside
+          className={cn(
+            "fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 lg:flex lg:flex-col lg:shadow-none",
+            isSidebarCollapsed ? "lg:w-[72px]" : "lg:w-72",
+            isMobileMenuOpen ? "translate-x-0 w-72" : "-translate-x-full lg:w-72"
+          )}
+        >
+          <div className={`flex flex-col h-full ${isSidebarCollapsed ? "px-2 py-6" : "p-6"}`}>
+            {/* Logo */}
+            <div
+              className={`flex items-center gap-2 mb-6 cursor-pointer ${isSidebarCollapsed ? "justify-center" : "justify-between"}`}
+              onClick={() => navigate("/")}
+              title="Back to Home"
+            >
+              <img
+                src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
+                alt="FlashSpace Logo"
+                className={`w-auto object-contain ${isSidebarCollapsed ? "h-7" : "h-8"}`}
+              />
+              <button
+                className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
           {/* Main Navigation */}
           <nav className="flex-1 overflow-y-auto">
@@ -250,67 +273,51 @@ export default function ClientDashboard() {
               </button>
             )}
           </div>
+          </div>
         </aside>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="lg:hidden fixed bottom-6 right-6 z-50 w-14 h-14 bg-yellow-400 rounded-full shadow-lg flex items-center justify-center"
-        >
-          <LayoutDashboard className="w-6 h-6 text-black" />
-        </button>
-
-        {/* Mobile Menu Overlay */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setIsMobileMenuOpen(false)}>
-            <div
-              className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 max-h-[80vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
-              <nav>
-                <ul className="space-y-2">
-                  {menuItems.map((item, idx) => {
-                    const isActive = activeIndex === idx;
-                    const isLogout = item.name === "Logout";
-                    const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
-                    return (
-                      <li key={item.name}>
-                        <button
-                          onClick={() => handleNavigation(idx)}
-                          className={`w-full flex items-center gap-3 px-4 py-4 rounded-xl text-base font-medium ${isActive
-                            ? isLogout
-                              ? "bg-red-100 text-red-700"
-                              : "bg-yellow-400 text-black"
-                            : "text-gray-600 hover:bg-gray-100"
-                            }`}
-                        >
-                          <item.icon className="w-5 h-5" />
-                          <span className="flex items-center gap-1">
-                            {item.name}
-                            {showKycDot && (
-                              <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
-                                <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
-                                <span className="text-red-600 font-bold">KYC</span>
-                              </span>
-                            )}
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </nav>
-            </div>
-          </div>
-        )}
 
         {/* Main Content */}
         <main
-          className="relative flex-1 min-w-0 h-full overflow-x-hidden overflow-y-auto touch-pan-y scroll-smooth"
+          className="relative flex-1 min-w-0 h-full overflow-x-hidden overflow-y-auto touch-pan-y scroll-smooth flex flex-col"
           data-lenis-prevent
         >
-          {mainContent}
+          {/* Top Bar (Mobile & Desktop) */}
+          <header className="h-16 lg:h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 flex items-center justify-between px-4 lg:px-8 shrink-0">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight">
+                <span className="text-gray-900">flash</span>
+                <span className="text-primary italic">space</span>
+              </div>
+              <p className="hidden sm:block text-[10px] text-gray-400 mt-0.5 font-bold uppercase tracking-widest">
+                {menuItems[activeIndex]?.name || "Dashboard"}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 md:gap-4">
+              <div className="hidden sm:flex flex-col items-end mr-2">
+                <span className="text-xs font-bold text-gray-900">{user?.fullName || "User"}</span>
+                <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{user?.role?.replace('_', ' ')}</span>
+              </div>
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+              <button
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                className="hidden lg:flex p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+              >
+                {isSidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+              </button>
+            </div>
+          </header>
+
+          <div className="flex-1 p-0">
+            {mainContent}
+          </div>
         </main>
       </div>
     </div>
