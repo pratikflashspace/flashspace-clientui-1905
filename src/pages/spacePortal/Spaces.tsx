@@ -57,6 +57,8 @@ const getStatusBadge = (status: string) => {
   }
 };
 
+import { getSafeImageUrl } from "@/utils/imageUrl";
+
 const MySpaces = () => {
   const [addSpaceOpen, setAddSpaceOpen] = useState(false);
   const [selectedSpace, setSelectedSpace] = useState<any | null>(null);
@@ -165,10 +167,13 @@ const MySpaces = () => {
                 prop.occupancyRate || Math.floor(Math.random() * 30) + 70,
               status: prop.status || "active",
               rating: prop.avgRating || 4.5,
-              image:
+              image: getSafeImageUrl(
                 prop.image ||
-                (prop.images && prop.images.length > 0 ? prop.images[0] : null) ||
+                  (prop.images && prop.images.length > 0
+                    ? prop.images[0]
+                    : null),
                 "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80",
+              ),
             };
           });
 

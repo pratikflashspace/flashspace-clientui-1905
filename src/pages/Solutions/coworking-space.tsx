@@ -471,7 +471,7 @@ const CoworkingSpace = () => {
                   transformed how we operate."
                 </p>
                 <footer className="flex items-center gap-4">
-                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&auto=format" alt="Rajesh Kumar" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
+                  <img src="/hero-illustrated.jpg" alt="Rajesh Kumar" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
                   <div>
                     <div className="font-semibold text-foreground">Rajesh Kumar</div>
                     <div className="text-sm text-muted-foreground">CEO at TechStart India</div>

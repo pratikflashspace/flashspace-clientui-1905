@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useState, useMemo } from "react";
 import {
   MapPin,
   Star,
@@ -14,6 +14,7 @@ import {
   MeetingRoomItem,
 } from "@/types/services";
 import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
+import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 
 // Union type that works with all service types
 export type ListingItem = (
@@ -65,13 +66,6 @@ interface ListingCardModernProps {
   onToggleFavorite?: (itemId: string) => void;
 }
 
-// Multiple images for carousel effect
-const PLACEHOLDER_IMAGES = [
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80",
-];
 
 /**
  * Modern Listing Card Component - MindTrip Style
@@ -88,13 +82,27 @@ const ListingCardModern = memo<ListingCardModernProps>(
     const [isHovered, setIsHovered] = useState(false);
     const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
 
-    // Priority: item.images (array) -> item.image (legacy string) -> placeholders
-    const images =
-      item.images && item.images.length > 0
-        ? item.images
-        : item.image
-          ? [item.image, ...PLACEHOLDER_IMAGES.slice(1)]
-          : PLACEHOLDER_IMAGES;
+    // Priority: item.images -> item.image -> single placeholder
+    const images = useMemo(() => {
+      // Collect all potential images
+      const rawImages = [
+        ...(item.images || []),
+        item.image
+      ].filter(Boolean) as string[];
+
+      // Filter out invalid/placeholder URLs
+      const cleanImages = rawImages
+        .filter(img => !isInvalidImageUrl(img))
+        .map(img => getSafeImageUrl(img));
+
+      // If we have real images, return them
+      if (cleanImages.length > 0) {
+        return cleanImages;
+      }
+
+      // Final fallback is a single placeholder (no carousel)
+      return ["/hero-illustrated.jpg"];
+    }, [item.images, item.image]);
 
     const handlePrevImage = (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -157,6 +165,12 @@ const ListingCardModern = memo<ListingCardModernProps>(
             alt={item.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (target.src !== "/hero-illustrated.jpg") {
+                target.src = "/hero-illustrated.jpg";
+              }
+            }}
           />
 
           {/* Gradient Overlay */}

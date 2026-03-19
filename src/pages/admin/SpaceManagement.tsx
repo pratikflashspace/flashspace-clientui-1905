@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { adminService } from "@/services/admin.service";
 import { Search, MapPin, Star, Plus, Trash2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
-import EditSpaceModal from "@/components/admin/EditSpaceModal";
-import AddSpaceModal from "@/components/admin/AddSpaceModal";
-import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
+import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
+
+const FALLBACK_IMAGE = "/hero-illustrated.jpg";
+const SECONDARY_FALLBACK =
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80";
 
 interface Space {
   _id: string;
@@ -17,14 +20,65 @@ interface Space {
   rating?: number;
   reviews?: number;
   image?: string;
+  images?: string[];
+  photos?: string[];
   features: string[];
   availability?: string;
+  isActive?: boolean;
   type: "virtual-office" | "coworking-space";
   price?: string;
   originalPrice?: string;
+  propertyId?: string;
 }
 
+
+// Helper to get the best available image from a space
+const getSpaceImage = (space: Space): string => {
+  // Try images array first
+  if (space.images && Array.isArray(space.images) && space.images.length > 0) {
+    const validImg = space.images.find((img) => !isInvalidImageUrl(img));
+    if (validImg) return getSafeImageUrl(validImg, FALLBACK_IMAGE);
+  }
+  // Try photos array
+  if (space.photos && Array.isArray(space.photos) && space.photos.length > 0) {
+    const validImg = space.photos.find((img) => !isInvalidImageUrl(img));
+    if (validImg) return getSafeImageUrl(validImg, FALLBACK_IMAGE);
+  }
+  // Try legacy single image field
+  if (!isInvalidImageUrl(space.image)) {
+    return getSafeImageUrl(space.image, FALLBACK_IMAGE);
+  }
+  return FALLBACK_IMAGE;
+};
+
+// Isolated image component so error state doesn't cause parent re-render / flickering
+const SpaceImage = ({ src, alt }: { src: string; alt: string }) => {
+  const [imageSrc, setImageSrc] = useState(src);
+  const [hasError, setHasError] = useState(false);
+
+  // Sync state with props if data changes
+  useEffect(() => {
+    setImageSrc(src);
+    setHasError(false);
+  }, [src]);
+
+  return (
+    <img
+      src={imageSrc}
+      alt={alt}
+      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+      onError={() => {
+        if (!hasError) {
+          setHasError(true);
+          setImageSrc(FALLBACK_IMAGE);
+        }
+      }}
+    />
+  );
+};
+
 export default function SpaceManagement() {
+  const navigate = useNavigate();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,13 +87,6 @@ export default function SpaceManagement() {
     "all" | "virtual-office" | "coworking-space"
   >("all");
   const [cityFilter, setCityFilter] = useState<string>("all");
-
-  // Edit Modal State
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
-
-  // Add Modal State
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     fetchSpaces();
@@ -64,8 +111,8 @@ export default function SpaceManagement() {
   };
 
   const handleEditClick = (space: Space) => {
-    setSelectedSpace(space);
-    setIsEditModalOpen(true);
+    const propertyId = space.propertyId || space._id;
+    navigate(`/admin/spaces/add?id=${propertyId}`);
   };
 
   const handleSaveSpace = async (
@@ -166,7 +213,7 @@ export default function SpaceManagement() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
-             <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-sm w-full sm:w-auto">
+            <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-sm w-full sm:w-auto">
               <button
                 onClick={() => setViewMode("active")}
                 className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
@@ -190,11 +237,11 @@ export default function SpaceManagement() {
               </button>
             </div>
             <button
-              onClick={() => setIsAddModalOpen(true)}
+              onClick={() => navigate("/admin/spaces/add")}
               className="w-full sm:w-auto px-6 py-3 bg-gray-900 text-white border border-transparent rounded-2xl hover:bg-black transition-all shadow-lg shadow-gray-900/10 hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center gap-2 font-bold whitespace-nowrap"
             >
               <Plus className="w-5 h-5" />
-              Add New Space
+              Add New Property
             </button>
           </div>
         </div>
@@ -250,8 +297,8 @@ export default function SpaceManagement() {
 
         {/* Loading State */}
         {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
-            <SkeletonCardGrid count={6} />
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
           </div>
         )}
 
@@ -262,24 +309,12 @@ export default function SpaceManagement() {
               <div
                 key={space._id}
                 className={`group bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-100/50 hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 overflow-hidden flex flex-col ${
-                  viewMode === "deleted"
-                    ? "opacity-80 grayscale-[0.3]"
-                    : ""
+                  viewMode === "deleted" ? "opacity-80 grayscale-[0.3]" : ""
                 }`}
               >
                 {/* Image Header */}
-                <div className="h-48 sm:h-56 relative overflow-hidden">
-                  {space.image ? (
-                    <img
-                      src={space.image}
-                      alt={space.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 font-bold uppercase tracking-widest text-[10px]">
-                      No Image Available
-                    </div>
-                  )}
+                <div className="h-48 sm:h-56 relative overflow-hidden bg-gray-200">
+                  <SpaceImage src={getSpaceImage(space)} alt={space.name} />
 
                   {/* Overlay Gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
@@ -307,7 +342,7 @@ export default function SpaceManagement() {
                   </div>
 
                   {/* Unavailable Badge */}
-                  {space.availability === "Unavailable" &&
+                  {(!space.isActive || space.availability === "Unavailable") &&
                     viewMode === "active" && (
                       <div className="absolute top-4 left-4 bg-red-500/90 backdrop-blur-md text-white px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5 border border-red-400/20">
                         <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
@@ -368,23 +403,21 @@ export default function SpaceManagement() {
 
                         <button
                           onClick={async () => {
-                            const isUnavailable =
-                              space.availability === "Unavailable";
+                            const willBeNowActive = !space.isActive;
                             await handleSaveSpace(space._id, space.type, {
-                              availability: isUnavailable
+                              availability: willBeNowActive
                                 ? "Available Now"
                                 : "Unavailable",
+                              isActive: willBeNowActive,
                             });
                           }}
                           className={`flex-[1.5] py-3 font-extrabold rounded-2xl border-2 transition-all text-xs uppercase tracking-widest whitespace-nowrap px-4 ${
-                            space.availability === "Unavailable"
+                            !space.isActive
                               ? "bg-green-50 text-green-700 border-green-100/50 hover:bg-green-100 hover:border-green-200"
                               : "bg-orange-50 text-orange-700 border-orange-100/50 hover:bg-orange-100 hover:border-orange-200"
                           }`}
                         >
-                          {space.availability === "Unavailable"
-                            ? "Make Available"
-                            : "Unavailable"}
+                          {!space.isActive ? "Make Available" : "Unavailable"}
                         </button>
 
                         <button
@@ -436,19 +469,6 @@ export default function SpaceManagement() {
             </p>
           </div>
         )}
-
-        <EditSpaceModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSave={handleSaveSpace}
-          space={selectedSpace}
-        />
-
-        <AddSpaceModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          onSave={handleCreateSpace}
-        />
       </div>
     </DashboardLayout>
   );

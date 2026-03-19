@@ -27,10 +27,8 @@ import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { CTA } from "@/components/sections/CTA";
 
-const featureVirtualOffice =
-  "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1600&auto=format&fit=crop&q=80";
-const officeIllustrated =
-  "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600&auto=format&fit=crop&q=80";
+const featureVirtualOffice = "/hero-illustrated.jpg";
+const officeIllustrated = "/hero-illustrated.jpg";
 
 const popularCities = ["Ahmedabad", "Bangalore", "Chennai", "Delhi", "Gurgaon", "Hyderabad", "Mumbai", "Noida", "Pune"];
 const otherCities = ["Agra", "Aluva", "Ambala", "Ambarnath", "Amritsar", "Anand", "Bareja", "Bhagalpur", "Bhilai", "Bhopal", "Bhubaneswar", "Chandigarh", "Coimbatore", "Dehradun", "Dhanbad", "Dharamsala", "Faridabad", "Gandhinagar", "Ghaziabad", "Goa", "Guntur", "Guwahati", "Gwalior", "Haridwar", "Imphal", "Indore", "Jabalpur", "Jaipur", "Jalandhar", "Jammu", "Jamshedpur", "Jodhpur", "Kanpur", "Kochi", "Kolkata", "Lucknow", "Ludhiana", "Meerut", "Mohali", "Mysore", "Nagpur", "Nashik", "Patna", "Raipur", "Rajkot", "Ranchi", "Rohtak", "Surat", "Trivandrum", "Udaipur", "Vadodara", "Vijayawada", "Visakhapatnam"];
@@ -550,7 +548,7 @@ const VirtualOffice = () => {
                   transformed how we operate."
                 </p>
                 <footer className="flex items-center gap-4">
-                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&auto=format" alt="Rajesh Kumar" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
+                  <img src="/hero-illustrated.jpg" alt="Rajesh Kumar" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
                   <div>
                     <div className="font-semibold text-foreground">Rajesh Kumar</div>
                     <div className="text-sm text-muted-foreground">CEO at TechStart India</div>

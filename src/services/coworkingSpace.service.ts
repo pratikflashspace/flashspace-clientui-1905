@@ -12,25 +12,6 @@ interface ApiResponse<T> {
   message?: string;
 }
 
-const isBadImageUrl = (url?: string) => {
-  if (!url) return true;
-  const value = String(url).trim().toLowerCase();
-  return (
-    value.length === 0 ||
-    value.startsWith("url") ||
-    value === "img1.jpg" ||
-    value === "url1.jpg" ||
-    value.includes("shorturl.at") ||
-    value.includes("tinyurl.com")
-  );
-};
-
-const pickBestImage = (item: any) => {
-  const firstArrayImage = Array.isArray(item.images) ? item.images.find((img: string) => !isBadImageUrl(img)) : undefined;
-  if (firstArrayImage) return firstArrayImage;
-  if (!isBadImageUrl(item.image)) return item.image;
-  return "/hero-illustrated.jpg";
-};
 
 const toNumber = (value: any) => {
   const numberValue = Number(value);
@@ -93,13 +74,6 @@ export const getCoworkingSpacesByCity = async (
             s.price ||
             formatMonthPrice(s.finalPricePerMonth || s.partnerPricePerMonth) ||
             "Price on request",
-          image: pickBestImage(s),
-          images:
-            Array.isArray(s.images) && s.images.length > 0
-              ? s.images.filter((img: string) => !isBadImageUrl(img))
-              : !isBadImageUrl(s.image)
-                ? [s.image]
-                : ["/hero-illustrated.jpg"],
           rating: toNumber(s.rating) || toNumber(s.avgRating),
           reviews: toNumber(s.reviews) || toNumber(s.totalReviews),
         };
@@ -160,13 +134,6 @@ export const getAllCoworkingSpaces = async (): Promise<
             s.price ||
             formatMonthPrice(s.finalPricePerMonth || s.partnerPricePerMonth) ||
             "Price on request",
-          image: pickBestImage(s),
-          images:
-            Array.isArray(s.images) && s.images.length > 0
-              ? s.images.filter((img: string) => !isBadImageUrl(img))
-              : !isBadImageUrl(s.image)
-                ? [s.image]
-                : ["/hero-illustrated.jpg"],
           rating: toNumber(s.rating) || toNumber(s.avgRating),
           reviews: toNumber(s.reviews) || toNumber(s.totalReviews),
         };
@@ -221,13 +188,6 @@ export const getCoworkingSpaceById = async (
             (s as any).finalPricePerMonth || (s as any).partnerPricePerMonth,
           ) ||
           "Price on request",
-        image: pickBestImage(s),
-        images:
-          Array.isArray((s as any).images) && (s as any).images.length > 0
-            ? (s as any).images.filter((img: string) => !isBadImageUrl(img))
-            : !isBadImageUrl((s as any).image)
-              ? [(s as any).image]
-              : ["/hero-illustrated.jpg"],
         rating: toNumber((s as any).rating) || toNumber((s as any).avgRating),
         reviews: toNumber((s as any).reviews) || toNumber((s as any).totalReviews),
       };
