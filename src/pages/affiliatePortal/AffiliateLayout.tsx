@@ -101,11 +101,15 @@ const AffiliateLayout = () => {
                         <span className="text-slate-900">flash</span>
                         <span className="text-[#5aa39c]">space</span>
                     </div>
-                    <button
+<button
                         onClick={() => setIsMobileOpen(true)}
-                        className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                        className="group relative flex flex-col items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 hover:bg-[#FEF8C3] hover:shadow-sm"
                     >
-                        <Menu size={24} />
+                        <div className="flex flex-col gap-1 items-center justify-center">
+                            <span className="w-5 h-0.5 bg-gray-600 rounded-full transition-all group-hover:bg-[#2D3F33] group-hover:w-6"></span>
+                            <span className="w-6 h-0.5 bg-gray-600 rounded-full transition-all group-hover:bg-[#2D3F33] group-hover:w-4"></span>
+                            <span className="w-5 h-0.5 bg-gray-600 rounded-full transition-all group-hover:bg-[#2D3F33] group-hover:w-6"></span>
+                        </div>
                     </button>
                 </header>
 

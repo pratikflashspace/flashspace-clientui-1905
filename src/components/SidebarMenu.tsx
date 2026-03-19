@@ -366,13 +366,12 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMen
           </div>
         )}
 
-        {/* Menu items */}
         <div
           ref={menuScrollRef}
           onWheel={handleSidebarWheel}
-          className="flex-1 overflow-y-auto pb-32 flex flex-col overscroll-contain touch-pan-y min-h-0 scroll-smooth"
+          className="flex-1 overflow-y-auto flex flex-col overscroll-contain touch-pan-y min-h-0 scroll-smooth"
         >
-          <div className="p-5 space-y-2 text-sm tracking-wide flex-1">
+          <div className="p-5 space-y-2 text-sm tracking-wide">
             <nav className="space-y-2">
               {/* Primary Top Items */}
               {primaryTop.map((item) => (
@@ -429,39 +428,41 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMen
                 </button>
               ))}
             </nav>
-
-            {/* Footer */}
-            {!hideLogoFooter && (
-              <div className="space-y-3 mt-4">
-                {!isAuthenticated && (
-                  <button
-                    onClick={() => {
-                      onOpenLogin();
-                      onClose();
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-3 px-4 text-[15px] font-semibold text-[#164e4e] dark:text-white border border-[#164e4e]/20 dark:border-white/20 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-                  >
-                    Log In / Sign Up
-                  </button>
-                )}
-                
-                <button
-                  onClick={() => {
-                    if (onOpenContact) {
-                      onOpenContact();
-                      closeBoth();
-                    } else {
-                      handleNavigation("#contact");
-                    }
-                  }}
-                  className="w-full rounded-[20px] bg-[#e8e2ad] text-[#253734] font-semibold py-3 text-[15px] hover:bg-[#e2da99] active:scale-[0.98] transition shadow-sm"
-                >
-                  Get Consultation
-                </button>
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Footer */}
+        {!hideLogoFooter && (
+          <div className="p-5 bg-[#f3f4f3] dark:bg-[#0f0f0f] border-t border-neutral-200/50 dark:border-white/5">
+            <div className="space-y-3">
+              {!isAuthenticated && (
+                <button
+                  onClick={() => {
+                    onOpenLogin();
+                    onClose();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 text-[15px] font-bold text-[#2D3F33] dark:text-white border-2 border-[#2D3F33]/10 dark:border-white/10 rounded-xl hover:bg-[#2D3F33] hover:text-[#FDE68A] dark:hover:bg-white/5 transition-all duration-300"
+                >
+                  Log In / Sign Up
+                </button>
+              )}
+
+              <button
+                onClick={() => {
+                  if (onOpenContact) {
+                    onOpenContact();
+                    closeBoth();
+                  } else {
+                    handleNavigation("#contact");
+                  }
+                }}
+                className="w-full rounded-[20px] bg-[#2D3F33] text-[#FDE68A] font-bold py-4 text-[15px] hover:bg-[#344C3D] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-md hover:shadow-lg"
+              >
+                Get Consultation
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
