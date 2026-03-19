@@ -9,6 +9,7 @@ import {
   MoreVertical,
   MapPin,
   Loader2,
+  RotateCcw,
 } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
@@ -265,154 +266,261 @@ const ClientManagement = () => {
   };
 
   const renderClientTable = (clientList: any[]) => (
-    <div className="bg-background border border-border rounded-xl overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Client
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Plan
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Space
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Revenue
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Health
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Status
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground whitespace-nowrap">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {clientList.length > 0 ? (
-              clientList.map((client) => (
-                <tr
-                  key={client.id}
-                  className="border-t border-border hover:bg-muted/30 transition-colors"
-                >
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                          {client.initials}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium text-foreground whitespace-nowrap">
-                          {client.name}
-                        </div>
-                        <div className="text-sm text-muted-foreground whitespace-nowrap">
-                          {client.contact}
+    <div className="space-y-4">
+      {/* Desktop Table View */}
+      <div className="hidden md:block bg-background border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-muted/50 border-b border-border">
+              <tr>
+                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Client
+                </th>
+                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Plan
+                </th>
+                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Space
+                </th>
+                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Revenue
+                </th>
+                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Health
+                </th>
+                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Status
+                </th>
+                <th className="text-right p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {clientList.length > 0 ? (
+                clientList.map((client) => (
+                  <tr
+                    key={client.id}
+                    className="hover:bg-muted/30 transition-colors group"
+                  >
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm">
+                          <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+                            {client.initials}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <div className="font-bold text-foreground truncate max-w-[150px]">
+                            {client.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate max-w-[150px]">
+                            {client.contact}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <Badge variant="outline" className="whitespace-nowrap">
-                      {client.plan}
-                    </Badge>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground whitespace-nowrap">
-                      <MapPin className="w-3 h-3" />
-                      {client.space}
-                    </div>
-                  </td>
-                  <td className="p-4 font-semibold text-foreground whitespace-nowrap">
-                    {client.revenue}
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-8 h-2 rounded-full ${getHealthColor(client.healthScore)}`}
-                      />
-                      <span className="text-sm text-muted-foreground">
-                        {client.healthScore}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-4">{getStatusBadge(client.status)}</td>
-                  <td className="p-4">
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewClient(client)}
-                        className="hover:bg-primary/10"
+                    </td>
+                    <td className="p-4">
+                      <Badge
+                        variant="secondary"
+                        className="bg-primary/5 text-primary border-primary/10 font-bold"
                       >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleChatClient(client)}
-                        className="hover:bg-primary/10"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleClientAction("send_renewal", client)
-                            }
-                          >
-                            Send Renewal Reminder
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleClientAction("schedule_call", client)
-                            }
-                          >
-                            Schedule Call
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleClientAction("view_invoices", client)
-                            }
-                          >
-                            View Invoices
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleClientAction("export_data", client)
-                            }
-                          >
-                            Export Client Data
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                        {client.plan}
+                      </Badge>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                        <MapPin className="w-3 h-3 text-primary/60" />
+                        <span className="truncate max-w-[150px]">
+                          {client.space}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-4 font-bold text-foreground">
+                      {client.revenue}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 min-w-[60px] h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${getHealthColor(client.healthScore)} transition-all`}
+                            style={{ width: `${client.healthScore}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-muted-foreground min-w-[20px]">
+                          {client.healthScore}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-4">{getStatusBadge(client.status)}</td>
+                    <td className="p-4 text-right">
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-primary hover:bg-primary/10 hover:text-primary transition-colors"
+                          onClick={() => handleViewClient(client)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-primary hover:bg-primary/10 hover:text-primary transition-colors"
+                          onClick={() => handleChatClient(client)}
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-muted"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleClientAction("send_renewal", client)
+                              }
+                              className="gap-2"
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                              Send Renewal Reminder
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleClientAction("schedule_call", client)
+                              }
+                              className="gap-2"
+                            >
+                              <MessageSquare className="w-4 h-4" />
+                              Schedule Call
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleClientAction("view_invoices", client)
+                              }
+                              className="gap-2"
+                            >
+                              <Eye className="w-4 h-4" />
+                              View Invoices
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="p-12 text-center text-muted-foreground font-medium"
+                  >
+                    No clients found in this category.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="p-8 text-center text-muted-foreground"
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden grid grid-cols-1 gap-4">
+        {clientList.length > 0 ? (
+          clientList.map((client) => (
+            <div
+              key={client.id}
+              className="bg-white border border-border rounded-[24px] p-6 shadow-sm space-y-5 active:scale-[0.98] transition-all"
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-12 w-12 shadow-md">
+                    <AvatarFallback className="bg-primary/10 text-primary font-extrabold">
+                      {client.initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <h3 className="font-extrabold text-gray-900 truncate">
+                      {client.name}
+                    </h3>
+                    <p className="text-sm text-gray-500 font-medium">
+                      {client.contact}
+                    </p>
+                  </div>
+                </div>
+                {getStatusBadge(client.status)}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                    Plan
+                  </p>
+                  <p className="text-sm font-bold text-gray-900">
+                    {client.plan}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">
+                    Revenue
+                  </p>
+                  <p className="text-sm font-bold text-gray-900 text-right">
+                    {client.revenue}
+                  </p>
+                </div>
+                <div className="col-span-2 space-y-1">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                    Space
+                  </p>
+                  <p className="text-sm font-medium text-gray-600 truncate flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                    {client.space}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  <span>Health Score</span>
+                  <span>{client.healthScore}%</span>
+                </div>
+                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden border border-gray-50">
+                  <div
+                    className={`h-full ${getHealthColor(client.healthScore)} transition-all`}
+                    style={{ width: `${client.healthScore}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  className="flex-1 bg-gray-900 hover:bg-black text-white rounded-2xl h-11 font-bold transition-all shadow-lg active:scale-95"
+                  onClick={() => handleViewClient(client)}
                 >
-                  No clients found in this category.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                  <Eye className="w-4 h-4 mr-2" />
+                  View Details
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-12 h-11 p-0 rounded-2xl border-gray-200 active:scale-95 transition-all"
+                  onClick={() => handleChatClient(client)}
+                >
+                  <MessageSquare className="w-5 h-5 text-gray-600" />
+                </Button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="bg-muted/30 border border-dashed border-border rounded-[24px] p-12 text-center">
+            <p className="text-muted-foreground font-medium">No results.</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -473,12 +581,12 @@ const ClientManagement = () => {
       </div>
 
       {/* Search & Filter */}
-      <div className="flex gap-4 mb-6">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search clients..." className="pl-10" />
+          <Input placeholder="Search clients..." className="pl-10 w-full rounded-xl" />
         </div>
-        <Button variant="outline">
+        <Button variant="outline" className="w-full sm:w-auto rounded-xl">
           <Filter className="w-4 h-4 mr-2" />
           Filter
         </Button>

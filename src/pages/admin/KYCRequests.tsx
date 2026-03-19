@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SpacePartnerKycRequest from "./SpacePartnerKycRequest";
 import { adminService } from "@/services/admin.service";
 import {
@@ -589,7 +589,7 @@ export default function KYCRequests() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
             <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-yellow-600">
               {stats.pending}
