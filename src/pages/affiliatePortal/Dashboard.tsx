@@ -290,15 +290,15 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans animate-fade-in relative">
+        <div className="min-h-screen bg-[#f7f7f6] p-4 md:p-6 lg:p-10 font-sans animate-fade-in relative">
             <div className="w-full space-y-10">
                 {/* 1. Page Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-2">
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+                        <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
                             Affiliate <span className="text-[#35503F] italic font-medium">Dashboard</span>
                         </h1>
-                        <p className="text-gray-500 text-lg">
+                        <p className="text-gray-500 text-base md:text-lg">
                             Track your referrals, revenue, and performance
                         </p>
                     </div>
@@ -362,7 +362,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Referral Reward Program (Coupon Generation) */}
-                <div className="bg-[#f8f8f8] rounded-2xl border border-gray-200 p-8 shadow transition-all duration-300 relative overflow-hidden group">
+                <div className="bg-[#f8f8f8] rounded-2xl border border-gray-200 p-6 md:p-8 shadow transition-all duration-300 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#334D3D]/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110 duration-700"></div>
 
                     <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -373,8 +373,8 @@ const Dashboard = () => {
                                 </div>
                                 <h2 className="text-2xl font-bold text-slate-900">Referral Reward Program</h2>
                             </div>
-                            <p className="text-gray-500 leading-relaxed">
-                                Share your unique coupon code with potential clients. They get a <span className="text-[#334D3D] font-bold text-lg">10% discount</span> on their first booking, and you earn commissions on every successful conversion!
+                            <p className="text-gray-500 leading-relaxed text-sm md:text-base">
+                                Share your unique coupon code with potential clients. They get a <span className="text-[#334D3D] font-bold text-base md:text-lg">10% discount</span> on their first booking, and you earn commissions on every successful conversion!
                             </p>
                             {!user?.kycVerified && (
                                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-100 rounded-full text-amber-700 text-xs font-semibold">
@@ -387,16 +387,16 @@ const Dashboard = () => {
                             {coupon ? (
                                 <div className="bg-slate-50 border-2 border-dashed border-[#334D3D]/30 rounded-2xl p-6 flex flex-col items-center gap-4 animate-fade-in min-w-[280px]">
                                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Your Unique Code</span>
-                                    <div className="flex items-center gap-3">
-                                        <code className="text-3xl font-black text-slate-900 tracking-tighter bg-[#f8f8f8] px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+                                    <div className="flex items-center gap-2 md:gap-3">
+                                        <code className="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter bg-[#f8f8f8] px-3 md:px-4 py-2 rounded-xl shadow-sm border border-gray-100">
                                             {coupon.code}
                                         </code>
                                         <button
                                             onClick={() => copyToClipboard(coupon.code)}
-                                            className="p-3 bg-[#334D3D] text-white rounded-xl hover:bg-[#335D3D] transition-colors shadow-md hover:shadow-lg active:scale-95 translate-y-0 hover:-translate-y-1 duration-200"
+                                            className="p-2.5 md:p-3 bg-[#334D3D] text-white rounded-xl hover:bg-[#335D3D] transition-colors shadow-md hover:shadow-lg active:scale-95 translate-y-0 hover:-translate-y-1 duration-200"
                                             title="Copy Code"
                                         >
-                                            <Copy size={20} />
+                                            <Copy size={18} />
                                         </button>
                                     </div>
                                     <div className="flex items-center gap-2 text-[#334D3D] text-xs font-bold">
@@ -407,7 +407,7 @@ const Dashboard = () => {
                                 <button
                                     onClick={handleGenerateCoupon}
                                     disabled={!user?.kycVerified || isGenerating}
-                                    className={`relative px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-xl flex items-center gap-3 overflow-hidden ${user?.kycVerified
+                                    className={`relative px-6 md:px-8 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-bold text-base md:text-lg transition-all duration-300 shadow-xl flex items-center gap-3 overflow-hidden ${user?.kycVerified
                                         ? "bg-[#334D3D] text-white hover:bg-[#335D3D] hover:shadow-[#334D3D]/20 hover:-translate-y-1 active:translate-y-0 active:scale-95"
                                         : "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200 shadow-none"
                                         }`}
