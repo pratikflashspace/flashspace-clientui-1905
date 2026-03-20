@@ -36,9 +36,9 @@ interface IndexProps {
 
 const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
   return (
-    <div className="min-h-screen flex flex-col scroll-smooth overflow-x-hidden relative w-full">
+    <div className="min-h-screen flex flex-col scroll-smooth relative w-full">
       <Header openLogin={openLogin} openSignup={openSignup} />
-      <main className="flex-1 overflow-x-hidden w-full relative">
+      <main className="flex-1 w-full relative">
         <HeroWithSearch />
         <FadeInSection>
           <PlanLocationsShowcase />

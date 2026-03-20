@@ -128,11 +128,10 @@ const VirtualOffice = () => {
                 <button
                   key={sub.label}
                   onClick={() => setActiveSubTab(i)}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border transition-colors ${
-                    activeSubTab === i
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border transition-colors ${activeSubTab === i
                       ? "border-primary/30 bg-primary/5 text-foreground"
                       : "border-border bg-background text-muted-foreground hover:text-foreground hover:border-primary/20"
-                  }`}
+                    }`}
                 >
                   <sub.icon className="w-4 h-4" />
                   {sub.label}
@@ -349,9 +348,8 @@ const VirtualOffice = () => {
             <button
               key={n.id}
               onClick={() => scrollTo(n.id)}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase transition-colors ${
-                active === n.id ? "bg-[#35503f] text-white" : "text-foreground/50 hover:text-foreground"
-              }`}
+              className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase transition-colors ${active === n.id ? "bg-[#35503f] text-white" : "text-foreground/50 hover:text-foreground"
+                }`}
             >
               {n.label}
             </button>
@@ -450,9 +448,9 @@ const VirtualOffice = () => {
                     <span className="text-white/90 text-sm font-medium">AI-Powered</span>
                   </div>
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
-                    Flash. The #1 AI
+                    Flash, The #1 AI
                     <br />
-                    <span className="text-white/70">for workspace management.</span>
+                    <span className="text-white/70">for End to End Business Solutions.</span>
                   </h2>
                 </div>
               </motion.div>
@@ -460,9 +458,9 @@ const VirtualOffice = () => {
               <div className="grid lg:grid-cols-2 gap-12 items-start">
                 <div>
                   <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                    Flash AI works with any workspace to handle even your most complex
-                    requirements—from compliance documentation to smart access control,
-                    across all your locations.
+                    Flash AI works with your entire business ecosystem, from AI-powered chat that answers every query instantly,
+                    to intelligent forecasting for renewals, smart recommendation engines, and beyond. One platform. End-to-end
+                    intelligence.
                   </p>
                   <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
                     Learn more
@@ -611,9 +609,8 @@ const VirtualOffice = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ delay: index * 0.1 }}
-                className={`relative flex flex-col lg:flex-row gap-8 lg:gap-16 mb-20 last:mb-0 ${
-                  index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
-                }`}
+                className={`relative flex flex-col lg:flex-row gap-8 lg:gap-16 mb-20 last:mb-0 ${index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
+                  }`}
               >
                 <div className="absolute left-6 lg:left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold z-10 shadow-lg shadow-primary/20">
                   {item.step}
