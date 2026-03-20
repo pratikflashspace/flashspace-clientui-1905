@@ -58,7 +58,7 @@ export const HeroWithSearch = () => {
     }, []);
 
     return (
-        <section className="relative min-h-[92vh] flex flex-col items-center justify-center overflow-hidden">
+        <section className="relative min-h-[75vh] sm:min-h-[85vh] flex flex-col items-center justify-center overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0">
                 <img
