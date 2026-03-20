@@ -53,13 +53,13 @@ export const FeatureCTA = () => {
                         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-medium text-secondary mb-8 tracking-tight leading-tight">
                             FlashSpace is built for
                             <br />
-                            modern workspaces
+                            modern businesses.
                         </h2>
 
                         <p className="text-background/70 max-w-lg leading-relaxed mb-8 text-xl">
-                            Traditional workspace management can't handle the complexity of modern hybrid work.
-                            FlashSpace is designed specifically for flexible workspace needs.
-                            Book, manage, and optimize spaces 24x faster with our platform.
+                            Traditional business management can't keep up with today's demands. FlashSpace simplifies
+                            workspace bookings, compliance tracking and more, across every location, worldwide. Do in minutes what once
+                            took a day.
                         </p>
 
                         <Button
