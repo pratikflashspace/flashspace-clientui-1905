@@ -66,53 +66,8 @@ export const AnimatedTestimonials = ({
             {/* STICKY VIEWPORT */}
             <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
                 <div className="max-w-sm md:max-w-4xl mx-auto antialiased font-sans px-4 md:px-8 lg:px-12">
-                    <div className="relative grid grid-cols-1 md:grid-cols-2 gap-20">
-                        <div>
-                            <div className="relative h-80 w-full">
-                                <AnimatePresence>
-                                    {testimonials.map((testimonial, index) => (
-                                        <motion.div
-                                            key={testimonial.src}
-                                            initial={{
-                                                opacity: 0,
-                                                scale: 0.9,
-                                                z: -100,
-                                                rotate: randomRotateY(),
-                                            }}
-                                            animate={{
-                                                opacity: active === index ? 1 : 0.7,
-                                                scale: active === index ? 1 : 0.95,
-                                                z: active === index ? 0 : -100,
-                                                rotate: active === index ? 0 : randomRotateY(),
-                                                zIndex: active === index
-                                                    ? 999
-                                                    : testimonials.length + 2 - index,
-                                                y: active === index ? [0, -80, 0] : 0,
-                                            }}
-                                            exit={{
-                                                opacity: 0,
-                                                scale: 0.9,
-                                                z: 100,
-                                                rotate: randomRotateY(),
-                                            }}
-                                            transition={{
-                                                duration: 0.4,
-                                                ease: "easeInOut",
-                                            }}
-                                            className="absolute inset-0 origin-bottom"
-                                        >
-                                            <img
-                                                src={testimonial.src}
-                                                alt={testimonial.name}
-                                                draggable={false}
-                                                className="h-full w-full rounded-3xl object-cover object-center"
-                                            />
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
-                            </div>
-                        </div>
-                        <div className="flex justify-between flex-col py-4">
+                    <div className="relative flex justify-center w-full max-w-4xl mx-auto text-center">
+                        <div className="flex justify-between flex-col py-4 w-full">
                             <motion.div
                                 key={active}
                                 initial={{
@@ -166,7 +121,7 @@ export const AnimatedTestimonials = ({
                             </motion.div>
 
                             {/* Scroll Indicator Hint */}
-                            <div className="pt-12 md:pt-0 flex items-center gap-2 text-gray-400 animate-pulse">
+                            <div className="pt-12 md:pt-16 flex flex-col items-center gap-2 text-gray-400 animate-pulse w-full justify-center">
                                 <div className="h-8 w-0.5 bg-gray-300 dark:bg-neutral-700 rounded-full"></div>
                                 <span className="text-xs uppercase tracking-widest font-medium">Scroll to explore</span>
                             </div>

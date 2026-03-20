@@ -150,150 +150,154 @@ const VirtualOffice = () => {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -40 }}
                     transition={{ duration: 0.25 }}
-                    className="flex items-center bg-background rounded-xl border border-border overflow-visible relative"
+                    className="flex flex-col sm:flex-row items-stretch sm:items-center bg-transparent sm:bg-background rounded-none sm:rounded-xl border-0 sm:border sm:border-border overflow-visible relative gap-3 sm:gap-0"
                   >
-                    <div ref={cityRef} className="relative shrink-0">
+                    <div className="flex items-center bg-background rounded-xl border border-border sm:border-0 sm:rounded-none w-full flex-1 shadow-sm sm:shadow-none">
+                      <div ref={cityRef} className="relative shrink-0">
+                        <button
+                          onClick={() => {
+                            setShowCityDropdown(!showCityDropdown);
+                            setCitySearch("");
+                          }}
+                          className="flex items-center gap-1 px-5 py-3.5 border-r border-border text-sm"
+                        >
+                          <span className="font-medium text-foreground">{selectedCity}</span>
+                          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${showCityDropdown ? "rotate-180" : ""}`} />
+                        </button>
+
+                        <AnimatePresence>
+                          {showCityDropdown && (() => {
+                            const q = citySearch.toLowerCase();
+                            const filteredPopular = popularCities.filter((c) => c.toLowerCase().includes(q));
+                            const filteredOther = otherCities.filter((c) => c.toLowerCase().includes(q));
+                            return (
+                              <motion.div
+                                initial={{ opacity: 0, y: 4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 4 }}
+                                transition={{ duration: 0.15 }}
+                                className="absolute top-full left-0 mt-1 w-64 bg-card border border-border rounded-xl shadow-xl z-50 max-h-72 overflow-y-auto"
+                              >
+                                <div className="sticky top-0 bg-card p-2 border-b border-border/50">
+                                  <input
+                                    type="text"
+                                    value={citySearch}
+                                    onChange={(e) => setCitySearch(e.target.value)}
+                                    placeholder="Search city..."
+                                    className="w-full px-3 py-2 text-sm bg-muted/50 rounded-lg outline-none placeholder:text-muted-foreground/50"
+                                    autoFocus
+                                  />
+                                </div>
+                                {filteredPopular.length > 0 && (
+                                  <>
+                                    <div className="px-4 pt-2.5 pb-1 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Popular Cities</div>
+                                    {filteredPopular.map((city) => (
+                                      <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-muted/60 ${city === selectedCity ? "text-primary font-medium" : "text-foreground"}`}>
+                                        {city}
+                                      </button>
+                                    ))}
+                                  </>
+                                )}
+                                {filteredOther.length > 0 && (
+                                  <>
+                                    <div className="px-4 pt-2.5 pb-1 text-[10px] uppercase tracking-widest text-muted-foreground font-medium border-t border-border/50">All Cities</div>
+                                    {filteredOther.map((city) => (
+                                      <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-muted/60 ${city === selectedCity ? "text-primary font-medium" : "text-foreground"}`}>
+                                        {city}
+                                      </button>
+                                    ))}
+                                  </>
+                                )}
+                                {filteredPopular.length === 0 && filteredOther.length === 0 && (
+                                  <div className="px-4 py-6 text-center text-sm text-muted-foreground">No cities found</div>
+                                )}
+                              </motion.div>
+                            );
+                          })()}
+                        </AnimatePresence>
+                      </div>
+
+                      <div ref={locationRef} className="relative flex items-center flex-1 px-4 gap-2">
+                        <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <input
+                          type="text"
+                          value={locationSearch}
+                          onChange={(e) => {
+                            setLocationSearch(e.target.value);
+                            setShowLocationDropdown(true);
+                          }}
+                          onFocus={() => {
+                            if (locationSearch.length > 0) setShowLocationDropdown(true);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              const q = locationSearch.toLowerCase();
+                              const allCities = [...popularCities, ...otherCities];
+                              const match = allCities.find((c) => c.toLowerCase().includes(q));
+                              const cityToUse = match || selectedCity;
+                              setSelectedCity(cityToUse);
+                              setLocationSearch("");
+                              setShowLocationDropdown(false);
+                              navigate(`/get-workspaces?city=${encodeURIComponent(cityToUse)}`);
+                            }
+                          }}
+                          placeholder={`Search virtual offices in ${selectedCity}`}
+                          className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground py-3.5"
+                        />
+
+                        <AnimatePresence>
+                          {showLocationDropdown && locationSearch.length > 0 && (() => {
+                            const q = locationSearch.toLowerCase();
+                            const matchedPopular = popularCities.filter((c) => c.toLowerCase().includes(q));
+                            const matchedOther = otherCities.filter((c) => c.toLowerCase().includes(q));
+                            if (matchedPopular.length === 0 && matchedOther.length === 0) return null;
+                            return (
+                              <motion.div
+                                initial={{ opacity: 0, y: 4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 4 }}
+                                transition={{ duration: 0.15 }}
+                                className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto"
+                              >
+                                {matchedPopular.length > 0 && (
+                                  <>
+                                    <div className="px-4 pt-2.5 pb-1 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Popular Cities</div>
+                                    {matchedPopular.map((city) => (
+                                      <button key={city} onClick={() => { setSelectedCity(city); setLocationSearch(""); setShowLocationDropdown(false); navigate(`/get-workspaces?city=${encodeURIComponent(city)}`); }} className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted/60 transition-colors">
+                                        {city}
+                                      </button>
+                                    ))}
+                                  </>
+                                )}
+                                {matchedOther.length > 0 && (
+                                  <>
+                                    <div className="px-4 pt-2.5 pb-1 text-[10px] uppercase tracking-widest text-muted-foreground font-medium border-t border-border/50">All Cities</div>
+                                    {matchedOther.map((city) => (
+                                      <button key={city} onClick={() => { setSelectedCity(city); setLocationSearch(""); setShowLocationDropdown(false); navigate(`/get-workspaces?city=${encodeURIComponent(city)}`); }} className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted/60 transition-colors">
+                                        {city}
+                                      </button>
+                                    ))}
+                                  </>
+                                )}
+                              </motion.div>
+                            );
+                          })()}
+                        </AnimatePresence>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end sm:block">
                       <button
                         onClick={() => {
-                          setShowCityDropdown(!showCityDropdown);
-                          setCitySearch("");
+                          setAiMode(true);
+                          setTimeout(() => aiInputRef.current?.focus(), 100);
                         }}
-                        className="flex items-center gap-1 px-5 py-3.5 border-r border-border text-sm"
+                        className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-10 py-3 sm:py-2.5 rounded-xl text-sm font-medium sm:mr-2 hover:bg-primary/90 transition-colors shrink-0 shadow-sm sm:shadow-none"
                       >
-                        <span className="font-medium text-foreground">{selectedCity}</span>
-                        <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${showCityDropdown ? "rotate-180" : ""}`} />
+                        <Sparkles className="w-4 h-4" />
+                        Chat with AI
                       </button>
-
-                      <AnimatePresence>
-                        {showCityDropdown && (() => {
-                          const q = citySearch.toLowerCase();
-                          const filteredPopular = popularCities.filter((c) => c.toLowerCase().includes(q));
-                          const filteredOther = otherCities.filter((c) => c.toLowerCase().includes(q));
-                          return (
-                            <motion.div
-                              initial={{ opacity: 0, y: 4 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 4 }}
-                              transition={{ duration: 0.15 }}
-                              className="absolute top-full left-0 mt-1 w-64 bg-card border border-border rounded-xl shadow-xl z-50 max-h-72 overflow-y-auto"
-                            >
-                              <div className="sticky top-0 bg-card p-2 border-b border-border/50">
-                                <input
-                                  type="text"
-                                  value={citySearch}
-                                  onChange={(e) => setCitySearch(e.target.value)}
-                                  placeholder="Search city..."
-                                  className="w-full px-3 py-2 text-sm bg-muted/50 rounded-lg outline-none placeholder:text-muted-foreground/50"
-                                  autoFocus
-                                />
-                              </div>
-                              {filteredPopular.length > 0 && (
-                                <>
-                                  <div className="px-4 pt-2.5 pb-1 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Popular Cities</div>
-                                  {filteredPopular.map((city) => (
-                                    <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-muted/60 ${city === selectedCity ? "text-primary font-medium" : "text-foreground"}`}>
-                                      {city}
-                                    </button>
-                                  ))}
-                                </>
-                              )}
-                              {filteredOther.length > 0 && (
-                                <>
-                                  <div className="px-4 pt-2.5 pb-1 text-[10px] uppercase tracking-widest text-muted-foreground font-medium border-t border-border/50">All Cities</div>
-                                  {filteredOther.map((city) => (
-                                    <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-muted/60 ${city === selectedCity ? "text-primary font-medium" : "text-foreground"}`}>
-                                      {city}
-                                    </button>
-                                  ))}
-                                </>
-                              )}
-                              {filteredPopular.length === 0 && filteredOther.length === 0 && (
-                                <div className="px-4 py-6 text-center text-sm text-muted-foreground">No cities found</div>
-                              )}
-                            </motion.div>
-                          );
-                        })()}
-                      </AnimatePresence>
                     </div>
-
-                    <div ref={locationRef} className="relative flex items-center flex-1 px-4 gap-2">
-                      <Search className="w-4 h-4 text-muted-foreground shrink-0" />
-                      <input
-                        type="text"
-                        value={locationSearch}
-                        onChange={(e) => {
-                          setLocationSearch(e.target.value);
-                          setShowLocationDropdown(true);
-                        }}
-                        onFocus={() => {
-                          if (locationSearch.length > 0) setShowLocationDropdown(true);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            const q = locationSearch.toLowerCase();
-                            const allCities = [...popularCities, ...otherCities];
-                            const match = allCities.find((c) => c.toLowerCase().includes(q));
-                            const cityToUse = match || selectedCity;
-                            setSelectedCity(cityToUse);
-                            setLocationSearch("");
-                            setShowLocationDropdown(false);
-                            navigate(`/get-workspaces?city=${encodeURIComponent(cityToUse)}`);
-                          }
-                        }}
-                        placeholder={`Search virtual offices in ${selectedCity}`}
-                        className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground py-3.5"
-                      />
-
-                      <AnimatePresence>
-                        {showLocationDropdown && locationSearch.length > 0 && (() => {
-                          const q = locationSearch.toLowerCase();
-                          const matchedPopular = popularCities.filter((c) => c.toLowerCase().includes(q));
-                          const matchedOther = otherCities.filter((c) => c.toLowerCase().includes(q));
-                          if (matchedPopular.length === 0 && matchedOther.length === 0) return null;
-                          return (
-                            <motion.div
-                              initial={{ opacity: 0, y: 4 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 4 }}
-                              transition={{ duration: 0.15 }}
-                              className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto"
-                            >
-                              {matchedPopular.length > 0 && (
-                                <>
-                                  <div className="px-4 pt-2.5 pb-1 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Popular Cities</div>
-                                  {matchedPopular.map((city) => (
-                                    <button key={city} onClick={() => { setSelectedCity(city); setLocationSearch(""); setShowLocationDropdown(false); navigate(`/get-workspaces?city=${encodeURIComponent(city)}`); }} className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted/60 transition-colors">
-                                      {city}
-                                    </button>
-                                  ))}
-                                </>
-                              )}
-                              {matchedOther.length > 0 && (
-                                <>
-                                  <div className="px-4 pt-2.5 pb-1 text-[10px] uppercase tracking-widest text-muted-foreground font-medium border-t border-border/50">All Cities</div>
-                                  {matchedOther.map((city) => (
-                                    <button key={city} onClick={() => { setSelectedCity(city); setLocationSearch(""); setShowLocationDropdown(false); navigate(`/get-workspaces?city=${encodeURIComponent(city)}`); }} className="w-full text-left px-4 py-2 text-sm text-foreground hover:bg-muted/60 transition-colors">
-                                      {city}
-                                    </button>
-                                  ))}
-                                </>
-                              )}
-                            </motion.div>
-                          );
-                        })()}
-                      </AnimatePresence>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        setAiMode(true);
-                        setTimeout(() => aiInputRef.current?.focus(), 100);
-                      }}
-                      className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-medium mr-2 hover:bg-primary/90 transition-colors shrink-0"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      Chat with AI
-                    </button>
                   </motion.div>
                 ) : (
                   <motion.div
@@ -302,45 +306,50 @@ const VirtualOffice = () => {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 40 }}
                     transition={{ duration: 0.25 }}
-                    className="flex items-center bg-background rounded-xl border border-primary/40 overflow-visible relative shadow-[0_0_12px_-4px_hsl(var(--primary)/0.3)]"
+                    className="flex flex-col sm:flex-row items-stretch sm:items-center bg-transparent sm:bg-background rounded-none sm:rounded-xl border-0 sm:border sm:border-primary/40 overflow-visible relative sm:shadow-[0_0_12px_-4px_hsl(var(--primary)/0.3)] gap-3 sm:gap-0"
                   >
-                    <div className="flex items-center gap-2 px-4 border-r border-border shrink-0">
-                      <Sparkles className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium text-primary py-3.5">AI</span>
+                    <div className="flex items-center bg-background rounded-xl border border-primary/40 sm:border-0 sm:rounded-none flex-1 shadow-[0_0_12px_-4px_hsl(var(--primary)/0.3)] sm:shadow-none">
+                      <div className="flex items-center gap-2 px-4 border-r border-border shrink-0">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        <span className="text-sm font-medium text-primary py-3.5">AI</span>
+                      </div>
+                      <input
+                        ref={aiInputRef}
+                        type="text"
+                        value={aiQuery}
+                        onChange={(e) => setAiQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && aiQuery.trim()) navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`);
+                          if (e.key === "Escape") {
+                            setAiMode(false);
+                            setAiQuery("");
+                          }
+                        }}
+                        placeholder="Ask AI anything — virtual offices, compliance, plans..."
+                        className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground px-4 py-3.5"
+                      />
+                      <button onClick={() => { setAiMode(false); setAiQuery(""); }} className="text-muted-foreground hover:text-foreground text-sm px-3 py-3.5 transition-colors shrink-0">
+                        Cancel
+                      </button>
                     </div>
-                    <input
-                      ref={aiInputRef}
-                      type="text"
-                      value={aiQuery}
-                      onChange={(e) => setAiQuery(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && aiQuery.trim()) navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`);
-                        if (e.key === "Escape") {
-                          setAiMode(false);
-                          setAiQuery("");
-                        }
-                      }}
-                      placeholder="Ask AI anything — virtual offices, compliance, plans..."
-                      className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground px-4 py-3.5"
-                    />
-                    <button onClick={() => { setAiMode(false); setAiQuery(""); }} className="text-muted-foreground hover:text-foreground text-sm px-3 py-3.5 transition-colors shrink-0">
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => { if (aiQuery.trim()) navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`); }}
-                      disabled={!aiQuery.trim()}
-                      className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-medium mr-2 hover:bg-primary/90 transition-colors shrink-0 disabled:opacity-40"
-                    >
-                      <Search className="w-4 h-4" />
-                      Ask AI
-                    </button>
+
+                    <div className="flex justify-end sm:block">
+                      <button
+                        onClick={() => { if (aiQuery.trim()) navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`); }}
+                        disabled={!aiQuery.trim()}
+                        className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-3 sm:py-2.5 rounded-xl text-sm font-medium sm:mr-2 hover:bg-primary/90 transition-colors shrink-0 disabled:opacity-40 shadow-sm sm:shadow-none"
+                      >
+                        <Search className="w-4 h-4" />
+                        Ask AI
+                      </button>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
-          </motion.div>
-        </div>
-      </section>
+          </motion.div >
+        </div >
+      </section >
 
       <div className="lg:hidden sticky top-16 z-30 bg-white/90 backdrop-blur border-b border-border/40">
         <div className="flex justify-center gap-2 px-4 py-2.5">
@@ -658,7 +667,7 @@ const VirtualOffice = () => {
       <BlogSection />
       <CTA />
       <Footer />
-    </div>
+    </div >
   );
 };
 

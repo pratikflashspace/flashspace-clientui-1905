@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -112,7 +112,7 @@ const WorkspaceCard = ({
   const images = rawImages
     .filter((img) => !isInvalidImageUrl(img))
     .map((img) => getSafeImageUrl(img));
-  
+
   if (images.length === 0) images.push(DEFAULT_WORKSPACE_IMAGE);
 
   const bookingItem: ListingItem = {
@@ -242,7 +242,7 @@ const WorkspaceCard = ({
                 e.stopPropagation();
                 handleNavigate();
               }}
-              className="py-2 px-4 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 whitespace-nowrap"
+              className="py-2 px-8 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 whitespace-nowrap flex-[1.4]"
             >
               Get Best Price
             </button>
@@ -251,7 +251,7 @@ const WorkspaceCard = ({
                 e.stopPropagation();
                 setIsMeetingModalOpen(true);
               }}
-              className="py-2 px-3 text-xs font-medium rounded-lg border border-border text-foreground hover:bg-muted transition-all duration-200 flex items-center gap-1 whitespace-nowrap"
+              className="py-2 px-4 text-xs font-medium rounded-lg border border-border text-foreground hover:bg-muted transition-all duration-200 flex items-center gap-1 whitespace-nowrap flex-1"
             >
               <Phone className="w-3 h-3" /> Contact Sales
             </button>
@@ -392,7 +392,7 @@ const WorkspaceCard = ({
               e.stopPropagation();
               handleNavigate();
             }}
-            className="flex-1 py-2.5 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
+            className="flex-[1.4] py-2.5 px-4 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
           >
             Get Best Price
           </button>
@@ -433,32 +433,6 @@ const GetWorkspaces = () => {
   };
   const [activeCity, setActiveCity] = useState(initialCity);
   const [workspaceType, setWorkspaceType] = useState(getInitialType());
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const mobileScrollContainerRef = useRef<HTMLDivElement>(null);
-
-  // Disable Lenis smooth scroll for listing containers
-  useEffect(() => {
-    const containers = [scrollContainerRef.current, mobileScrollContainerRef.current];
-
-    const preventLenis = (e: WheelEvent) => {
-      e.stopPropagation();
-    };
-
-    containers.forEach(container => {
-      if (container) {
-        container.setAttribute("data-lenis-prevent", "true");
-        container.addEventListener("wheel", preventLenis, { passive: false });
-      }
-    });
-
-    return () => {
-      containers.forEach(container => {
-        if (container) {
-          container.removeEventListener("wheel", preventLenis);
-        }
-      });
-    };
-  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -714,11 +688,11 @@ const GetWorkspaces = () => {
   };
 
   return (
-    <div className="h-screen bg-background flex flex-col overflow-hidden pt-[80px]">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
       {/* Full-width top section: Breadcrumb + Filters */}
-      <div className="bg-background border-b border-border/60">
+      <div className="mt-20 bg-background border-b border-border/60">
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
@@ -858,10 +832,9 @@ const GetWorkspaces = () => {
       </div>
 
       {/* Desktop: split view — listings left, map right */}
-      <div className="hidden lg:flex flex-1 min-h-0 overflow-hidden relative">
+      <div className="hidden lg:flex flex-1 h-[calc(100vh-13rem)] relative">
         {/* Left: Listings */}
         <div
-          ref={scrollContainerRef}
           className={`overflow-y-auto bg-muted/20 transition-all duration-300 ease-in-out relative ${mapCollapsed ? "w-full" : "w-[58%] border-r border-border/40"}`}
         >
           <div className="px-5 py-5 sm:px-8">
@@ -942,10 +915,11 @@ const GetWorkspaces = () => {
           </div>
         </div>
 
+        {/* Right: Map */}
         <div
           className={`transition-all duration-300 ease-in-out relative ${mapCollapsed ? "w-0 overflow-hidden opacity-0" : "w-[42%] opacity-100"}`}
         >
-          <div className="h-full m-2 sm:m-4 rounded-xl overflow-hidden shadow-sm border border-border/30">
+          <div className="sticky top-20 h-[calc(100vh-5.5rem)] m-2 sm:m-4 rounded-xl overflow-hidden shadow-sm border border-border/30">
             {/* Map toggle — fixed on the map */}
             <button
               onClick={() => setMapCollapsed(!mapCollapsed)}
@@ -987,10 +961,7 @@ const GetWorkspaces = () => {
       </div>
 
       {/* Mobile: full-width listings + expandable map */}
-      <div
-        ref={mobileScrollContainerRef}
-        className="lg:hidden flex-1 relative overflow-y-auto"
-      >
+      <div className="lg:hidden flex-1 relative">
         <div className="px-4 py-3">
           {loading ? (
             <div

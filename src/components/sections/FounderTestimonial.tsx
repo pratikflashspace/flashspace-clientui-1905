@@ -68,14 +68,7 @@ export const FounderTestimonial = () => {
                         transition={{ duration: 0.4 }}
                         className="mt-12 flex flex-col items-center gap-4"
                     >
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
-                            <img
-                                src={current.avatar}
-                                alt={current.name}
-                                className="w-16 h-16 rounded-full object-cover border-2 border-primary/20 relative z-10"
-                            />
-                        </div>
+
                         <div>
                             <p className="text-white font-bold text-lg">{current.name}</p>
                             <p className="text-muted-foreground text-sm font-medium">{current.title}</p>
@@ -90,8 +83,8 @@ export const FounderTestimonial = () => {
                             key={i}
                             onClick={() => setActiveIndex(i)}
                             className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === activeIndex
-                                    ? "bg-[#EFAD1A] w-6"
-                                    : "bg-white/20 hover:bg-white/40"
+                                ? "bg-[#EFAD1A] w-6"
+                                : "bg-white/20 hover:bg-white/40"
                                 }`}
                             aria-label={`Go to testimonial ${i + 1}`}
                         />

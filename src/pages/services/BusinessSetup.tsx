@@ -1,5 +1,5 @@
 import { Building, MapPin, Mail, Phone, FileText, CheckCircle, Star, Users, Award, ChevronDown, Shield, FileCheck, Clock } from "lucide-react";
-import {  Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
@@ -10,12 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  BusinessSolution, 
-  BusinessSetupFeature, 
-  BusinessSetupService, 
-  BusinessSetupCityKey, 
-  BusinessSetupServicesByCity 
+import {
+  BusinessSolution,
+  BusinessSetupFeature,
+  BusinessSetupService,
+  BusinessSetupCityKey,
+  BusinessSetupServicesByCity
 } from "@/types/services";
 
 const BusinessSetup = () => {
@@ -39,14 +39,14 @@ const BusinessSetup = () => {
       description: "Professional business address solutions"
     },
     {
-      label: "Coworking Space", 
+      label: "Coworking Space",
       href: "/services/coworking-space",
       icon: Users,
       description: "Flexible workspace solutions"
     },
     {
       label: "On Demand",
-      href: "/services/on-demand", 
+      href: "/services/on-demand",
       icon: Phone,
       description: "Meeting rooms & services"
     },
@@ -144,12 +144,12 @@ const BusinessSetup = () => {
               <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
               Back to Home
             </Link>
-            
+
             {/* Business Solutions Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="text-sm text-gray-700 hover:text-primary transition-colors duration-300 font-medium flex items-center gap-2 border-gray-300"
                 >
                   Business Setup
@@ -204,9 +204,9 @@ const BusinessSetup = () => {
                 </span>
               )}
             </h1>
-            
+
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
-              Get your business registered and compliant with expert guidance. From company registration 
+              Get your business registered and compliant with expert guidance. From company registration
               to GST filing, we handle everything so you can focus on growing your business.
             </p>
 
@@ -225,7 +225,7 @@ const BusinessSetup = () => {
             <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
               Complete Business Registration Services
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {features.map((feature, index) => (
                 <Card key={index} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover-lift border border-gray-200">

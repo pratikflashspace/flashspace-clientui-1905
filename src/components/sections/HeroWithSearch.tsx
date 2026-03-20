@@ -158,7 +158,7 @@ export const HeroWithSearch = () => {
                                 >
                                     {/* City selector */}
                                     {/* <div ref={cityRef} className="relative shrink-0"> */}
-                                        {/* <button
+                                    {/* <button
                                             onClick={() => { setShowCityDropdown(!showCityDropdown); setCitySearch(""); }}
                                             className="flex items-center gap-1 px-5 py-3.5 border-r border-border text-sm"
                                         >
@@ -166,7 +166,7 @@ export const HeroWithSearch = () => {
                                             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${showCityDropdown ? "rotate-180" : ""}`} />
                                         </button> */}
 
-                                        {/* <AnimatePresence>
+                                    {/* <AnimatePresence>
                                             {showCityDropdown && (() => {
                                                 const q = citySearch.toLowerCase();
                                                 const filteredPopular = popularCities.filter(c => c.toLowerCase().includes(q));
@@ -314,7 +314,7 @@ export const HeroWithSearch = () => {
                                             setAiMode(true);
                                             setTimeout(() => aiInputRef.current?.focus(), 100);
                                         }}
-                                        className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-xs sm:text-sm font-medium sm:mr-2 hover:bg-primary/90 transition-colors shrink-0"
+                                        className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-10 py-2.5 rounded-xl text-xs sm:text-sm font-medium sm:mr-2 hover:bg-primary/90 transition-colors shrink-0"
                                     >
                                         <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                         Chat with AI

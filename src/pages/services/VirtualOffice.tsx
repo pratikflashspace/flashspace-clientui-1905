@@ -1,24 +1,18 @@
-import {
-  Building,
-  MapPin,
-  Phone,
-  Users,
-  ChevronDown,
+ChevronRight,
   ChevronLeft,
   Grid3X3,
   List,
   Search,
   Presentation,
+  Map,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { cityCenters } from "@/components/Map/locationData.example";
 import Header from "@/components/Header";
-import MapSection from "@/components/services/MapSection";
-import SearchHeader from "@/components/services/SearchHeader";
 import ListingCardModern from "@/components/services/ListingCardModern";
-import ResizableMapLayout from "@/components/services/ResizableMapLayout";
+import MapLibreMap from "@/components/Map/MapLibreMap";
 import { getVirtualOfficesByCity } from "@/services/virtualOffice.service";
 import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import {
@@ -33,7 +27,7 @@ import { useLocationMetadata } from "@/hooks/useLocationMetadata";
 const VirtualOffice = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [mapCollapsed, setMapCollapsed] = useState(false);
 
   // Initialize state from URL params to ensure first render is correct
   const initialCity = searchParams.get("city") || "Delhi";
@@ -73,25 +67,7 @@ const VirtualOffice = () => {
     setSearchCity(city);
   }, [searchParams]);
 
-  // Disable Lenis smooth scroll for this specific container
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
 
-    // Add data attribute to tell Lenis to ignore this element
-    scrollContainer.setAttribute("data-lenis-prevent", "true");
-
-    // Also prevent Lenis from handling wheel events on this container
-    const preventLenis = (e: WheelEvent) => {
-      e.stopPropagation();
-    };
-
-    scrollContainer.addEventListener("wheel", preventLenis, { passive: false });
-
-    return () => {
-      scrollContainer.removeEventListener("wheel", preventLenis);
-    };
-  }, []);
 
   // Fetch virtual offices from API
   useEffect(() => {
@@ -265,81 +241,66 @@ const VirtualOffice = () => {
   }, [virtualOffices, resolvedCenter]);
 
   return (
-    <div className="flex flex-col h-screen bg-white overflow-hidden pt-16 md:pt-20">
-      {/* Original Header */}
-      <div className="flex-shrink-0">
-        <Header />
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+
+      {/* Full-width top section: Breadcrumb + Filters */}
+      <div className="mt-20 bg-background border-b border-border/60">
+        <div className="px-4 sm:px-6 lg:px-8 py-4">
+          {/* Breadcrumb */}
+          <div
+            className={`flex items-center gap-1.5 text-xs text-muted-foreground mb-4 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+          >
+            <span className="hover:text-foreground transition-colors cursor-pointer" onClick={() => navigate("/")}>Home</span>
+            <ChevronRight className="w-3 h-3" />
+            <span className="hover:text-foreground transition-colors cursor-pointer">Virtual Office</span>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-foreground font-medium truncate">
+              {selectedCity}
+            </span>
+          </div>
+
+          {/* SearchHeader - Full Width Top Section */}
+          <SearchHeader
+            searchCity={searchCity}
+            onSearchChange={handleSearchChange}
+            onCitySelect={handleCitySearch}
+            onSearchSubmit={handleSearchSubmit}
+            onSearchFocus={handleSearchFocus}
+            onSearchBlur={handleSearchBlur}
+            isSearchFocused={isSearchFocused}
+            showSuggestions={showSuggestions}
+            filteredCities={filteredCities}
+            currentService="Virtual Office"
+            businessSolutions={businessSolutions}
+            onServiceNavigation={handleNavigation}
+          />
+        </div>
       </div>
 
-      {/* Main Content - Responsive Layout with Resizable Map */}
-      <div
-        className="flex-1 min-h-0 flex overflow-hidden"
-      >
-        <ResizableMapLayout
-          defaultListingWidth={50}
-          mapContent={
-            <MapSection
-              key="virtual-office-map"
-              center={resolvedCenter}
-              markers={mapMarkers}
-              zoom={11}
-              height="100%"
-            />
-          }
+      <div className="flex-1 lg:flex h-auto lg:h-[calc(100vh-13rem)] relative">
+        {/* Listings Content */}
+        <div
+          className={`overflow-y-auto bg-muted/20 transition-all duration-300 ease-in-out relative ${mapCollapsed ? "w-full" : "w-full lg:w-[58%] border-r border-border/40"}`}
         >
-          {/* Listings Content */}
-          <div
-            ref={scrollContainerRef}
-            className="w-full h-full overflow-y-auto"
-          >
-            <div className="px-4 sm:px-6 py-4 sm:py-6">
-              {/* Mobile Back Button */}
-              <button
-                onClick={() => navigate("/")}
-                className="md:hidden flex items-center gap-2 text-sm text-gray-500 mb-4 hover:text-black transition"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Back
-              </button>
+          <div className="px-4 sm:px-8 py-6">
+            {/* Mobile Back Button */}
+            <button
+              onClick={() => navigate("/")}
+              className="md:hidden flex items-center gap-2 text-sm text-gray-500 mb-4 hover:text-black transition"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back
+            </button>
 
-              {/* Breadcrumb */}
-              <div
-                className={`flex items-center gap-2 text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
-              >
-                <span>Home</span>
-                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
-                <span>Virtual Office</span>
-                <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 rotate-[-90deg]" />
-                <span className="text-gray-900 font-medium truncate">
-                  {selectedCity}
-                </span>
-              </div>
+            <h1
+              className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+            >
+              Virtual Office Space In {selectedCity}
+            </h1>
 
-              {/* Page Title */}
-              <h1
-                className={`text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
-              >
-                Virtual Office Space In {selectedCity}
-              </h1>
-
-              {/* City Search Section - Using Optimized SearchHeader Component */}
-              <SearchHeader
-                searchCity={searchCity}
-                onSearchChange={handleSearchChange}
-                onCitySelect={handleCitySearch}
-                onSearchSubmit={handleSearchSubmit}
-                onSearchFocus={handleSearchFocus}
-                onSearchBlur={handleSearchBlur}
-                isSearchFocused={isSearchFocused}
-                showSuggestions={showSuggestions}
-                filteredCities={filteredCities}
-                currentService="Virtual Office"
-                businessSolutions={businessSolutions}
-                onServiceNavigation={handleNavigation}
-              />
-
-              {/* Filters Row */}
-              {/* <div className={`bg-white rounded-lg border border-gray-200 p-4 mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
+            {/* Filters Row */}
+            {/* <div className={`bg-white rounded-lg border border-gray-200 p-4 mb-6 relative z-30 transition-opacity duration-300 ${isSearchFocused ? 'opacity-50' : 'opacity-100'}`}>
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
                 <Filter className="w-4 h-4" />
@@ -385,74 +346,115 @@ const VirtualOffice = () => {
             </div>
           </div> */}
 
-              {/* Results Header */}
-              <div
-                className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
-              >
-                <p className="text-sm text-gray-600">
-                  Showing{" "}
-                  <span className="font-semibold text-gray-900">
-                    {virtualOffices.length} result(s)
-                  </span>{" "}
-                  for virtual office space in {selectedCity}
-                </p>
+            {/* Results Header */}
+            <div
+              className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+            >
+              <p className="text-sm text-gray-600">
+                Showing{" "}
+                <span className="font-semibold text-gray-900">
+                  {virtualOffices.length} result(s)
+                </span>{" "}
+                for virtual office space in {selectedCity}
+              </p>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={viewMode === "list" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setViewMode("list")}
-                    className="flex items-center gap-1 text-xs sm:text-sm h-8"
-                  >
-                    <List className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span className="hidden sm:inline">List</span>
-                  </Button>
-                  <Button
-                    variant={viewMode === "grid" ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setViewMode("grid")}
-                    className="flex items-center gap-1 text-xs sm:text-sm h-8"
-                  >
-                    <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span className="hidden sm:inline">Grid</span>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Office Cards Grid - Modern MindTrip Style Cards */}
-              <div
-                className={`grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
-              >
-                {loading ? (
-                  <SkeletonCardGrid count={6} view={viewMode} />
-                ) : error ? (
-                  <div className="col-span-full text-center py-8 sm:py-12">
-                    <p className="text-sm sm:text-base text-red-600">{error}</p>
-                  </div>
-                ) : virtualOffices.length === 0 ? (
-                  <div className="col-span-full text-center py-8 sm:py-12">
-                    <p className="text-sm sm:text-base text-gray-600">
-                      No virtual offices found for {selectedCity}
-                    </p>
-                  </div>
-                ) : (
-                  virtualOffices.map((office) => (
-                    <ListingCardModern
-                      key={office._id}
-                      item={office}
-                      onGetBestPrice={() => handleGetBestPrice(office._id)}
-                      onToggleFavorite={(itemId) => {
-                        /* console.log('Toggle favorite for:', itemId) */
-                      }}
-                    />
-                  ))
-                )}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="flex items-center gap-1 text-xs sm:text-sm h-8"
+                >
+                  <List className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">List</span>
+                </Button>
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="flex items-center gap-1 text-xs sm:text-sm h-8"
+                >
+                  <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Grid</span>
+                </Button>
               </div>
             </div>
+
+            {/* Office Cards Grid - Modern MindTrip Style Cards */}
+            <div
+              className={`grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 sm:mb-8 transition-opacity duration-300 ${isSearchFocused ? "opacity-50" : "opacity-100"}`}
+            >
+              {loading ? (
+                <SkeletonCardGrid count={6} view={viewMode} />
+              ) : error ? (
+                <div className="col-span-full text-center py-8 sm:py-12">
+                  <p className="text-sm sm:text-base text-red-600">{error}</p>
+                </div>
+              ) : virtualOffices.length === 0 ? (
+                <div className="col-span-full text-center py-8 sm:py-12">
+                  <p className="text-sm sm:text-base text-gray-600">
+                    No virtual offices found for {selectedCity}
+                  </p>
+                </div>
+              ) : (
+                virtualOffices.map((office) => (
+                  <ListingCardModern
+                    key={office._id}
+                    item={office}
+                    onGetBestPrice={() => handleGetBestPrice(office._id)}
+                    onToggleFavorite={(itemId) => {
+                      /* console.log('Toggle favorite for:', itemId) */
+                    }}
+                  />
+                ))
+              )}
+            </div>
           </div>
-        </ResizableMapLayout>
+        </div>
       </div>
+
+      {/* Right: Map */}
+      <div
+        className={`hidden lg:block transition-all duration-300 ease-in-out relative ${mapCollapsed ? "w-0 overflow-hidden opacity-0" : "w-[42%] opacity-100"}`}
+      >
+        <div className="sticky top-20 h-[calc(100vh-5.5rem)] m-2 sm:m-4 rounded-xl overflow-hidden shadow-sm border border-border/30">
+          {/* Map toggle — fixed on the map */}
+          <button
+            onClick={() => setMapCollapsed(!mapCollapsed)}
+            className="absolute top-4 left-4 z-20 w-9 h-9 rounded-full border border-border bg-card shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 cursor-pointer"
+            aria-label="Hide map"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          <MapLibreMap
+            center={resolvedCenter}
+            markers={mapMarkers.map((m, idx) => ({
+              id: `marker-${idx}`,
+              position: m.position,
+              title: m.title,
+              image: m.image,
+              price: m.price,
+              rating: m.rating,
+              address: m.address,
+            }))}
+            height="100%"
+            mapStyle="retro"
+          />
+        </div>
+      </div>
+
+      {/* Floating map button — fixed top-right, below filter bar */}
+      {mapCollapsed && (
+        <button
+          onClick={() => setMapCollapsed(false)}
+          className="fixed top-[184px] right-8 z-30 w-10 h-10 rounded-full border border-border bg-card shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 cursor-pointer"
+          aria-label="Show map"
+        >
+          <Map className="w-4.5 h-4.5" />
+        </button>
+      )}
     </div>
+    </div >
   );
 };
 
