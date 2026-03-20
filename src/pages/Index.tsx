@@ -9,6 +9,7 @@ import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { CTA } from "@/components/sections/CTA";
 import Footer from "@/components/Footer";
+import { TrustedByFilmstrip } from "@/components/sections/TrustedByFilmstrip";
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
 
@@ -40,6 +41,7 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
       <Header openLogin={openLogin} openSignup={openSignup} />
       <main className="flex-1 w-full relative">
         <HeroWithSearch />
+        <TrustedByFilmstrip />
         <FadeInSection>
           <PlanLocationsShowcase />
         </FadeInSection>
