@@ -368,7 +368,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
           <div className="flex gap-2 mt-auto">
             <button
               onClick={handleCardClick}
-              className="flex-1 bg-primary text-primary-foreground text-sm font-normal py-2.5 rounded-xl hover:bg-primary/90 transition-all active:scale-[0.98]"
+              className="flex-[1.4] bg-primary text-primary-foreground text-sm font-normal py-2.5 px-4 rounded-xl hover:bg-primary/90 transition-all active:scale-[0.98]"
             >
               Get Best Price
             </button>
@@ -377,7 +377,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
                 e.stopPropagation();
                 setIsMeetingModalOpen(true);
               }}
-              className="flex-1 flex items-center justify-center gap-1.5 border border-border text-sm font-normal text-foreground py-2.5 rounded-xl hover:bg-muted/50 transition-all active:scale-[0.98]"
+              className="flex-1 flex items-center justify-center gap-1.5 border border-border text-sm font-normal text-foreground py-2.5 px-2 rounded-xl hover:bg-muted/50 transition-all active:scale-[0.98]"
             >
               <Phone className="w-4 h-4" />
               Contact Sales
