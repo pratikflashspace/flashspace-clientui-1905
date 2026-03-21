@@ -1,15 +1,11 @@
-import React from "react";
-import { 
-  Leaf, 
-  MonitorPlay, 
-  Film, 
-  GraduationCap, 
-  BookOpen, 
-  ShoppingBag, 
-  Library, 
-  Heart, 
-  Droplets, 
-  PhoneCall 
+import React, { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import {
+  MonitorPlay,
+  Film,
+  GraduationCap,
+  BookOpen,
+  ShoppingBag,
 } from "lucide-react";
 
 // Custom SVG to match the Adda247 logo shape
@@ -60,21 +56,14 @@ const AgrizyShapesIcon = (props: React.SVGProps<SVGSVGElement>) => (
     {...props}
     stroke="none"
   >
-    {/* 1. Circle */}
     <circle cx="12" cy="12" r="11" />
-    
-    {/* 2. Modified Leaf shape (rounded D leaning right) */}
     <path d="M42 1C32 1 32 23 42 23C48 23 53 18 53 12C53 6 48 1 42 1Z" />
-    
-    {/* 3. Rounded Play Button */}
     <path d="M66 2A4 4 0 0 0 60 5.5v13A4 4 0 0 0 66 22l11-6.5A4 4 0 0 0 77 8.5L66 2z" />
-    
-    {/* 4. Rounded Play Button */}
     <path d="M92 2A4 4 0 0 0 86 5.5v13A4 4 0 0 0 92 22l11-6.5A4 4 0 0 0 103 8.5L92 2z" />
   </svg>
 );
 
-// Custom SVG for Caller Desk (Full Logo with Text)
+// Custom SVG for Caller Desk
 const CallerDeskIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 1020 250"
@@ -99,16 +88,24 @@ const CallerDeskIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const svgLogos = [
-  { 
-    name: "agrizy", 
+interface LogoItem {
+  name: string;
+  icon?: React.ComponentType<any>;
+  hideText?: boolean;
+  className?: string;
+  customRender?: () => React.ReactNode;
+}
+
+const svgLogos: LogoItem[] = [
+  {
+    name: "agrizy",
     hideText: true,
     customRender: () => (
-      <div className="flex items-center text-xl sm:text-2xl font-bold tracking-[0.05em] font-sans">
-        <AgrizyShapesIcon className="text-muted-foreground w-[4rem] sm:w-[5rem] h-auto mr-2 sm:mr-3 opacity-90" />
+      <div className="flex items-center text-lg sm:text-xl font-bold tracking-[0.05em] font-sans">
+        <AgrizyShapesIcon className="w-[3.5rem] sm:w-[4rem] h-auto mr-2 opacity-90" />
         <span className="translate-y-[1px]">agrizy</span>
       </div>
-    )
+    ),
   },
   { name: "STAGE OTT", icon: MonitorPlay },
   { name: "LUV FILMS", icon: Film },
@@ -117,61 +114,227 @@ const svgLogos = [
   { name: "Flipkart", icon: ShoppingBag },
   { name: "Adda247", icon: Adda247Icon },
   { name: "TrulyMadly", icon: TrulyMadlyIcon },
-  { 
-    name: "plum", 
+  {
+    name: "plum",
     hideText: true,
     customRender: () => (
-      <div className="flex items-baseline text-xl sm:text-2xl font-bold tracking-tight font-sans">
+      <div className="flex items-baseline text-lg sm:text-xl font-bold tracking-tight font-sans">
         <span>pl</span>
-        <PlumFruitIcon className="w-5 h-5 sm:w-6 sm:h-6 mx-[1px] text-muted-foreground self-baseline" />
+        <PlumFruitIcon className="w-4 h-4 sm:w-5 sm:h-5 mx-[1px] self-baseline" />
         <span>m</span>
       </div>
-    )
+    ),
   },
-  { name: "CallerDesk", icon: CallerDeskIcon, hideText: true, className: "h-6 sm:h-8 w-auto px-2" },
+  {
+    name: "CallerDesk",
+    icon: CallerDeskIcon,
+    hideText: true,
+    className: "h-5 sm:h-7 w-auto px-2",
+  },
 ];
 
-export const TrustedByFilmstrip = () => {
+// Split logos into two rows for dual-row display
+const row1Logos = svgLogos.slice(0, 5);
+const row2Logos = svgLogos.slice(5);
+
+const LogoCard = ({ logo, index }: { logo: LogoItem; index: number }) => {
+  const Icon = logo.icon;
+
   return (
-    <section className="py-5 sm:py-6 bg-background relative overflow-hidden border-t border-b border-border/40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4 text-center">
-        <p className="text-sm font-medium text-muted-foreground tracking-wider uppercase">
-          Trusted by Innovative Companies
-        </p>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: index * 0.05, duration: 0.4 }}
+      className="group relative flex items-center justify-center gap-2.5 sm:gap-3 cursor-pointer"
+      style={{ minWidth: "170px", padding: "0 20px" }}
+    >
+      {/* Glassmorphic background card */}
+      <div
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+        style={{
+          background: "linear-gradient(135deg, hsla(142, 20%, 50%, 0.04), hsla(54, 96%, 88%, 0.06))",
+          backdropFilter: "blur(8px)",
+        }}
+      />
+
+      <div className="relative z-10 flex items-center justify-center gap-2.5 sm:gap-3 py-4 px-2 transition-all duration-500 text-muted-foreground/60 group-hover:text-foreground/90">
+        {logo.customRender ? (
+          logo.customRender()
+        ) : (
+          <>
+            {Icon && (
+              <Icon
+                className={
+                  logo.className ||
+                  (logo.hideText
+                    ? "h-5 sm:h-7 w-auto px-1"
+                    : "w-5 h-5 sm:w-6 sm:h-6 stroke-[1.8] transition-transform duration-500 group-hover:scale-110")
+                }
+              />
+            )}
+            {!logo.hideText && (
+              <span className="text-lg sm:text-xl font-semibold tracking-tight font-sans whitespace-nowrap">
+                {logo.name}
+              </span>
+            )}
+          </>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+const ScrollRow = ({
+  logos,
+  speed,
+  reverse = false,
+}: {
+  logos: LogoItem[];
+  speed: number;
+  reverse?: boolean;
+}) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let animationId: number;
+    let position = 0;
+    const totalWidth = el.scrollWidth / 2;
+
+    const animate = () => {
+      if (!isPaused) {
+        position += reverse ? speed : -speed;
+        if (!reverse && position <= -totalWidth) position = 0;
+        if (reverse && position >= 0) position = -totalWidth;
+        el.style.transform = `translateX(${position}px)`;
+      }
+      animationId = requestAnimationFrame(animate);
+    };
+
+    // Start reversed rows at offset
+    if (reverse) position = -totalWidth;
+
+    animationId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationId);
+  }, [isPaused, speed, reverse]);
+
+  // Triple the logos for seamless looping
+  const tripled = [...logos, ...logos, ...logos, ...logos];
+
+  return (
+    <div
+      className="relative overflow-hidden"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div
+        ref={scrollRef}
+        className="flex items-center will-change-transform"
+        style={{ width: "max-content" }}
+      >
+        {tripled.map((logo, i) => (
+          <LogoCard key={`${logo.name}-${i}`} logo={logo} index={i % logos.length} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export const TrustedByFilmstrip = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-60px" });
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative py-6 sm:py-8 lg:py-10 overflow-hidden"
+      style={{ background: "linear-gradient(180deg, hsl(60, 30%, 97%) 0%, hsl(60, 25%, 95%) 50%, hsl(60, 30%, 97%) 100%)" }}
+    >
+      {/* Subtle decorative gradient orbs */}
+      <div
+        className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, hsla(142, 25%, 50%, 0.04) 0%, transparent 70%)",
+          transform: "translate(-50%, -60%)",
+        }}
+      />
+      <div
+        className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, hsla(54, 96%, 60%, 0.05) 0%, transparent 70%)",
+          transform: "translate(50%, 50%)",
+        }}
+      />
+
+      {/* Header */}
+      <div className="relative z-10 max-w-4xl mx-auto px-6 mb-4 sm:mb-6 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+          className="flex flex-col items-center gap-2.5"
+        >
+          {/* Decorative line + badge */}
+          <div className="flex items-center gap-3">
+            <div
+              className="h-[1px] w-8 sm:w-12"
+              style={{ background: "linear-gradient(90deg, transparent, hsl(142, 20%, 60%))" }}
+            />
+            <span
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-[0.18em]"
+              style={{
+                background: "linear-gradient(135deg, hsla(142, 20%, 50%, 0.08), hsla(54, 96%, 88%, 0.12))",
+                color: "hsl(142, 20%, 35%)",
+                border: "1px solid hsla(142, 20%, 50%, 0.12)",
+              }}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ backgroundColor: "hsl(142, 40%, 45%)" }}
+              />
+              Trusted Partners
+            </span>
+            <div
+              className="h-[1px] w-8 sm:w-12"
+              style={{ background: "linear-gradient(90deg, hsl(142, 20%, 60%), transparent)" }}
+            />
+          </div>
+        </motion.div>
       </div>
 
-      {/* Main scrolling container */}
-      <div className="relative flex overflow-hidden group">
-        {/* Left and Right gradient fades for smooth entrance/exit */}
-        <div className="absolute top-0 left-0 w-24 sm:w-48 h-full bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-24 sm:w-48 h-full bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+      {/* Logo scroll rows */}
+      <div className="relative z-10 space-y-2 sm:space-y-3">
+        {/* Smooth gradient fades on edges */}
+        <div
+          className="absolute top-0 left-0 w-20 sm:w-36 lg:w-48 h-full z-20 pointer-events-none"
+          style={{ background: "linear-gradient(to right, hsl(60, 30%, 97%), transparent)" }}
+        />
+        <div
+          className="absolute top-0 right-0 w-20 sm:w-36 lg:w-48 h-full z-20 pointer-events-none"
+          style={{ background: "linear-gradient(to left, hsl(60, 30%, 97%), transparent)" }}
+        />
 
-        {/* The scrolling content. We render the list twice to create a seamless loop. */}
-        <div className="flex w-max animate-scroll-logos hover:[animation-play-state:paused] items-center">
-          {[...svgLogos, ...svgLogos].map((logo: any, index) => {
-            const Icon = logo.icon;
-            return (
-              <div
-                key={`${logo.name}-${index}`}
-                className="flex items-center justify-center gap-2 sm:gap-3 w-[160px] sm:w-[220px] mx-4 sm:mx-8 transition-all duration-300 text-muted-foreground opacity-70 hover:opacity-100 hover:text-foreground cursor-pointer"
-              >
-                {logo.customRender ? (
-                  logo.customRender()
-                ) : (
-                  <>
-                    <Icon className={logo.className || (logo.hideText ? "h-6 sm:h-8 w-auto px-2" : "w-5 h-5 sm:w-7 sm:h-7 stroke-[2]")} />
-                    {!logo.hideText && (
-                      <span className="text-xl sm:text-2xl font-bold tracking-tight font-sans">
-                        {logo.name}
-                      </span>
-                    )}
-                  </>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <ScrollRow logos={row1Logos} speed={0.4} />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <ScrollRow logos={row2Logos} speed={0.3} reverse />
+        </motion.div>
       </div>
+
+      
     </section>
   );
 };
