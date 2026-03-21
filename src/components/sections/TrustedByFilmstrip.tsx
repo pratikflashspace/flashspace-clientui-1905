@@ -98,28 +98,28 @@ interface LogoItem {
 
 const svgLogos: LogoItem[] = [
   {
-    name: "agrizy",
+    name: "Agrizy",
     hideText: true,
     customRender: () => (
       <div className="flex items-center text-lg sm:text-xl font-bold tracking-[0.05em] font-sans">
         <AgrizyShapesIcon className="w-[3.5rem] sm:w-[4rem] h-auto mr-2 opacity-90" />
-        <span className="translate-y-[1px]">agrizy</span>
+        <span className="translate-y-[1px]">Agrizy</span>
       </div>
     ),
   },
-  { name: "STAGE OTT", icon: MonitorPlay },
-  { name: "LUV FILMS", icon: Film },
-  { name: "GrowthSchool", icon: GraduationCap },
-  { name: "StudyIQ", icon: BookOpen },
-  { name: "Flipkart", icon: ShoppingBag },
+  { name: "Stage Ott", icon: MonitorPlay },
+  { name: "Luv Films", icon: Film },
+  { name: "Growth School", icon: GraduationCap },
+  { name: "Study IQ", icon: BookOpen },
+  { name: "Flipkart" },
   { name: "Adda247", icon: Adda247Icon },
-  { name: "TrulyMadly", icon: TrulyMadlyIcon },
+  { name: "Truly Madly", icon: TrulyMadlyIcon },
   {
-    name: "plum",
+    name: "Plum",
     hideText: true,
     customRender: () => (
       <div className="flex items-baseline text-lg sm:text-xl font-bold tracking-tight font-sans">
-        <span>pl</span>
+        <span>Pl</span>
         <PlumFruitIcon className="w-4 h-4 sm:w-5 sm:h-5 mx-[1px] self-baseline" />
         <span>m</span>
       </div>
