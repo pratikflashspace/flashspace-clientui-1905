@@ -87,6 +87,72 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         setIsSignupOpen(openSignup);
     }, [openSignup]);
 
+    const isModalOpenRef = useRef(isContactOpen);
+    useEffect(() => {
+        isModalOpenRef.current = isContactOpen;
+    }, [isContactOpen]);
+
+    useEffect(() => {
+        // Rule 1: Show after 10 seconds on site (once per session)
+        const hasShownInitial = sessionStorage.getItem("hasShownInitialGetInTouch");
+        if (!hasShownInitial) {
+            let sessionStartTime = sessionStorage.getItem("sessionStartTime");
+            if (!sessionStartTime) {
+                sessionStartTime = Date.now().toString();
+                sessionStorage.setItem("sessionStartTime", sessionStartTime);
+            }
+
+            const elapsed = Date.now() - parseInt(sessionStartTime);
+            const remaining = Math.max(0, 10000 - elapsed);
+
+            const timer = setTimeout(() => {
+                const alreadyShown = sessionStorage.getItem("hasShownInitialGetInTouch");
+                if (!alreadyShown) {
+                    setIsContactOpen(true);
+                    sessionStorage.setItem("hasShownInitialGetInTouch", "true");
+                }
+            }, remaining);
+
+            // Cleanup Rule 1 timer on unmount
+            return () => clearTimeout(timer);
+        }
+    }, []);
+
+    useEffect(() => {
+        // Rule 2: Show every time the user is inactive for 20 seconds
+        let inactivityTimer: NodeJS.Timeout;
+
+        const showInactivityModal = () => {
+            if (!isModalOpenRef.current) {
+                setIsContactOpen(true);
+            }
+            // Restart timer for next inactivity period?
+            // Actually, the listeners will reset it once they become active again.
+        };
+
+        const resetInactivityTimer = () => {
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(showInactivityModal, 20000); // 20 seconds of inactivity
+        };
+
+        const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
+        
+        // Initial timer start
+        resetInactivityTimer();
+
+        // Set up listeners for activity
+        activityEvents.forEach(event => {
+            window.addEventListener(event, resetInactivityTimer);
+        });
+
+        return () => {
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            activityEvents.forEach(event => {
+                window.removeEventListener(event, resetInactivityTimer);
+            });
+        };
+    }, []);
+
     const handleNavigation = (href: string) => {
         if (href.startsWith("#")) {
             const element = document.querySelector(href);
