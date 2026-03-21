@@ -1,4 +1,4 @@
-import axiosInstance from "./api.service";
+import axiosInstance from "@/lib/axios";
 import { Property, ApiResponse } from "@/types/services";
 
 /**
@@ -10,7 +10,7 @@ export const createProperty = async (
   data: Partial<Property>,
 ): Promise<Property> => {
   try {
-    const response = await axiosInstance.post("/property/create", data);
+    const response = await axiosInstance.post("/api/property/create", data);
     const responseData = response.data as ApiResponse<Property>;
 
     if (response.status === 201 && responseData.success && responseData.data) {
@@ -29,7 +29,7 @@ export const updateProperty = async (
   data: Partial<Property>,
 ): Promise<Property> => {
   try {
-    const response = await axiosInstance.put(`/property/update/${id}`, data);
+    const response = await axiosInstance.put(`/api/property/update/${id}`, data);
     const responseData = response.data as ApiResponse<Property>;
 
     if (response.status === 200 && responseData.success && responseData.data) {
@@ -45,7 +45,7 @@ export const updateProperty = async (
 
 export const getPropertyById = async (id: string): Promise<Property> => {
   try {
-    const response = await axiosInstance.get(`/property/${id}`);
+    const response = await axiosInstance.get(`/api/property/${id}`);
     const responseData = response.data as ApiResponse<Property>;
 
     if (response.status === 200 && responseData.success && responseData.data) {
@@ -65,8 +65,8 @@ export const getPropertySpaces = async (
 ): Promise<any> => {
   try {
     const url = type
-      ? `/property/${id}/spaces?type=${type}`
-      : `/property/${id}/spaces`;
+      ? `/api/property/${id}/spaces?type=${type}`
+      : `/api/property/${id}/spaces`;
     const response = await axiosInstance.get(url);
     const responseData = response.data as ApiResponse<any>;
 
@@ -83,7 +83,7 @@ export const getPropertySpaces = async (
 
 export const getPartnerProperties = async (): Promise<Property[]> => {
   try {
-    const response = await axiosInstance.get("/property/partner/all");
+    const response = await axiosInstance.get("/api/property/partner/all");
     const responseData = response.data as ApiResponse<Property[]>;
 
     if (response.status === 200 && responseData.success && responseData.data) {
@@ -123,7 +123,7 @@ export const getPropertyBookingsForPartner = async (
 
 export const deleteProperty = async (id: string): Promise<boolean> => {
   try {
-    const response = await axiosInstance.delete(`/property/delete/${id}`);
+    const response = await axiosInstance.delete(`/api/property/delete/${id}`);
     const responseData = response.data as ApiResponse<any>;
 
     if (response.status === 200 && responseData.success) {
@@ -146,7 +146,7 @@ export const uploadPropertyImage = async (
     formData.append("file", file);
 
     const response = await axiosInstance.post(
-      `/property/${propertyId}/upload-image`,
+      `/api/property/${propertyId}/upload-image`,
       formData,
       {
         headers: {
@@ -157,6 +157,32 @@ export const uploadPropertyImage = async (
     return response.data;
   } catch (error: any) {
     console.error("Error uploading property image:", error);
+    throw error;
+  }
+};
+
+export const uploadMultiplePropertyImages = async (
+  propertyId: string,
+  files: File[],
+): Promise<any> => {
+  try {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    const response = await axiosInstance.post(
+      `/api/property/${propertyId}/upload-multiple-images`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error uploading multiple property images:", error);
     throw error;
   }
 };
@@ -172,7 +198,7 @@ export const uploadPropertyDocument = async (
     formData.append("file", file);
 
     const response = await axiosInstance.post(
-      `/property/${propertyId}/upload-document`,
+      `/api/property/${propertyId}/upload-document`,
       formData,
       {
         headers: {
@@ -193,7 +219,7 @@ export const deletePropertyDocument = async (
 ): Promise<any> => {
   try {
     const response = await axiosInstance.delete(
-      `/property/${propertyId}/delete-document`,
+      `/api/property/${propertyId}/delete-document`,
       {
         params: { documentType },
       },
@@ -207,7 +233,7 @@ export const deletePropertyDocument = async (
 
 export const getSearchMetadata = async (): Promise<any> => {
   try {
-    const response = await axiosInstance.get("/property/available-cities");
+    const response = await axiosInstance.get("/api/property/available-cities");
     const responseData = response.data as ApiResponse<any>;
 
     if (response.status === 200 && responseData.success && responseData.data) {
@@ -230,6 +256,7 @@ const propertyService = {
   getPropertyBookingsForPartner,
   deleteProperty,
   uploadPropertyImage,
+  uploadMultiplePropertyImages,
   uploadPropertyDocument,
   deletePropertyDocument,
   getSearchMetadata,

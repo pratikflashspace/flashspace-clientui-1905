@@ -204,7 +204,7 @@ interface SidebarMenuItem {
 // [NEW] Constants for the popup
 const SIDEBAR_WIDTH_ICON = 80; // Your sidebar is 80px (w-20)
 const UPDATES_WIDTH = 420;
-const HEADER_OFFSET = '4.5rem'; // Match global header height (~72px)
+const HEADER_OFFSET = '4.5rem'; // Restored to 4.5rem to close the gap
 
 // [NEW] Copied the UpdatesPopup component from your other file
 // ------------------------------------------------
@@ -213,11 +213,13 @@ const HEADER_OFFSET = '4.5rem'; // Match global header height (~72px)
 const UpdatesPopup = ({
   open,
   menuWidth,
-  onCloseBoth
+  onCloseBoth,
+  scrollRef
 }: {
   open: boolean;
   menuWidth: number;
   onCloseBoth: () => void;
+  scrollRef?: React.RefObject<HTMLDivElement>;
 }) => {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [activeFilter, setActiveFilter] = useState("All");
@@ -272,6 +274,7 @@ const UpdatesPopup = ({
       }}
     >
       <div
+        ref={scrollRef}
         className="w-full h-full overflow-y-auto flex flex-col relative bg-[#F8F9FA] dark:bg-[#0a0a0a] border-l border-neutral-200 dark:border-white/10 shadow-2xl rounded-r-[22px] rounded-l-none text-black dark:text-white p-6 md:p-8"
       >
         {/* Header */}
@@ -381,13 +384,15 @@ const StartChatting = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const { darkMode, toggleDarkMode } = useDarkMode();
   const [message, setMessage] = useState('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
   const [activeChatId, setActiveChatId] = useState<string | null>(() => sessionStorage.getItem('flashspace_activeChatId'));
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // [NEW] User menu state
   const [showUpdates, setShowUpdates] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false); // [NEW] Contact form state
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const sidebarScrollRef = useRef<HTMLElement>(null);
+  const updatesScrollRef = useRef<HTMLDivElement>(null);
 
 
   const [contactForm, setContactForm] = useState<ContactForm>({
@@ -1174,23 +1179,33 @@ const StartChatting = () => {
     }
   }, [chatMessages]);
 
-  // Keep native wheel scrolling reliable inside chat panel when Lenis is enabled globally.
+  // Keep native wheel scrolling reliable inside scrollable panels when Lenis is enabled globally.
   useEffect(() => {
-    const scrollContainer = chatContainerRef.current;
-    if (!scrollContainer) return;
-
-    scrollContainer.setAttribute('data-lenis-prevent', 'true');
+    const containers = [
+      chatContainerRef.current,
+      sidebarScrollRef.current,
+      updatesScrollRef.current
+    ];
 
     const preventLenisWheel = (event: WheelEvent) => {
       event.stopPropagation();
     };
 
-    scrollContainer.addEventListener('wheel', preventLenisWheel, { passive: true });
+    containers.forEach(container => {
+      if (container) {
+        container.setAttribute('data-lenis-prevent', 'true');
+        container.addEventListener('wheel', preventLenisWheel, { passive: true });
+      }
+    });
 
     return () => {
-      scrollContainer.removeEventListener('wheel', preventLenisWheel);
+      containers.forEach(container => {
+        if (container) {
+          container.removeEventListener('wheel', preventLenisWheel);
+        }
+      });
     };
-  }, []);
+  }, [showUpdates]); // Re-run when updates popup might be mounted
 
   const handleContactSubmit = () => {
     // console.log('Contact form submitted:', contactForm);
@@ -1212,7 +1227,9 @@ const StartChatting = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0B1120] dark:text-gray-100 flex flex-col overflow-x-hidden font-grotesk">
-      <Header openLogin={isLoginOpen} openSignup={isSignupOpen} />
+      <div className="z-[200] relative">
+        <Header openLogin={isLoginOpen} openSignup={isSignupOpen} />
+      </div>
 
       {showUpdates && (
         <div
@@ -1233,15 +1250,19 @@ const StartChatting = () => {
       {/* Backdrop Overlay (for mobile sidebar) */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] transition-opacity duration-300"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
-      {/* Mini Sidebar — visible when full sidebar is collapsed */}
+
+      {/* Mini Sidebar — visible when full sidebar is collapsed - Hidden on mobile */}
       {!isSidebarOpen && (
         <div
-          className="fixed left-0 w-[56px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[60] flex flex-col items-center pt-4 gap-3 shadow-sm"
-          style={{ top: HEADER_OFFSET, height: `calc(100vh - ${HEADER_OFFSET})` }}
+          className="hidden sm:flex fixed left-0 w-[60px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[60] flex-col items-center pt-4 gap-3 shadow-sm transition-all"
+          style={{
+            top: HEADER_OFFSET,
+            height: `calc(100vh - ${HEADER_OFFSET})`,
+          }}
         >
           <button
             onClick={() => setIsSidebarOpen(true)}
@@ -1265,59 +1286,71 @@ const StartChatting = () => {
       {/* Fixed Left Sidebar */}
       <div
         ref={sidebarRef}
-        className={`fixed left-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-[60] flex flex-col overflow-hidden transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-        style={{ width: '260px', top: HEADER_OFFSET, height: `calc(100vh - ${HEADER_OFFSET})` }}
+        className={`fixed left-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-xl lg:shadow-none z-[110] lg:z-10 flex flex-col overflow-hidden transform transition-all duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } ${!isSidebarOpen ? "lg:translate-x-0 lg:w-[60px]" : "lg:w-[260px]"}`}
+        style={{
+          width: isSidebarOpen ? "260px" : "60px",
+          top: HEADER_OFFSET,
+          height: `calc(100vh - ${HEADER_OFFSET})`,
+        }}
       >
-        {/* New Chat + Collapse button row */}
-        <div className="h-16 flex items-center justify-between px-4 flex-shrink-0">
-          <button
-            onClick={() => setIsSidebarOpen(false)}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center gap-2 text-sm font-semibold"
-            title="Collapse sidebar"
-            style={{ color: '#677e73' }}
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Collapse</span>
-          </button>
+        {/* New Chat + Collapse button row - FIXED TOP */}
+        <div className="flex-shrink-0 flex flex-col px-2 bg-white dark:bg-gray-900 z-10">
+          <div className="h-14 flex items-center justify-between px-2">
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center gap-2 text-sm font-semibold"
+              title="Collapse sidebar"
+              style={{ color: '#677e73' }}
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Collapse</span>
+            </button>
+          </div>
+
+          <div className="space-y-0.5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
+            <button
+              onClick={handleNewChat}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+              style={{ color: '#677e73' }}
+            >
+              <MessageSquare className="w-4 h-4 flex-shrink-0" />
+              New Chat
+            </button>
+            <button
+              onClick={() => handleNavigation('/solutions/virtual-office')}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+              style={{ color: '#677e73' }}
+            >
+              <Briefcase className="w-4 h-4 flex-shrink-0" />
+              Workspaces
+            </button>
+            <button
+              onClick={() => setShowUpdates(prev => !prev)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+              style={{ color: '#677e73' }}
+            >
+              <Bell className="w-4 h-4 flex-shrink-0" />
+              Notifications
+            </button>
+            <button
+              onClick={() => handleNavigation('/settings')}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+              style={{ color: '#677e73' }}
+            >
+              <Settings className="w-4 h-4 flex-shrink-0" />
+              Settings
+            </button>
+          </div>
         </div>
 
-        {/* Main Nav */}
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5">
-          <button
-            onClick={handleNewChat}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
-            style={{ color: '#677e73' }}
-          >
-            <MessageSquare className="w-4 h-4 flex-shrink-0" />
-            New Chat
-          </button>
-          <button
-            onClick={() => handleNavigation('/solutions/virtual-office')}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
-            style={{ color: '#677e73' }}
-          >
-            <Briefcase className="w-4 h-4 flex-shrink-0" />
-            Workspaces
-          </button>
-          <button
-            onClick={() => setShowUpdates(prev => !prev)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
-            style={{ color: '#677e73' }}
-          >
-            <Bell className="w-4 h-4 flex-shrink-0" />
-            Notifications
-          </button>
-          <button
-            onClick={() => handleNavigation('/settings')}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
-            style={{ color: '#677e73' }}
-          >
-            <Settings className="w-4 h-4 flex-shrink-0" />
-            Settings
-          </button>
-
+        {/* Main Nav - SCROLLABLE CONTENT */}
+        <nav
+          ref={sidebarScrollRef}
+          className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5"
+        >
           {/* Recent Section */}
-          <div className="pt-4 pb-1">
+          <div className="pt-2 pb-1">
             <p className="text-[10px] font-semibold tracking-widest uppercase px-3 mb-1" style={{ color: '#677e73', opacity: 0.6 }}>RECENT</p>
             {chatSessions.length === 0 ? (
               <p className="px-3 py-2 text-xs italic" style={{ color: '#677e73', opacity: 0.5 }}>No past chats yet</p>
@@ -1394,27 +1427,39 @@ const StartChatting = () => {
       </div>
 
       {/* Main Content - Adjusted for wider sidebar */}
-      <div className={`flex-1 pt-16 flex flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? 'ml-[260px]' : 'ml-[60px]'}`}>
-        <div className="flex-1 h-[calc(100dvh-4rem)] bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col min-w-0 transition-all duration-500">
+      <div
+        className={`flex-1 pt-[4.5rem] flex flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? "lg:ml-[260px]" : "lg:ml-[60px]"} ml-0`}
+      >
+        <div className="flex-1 h-[calc(100dvh-3rem)] lg:h-[calc(100dvh-4rem)] bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col min-w-0 transition-all duration-500">
           {/* Chat Interface */}
           <div className="w-full h-full flex flex-col bg-white dark:bg-[#0B1120] relative">
 
             {/* Chat Header with Map Toggle */}
-            <div className="flex items-center justify-end px-4 pt-3 pb-1 flex-shrink-0">
+            <div className="flex items-center justify-between lg:justify-end px-4 pt-2 lg:pt-3 pb-1 flex-shrink-0 gap-2">
               <button
-                onClick={() => setShowMap(prev => !prev)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border shadow-sm ${showMap
-                  ? 'bg-[#35503F] text-white border-[#35503F] shadow-[#35503F]/20'
-                  : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-[#35503F] hover:text-[#35503F]'
-                  }`}
-                title={showMap ? 'Hide map' : 'Show map'}
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors text-gray-500"
+                title="Open sidebar"
               >
-                <Map className="w-3.5 h-3.5" />
-                <span>{showMap ? 'Hide Map' : 'Show Map'}</span>
+                <MenuIcon className="w-5 h-5" />
+              </button>
+
+              <button
+                onClick={() => setShowMap((prev) => !prev)}
+                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-semibold transition-all duration-200 border shadow-sm ${showMap
+                  ? "bg-[#35503F] text-white border-[#35503F] shadow-[#35503F]/20"
+                  : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-[#35503F] hover:text-[#35503F]"
+                  }`}
+                title={showMap ? "Hide map" : "Show map"}
+              >
+                <Map className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span>{showMap ? "Hide Map" : "Show Map"}</span>
                 {!showMap && mapMarkers.length > 0 && (
-                  <span className="w-2 h-2 rounded-full bg-[#35503F] animate-pulse ml-0.5" />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#35503F] animate-pulse ml-0.5" />
                 )}
-                <ChevronRight className={`w-3 h-3 transition-transform duration-200 ${showMap ? 'rotate-180' : ''}`} />
+                <ChevronRight
+                  className={`w-2.5 h-2.5 sm:w-3 sm:h-3 transition-transform duration-200 ${showMap ? "rotate-180" : ""}`}
+                />
               </button>
             </div>
 
@@ -1430,15 +1475,16 @@ const StartChatting = () => {
             >
               {chatMessages.length === 0 ? (
                 // Clean Welcome State (matching screenshot)
-                <div className="flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto px-6">
-                  <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
+                <div className="flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto px-4 sm:px-6">
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 lg:mb-4 tracking-tight leading-tight">
                     How can we help your business?
                   </h2>
-                  <p className="text-gray-500 dark:text-gray-400 mb-12 max-w-md text-base leading-relaxed">
-                    Ask about coworking spaces, virtual offices, compliance, or compare plans instantly.
+                  <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-8 lg:mb-12 max-w-md leading-relaxed">
+                    Ask about coworking spaces, virtual offices, compliance, or
+                    compare plans instantly.
                   </p>
 
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full max-w-2xl lg:max-w-none">
                     <button
                       onClick={() => handleQuickAction('Find coworking spaces in Delhi NCR region')}
                       className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
@@ -1479,18 +1525,24 @@ const StartChatting = () => {
                       className={`flex gap-4 group ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                     >
                       {/* Avatar */}
-                      <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${msg.role === 'user'
-                        ? 'bg-gradient-to-br from-[#35503F] to-[#3d6b4f] border-[#35503F] text-white'
-                        : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-[#35503F]'
-                        }`}>
-                        {msg.role === 'user' ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
+                      <div
+                        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${msg.role === "user"
+                          ? "bg-gradient-to-br from-[#35503F] to-[#3d6b4f] border-[#35503F] text-white"
+                          : "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-[#35503F]"
+                          }`}
+                      >
+                        {msg.role === "user" ? (
+                          <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                        ) : (
+                          <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                        )}
                       </div>
 
                       {/* Message Bubble */}
                       <div
-                        className={`max-w-[85%] sm:max-w-[85%] px-6 py-4 shadow-sm ${msg.role === 'user'
-                          ? 'bg-gradient-to-br from-[#35503F] to-[#3d6b4f] text-white rounded-2xl rounded-tr-sm'
-                          : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-sm'
+                        className={`max-w-[90%] sm:max-w-[85%] px-4 sm:px-6 py-3 sm:py-4 shadow-sm ${msg.role === "user"
+                          ? "bg-gradient-to-br from-[#35503F] to-[#3d6b4f] text-white rounded-2xl rounded-tr-sm"
+                          : "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-sm"
                           }`}
                       >
                         {msg.role === 'assistant' && msg.isTyping ? (
@@ -1541,58 +1593,70 @@ const StartChatting = () => {
             </div>
 
             {/* Chat Input */}
-            <div className="p-4 sm:p-6 bg-transparent relative z-20">
+            <div className="p-3 sm:p-4 lg:p-6 bg-transparent relative z-20">
               <div className="max-w-4xl mx-auto relative group">
-                <div className="relative bg-white dark:bg-[#1E293B] shadow-lg rounded-[1.25rem] border border-gray-200 dark:border-white/5 flex items-center p-2 pr-2 gap-2 transition-all focus-within:border-gray-300 dark:focus-within:border-white/10">
-                  <button className="p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
-                    <Plus className="w-5 h-5" />
+                <div className="relative bg-white dark:bg-[#1E293B] shadow-lg rounded-2xl sm:rounded-[1.25rem] border border-gray-200 dark:border-white/5 flex items-center p-1.5 sm:p-2 pr-1.5 sm:pr-2 gap-1 sm:gap-2 transition-all focus-within:border-gray-300 dark:focus-within:border-white/10">
+                  <button className="p-2 sm:p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
+                    <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                   <input
                     type="text"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         e.preventDefault();
                         handleSendMessage();
                       }
                     }}
                     placeholder="Type a message..."
-                    className="flex-1 bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 placeholder-gray-400 text-[16px] font-medium h-full py-2 min-w-0"
+                    className="flex-1 bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 placeholder-gray-400 text-sm sm:text-[16px] font-medium h-full py-2 min-w-0"
                   />
                   <button
                     onClick={toggleVoiceInput}
-                    className={`p-3 rounded-xl transition-all ${isListening
-                      ? 'text-red-500 bg-red-50 hover:bg-red-100 animate-pulse'
-                      : 'text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    className={`p-2 sm:p-3 rounded-xl transition-all ${isListening
+                      ? "text-red-500 bg-red-50 hover:bg-red-100 animate-pulse"
+                      : "text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
                       }`}
                     title={isListening ? "Stop listening" : "Start voice input"}
                   >
-                    <Mic className={`w-5 h-5 ${isListening ? 'fill-current' : ''}`} />
+                    <Mic
+                      className={`w-4 h-4 sm:w-5 sm:h-5 ${isListening ? "fill-current" : ""}`}
+                    />
                   </button>
                   <button
                     onClick={() => handleSendMessage()}
-                    className="p-3 bg-[#35503F] text-white rounded-xl shadow-sm hover:bg-[#2d4435] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 sm:p-3 bg-[#35503F] text-white rounded-xl shadow-sm hover:bg-[#2d4435] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={!message.trim() || isLoading}
                   >
-                    <Send className="w-5 h-5" />
+                    <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
-                <p className="text-[10px] text-center text-gray-400 mt-3 font-medium">
-                  Flashspace AI can make mistakes. Please verify important details.
+                <p className="text-[9px] sm:text-[10px] text-center text-gray-400 mt-2 sm:mt-3 font-medium">
+                  Flashspace AI can make mistakes. Please verify important
+                  details.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* [NEW] Sliding Map Panel */}
         <div
-          className={`h-[calc(100dvh-4rem)] flex-shrink-0 bg-white dark:bg-[#0d1728] border-l border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden transition-all ${isResizing ? '' : 'duration-500'} ease-in-out relative`}
+          className={`flex-shrink-0 bg-white dark:bg-[#0d1728] border-l border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden transition-all ${isResizing ? "" : "duration-500"
+            } ease-in-out fixed lg:relative right-0 bottom-0 z-[120] lg:z-10`}
           style={{
-            width: showMap ? `${mapWidth}px` : '0px',
+            width: showMap
+              ? window.innerWidth < 1024
+                ? "100%"
+                : `${mapWidth}px`
+              : "0px",
+            top: showMap && window.innerWidth < 1024 ? HEADER_OFFSET : "",
+            height:
+              showMap && window.innerWidth < 1024
+                ? `calc(100vh - ${HEADER_OFFSET})`
+                : "100%",
             opacity: showMap ? 1 : 0,
-            transform: showMap ? 'translateX(0)' : 'translateX(100%)',
+            transform: showMap ? "translateX(0)" : "translateX(100%)",
           }}
         >
           {showMap && (

@@ -58,7 +58,7 @@ export default function SpacePortalSettings() {
 
   return (
     <div className="flex-1">
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
         {/* Notification Preferences */}
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center gap-2">
@@ -166,15 +166,13 @@ function SettingToggle({
       <button
         type="button"
         onClick={onToggle}
-        className={`h-6 w-11 rounded-full px-1 transition ${
-          enabled ? "bg-[#3FA69E]" : "bg-slate-200"
-        }`}
+        className={`h-6 w-11 rounded-full px-1 transition ${enabled ? "bg-[#3FA69E]" : "bg-slate-200"
+          }`}
         aria-pressed={enabled}
       >
         <span
-          className={`block h-4 w-4 rounded-full bg-white transition ${
-            enabled ? "translate-x-5" : "translate-x-0"
-          }`}
+          className={`block h-4 w-4 rounded-full bg-white transition ${enabled ? "translate-x-5" : "translate-x-0"
+            }`}
         />
       </button>
     </div>

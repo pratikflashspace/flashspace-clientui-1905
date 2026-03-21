@@ -342,62 +342,62 @@ const MyBookings: React.FC = () => {
     <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold  text-[#35503F]">
-              My <span className="italic">Bookings</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+              My <span className="text-primary italic">Bookings</span>
             </h1>
-            <p className="text-gray-500 mt-2">
+            <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your virtual offices and coworking spaces
             </p>
           </div>
           <a
             href="/services/virtual-office"
-            className="inline-flex items-center gap-2 bg-[#35503F] text-[#FEF8C3] px-6 py-3 rounded-full font-medium hover:bg-[#35503F]/90 transition-colors"
+            className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
           >
-            <span className="text-lg">+</span>
+            <span className="text-xl">+</span>
             Book New Space
           </a>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-150">
-            <p className="text-3xl font-bold text-[#35503F] mb-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">
               {bookingStats.total}
             </p>
-            <p className="text-xs text-gray-500">Total Bookings</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Bookings</p>
           </div>
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-150">
-            <p className="text-3xl font-bold text-[#10B981] mb-1">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-[#10B981]">
+            <p className="text-3xl font-extrabold text-[#10B981] mb-1">
               {bookingStats.active}
             </p>
-            <p className="text-xs text-gray-500">Active</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Active</p>
           </div>
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-150">
-            <p className="text-3xl font-bold text-[#35503F] mb-1">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">
               {bookingStats.virtualOffice}
             </p>
-            <p className="text-xs text-gray-500">Virtual Offices</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Virtual Offices</p>
           </div>
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-150">
-            <p className="text-3xl font-bold text-[#35503F] mb-1">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">
               {bookingStats.coworking}
             </p>
-            <p className="text-xs text-gray-500">Coworking</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Coworking</p>
           </div>
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-150">
-            <p className="text-3xl font-bold text-[#35503F] mb-1">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">
               {bookingStats.meetingRoom}
             </p>
-            <p className="text-xs text-gray-500">On Demand</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">On Demand</p>
           </div>
         </div>
 
         {/* Filters Bar */}
-        <div className="flex flex-col md:flex-row justify-between gap-4 items-center">
-          {/* Service Type Tabs */}
-          <div className="flex p-1 rounded-lg shadow-sm bg-gray-100">
+        <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
+          {/* Service Type Tabs - Better scroll behavior on mobile */}
+          <div className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
             {[
               { id: "all", label: "All", icon: null },
               {
@@ -411,9 +411,9 @@ const MyBookings: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium transition-all ${activeTab === tab.id
-                  ? "bg-white text-black shadow-md"
-                  : "text-gray-500 hover:text-gray-700"
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all shrink-0 ${activeTab === tab.id
+                  ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
                   }`}
               >
                 {tab.icon && <tab.icon className="w-4 h-4" />}
@@ -422,16 +422,16 @@ const MyBookings: React.FC = () => {
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-3 items-center w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center w-full lg:w-auto">
             {/* Search */}
-            <div className="relative flex-1 md:w-64">
+            <div className="relative flex-1 lg:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by name, ID, or city..."
+                placeholder="Search bookings..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white rounded-full border border-gray-100 focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 text-sm"
+                className="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-[#35503F]/10 text-sm font-medium transition-all"
               />
             </div>
 
@@ -442,19 +442,19 @@ const MyBookings: React.FC = () => {
                   id="date"
                   variant={"outline"}
                   className={cn(
-                    "justify-start text-left font-normal bg-white border-gray-100 rounded-full hover:bg-white px-4 h-11",
+                    "justify-start text-left font-semibold bg-white border-gray-100 rounded-2xl hover:bg-gray-50 px-4 h-12 transition-all",
                     !date && "text-muted-foreground",
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
                   {date?.from ? (
                     date.to ? (
-                      <>
-                        {format(date.from, "LLL dd")} -{" "}
-                        {format(date.to, "LLL dd")}
-                      </>
+                      <span className="text-gray-900">
+                        {format(date.from, "MMM dd")} -{" "}
+                        {format(date.to, "MMM dd")}
+                      </span>
                     ) : (
-                      format(date.from, "LLL dd")
+                      <span className="text-gray-900">{format(date.from, "MMM dd")}</span>
                     )
                   ) : (
                     <span>Pick a date</span>
@@ -477,10 +477,11 @@ const MyBookings: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-100 rounded-full hover:bg-gray-50 transition-colors text-sm"
+                className="w-full flex items-center justify-center gap-2 px-5 h-12 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all text-sm font-semibold text-gray-700"
               >
-                <Filter className="w-4 h-4" />
+                <Filter className="w-4 h-4 text-primary" />
                 Status
+                <ChevronDown className={cn("w-4 h-4 transition-transform", showFilters && "rotate-180")} />
               </button>
               {showFilters && (
                 <div className="absolute right-0 top-full mt-2 bg-white border border-gray-100 rounded-xl shadow-lg z-10 min-w-[150px] p-1">
@@ -514,27 +515,27 @@ const MyBookings: React.FC = () => {
 
         {/* Bookings Grid */}
         {filteredBookings.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 text-center shadow-sm">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Building2 className="w-8 h-8 text-gray-300" />
+          <div className="bg-white rounded-[32px] p-16 text-center shadow-sm border border-gray-100">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Building2 className="w-10 h-10 text-gray-200" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
               No bookings found
             </h3>
-            <p className="text-gray-500 mb-6 max-w-sm mx-auto text-sm">
+            <p className="text-gray-500 mb-8 max-w-sm mx-auto text-sm font-medium">
               {searchQuery
-                ? "We couldn't find any bookings matching your search. Try adjusting your filters."
-                : "You haven't made any bookings yet."}
+                ? "We couldn't find any bookings matching your search. Try resetting your filters."
+                : "You haven't made any bookings yet. Explore our premium spaces to get started."}
             </p>
             <a
               href="/services/virtual-office"
-              className="inline-flex items-center gap-2 bg-[#35503F] text-[#FEF8C3] px-6 py-2.5 rounded-full font-medium hover:bg-[#35503F]/90 transition-colors text-sm"
+              className="inline-flex items-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95"
             >
               Browse Spaces
             </a>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBookings.map((booking) => {
               const statusConfig = getStatusConfig(booking.status);
               const daysRemaining = calculateDaysRemaining(

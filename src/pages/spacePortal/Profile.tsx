@@ -33,7 +33,7 @@ export default function Profile() {
       {/* Header */}
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl">
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
             Partner <span className="text-primary italic">Profile</span>
           </h1>
           <p className="text-muted-foreground mt-2 font-medium">
@@ -135,7 +135,7 @@ export default function Profile() {
               </Button>
             </div>
 
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-5 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
               <ProfileField
                 label="Legal Full Name"
                 value={user?.fullName || "Not set"}
@@ -205,7 +205,7 @@ export default function Profile() {
           </div>
 
           {/* Compliance & Security Preview */}
-          <div className="bg-background border border-border rounded-2xl p-8 shadow-sm flex items-center justify-between border-l-4 border-l-primary/40">
+          <div className="bg-background border border-border rounded-2xl p-5 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border-l-4 border-l-primary/40">
             <div className="flex items-center gap-5">
               <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
                 <ShieldCheck className="w-6 h-6" />

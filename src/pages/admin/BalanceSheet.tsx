@@ -16,6 +16,7 @@ import {
   Filter,
 } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
+import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -142,9 +143,7 @@ const BalanceSheet = () => {
         portalDescription="Complete platform management"
         navItems={ADMIN_NAV_ITEMS}
       >
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Loading financial data...</p>
-        </div>
+        <AdminPageSkeleton />
       </DashboardLayout>
     );
   }
@@ -165,15 +164,29 @@ const BalanceSheet = () => {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => setFilterDialogOpen(true)} className="flex-1 md:flex-none h-10 border-muted-foreground/20">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFilterDialogOpen(true)}
+            className="flex-1 md:flex-none h-10 border-muted-foreground/20"
+          >
             <Calendar className="w-4 h-4 mr-2" />
             Period
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setFilterDialogOpen(true)} className="flex-1 md:flex-none h-10 border-muted-foreground/20">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFilterDialogOpen(true)}
+            className="flex-1 md:flex-none h-10 border-muted-foreground/20"
+          >
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
-          <Button size="sm" onClick={handleExportCSV} className="w-full md:w-auto h-10 shadow-lg shadow-primary/10">
+          <Button
+            size="sm"
+            onClick={handleExportCSV}
+            className="w-full md:w-auto h-10 shadow-lg shadow-primary/10"
+          >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>
@@ -225,9 +238,15 @@ const BalanceSheet = () => {
       >
         <div className="overflow-x-auto pb-1 -mx-2 px-2 scrollbar-none">
           <TabsList className="h-auto p-1 bg-muted/50 rounded-lg inline-flex w-full md:w-auto">
-            <TabsTrigger value="monthly" className="px-5 py-2.5 text-sm">Monthly Breakdown</TabsTrigger>
-            <TabsTrigger value="city" className="px-5 py-2.5 text-sm">City-wise</TabsTrigger>
-            <TabsTrigger value="partner" className="px-5 py-2.5 text-sm">Partner-wise</TabsTrigger>
+            <TabsTrigger value="monthly" className="px-5 py-2.5 text-sm">
+              Monthly Breakdown
+            </TabsTrigger>
+            <TabsTrigger value="city" className="px-5 py-2.5 text-sm">
+              City-wise
+            </TabsTrigger>
+            <TabsTrigger value="partner" className="px-5 py-2.5 text-sm">
+              Partner-wise
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -279,23 +298,42 @@ const BalanceSheet = () => {
             {/* Mobile View */}
             <div className="lg:hidden grid gap-4 grid-cols-1 md:grid-cols-2">
               {monthlyBreakdown.map((item, index) => (
-                <div key={index} className="bg-background border border-border rounded-xl p-4 space-y-4 shadow-sm">
+                <div
+                  key={index}
+                  className="bg-background border border-border rounded-xl p-4 space-y-4 shadow-sm"
+                >
                   <div className="flex justify-between items-center border-b border-border/50 pb-2">
-                    <span className="font-bold text-foreground">{item.month}</span>
-                    <Badge className="bg-primary/10 text-primary border-0 font-bold px-3">Summary</Badge>
+                    <span className="font-bold text-foreground">
+                      {item.month}
+                    </span>
+                    <Badge className="bg-primary/10 text-primary border-0 font-bold px-3">
+                      Summary
+                    </Badge>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     <div className="text-center">
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Revenue</p>
-                      <p className="text-sm font-bold text-green-600">{formatCurrency(item.revenue)}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+                        Revenue
+                      </p>
+                      <p className="text-sm font-bold text-green-600">
+                        {formatCurrency(item.revenue)}
+                      </p>
                     </div>
                     <div className="text-center">
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Expense</p>
-                      <p className="text-sm font-bold text-red-600">{formatCurrency(item.expenses)}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+                        Expense
+                      </p>
+                      <p className="text-sm font-bold text-red-600">
+                        {formatCurrency(item.expenses)}
+                      </p>
                     </div>
                     <div className="text-center">
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Profit</p>
-                      <p className="text-sm font-black text-foreground">{formatCurrency(item.profit)}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+                        Profit
+                      </p>
+                      <p className="text-sm font-black text-foreground">
+                        {formatCurrency(item.profit)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -367,9 +405,14 @@ const BalanceSheet = () => {
             {/* Mobile View */}
             <div className="lg:hidden grid gap-4 grid-cols-1 md:grid-cols-2">
               {cityBreakdown.map((item, index) => (
-                <div key={index} className="bg-background border border-border rounded-xl p-4 space-y-4 shadow-sm">
+                <div
+                  key={index}
+                  className="bg-background border border-border rounded-xl p-4 space-y-4 shadow-sm"
+                >
                   <div className="flex justify-between items-center border-b border-border/50 pb-2">
-                    <span className="font-bold text-foreground">{item.city}</span>
+                    <span className="font-bold text-foreground">
+                      {item.city}
+                    </span>
                     <Badge
                       className={`${
                         parseInt(item.margin) >= 40
@@ -383,16 +426,28 @@ const BalanceSheet = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     <div className="text-center">
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Revenue</p>
-                      <p className="text-sm font-bold text-green-600">{formatCurrency(item.revenue)}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+                        Revenue
+                      </p>
+                      <p className="text-sm font-bold text-green-600">
+                        {formatCurrency(item.revenue)}
+                      </p>
                     </div>
                     <div className="text-center">
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Expense</p>
-                      <p className="text-sm font-bold text-red-600">{formatCurrency(item.expenses)}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+                        Expense
+                      </p>
+                      <p className="text-sm font-bold text-red-600">
+                        {formatCurrency(item.expenses)}
+                      </p>
                     </div>
                     <div className="text-center">
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Profit</p>
-                      <p className="text-sm font-black text-foreground">{formatCurrency(item.profit)}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+                        Profit
+                      </p>
+                      <p className="text-sm font-black text-foreground">
+                        {formatCurrency(item.profit)}
+                      </p>
                     </div>
                   </div>
                 </div>

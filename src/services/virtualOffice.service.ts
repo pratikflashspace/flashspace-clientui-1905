@@ -1,4 +1,4 @@
-import axiosInstance from "./api.service";
+import axiosInstance from "@/lib/axios";
 import { VirtualOfficeItem } from "@/types/services";
 
 /**
@@ -12,27 +12,6 @@ interface ApiResponse<T> {
   message?: string;
 }
 
-const isBadImageUrl = (url?: string) => {
-  if (!url) return true;
-  const value = String(url).trim().toLowerCase();
-  return (
-    value.length === 0 ||
-    value.startsWith("url") ||
-    value === "img1.jpg" ||
-    value === "url1.jpg" ||
-    value.includes("shorturl.at") ||
-    value.includes("tinyurl.com")
-  );
-};
-
-const pickBestImage = (item: any) => {
-  const firstArrayImage = Array.isArray(item.images)
-    ? item.images.find((img: string) => !isBadImageUrl(img))
-    : undefined;
-  if (firstArrayImage) return firstArrayImage;
-  if (!isBadImageUrl(item.image)) return item.image;
-  return "/hero-illustrated.jpg";
-};
 
 const toNumber = (value: any) => {
   const numberValue = Number(value);
@@ -75,9 +54,9 @@ export const getVirtualOfficesByCity = async (
           (Array.isArray(o.location?.coordinates) &&
             o.location.coordinates.length === 2
             ? {
-              lat: o.location.coordinates[1],
-              lng: o.location.coordinates[0],
-            }
+                lat: o.location.coordinates[1],
+                lng: o.location.coordinates[0],
+              }
             : undefined),
         features: o.features || [],
         gstPlanPrice:
@@ -91,13 +70,6 @@ export const getVirtualOfficesByCity = async (
         brPlanPrice:
           o.brPlanPrice ||
           formatYearPrice(o.brPlanPricePerYear || o.finalBrPricePerYear),
-        image: pickBestImage(o),
-        images:
-          Array.isArray(o.images) && o.images.length > 0
-            ? o.images.filter((img: string) => !isBadImageUrl(img))
-            : !isBadImageUrl(o.image)
-              ? [o.image]
-              : ["/hero-illustrated.jpg"],
         rating: toNumber(o.rating) || toNumber(o.avgRating),
         reviews: toNumber(o.reviews) || toNumber(o.totalReviews),
       }));
@@ -135,9 +107,9 @@ export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
           (Array.isArray(o.location?.coordinates) &&
             o.location.coordinates.length === 2
             ? {
-              lat: o.location.coordinates[1],
-              lng: o.location.coordinates[0],
-            }
+                lat: o.location.coordinates[1],
+                lng: o.location.coordinates[0],
+              }
             : undefined),
         features: o.features || [],
         gstPlanPrice:
@@ -151,13 +123,6 @@ export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
         brPlanPrice:
           o.brPlanPrice ||
           formatYearPrice(o.brPlanPricePerYear || o.finalBrPricePerYear),
-        image: pickBestImage(o),
-        images:
-          Array.isArray(o.images) && o.images.length > 0
-            ? o.images.filter((img: string) => !isBadImageUrl(img))
-            : !isBadImageUrl(o.image)
-              ? [o.image]
-              : ["/hero-illustrated.jpg"],
         rating: toNumber(o.rating) || toNumber(o.avgRating),
         reviews: toNumber(o.reviews) || toNumber(o.totalReviews),
       }));

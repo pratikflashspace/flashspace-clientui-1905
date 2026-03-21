@@ -33,33 +33,10 @@ export const DashboardLayout = ({
 
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-background border-b border-border z-50 flex items-center justify-between px-4">
-        <Link to="/" className="flex items-baseline">
-          <span className="text-xl font-extrabold tracking-tight text-foreground">
-            flash
-          </span>
-          <span className="text-lg font-extrabold tracking-tight text-primary italic">
-            space
-          </span>
-        </Link>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? (
-            <X className="w-5 h-5" />
-          ) : (
-            <Menu className="w-5 h-5" />
-          )}
-        </Button>
-      </div>
-
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Overlay (keeping as overlay but removing fixed height dependencies) */}
       {mobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
@@ -67,7 +44,7 @@ export const DashboardLayout = ({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-full bg-background border-r border-border z-50 transition-all duration-300",
+          "fixed top-0 left-0 h-full bg-background border-r border-border z-50 transition-all duration-300 shadow-sm",
           collapsed ? "w-20" : "w-72",
           mobileMenuOpen
             ? "translate-x-0"
@@ -80,11 +57,11 @@ export const DashboardLayout = ({
             <Link to="/" className="flex items-baseline mb-4">
               <span
                 className={cn(
-                  "font-extrabold tracking-tight text-foreground transition-all",
+                  "font-extrabold tracking-tight text-foreground transition-all uppercase",
                   collapsed ? "text-xl" : "text-2xl",
                 )}
               >
-                {collapsed ? "f" : "flash"}
+                {collapsed ? "f" : "FLASH"}
               </span>
               {!collapsed && (
                 <span className="text-xl font-extrabold tracking-tight text-primary italic">
@@ -146,22 +123,23 @@ export const DashboardLayout = ({
             </nav>
           </ScrollArea>
 
-          {/* Collapse Toggle */}
+          {/* Sidebar Header for Mobile only when open */}
+          <div className="lg:hidden p-4 border-b flex justify-end">
+            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Collapse Toggle (Desktop) */}
           <div className="p-4 border-t border-border hidden lg:block">
             <Button
               variant="ghost"
               size="sm"
-              className="w-full justify-center"
               onClick={() => setCollapsed(!collapsed)}
+              className={cn("w-full flex items-center gap-3 justify-start text-muted-foreground hover:bg-muted hover:text-foreground", collapsed && "justify-center")}
             >
-              {collapsed ? (
-                <ChevronRight className="w-4 h-4" />
-              ) : (
-                <>
-                  <ChevronLeft className="w-4 h-4 mr-2" />
-                  <span>Collapse</span>
-                </>
-              )}
+              <ChevronLeft className={cn("w-5 h-5 transition-transform duration-300", collapsed && "rotate-180")} />
+              {!collapsed && <span className="font-semibold text-xs uppercase tracking-wider">Collapse</span>}
             </Button>
           </div>
 
@@ -171,24 +149,50 @@ export const DashboardLayout = ({
               <Button
                 variant="outline"
                 size="sm"
-                className={cn("w-full", collapsed && "px-2")}
+                className={cn("w-full flex items-center justify-start gap-3", collapsed && "justify-center px-2")}
               >
                 <Home className="w-4 h-4" />
-                {!collapsed && <span className="ml-2">Back to Home</span>}
+                {!collapsed && <span className="font-medium text-xs uppercase tracking-wider">Home</span>}
               </Button>
             </Link>
           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <main
         className={cn(
-          "transition-all duration-300 pt-16 lg:pt-0",
+          "transition-all duration-300 min-h-screen flex flex-col",
           collapsed ? "lg:ml-20" : "lg:ml-72",
         )}
       >
-        <div className="p-6 lg:p-8">{children}</div>
+        {/* Mobile Top Bar (Only visible when sidebar needs toggle) */}
+        <header className="lg:hidden h-16 bg-white/80 backdrop-blur-md border-b border-border sticky top-0 z-30 flex items-center justify-between px-4 shrink-0">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight uppercase">
+              <span className="text-foreground">FLASH</span>
+              <span className="text-primary italic lowercase">space</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest leading-none">
+              {portalName}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden">
+          {children}
+        </div>
       </main>
     </div>
   );

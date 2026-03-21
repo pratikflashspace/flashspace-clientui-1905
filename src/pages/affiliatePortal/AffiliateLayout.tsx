@@ -95,17 +95,26 @@ const AffiliateLayout = () => {
 
             {/* 2. Main Content Wrapper */}
             <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden relative transition-all duration-300">
-                {/* --- Header (Mobile Only) --- */}
-                <header className="lg:hidden bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 shrink-0 z-30 relative">
-                    <div className="flex items-center gap-2 font-bold text-xl">
-                        <span className="text-slate-900">flash</span>
-                        <span className="text-[#5aa39c]">space</span>
+                {/* --- Header (Mobile/Tablet/Laptop Only) --- */}
+                <header className="xl:hidden bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 shrink-0 z-30 relative shadow-sm">
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight">
+                            <span className="text-slate-900">flash</span>
+                            <span className="text-primary italic">space</span>
+                        </div>
+                        <p className="hidden sm:block text-[10px] text-gray-400 mt-0.5 font-bold uppercase tracking-widest leading-none">
+                            Affiliate Portal
+                        </p>
                     </div>
-                    <button
+<button
                         onClick={() => setIsMobileOpen(true)}
-                        className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                        className="group relative flex flex-col items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 hover:bg-[#FEF8C3] hover:shadow-sm"
                     >
-                        <Menu size={24} />
+                        <div className="flex flex-col gap-1 items-center justify-center">
+                            <span className="w-5 h-0.5 bg-gray-600 rounded-full transition-all group-hover:bg-[#2D3F33] group-hover:w-6"></span>
+                            <span className="w-6 h-0.5 bg-gray-600 rounded-full transition-all group-hover:bg-[#2D3F33] group-hover:w-4"></span>
+                            <span className="w-5 h-0.5 bg-gray-600 rounded-full transition-all group-hover:bg-[#2D3F33] group-hover:w-6"></span>
+                        </div>
                     </button>
                 </header>
 

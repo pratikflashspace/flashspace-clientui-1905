@@ -323,7 +323,7 @@ export default function BookingCalendar() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
       {/* Property Selection & View Mode Controls */}
-      <div className="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-end bg-background border border-border rounded-3xl p-8 shadow-xl relative overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-end bg-background border border-border rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/10 rounded-full -ml-12 -mb-12 blur-2xl" />
 
@@ -428,32 +428,29 @@ export default function BookingCalendar() {
             {propertyType !== "MEETING_ROOM" && (
               <button
                 onClick={() => setViewMode("YEAR")}
-                className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${
-                  viewMode === "YEAR"
+                className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === "YEAR"
                     ? "bg-white text-primary shadow-sm ring-1 ring-border/5"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 Year
               </button>
             )}
             <button
               onClick={() => setViewMode("MONTH")}
-              className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${
-                viewMode === "MONTH"
+              className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === "MONTH"
                   ? "bg-white text-primary shadow-sm ring-1 ring-border/5"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               Month
             </button>
             <button
               onClick={() => setViewMode("MONTH_DATES")}
-              className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${
-                viewMode === "MONTH_DATES"
+              className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === "MONTH_DATES"
                   ? "bg-white text-primary shadow-sm ring-1 ring-border/5"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               Timeline
             </button>

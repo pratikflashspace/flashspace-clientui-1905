@@ -10,9 +10,9 @@ const stats = [
 ];
 
 const distribution = [
-    { label: "Virtual Office", percent: 32 },
+    { label: "Virtual Office", percent: 42 },
     { label: "Coworking Space", percent: 28 },
-    { label: "On Demand", percent: 25 },
+    { label: "On Demand", percent: 15 },
     { label: "Business Setup", percent: 15 },
 ];
 

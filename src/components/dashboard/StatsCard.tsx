@@ -24,7 +24,7 @@ export const StatsCard = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "bg-background border border-border rounded-xl p-6 shadow-soft",
+        "bg-background border border-border rounded-xl p-4 sm:p-6 shadow-soft",
         className,
       )}
     >
@@ -38,7 +38,7 @@ export const StatsCard = ({
           </div>
         )}
       </div>
-      <div className="text-3xl font-extrabold text-foreground tracking-tight">
+      <div className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
         {value}
       </div>
       {change !== undefined && (

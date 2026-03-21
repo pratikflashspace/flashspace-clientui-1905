@@ -178,7 +178,7 @@ const SupportTickets = () => {
 
     if (selectedTicket) {
         return (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 p-4 md:p-6 animate-in fade-in zoom-in-95 duration-200">
                 <button
                     onClick={() => setSelectedTicket(null)}
                     className="flex items-center gap-2 text-[#6b7280] hover:text-[#2d5a4c] mb-6 transition-colors font-bold text-sm"
@@ -186,10 +186,10 @@ const SupportTickets = () => {
                     <ArrowLeft className="w-4 h-4" /> Back to Tickets
                 </button>
 
-                <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-50">
+                <div className="flex flex-col md:flex-row md:items-start justify-between mb-6 pb-6 border-b border-gray-50 gap-4">
                     <div>
-                        <p className="text-xs font-black text-[#2d5a4c] mb-1">{selectedTicket.ticketNumber}</p>
-                        <h2 className="text-2xl font-bold text-gray-900 leading-tight">{selectedTicket.subject}</h2>
+                        <p className="text-[10px] font-black text-[#2d5a4c] mb-1">{selectedTicket.ticketNumber}</p>
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">{selectedTicket.subject}</h2>
                         <div className="flex items-center gap-3 mt-3">
                             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusConfig(selectedTicket.status).bg} ${getStatusConfig(selectedTicket.status).text}`}>
                                 {getStatusConfig(selectedTicket.status).label}
@@ -207,7 +207,7 @@ const SupportTickets = () => {
                         const isUser = msg.sender === "user" || msg.sender === "affiliate";
                         return (
                             <div key={idx} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-                                <div className={`max-w-[85%] rounded-2xl p-5 ${isUser ? "bg-[#f2faf9] border border-[#5bb09c]/10 text-gray-800 rounded-tr-sm" : "bg-gray-50 border border-gray-100 text-gray-800 rounded-tl-sm"}`}>
+                                <div className={`max-w-[90%] md:max-w-[85%] rounded-xl md:rounded-2xl p-4 md:p-5 ${isUser ? "bg-[#f2faf9] border border-[#5bb09c]/10 text-gray-800 rounded-tr-sm" : "bg-gray-50 border border-gray-100 text-gray-800 rounded-tl-sm"}`}>
                                     <div className="flex items-center justify-between gap-4 mb-2">
                                         <span className="text-sm font-bold text-gray-900">
                                             {isUser ? "You" : "Support Team"}
@@ -248,8 +248,8 @@ const SupportTickets = () => {
                         </Button>
                     </div>
                 ) : (
-                    <div className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-100">
-                        <CheckCircle2 className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                    <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 md:p-6 text-center border border-gray-100">
+                        <CheckCircle2 className="w-8 h-8 md:w-10 md:h-10 text-gray-400 mx-auto mb-3" />
                         <p className="text-gray-600 font-medium">This ticket has been {selectedTicket.status === "resolved" ? "resolved" : "closed"}.</p>
                         <p className="text-sm text-gray-400 mt-1">Please create a new ticket if you need further assistance.</p>
                     </div>

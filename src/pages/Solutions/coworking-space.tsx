@@ -351,9 +351,9 @@ const CoworkingSpace = () => {
                     <span className="text-white/90 text-sm font-medium">AI-Powered</span>
                   </div>
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
-                    Flash. The #1 AI
+                    Flash, The #1 AI
                     <br />
-                    <span className="text-white/70">for workspace management.</span>
+                    <span className="text-white/70">for End to End Business Solutions.</span>
                   </h2>
                 </div>
               </motion.div>
@@ -361,9 +361,9 @@ const CoworkingSpace = () => {
               <div className="grid lg:grid-cols-2 gap-12 items-start">
                 <div>
                   <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                    Flash AI works with any workspace to handle even your most complex
-                    requirements—from desk availability to smart access control,
-                    across all your locations.
+                    Flash AI works with your entire business ecosystem, from AI-powered chat that answers every query instantly,
+                    to intelligent forecasting for renewals, smart recommendation engines, and beyond. One platform. End-to-end
+                    intelligence.
                   </p>
                   <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
                     Learn more
@@ -471,7 +471,7 @@ const CoworkingSpace = () => {
                   transformed how we operate."
                 </p>
                 <footer className="flex items-center gap-4">
-                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&auto=format" alt="Rajesh Kumar" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
+                  <img src="/hero-illustrated.jpg" alt="Rajesh Kumar" className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20" />
                   <div>
                     <div className="font-semibold text-foreground">Rajesh Kumar</div>
                     <div className="text-sm text-muted-foreground">CEO at TechStart India</div>

@@ -19,6 +19,11 @@ import {
   File,
   ArrowLeft,
 } from "lucide-react";
+import {
+  KYCRequestGridSkeleton,
+  ProfileCardGridSkeleton,
+  AdminPageSkeleton,
+} from "@/components/ui/skeleton-loaders";
 import { toast } from "sonner";
 import { API_CONFIG } from "@/config/api.config";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -510,9 +515,13 @@ export default function KYCRequests() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-      </div>
+      <DashboardLayout
+        portalName="FlashSpace Admin"
+        portalDescription="Complete platform management"
+        navItems={ADMIN_NAV_ITEMS}
+      >
+        <AdminPageSkeleton />
+      </DashboardLayout>
     );
   }
 
@@ -580,7 +589,7 @@ export default function KYCRequests() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
             <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-yellow-600">
               {stats.pending}
@@ -593,13 +602,17 @@ export default function KYCRequests() {
             <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-green-600">
               {stats.approved}
             </h3>
-            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">Approved</p>
+            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
+              Approved
+            </p>
           </div>
           <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
             <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-red-600">
               {stats.rejected}
             </h3>
-            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">Rejected</p>
+            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
+              Rejected
+            </p>
           </div>
           <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
             <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
@@ -637,10 +650,7 @@ export default function KYCRequests() {
             <div className="p-4 md:p-6">
               {/* ... Existing Partner Grid ... */}
               {loadingPartnerRequests ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                  <p className="text-gray-500">Loading partner profiles...</p>
-                </div>
+                <ProfileCardGridSkeleton count={4} />
               ) : partnerRequests.length === 0 ? (
                 <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                   <User className="w-12 h-12 text-gray-300 mx-auto mb-3" />
@@ -737,10 +747,7 @@ export default function KYCRequests() {
 
             <div className="p-4 md:p-6">
               {loadingBusinessInfo ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                  <p className="text-gray-500">Loading business profiles...</p>
-                </div>
+                <ProfileCardGridSkeleton count={4} />
               ) : businessInfo.length === 0 ? (
                 <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                   <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
@@ -894,10 +901,7 @@ export default function KYCRequests() {
 
                 {/* User KYC Requests Grid */}
                 {loading ? (
-                  <div className="p-12 text-center bg-white rounded-[24px] border border-gray-100">
-                    <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-gray-500">Loading requests...</p>
-                  </div>
+                  <KYCRequestGridSkeleton count={6} />
                 ) : filteredRequests.length === 0 ? (
                   <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm p-16 text-center">
                     <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">

@@ -15,6 +15,7 @@ import {
   Check,
   ChevronsUpDown,
 } from "lucide-react";
+import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { toast } from "sonner";
@@ -238,9 +239,7 @@ export default function Coupons() {
           {/* Table */}
           <div className="min-h-[400px]">
             {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
-              </div>
+              <AdminPageSkeleton />
             ) : filteredCoupons.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 text-center p-8">
                 <Tag className="w-12 h-12 text-gray-200 mb-4" />

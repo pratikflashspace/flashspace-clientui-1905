@@ -24,6 +24,7 @@ import {
   Flame,
   Map,
 } from "lucide-react";
+import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import MapLibreMap from "@/components/Map/MapLibreMap";
 import {
   getVirtualOfficesByCity,
@@ -33,6 +34,7 @@ import { getCoworkingSpacesByCity } from "@/services/coworkingSpace.service";
 import { getMeetingRoomsByCity } from "@/services/meetingRoom.service";
 import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
 import { ListingItem } from "@/components/services/ListingCardModern";
+import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 
 // Static placeholders for fallback/missing data
 // import connaughtPlace1 from "@/assets/connaught-place-1.png";
@@ -58,18 +60,6 @@ interface UnifiedWorkspace {
   lng: number;
 }
 
-const getValidImage = (img: string | undefined, defaultImg: string) => {
-  if (
-    !img ||
-    img.startsWith("url") ||
-    img.trim() === "img1.jpg" ||
-    img.trim() === "url1.jpg" ||
-    img.includes("shorturl.at") ||
-    img.includes("tinyurl.com")
-  )
-    return defaultImg;
-  return img;
-};
 
 const DEFAULT_WORKSPACE_IMAGE = "/hero-illustrated.jpg";
 
@@ -119,9 +109,11 @@ const WorkspaceCard = ({
   };
 
   const rawImages = ws.images && ws.images.length > 0 ? ws.images : [ws.image];
-  const images = rawImages.map((img) =>
-    getValidImage(img, DEFAULT_WORKSPACE_IMAGE),
-  );
+  const images = rawImages
+    .filter((img) => !isInvalidImageUrl(img))
+    .map((img) => getSafeImageUrl(img));
+
+  if (images.length === 0) images.push(DEFAULT_WORKSPACE_IMAGE);
 
   const bookingItem: ListingItem = {
     _id: ws.id,
@@ -250,7 +242,7 @@ const WorkspaceCard = ({
                 e.stopPropagation();
                 handleNavigate();
               }}
-              className="py-2 px-4 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 whitespace-nowrap"
+              className="py-2 px-8 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 whitespace-nowrap flex-[1.4]"
             >
               Get Best Price
             </button>
@@ -259,7 +251,7 @@ const WorkspaceCard = ({
                 e.stopPropagation();
                 setIsMeetingModalOpen(true);
               }}
-              className="py-2 px-3 text-xs font-medium rounded-lg border border-border text-foreground hover:bg-muted transition-all duration-200 flex items-center gap-1 whitespace-nowrap"
+              className="py-2 px-4 text-xs font-medium rounded-lg border border-border text-foreground hover:bg-muted transition-all duration-200 flex items-center gap-1 whitespace-nowrap flex-1"
             >
               <Phone className="w-3 h-3" /> Contact Sales
             </button>
@@ -400,7 +392,7 @@ const WorkspaceCard = ({
               e.stopPropagation();
               handleNavigate();
             }}
-            className="flex-1 py-2.5 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
+            className="flex-[1.4] py-2.5 px-4 text-xs font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
           >
             Get Best Price
           </button>
@@ -882,10 +874,14 @@ const GetWorkspaces = () => {
               </div>
             </div>
             {loading ? (
-              <div className="py-16 text-center text-muted-foreground">
-                <p className="text-base font-medium animate-pulse">
-                  Loading spaces...
-                </p>
+              <div
+                className={
+                  viewMode === "grid"
+                    ? `grid gap-4 pb-8 ${mapCollapsed ? "grid-cols-1 min-[700px]:grid-cols-2 min-[1100px]:grid-cols-3 min-[1500px]:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
+                    : "flex flex-col gap-4 pb-8"
+                }
+              >
+                <SkeletonCardGrid count={6} view={viewMode} />
               </div>
             ) : (
               <div
@@ -968,10 +964,14 @@ const GetWorkspaces = () => {
       <div className="lg:hidden flex-1 relative">
         <div className="px-4 py-3">
           {loading ? (
-            <div className="py-16 text-center text-muted-foreground">
-              <p className="text-base font-medium animate-pulse">
-                Loading spaces...
-              </p>
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 min-[500px]:grid-cols-2 gap-4 pb-8"
+                  : "flex flex-col gap-3 pb-8"
+              }
+            >
+              <SkeletonCardGrid count={4} view={viewMode} />
             </div>
           ) : (
             <div

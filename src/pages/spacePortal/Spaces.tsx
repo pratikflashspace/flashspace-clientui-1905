@@ -8,6 +8,7 @@ import {
   MoreVertical,
   Star,
 } from "lucide-react";
+import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AddSpaceDialog } from "@/components/modals/AddSpaceDialog";
@@ -56,6 +57,8 @@ const getStatusBadge = (status: string) => {
   }
 };
 
+import { getSafeImageUrl } from "@/utils/imageUrl";
+
 const MySpaces = () => {
   const [addSpaceOpen, setAddSpaceOpen] = useState(false);
   const [selectedSpace, setSelectedSpace] = useState<any | null>(null);
@@ -87,24 +90,24 @@ const MySpaces = () => {
           const propertiesArr = Array.isArray(propertiesRes.data)
             ? propertiesRes.data
             : propertiesRes.data?.properties ||
-              propertiesRes.data?.spaces ||
-              [];
+            propertiesRes.data?.spaces ||
+            [];
 
           // Flatten coworking data
           const coSpacesArr = Array.isArray(coworkingRes)
             ? coworkingRes
             : coworkingRes?.data ||
-              coworkingRes?.spaces ||
-              coworkingRes?.coworkingSpaces ||
-              [];
+            coworkingRes?.spaces ||
+            coworkingRes?.coworkingSpaces ||
+            [];
 
           // Flatten meeting room data
           const mRoomsArr = Array.isArray(meetingRoomsRes)
             ? meetingRoomsRes
             : meetingRoomsRes?.data ||
-              meetingRoomsRes?.meetingRooms ||
-              meetingRoomsRes?.rooms ||
-              [];
+            meetingRoomsRes?.meetingRooms ||
+            meetingRoomsRes?.rooms ||
+            [];
 
           console.log("[Spaces DEBUG] Raw Counts:", {
             properties: propertiesArr.length,
@@ -121,10 +124,10 @@ const MySpaces = () => {
             const associatedCoworking = coSpacesArr.filter((cs: any) => {
               const csPropId = cs.propertyId || (typeof cs.property === 'string' ? cs.property : cs.property?._id);
               const idMatch = String(csPropId) === propId;
-              
-              const nameMatch = (cs.name || "").toLowerCase().trim() === propName && 
-                                (cs.city || "").toLowerCase().trim() === propCity;
-              
+
+              const nameMatch = (cs.name || "").toLowerCase().trim() === propName &&
+                (cs.city || "").toLowerCase().trim() === propCity;
+
               if (!idMatch && nameMatch) console.log(`[Spaces DEBUG] Coworking Fallback Match: ${cs.name} -> ${prop.name}`);
               return idMatch || nameMatch;
             });
@@ -138,9 +141,9 @@ const MySpaces = () => {
             const associatedMR = mRoomsArr.filter((mr: any) => {
               const mrPropId = mr.propertyId || (typeof mr.property === 'string' ? mr.property : mr.property?._id);
               const idMatch = String(mrPropId) === propId;
-              
-              const nameMatch = (mr.name || "").toLowerCase().trim() === propName && 
-                                (mr.city || "").toLowerCase().trim() === propCity;
+
+              const nameMatch = (mr.name || "").toLowerCase().trim() === propName &&
+                (mr.city || "").toLowerCase().trim() === propCity;
 
               if (!idMatch && nameMatch) console.log(`[Spaces DEBUG] MeetingRoom Fallback Match: ${mr.name} -> ${prop.name}`);
               return idMatch || nameMatch;
@@ -164,10 +167,13 @@ const MySpaces = () => {
                 prop.occupancyRate || Math.floor(Math.random() * 30) + 70,
               status: prop.status || "active",
               rating: prop.avgRating || 4.5,
-              image:
+              image: getSafeImageUrl(
                 prop.image ||
-                (prop.images && prop.images.length > 0 ? prop.images[0] : null) ||
+                (prop.images && prop.images.length > 0
+                  ? prop.images[0]
+                  : null),
                 "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80",
+              ),
             };
           });
 
@@ -222,24 +228,33 @@ const MySpaces = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex-1">
+        <div className="mb-8 flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-10 w-64 bg-gray-200 rounded" />
+            <div className="h-4 w-96 bg-gray-100 rounded" />
+          </div>
+          <div className="h-11 w-40 bg-gray-100 rounded-xl" />
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <SkeletonCardGrid count={6} />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex-1">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
             My <span className="text-primary italic">Spaces</span>
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm text-muted-foreground mt-1">
             Manage all your workspace listings
           </p>
         </div>
-        <Button onClick={() => setAddSpaceOpen(true)}>
+        <Button onClick={() => setAddSpaceOpen(true)} className="w-full sm:w-auto rounded-xl font-bold h-11">
           <Plus className="w-4 h-4 mr-2" />
           Add New Space
         </Button>
@@ -276,7 +291,7 @@ const MySpaces = () => {
               </div>
 
               {/* Space Details */}
-              <div className="p-5">
+              <div className="p-4 sm:p-5">
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <h3 className="font-bold text-foreground">{space.name}</h3>

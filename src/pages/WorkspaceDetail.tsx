@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 import MapLibreMap from "@/components/Map/MapLibreMap";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -93,22 +94,21 @@ const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
     fetchData();
   }, [id, type]);
 
-  // Unified getters
-  const getPhotos = () => {
-    if (!data) return DEFAULT_PHOTOS;
-    const rawImages =
-      data.images && data.images.length > 0 ? data.images : [data.image];
-    const cleanImages = rawImages.map(
-      (img: string) => img || DEFAULT_PHOTOS[0],
-    );
-    // Ensure we have at least 4 for the grid
-    while (cleanImages.length < 4) {
-      cleanImages.push(
-        DEFAULT_PHOTOS[cleanImages.length % DEFAULT_PHOTOS.length],
-      );
-    }
-    return cleanImages;
-  };
+// Unified getters
+const getPhotos = () => {
+  if (!data) return [];
+  
+  const rawImages = [
+    ...(data.images || []),
+    data.image
+  ].filter(Boolean) as string[];
+
+  const cleanImages = rawImages
+    .filter(img => !isInvalidImageUrl(img))
+    .map((img: string) => getSafeImageUrl(img));
+
+  return cleanImages;
+};
 
   const getAmenityIcon = (name: string) => {
     const lower = name.toLowerCase();
@@ -592,56 +592,74 @@ const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
         </div>
 
         {/* Gallery */}
-        <div className="grid grid-cols-4 grid-rows-2 gap-2 mb-10 rounded-2xl overflow-hidden h-[420px]">
-          <div
-            className="col-span-2 row-span-2 cursor-pointer overflow-hidden relative group"
-            onClick={() => setLightboxIndex(0)}
-          >
-            <img
-              src={photos[0]}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          </div>
-          <div
-            className="cursor-pointer overflow-hidden group"
-            onClick={() => setLightboxIndex(1)}
-          >
-            <img
-              src={photos[1]}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          </div>
-          <div
-            className="cursor-pointer overflow-hidden group"
-            onClick={() => setLightboxIndex(2)}
-          >
-            <img
-              src={photos[2]}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          </div>
-          <div
-            className="cursor-pointer overflow-hidden group"
-            onClick={() => setLightboxIndex(3)}
-          >
-            <img
-              src={photos[3]}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          </div>
-          <div
-            className="cursor-pointer overflow-hidden group relative"
-            onClick={() => setLightboxIndex(0)}
-          >
-            <img
-              src={photos[0]}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-75"
-            />
-            <div className="absolute inset-0 flex flex-col items-center justify-center top-0 left-0 bg-black/40 hover:bg-black/20 transition-colors">
-              <span className="text-white font-medium">View all photos</span>
+        {photos.length > 0 ? (
+          <div className={`grid gap-2 mb-10 rounded-2xl overflow-hidden h-[420px] ${
+            photos.length === 1 ? "grid-cols-1" :
+            photos.length === 2 ? "grid-cols-2" :
+            photos.length === 3 ? "grid-cols-3" : "grid-cols-4 grid-rows-2"
+          }`}>
+            {/* Main/First Image */}
+            <div
+              className={`${photos.length >= 4 ? "col-span-2 row-span-2" : "col-span-1 h-full"} cursor-pointer overflow-hidden relative group`}
+              onClick={() => setLightboxIndex(0)}
+            >
+              <img
+                src={photos[0]}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (target.src !== "/hero-illustrated.jpg") {
+                    target.src = "/hero-illustrated.jpg";
+                  }
+                }}
+              />
             </div>
+
+            {/* Additional Images (up to 3 more for grid of 4) */}
+            {photos.length > 1 && photos.slice(1, 4).map((photo, index) => (
+              <div
+                key={index + 1}
+                className={`cursor-pointer overflow-hidden group ${photos.length < 4 ? "h-full" : ""}`}
+                onClick={() => setLightboxIndex(index + 1)}
+              >
+                <img
+                  src={photo}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== "/hero-illustrated.jpg") {
+                      target.src = "/hero-illustrated.jpg";
+                    }
+                  }}
+                />
+              </div>
+            ))}
+
+            {/* View All Photos Overlay (Only if we have 5 or more) */}
+            {photos.length >= 5 && (
+              <div
+                className="cursor-pointer overflow-hidden group relative"
+                onClick={() => setLightboxIndex(0)}
+              >
+                <img
+                  src={photos[4]}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-75"
+                />
+                <div className="absolute inset-0 flex flex-col items-center justify-center top-0 left-0 bg-black/40 hover:bg-black/20 transition-colors">
+                  <span className="text-white font-medium">+{photos.length - 4} more photos</span>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        ) : (
+          <div className="h-[420px] mb-10 rounded-2xl bg-muted flex items-center justify-center">
+            <img 
+              src="/hero-illustrated.jpg" 
+              alt="Workspace Placeholder" 
+              className="w-full h-full object-cover opacity-50"
+            />
+          </div>
+        )}
 
         {/* Lightbox */}
         {lightboxIndex !== null && (

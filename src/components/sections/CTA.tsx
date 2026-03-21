@@ -42,7 +42,7 @@ export const CTA = () => {
                     viewport={{ once: true }}
                     className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-10 tracking-tight"
                 >
-                    Ready to transform your workspace?
+                    Ready to Transform Your Business ?
                 </motion.h2>
 
                 {/* Highlight cards */}
@@ -78,7 +78,7 @@ export const CTA = () => {
                         className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold transition-all duration-200 hover:brightness-95"
                         style={{
                             borderRadius: 999,
-                            padding: "14px 28px",
+                            padding: "14px 42px",
                             fontSize: 15,
                             border: "none",
                             cursor: "pointer",
@@ -93,7 +93,7 @@ export const CTA = () => {
                         className="inline-flex items-center gap-2 bg-background text-foreground font-semibold border border-border transition-all duration-200 hover:bg-muted"
                         style={{
                             borderRadius: 999,
-                            padding: "14px 28px",
+                            padding: "14px 42px",
                             fontSize: 15,
                             cursor: "pointer",
                         }}

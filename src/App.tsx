@@ -110,6 +110,8 @@ import SpacePortalProfile from "./pages/spacePortal/Profile";
 import Notifications from "./pages/spacePortal/Notifications";
 import SpacePortalSettings from "./pages/spacePortal/Settings";
 import AddSpace from "./pages/spacePortal/AddSpace";
+import { DashboardLayout } from "./components/layout/DashboardLayout";
+import { ADMIN_NAV_ITEMS } from "./constants/adminNavItems";
 import PropertyDetails from "./pages/spacePortal/PropertyDetails";
 
 import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
@@ -381,6 +383,18 @@ const App = () => (
                           element={<SpacePartnerKycDetails />}
                         />
                         <Route path="spaces" element={<SpaceManagement />} />
+                        <Route
+                          path="spaces/add"
+                          element={
+                            <DashboardLayout
+                              portalName="Admin Portal"
+                              portalDescription="Manage FlashSpace Platform"
+                              navItems={ADMIN_NAV_ITEMS}
+                            >
+                              <AddSpace />
+                            </DashboardLayout>
+                          }
+                        />
                         <Route
                           path="space-details/:id"
                           element={<SpaceDetail />}

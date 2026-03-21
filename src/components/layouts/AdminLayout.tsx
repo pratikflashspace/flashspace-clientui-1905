@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
@@ -28,6 +28,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { adminService } from "@/services/admin.service";
+import { cn } from "@/lib/utils";
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -228,15 +229,19 @@ export default function AdminLayout() {
       >
         {/* Sidebar Header */}
         <div className="h-auto py-8 px-6 flex flex-col items-start gap-1">
-          <div className="flex items-center gap-2 text-xl font-bold tracking-tight text-teal-900 font-sans mb-2">
-            {isSidebarOpen ? (
-              <span className="text-2xl font-extrabold tracking-tighter text-teal-950">
-                flashspace
+          <Link to="/" className="flex items-baseline gap-0.5 mb-2 group">
+            <span className={cn(
+              "font-extrabold tracking-tight text-teal-950 transition-all uppercase",
+              isSidebarOpen ? "text-2xl" : "text-xl"
+            )}>
+              {isSidebarOpen ? "FLASH" : "F"}
+            </span>
+            {isSidebarOpen && (
+              <span className="text-xl font-extrabold tracking-tight text-primary italic lowercase">
+                space
               </span>
-            ) : (
-              <span className="text-2xl font-extrabold text-teal-600">f.</span>
             )}
-          </div>
+          </Link>
           {isSidebarOpen && (
             <>
               <h2 className="text-sm font-bold text-gray-900">
@@ -432,21 +437,28 @@ export default function AdminLayout() {
           <Outlet />
         ) : (
           <>
-            {/* Topbar - Simplified to match clean style */}
-            <header className="h-20 bg-transparent flex items-center justify-between px-8 md:px-12 pt-6">
-              <div className="flex items-center gap-4">
+            <header className="lg:hidden h-20 bg-transparent flex items-center justify-between px-4 md:px-12 pt-6 transition-all duration-300">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight uppercase">
+                  <span className="text-foreground">FLASH</span>
+                  <span className="text-primary italic lowercase">space</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest leading-none">
+                  Admin Portal
+                </p>
+              </div>
+              <div className="flex items-center gap-6">
                 <button
-                  className="md:hidden p-2 hover:bg-gray-100 rounded-lg text-gray-500"
+                  className="p-2.5 bg-white shadow-sm border border-gray-100 hover:bg-gray-50 rounded-xl text-gray-600 transition-all hover:scale-105 active:scale-95"
                   onClick={() => setIsMobileOpen(true)}
                 >
                   <Menu className="w-6 h-6" />
                 </button>
               </div>
-              <div className="flex items-center gap-6" />
             </header>
 
             {/* Page Content */}
-            <main className="flex-1 px-8 md:px-12 py-6">
+            <main className="flex-1 px-4 md:px-12 py-6">
               <div className="max-w-7xl mx-auto">
                 <Outlet />
               </div>

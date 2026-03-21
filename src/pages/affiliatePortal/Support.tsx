@@ -24,22 +24,22 @@ const Support = () => {
   ]);
 
   return (
-    <div className=" mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-500">
+    <div className="mx-auto min-h-screen p-4 md:p-6 lg:p-10 space-y-6 md:space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-extrabold text-[#1a1a1a] tracking-tight">Support</h1>
-        <p className="text-[#6b7280] mt-2 text-lg font-medium">Get help with AI-powered chat or raise a ticket</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-[#1a1a1a] tracking-tight">Support</h1>
+        <p className="text-[#6b7280] mt-2 text-base md:text-lg font-medium leading-relaxed">Get help with AI-powered chat or raise a ticket</p>
       </div>
 
       <Tabs defaultValue="chat" className="w-full">
-        <TabsList className="bg-transparent p-0 mb-8 flex justify-start gap-4">
-          <TabsTrigger value="chat" className="gap-2 px-6 py-2.5 bg-white shadow-sm ring-1 ring-black/5 rounded-full data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:ring-[#2d5a4c] transition-all text-[#6b7280] data-[state=active]:text-[#1a1a1a] font-bold">
+        <TabsList className="bg-transparent p-1 pt-2 pb-4 mb-4 flex justify-start gap-2 md:gap-4 overflow-x-auto no-scrollbar scroll-smooth w-full max-w-full items-center min-h-[60px]">
+          <TabsTrigger value="chat" className="shrink-0 whitespace-nowrap gap-2 px-4 md:px-6 py-2 md:py-2.5 bg-white shadow-sm ring-1 ring-black/5 rounded-full data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:ring-[#2d5a4c] transition-all text-[#6b7280] data-[state=active]:text-[#1a1a1a] font-bold text-sm md:text-base mb-1">
             <MessageSquare className="w-4 h-4" /> AI Chat
           </TabsTrigger>
-          <TabsTrigger value="chat_tickets" className="gap-2 px-6 py-2.5 bg-transparent rounded-full data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-black/5 transition-all text-[#6b7280] data-[state=active]:text-[#1a1a1a] font-bold">
+          <TabsTrigger value="chat_tickets" className="shrink-0 whitespace-nowrap gap-2 px-4 md:px-6 py-2 md:py-2.5 bg-transparent rounded-full data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-black/5 transition-all text-[#6b7280] data-[state=active]:text-[#1a1a1a] font-bold text-sm md:text-base mb-1">
             <Ticket className="w-4 h-4" /> My Tickets
           </TabsTrigger>
-          <TabsTrigger value="faq" className="gap-2 px-6 py-2.5 bg-transparent rounded-full data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-black/5 transition-all text-[#6b7280] data-[state=active]:text-[#1a1a1a] font-bold">
+          <TabsTrigger value="faq" className="shrink-0 whitespace-nowrap gap-2 px-4 md:px-6 py-2 md:py-2.5 bg-transparent rounded-full data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-black/5 transition-all text-[#6b7280] data-[state=active]:text-[#1a1a1a] font-bold text-sm md:text-base mb-1">
             <HelpCircle className="w-4 h-4" /> FAQ
           </TabsTrigger>
         </TabsList>
@@ -48,7 +48,7 @@ const Support = () => {
         <TabsContent value="chat" className="outline-none">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Chat Interface - Passing state and setter as props */}
-            <div className="lg:col-span-8 animate-slide-up">
+            <div className="lg:col-span-8 animate-slide-up order-1">
               <SupportChat
                 messages={chatMessages}
                 setMessages={setChatMessages}
@@ -56,9 +56,9 @@ const Support = () => {
             </div>
 
             {/* Sidebar: Only visible in Chat Tab */}
-            <div className="lg:col-span-4 space-y-8 animate-slide-up">
+            <div className="lg:col-span-4 space-y-6 md:space-y-8 animate-slide-up order-2">
               {/* Contact Us Card */}
-              <div className="bg-[#f8f8f8] p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
+              <div className="bg-[#f8f8f8] p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
                 <h3 className="text-xl font-black text-[#1a1a1a]">Contact Us</h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-4 p-4 bg-[#f9fafb] rounded-[1.5rem] ring-1 ring-black/5 group cursor-pointer hover:bg-white hover:shadow-md transition-all">
@@ -70,13 +70,13 @@ const Support = () => {
                       <p className="text-xs text-[#6b7280] font-bold">+91 80 1234 5678</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 p-4 bg-[#f9fafb] rounded-[1.5rem] ring-1 ring-black/5 group cursor-pointer hover:bg-white hover:shadow-md transition-all">
-                    <div className="p-3 bg-white shadow-sm rounded-2xl text-[#2d5a4c]">
+                  <div className="flex items-center gap-4 p-4 bg-[#f9fafb] rounded-[1.5rem] ring-1 ring-black/5 group cursor-pointer hover:bg-white hover:shadow-md transition-all overflow-hidden">
+                    <div className="p-3 bg-white shadow-sm rounded-2xl text-[#2d5a4c] shrink-0">
                       <Mail className="w-5 h-5" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-black text-[#1a1a1a]">Email Support</p>
-                      <p className="text-xs text-[#6b7280] font-bold">partners@flashspace.in</p>
+                      <p className="text-xs text-[#6b7280] font-bold break-all">partners@flashspace.in</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 p-4 bg-[#f9fafb] rounded-[1.5rem] ring-1 ring-black/5 group cursor-pointer hover:bg-white hover:shadow-md transition-all">
@@ -92,7 +92,7 @@ const Support = () => {
               </div>
 
               {/* Quick Links Card */}
-              <div className="bg-[#f8f8f8] p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
+              <div className="bg-[#f8f8f8] p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-6">
                 <h3 className="text-xl font-black text-[#1a1a1a]">Quick Links</h3>
                 <div className="space-y-3">
                   {[
