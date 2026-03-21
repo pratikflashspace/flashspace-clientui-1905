@@ -54,7 +54,7 @@ export const ScrollNavLayout = () => {
     };
 
     return (
-        <div ref={containerRef} className="relative overflow-hidden">
+        <div ref={containerRef} className="relative">
             <div className="container mx-auto px-4 lg:px-8">
                 <div className="grid lg:grid-cols-[200px_1fr] gap-8 lg:gap-16">
                     {/* Sticky left nav */}
