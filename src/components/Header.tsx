@@ -132,11 +132,11 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
         const resetInactivityTimer = () => {
             if (inactivityTimer) clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(showInactivityModal, 20000); // 20 seconds of inactivity
+            inactivityTimer = setTimeout(showInactivityModal, 40000); // 40 seconds of inactivity
         };
 
         const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
-        
+
         // Initial timer start
         resetInactivityTimer();
 
@@ -152,6 +152,88 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
             });
         };
     }, []);
+
+    useEffect(() => {
+        // Rule 3: Show when landing page is scrolled 50%-70%
+        if (location.pathname !== "/") return;
+
+        const handleScroll = (e: Event) => {
+            const hasShownScroll = sessionStorage.getItem("hasShownScrollGetInTouch");
+            if (hasShownScroll) return;
+
+            const target = e.target as HTMLElement | Document;
+
+            let scrollTop = 0;
+            let scrollHeight = 0;
+            let clientHeight = 0;
+
+            if (target === document || (target as any) === window) {
+                scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                scrollHeight = Math.max(
+                    document.body.scrollHeight, document.documentElement.scrollHeight,
+                    document.body.offsetHeight, document.documentElement.offsetHeight,
+                    document.body.clientHeight, document.documentElement.clientHeight
+                );
+                clientHeight = document.documentElement.clientHeight || window.innerHeight;
+            } else {
+                const element = target as HTMLElement;
+                // Only track scroll on major container elements that act as the main scroll view
+                if (element.scrollHeight <= element.clientHeight + 10) return;
+
+                scrollTop = element.scrollTop;
+                scrollHeight = element.scrollHeight;
+                clientHeight = element.clientHeight;
+            }
+
+            const docHeight = scrollHeight - clientHeight;
+            if (docHeight <= 0) return;
+
+            const scrollPercent = (scrollTop / docHeight) * 100;
+
+            if (scrollPercent >= 70) {
+                if (!isModalOpenRef.current) {
+                    setIsContactOpen(true);
+                    sessionStorage.setItem("hasShownScrollGetInTouch", "true");
+                }
+            }
+        };
+
+        // Use capture phase to intercept scroll events from any nested scrollable container
+        window.addEventListener("scroll", handleScroll, { passive: true, capture: true });
+
+        // Initial check in case they reload the page midway down
+        setTimeout(() => {
+            // Fake an event for initial check on document
+            handleScroll({ target: document } as unknown as Event);
+        }, 500);
+
+        return () => window.removeEventListener("scroll", handleScroll, { capture: true } as EventListenerOptions);
+    }, [location.pathname]);
+
+    useEffect(() => {
+        // Rule 4: Show after 10 seconds on space detail pages (once per space)
+        const isSpaceDetail = location.pathname.startsWith("/space/") ||
+            location.pathname.startsWith("/coworking-space/") ||
+            location.pathname.startsWith("/meeting-room/");
+
+        if (!isSpaceDetail) return;
+
+        const spaceId = location.pathname.split("/").pop();
+        if (!spaceId) return;
+
+        const sessionKey = `hasShownSpacePopup_${spaceId}`;
+        const alreadyShown = sessionStorage.getItem(sessionKey);
+        if (alreadyShown) return;
+
+        const timer = setTimeout(() => {
+            if (!isModalOpenRef.current) {
+                setIsContactOpen(true);
+                sessionStorage.setItem(sessionKey, "true");
+            }
+        }, 10000); // 10 seconds
+
+        return () => clearTimeout(timer);
+    }, [location.pathname]);
 
     const handleNavigation = (href: string) => {
         if (href.startsWith("#")) {
@@ -309,7 +391,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 </div>
                             ) : (
                                 <button
-                                   onClick={() => navigate('/login')}
+                                    onClick={() => navigate('/login')}
                                     className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all"
                                 >
                                     Sign in
