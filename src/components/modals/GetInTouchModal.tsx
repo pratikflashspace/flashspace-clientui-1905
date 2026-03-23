@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
+import { createContactForm } from "@/Api/contactForm.service";
+import { toast } from "sonner";
 
 interface GetInTouchModalProps {
     open: boolean;
@@ -36,6 +38,7 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (open) {
@@ -48,9 +51,35 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
         };
     }, [open]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: integrate with backend
+        
+        // Basic 10-digit validation
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(phone)) {
+            toast.error("Please enter a valid 10-digit mobile number.");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            await createContactForm({
+                fullName: name,
+                email,
+                phoneNumber: phone,
+            });
+            localStorage.setItem("hasFilledGetInTouch", "true");
+            toast.success("Thank you! We will get in touch soon.");
+            onClose();
+            // Reset form
+            setName("");
+            setPhone("");
+            setEmail("");
+        } catch (error: any) {
+            toast.error(error.message || "Something went wrong. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -155,9 +184,17 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
 
                                     <button
                                         type="submit"
-                                        className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3.5 rounded-lg hover:bg-primary/90 transition-all text-sm mt-2 shadow-md"
+                                        disabled={isLoading}
+                                        className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3.5 rounded-lg hover:bg-primary/90 transition-all text-sm mt-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        Get Expert Advice
+                                        {isLoading ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                Submitting...
+                                            </>
+                                        ) : (
+                                            "Get Expert Advice"
+                                        )}
                                     </button>
                                 </form>
                             </div>
