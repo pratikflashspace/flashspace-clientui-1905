@@ -45,9 +45,7 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
         <FadeInSection>
           <PlanLocationsShowcase />
         </FadeInSection>
-        <FadeInSection>
-          <ScrollNavLayout />
-        </FadeInSection>
+        <ScrollNavLayout />
         <FadeInSection>
           <FeatureCTA />
         </FadeInSection>

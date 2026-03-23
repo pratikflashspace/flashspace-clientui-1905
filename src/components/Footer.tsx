@@ -3,12 +3,6 @@ import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-anim
 import { cn } from "@/lib/utils";
 
 const footerLinks = {
-  portals: [
-    { label: "Customer Portal", href: "/dashboard" },
-    { label: "Space Partner Portal", href: "/spaceportal" },
-    { label: "Admin Portal", href: "/admin" },
-    { label: "Affiliate Portal", href: "/affiliate-portal" },
-  ],
   solutions: [
     { label: "Virtual Office", href: "/Solutions/virtual-office" },
     { label: "Coworking Space", href: "/Solutions/coworking-space" },
@@ -25,14 +19,11 @@ const footerLinks = {
     { label: "Careers", href: "/career" },
     { label: "Pricing", href: "/Solutions/virtual-office" },
     { label: "Privacy Policy", href: "/about" },
-    { label: "Terms of Service", href: "/about" },
   ],
   community: [
     { label: "LinkedIn", href: "https://www.linkedin.com/company/flashspace" },
     { label: "Twitter", href: "https://twitter.com/flashspace" },
     { label: "Instagram", href: "https://instagram.com/flashspace" },
-    { label: "YouTube", href: "#" },
-    { label: "Newsletter", href: "#" },
   ],
 };
 
@@ -47,7 +38,7 @@ const Footer = () => {
         "container mx-auto px-4 sm:px-6 py-12 sm:py-16",
         getAnimationClasses(isVisible, 'slideUp', 0)
       )}>
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-y-10 gap-x-4 sm:gap-8 lg:gap-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-4 sm:gap-8 lg:gap-12">
 
           {/* Solutions */}
           <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
@@ -68,24 +59,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Portals */}
-          <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
-            <h4 className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
-              Portals
-            </h4>
-            <ul className="space-y-4">
-              {footerLinks.portals.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-white/70 hover:text-[#EDB003] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EDB003] rounded"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+    
 
           {/* Resources */}
           <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">

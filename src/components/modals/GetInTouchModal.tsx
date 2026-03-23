@@ -36,7 +36,6 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
-    const [message, setMessage] = useState("");
 
     useEffect(() => {
         if (open) {
@@ -112,7 +111,7 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                             </div>
 
                             {/* Right — Form */}
-                            <div className="p-5 sm:p-6 md:border-l border-border">
+                            <div className="p-5 sm:p-6 md:border-l border-border flex flex-col justify-center">
                                 <h2 className="text-xl font-bold text-foreground text-center mb-4">
                                     Get in <span className="text-primary">Touch</span>
                                 </h2>
@@ -154,17 +153,6 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                                         />
                                     </div>
 
-                                    <div>
-                                        <label className="block text-xs font-semibold text-foreground mb-1.5">Message</label>
-                                        <textarea
-                                            value={message}
-                                            onChange={(e) => setMessage(e.target.value)}
-                                            placeholder="How can we help?"
-                                            rows={3}
-                                            className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-all resize-none"
-                                            required
-                                        />
-                                    </div>
 
                                     <button
                                         type="submit"
