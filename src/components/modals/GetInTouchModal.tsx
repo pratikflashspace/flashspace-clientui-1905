@@ -56,12 +56,12 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
     return (
         <AnimatePresence>
             {open && (
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-foreground/20 backdrop-blur-sm p-4 sm:p-6"
+                    className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-foreground/20 backdrop-blur-sm p-4 sm:p-6"
                     onClick={onClose}
                 >
                     <motion.div
@@ -80,13 +80,13 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                             <X className="w-5 h-5" />
                         </button>
 
-                        <div className="grid md:grid-cols-2 gap-0">
+                        <div className="grid md:grid-cols-2 gap-0 overflow-hidden rounded-2xl">
                             {/* Left — Contact Cards (Desktop only) */}
-                            <div className="hidden md:block p-5 sm:p-6 space-y-3">
+                            <div className="hidden md:block p-5 sm:p-6 space-y-3 bg-muted/30">
                                 {contactCards.map((card) => (
                                     <div
                                         key={card.title}
-                                        className="bg-background rounded-xl border border-border p-4"
+                                        className="bg-background rounded-xl border border-border p-4 shadow-sm"
                                     >
                                         <h3 className="text-base font-bold text-foreground mb-1">{card.title}</h3>
                                         <p className="text-xs text-muted-foreground mb-2 leading-relaxed">
@@ -111,54 +111,53 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                             </div>
 
                             {/* Right — Form */}
-                            <div className="p-5 sm:p-6 md:border-l border-border flex flex-col justify-center">
-                                <h2 className="text-xl font-bold text-foreground text-center mb-4">
-                                    Get in <span className="text-primary">Touch</span>
+                            <div className="p-6 sm:p-8 bg-background flex flex-col justify-center">
+                                <h2 className="text-2xl font-bold text-foreground mb-2">
+                                    Get Expert Advice for Your Virtual Office
                                 </h2>
+                                <p className="text-sm text-muted-foreground mb-6">
+                                    Find your perfect virtual office solution with our expert insights.
+                                </p>
 
-                                <form onSubmit={handleSubmit} className="space-y-3">
+                                <form onSubmit={handleSubmit} className="space-y-4">
                                     <div>
-                                        <label className="block text-xs font-semibold text-foreground mb-1.5">Full Name</label>
                                         <input
                                             type="text"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
-                                            placeholder="Your Name"
-                                            className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-all"
+                                            placeholder="Name*"
+                                            className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
                                             required
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-semibold text-foreground mb-1.5">Phone Number</label>
                                         <input
                                             type="tel"
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
-                                            placeholder="+91 9876543210"
-                                            className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-all"
+                                            placeholder="Mobile number*"
+                                            className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
                                             required
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-semibold text-foreground mb-1.5">Email</label>
                                         <input
                                             type="email"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            placeholder="you@example.com"
-                                            className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-all"
+                                            placeholder="Email*"
+                                            className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
                                             required
                                         />
                                     </div>
 
-
                                     <button
                                         type="submit"
-                                        className="w-full flex items-center justify-center gap-2 bg-primary text-secondary font-semibold py-3 rounded-xl hover:bg-primary/90 transition-colors text-sm"
+                                        className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3.5 rounded-lg hover:bg-primary/90 transition-all text-sm mt-2 shadow-md"
                                     >
-                                        Send Message
+                                        Get Expert Advice
                                     </button>
                                 </form>
                             </div>
