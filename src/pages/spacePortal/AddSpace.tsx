@@ -1112,13 +1112,13 @@ export default function AddSpace() {
       {
         id: "ownership_proof",
         label: "Ownership Proof / Lease Agreement",
-        required: true,
+        required: false,
       },
       { id: "property_tax", label: "Property Tax Receipt", required: false },
       {
         id: "electricity_bill",
         label: "Electricity Bill (Latest)",
-        required: true,
+        required: false,
       },
       { id: "fire_safety", label: "Fire Safety Certificate", required: false },
       { id: "trade_license", label: "Trade License", required: false },
@@ -1402,9 +1402,9 @@ export default function AddSpace() {
             </div>
             <Input
               type="number"
-              placeholder="e.g. 5000"
+              placeholder="0"
               className="pl-14 h-14 rounded-2xl border-2 hover:border-primary/30 focus:border-primary transition-all text-lg font-black"
-              value={coworkingData.pricePerMonth}
+              value={coworkingData.pricePerMonth || ""}
               onChange={(e: any) => {
                 setCoworkingData({
                   ...coworkingData,
@@ -1581,8 +1581,9 @@ export default function AddSpace() {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-black">₹</span>
                   <Input
                     type="number"
+                    placeholder="0"
                     className={`pl-8 h-14 rounded-2xl font-black text-lg ${errors[plan.id] ? "border-destructive focus:ring-destructive" : "border-primary/30 focus:ring-primary"}`}
-                    value={(virtualData as any)[plan.field]}
+                    value={(virtualData as any)[plan.field] || ""}
                     onChange={(e) => {
                       setVirtualData({
                         ...virtualData,
