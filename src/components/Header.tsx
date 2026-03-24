@@ -94,8 +94,9 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
     useEffect(() => {
         // Rule 1: Show after 10 seconds on site (once per session)
+        const hasFilled = localStorage.getItem("hasFilledGetInTouch");
         const hasShownInitial = sessionStorage.getItem("hasShownInitialGetInTouch");
-        if (!hasShownInitial) {
+        if (!hasShownInitial && !hasFilled) {
             let sessionStartTime = sessionStorage.getItem("sessionStartTime");
             if (!sessionStartTime) {
                 sessionStartTime = Date.now().toString();
@@ -107,7 +108,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
             const timer = setTimeout(() => {
                 const alreadyShown = sessionStorage.getItem("hasShownInitialGetInTouch");
-                if (!alreadyShown) {
+                const hasFilledLatest = localStorage.getItem("hasFilledGetInTouch");
+                if (!alreadyShown && !hasFilledLatest) {
                     setIsContactOpen(true);
                     sessionStorage.setItem("hasShownInitialGetInTouch", "true");
                 }
@@ -123,7 +125,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         let inactivityTimer: NodeJS.Timeout;
 
         const showInactivityModal = () => {
-            if (!isModalOpenRef.current) {
+            const hasFilled = localStorage.getItem("hasFilledGetInTouch");
+            if (!isModalOpenRef.current && !hasFilled) {
                 setIsContactOpen(true);
             }
             // Restart timer for next inactivity period?
@@ -132,7 +135,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
         const resetInactivityTimer = () => {
             if (inactivityTimer) clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(showInactivityModal, 40000); // 40 seconds of inactivity
+            inactivityTimer = setTimeout(showInactivityModal, 20000); // 20 seconds of inactivity
         };
 
         const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
@@ -158,8 +161,9 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         if (location.pathname !== "/") return;
 
         const handleScroll = (e: Event) => {
+            const hasFilled = localStorage.getItem("hasFilledGetInTouch");
             const hasShownScroll = sessionStorage.getItem("hasShownScrollGetInTouch");
-            if (hasShownScroll) return;
+            if (hasShownScroll || hasFilled) return;
 
             const target = e.target as HTMLElement | Document;
 
@@ -191,7 +195,8 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
             const scrollPercent = (scrollTop / docHeight) * 100;
 
             if (scrollPercent >= 70) {
-                if (!isModalOpenRef.current) {
+                const hasFilledLatest = localStorage.getItem("hasFilledGetInTouch");
+                if (!isModalOpenRef.current && !hasFilledLatest) {
                     setIsContactOpen(true);
                     sessionStorage.setItem("hasShownScrollGetInTouch", "true");
                 }
@@ -223,10 +228,12 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
         const sessionKey = `hasShownSpacePopup_${spaceId}`;
         const alreadyShown = sessionStorage.getItem(sessionKey);
-        if (alreadyShown) return;
+        const hasFilled = localStorage.getItem("hasFilledGetInTouch");
+        if (alreadyShown || hasFilled) return;
 
         const timer = setTimeout(() => {
-            if (!isModalOpenRef.current) {
+            const hasFilledLatest = localStorage.getItem("hasFilledGetInTouch");
+            if (!isModalOpenRef.current && !hasFilledLatest) {
                 setIsContactOpen(true);
                 sessionStorage.setItem(sessionKey, "true");
             }

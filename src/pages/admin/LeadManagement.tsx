@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { adminService } from "@/services/admin.service";
+import { getAllContactForms } from "@/Api/contactForm.service";
 import {
   Plus,
   Search,
@@ -36,10 +37,9 @@ const LeadManagement = () => {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const response = await adminService.getAllBookings(); // Using bookings as leads for now
-        if (response.success && response.data && response.data.bookings) {
-          processLeads(response.data.bookings);
-        }
+        const contactsRes = await getAllContactForms();
+        const contacts = Array.isArray(contactsRes) ? contactsRes : [];
+        processLeads(contacts);
       } catch (error) {
         console.error("Failed to fetch leads", error);
         toast({
@@ -55,63 +55,35 @@ const LeadManagement = () => {
     fetchLeads();
   }, []);
 
-  const processLeads = (bookings: any[]) => {
-    const sortedBookings = [...bookings].sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-
-    const processed = sortedBookings.map((booking, index) => {
-      const amount = Number(booking.amount || booking.plan?.price || 0);
-      const randomBase = Math.floor(Math.random() * (95 - 65) + 65);
-      const score = Math.min(randomBase + (amount > 10000 ? 5 : 0), 99);
-
-      let status = "warm";
-      if (booking.status === "confirmed" || booking.status === "completed") {
-        status = "won";
-      } else if (booking.status === "cancelled") {
-        status = "cold";
-      } else if (score > 85) {
-        status = "hot";
-      }
-
-      let interest = booking.plan?.name || booking.type || "Inquiry";
-      interest = interest
-        .replace(/-/g, " ")
-        .replace(/\b\w/g, (l) => l.toUpperCase());
-
+  const processLeads = (contacts: any[]) => {
+    const contactLeads = contacts.map((contact, index) => {
       return {
-        id: booking.bookingNumber || `LD-${100 + index}`,
-        name:
-          booking.user?.companyName ||
-          (booking.user?.firstName
-            ? `${booking.user.firstName} ${booking.user.lastName || ""}`
-            : "Unknown Client"),
-        contact: booking.user?.firstName
-          ? `${booking.user.firstName} ${booking.user.lastName || ""}`
-          : "N/A",
-        email: booking.user?.email || "No email",
-        phone: booking.user?.phone || "+91 00000 00000",
-        interest: interest,
-        source: booking.user?.source || "Website",
-        score: score,
-        status: status,
+        id: contact._id || `CLI-${100 + index}`,
+        name: contact.fullName || "Unknown",
+        email: contact.email || "No email",
+        phone: contact.phoneNumber || "No phone",
+        interest: Array.isArray(contact.serviceInterest) ? contact.serviceInterest.join(", ") : contact.serviceInterest || "Inquiry",
+        source: "Contact Form",
+        score: Math.floor(Math.random() * (99 - 70) + 70), // High score for direct inquiries
+        status: "hot",
         assignee: "Unassigned",
-        lastActivity: new Date(booking.createdAt).toLocaleDateString(
-          undefined,
-          {
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          },
-        ),
-        notes: "Auto-generated lead from booking request.",
-        rawStatus: booking.status,
+        lastActivity: new Date(contact.createdAt).toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        notes: contact.message || "New inquiry from website form.",
+        rawStatus: "pending",
+        companyName: contact.companyName
       };
     });
 
-    setLeads(processed);
+    const sortedLeads = [...contactLeads].sort(
+      (a, b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime(),
+    );
+
+    setLeads(sortedLeads);
   };
 
   const getStatusBadge = (status: string) => {
@@ -182,25 +154,13 @@ const LeadManagement = () => {
           <thead className="bg-muted/50 border-b border-border">
             <tr>
               <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Lead
+                Name
               </th>
               <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Interest
+                Email
               </th>
               <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Source
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                AI Score
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Status
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Assignee
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Last Activity
+                Mobile Number
               </th>
               <th className="text-left p-4 text-sm font-semibold text-foreground">
                 Actions
@@ -214,34 +174,19 @@ const LeadManagement = () => {
                 className="border-b border-border last:border-b-0 hover:bg-muted/30 transition-colors"
               >
                 <td className="p-4">
-                  <div>
-                    <div className="font-medium text-foreground">
-                      {lead.name}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {lead.contact}
-                    </div>
+                  <div className="font-medium text-foreground">
+                    {lead.name}
                   </div>
                 </td>
                 <td className="p-4">
-                  <Badge variant="outline">{lead.interest}</Badge>
-                </td>
-                <td className="p-4 text-sm text-muted-foreground">
-                  {lead.source}
+                  <div className="text-sm text-muted-foreground">
+                    {lead.email}
+                  </div>
                 </td>
                 <td className="p-4">
-                  <span
-                    className={`font-bold text-lg ${getScoreColor(lead.score)}`}
-                  >
-                    {lead.score}
-                  </span>
-                </td>
-                <td className="p-4">{getStatusBadge(lead.status)}</td>
-                <td className="p-4 text-sm text-muted-foreground">
-                  {lead.assignee}
-                </td>
-                <td className="p-4 text-sm text-muted-foreground">
-                  {lead.lastActivity}
+                  <div className="text-sm text-muted-foreground">
+                    {lead.phone}
+                  </div>
                 </td>
                 <td className="p-4">
                   <div className="flex gap-1">
@@ -309,7 +254,7 @@ const LeadManagement = () => {
             Lead <span className="text-primary italic">Management</span>
           </h1>
           <p className="text-muted-foreground mt-2">
-            Track, score, and convert leads with AI assistance
+            Track and manage your incoming leads
           </p>
         </div>
         <Button onClick={handleAddLead}>
@@ -320,29 +265,11 @@ const LeadManagement = () => {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-4 mb-8">
-        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
+        <div className="bg-background border border-border rounded-xl p-5 shadow-sm col-span-4 sm:col-span-1">
           <p className="text-2xl font-extrabold text-foreground">
             {leads.length}
           </p>
           <p className="text-sm text-muted-foreground">Total Leads</p>
-        </div>
-        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
-          <p className="text-2xl font-extrabold text-red-600">
-            {hotLeads.length}
-          </p>
-          <p className="text-sm text-muted-foreground">Hot Leads</p>
-        </div>
-        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
-          <p className="text-2xl font-extrabold text-orange-600">
-            {warmLeads.length}
-          </p>
-          <p className="text-sm text-muted-foreground">Warm Leads</p>
-        </div>
-        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
-          <p className="text-2xl font-extrabold text-foreground">
-            {conversionRate}%
-          </p>
-          <p className="text-sm text-muted-foreground">Conversion Rate</p>
         </div>
       </div>
 
@@ -358,22 +285,9 @@ const LeadManagement = () => {
         </Button>
       </div>
 
-      <Tabs defaultValue="all" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="all">All Leads ({leads.length})</TabsTrigger>
-          <TabsTrigger value="hot">Hot ({hotLeads.length})</TabsTrigger>
-          <TabsTrigger value="warm">Warm ({warmLeads.length})</TabsTrigger>
-          <TabsTrigger value="cold">Cold ({coldLeads.length})</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all">{renderLeadTable(leads)}</TabsContent>
-
-        <TabsContent value="hot">{renderLeadTable(hotLeads)}</TabsContent>
-
-        <TabsContent value="warm">{renderLeadTable(warmLeads)}</TabsContent>
-
-        <TabsContent value="cold">{renderLeadTable(coldLeads)}</TabsContent>
-      </Tabs>
+      <div className="mt-6">
+        {renderLeadTable(leads)}
+      </div>
 
       {/* Lead View Modal */}
       <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>

@@ -14,7 +14,7 @@ export const createContactForm = async (contactForm: any) => {
       contactForm
     );
 
-    if (response.status === 200 && response.data.success) {
+    if ((response.status === 200 || response.status === 201) && response.data.success) {
       return response.data.data;
     }
 
@@ -45,7 +45,7 @@ export const getAllContactForms = async () => {
       `${API.domain}${API.endPoints.getAllContactForm}`
     );
 
-    if (response.status === 200 && response.data.success) {
+    if ((response.status === 200 || response.status === 201) && response.data.success) {
       return response.data.data;
     }
 
@@ -77,7 +77,7 @@ export const getContactFormById = async (id: string) => {
       `${API.domain}${API.endPoints.getContactFormById}${id}`
     );
 
-    if (response.status === 200 && response.data.success) {
+    if ((response.status === 200 || response.status === 201) && response.data.success) {
       return response.data.data;
     }
 
@@ -111,7 +111,7 @@ export const updateContactForm = async (id: string, contactForm: any) => {
       contactForm
     );
 
-    if (response.status === 200 && response.data.success) {
+    if ((response.status === 200 || response.status === 201) && response.data.success) {
       return response.data.data;
     }
 
@@ -143,7 +143,7 @@ export const deleteContactForm = async (id: string) => {
       `${API.domain}${API.endPoints.deleteContactForm}${id}`
     );
 
-    if (response.status === 200 && response.data.success) {
+    if ((response.status === 200 || response.status === 201) && response.data.success) {
       return response.data.message || "Contact form deleted successfully";
     }
 
