@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Headphones, TrendingUp, Handshake, Mail, Phone } from "lucide-react";
 import { createContactForm } from "@/Api/contactForm.service";
 import { toast } from "sonner";
 
@@ -12,24 +12,27 @@ interface GetInTouchModalProps {
 const contactCards = [
     {
         title: "Support",
+        icon: Headphones,
         description: "Need technical help or facing issues with our platform? Our support team is here 24×7 to assist you with queries and troubleshooting.",
         contacts: [
-            { label: "Support Mail:", value: "support@flashspace.co", href: "mailto:support@flashspace.co" },
+            { label: "Support Mail:", value: "support@flashspace.co", href: "mailto:support@flashspace.co", icon: Mail },
         ],
     },
     {
         title: "Sales",
+        icon: TrendingUp,
         description: "Want to explore FlashSpace solutions for your business? Our sales experts will help you find the right plan and growth strategy.",
         contacts: [
-            { label: "Sales Mail:", value: "sales@flashspace.co", href: "mailto:sales@flashspace.co" },
-            { label: "Contact:", value: "8100888777" },
+            { label: "Sales Mail:", value: "sales@flashspace.co", href: "mailto:sales@flashspace.co", icon: Mail },
+            { label: "Contact:", value: "8100888777", icon: Phone },
         ],
     },
     {
         title: "Partnership",
+        icon: Handshake,
         description: "Interested in collaborating or becoming a FlashSpace partner? Let's innovate together and build future-ready digital solutions.",
         contacts: [
-            { label: "Partnership Mail:", value: "partner@flashspace.co", href: "mailto:partner@flashspace.co" },
+            { label: "Partnership Mail:", value: "partner@flashspace.co", href: "mailto:partner@flashspace.co", icon: Mail },
         ],
     },
 ];
@@ -111,28 +114,36 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
 
                         <div className="grid md:grid-cols-2 gap-0 overflow-hidden rounded-2xl">
                             {/* Left — Contact Cards (Desktop only) */}
-                            <div className="hidden md:block p-5 sm:p-6 space-y-3 bg-muted/30">
+                            <div className="hidden md:block p-5 sm:p-6 space-y-4 bg-muted/30">
                                 {contactCards.map((card) => (
                                     <div
                                         key={card.title}
-                                        className="bg-background rounded-xl border border-border p-4 shadow-sm"
+                                        className="bg-background rounded-2xl border border-border p-5 shadow-sm hover:shadow-md transition-shadow duration-300"
                                     >
-                                        <h3 className="text-base font-bold text-foreground mb-1">{card.title}</h3>
-                                        <p className="text-xs text-muted-foreground mb-2 leading-relaxed">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                                                <card.icon className="w-5 h-5" />
+                                            </div>
+                                            <h3 className="text-lg font-bold text-foreground">{card.title}</h3>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
                                             {card.description}
                                         </p>
-                                        <div className="space-y-0.5">
+                                        <div className="space-y-2">
                                             {card.contacts.map((c) => (
-                                                <p key={c.label} className="text-xs text-foreground">
-                                                    <span className="font-semibold">{c.label}</span>{" "}
-                                                    {c.href ? (
-                                                        <a href={c.href} className="text-primary hover:text-primary/80 transition-colors underline">
-                                                            {c.value}
-                                                        </a>
-                                                    ) : (
-                                                        <span>{c.value}</span>
-                                                    )}
-                                                </p>
+                                                <div key={c.label} className="flex items-center gap-2 group">
+                                                    <c.icon className="w-3.5 h-3.5 text-primary/60 group-hover:text-primary transition-colors" />
+                                                    <p className="text-xs text-foreground">
+                                                        <span className="font-semibold text-muted-foreground mr-1">{c.label}</span>{" "}
+                                                        {c.href ? (
+                                                            <a href={c.href} className="text-primary font-medium hover:text-primary/80 transition-colors underline decoration-primary/30 underline-offset-2">
+                                                                {c.value}
+                                                            </a>
+                                                        ) : (
+                                                            <span className="font-medium">{c.value}</span>
+                                                        )}
+                                                    </p>
+                                                </div>
                                             ))}
                                         </div>
                                     </div>
@@ -140,44 +151,51 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                             </div>
 
                             {/* Right — Form */}
-                            <div className="p-6 sm:p-8 bg-background flex flex-col justify-center">
-                                <h2 className="text-2xl font-bold text-foreground mb-2">
-                                    Get Expert Advice for Your Virtual Office
-                                </h2>
-                                <p className="text-sm text-muted-foreground mb-6">
-                                    Find your perfect virtual office solution with our expert insights.
-                                </p>
+                            <div className="p-6 sm:p-10 bg-background flex flex-col justify-center">
+                                <div className="mb-6">
+                                    <img
+                                        src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
+                                        alt="FlashSpace Logo"
+                                        className="h-8 md:h-10 w-auto mb-4 dark:invert opacity-90"
+                                    />
+                                    <h2 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight leading-tight mb-2">
+                                        Get Expert Advice for Your Virtual Office
+                                    </h2>
+                                    <p className="text-sm md:text-base text-muted-foreground">
+                                        Find your perfect virtual office solution with our expert insights.
+                                    </p>
+                                </div>
 
-                                <form onSubmit={handleSubmit} className="space-y-4">
-                                    <div>
+                                <form onSubmit={handleSubmit} className="space-y-5">
+                                    <div className="relative group">
                                         <input
                                             type="text"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
                                             placeholder="Name*"
-                                            className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+                                            className="w-full px-5 py-4 rounded-xl border-2 border-border/60 bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm group-hover:border-primary/30"
                                             required
                                         />
                                     </div>
 
-                                    <div>
+                                    <div className="relative group">
                                         <input
                                             type="tel"
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
                                             placeholder="Mobile number*"
-                                            className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+                                            className="w-full px-5 py-4 rounded-xl border-2 border-border/60 bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm group-hover:border-primary/30"
                                             required
                                         />
                                     </div>
 
-                                    <div>
+                                    <div className="relative group">
                                         <input
                                             type="email"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             placeholder="Email*"
-                                            className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+                                            className="w-full px-5 py-4 rounded-xl border-2 border-border/60 bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm group-hover:border-primary/30"
                                             required
                                         />
                                     </div>
@@ -185,11 +203,11 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3.5 rounded-lg hover:bg-primary/90 transition-all text-sm mt-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold py-4 rounded-xl hover:bg-primary/95 hover:shadow-lg active:scale-[0.98] transition-all text-base mt-4 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {isLoading ? (
                                             <>
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 className="w-5 h-5 animate-spin" />
                                                 Submitting...
                                             </>
                                         ) : (
