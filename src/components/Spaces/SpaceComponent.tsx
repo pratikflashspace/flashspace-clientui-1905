@@ -104,8 +104,17 @@ const SpaceComponent = () => {
   // Get photos - use API image or fallback to defaults
   const getPhotos = () => {
     if (!spaceDetails) return DEFAULT_PHOTOS;
-    const mainImage = spaceDetails.image || DEFAULT_PHOTOS[0];
-    return [mainImage, ...DEFAULT_PHOTOS.slice(1)];
+
+    const gallery = Array.isArray(spaceDetails.images) ? spaceDetails.images : [];
+    const mainImage = spaceDetails.image || gallery[0];
+
+    // Keep main image first, then rest of gallery without duplicates
+    const ordered = [
+      ...(mainImage ? [mainImage] : []),
+      ...gallery.filter((img) => img && img !== mainImage),
+    ];
+
+    return ordered.length ? ordered : DEFAULT_PHOTOS;
   };
 
   const handleBookNow = () => {
@@ -149,6 +158,10 @@ const SpaceComponent = () => {
   }
 
   const photos = getPhotos();
+  // Ensure the desktop grid always has 4 images; pad with defaults if needed
+  const photosForGrid = (photos.length >= 4)
+    ? photos
+    : [...photos, ...DEFAULT_PHOTOS].slice(0, 4);
 
   return (<div className="flex flex-col min-h-screen">
     <Header />
@@ -253,7 +266,7 @@ const SpaceComponent = () => {
         <div className="hidden md:grid grid-cols-4 gap-2 h-[400px] mb-8 rounded-2xl overflow-hidden">
           <div className="col-span-2 h-full">
             <img
-              src={photos[0]}
+              src={photosForGrid[0]}
               alt="Main Space"
               className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
               onClick={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}
@@ -261,13 +274,13 @@ const SpaceComponent = () => {
           </div>
           <div className="col-span-1 grid grid-rows-2 gap-2 h-full">
             <img
-              src={photos[1]}
+              src={photosForGrid[1]}
               alt="Detail 1"
               className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
               onClick={() => { setGalleryInitialIndex(1); setIsGalleryOpen(true); }}
             />
             <img
-              src={photos[2]}
+              src={photosForGrid[2]}
               alt="Detail 2"
               className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
               onClick={() => { setGalleryInitialIndex(2); setIsGalleryOpen(true); }}
@@ -275,7 +288,7 @@ const SpaceComponent = () => {
           </div>
           <div className="col-span-1 h-full relative">
             <img
-              src={photos[3]}
+              src={photosForGrid[3]}
               alt="Detail 3"
               className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
               onClick={() => { setGalleryInitialIndex(3); setIsGalleryOpen(true); }}

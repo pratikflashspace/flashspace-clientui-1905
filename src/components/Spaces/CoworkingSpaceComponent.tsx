@@ -88,8 +88,16 @@ const CoworkingSpaceComponent = () => {
   // Get photos - use API image or fallback to defaults
   const getPhotos = () => {
     if (!spaceDetails) return DEFAULT_PHOTOS;
-    const mainImage = spaceDetails.image || DEFAULT_PHOTOS[0];
-    return [mainImage, ...DEFAULT_PHOTOS.slice(1)];
+
+    const gallery = Array.isArray(spaceDetails.images) ? spaceDetails.images : [];
+    const mainImage = spaceDetails.image || gallery[0];
+
+    const ordered = [
+      ...(mainImage ? [mainImage] : []),
+      ...gallery.filter((img) => img && img !== mainImage),
+    ];
+
+    return ordered.length ? ordered : DEFAULT_PHOTOS;
   };
 
   const handleBookNow = () => {
@@ -138,6 +146,9 @@ const CoworkingSpaceComponent = () => {
   }
 
   const photos = getPhotos();
+  const photosForGrid = (photos.length >= 4)
+    ? photos
+    : [...photos, ...DEFAULT_PHOTOS].slice(0, 4);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -208,7 +219,7 @@ const CoworkingSpaceComponent = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[400px] mb-8 rounded-2xl overflow-hidden">
             <div className="md:col-span-2 h-full">
               <img
-                src={photos[0]}
+                src={photosForGrid[0]}
                 alt="Main Space"
                 className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                 onClick={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}
@@ -216,13 +227,13 @@ const CoworkingSpaceComponent = () => {
             </div>
             <div className="md:col-span-1 grid grid-rows-2 gap-2 h-full">
               <img
-                src={photos[1]}
+                src={photosForGrid[1]}
                 alt="Detail 1"
                 className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                 onClick={() => { setGalleryInitialIndex(1); setIsGalleryOpen(true); }}
               />
               <img
-                src={photos[2]}
+                src={photosForGrid[2]}
                 alt="Detail 2"
                 className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                 onClick={() => { setGalleryInitialIndex(2); setIsGalleryOpen(true); }}
@@ -230,7 +241,7 @@ const CoworkingSpaceComponent = () => {
             </div>
             <div className="md:col-span-1 h-full relative">
               <img
-                src={photos[3]}
+                src={photosForGrid[3]}
                 alt="Detail 3"
                 className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                 onClick={() => { setGalleryInitialIndex(3); setIsGalleryOpen(true); }}

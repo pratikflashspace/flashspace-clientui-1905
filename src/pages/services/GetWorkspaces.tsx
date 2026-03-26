@@ -62,6 +62,18 @@ interface UnifiedWorkspace {
 
 
 const DEFAULT_WORKSPACE_IMAGE = "/hero-illustrated.jpg";
+const PAGE_SIZE = 20;
+
+type PaginationMeta = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage?: boolean;
+  hasPrevPage?: boolean;
+  nextPage?: number | null;
+  prevPage?: number | null;
+};
 
 const WorkspaceCard = ({
   ws,
@@ -450,6 +462,11 @@ const GetWorkspaces = () => {
     }
   }, [location.pathname]);
 
+  // Reset pagination whenever type or city changes
+  useEffect(() => {
+    setPage(1);
+  }, [workspaceType, activeCity]);
+
   const handleWorkspaceTypeChange = (value: string) => {
     setWorkspaceType(value);
     const params = new URLSearchParams(location.search);
@@ -477,6 +494,22 @@ const GetWorkspaces = () => {
 
   const [workspaces, setWorkspaces] = useState<UnifiedWorkspace[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
+
+  const goPrevPage = () => {
+    if (workspaceType !== "virtual-office") return;
+    if (pagination?.hasPrevPage) {
+      setPage((p) => Math.max(1, p - 1));
+    }
+  };
+
+  const goNextPage = () => {
+    if (workspaceType !== "virtual-office") return;
+    if (pagination?.hasNextPage) {
+      setPage((p) => p + 1);
+    }
+  };
 
   // Fetch available cities once on mount
   useEffect(() => {
@@ -494,7 +527,13 @@ const GetWorkspaces = () => {
       try {
         let fetchedData: any[] = [];
         if (workspaceType === "virtual-office") {
-          fetchedData = await getVirtualOfficesByCity(activeCity);
+          const { offices, pagination } = await getVirtualOfficesByCity(
+            activeCity,
+            page,
+            PAGE_SIZE,
+          );
+          setPagination(pagination || null);
+          fetchedData = offices;
           setWorkspaces(
             fetchedData.map((vo) => ({
               id: vo._id || "",
@@ -535,6 +574,7 @@ const GetWorkspaces = () => {
           );
         } else if (workspaceType === "coworking") {
           fetchedData = await getCoworkingSpacesByCity(activeCity);
+          setPagination(null);
           setWorkspaces(
             fetchedData.map((cw) => ({
               id: cw._id || "",
@@ -603,13 +643,14 @@ const GetWorkspaces = () => {
       } catch (error) {
         console.error("Error fetching workspaces:", error);
         setWorkspaces([]); // Fallback
+        setPagination(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchWorkspaces();
-  }, [workspaceType, activeCity]);
+  }, [workspaceType, activeCity, page]);
 
   // Client-side filtering logic
   const filteredWorkspaces = useMemo(() => {
@@ -680,6 +721,10 @@ const GetWorkspaces = () => {
 
     return list.sort((a, b) => Number(b.popular) - Number(a.popular));
   }, [filteredWorkspaces, sortBy]);
+
+  const totalResults = pagination?.total ?? sortedWorkspaces.length;
+  const currentPage = pagination?.page ?? 1;
+  const totalPages = pagination?.totalPages ?? 1;
 
   const typeLabel: Record<string, string> = {
     "virtual-office": "Virtual Office",
@@ -843,7 +888,7 @@ const GetWorkspaces = () => {
               <p className="text-sm text-muted-foreground">
                 Showing{" "}
                 <span className="font-semibold text-foreground">
-                  {sortedWorkspaces.length} result(s)
+                  {sortedWorkspaces.length} of {totalResults} result(s)
                 </span>{" "}
                 for {typeLabel[workspaceType].toLowerCase()} in{" "}
                 <span className="font-medium text-foreground">
@@ -851,6 +896,27 @@ const GetWorkspaces = () => {
                 </span>
               </p>
               <div className="flex items-center gap-2">
+                {workspaceType === "virtual-office" && totalPages > 1 && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <button
+                      onClick={goPrevPage}
+                      disabled={!pagination?.hasPrevPage}
+                      className="px-3 py-1 rounded-full border border-border bg-card text-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+                    >
+                      Prev
+                    </button>
+                    <span className="text-[11px]">
+                      Page {currentPage} / {totalPages}
+                    </span>
+                    <button
+                      onClick={goNextPage}
+                      disabled={!pagination?.hasNextPage}
+                      className="px-3 py-1 rounded-full border border-border bg-card text-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
                 <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
                   <button
                     onClick={() => setViewMode("list")}
