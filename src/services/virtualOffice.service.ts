@@ -12,7 +12,6 @@ interface ApiResponse<T> {
   message?: string;
 }
 
-
 const toNumber = (value: any) => {
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : 0;
@@ -23,18 +22,30 @@ const formatYearPrice = (value: any) => {
   return amount > 0 ? `₹${amount.toLocaleString()}/yr` : "";
 };
 
+type PaginationMeta = {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage?: boolean;
+  hasPrevPage?: boolean;
+  nextPage?: number | null;
+  prevPage?: number | null;
+};
+
 /**
  * Get virtual offices by city
- * @param city - City name
- * @returns Array of virtual offices in that city
+ * Supports pagination via page + limit
  */
 export const getVirtualOfficesByCity = async (
   city: string,
-): Promise<VirtualOfficeItem[]> => {
+  page: number = 1,
+  limit: number = 12,
+): Promise<{ offices: VirtualOfficeItem[]; pagination?: PaginationMeta }> => {
   try {
-    // console.log(`📍 Fetching virtual offices for city: ${city}`);
     const response = await axiosInstance.get(
       `/virtualOffice/getByCity/${city}`,
+      { params: { page, limit } },
     );
     const data = response.data as ApiResponse<any>;
 
@@ -43,16 +54,16 @@ export const getVirtualOfficesByCity = async (
       const offices = Array.isArray(data.data)
         ? data.data
         : (data.data as any).offices;
+      const pagination = (response.data as any).pagination as
+        | PaginationMeta
+        | undefined;
 
-      console.log(`✅ Successfully fetched ${offices.length} virtual offices`);
-
-      // Map backend data to frontend expectations
-      return offices.map((o: any) => ({
+      const mapped = offices.map((o: any) => ({
         ...o,
         coordinates:
           o.coordinates ||
           (Array.isArray(o.location?.coordinates) &&
-            o.location.coordinates.length === 2
+          o.location.coordinates.length === 2
             ? {
                 lat: o.location.coordinates[1],
                 lng: o.location.coordinates[0],
@@ -73,6 +84,8 @@ export const getVirtualOfficesByCity = async (
         rating: toNumber(o.rating) || toNumber(o.avgRating),
         reviews: toNumber(o.reviews) || toNumber(o.totalReviews),
       }));
+
+      return { offices: mapped, pagination };
     }
 
     throw new Error(data.message || "Failed to fetch virtual offices");
@@ -87,10 +100,12 @@ export const getVirtualOfficesByCity = async (
 };
 
 /**
- * Get all virtual offices
- * @returns Array of all virtual offices
+ * Get all virtual offices (optionally paginated by backend defaults)
  */
-export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
+export const getAllVirtualOffices = async (): Promise<{
+  offices: VirtualOfficeItem[];
+  pagination?: PaginationMeta;
+}> => {
   try {
     const response = await axiosInstance.get("/virtualOffice/getAll");
     const data = response.data as ApiResponse<any>;
@@ -99,13 +114,16 @@ export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
       const offices = Array.isArray(data.data)
         ? data.data
         : data.data?.offices || [];
+      const pagination = (response.data as any).pagination as
+        | PaginationMeta
+        | undefined;
 
-      return offices.map((o: any) => ({
+      const mapped = offices.map((o: any) => ({
         ...o,
         coordinates:
           o.coordinates ||
           (Array.isArray(o.location?.coordinates) &&
-            o.location.coordinates.length === 2
+          o.location.coordinates.length === 2
             ? {
                 lat: o.location.coordinates[1],
                 lng: o.location.coordinates[0],
@@ -126,6 +144,8 @@ export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
         rating: toNumber(o.rating) || toNumber(o.avgRating),
         reviews: toNumber(o.reviews) || toNumber(o.totalReviews),
       }));
+
+      return { offices: mapped, pagination };
     }
 
     throw new Error(data.message || "Failed to fetch virtual offices");
@@ -137,8 +157,6 @@ export const getAllVirtualOffices = async (): Promise<VirtualOfficeItem[]> => {
 
 /**
  * Get virtual office by ID
- * @param id - Virtual office ID
- * @returns Virtual office details
  */
 export const getVirtualOfficeById = async (
   id: string,
@@ -160,8 +178,6 @@ export const getVirtualOfficeById = async (
 
 /**
  * Create a new virtual office
- * @param data - Virtual office data
- * @returns Created virtual office
  */
 export const createVirtualOffice = async (
   data: Partial<VirtualOfficeItem>,
@@ -183,9 +199,6 @@ export const createVirtualOffice = async (
 
 /**
  * Update a virtual office
- * @param id - Virtual office ID
- * @param data - Updated virtual office data
- * @returns Updated virtual office
  */
 export const updateVirtualOffice = async (
   id: string,
@@ -211,8 +224,6 @@ export const updateVirtualOffice = async (
 
 /**
  * Delete a virtual office
- * @param id - Virtual office ID
- * @returns Deletion status
  */
 export const deleteVirtualOffice = async (id: string): Promise<boolean> => {
   try {

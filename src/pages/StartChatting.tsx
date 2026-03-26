@@ -637,7 +637,7 @@ const StartChatting = () => {
     const fetchGlobalMarkers = async () => {
       if (hasLoadedGlobalMarkers) return;
       try {
-        const [voRes, cwRes] = await Promise.all([
+        const [{ offices: voRes }, cwRes] = await Promise.all([
           getAllVirtualOffices(),
           getAllCoworkingSpaces()
         ]);
