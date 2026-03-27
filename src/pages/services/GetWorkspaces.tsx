@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -18,6 +18,8 @@ import {
   LayoutGrid,
   ChevronRight,
   ChevronLeft,
+  ChevronUp,
+  ChevronDown,
   Bookmark,
   ShoppingCart,
   Phone,
@@ -73,6 +75,95 @@ type PaginationMeta = {
   hasPrevPage?: boolean;
   nextPage?: number | null;
   prevPage?: number | null;
+};
+
+/** Custom city dropdown with always-visible clickable chevron arrows */
+const CityDropdown = ({
+  activeCity,
+  cities,
+  loading,
+  onSelect,
+}: {
+  activeCity: string;
+  cities: string[];
+  loading: boolean;
+  onSelect: (city: string) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const scroll = (dir: "up" | "down") => {
+    if (listRef.current) {
+      listRef.current.scrollBy({ top: dir === "up" ? -120 : 120, behavior: "smooth" });
+    }
+  };
+
+  return (
+    <div className="sm:w-[160px] relative" ref={containerRef}>
+      <button
+        onClick={() => setOpen(!open)}
+        disabled={loading}
+        className="flex items-center gap-1.5 border border-border/60 rounded-xl h-10 text-sm font-medium px-4 w-full transition-all duration-200 bg-card hover:border-border hover:shadow-sm text-foreground"
+      >
+        <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+        <span className="flex-1 text-left truncate">{loading ? "Loading..." : activeCity}</span>
+        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 mt-1 w-full bg-popover border border-border rounded-xl shadow-lg z-[9999] flex flex-col overflow-hidden">
+          {/* Always-visible UP chevron */}
+          <button
+            type="button"
+            onClick={() => scroll("up")}
+            className="flex items-center justify-center py-1.5 border-b border-border text-muted-foreground hover:bg-accent hover:text-foreground transition-colors cursor-pointer shrink-0"
+          >
+            <ChevronUp className="h-4 w-4" />
+          </button>
+
+          {/* Scrollable city list */}
+          <div ref={listRef} className="max-h-[200px] overflow-y-auto overscroll-contain">
+            {cities.length > 0 ? (
+              cities.map((city) => (
+                <button
+                  key={city}
+                  onClick={() => { onSelect(city); setOpen(false); }}
+                  className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-accent ${
+                    city === activeCity ? "bg-accent/50 font-medium text-primary" : "text-popover-foreground"
+                  }`}
+                >
+                  {city}
+                </button>
+              ))
+            ) : (
+              <div className="px-4 py-3 text-sm text-muted-foreground">No cities available</div>
+            )}
+          </div>
+
+          {/* Always-visible DOWN chevron */}
+          <button
+            type="button"
+            onClick={() => scroll("down")}
+            className="flex items-center justify-center py-1.5 border-t border-border text-muted-foreground hover:bg-accent hover:text-foreground transition-colors cursor-pointer shrink-0"
+          >
+            <ChevronDown className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
 };
 
 const WorkspaceCard = ({
@@ -779,34 +870,13 @@ const GetWorkspaces = () => {
             {/* Divider */}
             <div className="hidden sm:block w-px h-8 bg-border/60 flex-shrink-0" />
 
-            {/* City — dynamic dropdown */}
-            <div className="sm:w-[160px]">
-              <Select
-                value={activeCity}
-                onValueChange={(city) => setActiveCity(city)}
-                disabled={citiesLoading}
-              >
-                <SelectTrigger className="border border-border/60 shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 bg-card hover:border-border hover:shadow-sm text-foreground">
-                  <MapPin className="w-3.5 h-3.5 text-muted-foreground mr-1.5 flex-shrink-0" />
-                  <SelectValue
-                    placeholder={citiesLoading ? "Loading..." : "Select city"}
-                  />
-                </SelectTrigger>
-                <SelectContent className="max-h-64">
-                  {availableCities.length > 0 ? (
-                    availableCities.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <div className="px-4 py-3 text-sm text-muted-foreground">
-                      No cities available
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* City — custom dropdown with always-visible chevrons */}
+            <CityDropdown
+              activeCity={activeCity}
+              cities={availableCities}
+              loading={citiesLoading}
+              onSelect={(city) => setActiveCity(city)}
+            />
 
             {/* Search Location */}
             <div className="relative flex-1 min-w-[140px]">
