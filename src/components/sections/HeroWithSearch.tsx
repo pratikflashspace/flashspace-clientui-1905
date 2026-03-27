@@ -378,4 +378,4 @@ export const HeroWithSearch = () => {
             </div>
         </section>
     );
-};
+};
