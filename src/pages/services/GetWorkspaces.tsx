@@ -792,7 +792,7 @@ const GetWorkspaces = () => {
                     placeholder={citiesLoading ? "Loading..." : "Select city"}
                   />
                 </SelectTrigger>
-                <SelectContent className="max-h-64 overflow-y-auto">
+                <SelectContent className="max-h-64">
                   {availableCities.length > 0 ? (
                     availableCities.map((city) => (
                       <SelectItem key={city} value={city}>
