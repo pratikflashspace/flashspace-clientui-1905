@@ -280,7 +280,7 @@ const WorkspaceCard = ({
           {/* Name + Rating + Actions */}
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1">
-              {ws.spaceId || ws.address || ws.location || ws.name}
+              {ws.spaceId || ws.name} {ws.address && `at ${ws.address}`}
             </h3>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
@@ -448,7 +448,7 @@ const WorkspaceCard = ({
         {/* Name + Rating */}
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1">
-            {ws.spaceId || ws.address || ws.location || ws.name}
+            {ws.spaceId || ws.name} {ws.address && `at ${ws.address}`}
           </h3>
           <div className="flex items-center gap-1 flex-shrink-0 bg-muted/60 rounded-full px-2 py-0.5">
             <Star className="w-3 h-3 fill-gold text-gold" />
@@ -1077,7 +1077,7 @@ const GetWorkspaces = () => {
               markers={useMemo(() => sortedWorkspaces.map((ws) => ({
                 id: ws.id,
                 position: { lat: ws.lat, lng: ws.lng },
-                title: ws.spaceId || ws.location || ws.name,
+                title: ws.spaceId || ws.name,
                 image: ws.images?.[0] || ws.image,
                 price: ws.plans?.[0]?.price,
                 rating: ws.rating,
@@ -1170,7 +1170,7 @@ const GetWorkspaces = () => {
               markers={useMemo(() => sortedWorkspaces.map((ws) => ({
                 id: ws.id,
                 position: { lat: ws.lat, lng: ws.lng },
-                title: ws.spaceId || ws.location || ws.name,
+                title: ws.spaceId || ws.name,
                 image: ws.images?.[0] || ws.image,
                 price: ws.plans?.[0]?.price,
                 rating: ws.rating,
