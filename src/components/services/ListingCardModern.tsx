@@ -23,6 +23,7 @@ export type ListingItem = (
   | MeetingRoomItem
   | {
     _id: string;
+    spaceId?: string;
     name: string;
     address: string;
     area: string;
@@ -267,7 +268,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
           {/* Title Row */}
           <div className="flex items-start justify-between gap-2 mb-2">
             <h4 className="text-base font-bold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1">
-              {item.name}
+              {item.spaceId || item.name} {item.address && `at ${item.address}`}
             </h4>
             <div className="flex items-center gap-1 shrink-0">
               <Star className="w-3.5 h-3.5 text-[#EDB003] fill-[#EDB003]" />
@@ -282,7 +283,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
 
           {/* Location */}
           <div className="flex items-center gap-1 text-gray-500 text-sm mb-2">
-            <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+            <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-[#35503F]" />
             <span className="line-clamp-1">{item.address}</span>
           </div>
 

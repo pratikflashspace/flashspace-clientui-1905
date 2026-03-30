@@ -9,6 +9,7 @@ import ListingCardModern from "@/components/services/ListingCardModern";
 import MapLibreMap from "@/components/Map/MapLibreMap";
 import { getMeetingRoomsByCity } from "@/services/meetingRoom.service";
 import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
+import SearchHeader from "@/components/services/SearchHeader";
 import {
     City,
     BusinessSolution,
@@ -33,6 +34,7 @@ const OnDemand = () => {
     const [meetingRooms, setOnDemand] = useState<MeetingRoomItem[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     // Available cities for search
     const availableCities: City[] = [
@@ -205,7 +207,7 @@ const OnDemand = () => {
 
             return {
                 position: room.coordinates || generateRandomCoordinates(resolvedCenter, index),
-                title: room.name,
+                title: room.spaceId || room.name,
                 address: room.address,
                 price: room.price,
                 rating: room.rating,
