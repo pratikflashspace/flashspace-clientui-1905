@@ -24,6 +24,7 @@ import {
   Calendar,
   ShieldCheck,
   Printer,
+  Map as MapIcon,
 } from "lucide-react";
 import hotToast from "react-hot-toast";
 
@@ -561,7 +562,7 @@ const getPhotos = () => {
         <div className="flex items-start justify-between mb-2">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
-              {data.name}
+              {data.spaceId || data.name}
             </h1>
             <span className="bg-primary text-primary-foreground bg-[#2D3F33] px-3 py-1 rounded-full text-xs font-semibold">
               {type.replace("-", " ").toUpperCase()}
@@ -586,7 +587,7 @@ const getPhotos = () => {
           </div>
           <span className="text-border hidden sm:block">•</span>
           <div className="flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+            <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-[#35503F]" />
             <span>{address}</span>
           </div>
         </div>
@@ -668,8 +669,7 @@ const getPhotos = () => {
             onClick={() => setLightboxIndex(null)}
           >
             <button
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={() => {
                 setLightboxIndex(null);
               }}
               className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20"
@@ -717,7 +717,7 @@ const getPhotos = () => {
               </h2>
               <p className="text-muted-foreground leading-relaxed">
                 {data.description ||
-                  `${data.name} is a premium workspace located in ${data.area || data.city}. Perfect for startups, freelancers, and enterprises looking for a professional business address and workspace solutions.`}
+                  `${data.spaceId ? data.spaceId + " at " : ""}${data.name} is a premium workspace located in ${data.area || data.city}. Perfect for startups, freelancers, and enterprises looking for a professional business address and workspace solutions.`}
               </p>
             </section>
 
@@ -754,8 +754,8 @@ const getPhotos = () => {
                   markers={mapData.map((ws) => ({
                     id: ws._id,
                     position: { lat: ws.lat, lng: ws.lng },
-                    title: ws.name,
-                    image: ws.image,
+                    title: ws.spaceId || ws.name,
+                    image: photos[0],
                     address: ws.address,
                     rating: ws.rating,
                     price: ws.price,

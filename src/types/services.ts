@@ -36,6 +36,7 @@ export interface Property {
   _id: string;
   id?: string;
   name: string;
+  spaceId?: string;
   address: string;
   city: string;
   area: string;
@@ -65,6 +66,7 @@ export interface Property {
 // Virtual Office specific types
 export interface VirtualOfficeItem {
   _id: string;
+  spaceId?: string;
   name: string;
   address: string;
   city: string;
@@ -117,6 +119,7 @@ export interface VirtualOfficeItem {
   createdAt?: string;
   updatedAt?: string;
   __v?: number;
+  property?: Property;
 }
 
 export type VirtualOfficeCityKey = "delhi" | "mumbai" | "bangalore" | "pune";
@@ -157,6 +160,7 @@ export type EventSpacesByCity = Record<EventSpaceCityKey, EventSpaceItem[]>;
 // Coworking Space specific types
 export interface CoworkingSpaceItem {
   _id: string;
+  spaceId?: string;
   name: string;
   address: string;
   city: string;
@@ -193,6 +197,7 @@ export interface CoworkingSpaceItem {
   createdAt?: string;
   updatedAt?: string;
   __v?: number;
+  property?: Property;
 }
 
 export type CoworkingSpaceCityKey = "delhi" | "mumbai" | "bangalore" | "pune";
@@ -204,6 +209,7 @@ export type CoworkingSpacesByCity = Record<
 // Meeting Room specific types
 export interface MeetingRoomItem {
   _id: string;
+  spaceId?: string;
   name: string;
   address: string;
   city: string;
@@ -244,6 +250,7 @@ export interface MeetingRoomItem {
   createdAt?: string;
   updatedAt?: string;
   __v?: number;
+  property?: Property;
 }
 
 export type MeetingRoomCityKey =
@@ -331,6 +338,7 @@ export interface DashboardData {
 
 export interface SpaceSnapshot {
   _id?: string;
+  spaceId?: string;
   name?: string;
   address?: string;
   city?: string;

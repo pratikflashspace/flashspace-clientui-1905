@@ -963,10 +963,10 @@ const BookingPage = () => {
                     </div>
                     <div className="p-8 md:w-3/5">
                       <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {spaceDetails.name}
+                        {spaceDetails.spaceId || spaceDetails.name}
                       </h3>
                       <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
-                        <MapPin className="w-4 h-4 text-gray-400" />
+                        <MapPin className="w-4 h-4 text-[#35503F]" />
                         {spaceDetails.address}
                       </div>
                       {spaceDetails.features && (
@@ -1269,10 +1269,10 @@ const BookingPage = () => {
                       />
                       <div>
                         <h4 className="font-bold text-gray-900">
-                          {spaceDetails.name}
+                          {spaceDetails.spaceId || spaceDetails.name}
                         </h4>
                         <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                          <MapPin className="w-3 h-3" />
+                          <MapPin className="w-3 h-3 text-[#35503F]" />
                           {spaceDetails.address}
                         </p>
                         <div className="flex gap-2 mt-2">

@@ -583,10 +583,10 @@ const MyBookings: React.FC = () => {
                   {/* Main Content */}
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-[#35503F] transition-colors line-clamp-1">
-                      {booking.spaceSnapshot?.name}
+                      {booking.spaceSnapshot?.spaceId || booking.spaceSnapshot?.name}
                     </h3>
                     <div className="flex items-start gap-1.5 text-gray-500 text-xs mb-2 h-8">
-                      <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                      <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0 text-[#35503F]" />
                       <span className="line-clamp-2">
                         {booking.spaceSnapshot?.address},{" "}
                         {booking.spaceSnapshot?.city}
@@ -738,10 +738,10 @@ const MyBookings: React.FC = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h2 className="text-xl font-bold text-gray-900">
-                      {selectedBooking.spaceSnapshot?.name}
+                      {selectedBooking.spaceSnapshot?.spaceId || selectedBooking.spaceSnapshot?.name}
                     </h2>
                     <p className="text-gray-500 flex items-center gap-1 mt-1">
-                      <MapPin className="w-4 h-4" />{" "}
+                      <MapPin className="w-4 h-4 text-[#35503F]" />{" "}
                       {selectedBooking.spaceSnapshot?.address}
                     </p>
                   </div>

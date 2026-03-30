@@ -24,6 +24,7 @@ import { useLocationMetadata } from "@/hooks/useLocationMetadata";
 // Define EventSpaceItem locally since it's used in this file
 interface EventSpaceItem {
   _id: string;
+  spaceId?: string;
   name: string;
   address: string;
   area: string;
@@ -243,7 +244,7 @@ const EventSpaces = () => {
 
       return {
         position: space.coordinates || resolvedCenter,
-        title: space.name,
+        title: space.spaceId || space.name,
         address: space.address,
         price: space.price,
         rating: space.rating,

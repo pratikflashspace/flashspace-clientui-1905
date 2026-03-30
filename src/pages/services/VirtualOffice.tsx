@@ -1,11 +1,17 @@
-ChevronRight,
+import {
+  ChevronRight,
   ChevronLeft,
   Grid3X3,
   List,
   Search,
   Presentation,
-  Map,
+  Map as MapIcon,
+  Building,
+  Users,
+  Phone,
+  MapPin,
 } from "lucide-react";
+import SearchHeader from "@/components/services/SearchHeader";
 import { Button } from "@/components/ui/button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, useMemo } from "react";
@@ -79,7 +85,7 @@ const VirtualOffice = () => {
 
       try {
         const data = await getVirtualOfficesByCity(selectedCity);
-        setVirtualOffices(data);
+        setVirtualOffices(data.offices || data);
       } catch (err: any) {
         setError(
           err.message || "Error connecting to server. Please try again later.",
@@ -221,7 +227,7 @@ const VirtualOffice = () => {
         position:
           office.coordinates ||
           generateRandomCoordinates(resolvedCenter, index),
-        title: office.name,
+        title: office.spaceId || office.name,
         address: office.address,
         price: office.gstPlanPricePerYear
           ? `₹${office.gstPlanPricePerYear.toLocaleString("en-IN")}/yr`
@@ -450,11 +456,10 @@ const VirtualOffice = () => {
           className="fixed top-[184px] right-8 z-30 w-10 h-10 rounded-full border border-border bg-card shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 cursor-pointer"
           aria-label="Show map"
         >
-          <Map className="w-4.5 h-4.5" />
+          <MapIcon className="w-4.5 h-4.5" />
         </button>
       )}
     </div>
-    </div >
   );
 };
 

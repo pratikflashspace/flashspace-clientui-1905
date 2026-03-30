@@ -175,7 +175,7 @@ const MeetingRooms = () => {
 
             return {
                 position: room.coordinates || generateRandomCoordinates(resolvedCenter, index),
-                title: room.name,
+                title: room.spaceId || room.name,
                 address: room.address,
                 price: room.price,
                 rating: room.rating,

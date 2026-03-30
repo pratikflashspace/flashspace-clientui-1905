@@ -319,26 +319,25 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
       const el = document.createElement('div');
       el.className = 'custom-marker';
 
-      const primary = '#FBBC04'; // yellow color for accents
+      const primary = '#35503F'; // dark green branding
 
-      // Custom Marker - Standard Style (Restored)
       el.innerHTML = `
         <div class="marker-container" style="
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          padding: 4px 10px;
-          border-radius: 999px;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
           background: #ffffff;
           box-shadow: 0 4px 12px rgba(0,0,0,0.18);
           border: 1px solid rgba(0,0,0,0.08);
           cursor: pointer;
-          white-space: nowrap;
         ">
           <!-- Left icon circle -->
           <span class="marker-icon" style="
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 999px;
             background: ${primary}10;
             display: inline-flex;
@@ -346,21 +345,9 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
             justify-content: center;
             color: ${primary};
           ">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
             </svg>
-          </span>
-
-          <!-- Title / label -->
-          <span style="
-            font-size: 12px;
-            font-weight: 600;
-            color: #202124;
-            max-width: 140px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          ">
-            ${markerData.title || 'Office Space'}
           </span>
         </div>
       `;
@@ -515,7 +502,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
                 </span>
               </div>
               <button style="
-                background: #1a1a1a;
+                background: #35503F;
                 color: white;
                 border: none;
                 padding: 8px 16px;

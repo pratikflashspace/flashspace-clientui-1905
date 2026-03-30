@@ -24,7 +24,7 @@ import {
   ShoppingCart,
   Phone,
   Flame,
-  Map,
+  Map as MapIcon,
 } from "lucide-react";
 import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import MapLibreMap from "@/components/Map/MapLibreMap";
@@ -60,6 +60,7 @@ interface UnifiedWorkspace {
   negotiable: boolean;
   lat: number;
   lng: number;
+  spaceId?: string;
 }
 
 
@@ -140,9 +141,8 @@ const CityDropdown = ({
                 <button
                   key={city}
                   onClick={() => { onSelect(city); setOpen(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-accent ${
-                    city === activeCity ? "bg-accent/50 font-medium text-primary" : "text-popover-foreground"
-                  }`}
+                  className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-accent ${city === activeCity ? "bg-accent/50 font-medium text-primary" : "text-popover-foreground"
+                    }`}
                 >
                   {city}
                 </button>
@@ -234,6 +234,8 @@ const WorkspaceCard = ({
     coordinates: { lat: ws.lat, lng: ws.lng },
   };
 
+  console.log(`🏠 Rendering Card: ${ws.name}, WS OBJECT:`, JSON.stringify(ws, null, 2));
+
   const prevImg = (e: React.MouseEvent) => {
     e.stopPropagation();
     setImgIndex((i) => (i - 1 + images.length) % images.length);
@@ -277,8 +279,8 @@ const WorkspaceCard = ({
         <div className="flex-1 min-w-0 flex flex-col gap-2">
           {/* Name + Rating + Actions */}
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px]">
-              {ws.location || ws.name}
+            <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1">
+              {ws.spaceId || ws.address || ws.location || ws.name}
             </h3>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
@@ -445,8 +447,8 @@ const WorkspaceCard = ({
       <div className="p-4 flex flex-col flex-1">
         {/* Name + Rating */}
         <div className="flex items-center justify-between gap-2">
-          <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate">
-            {ws.location || ws.name}
+          <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1">
+            {ws.spaceId || ws.address || ws.location || ws.name}
           </h3>
           <div className="flex items-center gap-1 flex-shrink-0 bg-muted/60 rounded-full px-2 py-0.5">
             <Star className="w-3 h-3 fill-gold text-gold" />
@@ -628,9 +630,9 @@ const GetWorkspaces = () => {
           setWorkspaces(
             fetchedData.map((vo) => ({
               id: vo._id || "",
-              name: vo.name || "Virtual Office",
-              location: vo.name || vo.area || "City Center", // the mockup uses the name as location if name is like 'Stirring Minds'
-              address: vo.address || "",
+              name: vo.property?.name || vo.name || "Virtual Office",
+              location: vo.property?.name || vo.name || vo.area || "City Center",
+              address: vo.property?.address || vo.address || "",
               rating: Number(vo.rating ?? 0),
               reviews: Number(vo.reviews ?? 0),
               tags: vo.features?.length
@@ -661,6 +663,7 @@ const GetWorkspaces = () => {
                 vo.coordinates?.lat ?? vo.location?.coordinates?.[1] ?? 28.6139,
               lng:
                 vo.coordinates?.lng ?? vo.location?.coordinates?.[0] ?? 77.209,
+              spaceId: vo.spaceId || vo.property?.spaceId || "",
             })),
           );
         } else if (workspaceType === "coworking") {
@@ -669,9 +672,9 @@ const GetWorkspaces = () => {
           setWorkspaces(
             fetchedData.map((cw) => ({
               id: cw._id || "",
-              name: cw.name || "Coworking Space",
-              location: cw.name || cw.area || "Workspace Hub",
-              address: cw.address || "",
+              name: cw.property?.name || cw.name || "Coworking Space",
+              location: cw.property?.name || cw.name || cw.area || "Workspace Hub",
+              address: cw.property?.address || cw.address || "",
               rating: Number(cw.rating ?? 0),
               reviews: Number(cw.reviews ?? 0),
               tags: cw.features?.length
@@ -694,6 +697,7 @@ const GetWorkspaces = () => {
                 cw.coordinates?.lat ?? cw.location?.coordinates?.[1] ?? 28.6139,
               lng:
                 cw.coordinates?.lng ?? cw.location?.coordinates?.[0] ?? 77.209,
+              spaceId: cw.spaceId || cw.property?.spaceId || "",
             })),
           );
         } else if (workspaceType === "on-demand") {
@@ -701,9 +705,9 @@ const GetWorkspaces = () => {
           setWorkspaces(
             fetchedData.map((mr) => ({
               id: mr._id || "",
-              name: mr.name || "Meeting Room",
-              location: mr.name || mr.area || "Conference Center",
-              address: mr.address || "",
+              name: mr.property?.name || mr.name || "Meeting Room",
+              location: mr.property?.name || mr.name || mr.area || "Conference Center",
+              address: mr.property?.address || mr.address || "",
               rating: Number(mr.rating ?? 0),
               reviews: Number(mr.reviews ?? 0),
               tags: mr.features?.length
@@ -728,6 +732,7 @@ const GetWorkspaces = () => {
                 mr.coordinates?.lat ?? mr.location?.coordinates?.[1] ?? 28.6139,
               lng:
                 mr.coordinates?.lng ?? mr.location?.coordinates?.[0] ?? 77.209,
+              spaceId: mr.spaceId || mr.property?.spaceId || "",
             })),
           );
         }
@@ -1072,7 +1077,7 @@ const GetWorkspaces = () => {
               markers={useMemo(() => sortedWorkspaces.map((ws) => ({
                 id: ws.id,
                 position: { lat: ws.lat, lng: ws.lng },
-                title: ws.location || ws.name,
+                title: ws.spaceId || ws.location || ws.name,
                 image: ws.images?.[0] || ws.image,
                 price: ws.plans?.[0]?.price,
                 rating: ws.rating,
@@ -1091,7 +1096,7 @@ const GetWorkspaces = () => {
             className="fixed top-[184px] right-8 z-30 w-10 h-10 rounded-full border border-border bg-card shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 cursor-pointer"
             aria-label="Show map"
           >
-            <Map className="w-4.5 h-4.5" />
+            <MapIcon className="w-4.5 h-4.5" />
           </button>
         )}
       </div>
@@ -1145,7 +1150,7 @@ const GetWorkspaces = () => {
           onClick={() => setShowMap(!showMap)}
           className="fixed bottom-4 right-4 z-40 flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-card border border-border shadow-soft-lg text-xs font-medium text-foreground hover:bg-muted transition-all"
         >
-          <MapPin className="w-3.5 h-3.5" />
+          <MapPin className="w-3.5 h-3.5 text-[#35503F]" />
           {showMap ? "Hide Map" : "Expand Map"}
         </button>
 
@@ -1165,7 +1170,7 @@ const GetWorkspaces = () => {
               markers={useMemo(() => sortedWorkspaces.map((ws) => ({
                 id: ws.id,
                 position: { lat: ws.lat, lng: ws.lng },
-                title: ws.location || ws.name,
+                title: ws.spaceId || ws.location || ws.name,
                 image: ws.images?.[0] || ws.image,
                 price: ws.plans?.[0]?.price,
                 rating: ws.rating,
