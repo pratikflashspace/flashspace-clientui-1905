@@ -15,6 +15,7 @@ import {
 } from "@/types/services";
 import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
 import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
+import { getShortAddress } from "@/utils/address";
 
 // Union type that works with all service types
 export type ListingItem = (
@@ -268,7 +269,8 @@ const ListingCardModern = memo<ListingCardModernProps>(
           {/* Title Row */}
           <div className="flex items-start justify-between gap-2 mb-2">
             <h4 className="text-base font-bold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1">
-              {item.spaceId || item.name} {item.address && `at ${item.address}`}
+              {item.spaceId || item.name}
+              {item.address && ` at ${getShortAddress(item.address)}`}
             </h4>
             <div className="flex items-center gap-1 shrink-0">
               <Star className="w-3.5 h-3.5 text-[#EDB003] fill-[#EDB003]" />
@@ -284,7 +286,9 @@ const ListingCardModern = memo<ListingCardModernProps>(
           {/* Location */}
           <div className="flex items-center gap-1 text-gray-500 text-sm mb-2">
             <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-[#35503F]" />
-            <span className="line-clamp-1">{item.address}</span>
+            <span className="line-clamp-1">
+              {getShortAddress(item.address)}
+            </span>
           </div>
 
           {/* Features Tags */}

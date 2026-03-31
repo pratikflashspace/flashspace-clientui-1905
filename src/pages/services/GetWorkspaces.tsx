@@ -37,6 +37,7 @@ import { getMeetingRoomsByCity } from "@/services/meetingRoom.service";
 import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
 import { ListingItem } from "@/components/services/ListingCardModern";
 import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
+import { getShortAddress } from "@/utils/address";
 
 // Static placeholders for fallback/missing data
 // import connaughtPlace1 from "@/assets/connaught-place-1.png";
@@ -280,7 +281,8 @@ const WorkspaceCard = ({
           {/* Name + Rating + Actions */}
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1">
-              {ws.spaceId || ws.name} {ws.address && `at ${ws.address}`}
+              {ws.spaceId || ws.name}
+              {ws.address && ` at ${getShortAddress(ws.address)}`}
             </h3>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
@@ -448,7 +450,8 @@ const WorkspaceCard = ({
         {/* Name + Rating */}
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1">
-            {ws.spaceId || ws.name} {ws.address && `at ${ws.address}`}
+            {ws.spaceId || ws.name}
+            {ws.address && ` at ${getShortAddress(ws.address)}`}
           </h3>
           <div className="flex items-center gap-1 flex-shrink-0 bg-muted/60 rounded-full px-2 py-0.5">
             <Star className="w-3 h-3 fill-gold text-gold" />

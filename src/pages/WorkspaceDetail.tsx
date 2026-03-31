@@ -542,14 +542,21 @@ const getPhotos = () => {
 
   const photos = getPhotos();
   const address = data.address || data.area || "";
+  
+  // Extract coordinates correctly from flattened backend response
+  const lat = data.coordinates?.lat || 
+              (Array.isArray(data.location?.coordinates) ? data.location.coordinates[1] : 28.6139);
+  const lng = data.coordinates?.lng || 
+              (Array.isArray(data.location?.coordinates) ? data.location.coordinates[0] : 77.209);
+
   const mapData = [
     {
       ...data,
       location: data.name,
       address: address,
       image: photos[0],
-      lat: data.lat || 28.6139,
-      lng: data.lng || 77.209,
+      lat,
+      lng,
     },
   ];
 
@@ -760,7 +767,7 @@ const getPhotos = () => {
                     rating: ws.rating,
                     price: ws.price,
                   }))}
-                  center={{ lat: data.lat || 28.6139, lng: data.lng || 77.209 }}
+                  center={{ lat, lng }}
                   zoom={14}
                   height="100%"
                   mapStyle="retro"
