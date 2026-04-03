@@ -66,20 +66,41 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
 
         setIsLoading(true);
         try {
-            await createContactForm({
-                fullName: name,
-                email,
-                phoneNumber: phone,
+            const rawBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
+            const base = rawBase.replace(/\/$/, "");
+            
+            const res = await fetch(`${base}/api/leads`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": "flashspace123", // must match backend
+              },
+              body: JSON.stringify({
+                name: name,
+                email: email,
+                phone: phone,
+                city: "Get In Touch", // Using city field for context
+                source: "Get In Touch Modal",
+                page: window.location.href,
+              }),
             });
-            localStorage.setItem("hasFilledGetInTouch", "true");
-            toast.success("Thank you! We will get in touch soon.");
-            onClose();
-            // Reset form
-            setName("");
-            setPhone("");
-            setEmail("");
+
+            const data = await res.json();
+
+            if (data.ok) {
+              localStorage.setItem("hasFilledGetInTouch", "true");
+              toast.success("Thank you! We will get in touch soon.");
+              onClose();
+              // Reset form
+              setName("");
+              setPhone("");
+              setEmail("");
+            } else {
+              toast.error(data.message || "Something went wrong. Please try again.");
+            }
         } catch (error: any) {
-            toast.error(error.message || "Something went wrong. Please try again.");
+            console.error(error);
+            toast.error("Server error. Please try again later.");
         } finally {
             setIsLoading(false);
         }
