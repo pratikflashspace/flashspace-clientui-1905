@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/chat/send", "destination": "http://91.108.105.211:8001/chat" },
     { "source": "/api/:path*", "destination": "http://91.108.105.211:5000/api/:path*" },
     { "source": "/(.*)", "destination": "/" }
   ],
