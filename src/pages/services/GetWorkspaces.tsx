@@ -260,6 +260,8 @@ const WorkspaceCard = ({
             onError={(e) => {
               e.currentTarget.src = DEFAULT_WORKSPACE_IMAGE;
             }}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
 
@@ -387,6 +389,8 @@ const WorkspaceCard = ({
           onError={(e) => {
             e.currentTarget.src = DEFAULT_WORKSPACE_IMAGE;
           }}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
 

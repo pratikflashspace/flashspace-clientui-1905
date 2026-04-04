@@ -193,6 +193,7 @@ import { useChat, ChatMessage } from "@/contexts/ChatContext";
 
 // Backend chat endpoint (backend calls AI backend internally)
 const BACKEND_CHAT_URL = "/api/chat/send";
+const GUEST_CHAT_URL = "/api/guest-chat-send";
 
 interface SidebarMenuItem {
   label: string;
@@ -1087,8 +1088,10 @@ const StartChatting = () => {
       const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
       const sessionId = getSessionId();
 
+      const targetUrl = isAuthenticated ? BACKEND_CHAT_URL : GUEST_CHAT_URL;
+
       // Call backend chat endpoint (backend calls AI backend internally)
-      const response = await fetch(BACKEND_CHAT_URL, {
+      const response = await fetch(targetUrl, {
         method: 'POST',
         credentials: 'include',
         headers: {

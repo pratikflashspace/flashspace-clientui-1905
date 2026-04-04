@@ -167,6 +167,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
             alt={item.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
+            decoding="async"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               if (target.src !== "/hero-illustrated.jpg") {
