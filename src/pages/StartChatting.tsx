@@ -192,10 +192,9 @@ interface ContactForm {
 import { useChat, ChatMessage } from "@/contexts/ChatContext";
 
 // Backend chat endpoint (backend calls AI backend internally)
-const rawBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
-const base = rawBase.replace(/\/+$/, "");
-const BACKEND_CHAT_URL = `${base}/api/chat/send`;
-const GUEST_CHAT_URL = `${base}/api/guest-chat-send`;
+// Backend chat endpoint (backend calls AI backend internally)
+const BACKEND_CHAT_URL = "/api/chat/send";
+const GUEST_CHAT_URL = "/api/guest-chat-send";
 
 interface SidebarMenuItem {
   label: string;
