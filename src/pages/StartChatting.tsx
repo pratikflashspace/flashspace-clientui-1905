@@ -194,7 +194,7 @@ import { useChat, ChatMessage } from "@/contexts/ChatContext";
 // Backend chat endpoint (backend calls AI backend internally)
 // Backend chat endpoint (backend calls AI backend internally)
 const BACKEND_CHAT_URL = "/api/chat/send";
-const GUEST_CHAT_URL = "/api/guest-chat-send";
+const GUEST_CHAT_URL = "/api/chat/guest";
 
 interface SidebarMenuItem {
   label: string;
