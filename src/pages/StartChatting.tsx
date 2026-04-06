@@ -192,10 +192,9 @@ interface ContactForm {
 import { useChat, ChatMessage } from "@/contexts/ChatContext";
 
 // Backend chat endpoint (backend calls AI backend internally)
-// Backend chat endpoint (backend calls AI backend internally)
 const BACKEND_CHAT_URL = "/api/chat/send";
 const GUEST_CHAT_URL = "/api/chat/guest";
-
+    
 interface SidebarMenuItem {
   label: string;
   icon: React.ElementType;
@@ -249,7 +248,7 @@ const UpdatesPopup = ({
       case NotificationType.ERROR:
         return X;
       default:
-        return Bell;
+        return Bell;        
     }
   };
 
@@ -607,7 +606,7 @@ const StartChatting = () => {
 
   // [NEW] Map Integration State
   const [showMap, setShowMap] = useState(false);
-  const [mapWidth, setMapWidth] = useState(() => window.innerWidth * 0.45); // [UPDATED] Default to 45% of screen
+  const [mapWidth, setMapWidth] = useState(() => Math.min(window.innerWidth * 0.42, 600));
   const [isResizing, setIsResizing] = useState(false);
   const [mapMarkers, setMapMarkers] = useState<MapMarker[]>([]);
   const [allMapMarkers, setAllMapMarkers] = useState<MapMarker[]>([]);
@@ -632,17 +631,22 @@ const StartChatting = () => {
   const [hasLoadedGlobalMarkers, setHasLoadedGlobalMarkers] = useState(false);
 
   // Constant list of major Indian hubs for robust offline detection
-  const MAJOR_HUBS = ["Delhi", "Bangalore"];
+  const MAJOR_HUBS = ["Delhi", "Bangalore", "Gurgaon", "Noida", "Mumbai", "Pune", "Hyderabad", "Chennai", "Kolkata"];
 
   // [PHASE 9] Fetch all markers on mount for persistent global visibility
   useEffect(() => {
     const fetchGlobalMarkers = async () => {
       if (hasLoadedGlobalMarkers) return;
       try {
-        const [{ offices: voRes }, cwRes] = await Promise.all([
+        const [voResData, cwResData] = await Promise.all([
           getAllVirtualOffices(),
           getAllCoworkingSpaces()
         ]);
+
+        // voResData is { offices: [...], pagination: ... }
+        // cwResData is [...]
+        const voRes = (voResData as any).offices || (Array.isArray(voResData) ? voResData : []);
+        const cwRes = Array.isArray(cwResData) ? cwResData : (cwResData as any).spaces || [];
 
         const voMarkers = voRes.map(item => ({
           position: item.coordinates || { lat: 0, lng: 0 },
@@ -770,17 +774,20 @@ const StartChatting = () => {
     // Also ignore if it's different from what the user just intentionally searched.
     if (isAIResponse && cityName) {
       const target = lastTargetCity.current?.toLowerCase();
-      const currentCity = mapMarkers[0]?.address.toLowerCase();
+      // const currentCity = mapMarkers[0]?.address.toLowerCase();
 
       if (target && !cityName.toLowerCase().includes(target)) {
         console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on user-targeted ${lastTargetCity.current}`);
         return;
       }
 
+      // [FIX] Removed strict current markers check to allow AI to fetch for the target city if not yet loaded.
+      /*
       if (mapMarkers.length > 0 && currentCity && !currentCity.includes(cityName.toLowerCase())) {
         console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on current markers.`);
         return;
       }
+      */
     }
 
     if (cityName) {
@@ -802,7 +809,13 @@ const StartChatting = () => {
 
       try {
         let markers: MapMarker[] = [];
-        const center = resolveCoordinates(cityName) || (property?.coordinates) || cityCenters.delhi;
+        // [PHASE 10] Robust Center Resolution: Try resolveCoordinates, then cityCenters map (case-insensitive), then fallback
+        const lowerCity = cityName.toLowerCase();
+        const cityCenter = (cityCenters as any)[lowerCity] || 
+                           (cityCenters as any)[lowerCity === 'gurugram' ? 'gurgaon' : lowerCity] ||
+                           cityCenters.delhi;
+
+        const center = resolveCoordinates(cityName) || (property?.coordinates) || cityCenter;
         setMapCenter(center);
         // setShowMap(true); // [MOVE] We now wait for results to avoid showing empty map
 
@@ -810,12 +823,14 @@ const StartChatting = () => {
         const fetchVirtual = !serviceType || serviceType === 'virtual';
         const fetchCoworking = !serviceType || serviceType === 'coworking';
 
-        const [virtualItems, coworkingItems] = await Promise.all([
-          fetchVirtual ? getVirtualOfficesByCity(cityName) : Promise.resolve([]),
+        const [virtualRes, coworkingRes] = await Promise.all([
+          fetchVirtual ? getVirtualOfficesByCity(cityName) : Promise.resolve({ offices: [] }),
           fetchCoworking ? getCoworkingSpacesByCity(cityName) : Promise.resolve([])
         ]);
 
-        const virtualMarkers = virtualItems.map((item) => ({
+        // Virtual office service returns { offices: [...], pagination: ... }
+        const virtualData = (virtualRes as any).offices || (Array.isArray(virtualRes) ? virtualRes : []);
+        const virtualMarkers = virtualData.map((item: any) => ({
           position: item.coordinates || generateRandomCoordinates(center, 0),
           title: item.name,
           address: item.address,
@@ -826,7 +841,9 @@ const StartChatting = () => {
           features: item.features || []
         }));
 
-        const coworkingMarkers = coworkingItems.map((item) => ({
+        // Coworking service returns array Directly
+        const coworkingData = Array.isArray(coworkingRes) ? coworkingRes : (coworkingRes as any).spaces || [];
+        const coworkingMarkers = coworkingData.map((item: any) => ({
           position: item.coordinates || generateRandomCoordinates(center, 0),
           title: item.name,
           address: item.address,
@@ -852,11 +869,11 @@ const StartChatting = () => {
           };
         });
 
-        // Update map results (focused set)
-        setMapMarkers(jitteredResults);
-
-        // [NEW] Only open the map if we actually found listings in the DB
+        // [PHASE 11] Smart Center & Results Update
         if (jitteredResults.length > 0) {
+          setMapMarkers(jitteredResults);
+          const firstResult = jitteredResults[0].position;
+          setMapCenter(firstResult);
           setShowMap(true);
         } else {
           console.log(`[MAP] No listings found for ${cityName} in local DB. Keeping map closed.`);
@@ -941,6 +958,10 @@ const StartChatting = () => {
   useEffect(() => {
     if (showMap) {
       setIsSidebarOpen(false); // Auto-collapse sidebar when map opens
+      // [NEW] Force a global resize event after transition to ensure map layout is correct
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 500);
     }
   }, [showMap]);
 
@@ -967,13 +988,19 @@ const StartChatting = () => {
     if (isResizing) {
       window.addEventListener('mousemove', resize);
       window.addEventListener('mouseup', stopResizing);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
     } else {
       window.removeEventListener('mousemove', resize);
       window.removeEventListener('mouseup', stopResizing);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
     }
     return () => {
       window.removeEventListener('mousemove', resize);
       window.removeEventListener('mouseup', stopResizing);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
     };
   }, [isResizing]);
 
@@ -1111,7 +1138,7 @@ const StartChatting = () => {
       const { serviceType: userServiceType } = detectIntents(userMessage.content);
 
       // [NEW] Trigger map update based on user message (optimistic update)
-      updateMapForQuery(userMessage.content);
+      await updateMapForQuery(userMessage.content);
 
       if (!response.ok) {
         throw new Error('Failed to get response from chatbot');
@@ -1124,7 +1151,7 @@ const StartChatting = () => {
 
       // [NEW] Trigger map update based on AI response text (isAIResponse = true)
       // Pass userServiceType to preserve the user's primary intent (e.g. coworking)
-      updateMapForQuery(aiResponseText, true, userServiceType as any);
+      await updateMapForQuery(aiResponseText, true, userServiceType as any);
 
       // Add AI response to chat
       const assistantMessage: ChatMessage = {
@@ -1136,6 +1163,7 @@ const StartChatting = () => {
       };
 
       setChatMessages(prev => [...prev, assistantMessage]);
+      setShowMap(true); // [FIX] Force map to open for AI response if markers found
     } catch (error) {
       console.error('Error sending message to backend:', error);
 
@@ -1433,6 +1461,9 @@ const StartChatting = () => {
       {/* Main Content - Adjusted for wider sidebar */}
       <div
         className={`flex-1 pt-[4.5rem] flex flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? "lg:ml-[260px]" : "lg:ml-[60px]"} ml-0`}
+        style={{
+          marginRight: showMap && window.innerWidth >= 1024 ? `${mapWidth}px` : '0px',
+        }}
       >
         <div className="flex-1 h-[calc(100dvh-3rem)] lg:h-[calc(100dvh-4rem)] bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col min-w-0 transition-all duration-500">
           {/* Chat Interface */}
@@ -1645,22 +1676,17 @@ const StartChatting = () => {
           </div>
         </div>
 
+        {/* Map Area */}
         <div
-          className={`flex-shrink-0 bg-white dark:bg-[#0d1728] border-l border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden transition-all ${isResizing ? "" : "duration-500"
-            } ease-in-out fixed lg:relative right-0 bottom-0 z-[120] lg:z-10`}
+          className={`flex-shrink-0 bg-white dark:bg-[#0d1728] border-l border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden transition-all duration-300 ease-in-out fixed right-0 bottom-0 z-[120] ${
+            showMap 
+              ? "opacity-100" 
+              : "w-0 opacity-0 pointer-events-none"
+          }`}
           style={{
-            width: showMap
-              ? window.innerWidth < 1024
-                ? "100%"
-                : `${mapWidth}px`
-              : "0px",
-            top: showMap && window.innerWidth < 1024 ? HEADER_OFFSET : "",
-            height:
-              showMap && window.innerWidth < 1024
-                ? `calc(100vh - ${HEADER_OFFSET})`
-                : "100%",
-            opacity: showMap ? 1 : 0,
-            transform: showMap ? "translateX(0)" : "translateX(100%)",
+            top: HEADER_OFFSET,
+            height: `calc(100vh - ${HEADER_OFFSET})`,
+            width: showMap ? (window.innerWidth < 1024 ? '100%' : `${mapWidth}px`) : '0px',
           }}
         >
           {showMap && (
@@ -1668,10 +1694,10 @@ const StartChatting = () => {
               {/* Resize Handle */}
               <div
                 onMouseDown={startResizing}
-                className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-[#35503F]/30 z-[100] transition-colors group"
+                className="absolute left-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-[#35503F]/20 z-[100] transition-colors group hidden lg:block"
                 title="Drag to resize"
               >
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-8 bg-gray-300 dark:bg-gray-600 rounded-full group-hover:bg-[#35503F]" />
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-10 bg-gray-300 dark:bg-gray-600 rounded-full group-hover:bg-[#35503F] transition-colors" />
               </div>
 
               {/* Map Panel Header */}
@@ -1696,8 +1722,8 @@ const StartChatting = () => {
                 </button>
               </div>
 
-              {/* Map Body */}
-              <div className="flex-1 relative overflow-hidden">
+              {/* Map Body - uses absolute positioning to guarantee height */}
+              <div className="flex-1 relative min-h-0">
                 {isMapLoading && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 dark:bg-black/50 backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-2">
@@ -1706,13 +1732,16 @@ const StartChatting = () => {
                     </div>
                   </div>
                 )}
-                <MapSection
-                  center={mapCenter}
-                  markers={mapMarkers.length > 0 ? mapMarkers : allMapMarkers}
-                  focusMarkers={mapMarkers}
-                  zoom={mapZoom}
-                  height="100%"
-                />
+                <div className="absolute inset-0">
+                  <MapSection
+                    center={mapCenter}
+                    markers={mapMarkers.length > 0 ? mapMarkers : allMapMarkers}
+                    focusMarkers={mapMarkers}
+                    zoom={mapZoom}
+                    height="100%"
+                    visible={showMap}
+                  />
+                </div>
               </div>
             </>
           )}

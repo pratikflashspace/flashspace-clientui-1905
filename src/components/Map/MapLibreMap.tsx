@@ -113,6 +113,7 @@ interface MapLibreMapProps {
   focusMarkers?: Array<{
     position: { lat: number; lng: number };
   }>;
+  visible?: boolean;
 }
 
 // MapLibre-compatible open source map styles - Colorful & Vibrant
@@ -190,6 +191,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
   showStyleSelector = false,
   bounds,
   focusMarkers = [],
+  visible = true,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
@@ -300,6 +302,31 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
       essential: true,
     });
   }, [center, zoom, isLoaded]);
+
+  // [NEW] Trigger resize when visibility changes (Crucial for fixed/transitioning containers)
+  useEffect(() => {
+    if (!map.current || !isLoaded || !visible) return;
+
+    // Small delay to allow for CSS transitions to settle
+    const timer = setTimeout(() => {
+      if (map.current) {
+        map.current.resize();
+        console.log('[MAP] Triggered visibility-based resize');
+      }
+    }, 300); // Wait for transition-all duration-500 (partially)
+
+    // Second resize for insurance after fully settled
+    const secondTimer = setTimeout(() => {
+      if (map.current) {
+         map.current.resize();
+      }
+    }, 600);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(secondTimer);
+    };
+  }, [visible, isLoaded]);
 
   // Update markers
   useEffect(() => {
@@ -623,7 +650,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           [[bounds.sw.lng, bounds.sw.lat], [bounds.ne.lng, bounds.ne.lat]],
           {
             padding: { top: 70, bottom: 50, left: 50, right: 50 },
-            maxZoom: 15,
+            maxZoom: 13.5,
             duration: 1200
           }
         );
@@ -634,7 +661,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
         map.current.fitBounds(focusBounds, {
           padding: { top: 70, bottom: 50, left: 50, right: 50 },
-          maxZoom: 15,
+          maxZoom: 13.5,
           duration: 1200
         });
       } else if (markers.length > 0 && markers.length < 50 && !bounds) {
@@ -644,7 +671,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
         map.current.fitBounds(markerBounds, {
           padding: { top: 70, bottom: 50, left: 50, right: 50 },
-          maxZoom: 15,
+          maxZoom: 13.5,
           duration: 1200
         });
       }

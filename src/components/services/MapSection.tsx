@@ -12,6 +12,7 @@ export interface MapSectionProps {
   focusMarkers?: Array<{
     position: { lat: number; lng: number };
   }>;
+  visible?: boolean;
 }
 
 /**
@@ -28,6 +29,7 @@ const MapSection = memo<MapSectionProps>(({
   mapStyle,
   showStyleSelector,
   focusMarkers,
+  visible = true,
 }) => {
   return (
     <div className="w-full h-full relative" style={{ overflow: 'hidden', maxHeight: '100%' }}>
@@ -40,6 +42,7 @@ const MapSection = memo<MapSectionProps>(({
         mapStyle={mapStyle}
         showStyleSelector={showStyleSelector}
         focusMarkers={focusMarkers}
+        visible={visible}
       />
     </div>
   );
@@ -66,8 +69,10 @@ const MapSection = memo<MapSectionProps>(({
   const focusMarkersUnchanged =
     (prevProps.focusMarkers?.length || 0) === (nextProps.focusMarkers?.length || 0);
 
+  const visibleUnchanged = prevProps.visible === nextProps.visible;
+
   // Return true if nothing changed (prevents re-render)
-  return centerUnchanged && zoomUnchanged && markersUnchanged && focusMarkersUnchanged;
+  return centerUnchanged && zoomUnchanged && markersUnchanged && focusMarkersUnchanged && visibleUnchanged;
 });
 
 MapSection.displayName = 'MapSection';
