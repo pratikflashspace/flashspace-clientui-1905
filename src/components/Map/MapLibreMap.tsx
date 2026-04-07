@@ -200,6 +200,23 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentStyle, setCurrentStyle] = useState<MapStyle>(mapStyle);
 
+  // ─── Helper: resize then fitBounds with delay ──────────────────────────────
+  // Production mein container height settle hone ka time deta hai before fitBounds
+  const safeFitBounds = (
+    fitBoundsFn: () => void,
+    delay = 200
+  ) => {
+    // Immediate resize attempt
+    map.current?.resize();
+
+    // Delayed resize + fitBounds — guarantees layout is settled in prod
+    setTimeout(() => {
+      if (!map.current) return;
+      map.current.resize();
+      fitBoundsFn();
+    }, delay);
+  };
+
   // Initialize map
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
@@ -213,9 +230,9 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
         style: MAP_STYLES[currentStyle].url,
         center: [center.lng, center.lat],
         zoom: zoom,
-        scrollZoom: true, // Enable scroll zoom when cursor is on map
-        dragRotate: false, // Disable map rotation
-        touchZoomRotate: true, // Keep pinch zoom on mobile
+        scrollZoom: true,
+        dragRotate: false,
+        touchZoomRotate: true,
       });
 
       // Add navigation controls
@@ -262,7 +279,6 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     let resizeTimeout: NodeJS.Timeout;
 
     const resizeObserver = new ResizeObserver(() => {
-      // Debounce resize calls to avoid excessive reflows
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
         if (map.current) {
@@ -288,7 +304,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     try {
       map.current.setStyle(MAP_STYLES[currentStyle].url);
     } catch (err) {
-      console.error('Failed to change map :', err);
+      console.error('Failed to change map style:', err);
     }
   }, [currentStyle, isLoaded]);
 
@@ -303,22 +319,20 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     });
   }, [center, zoom, isLoaded]);
 
-  // [NEW] Trigger resize when visibility changes (Crucial for fixed/transitioning containers)
+  // Trigger resize when visibility changes (Crucial for fixed/transitioning containers)
   useEffect(() => {
     if (!map.current || !isLoaded || !visible) return;
 
-    // Small delay to allow for CSS transitions to settle
     const timer = setTimeout(() => {
       if (map.current) {
         map.current.resize();
         console.log('[MAP] Triggered visibility-based resize');
       }
-    }, 300); // Wait for transition-all duration-500 (partially)
+    }, 300);
 
-    // Second resize for insurance after fully settled
     const secondTimer = setTimeout(() => {
       if (map.current) {
-         map.current.resize();
+        map.current.resize();
       }
     }, 600);
 
@@ -342,11 +356,10 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     markers.forEach((markerData, index) => {
       if (!map.current) return;
 
-      // Create custom marker element - Simple pill style with name
       const el = document.createElement('div');
       el.className = 'custom-marker';
 
-      const primary = '#35503F'; // dark green branding
+      const primary = '#35503F';
 
       el.innerHTML = `
         <div class="marker-container" style="
@@ -361,7 +374,6 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           border: 1px solid rgba(0,0,0,0.1);
           cursor: pointer;
         ">
-          <!-- Left icon circle -->
           <span class="marker-icon" style="
             width: 32px;
             height: 32px;
@@ -379,7 +391,6 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
         </div>
       `;
 
-      // Create detailed popup card with image
       let popup: maplibregl.Popup | undefined;
       const popupHTML = `
         <div style="
@@ -390,41 +401,19 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           background: white;
           box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         ">
-          <!-- Image Section -->
-          <div style="
-            position: relative;
-            width: 100%;
-            height: 180px;
-          ">
+          <div style="position: relative; width: 100%; height: 180px;">
             <img 
               src="${markerData.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop'}" 
               alt="${markerData.title || 'Office'}"
-              style="
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                transition: transform 0.5s;
-              "
+              style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"
             />
-            
-            <!-- Floating Actions (Top Right) -->
-            <div style="
-              position: absolute;
-              top: 12px;
-              right: 12px;
-              display: flex;
-              gap: 8px;
-            ">
-               <!-- Heart Button -->
+            <div style="position: absolute; top: 12px; right: 12px; display: flex; gap: 8px;">
                <div style="
-                 width: 32px;
-                 height: 32px;
-                 background: rgba(255, 255, 255, 0.9);
+                 width: 32px; height: 32px;
+                 background: rgba(255,255,255,0.9);
                  backdrop-filter: blur(4px);
                  border-radius: 50%;
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
+                 display: flex; align-items: center; justify-content: center;
                  cursor: pointer;
                  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
                  transition: transform 0.2s;
@@ -433,16 +422,12 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                  </svg>
                </div>
-               <!-- Plus Button -->
                <div style="
-                 width: 32px;
-                 height: 32px;
-                 background: rgba(255, 255, 255, 0.9);
+                 width: 32px; height: 32px;
+                 background: rgba(255,255,255,0.9);
                  backdrop-filter: blur(4px);
                  border-radius: 50%;
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
+                 display: flex; align-items: center; justify-content: center;
                  cursor: pointer;
                  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
                  transition: transform 0.2s;
@@ -453,21 +438,13 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
                  </svg>
                </div>
             </div>
-
-            <!-- Rating Badge (Bottom Left on Image) -->
             ${markerData.rating ? `
               <div style="
-                position: absolute;
-                bottom: 12px;
-                left: 12px;
-                background: rgba(255, 255, 255, 0.95);
-                padding: 4px 8px;
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                gap: 4px;
-                font-size: 12px;
-                font-weight: 600;
+                position: absolute; bottom: 12px; left: 12px;
+                background: rgba(255,255,255,0.95);
+                padding: 4px 8px; border-radius: 12px;
+                display: flex; align-items: center; gap: 4px;
+                font-size: 12px; font-weight: 600;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.15);
               ">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="#F1B922" stroke="#F1B922" stroke-width="1">
@@ -477,50 +454,24 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
               </div>
             ` : ''}
           </div>
-          
-          <!-- Content Section -->
-          <div style="
-            padding: 16px;
-          ">
-            <!-- Title -->
-            <h3 style="
-              margin: 0 0 6px 0;
-              font-size: 16px;
-              font-weight: 700;
-              color: #1a1a1a;
-              line-height: 1.3;
-            ">${markerData.title || 'Space'}</h3>
-            
-            <!-- Address -->
+          <div style="padding: 16px;">
+            <h3 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 700; color: #1a1a1a; line-height: 1.3;">
+              ${markerData.title || 'Space'}
+            </h3>
             ${markerData.address ? `
-              <div style="
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                margin-bottom: 12px;
-                color: #666;
-                font-size: 13px;
-              ">
+              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px; color: #666; font-size: 13px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                <span style="
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  max-width: 200px;
-                ">${markerData.address}</span>
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
+                  ${markerData.address}
+                </span>
               </div>
             ` : ''}
-
-            <!-- Price & Button Row -->
             <div style="
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              padding-top: 12px;
-              border-top: 1px solid #f0f0f0;
+              display: flex; align-items: center; justify-content: space-between;
+              padding-top: 12px; border-top: 1px solid #f0f0f0;
             ">
               <div>
                 <span style="font-size: 11px; color: #888; display: block;">Starting from</span>
@@ -529,14 +480,9 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
                 </span>
               </div>
               <button style="
-                background: #35503F;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 10px;
-                font-size: 12px;
-                font-weight: 600;
-                cursor: pointer;
+                background: #35503F; color: white; border: none;
+                padding: 8px 16px; border-radius: 10px;
+                font-size: 12px; font-weight: 600; cursor: pointer;
                 transition: opacity 0.2s;
               " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
                 View
@@ -566,21 +512,17 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
       popupsRef.current.push(popup);
 
-      // Create marker (without automatic popup binding)
       const marker = new maplibregl.Marker({ element: el })
         .setLngLat([markerData.position.lng, markerData.position.lat])
         .addTo(map.current);
 
       let closeTimeout: NodeJS.Timeout;
 
-      // Add hover effect to marker
       const markerIcon = el.querySelector('.marker-icon') as HTMLElement;
 
-      // Mouse enters marker - show popup and scale up
       el.addEventListener('mouseenter', () => {
         clearTimeout(closeTimeout);
 
-        // Scale up animation
         if (markerIcon) {
           markerIcon.style.transform = 'scale(1.15)';
           markerIcon.style.boxShadow = '0 5px 12px rgba(0,0,0,0.4)';
@@ -590,32 +532,23 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           popup.setLngLat([markerData.position.lng, markerData.position.lat]);
           popup.addTo(map.current);
 
-          // Wait a bit for popup to render, then add listeners
           setTimeout(() => {
             const popupEl = popup.getElement();
             if (popupEl) {
-              // Make popup interactive
               popupEl.style.pointerEvents = 'auto';
 
-              // Handle "View Details" click
               const viewDetailsBtn = popupEl.querySelector('.view-details-btn');
               if (viewDetailsBtn) {
                 viewDetailsBtn.addEventListener('click', (e) => {
-                  e.stopPropagation(); // Prevent map click
-                  // Determine route based on some data or default to generic space
-                  // Assuming markerData.id is unique and we can route to it.
-                  // We might need to know if it's a coworking space or virtual office.
-                  // For now, defaulting to /space/:id which seems to be the pattern
+                  e.stopPropagation();
                   window.location.href = `/space/${markerData.id}`;
                 });
               }
 
-              // Mouse enters popup - don't close
               popupEl.addEventListener('mouseenter', () => {
                 clearTimeout(closeTimeout);
               });
 
-              // Mouse leaves popup - delay closing to prevent accidental close
               popupEl.addEventListener('mouseleave', () => {
                 closeTimeout = setTimeout(() => {
                   popup.remove();
@@ -626,9 +559,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
         }
       });
 
-      // Mouse leaves marker - delay closing (so user can move to popup)
       el.addEventListener('mouseleave', () => {
-        // Scale back down
         if (markerIcon) {
           markerIcon.style.transform = 'scale(1)';
           markerIcon.style.boxShadow = '0 3px 8px rgba(0,0,0,0.3)';
@@ -642,43 +573,43 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
       markersRef.current.push(marker);
     });
 
-    // [NEW] Fit map to markers bounds
+    // ─── FIT BOUNDS (Production-safe) ────────────────────────────────────────
+    // resize() pehle call karo, phir 200ms baad actual fitBounds
+    // Yeh ensure karta hai ki production mein container height 0 na ho
     if (map.current && isLoaded) {
       if (bounds) {
-        // Use explicit bounds if provided
-        map.current.fitBounds(
-          [[bounds.sw.lng, bounds.sw.lat], [bounds.ne.lng, bounds.ne.lat]],
-          {
-            padding: { top: 70, bottom: 50, left: 50, right: 50 },
-            maxZoom: 16.5,
-            duration: 1200
-          }
-        );
+        safeFitBounds(() => {
+          map.current!.fitBounds(
+            [[bounds.sw.lng, bounds.sw.lat], [bounds.ne.lng, bounds.ne.lat]],
+            { padding: { top: 70, bottom: 50, left: 50, right: 50 }, maxZoom: 16.5, duration: 1200 }
+          );
+        });
       } else if (focusMarkers.length > 0) {
-        // [PHASE 9] Focus on specific markers if provided
         const focusBounds = new maplibregl.LngLatBounds();
         focusMarkers.forEach(m => focusBounds.extend([m.position.lng, m.position.lat]));
 
-        map.current.fitBounds(focusBounds, {
-          padding: { top: 70, bottom: 50, left: 50, right: 50 },
-          maxZoom: 16.5,
-          duration: 1200
+        safeFitBounds(() => {
+          map.current!.fitBounds(focusBounds, {
+            padding: { top: 70, bottom: 50, left: 50, right: 50 },
+            maxZoom: 16.5,
+            duration: 1200
+          });
         });
       } else if (markers.length > 0 && markers.length < 50 && !bounds) {
-        // Legend: Automatic fitBounds only if no explicit focus and marker count is low
         const markerBounds = new maplibregl.LngLatBounds();
         markers.forEach(m => markerBounds.extend([m.position.lng, m.position.lat]));
 
-        map.current.fitBounds(markerBounds, {
-          padding: { top: 70, bottom: 50, left: 50, right: 50 },
-          maxZoom: 16.5,
-          duration: 1200
+        safeFitBounds(() => {
+          map.current!.fitBounds(markerBounds, {
+            padding: { top: 70, bottom: 50, left: 50, right: 50 },
+            maxZoom: 16.5,
+            duration: 1200
+          });
         });
       }
     }
   }, [markers, bounds, focusMarkers, isLoaded]);
 
-  // Change map style
   const handleStyleChange = (style: MapStyle) => {
     setCurrentStyle(style);
   };
@@ -705,10 +636,11 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
               <button
                 key={key}
                 onClick={() => handleStyleChange(key as MapStyle)}
-                className={`px-4 py-3 text-left transition-all duration-200 border-b border-gray-100 last:border-b-0 ${currentStyle === key
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-inner'
-                  : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50'
-                  }`}
+                className={`px-4 py-3 text-left transition-all duration-200 border-b border-gray-100 last:border-b-0 ${
+                  currentStyle === key
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-inner'
+                    : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50'
+                }`}
                 title={value.description}
               >
                 <div className="flex items-center gap-3">
