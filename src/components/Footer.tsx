@@ -12,7 +12,6 @@ const footerLinks = {
   resources: [
     { label: "Documentation", href: "/coming-soon" },
     { label: "Help Center", href: "/community" },
-    { label: "Blog", href: "/blog" },
   ],
   company: [
     { label: "About Us", href: "/about" },

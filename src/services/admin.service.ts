@@ -407,9 +407,12 @@ class AdminService {
         userData,
       );
       return response.data;
-    } catch (error: unknown) {
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        return { success: false, message: "You don't have access to perform this action." };
+      }
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to create user";
+        error.response?.data?.message || (error instanceof Error ? error.message : "Failed to create user");
       return {
         success: false,
         message: errorMessage,
@@ -426,9 +429,12 @@ class AdminService {
         `/api/admin/users/${id}?restore=${restore}`,
       );
       return response.data;
-    } catch (error: unknown) {
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        return { success: false, message: "You don't have access to perform this action." };
+      }
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to update user";
+        error.response?.data?.message || (error instanceof Error ? error.message : "Failed to update user");
       return {
         success: false,
         message: errorMessage,
@@ -446,9 +452,12 @@ class AdminService {
         data,
       );
       return response.data;
-    } catch (error: unknown) {
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        return { success: false, message: "You don't have access to perform this action." };
+      }
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to update user";
+        error.response?.data?.message || (error instanceof Error ? error.message : "Failed to update user");
       return {
         success: false,
         message: errorMessage,

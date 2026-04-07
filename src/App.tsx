@@ -47,7 +47,6 @@ import Community from "./pages/Community";
 import Settings from "./pages/Settings";
 import CityListing from "./pages/CityListing";
 import AboutUs from "./pages/AboutUs";
-import Blog, { SinglePostPage } from "./pages/Blog";
 import HelpCenter from "./pages/help/HelpCenter";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
@@ -325,8 +324,6 @@ const App = () => (
                     <Route path="/city-listing" element={<CityListing />} />
                     <Route path="/career" element={<Career />} />
                     <Route path="/about" element={<AboutUs />} />
-                    <Route path="/blog" element={<Blog />} />
-                    <Route path="/blog/:id" element={<SinglePostPage />} />
                     <Route path="/help" element={<HelpCenter />} />
                     <Route path="/privacy" element={<PrivacyPolicy />} />
 

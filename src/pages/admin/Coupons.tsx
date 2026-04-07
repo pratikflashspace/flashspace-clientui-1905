@@ -50,8 +50,10 @@ import {
 } from "@/services/coupon.service";
 import { adminService } from "@/services/admin.service";
 import { Coupon, CouponStatus } from "@/types/coupon.types";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Coupons() {
+  const { user } = useAuth();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -101,6 +103,10 @@ export default function Coupons() {
 
   const handleCreateCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (user?.role === 'sales' && Number(newCoupon.discountValue) > 15) {
+      toast.error("Sales role can only offer up to 15% discount.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       await createCoupon({
@@ -612,7 +618,7 @@ export default function Coupons() {
                       <input
                         type="number"
                         min="1"
-                        max="100"
+                        max={user?.role === 'sales' ? 15 : 100}
                         required
                         placeholder="0"
                         value={newCoupon.discountValue}
@@ -625,6 +631,11 @@ export default function Coupons() {
                         className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-gray-300 focus:ring-4 focus:ring-gray-100 outline-none transition-all font-medium text-gray-900"
                       />
                     </div>
+                    {user?.role === 'sales' && (
+                      <p className="text-xs text-amber-600 ml-1 font-medium">
+                        Sales team can provide a maximum of 15% discount.
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
