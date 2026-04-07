@@ -102,7 +102,7 @@ const SolutionsSection = () => {
         "Mail Forwarding",
         "Call Management",
       ],
-      path: "/Solutions/virtual-office",
+      path: "/services/virtual-office",
       gradient: "from-[#EFAD1A] to-[#F59E0B]", // Gold
       iconColor: "text-white",
     },
@@ -172,7 +172,7 @@ const SolutionsSection = () => {
         "Premium Amenities",
         "24/7 Access",
       ],
-      path: "/Solutions/coworking-space",
+      path: "/services/coworking-space",
       gradient: "from-[#EFAD1A] to-[#F59E0B]", // Gold
       iconColor: "text-white",
     },
@@ -231,7 +231,7 @@ const SolutionsSection = () => {
         "Presentation Tools",
         "Flexible Booking",
       ],
-      path: "/Solutions/on-demand",
+      path: "/services/on-demand",
       gradient: "from-[#EFAD1A] to-[#F59E0B]", // Gold
       iconColor: "text-white",
     },
@@ -299,7 +299,7 @@ const SolutionsSection = () => {
         "Compliance Support",
         "Tax Advisory",
       ],
-      path: "/Solutions/business-setup",
+      path: "/services/business-setup",
       gradient: "from-[#EFAD1A] to-[#F59E0B]", // Gold
       iconColor: "text-white",
     },
