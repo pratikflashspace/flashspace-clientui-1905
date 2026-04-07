@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { adminService } from "@/services/admin.service";
-import { getAllContactForms } from "@/Api/contactForm.service";
+import axiosInstance from "@/lib/axios";
 import {
   Plus,
   Search,
@@ -37,8 +37,8 @@ const LeadManagement = () => {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const contactsRes = await getAllContactForms();
-        const contacts = Array.isArray(contactsRes) ? contactsRes : [];
+        const response = await axiosInstance.get("/api/leads");
+        const contacts = response?.data?.data || [];
         processLeads(contacts);
       } catch (error) {
         console.error("Failed to fetch leads", error);
@@ -57,15 +57,18 @@ const LeadManagement = () => {
 
   const processLeads = (contacts: any[]) => {
     const contactLeads = contacts.map((contact, index) => {
+      // Mock score logic
+      const generateScore = () => Math.floor(Math.random() * (99 - 70) + 70);
+
       return {
         id: contact._id || `CLI-${100 + index}`,
-        name: contact.fullName || "Unknown",
+        name: contact.name || contact.fullName || "Unknown",
         email: contact.email || "No email",
-        phone: contact.phoneNumber || "No phone",
-        interest: Array.isArray(contact.serviceInterest) ? contact.serviceInterest.join(", ") : contact.serviceInterest || "Inquiry",
-        source: "Contact Form",
-        score: Math.floor(Math.random() * (99 - 70) + 70), // High score for direct inquiries
-        status: "hot",
+        phone: contact.phone || contact.phoneNumber || "No phone",
+        interest: contact.businessType || (Array.isArray(contact.serviceInterest) ? contact.serviceInterest.join(", ") : contact.serviceInterest) || "General Inquiry",
+        source: contact.source || "Website Lead",
+        score: generateScore(), 
+        status: contact.status === "hot" ? "hot" : "warm", // Map real status dynamically over time 
         assignee: "Unassigned",
         lastActivity: new Date(contact.createdAt).toLocaleDateString(undefined, {
           month: "short",
@@ -73,9 +76,8 @@ const LeadManagement = () => {
           hour: "2-digit",
           minute: "2-digit",
         }),
-        notes: contact.message || "New inquiry from website form.",
-        rawStatus: "pending",
-        companyName: contact.companyName
+        notes: contact.message || (contact.city ? `City Focus: ${contact.city}` : "New lead from website."),
+        rawStatus: contact.status || "pending",
       };
     });
 
@@ -87,7 +89,7 @@ const LeadManagement = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    switch (status.toLowerCase()) {
+    switch ((status || "").toLowerCase()) {
       case "hot":
         return <Badge variant="destructive">Hot Lead</Badge>;
       case "warm":
@@ -121,10 +123,7 @@ const LeadManagement = () => {
   };
 
   const handleCall = (phone: string) => {
-    toast({
-      title: "Initiating Call",
-      description: `Calling ${phone}...`,
-    });
+    window.location.href = `tel:${phone}`;
   };
 
   const handleEmail = (email: string) => {
@@ -193,14 +192,6 @@ const LeadManagement = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleView(lead)}
-                      className="bg-primary/10 hover:bg-primary/20"
-                    >
-                      <Eye className="w-4 h-4 text-primary" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
                       onClick={() => handleCall(lead.phone)}
                     >
                       <Phone className="w-4 h-4" />
@@ -211,9 +202,6 @@ const LeadManagement = () => {
                       onClick={() => handleEmail(lead.email)}
                     >
                       <Mail className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <MoreVertical className="w-4 h-4" />
                     </Button>
                   </div>
                 </td>
@@ -302,8 +290,8 @@ const LeadManagement = () => {
                   <h3 className="text-xl font-bold text-foreground">
                     {selectedLead.name}
                   </h3>
-                  <p className="text-muted-foreground">
-                    {selectedLead.contact}
+                  <p className="text-muted-foreground text-sm">
+                    Added: {selectedLead.lastActivity}
                   </p>
                 </div>
                 {getStatusBadge(selectedLead.status)}
