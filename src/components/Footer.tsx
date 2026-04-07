@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 
 const footerLinks = {
   solutions: [
-    { label: "Virtual Office", href: "/Solutions/virtual-office" },
-    { label: "Coworking Space", href: "/Solutions/coworking-space" },
-    { label: "On Demand", href: "/Solutions/on-demand" },
-    { label: "Business Setup", href: "/Solutions/business-setup" },
+    { label: "Virtual Office", href: "/services/virtual-office" },
+    { label: "Coworking Space", href: "/services/coworking-space" },
+    { label: "On Demand", href: "/services/on-demand" },
+    { label: "Business Setup", href: "/services/business-setup" },
   ],
   resources: [
     { label: "Documentation", href: "/coming-soon" },
@@ -16,7 +16,7 @@ const footerLinks = {
   company: [
     { label: "About Us", href: "/about" },
     { label: "Careers", href: "/career" },
-    { label: "Pricing", href: "/Solutions/virtual-office" },
+    { label: "Pricing", href: "/services/virtual-office" },
     { label: "Privacy Policy", href: "/about" },
   ],
   community: [

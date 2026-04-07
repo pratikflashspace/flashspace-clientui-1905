@@ -68,8 +68,8 @@ export const PlanLocationsShowcase = () => {
             // Navigate to the coworking space detail page
             navigate(`/coworking-space/${item._id}`);
         } else {
-            // For static registrations, take to the virtual office solutions page
-            navigate(`/Solutions/virtual-office`);
+            // For static registrations, take to the virtual office services page
+            navigate(`/services/virtual-office`);
         }
     };
 

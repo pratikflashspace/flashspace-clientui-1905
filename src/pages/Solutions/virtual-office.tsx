@@ -411,7 +411,12 @@ const VirtualOffice = () => {
                   Establish your business presence in premium locations without the overhead of a physical office.
                   Perfect for startups, remote teams, and businesses expanding into new markets.
                 </p>
-                <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="group border-primary/30 hover:bg-primary/5 font-semibold"
+                  onClick={() => navigate("/services/virtual-office")}
+                >
                   Explore Virtual Offices
                   <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </Button>
