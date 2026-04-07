@@ -4,7 +4,6 @@ import { ScrollNavLayout } from "@/components/sections/ScrollNavLayout";
 import { PlanLocationsShowcase } from "@/components/sections/PlanLocationsShowcase";
 import { FeatureCTA } from "@/components/sections/FeatureCTA";
 import { Stats } from "@/components/sections/Stats";
-import { BlogSection } from "@/components/sections/BlogSection";
 import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { CTA } from "@/components/sections/CTA";
@@ -54,9 +53,6 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
         </FadeInSection>
         <FadeInSection>
           <FounderTestimonial />
-        </FadeInSection>
-        <FadeInSection>
-          <BlogSection />
         </FadeInSection>
         <FadeInSection>
           <FAQSection />

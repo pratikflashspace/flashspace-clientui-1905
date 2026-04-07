@@ -34,9 +34,9 @@ export const FeatureSection = ({
   const handleFeatureClick = (feature: Feature) => {
     if (feature.isAI) {
       console.log("AI Feature clicked:", feature.title);
-    } else if (feature.href) {
-      navigate(feature.href);
     }
+    // Intentionally omitting navigate(feature.href)
+    // as we want to prevent redirecting to other pages from the dashboard.
   };
 
   return (
@@ -72,7 +72,7 @@ export const FeatureSection = ({
               onClick={() => handleFeatureClick(feature)}
               className={cn(
                 "bg-muted/30 border border-border rounded-xl p-5 transition-all text-left",
-                (feature.isAI || feature.href) &&
+                feature.isAI &&
                 "cursor-pointer hover:border-primary/50 hover:shadow-md hover:bg-background",
               )}
             >
