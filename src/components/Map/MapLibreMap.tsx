@@ -650,7 +650,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           [[bounds.sw.lng, bounds.sw.lat], [bounds.ne.lng, bounds.ne.lat]],
           {
             padding: { top: 70, bottom: 50, left: 50, right: 50 },
-            maxZoom: 13.5,
+            maxZoom: 16.5,
             duration: 1200
           }
         );
@@ -661,7 +661,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
         map.current.fitBounds(focusBounds, {
           padding: { top: 70, bottom: 50, left: 50, right: 50 },
-          maxZoom: 13.5,
+          maxZoom: 16.5,
           duration: 1200
         });
       } else if (markers.length > 0 && markers.length < 50 && !bounds) {
@@ -671,7 +671,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 
         map.current.fitBounds(markerBounds, {
           padding: { top: 70, bottom: 50, left: 50, right: 50 },
-          maxZoom: 13.5,
+          maxZoom: 16.5,
           duration: 1200
         });
       }
