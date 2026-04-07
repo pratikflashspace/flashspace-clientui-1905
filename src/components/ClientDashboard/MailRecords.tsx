@@ -14,6 +14,11 @@ import {
   CheckCircle2,
   Navigation,
   ExternalLink,
+  ChevronRight,
+  Package,
+  Send,
+  Inbox,
+  ArrowRight
 } from "lucide-react";
 import { format } from "date-fns";
 import { API_CONFIG } from "@/config/api.config";
@@ -23,8 +28,7 @@ export default function MailRecords() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [showFilters, setShowFilters] = useState(false);
+  const [activeTab, setActiveTab] = useState<"received" | "forwarded">("received");
 
   const fetchMails = async () => {
     setLoading(true);
@@ -46,35 +50,65 @@ export default function MailRecords() {
     fetchMails();
   }, []);
 
+  const pendingCount = mails.filter(m => m.status === "Pending Action").length;
+  const forwardedCount = mails.filter(m => m.status === "Forwarded").length;
+  const totalCount = mails.length;
+
   const filteredMails = mails.filter((m) => {
     const matchSearch =
       searchQuery === "" ||
       m.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
       m.mailId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       m.space.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchStatus = statusFilter === "all" || m.status === statusFilter;
-    return matchSearch && matchStatus;
+    
+    // In the screenshot, "Forwarded Mail" tab likely shows only Forwarded status
+    // and "Received Mail" shows Pending or Collected? Or everything?
+    // Let's assume Received is everything except Forwarded for now, or just a toggle.
+    const matchTab = activeTab === "forwarded" ? m.status === "Forwarded" : m.status !== "Forwarded";
+    
+    return matchSearch && matchTab;
   });
 
-  const getStatusConfig = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case "Pending Action":
-        return { bg: "bg-yellow-100", text: "text-yellow-700", icon: Clock };
+      case "Pending Pickup":
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+            <Clock className="w-3 h-3" />
+            Pending Pickup
+          </span>
+        );
       case "Forwarded":
-        return { bg: "bg-blue-100", text: "text-blue-700", icon: Navigation };
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+            <Send className="w-3 h-3" />
+            Forwarded
+          </span>
+        );
       case "Collected":
-        return {
-          bg: "bg-green-100",
-          text: "text-green-700",
-          icon: CheckCircle2,
-        };
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+            <CheckCircle2 className="w-3 h-3" />
+            Collected
+          </span>
+        );
       default:
-        return { bg: "bg-gray-100", text: "text-gray-600", icon: Mail };
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+            <Mail className="w-3 h-3" />
+            {status}
+          </span>
+        );
     }
   };
 
   const formatDate = (dateStr: string) => {
-    return format(new Date(dateStr), "MMM dd, yyyy");
+    try {
+      return format(new Date(dateStr), "MMM dd, yyyy");
+    } catch (e) {
+      return dateStr;
+    }
   };
 
   const resolveDocumentUrl = (documentUrl?: string) => {
@@ -93,188 +127,184 @@ export default function MailRecords() {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 text-yellow-500 animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading mail records...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <div className="text-center bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <p className="text-gray-900 font-medium mb-2 text-lg">
-            Oops! Something went wrong
-          </p>
-          <p className="text-gray-500 mb-6">{error}</p>
-          <button
-            onClick={fetchMails}
-            className="px-6 py-2.5 bg-[#35503F] text-[#FEF8C3] rounded-full font-medium hover:bg-[#35503F]/90 transition-colors inline-flex items-center gap-2"
-          >
-            <RefreshCw className="w-4 h-4" /> Try Again
-          </button>
+          <Loader2 className="w-10 h-10 text-[#35503F] animate-spin mx-auto mb-4" />
+          <p className="text-gray-500 font-medium">Loading mail records...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-transparent py-8 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div>
+        <h1 className="text-4xl font-bold text-[#35503F] flex items-center gap-3">
+          Mail <span className="text-[#35503F]/70 italic">Records</span>
+        </h1>
+        <p className="text-gray-500 mt-2 text-lg">
+          Track all mail and parcels received at your virtual office
+        </p>
+      </div>
+
+      {/* Stats Cards Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 translate-y-0 hover:-translate-y-1 transition-all">
+          <div className="w-14 h-14 rounded-2xl bg-yellow-50 flex items-center justify-center">
+            <Inbox className="w-7 h-7 text-yellow-600" />
+          </div>
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[#35503F]">
-              Mail <span className="italic">Records</span>
-            </h1>
-            <p className="text-gray-500 mt-2">
-              Track and manage all mail and packages received at your virtual
-              office spaces.
-            </p>
+            <div className="text-3xl font-bold text-gray-900 line-clamp-1">{pendingCount}</div>
+            <div className="text-sm font-medium text-gray-500">Pending Pickup</div>
+          </div>
+        </div>
+        
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 translate-y-0 hover:-translate-y-1 transition-all">
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center">
+            <Send className="w-7 h-7 text-blue-600" />
+          </div>
+          <div>
+            <div className="text-3xl font-bold text-gray-900 line-clamp-1">{forwardedCount}</div>
+            <div className="text-sm font-medium text-gray-500">Forwarded</div>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col md:flex-row justify-between gap-4 items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-          <div className="relative flex-1 w-full md:max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 translate-y-0 hover:-translate-y-1 transition-all">
+          <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center">
+            <Package className="w-7 h-7 text-green-600" />
+          </div>
+          <div>
+            <div className="text-3xl font-bold text-gray-900 line-clamp-1">{totalCount}</div>
+            <div className="text-sm font-medium text-gray-500">Total Received</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Tabs and Search */}
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-x-auto pb-1">
+          <div className="flex bg-gray-100 p-1 rounded-xl w-fit">
+            <button
+              onClick={() => setActiveTab("received")}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                activeTab === "received"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Received Mail
+            </button>
+            <button
+              onClick={() => setActiveTab("forwarded")}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                activeTab === "forwarded"
+                  ? "bg-white text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Forwarded Mail
+            </button>
+          </div>
+
+          <div className="relative flex-1 md:max-w-md w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by sender, ID, or space..."
+              placeholder="Search sender, ID, or office city..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 text-sm transition-all"
+              className="w-full pl-11 pr-4 py-2.5 bg-gray-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-[#35503F]/20 transition-all font-medium"
             />
-          </div>
-
-          <div className="relative w-full md:w-auto">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="w-full md:w-auto flex items-center justify-between gap-2 px-6 py-3 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-sm font-medium text-gray-700"
-            >
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4" />
-                {statusFilter === "all" ? "All Statuses" : statusFilter}
-              </div>
-            </button>
-            {showFilters && (
-              <div className="absolute right-0 top-full mt-2 w-full md:w-48 bg-white border border-gray-100 rounded-xl shadow-xl z-20 py-2">
-                {["all", "Pending Action", "Forwarded", "Collected"].map(
-                  (status) => (
-                    <button
-                      key={status}
-                      onClick={() => {
-                        setStatusFilter(status);
-                        setShowFilters(false);
-                      }}
-                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
-                        statusFilter === status
-                          ? "bg-[#35503F]/5 text-[#35503F] font-medium"
-                          : "text-gray-600"
-                      }`}
-                    >
-                      {status === "all" ? "All Statuses" : status}
-                    </button>
-                  ),
-                )}
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Mails Grid */}
-        {filteredMails.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
-            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Mail className="w-10 h-10 text-gray-300" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              No mail records found
-            </h3>
-            <p className="text-gray-500 mb-8 max-w-md mx-auto">
-              {searchQuery
-                ? "We couldn't find any mail matching your current filters. Try adjusting your search."
-                : "You don't have any mail records yet. Any packages or letters received at your virtual office will appear here."}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredMails.map((mail) => {
-              const statusConfig = getStatusConfig(mail.status);
-
-              return (
-                <div
-                  key={mail._id}
-                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all group flex flex-col h-full"
-                >
-                  {/* Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-50 px-3 py-1 rounded-md">
-                      {mail.mailId}
-                    </span>
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}
-                    >
-                      <statusConfig.icon className="w-3.5 h-3.5" />
-                      {mail.status}
-                    </span>
-                  </div>
-
-                  {/* Body */}
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-[#35503F] transition-colors line-clamp-1">
-                      From: {mail.sender}
-                    </h3>
-
-                    <div className="space-y-2.5">
-                      <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                        <div className="w-7 h-7 rounded-full bg-[#35503F]/10 flex items-center justify-center shrink-0">
-                          <FileText className="w-3.5 h-3.5 text-[#35503F]" />
+        {/* Mails Table */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto min-h-[400px]">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-gray-50 bg-gray-50/50">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Sender</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Office</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Received</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {filteredMails.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-20 text-center">
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
+                          <Mail className="w-8 h-8 text-gray-300" />
                         </div>
-                        <span className="font-medium">{mail.type}</span>
+                        <div>
+                          <p className="text-gray-900 font-bold text-lg">No records found</p>
+                          <p className="text-gray-500 text-sm mt-1 max-w-xs mx-auto">
+                            We couldn't find any mail matching your current search or filters.
+                          </p>
+                        </div>
                       </div>
-
-                      <div className="flex items-center gap-2.5 text-sm text-gray-600 border-t border-gray-50 pt-2.5">
-                        <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                          <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                        </div>
-                        <span className="truncate" title={mail.space}>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredMails.map((mail) => (
+                    <tr key={mail._id} className="hover:bg-gray-50/50 transition-colors group">
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-bold text-gray-900">{mail.mailId}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-semibold text-gray-700">{mail.sender}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-500 font-medium">{mail.type}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-500 font-medium line-clamp-1 max-w-[150px]" title={mail.space}>
                           {mail.space}
                         </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {mail.documentUrl && (
-                    <a
-                      href={resolveDocumentUrl(mail.documentUrl)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#35503F] hover:underline"
-                    >
-                      View Uploaded Document
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-
-                  <div className="h-px bg-gray-100 my-4" />
-
-                  {/* Footer */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 font-medium">
-                    <span className="flex items-center gap-1.5">
-                      <Clock className="w-4 h-4" />
-                      Received
-                    </span>
-                    <span>{formatDate(mail.received)}</span>
-                  </div>
-                </div>
-              );
-            })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-500 font-medium">{formatDate(mail.received)}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {getStatusBadge(mail.status)}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-3">
+                          {mail.documentUrl && (
+                            <a
+                              href={resolveDocumentUrl(mail.documentUrl)}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="View Document"
+                              className="p-2 text-gray-400 hover:text-[#35503F] hover:bg-gray-100 rounded-lg transition-all"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          )}
+                          <button 
+                            className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-900 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm active:scale-95"
+                            onClick={() => {
+                              // Forwarding logic would go here
+                              alert(`Request forwarded for ${mail.mailId}`);
+                            }}
+                          >
+                            Request Forward
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
 }
+
