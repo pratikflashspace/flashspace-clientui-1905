@@ -48,7 +48,7 @@ export const PlanLocationsShowcase = () => {
         const fetchSpaces = async () => {
             setIsLoading(true);
             try {
-                const spaces = await getAllCoworkingSpaces();
+                const spaces = await getAllCoworkingSpaces(100);
                 
                 // Filter by specific IDs provided by the user and maintain that order
                 const filteredSpaces = POPULAR_SPACE_IDS
