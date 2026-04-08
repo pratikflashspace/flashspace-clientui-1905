@@ -8,7 +8,6 @@ import {
   Clock,
   MapPin,
   Users,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   History,
@@ -148,24 +147,8 @@ export default function Dashboard() {
     },
   ];
 
-  const aiFeatures = [
-    {
-      title: "Goal Analysis Quiz",
-      description: "AI-powered quiz to analyze your ultimate goal for virtual office and get personalized suggestions",
-    },
-    {
-      title: "Delivery Predictions",
-      description: "AI predicts expected delivery date and time for your orders with real-time updates",
-    },
-    {
-      title: "Delay Tracking & Alerts",
-      description: "If delays occur, AI explains the reason and prescribes actions for fast tracking",
-    },
-    {
-      title: "Compliance Suggestions",
-      description: "AI promotes additional compliance services and best options for next 3-6 months",
-    },
-  ];
+
+
 
 
   return (
@@ -195,27 +178,8 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* AI-Powered Features */}
-      <div className="mb-12">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 ">AI-Powered Features</h2>
-          <p className="text-gray-500">Intelligent assistance throughout your journey</p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {aiFeatures.map((feature, idx) => (
-            <div key={idx} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/30 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between">
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="font-semibold text-gray-900 text-sm leading-tight pr-2">{feature.title}</h3>
-                <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-800 gap-1 shrink-0">
-                  <Sparkles className="w-3 h-3" /> AI
-                </div>
-              </div>
-              <p className="text-gray-500 text-xs leading-relaxed">{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+
 
 
     </div>

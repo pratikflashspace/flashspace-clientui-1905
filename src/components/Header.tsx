@@ -135,7 +135,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
 
         const resetInactivityTimer = () => {
             if (inactivityTimer) clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(showInactivityModal, 60000); // 1 minute of inactivity
+            inactivityTimer = setTimeout(showInactivityModal, 20000); // 20 seconds of inactivity
         };
 
         const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];

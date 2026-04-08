@@ -1077,19 +1077,32 @@ const GetWorkspaces = () => {
               <ChevronRight className="w-4 h-4" />
             </button>
             <MapLibreMap
-              center={useMemo(() => ({
-                lat: sortedWorkspaces[0]?.lat || workspaces[0]?.lat || 28.6139,
-                lng: sortedWorkspaces[0]?.lng || workspaces[0]?.lng || 77.209,
-              }), [sortedWorkspaces, workspaces])}
-              markers={useMemo(() => sortedWorkspaces.map((ws) => ({
-                id: ws.id,
-                position: { lat: ws.lat, lng: ws.lng },
-                title: ws.spaceId || ws.name,
-                image: ws.images?.[0] || ws.image,
-                price: ws.plans?.[0]?.price,
-                rating: ws.rating,
-                address: ws.address,
-              })), [sortedWorkspaces])}
+              center={useMemo(() => {
+                const validWS = sortedWorkspaces.find(ws => ws.lat && ws.lng && ws.lat !== 0 && ws.lng !== 0);
+                return {
+                  lat: validWS?.lat || 28.6139,
+                  lng: validWS?.lng || 77.209,
+                };
+              }, [sortedWorkspaces])}
+              markers={useMemo(() => sortedWorkspaces
+                .filter(ws => ws.lat && ws.lng && ws.lat !== 0 && ws.lng !== 0)
+                .map((ws, idx) => {
+                  // [NEW] Jitter markers to spread them out if they have the same coords
+                  const angle = (idx * 137.5) * (Math.PI / 180);
+                  const r = 0.0003 + (Math.random() * 0.0002);
+                  return {
+                    id: ws.id,
+                    position: { 
+                      lat: ws.lat + Math.cos(angle) * r, 
+                      lng: ws.lng + Math.sin(angle) * r 
+                    },
+                    title: ws.spaceId || ws.name,
+                    image: ws.images?.[0] || ws.image,
+                    price: ws.plans?.[0]?.price,
+                    rating: ws.rating,
+                    address: ws.address,
+                  };
+                }), [sortedWorkspaces])}
               height="100%"
               mapStyle="retro"
             />
@@ -1174,15 +1187,25 @@ const GetWorkspaces = () => {
                 lat: sortedWorkspaces[0]?.lat || workspaces[0]?.lat || 28.6139,
                 lng: sortedWorkspaces[0]?.lng || workspaces[0]?.lng || 77.209,
               }), [sortedWorkspaces, workspaces])}
-              markers={useMemo(() => sortedWorkspaces.map((ws) => ({
-                id: ws.id,
-                position: { lat: ws.lat, lng: ws.lng },
-                title: ws.spaceId || ws.name,
-                image: ws.images?.[0] || ws.image,
-                price: ws.plans?.[0]?.price,
-                rating: ws.rating,
-                address: ws.address,
-              })), [sortedWorkspaces])}
+              markers={useMemo(() => sortedWorkspaces
+                .filter(ws => ws.lat && ws.lng && ws.lat !== 0 && ws.lng !== 0)
+                .map((ws, idx) => {
+                  // [NEW] Jitter markers to spread them out if they have the same coords
+                  const angle = (idx * 137.5) * (Math.PI / 180);
+                  const r = 0.0003 + (Math.random() * 0.0002);
+                  return {
+                    id: ws.id,
+                    position: { 
+                      lat: ws.lat + Math.cos(angle) * r, 
+                      lng: ws.lng + Math.sin(angle) * r 
+                    },
+                    title: ws.spaceId || ws.name,
+                    image: ws.images?.[0] || ws.image,
+                    price: ws.plans?.[0]?.price,
+                    rating: ws.rating,
+                    address: ws.address,
+                  };
+                }), [sortedWorkspaces])}
               height="100%"
               mapStyle="retro"
             />

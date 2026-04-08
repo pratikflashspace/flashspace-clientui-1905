@@ -48,7 +48,7 @@ export const CoworkingSection = () => {
                             From hot desks to private cabins, find the perfect coworking setup for individuals
                             and teams. Fully furnished, move-in ready spaces with world-class amenities.
                         </p>
-                        <Link to="/Solutions/coworking-space">
+                        <Link to="/services/coworking-space">
                             <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
                                 Browse Coworking Spaces
                                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
