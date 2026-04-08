@@ -95,11 +95,13 @@ export const getCoworkingSpacesByCity = async (
  * Get all coworking spaces
  * @returns Array of all coworking spaces
  */
-export const getAllCoworkingSpaces = async (): Promise<
-  CoworkingSpaceItem[]
-> => {
+export const getAllCoworkingSpaces = async (
+  limit?: number,
+): Promise<CoworkingSpaceItem[]> => {
   try {
-    const response = await axiosInstance.get("/coworkingSpace/getAll");
+    const response = await axiosInstance.get(
+      `/coworkingSpace/getAll${limit ? `?limit=${limit}` : ""}`,
+    );
     const data = response.data as ApiResponse<any>;
 
     if (response.status === 200 && data.success) {
