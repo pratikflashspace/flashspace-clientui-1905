@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import userDashboardService from "@/services/userDashboard.service";
 
 // Remove this type definition if useAuth already provides the correct user type
@@ -62,6 +63,7 @@ export default function ClientDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { user } = useAuth();
+  const { unreadCount } = useNotifications();
   const [kycStatus, setKycStatus] = useState<string | null>(null);
 
   // Fetch KYC status for indicator
@@ -179,12 +181,15 @@ export default function ClientDashboard() {
               {mainMenuItems.map((item, idx) => {
                 const isActive = activeIndex === idx;
                 const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
+                const showNotificationBadge =
+                  item.name === "Notifications" && unreadCount > 0;
+
                 return (
                   <li key={item.name}>
                     <button
                       onClick={() => handleNavigation(idx)}
                       title={isSidebarCollapsed ? item.name : undefined}
-                      className={`w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${isSidebarCollapsed ? "justify-center px-2 py-3" : "px-4 py-3"
+                      className={`relative w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${isSidebarCollapsed ? "justify-center px-2 py-3" : "px-4 py-3"
                         } ${isActive
                           ? "bg-[#35503F] text-[#FEF8C3] shadow-sm"
                           : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -194,6 +199,16 @@ export default function ClientDashboard() {
                       {!isSidebarCollapsed && (
                         <span className="flex items-center gap-1">
                           {item.name}
+                          {showNotificationBadge && (
+                            <span
+                              className={`ml-2 inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${isActive
+                                ? "bg-[#FEF8C3] text-[#35503F]"
+                                : "bg-[#35503F] text-[#FEF8C3]"
+                                }`}
+                            >
+                              {unreadCount > 99 ? "99+" : unreadCount}
+                            </span>
+                          )}
                           {showKycDot && (
                             <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
                               <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
@@ -201,6 +216,9 @@ export default function ClientDashboard() {
                             </span>
                           )}
                         </span>
+                      )}
+                      {isSidebarCollapsed && showNotificationBadge && (
+                        <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-red-500" />
                       )}
                     </button>
                   </li>

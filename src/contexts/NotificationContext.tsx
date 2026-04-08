@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext'; // Assuming you have an AuthContext
 import toast from 'react-hot-toast';
@@ -25,6 +24,30 @@ export interface INotification {
     metadata?: any;
 }
 
+const getCreatedAtTime = (value?: string): number => {
+    if (!value) return 0;
+    const parsed = Date.parse(value);
+    return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+const normalizeNotifications = (items: INotification[]): INotification[] => {
+    const deduped = new Map<string, INotification>();
+
+    items.forEach((item) => {
+        if (!item?._id) return;
+        deduped.set(item._id, item);
+    });
+
+    return Array.from(deduped.values()).sort(
+        (a, b) => getCreatedAtTime(b.createdAt) - getCreatedAtTime(a.createdAt)
+    );
+};
+
+const mergeNotifications = (
+    current: INotification[],
+    incoming: INotification[]
+): INotification[] => normalizeNotifications([...current, ...incoming]);
+
 interface NotificationContextType {
     notifications: INotification[];
     unreadCount: number;
@@ -45,7 +68,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const unreadCount = notifications.filter(n => !n.read).length;
 
     // 1. Fetch History
-    const fetchNotifications = async () => {
+    const fetchNotifications = useCallback(async () => {
         if (!user) return;
 
         // Debug user object to see why _id is undefined
@@ -71,13 +94,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             const data = await res.json();
             // console.log("Notification API Response:", data);
 
-            if (data.success) {
-                setNotifications(data.data);
+            if (data.success && Array.isArray(data.data)) {
+                setNotifications(normalizeNotifications(data.data));
             }
         } catch (err) {
             console.error("Failed to fetch notifications", err);
         }
-    };
+    }, [user]);
 
     // 2. Initial Fetch
     useEffect(() => {
@@ -86,7 +109,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         } else {
             setNotifications([]);
         }
-    }, [user]);
+    }, [user, fetchNotifications]);
 
     // 3. Socket Connection
     useEffect(() => {
@@ -103,19 +126,24 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         // Listen for new notifications
         socketInstance.on('notification:new', (newNotification: INotification) => {
+            const normalizedIncoming: INotification = {
+                ...newNotification,
+                _id: newNotification?._id || `notification-${Date.now()}`,
+            };
+
             // Show Toast
             toast(
                 (t) => (
                     <div onClick={() => toast.dismiss(t.id)}>
-                        <strong>{newNotification.title}</strong>
-                        <p>{newNotification.message}</p>
+                        <strong>{normalizedIncoming.title}</strong>
+                        <p>{normalizedIncoming.message}</p>
                     </div>
                 ),
                 { duration: 4000, position: 'top-right' }
             );
 
             // Update State
-            setNotifications(prev => [newNotification, ...prev]);
+            setNotifications(prev => mergeNotifications(prev, [normalizedIncoming]));
         });
 
         // Join Rooms based on role
