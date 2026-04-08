@@ -22,37 +22,12 @@ const locationCyber = "/card-hinjewadi.jpg";
 
 const services = [
     { name: "Popular Spaces" },
-    { name: "Popular Registrations" },
 ];
 
-type CardItem = {
-    name: string;
-    image: string;
-    tags: string[];
-    rating: number;
-    reviews: number;
-    startingFrom: string;
-    popular?: boolean;
-};
-
-const cardsMap: Record<string, CardItem[]> = {
-    "Popular Spaces": [
-        { name: "HSR Layout, Bangalore", image: spaceHsr, tags: ["Startup Hub", "Cafeteria"], rating: 4.8, reviews: 203, startingFrom: "₹5,500/seat", popular: true },
-        { name: "Nariman Point, Mumbai", image: spaceNariman, tags: ["Sea View", "Premium Facilities"], rating: 4.9, reviews: 278, startingFrom: "₹8,000/seat", popular: true },
-        { name: "Connaught Place, Delhi", image: spaceConnaught, tags: ["Central Delhi", "Premium Facilities"], rating: 4.7, reviews: 198, startingFrom: "₹6,000/seat" },
-        { name: "Anna Nagar, Chennai", image: spaceAnna, tags: ["Metro Access", "24/7 Access"], rating: 4.5, reviews: 134, startingFrom: "₹4,500/seat" },
-        { name: "BKC, Mumbai", image: locationBkc, tags: ["Financial Hub", "Premium Address"], rating: 4.8, reviews: 312, startingFrom: "₹9,000/seat", popular: true },
-        { name: "Near Connaught Place", image: locationCp, tags: ["High-Speed WiFi", "Meeting Rooms"], rating: 4.9, reviews: 245, startingFrom: "₹6,500/seat" },
-    ],
-    "Popular Registrations": [
-        { name: "Company Incorporation", image: featureBusinessSetup, tags: ["Pvt Ltd", "LLP", "OPC"], rating: 4.9, reviews: 520, startingFrom: "₹4,999", popular: true },
-        { name: "GST Registration", image: featureVirtualOffice, tags: ["All States", "Quick Process"], rating: 4.8, reviews: 430, startingFrom: "₹1,499", popular: true },
-        { name: "FSSAI License", image: featureGlobalAccess, tags: ["Food Business", "Central & State"], rating: 4.6, reviews: 156, startingFrom: "₹2,999" },
-        { name: "Trade License", image: featureCoworking, tags: ["Municipal", "All Cities"], rating: 4.5, reviews: 112, startingFrom: "₹3,499" },
-        { name: "MSME Registration", image: locationMg, tags: ["Udyam", "Quick Approval"], rating: 4.7, reviews: 289, startingFrom: "₹999" },
-        { name: "Trademark Filing", image: locationCyber, tags: ["Brand Protection", "Pan India"], rating: 4.6, reviews: 198, startingFrom: "₹5,499" },
-    ],
-};
+/**
+ * Curated list of popular spaces to ensure they always show up correctly.
+ */
+const POPULAR_SPACE_IDS = ["FSDL01", "FSBLR05", "FSGUR03", "FSNOD04", "FSHYD01", "FSTHA01"];
 
 const CARDS_PER_PAGE = 3;
 
@@ -68,8 +43,8 @@ export const PlanLocationsShowcase = () => {
             // Navigate to the coworking space detail page
             navigate(`/coworking-space/${item._id}`);
         } else {
-            // For static registrations, take to the virtual office services page
-            navigate(`/services/virtual-office`);
+            // For static registrations, take to the virtual office solutions page
+            navigate(`/Solutions/virtual-office`);
         }
     };
 
@@ -77,14 +52,15 @@ export const PlanLocationsShowcase = () => {
         const fetchSpaces = async () => {
             setIsLoading(true);
             try {
-                const spaces = await getAllCoworkingSpaces();
-                // Sort by popular first, then rating
-                const sortedSpaces = [...spaces].sort((a, b) => {
-                    if (a.popular && !b.popular) return -1;
-                    if (!a.popular && b.popular) return 1;
-                    return (b.rating || 0) - (a.rating || 0);
-                });
-                setDynamicSpaces(sortedSpaces.slice(0, 3));
+                // Fetch with a high limit to ensure we get our curated selection
+                const spaces = await getAllCoworkingSpaces(100);
+                
+                // Filter by the specific IDs provided by the user and maintain that exact order
+                const filteredSpaces = POPULAR_SPACE_IDS
+                    .map(id => spaces.find(s => s.spaceId === id))
+                    .filter(Boolean) as CoworkingSpaceItem[];
+
+                setDynamicSpaces(filteredSpaces);
             } catch (error) {
                 console.error("Error fetching coworking spaces for showcase:", error);
             } finally {
@@ -97,12 +73,9 @@ export const PlanLocationsShowcase = () => {
 
     const active = services[activeIndex];
 
-    // Use dynamic spaces for "Popular Spaces" tab, otherwise use static map
+    // Use dynamic spaces for "Popular Spaces" tab
     const getCards = () => {
-        if (active.name === "Popular Spaces" && dynamicSpaces.length > 0) {
-            return dynamicSpaces;
-        }
-        return cardsMap[active.name] || [];
+        return dynamicSpaces;
     };
 
     const allCards = getCards();
@@ -188,80 +161,26 @@ export const PlanLocationsShowcase = () => {
                         transition={{ duration: 0.3 }}
                         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
                     >
-                        {isLoading && active.name === "Popular Spaces" ? (
+                        {isLoading ? (
                             <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground">
                                 <Loader2 className="w-10 h-10 animate-spin mb-4 text-primary" />
                                 <p>Loading premium workspaces...</p>
                             </div>
                         ) : (
-                            visibleCards.map((loc, i) => {
-                                // If it's a dynamic VirtualOfficeItem, use ListingCardModern
-                                if (active.name === "Popular Spaces" && dynamicSpaces.length > 0) {
-                                    return (
-                                        <motion.div
-                                            key={(loc as VirtualOfficeItem)._id || loc.name}
-                                            initial={{ opacity: 0, y: 24 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: i * 0.08, duration: 0.5 }}
-                                        >
-                                            <ListingCardModern
-                                                item={loc as CoworkingSpaceItem}
-                                                onGetBestPrice={() => handleGetBestPrice(loc, true)}
-                                                onClick={() => handleGetBestPrice(loc, true)}
-                                            />
-                                        </motion.div>
-                                    );
-                                }
-
-                                // Fallback for static "Popular Registrations"
-                                return (
-                                    <motion.div
-                                        key={loc.name}
-                                        initial={{ opacity: 0, y: 24 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: i * 0.08, duration: 0.5 }}
-                                        className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-transform duration-200 ease-out shadow-sm hover:shadow-md"
-                                    >
-                                        <div className="relative aspect-[16/10] overflow-hidden">
-                                            <img src={(loc as any).image} alt={loc.name} className="w-full h-full object-cover transition-transform duration-200 ease-out group-hover:scale-105" />
-                                            <span className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-normal px-2.5 py-1 rounded-full z-10">
-                                                Available Now
-                                            </span>
-                                        </div>
-                                        <div className="p-4">
-                                            <div className="flex items-start justify-between mb-2">
-                                                <h4 className="text-base font-bold text-foreground leading-tight">{loc.name}</h4>
-                                                <span className="flex items-center gap-1 text-sm text-foreground shrink-0 ml-2">
-                                                    <Star className="w-3.5 h-3.5 text-secondary fill-secondary" />
-                                                    {loc.rating} <span className="text-muted-foreground text-xs">({loc.reviews})</span>
-                                                </span>
-                                            </div>
-                                            <div className="flex flex-wrap gap-1.5 mb-3">
-                                                {loc.tags.map((tag) => (
-                                                    <span key={tag} className="text-[11px] text-muted-foreground border border-border rounded-full px-2.5 py-0.5">{tag}</span>
-                                                ))}
-                                            </div>
-                                            <p className="text-sm text-muted-foreground mb-4">
-                                                Starting from <span className="font-bold text-foreground">{loc.startingFrom}</span>
-                                            </p>
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => handleGetBestPrice(loc, false)}
-                                                    className="flex-1 bg-primary text-primary-foreground text-sm font-normal py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
-                                                >
-                                                    Get Best Price
-                                                </button>
-                                                <button
-                                                    onClick={() => navigate('/services/virtual-office')}
-                                                    className="flex-1 flex items-center justify-center gap-1.5 border border-border text-sm font-normal text-foreground py-2.5 rounded-xl hover:bg-muted/50 transition-colors"
-                                                >
-                                                    Explore More
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                );
-                            })
+                            visibleCards.map((loc, i) => (
+                                <motion.div
+                                    key={(loc as any)._id || loc.spaceId || i}
+                                    initial={{ opacity: 0, y: 24 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.08, duration: 0.5 }}
+                                >
+                                    <ListingCardModern
+                                        item={loc as any}
+                                        onGetBestPrice={() => handleGetBestPrice(loc, true)}
+                                        onClick={() => handleGetBestPrice(loc, true)}
+                                    />
+                                </motion.div>
+                            ))
                         )}
                     </motion.div>
                 </AnimatePresence>
