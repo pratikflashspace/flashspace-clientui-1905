@@ -121,7 +121,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
     }, []);
 
     useEffect(() => {
-        // Rule 2: Show every time the user is inactive for 20 seconds
+        // Rule 2: Show every time the user is inactive for 60 seconds
         let inactivityTimer: NodeJS.Timeout;
 
         const showInactivityModal = () => {
@@ -129,13 +129,11 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
             if (!isModalOpenRef.current && !hasFilled) {
                 setIsContactOpen(true);
             }
-            // Restart timer for next inactivity period?
-            // Actually, the listeners will reset it once they become active again.
         };
 
         const resetInactivityTimer = () => {
             if (inactivityTimer) clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(showInactivityModal, 20000); // 20 seconds of inactivity
+            inactivityTimer = setTimeout(showInactivityModal, 60000); // 60 seconds of inactivity
         };
 
         const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
@@ -156,64 +154,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         };
     }, []);
 
-    useEffect(() => {
-        // Rule 3: Show when landing page is scrolled 50%-70%
-        if (location.pathname !== "/") return;
 
-        const handleScroll = (e: Event) => {
-            const hasFilled = localStorage.getItem("hasFilledGetInTouch");
-            const hasShownScroll = sessionStorage.getItem("hasShownScrollGetInTouch");
-            if (hasShownScroll || hasFilled) return;
-
-            const target = e.target as HTMLElement | Document;
-
-            let scrollTop = 0;
-            let scrollHeight = 0;
-            let clientHeight = 0;
-
-            if (target === document || (target as any) === window) {
-                scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-                scrollHeight = Math.max(
-                    document.body.scrollHeight, document.documentElement.scrollHeight,
-                    document.body.offsetHeight, document.documentElement.offsetHeight,
-                    document.body.clientHeight, document.documentElement.clientHeight
-                );
-                clientHeight = document.documentElement.clientHeight || window.innerHeight;
-            } else {
-                const element = target as HTMLElement;
-                // Only track scroll on major container elements that act as the main scroll view
-                if (element.scrollHeight <= element.clientHeight + 10) return;
-
-                scrollTop = element.scrollTop;
-                scrollHeight = element.scrollHeight;
-                clientHeight = element.clientHeight;
-            }
-
-            const docHeight = scrollHeight - clientHeight;
-            if (docHeight <= 0) return;
-
-            const scrollPercent = (scrollTop / docHeight) * 100;
-
-            if (scrollPercent >= 70) {
-                const hasFilledLatest = localStorage.getItem("hasFilledGetInTouch");
-                if (!isModalOpenRef.current && !hasFilledLatest) {
-                    setIsContactOpen(true);
-                    sessionStorage.setItem("hasShownScrollGetInTouch", "true");
-                }
-            }
-        };
-
-        // Use capture phase to intercept scroll events from any nested scrollable container
-        window.addEventListener("scroll", handleScroll, { passive: true, capture: true });
-
-        // Initial check in case they reload the page midway down
-        setTimeout(() => {
-            // Fake an event for initial check on document
-            handleScroll({ target: document } as unknown as Event);
-        }, 500);
-
-        return () => window.removeEventListener("scroll", handleScroll, { capture: true } as EventListenerOptions);
-    }, [location.pathname]);
 
     useEffect(() => {
         // Rule 4: Show after 10 seconds on space detail pages (once per space)
