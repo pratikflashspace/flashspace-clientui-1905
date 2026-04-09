@@ -29,21 +29,36 @@ const services = [
  */
 const POPULAR_SPACE_IDS = ["FSDL01", "FSBLR05", "FSGUR03", "FSNOD04", "FSHYD01", "FSTHA01"];
 
-const CARDS_PER_PAGE = 3;
+
 
 export const PlanLocationsShowcase = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [slideIndex, setSlideIndex] = useState(0);
     const [dynamicSpaces, setDynamicSpaces] = useState<CoworkingSpaceItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [screenSize, setScreenSize] = useState<"mobile" | "tablet" | "desktop">("desktop");
     const navigate = useNavigate();
+
+    // Responsive items per page matching grid: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
+    useEffect(() => {
+        const updateSize = () => {
+            if (window.innerWidth < 640) setScreenSize("mobile");
+            else if (window.innerWidth < 1024) setScreenSize("tablet");
+            else setScreenSize("desktop");
+        };
+        updateSize();
+        window.addEventListener("resize", updateSize);
+        return () => window.removeEventListener("resize", updateSize);
+    }, []);
+
+    const cardsPerPage = screenSize === "mobile" ? 1 : (screenSize === "tablet" ? 2 : 3);
+    const isMobileView = screenSize === "mobile";
+    const isSmallScreen = screenSize !== "desktop";
 
     const handleGetBestPrice = (item: any, isDynamic: boolean) => {
         if (isDynamic) {
-            // Navigate to the coworking space detail page
             navigate(`/coworking-space/${item._id}`);
         } else {
-            // For static registrations, take to the virtual office solutions page
             navigate(`/Solutions/virtual-office`);
         }
     };
@@ -52,10 +67,7 @@ export const PlanLocationsShowcase = () => {
         const fetchSpaces = async () => {
             setIsLoading(true);
             try {
-                // Fetch with a high limit to ensure we get our curated selection
                 const spaces = await getAllCoworkingSpaces(100);
-                
-                // Filter by the specific IDs provided by the user and maintain that exact order
                 const filteredSpaces = POPULAR_SPACE_IDS
                     .map(id => spaces.find(s => s.spaceId === id))
                     .filter(Boolean) as CoworkingSpaceItem[];
@@ -72,15 +84,9 @@ export const PlanLocationsShowcase = () => {
     }, []);
 
     const active = services[activeIndex];
-
-    // Use dynamic spaces for "Popular Spaces" tab
-    const getCards = () => {
-        return dynamicSpaces;
-    };
-
-    const allCards = getCards();
-    const totalPages = Math.ceil(allCards.length / CARDS_PER_PAGE);
-    const visibleCards = allCards.slice(slideIndex * CARDS_PER_PAGE, (slideIndex + 1) * CARDS_PER_PAGE);
+    const allCards = dynamicSpaces;
+    const totalPages = Math.ceil(allCards.length / cardsPerPage);
+    const visibleCards = allCards.slice(slideIndex * cardsPerPage, (slideIndex + 1) * cardsPerPage);
 
     const canPrev = slideIndex > 0;
     const canNext = slideIndex < totalPages - 1;
@@ -105,7 +111,7 @@ export const PlanLocationsShowcase = () => {
                 {/* Tabs + Slider arrows */}
                 <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-10 gap-6">
                     <div className="hidden lg:block w-32" />
-                    <div className="bg-[#F4F4F2] rounded-xl sm:rounded-[14px] px-4 sm:px-6 py-3 sm:py-4 inline-block max-w-full overflow-x-auto">
+                    <div className="bg-[#F4F4F2] rounded-xl sm:rounded-[14px] px-4 sm:px-6 py-3 sm:py-4 inline-block max-w-full overflow-x-auto scrollbar-hide">
                         <div className="relative">
                             <div className="flex gap-6 sm:gap-9 whitespace-nowrap">
                                 {services.map((s, i) => (
@@ -132,8 +138,8 @@ export const PlanLocationsShowcase = () => {
                         </div>
                     </div>
 
-                    {/* Arrow buttons */}
-                    <div className="hidden sm:flex gap-2">
+                    {/* Arrow buttons - hidden on mobile/tablet as sliding is handled by user */}
+                    <div className="hidden lg:flex gap-2">
                         <button
                             onClick={() => setSlideIndex((p) => Math.max(0, p - 1))}
                             disabled={!canPrev}
@@ -151,39 +157,67 @@ export const PlanLocationsShowcase = () => {
                     </div>
                 </div>
 
-                {/* Cards */}
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={`${active.name}-${slideIndex}`}
-                        initial={{ opacity: 0, x: 30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -30 }}
-                        transition={{ duration: 0.3 }}
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
-                    >
-                        {isLoading ? (
-                            <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground">
-                                <Loader2 className="w-10 h-10 animate-spin mb-4 text-primary" />
-                                <p>Loading premium workspaces...</p>
-                            </div>
-                        ) : (
-                            visibleCards.map((loc, i) => (
-                                <motion.div
-                                    key={(loc as any)._id || loc.spaceId || i}
-                                    initial={{ opacity: 0, y: 24 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: i * 0.08, duration: 0.5 }}
-                                >
-                                    <ListingCardModern
-                                        item={loc as any}
-                                        onGetBestPrice={() => handleGetBestPrice(loc, true)}
-                                        onClick={() => handleGetBestPrice(loc, true)}
-                                    />
-                                </motion.div>
-                            ))
-                        )}
-                    </motion.div>
-                </AnimatePresence>
+                {/* Cards Container */}
+                <div className="relative">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={`${active.name}-${slideIndex}-${screenSize}`}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.3 }}
+                            drag={isSmallScreen ? "x" : false}
+                            dragConstraints={{ left: 0, right: 0 }}
+                            dragElastic={0.2}
+                            onDragEnd={(_, { offset }) => {
+                                const swipe = offset.x;
+                                if (swipe < -50 && canNext) {
+                                    setSlideIndex(p => p + 1);
+                                } else if (swipe > 50 && canPrev) {
+                                    setSlideIndex(p => p - 1);
+                                }
+                            }}
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 touch-pan-y"
+                        >
+                            {isLoading ? (
+                                <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground">
+                                    <Loader2 className="w-10 h-10 animate-spin mb-4 text-primary" />
+                                    <p>Loading premium workspaces...</p>
+                                </div>
+                            ) : (
+                                visibleCards.map((loc, i) => (
+                                    <motion.div
+                                        key={(loc as any)._id || loc.spaceId || i}
+                                        initial={{ opacity: 0, y: 24 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.08, duration: 0.5 }}
+                                    >
+                                        <ListingCardModern
+                                            item={loc as any}
+                                            onGetBestPrice={() => handleGetBestPrice(loc, true)}
+                                            onClick={() => handleGetBestPrice(loc, true)}
+                                        />
+                                    </motion.div>
+                                ))
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+
+                    {/* Navigation Dots for Mobile/Tablet */}
+                    {isSmallScreen && totalPages > 1 && (
+                        <div className="flex justify-center gap-1.5 mt-8">
+                            {Array.from({ length: totalPages }).map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setSlideIndex(i)}
+                                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                                        i === slideIndex ? "bg-primary w-4" : "bg-muted-foreground/30"
+                                    }`}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </section>
     );

@@ -194,7 +194,7 @@ import { useChat, ChatMessage } from "@/contexts/ChatContext";
 // Backend chat endpoint (backend calls AI backend internally)
 const BACKEND_CHAT_URL = "/api/chat/send";
 const GUEST_CHAT_URL = "/api/chat/guest";
-    
+
 interface SidebarMenuItem {
   label: string;
   icon: React.ElementType;
@@ -248,7 +248,7 @@ const UpdatesPopup = ({
       case NotificationType.ERROR:
         return X;
       default:
-        return Bell;        
+        return Bell;
     }
   };
 
@@ -800,9 +800,9 @@ const StartChatting = () => {
         let markers: MapMarker[] = [];
         // [PHASE 10] Robust Center Resolution: Try resolveCoordinates, then cityCenters map (case-insensitive), then fallback
         const lowerCity = cityName.toLowerCase();
-        const cityCenter = (cityCenters as any)[lowerCity] || 
-                           (cityCenters as any)[lowerCity === 'gurugram' ? 'gurgaon' : lowerCity] ||
-                           cityCenters.delhi;
+        const cityCenter = (cityCenters as any)[lowerCity] ||
+          (cityCenters as any)[lowerCity === 'gurugram' ? 'gurgaon' : lowerCity] ||
+          cityCenters.delhi;
 
         const center = resolveCoordinates(cityName) || (property?.coordinates) || cityCenter;
         setMapCenter(center);
@@ -1088,7 +1088,7 @@ const StartChatting = () => {
       }
       localStorage.setItem('guest_chat_count', (currentCount + 1).toString());
     }
-
+ 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
@@ -1666,11 +1666,10 @@ const StartChatting = () => {
 
         {/* Map Area */}
         <div
-          className={`flex-shrink-0 bg-white dark:bg-[#0d1728] border-l border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden transition-all duration-300 ease-in-out fixed right-0 bottom-0 z-[120] ${
-            showMap 
-              ? "opacity-100" 
+          className={`flex-shrink-0 bg-white dark:bg-[#0d1728] border-l border-gray-200 dark:border-gray-800 flex flex-col overflow-hidden transition-all duration-300 ease-in-out fixed right-0 bottom-0 z-[120] ${showMap
+              ? "opacity-100"
               : "w-0 opacity-0 pointer-events-none"
-          }`}
+            }`}
           style={{
             top: HEADER_OFFSET,
             height: `calc(100vh - ${HEADER_OFFSET})`,
