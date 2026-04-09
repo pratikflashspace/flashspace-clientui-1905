@@ -773,21 +773,10 @@ const StartChatting = () => {
     // If this is an AI response suggesting a DIFFERENT city when we already have markers, IGNORE IT.
     // Also ignore if it's different from what the user just intentionally searched.
     if (isAIResponse && cityName) {
-      const target = lastTargetCity.current?.toLowerCase();
-      // const currentCity = mapMarkers[0]?.address.toLowerCase();
-
-      if (target && !cityName.toLowerCase().includes(target)) {
-        console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on user-targeted ${lastTargetCity.current}`);
+      const target = lastTargetCity.current;
+      if (!target || !cityName.toLowerCase().includes(target.toLowerCase())) {
         return;
       }
-
-      // [FIX] Removed strict current markers check to allow AI to fetch for the target city if not yet loaded.
-      /*
-      if (mapMarkers.length > 0 && currentCity && !currentCity.includes(cityName.toLowerCase())) {
-        console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on current markers.`);
-        return;
-      }
-      */
     }
 
     if (cityName) {
@@ -1163,7 +1152,6 @@ const StartChatting = () => {
       };
 
       setChatMessages(prev => [...prev, assistantMessage]);
-      setShowMap(true); // [FIX] Force map to open for AI response if markers found
     } catch (error) {
       console.error('Error sending message to backend:', error);
 
