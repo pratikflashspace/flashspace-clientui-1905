@@ -316,7 +316,7 @@ export default function ChatSupport() {
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header */}
                 <div className="mb-6 pl-1">
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-[#35503F]">
                         My <span className="text-[#35503F] italic">Queries</span>
                     </h1>
                     <p className="text-gray-500 mt-2">Get instant AI help for your workspace account queries</p>

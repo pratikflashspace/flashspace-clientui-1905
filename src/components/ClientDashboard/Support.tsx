@@ -331,8 +331,8 @@ export default function Support() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="mb-8 pl-1">
-          <h1 className="text-2xl md:text-3xl font-bold  text-gray-900">
-            Help & <span className="text-[#35503F]">Support</span>
+          <h1 className="text-3xl font-extrabold  text-[#35503F]">
+            Help & <span className="text-[#35503F] italic">Support</span>
           </h1>
           <p className="text-gray-500 mt-2">Get help with your virtual office and coworking services</p>
         </div>
