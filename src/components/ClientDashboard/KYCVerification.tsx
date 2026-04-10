@@ -520,9 +520,9 @@ export default function KYCVerification() {
         };
       case "rejected":
         return {
-          bg: "bg-red-100",
-          text: "text-red-700",
-          icon: AlertCircle,
+          bg: "bg-green-100",
+          text: "text-green-700",
+          icon: CheckCircle2,
           label: "Rejected",
         };
       default:
@@ -546,12 +546,12 @@ export default function KYCVerification() {
           icon: Clock,
         };
       case "rejected":
-        return { bg: "bg-red-500", text: "Action Required", icon: AlertCircle };
+        return { bg: "bg-green-500", text: "Action Required", icon: CheckCircle2 };
       case "resubmit":
         return {
-          bg: "bg-red-500",
+          bg: "bg-green-500",
           text: "Resubmission Required",
-          icon: RefreshCw,
+          icon: CheckCircle2,
         };
       case "in_progress":
         return {
