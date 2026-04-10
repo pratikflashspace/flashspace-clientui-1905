@@ -99,18 +99,18 @@ export default function Billing() {
         };
       case "overdue":
         return {
-          bg: "bg-red-50",
-          text: "text-red-700",
-          border: "border-red-200",
-          icon: AlertCircle,
+          bg: "bg-green-50",
+          text: "text-green-700",
+          border: "border-green-200",
+          icon: CheckCircle2,
           label: "Overdue",
         };
       case "cancelled":
         return {
-          bg: "bg-gray-50",
-          text: "text-gray-600",
-          border: "border-gray-200",
-          icon: AlertCircle,
+          bg: "bg-green-50",
+          text: "text-green-700",
+          border: "border-green-200",
+          icon: CheckCircle2,
           label: "Cancelled",
         };
       default:

@@ -1,6 +1,5 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  AlertCircle,
   Bell,
   CheckCircle2,
   Info,
@@ -22,7 +21,7 @@ type NotificationPreferencesState = {
 };
 
 type NotificationVisualMeta = {
-  Icon: typeof AlertCircle;
+  Icon: typeof Bell;
   iconClassName: string;
   cardClassName: string;
 };
@@ -50,9 +49,9 @@ const getNotificationVisualMeta = (notification: INotification): NotificationVis
 
   if (combinedText.includes("payment") || combinedText.includes("invoice") || combinedText.includes("due")) {
     return {
-      Icon: AlertCircle,
-      iconClassName: "text-red-500",
-      cardClassName: "border-red-200 bg-red-50/40",
+      Icon: CheckCircle2,
+      iconClassName: "text-emerald-500",
+      cardClassName: "border-emerald-200 bg-emerald-50/40",
     };
   }
 
@@ -249,7 +248,9 @@ const Notifications = () => {
         <section className="h-fit rounded-2xl border border-[#d8e3df] bg-white p-4 shadow-sm sm:p-5 lg:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold italic leading-none text-[#35503F] sm:text-4xl">Notifications</h1>
+              <h1 className="text-3xl font-extrabold text-[#35503F]">
+                My <span className="italic">Notifications</span>
+              </h1>
               <p className="mt-2 text-sm text-[#496065] sm:text-base">
                 Stay updated with all your workspace activities
               </p>
