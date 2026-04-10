@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, User, Send, MessageSquare, Loader2, RefreshCw, CheckCircle2, Clock, X, AlertCircle } from 'lucide-react';
+import { Bot, User, Send, MessageSquare, Loader2, RefreshCw, CheckCircle2, X, AlertCircle } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
 import { useAuth } from '@/contexts/AuthContext';
 import axiosInstance from '@/lib/axios';
@@ -34,6 +34,56 @@ interface Ticket {
     updatedAt: string;
 }
 
+interface AIChatMessage {
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    createdAt: string;
+}
+
+const AI_QUICK_PROMPTS = [
+    'How can I check the status of my recent booking?',
+    'How can I download my invoice and payment receipt?',
+    'What should I do if my KYC is rejected?',
+    'Explain the workspace cancellation and refund policy.',
+];
+
+const AI_SESSION_STORAGE_KEY = 'flashspace_support_ai_session';
+
+const getSupportSessionId = (): string => {
+    let sessionId = sessionStorage.getItem(AI_SESSION_STORAGE_KEY);
+    if (!sessionId) {
+        sessionId = `support_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+        sessionStorage.setItem(AI_SESSION_STORAGE_KEY, sessionId);
+    }
+    return sessionId;
+};
+
+const extractAIReply = (payload: unknown): string | null => {
+    if (typeof payload === 'string' && payload.trim().length > 0) return payload.trim();
+    if (!payload || typeof payload !== 'object') return null;
+
+    const responseObject = payload as Record<string, unknown>;
+    const nestedData =
+        responseObject.data && typeof responseObject.data === 'object'
+            ? (responseObject.data as Record<string, unknown>)
+            : null;
+
+    const possibleReplies = [
+        responseObject.reply,
+        responseObject.message,
+        responseObject.answer,
+        responseObject.response,
+        nestedData?.reply,
+        nestedData?.message,
+        nestedData?.answer,
+        nestedData?.response,
+    ];
+
+    const text = possibleReplies.find((item) => typeof item === 'string' && item.trim().length > 0);
+    return text ? text.trim() : null;
+};
+
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.FC<{ className?: string }> }> = {
     open: { label: 'Open', color: 'bg-red-100 text-red-700', icon: AlertCircle },
     in_progress: { label: 'In Progress', color: 'bg-blue-100 text-blue-700', icon: RefreshCw },
@@ -51,6 +101,18 @@ export default function ChatSupport() {
     const [messageInput, setMessageInput] = useState('');
     const [sending, setSending] = useState(false);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
+    const [aiInput, setAiInput] = useState('');
+    const [aiSending, setAiSending] = useState(false);
+    const [aiMessages, setAiMessages] = useState<AIChatMessage[]>([
+        {
+            id: 'support_welcome',
+            role: 'assistant',
+            content:
+                'Hi! I am FlashSpace AI Support.\n\nI can help with bookings, billing, KYC, documents, visit records, and dashboard actions.\n\nType your question or use one of the quick options below.',
+            createdAt: new Date().toISOString(),
+        },
+    ]);
+    const aiMessagesContainerRef = useRef<HTMLDivElement>(null);
 
     const activeTicket = tickets.find(t => t._id === activeTicketId);
 
@@ -88,6 +150,17 @@ export default function ChatSupport() {
             });
         }
     }, [activeTicket?.messages]);
+
+    // Scroll to bottom for AI assistant messages
+    useEffect(() => {
+        const container = aiMessagesContainerRef.current;
+        if (container) {
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth',
+            });
+        }
+    }, [aiMessages, aiSending]);
 
     // Socket: join the active ticket room and listen for new messages
     useEffect(() => {
@@ -146,6 +219,60 @@ export default function ChatSupport() {
         }
     };
 
+    const handleSendAiMessage = async (prefilledText?: string) => {
+        const content = (prefilledText ?? aiInput).trim();
+        if (!content || aiSending) return;
+
+        const userMessage: AIChatMessage = {
+            id: `${Date.now()}`,
+            role: 'user',
+            content,
+            createdAt: new Date().toISOString(),
+        };
+
+        setAiMessages((prev) => [...prev, userMessage]);
+        setAiInput('');
+        setAiSending(true);
+
+        try {
+            const response = await axiosInstance.post('/api/chat/send', {
+                message: content,
+                query: content,
+                conversation_id: 'dashboard-support',
+                session_id: getSupportSessionId(),
+            });
+
+            const aiReply =
+                extractAIReply(response.data) ||
+                'I can help with bookings, payments, invoices, KYC, and dashboard navigation. Please share a bit more detail.';
+
+            setAiMessages((prev) => [
+                ...prev,
+                {
+                    id: `${Date.now()}_assistant`,
+                    role: 'assistant',
+                    content: aiReply,
+                    createdAt: new Date().toISOString(),
+                },
+            ]);
+        } catch (error) {
+            console.error('Failed to send AI support message:', error);
+            toast.error('AI support is temporarily unavailable. Please try again.');
+            setAiMessages((prev) => [
+                ...prev,
+                {
+                    id: `${Date.now()}_assistant_error`,
+                    role: 'assistant',
+                    content:
+                        'I am unable to connect right now. Please try again in a moment, or raise a booking query from My Bookings for partner assistance.',
+                    createdAt: new Date().toISOString(),
+                },
+            ]);
+        } finally {
+            setAiSending(false);
+        }
+    };
+
     const getSenderLabel = (sender: string, ticket: Ticket) => {
         if (sender === 'user') return 'You';
         if (sender === 'partner') return 'Space Partner';
@@ -192,16 +319,115 @@ export default function ChatSupport() {
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                         My <span className="text-[#35503F] italic">Queries</span>
                     </h1>
-                    <p className="text-gray-500 mt-2">Chat with your space partner about your bookings</p>
+                    <p className="text-gray-500 mt-2">Get instant AI help for your workspace account queries</p>
                 </div>
 
                 {tickets.length === 0 ? (
-                    <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
-                        <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold text-gray-600 mb-2">No queries yet</h3>
-                        <p className="text-gray-400 max-w-sm mx-auto">
-                            Go to <strong>My Bookings</strong> and click <strong>Raise Query</strong> on any booking to start a chat with your space partner.
-                        </p>
+                    <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
+                        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+                            <div className="w-12 h-12 rounded-2xl bg-[#35503F]/10 text-[#35503F] flex items-center justify-center">
+                                <Bot className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900 mt-4">Smart Help Desk</h3>
+                            <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+                                Get instant answers for bookings, billing, KYC, documents, and dashboard actions.
+                            </p>
+
+                            <div className="mt-4 rounded-xl border border-[#35503F]/20 bg-[#35503F]/5 p-3">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-[#35503F]">Need Human Support?</p>
+                                <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                                    To chat directly with your booking partner, go to <strong>My Bookings</strong> and use <strong>Raise Query</strong>.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col min-h-[520px] max-h-[70vh] overflow-hidden">
+                            <div className="p-4 border-b border-gray-100">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-[#35503F]/10 text-[#35503F] flex items-center justify-center">
+                                        <Bot className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-gray-900">FlashSpace AI Assistant</h4>
+                                        <p className="text-xs text-gray-500">24/7 help for workspace queries</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div ref={aiMessagesContainerRef} className="flex-1 overflow-y-auto bg-gray-50/60 p-4 space-y-4">
+                                {aiMessages.map((message) => {
+                                    const isUserMessage = message.role === 'user';
+                                    return (
+                                        <div key={message.id} className={`flex ${isUserMessage ? 'justify-end' : 'justify-start'}`}>
+                                            <div className="max-w-[85%]">
+                                                <div className={`rounded-2xl px-4 py-3 shadow-sm text-sm leading-relaxed ${isUserMessage
+                                                    ? 'bg-[#35503F] text-white rounded-tr-none'
+                                                    : 'bg-white text-gray-700 border border-gray-100 rounded-tl-none'
+                                                    }`}>
+                                                    <div className={`mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold ${isUserMessage ? 'text-white/80 justify-end' : 'text-[#35503F]'}`}>
+                                                        {isUserMessage ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3" />}
+                                                        {isUserMessage ? 'You' : 'AI Support'}
+                                                    </div>
+                                                    <p className="whitespace-pre-wrap">{message.content}</p>
+                                                </div>
+                                                <p className={`text-[10px] text-gray-400 mt-1 px-1 ${isUserMessage ? 'text-right' : ''}`}>
+                                                    {format(new Date(message.createdAt), 'h:mm a')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+
+                                {aiSending ? (
+                                    <div className="flex justify-start">
+                                        <div className="rounded-2xl rounded-tl-none bg-white border border-gray-100 px-4 py-3 shadow-sm flex items-center gap-2 text-gray-500 text-sm">
+                                            <Loader2 className="w-4 h-4 animate-spin text-[#35503F]" />
+                                            AI is typing...
+                                        </div>
+                                    </div>
+                                ) : null}
+                            </div>
+
+                            <div className="p-4 border-t border-gray-100">
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {AI_QUICK_PROMPTS.map((prompt) => (
+                                        <button
+                                            key={prompt}
+                                            type="button"
+                                            onClick={() => handleSendAiMessage(prompt)}
+                                            disabled={aiSending}
+                                            className="px-3 py-1.5 rounded-full text-xs font-medium bg-[#35503F]/10 text-[#35503F] hover:bg-[#35503F]/15 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {prompt}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="flex items-center gap-2 bg-gray-50 rounded-xl border border-gray-200 focus-within:ring-2 focus-within:ring-[#35503F]/20 p-2">
+                                    <input
+                                        type="text"
+                                        value={aiInput}
+                                        onChange={(event) => setAiInput(event.target.value)}
+                                        onKeyDown={(event) => {
+                                            if (event.key === 'Enter' && !event.shiftKey) {
+                                                event.preventDefault();
+                                                handleSendAiMessage();
+                                            }
+                                        }}
+                                        placeholder="Ask your question..."
+                                        className="flex-1 bg-transparent border-none focus:outline-none px-2 text-sm text-gray-700 placeholder:text-gray-400"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => handleSendAiMessage()}
+                                        disabled={!aiInput.trim() || aiSending}
+                                        className="p-2.5 bg-[#35503F] text-white rounded-lg hover:bg-[#35503F]/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                        {aiSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 ) : (
                     <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-260px)] min-h-[500px]">
@@ -213,7 +439,6 @@ export default function ChatSupport() {
                             <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
                                 {tickets.map(ticket => {
                                     const cfg = STATUS_CONFIG[ticket.status] || STATUS_CONFIG.open;
-                                    const StatusIcon = cfg.icon;
                                     const isActive = ticket._id === activeTicketId;
                                     const lastMsg = ticket.messages[ticket.messages.length - 1];
                                     return (
