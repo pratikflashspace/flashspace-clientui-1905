@@ -153,7 +153,9 @@ export default function Documents() {
         <div className="p-8 max-w-7xl mx-auto">
             <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Documents</h1>
+                    <h1 className="text-3xl font-extrabold text-[#35503F] mb-2 flex items-center gap-2">
+                        My <span className="text-[#35503F] italic">Documents</span>
+                    </h1>
                     <p className="text-gray-500">Manage your agreements, invoices, and KYC documents</p>
                 </div>
                 <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto mt-4 md:mt-0">

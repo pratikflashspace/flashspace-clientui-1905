@@ -155,8 +155,8 @@ export default function Dashboard() {
     <div className="p-8 max-w-7xl mx-auto min-h-screen">
       {/* Header Section */}
       <div className="mb-10">
-        <h1 className="text-4xl font-bold text-[#35503F]  mb-2">
-          Welcome back, {user?.fullName?.split(" ")[0] || "Customer"}
+        <h1 className="text-3xl font-extrabold text-[#35503F]  mb-2">
+          Welcome back, <span className="italic">{user?.fullName?.split(" ")[0] || "Customer"}</span>
         </h1>
         <p className="text-gray-500 text-lg">
           Manage your workspace subscriptions and track your orders

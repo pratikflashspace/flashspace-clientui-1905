@@ -138,8 +138,8 @@ export default function MailRecords() {
     <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
       {/* Header Section */}
       <div>
-        <h1 className="text-4xl font-bold text-[#35503F] flex items-center gap-3">
-          Mail <span className="text-[#35503F]/70 italic">Records</span>
+        <h1 className="text-3xl font-extrabold text-[#35503F] flex items-center gap-3">
+          Mail <span className="text-[#35503F] italic">Records</span>
         </h1>
         <p className="text-gray-500 mt-2 text-lg">
           Track all mail and parcels received at your virtual office
