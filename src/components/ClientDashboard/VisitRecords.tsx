@@ -100,8 +100,8 @@ export default function VisitRecords() {
     <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500 font-[Inter]">
       {/* Header Section */}
       <div>
-        <h1 className="text-4xl font-bold text-[#35503F] flex items-center gap-3 font-[Inter]">
-          Visit <span className="text-[#35503F]/70 italic">Records</span>
+        <h1 className="text-3xl font-extrabold text-[#35503F] flex items-center gap-3 ">
+          Visit <span className="text-[#35503F] italic">Records</span>
         </h1>
         <p className="text-gray-500 mt-2 text-lg">
           Track all visits made to your registered virtual office

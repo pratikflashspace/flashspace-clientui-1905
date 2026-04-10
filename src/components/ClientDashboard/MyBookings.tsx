@@ -344,8 +344,8 @@ const MyBookings: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
-              My <span className="text-primary italic">Bookings</span>
+            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+              My <span className="text-[#35503F] italic">Bookings</span>
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your virtual offices and coworking spaces
