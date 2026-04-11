@@ -1528,23 +1528,43 @@ const BookingPage = () => {
                 </div>
 
                 {/* Pay Button */}
-                <Button
-                  onClick={handleProceedToPayment}
-                  disabled={paymentLoading}
-                  className="w-full py-6 bg-gradient-to-r from-teal-600 to-emerald-500 text-white rounded-2xl font-bold text-lg hover:from-teal-700 hover:to-emerald-600 transition-all duration-300 shadow-lg shadow-teal-200/50 hover:shadow-xl disabled:opacity-70"
-                >
-                  {paymentLoading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Processing...
-                    </span>
-                  ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <Shield className="w-5 h-5" />
-                      Pay ₹{finalPayableAmount.toLocaleString()} Securely
-                    </span>
-                  )}
-                </Button>
+                {!user?.kycVerified && user?.role === "user" ? (
+                  <div className="bg-amber-50 border border-amber-200 rounded-3xl p-8 mb-8 text-center animate-in fade-in zoom-in duration-500">
+                    <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Shield className="w-8 h-8 text-amber-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-amber-900 mb-2">
+                      KYC Verification Required
+                    </h3>
+                    <p className="text-amber-800 text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                      To ensure security and compliance, KYC verification is mandatory for booking this space. Your current KYC status is not yet approved.
+                    </p>
+                      <Button
+                        onClick={() => navigate("/dashboard/kyc")}
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-6 px-8 rounded-xl shadow-lg shadow-amber-200/50 transition-all hover:scale-[1.02] w-full"
+                      >
+                        Complete KYC Verification
+                      </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleProceedToPayment}
+                    disabled={paymentLoading}
+                    className="w-full py-6 bg-gradient-to-r from-teal-600 to-emerald-500 text-white rounded-2xl font-bold text-lg hover:from-teal-700 hover:to-emerald-600 transition-all duration-300 shadow-lg shadow-teal-200/50 hover:shadow-xl disabled:opacity-70"
+                  >
+                    {paymentLoading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Processing...
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        <Shield className="w-5 h-5" />
+                        Pay ₹{finalPayableAmount.toLocaleString()} Securely
+                      </span>
+                    )}
+                  </Button>
+                )}
 
                 {/* Dev Mode Simulate Button */}
                 {isDevMode && (

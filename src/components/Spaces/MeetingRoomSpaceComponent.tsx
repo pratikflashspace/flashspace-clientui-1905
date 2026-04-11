@@ -136,6 +136,14 @@ const MeetingRoomSpaceComponent = () => {
 
     if (!spaceDetails) return;
 
+    if (!user.kycVerified && user.role === "user") {
+      hotToast.error(
+        "Your KYC has not been approved yet. Please complete your KYC verification to book a space.",
+      );
+      navigate("/dashboard/kyc");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const totalPrice = getTotalPrice();
@@ -479,15 +487,36 @@ const MeetingRoomSpaceComponent = () => {
                   </div>
                 </div>
 
-                <button
-                  onClick={handleBookNow}
-                  disabled={isProcessing}
-                  className={`w-full font-bold py-3 rounded-lg transition-all duration-300 ${isProcessing ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-black text-white hover:bg-[#EDB003] hover:text-black"}`}
-                >
-                  {isProcessing
-                    ? "Processing Payment..."
-                    : `Pay ₹${totalPrice}`}
-                </button>
+                {user && !user.kycVerified && user.role === "user" ? (
+                  <div className="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-100 flex items-start gap-3">
+                    <ShieldCheck className="w-5 h-5 text-amber-600 mt-1 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-amber-900 mb-1">
+                        KYC Required
+                      </p>
+                      <p className="text-[11px] text-amber-700 leading-relaxed">
+                        KYC verification is mandatory before you can book.
+                        Please complete your verification to continue.
+                      </p>
+                      <button
+                        onClick={() => navigate("/dashboard/kyc")}
+                        className="mt-2 text-[11px] font-bold text-amber-600 underline"
+                      >
+                        Verify Now
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleBookNow}
+                    disabled={isProcessing}
+                    className={`w-full font-bold py-3 rounded-lg transition-all duration-300 ${isProcessing ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-black text-white hover:bg-[#EDB003] hover:text-black"}`}
+                  >
+                    {isProcessing
+                      ? "Processing Payment..."
+                      : `Pay ₹${totalPrice}`}
+                  </button>
+                )}
                 <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
                   <ShieldCheck className="w-3 h-3" /> Secure Payment via
                   Razorpay
