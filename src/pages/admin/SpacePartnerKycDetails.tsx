@@ -551,21 +551,22 @@ export default function SpacePartnerKycDetails() {
                       className="group border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all bg-gray-50/50"
                     >
                       <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
-                        <div className="flex items-center gap-4 w-full sm:w-auto">
+                        <div className="flex items-center gap-4 w-full lg:w-1/2">
                           <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                             <FileText className="w-6 h-6 text-blue-600" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h4 className="font-bold text-gray-900 capitalize truncate">
+                            <h4 className="font-bold text-gray-900 capitalize truncate text-sm md:text-base">
                               {doc.type.replace(/_/g, " ")}
                             </h4>
-                            <p className="text-xs text-gray-500 truncate mt-0.5">
+                            <p className="text-xs text-gray-400 truncate mt-0.5">
                               {doc.fileUrl?.split("/").pop() || "No file name"}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                        <div className="flex flex-wrap items-center justify-start sm:justify-end gap-3 w-full lg:w-1/2 pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+
                           <div className="sm:mr-2">
                             <span
                               className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border ${
@@ -602,6 +603,7 @@ export default function SpacePartnerKycDetails() {
                                 <CheckCircle2 className="w-4 h-4" />
                               </button>
                             )}
+
 
                             {doc.status !== "rejected" && (
                               <button
@@ -668,21 +670,22 @@ export default function SpacePartnerKycDetails() {
                         className="group border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all bg-gray-50/50"
                       >
                         <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
-                          <div className="flex items-center gap-4 w-full sm:w-auto">
+                          <div className="flex items-center gap-4 w-full lg:w-1/2">
                             <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                               <FileText className="w-6 h-6 text-blue-600" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h4 className="font-bold text-gray-900 capitalize truncate">
+                              <h4 className="font-bold text-gray-900 capitalize truncate text-sm md:text-base">
                                 {doc.title}
                               </h4>
-                              <p className="text-xs text-gray-500 truncate mt-0.5">
+                              <p className="text-xs text-gray-400 truncate mt-0.5 font-mono">
                                 {url.split("/").pop()}
                               </p>
                             </div>
                           </div>
 
-                          <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                          <div className="flex flex-wrap items-center justify-start sm:justify-end gap-3 w-full lg:w-1/2 pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+
                             <div className="sm:mr-2">
                               <span
                                 className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border ${

@@ -43,6 +43,7 @@ import {
   reportPaymentFailure,
   simulatePayment,
 } from "@/services/payment.service";
+import userDashboardService from "@/services/userDashboard.service";
 import { API_CONFIG, API_ENDPOINTS } from "@/config/api.config";
 import axiosInstance from "@/services/api.service";
 
@@ -116,6 +117,9 @@ const BookingPage = () => {
   const [holdExpiresAt, setHoldExpiresAt] = useState<string | null>(null);
   const [holdFetchError, setHoldFetchError] = useState<boolean>(false);
   const [fixedAmount, setFixedAmount] = useState<number | null>(null);
+  const [isKycChecking, setIsKycChecking] = useState(false);
+  const [isKycVerified, setIsKycVerified] = useState(false);
+  const [hasKycRedirected, setHasKycRedirected] = useState(false);
 
   // Load user data from auth
   useEffect(() => {
@@ -128,6 +132,113 @@ const BookingPage = () => {
       }));
     }
   }, [user]);
+
+  const isApprovedKycStatus = (status?: string) => {
+    const normalizedStatus = (status || "").toLowerCase().trim();
+    return normalizedStatus === "approved" || normalizedStatus === "verified";
+  };
+
+  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkKycStatus = async () => {
+      if (!isAuthenticated || !user || isAdmin) {
+        if (isMounted) {
+          setIsKycChecking(false);
+          setIsKycVerified(isAdmin); // Admins are always "verified" for booking purposes
+          setHasKycRedirected(false);
+        }
+        return;
+      }
+
+
+      setIsKycChecking(true);
+      try {
+        // If user object already has the flag, use it first
+        if (user.kycVerified) {
+          if (isMounted) setIsKycVerified(true);
+          return;
+        }
+
+        const response = await userDashboardService.getKYC();
+
+        if (response.success && response.data) {
+          const kycProfiles = Array.isArray(response.data)
+            ? response.data
+            : [response.data];
+          const verified = kycProfiles.some((profile) =>
+            isApprovedKycStatus(profile.overallStatus || profile.status),
+          );
+          if (isMounted) setIsKycVerified(verified);
+        } else if (isMounted) {
+          setIsKycVerified(false);
+        }
+      } catch (error) {
+        console.error("Failed to check KYC status before booking", error);
+        if (isMounted) setIsKycVerified(false);
+      } finally {
+        if (isMounted) setIsKycChecking(false);
+      }
+    };
+
+    checkKycStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated, user, user?._id, user?.id, user?.kycVerified]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user || isAdmin) return;
+    if (isKycChecking || isKycVerified || hasKycRedirected) return;
+
+
+    setHasKycRedirected(true);
+    toast({
+      title: "Complete your KYC first for booking",
+      description:
+        "Your KYC is not verified yet. Please complete KYC from Profile & KYC.",
+      variant: "destructive",
+    });
+    navigate("/dashboard/profile");
+  }, [
+    isAuthenticated,
+    user,
+    isKycChecking,
+    isKycVerified,
+    hasKycRedirected,
+    navigate,
+    toast,
+  ]);
+
+  const enforceKycForBooking = () => {
+    if (!isAuthenticated || !user || isAdmin) return false;
+
+
+    if (isKycChecking) {
+      toast({
+        title: "Checking KYC status",
+        description: "Please wait while we verify your KYC status.",
+        variant: "destructive",
+      });
+      return true;
+    }
+
+    if (!isKycVerified) {
+      toast({
+        title: "Complete your KYC first for booking",
+        description:
+          "Your KYC is not verified yet. Please complete KYC from Profile & KYC.",
+        variant: "destructive",
+      });
+      navigate("/dashboard/profile");
+      return true;
+    }
+
+    return false;
+  };
 
   // Scroll to top on step change
   useEffect(() => {
@@ -367,6 +478,7 @@ const BookingPage = () => {
   // ============ STEP NAVIGATION ============
   const goNext = () => {
     if (currentStep >= 4) return;
+    if (enforceKycForBooking()) return;
     setAnimating(true);
     setTimeout(() => {
       setCurrentStep((prev) => prev + 1);
@@ -384,6 +496,10 @@ const BookingPage = () => {
   };
 
   const canProceed = () => {
+    if (isAuthenticated && user && (isKycChecking || !isKycVerified)) {
+      return false;
+    }
+
     if (currentStep === 1) {
       return (
         userDetails.fullName.trim() &&
@@ -467,6 +583,7 @@ const BookingPage = () => {
       );
       return;
     }
+    if (enforceKycForBooking()) return;
     if (!spaceDetails || !selectedPlanDetails) return;
 
     try {
@@ -619,6 +736,7 @@ const BookingPage = () => {
       );
       return;
     }
+    if (enforceKycForBooking()) return;
     if (!spaceDetails || !selectedPlanDetails) return;
 
     try {
@@ -1483,20 +1601,21 @@ const BookingPage = () => {
                               : "border-gray-200 bg-white hover:border-gray-300"
                           }`}
                         >
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="text-base font-semibold text-gray-900">{option.label}</span>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-base font-semibold text-gray-900 truncate pr-2">{option.label}</span>
                             {selected && (
-                              <span className="text-xs font-bold uppercase tracking-wider text-teal-600">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-100/50 px-2 py-0.5 rounded-full shrink-0">
                                 Selected
                               </span>
                             )}
                           </div>
-                          <p className="text-2xl font-bold text-gray-900">
+                          <p className="text-xl sm:text-2xl font-bold text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
                             ₹{option.totalPrice.toLocaleString()}
                           </p>
-                          <p className="text-sm text-gray-500 mt-2">
+                          <p className="text-xs text-gray-500 mt-2 line-clamp-1">
                             Save {option.savingsPercent}% • ₹{option.savings.toLocaleString()} off
                           </p>
+
                         </button>
                       );
                     })}
@@ -1530,7 +1649,10 @@ const BookingPage = () => {
                 {/* Pay Button */}
                 <Button
                   onClick={handleProceedToPayment}
-                  disabled={paymentLoading}
+                  disabled={
+                    paymentLoading ||
+                    (isAuthenticated && (isKycChecking || !isKycVerified))
+                  }
                   className="w-full py-6 bg-gradient-to-r from-teal-600 to-emerald-500 text-white rounded-2xl font-bold text-lg hover:from-teal-700 hover:to-emerald-600 transition-all duration-300 shadow-lg shadow-teal-200/50 hover:shadow-xl disabled:opacity-70"
                 >
                   {paymentLoading ? (
@@ -1539,10 +1661,11 @@ const BookingPage = () => {
                       Processing...
                     </span>
                   ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <Shield className="w-5 h-5" />
-                      Pay ₹{finalPayableAmount.toLocaleString()} Securely
+                    <span className="flex items-center justify-center gap-2 overflow-hidden">
+                      <Shield className="w-5 h-5 shrink-0" />
+                      <span className="truncate">Pay ₹{finalPayableAmount.toLocaleString()} Securely</span>
                     </span>
+
                   )}
                 </Button>
 
@@ -1550,7 +1673,10 @@ const BookingPage = () => {
                 {isDevMode && (
                   <Button
                     onClick={handleSimulatePayment}
-                    disabled={paymentLoading}
+                    disabled={
+                      paymentLoading ||
+                      (isAuthenticated && (isKycChecking || !isKycVerified))
+                    }
                     variant="outline"
                     className="w-full mt-3 border-2 border-blue-400 text-blue-600 hover:bg-blue-50 font-semibold py-5 rounded-2xl"
                   >
@@ -1574,6 +1700,11 @@ const BookingPage = () => {
           </div>
 
           {/* ========== NAVIGATION BUTTONS ========== */}
+          {isAuthenticated && !isKycChecking && !isKycVerified && (
+            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+              Complete your KYC first for booking.
+            </div>
+          )}
           <div className="flex justify-between items-center mt-8">
             <button
               onClick={
