@@ -552,7 +552,7 @@ export default function KYCRequests() {
                 </>
               ) : (
                 <>
-                  KYC <span className="text-teal-500 italic">Verification</span>
+                  KYC <span className="text-[#35503F] italic">Verification</span>
                 </>
               )}
             </h1>

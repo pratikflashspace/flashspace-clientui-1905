@@ -473,17 +473,35 @@ const CompleteBookingPage = () => {
                                 </div>
 
                                 {/* CTA */}
-                                <button
-                                    onClick={handleOpenPaymentModal}
-                                    disabled={paymentLoading}
-                                    className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md disabled:opacity-70"
-                                >
-                                    {paymentLoading ? (
-                                        <><Loader2 className="w-4 h-4 animate-spin" /> Creating order…</>
-                                    ) : (
-                                        'Proceed to Payment'
-                                    )}
-                                </button>
+                                {!user?.kycVerified && user?.role === "user" ? (
+                                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-center">
+                                        <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                                        </div>
+                                        <p className="text-sm font-bold text-amber-900 dark:text-amber-100 mb-1">KYC Required</p>
+                                        <p className="text-[11px] text-amber-800 dark:text-amber-200/70 mb-3">
+                                            Your KYC must be approved before you can book a space.
+                                        </p>
+                                        <button
+                                            onClick={() => navigate("/dashboard/kyc")}
+                                            className="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-lg transition-colors"
+                                        >
+                                            Complete KYC Verification
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={handleOpenPaymentModal}
+                                        disabled={paymentLoading}
+                                        className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md disabled:opacity-70"
+                                    >
+                                        {paymentLoading ? (
+                                            <><Loader2 className="w-4 h-4 animate-spin" /> Creating order…</>
+                                        ) : (
+                                            'Proceed to Payment'
+                                        )}
+                                    </button>
+                                )}
 
                                 <p className="text-center text-[11px] text-muted-foreground">
                                     By proceeding, you agree to our{' '}

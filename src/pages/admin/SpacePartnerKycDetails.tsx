@@ -78,6 +78,12 @@ const isVideoFile = (url?: string) => {
   return ["mp4", "webm", "mov", "avi", "mkv"].includes(ext);
 };
 
+const truncateFileName = (name: string, maxLength: number = 25) => {
+  if (!name) return "";
+  if (name.length <= maxLength) return name;
+  return name.substring(0, maxLength) + "...";
+};
+
 import { API_CONFIG } from "@/config/api.config";
 // ... (rest of imports)
 
@@ -556,11 +562,20 @@ export default function SpacePartnerKycDetails() {
                             <FileText className="w-6 h-6 text-blue-600" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h4 className="font-bold text-gray-900 capitalize truncate">
-                              {doc.type.replace(/_/g, " ")}
+                            <h4
+                              className="font-bold text-gray-900 capitalize"
+                              title={doc.type.replace(/_/g, " ")}
+                            >
+                              {truncateFileName(doc.type.replace(/_/g, " "), 20)}
                             </h4>
-                            <p className="text-xs text-gray-500 truncate mt-0.5">
-                              {doc.fileUrl?.split("/").pop() || "No file name"}
+                            <p
+                              className="text-xs text-gray-500 mt-0.5"
+                              title={doc.fileUrl?.split("/").pop()}
+                            >
+                              {truncateFileName(
+                                doc.fileUrl?.split("/").pop() || "",
+                                30,
+                              )}
                             </p>
                           </div>
                         </div>
@@ -673,11 +688,17 @@ export default function SpacePartnerKycDetails() {
                               <FileText className="w-6 h-6 text-blue-600" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h4 className="font-bold text-gray-900 capitalize truncate">
-                                {doc.title}
+                               <h4
+                                className="font-bold text-gray-900 capitalize"
+                                title={doc.title}
+                              >
+                                {truncateFileName(doc.title, 20)}
                               </h4>
-                              <p className="text-xs text-gray-500 truncate mt-0.5">
-                                {url.split("/").pop()}
+                              <p
+                                className="text-xs text-gray-500 mt-0.5"
+                                title={url.split("/").pop()}
+                              >
+                                {truncateFileName(url.split("/").pop() || "", 30)}
                               </p>
                             </div>
                           </div>
