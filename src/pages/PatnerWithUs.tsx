@@ -387,7 +387,7 @@ const PartnerWithUs = () => {
         {/* Partner Form Section - Column Layout matching image */}
         <section className="py-24 lg:py-32 organic-bg" id="partner-form">
           <div className="container mx-auto px-4 lg:px-8">
-            <div className="grid lg:grid-cols-[1fr,1.2fr] gap-16 lg:gap-24 items-start">
+            <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-16 lg:gap-24 items-start">
               {/* Left Column */}
               <motion.div
                 initial={{ opacity: 1, x: 10 }}
@@ -462,7 +462,7 @@ const PartnerWithUs = () => {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-white border border-black/20 rounded-[2.5rem] p-8 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden"
+                className="lg:mt-16 bg-white border border-black/20 rounded-[2.5rem] p-8 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden"
               >
                 {/* Subtle Form Background Glow */}
                 {/* <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#334d3d]/[0.03] blur-[60px] rounded-full pointer-events-none" /> */}

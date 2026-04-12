@@ -78,6 +78,12 @@ const isVideoFile = (url?: string) => {
   return ["mp4", "webm", "mov", "avi", "mkv"].includes(ext);
 };
 
+const truncateFileName = (name: string, maxLength: number = 25) => {
+  if (!name) return "";
+  if (name.length <= maxLength) return name;
+  return name.substring(0, maxLength) + "...";
+};
+
 import { API_CONFIG } from "@/config/api.config";
 // ... (rest of imports)
 

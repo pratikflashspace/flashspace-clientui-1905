@@ -58,6 +58,12 @@ const getStatusBadge = (kycStatus?: string) => {
   );
 };
 
+const truncateFileName = (name: string, maxLength: number = 25) => {
+  if (!name) return "";
+  if (name.length <= maxLength) return name;
+  return name.substring(0, maxLength) + "...";
+};
+
 export default function SpaceDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -414,16 +420,22 @@ export default function SpaceDetail() {
                 <div className="space-y-4">
                   {space.sampleAgreementUrl && (
                     <div className="bg-blue-50 rounded-xl p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-blue-900">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-medium text-blue-900 flex-shrink-0">
                           Agreement
                         </span>
-                        <span className="text-xs text-gray-500">
-                          {space.sampleAgreementUrl.split("/").pop()}
+                        <span
+                          className="text-xs text-gray-500 truncate"
+                          title={space.sampleAgreementUrl.split("/").pop()}
+                        >
+                          {truncateFileName(
+                            space.sampleAgreementUrl.split("/").pop() || "",
+                            30,
+                          )}
                         </span>
                       </div>
                       <button
-                        className="px-3 py-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 rounded-lg"
+                        className="px-3 py-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 rounded-lg flex-shrink-0"
                         onClick={() =>
                           window.open(space.sampleAgreementUrl, "_blank")
                         }
@@ -434,16 +446,22 @@ export default function SpaceDetail() {
                   )}
                   {space.propertyTaxReceiptUrl && (
                     <div className="bg-blue-50 rounded-xl p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-blue-900">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-medium text-blue-900 flex-shrink-0">
                           Property Tax
                         </span>
-                        <span className="text-xs text-gray-500">
-                          {space.propertyTaxReceiptUrl.split("/").pop()}
+                        <span
+                          className="text-xs text-gray-500 truncate"
+                          title={space.propertyTaxReceiptUrl.split("/").pop()}
+                        >
+                          {truncateFileName(
+                            space.propertyTaxReceiptUrl.split("/").pop() || "",
+                            30,
+                          )}
                         </span>
                       </div>
                       <button
-                        className="px-3 py-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 rounded-lg"
+                        className="px-3 py-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 rounded-lg flex-shrink-0"
                         onClick={() =>
                           window.open(space.propertyTaxReceiptUrl, "_blank")
                         }

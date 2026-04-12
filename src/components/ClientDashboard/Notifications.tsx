@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  AlertCircle,
   Bell,
   CheckCircle2,
   Info,
@@ -23,7 +22,7 @@ type NotificationPreferencesState = {
 };
 
 type NotificationVisualMeta = {
-  Icon: typeof AlertCircle;
+  Icon: typeof Bell;
   iconClassName: string;
   cardClassName: string;
 };
@@ -51,9 +50,9 @@ const getNotificationVisualMeta = (notification: INotification): NotificationVis
 
   if (combinedText.includes("payment") || combinedText.includes("invoice") || combinedText.includes("due")) {
     return {
-      Icon: AlertCircle,
-      iconClassName: "text-red-500",
-      cardClassName: "border-red-200 bg-red-50/40",
+      Icon: CheckCircle2,
+      iconClassName: "text-emerald-500",
+      cardClassName: "border-emerald-200 bg-emerald-50/40",
     };
   }
 
@@ -68,8 +67,8 @@ const getNotificationVisualMeta = (notification: INotification): NotificationVis
   if (combinedText.includes("visitor") || combinedText.includes("visit")) {
     return {
       Icon: UserCircle2,
-      iconClassName: "text-blue-500",
-      cardClassName: "border-blue-200 bg-blue-50/30",
+      iconClassName: "text-[#35503F]",
+      cardClassName: "border-[#35503F]/35 bg-[#35503F]/8",
     };
   }
 
@@ -83,7 +82,7 @@ const getNotificationVisualMeta = (notification: INotification): NotificationVis
 
   return {
     Icon: Info,
-    iconClassName: "text-sky-500",
+    iconClassName: "text-[#35503F]",
     cardClassName: "border-slate-200 bg-slate-50/30",
   };
 };
@@ -164,7 +163,7 @@ const ToggleButton = ({
       disabled={disabled}
       onClick={onClick}
       className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 ${
-        checked ? "bg-[#39A6A0]" : "bg-slate-200"
+        checked ? "bg-[#35503F]" : "bg-slate-200"
       } ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
       aria-pressed={checked}
     >
@@ -323,7 +322,7 @@ const Notifications = () => {
 
                       <div className="flex shrink-0 items-start gap-2">
                         {!notification.read ? (
-                          <span className="rounded-full bg-[#39A6A0] px-2.5 py-1 text-xs font-semibold text-white">
+                          <span className="rounded-full bg-[#35503F] px-2.5 py-1 text-xs font-semibold text-white">
                             New
                           </span>
                         ) : null}
@@ -382,4 +381,3 @@ const Notifications = () => {
 };
 
 export default Notifications;
-

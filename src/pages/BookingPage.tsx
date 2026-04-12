@@ -494,13 +494,15 @@ const BookingPage = () => {
   const couponDiscountAmount = appliedCoupon
     ? Math.round((basePrice * appliedCoupon.discountValue) / 100)
     : 0;
-  const finalPayableAmount = basePrice - couponDiscountAmount;
+  const taxableAmount = Math.max(basePrice - couponDiscountAmount, 0);
+  const gstAmount = Math.round(taxableAmount * 0.18);
+  const finalPayableAmount = taxableAmount + gstAmount;
 
   // Compute end date from start date + tenure
   const computedEndDate = (() => {
     const start = new Date(selectedStartDate);
     const end = new Date(start);
-    end.setMonth(end.getMonth() + (isCoworking ? 1 : selectedTenure * 12));
+    end.setMonth(end.getMonth() + selectedTenure * 12);
     return end.toISOString().split("T")[0];
   })();
 
@@ -1479,6 +1481,12 @@ const BookingPage = () => {
                           </span>
                         </div>
                       )}
+                      <div className="flex justify-between text-sm text-gray-500">
+                        <span>GST (18%)</span>
+                        <span className="font-semibold">
+                          ₹{gstAmount.toLocaleString()}
+                        </span>
+                      </div>
                       <div className="border-t border-gray-700 pt-3 flex justify-between">
                         <span className="text-base font-bold">
                           Total Payable
@@ -1521,15 +1529,60 @@ const BookingPage = () => {
                         ₹{finalPayableAmount.toLocaleString()}
                       </p>
                       <p className="text-xs text-teal-100 mt-1">
-                        {selectedPlanDetails.name}{" "}
-                        {isCoworking
-                          ? ""
-                          : `• ${selectedTenure} Year${selectedTenure > 1 ? "s" : ""}`}
+                        {selectedPlanDetails.name} • {selectedTenure} Year{selectedTenure > 1 ? "s" : ""} • incl. GST
                       </p>
                     </div>
                     <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                       <Shield className="w-8 h-8 text-white" />
                     </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 p-6 mb-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Choose your booking duration
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Pick how many years you want to book. The total price updates automatically.
+                      </p>
+                    </div>
+                    <span className="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 px-3 py-1 text-sm font-semibold">
+                      {selectedTenure} Year{selectedTenure > 1 ? "s" : ""}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {tenureOptions.map((option) => {
+                      const selected = selectedTenure === option.years;
+                      return (
+                        <button
+                          key={option.years}
+                          type="button"
+                          onClick={() => setSelectedTenure(option.years as 1 | 2 | 3)}
+                          className={`text-left rounded-3xl border p-4 transition-all ${
+                            selected
+                              ? "border-teal-500 bg-teal-50 shadow-md"
+                              : "border-gray-200 bg-white hover:border-gray-300"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-base font-semibold text-gray-900">{option.label}</span>
+                            {selected && (
+                              <span className="text-xs font-bold uppercase tracking-wider text-teal-600">
+                                Selected
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-2xl font-bold text-gray-900">
+                            ₹{option.totalPrice.toLocaleString()}
+                          </p>
+                          <p className="text-sm text-gray-500 mt-2">
+                            Save {option.savingsPercent}% • ₹{option.savings.toLocaleString()} off
+                          </p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -1558,23 +1611,43 @@ const BookingPage = () => {
                 </div>
 
                 {/* Pay Button */}
-                <Button
-                  onClick={handleProceedToPayment}
-                  disabled={paymentLoading}
-                  className="w-full py-6 bg-gradient-to-r from-teal-600 to-emerald-500 text-white rounded-2xl font-bold text-lg hover:from-teal-700 hover:to-emerald-600 transition-all duration-300 shadow-lg shadow-teal-200/50 hover:shadow-xl disabled:opacity-70"
-                >
-                  {paymentLoading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Processing...
-                    </span>
-                  ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <Shield className="w-5 h-5" />
-                      Pay ₹{finalPayableAmount.toLocaleString()} Securely
-                    </span>
-                  )}
-                </Button>
+                {!user?.kycVerified && user?.role === "user" ? (
+                  <div className="bg-amber-50 border border-amber-200 rounded-3xl p-8 mb-8 text-center animate-in fade-in zoom-in duration-500">
+                    <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Shield className="w-8 h-8 text-amber-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-amber-900 mb-2">
+                      KYC Verification Required
+                    </h3>
+                    <p className="text-amber-800 text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                      To ensure security and compliance, KYC verification is mandatory for booking this space. Your current KYC status is not yet approved.
+                    </p>
+                      <Button
+                        onClick={() => navigate("/dashboard/kyc")}
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-6 px-8 rounded-xl shadow-lg shadow-amber-200/50 transition-all hover:scale-[1.02] w-full"
+                      >
+                        Complete KYC Verification
+                      </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleProceedToPayment}
+                    disabled={paymentLoading}
+                    className="w-full py-6 bg-gradient-to-r from-teal-600 to-emerald-500 text-white rounded-2xl font-bold text-lg hover:from-teal-700 hover:to-emerald-600 transition-all duration-300 shadow-lg shadow-teal-200/50 hover:shadow-xl disabled:opacity-70"
+                  >
+                    {paymentLoading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Processing...
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        <Shield className="w-5 h-5" />
+                        Pay ₹{finalPayableAmount.toLocaleString()} Securely
+                      </span>
+                    )}
+                  </Button>
+                )}
 
                 {/* Dev Mode Simulate Button */}
                 {isDevMode && (

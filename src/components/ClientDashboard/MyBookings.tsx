@@ -38,8 +38,17 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "react-hot-toast";
 import ReviewModal from "@/components/ui/ReviewModal";
+import { getAllVirtualOffices } from "@/services/virtualOffice.service";
+import { getAllCoworkingSpaces } from "@/services/coworkingSpace.service";
+import { getAllMeetingRooms } from "@/services/meetingRoom.service";
+import { getShortAddress } from "@/utils/address";
 
 const MyBookings: React.FC = () => {
+  type WorkspaceCodeSource = {
+    _id?: string;
+    spaceId?: string;
+  };
+
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"all" | BookingType>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | BookingStatus>(
@@ -63,6 +72,14 @@ const MyBookings: React.FC = () => {
     coworking: 0,
     meetingRoom: 0,
   });
+  const [workspaceCodeMap, setWorkspaceCodeMap] = useState<
+    Record<string, string>
+  >({});
+  const [workspaceCodeByAddress, setWorkspaceCodeByAddress] = useState<
+    Record<string, string>
+  >({});
+  const [workspaceCodeByShortAddress, setWorkspaceCodeByShortAddress] =
+    useState<Record<string, string>>({});
 
   // Raise Query state
   const [queryModalBooking, setQueryModalBooking] = useState<Booking | null>(
@@ -141,6 +158,137 @@ const MyBookings: React.FC = () => {
     fetchBookings();
   }, [activeTab, statusFilter]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const normalizeSpaceCode = (value?: string) => {
+      const trimmed = value?.trim();
+      if (!trimmed) return "";
+      const match = trimmed.toUpperCase().match(/\b[A-Z]{2,}\d{2,}\b/);
+      return match?.[0] || "";
+    };
+
+    const normalizeAddressKey = (value?: string) => {
+      return (value || "").toLowerCase().replace(/\s+/g, " ").trim();
+    };
+
+    const mapById = (items: WorkspaceCodeSource[]) => {
+      const mapped: Record<string, string> = {};
+      items.forEach((item) => {
+        const id = item._id?.trim();
+        const code = normalizeSpaceCode(item.spaceId);
+        if (id && code) {
+          mapped[id] = code;
+        }
+      });
+      return mapped;
+    };
+
+    const mapByAddress = (
+      items: Array<WorkspaceCodeSource & { address?: string }>,
+    ) => {
+      const mapped: Record<string, string> = {};
+      items.forEach((item) => {
+        const code = normalizeSpaceCode(item.spaceId);
+        const addressKey = normalizeAddressKey(item.address);
+        if (code && addressKey) {
+          mapped[addressKey] = code;
+        }
+      });
+      return mapped;
+    };
+
+    const mapByShortAddress = (
+      items: Array<WorkspaceCodeSource & { address?: string }>,
+    ) => {
+      const mapped: Record<string, string> = {};
+      items.forEach((item) => {
+        const code = normalizeSpaceCode(item.spaceId);
+        const shortAddressKey = normalizeAddressKey(
+          getShortAddress(item.address || ""),
+        );
+        if (code && shortAddressKey) {
+          mapped[shortAddressKey] = code;
+        }
+      });
+      return mapped;
+    };
+
+    const fetchWorkspaceCodes = async () => {
+      try {
+        const [virtualOfficeRes, coworkingRes, meetingRoomRes] =
+          await Promise.allSettled([
+            getAllVirtualOffices(),
+            getAllCoworkingSpaces(),
+            getAllMeetingRooms(),
+          ]);
+
+        const voMap =
+          virtualOfficeRes.status === "fulfilled"
+            ? mapById(virtualOfficeRes.value.offices)
+            : {};
+        const cwMap =
+          coworkingRes.status === "fulfilled"
+            ? mapById(coworkingRes.value)
+            : {};
+        const mrMap =
+          meetingRoomRes.status === "fulfilled"
+            ? mapById(meetingRoomRes.value)
+            : {};
+        const voAddressMap =
+          virtualOfficeRes.status === "fulfilled"
+            ? mapByAddress(virtualOfficeRes.value.offices)
+            : {};
+        const cwAddressMap =
+          coworkingRes.status === "fulfilled"
+            ? mapByAddress(coworkingRes.value)
+            : {};
+        const mrAddressMap =
+          meetingRoomRes.status === "fulfilled"
+            ? mapByAddress(meetingRoomRes.value)
+            : {};
+        const voShortAddressMap =
+          virtualOfficeRes.status === "fulfilled"
+            ? mapByShortAddress(virtualOfficeRes.value.offices)
+            : {};
+        const cwShortAddressMap =
+          coworkingRes.status === "fulfilled"
+            ? mapByShortAddress(coworkingRes.value)
+            : {};
+        const mrShortAddressMap =
+          meetingRoomRes.status === "fulfilled"
+            ? mapByShortAddress(meetingRoomRes.value)
+            : {};
+
+        if (isMounted) {
+          setWorkspaceCodeMap({
+            ...voMap,
+            ...cwMap,
+            ...mrMap,
+          });
+          setWorkspaceCodeByAddress({
+            ...voAddressMap,
+            ...cwAddressMap,
+            ...mrAddressMap,
+          });
+          setWorkspaceCodeByShortAddress({
+            ...voShortAddressMap,
+            ...cwShortAddressMap,
+            ...mrShortAddressMap,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to resolve workspace codes", error);
+      }
+    };
+
+    fetchWorkspaceCodes();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const handleToggleAutoRenew = async (
     bookingId: string,
     currentValue: boolean,
@@ -210,13 +358,13 @@ const MyBookings: React.FC = () => {
 
   // Filter bookings client-side for search
   const filteredBookings = bookings.filter((b) => {
+    const workspaceId = getWorkspaceDisplayName(b).toLowerCase();
+    const query = searchQuery.toLowerCase();
     const matchSearch =
       searchQuery === "" ||
-      b.spaceSnapshot?.name
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      b.bookingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      b.spaceSnapshot?.city?.toLowerCase().includes(searchQuery.toLowerCase());
+      workspaceId.includes(query) ||
+      b.bookingNumber.toLowerCase().includes(query) ||
+      b.spaceSnapshot?.city?.toLowerCase().includes(query);
 
     // Filter by Date Range (Start Date)
     const matchDate =
@@ -243,6 +391,46 @@ const MyBookings: React.FC = () => {
       year: "numeric",
     });
   };
+
+  function getWorkspaceDisplayName(booking?: Booking | null) {
+    const normalizeSpaceCode = (value?: string) => {
+      const trimmed = value?.trim();
+      if (!trimmed) return "";
+      const match = trimmed.toUpperCase().match(/\b[A-Z]{2,}\d{2,}\b/);
+      return match?.[0] || "";
+    };
+    const normalizeAddressKey = (value?: string) => {
+      return (value || "").toLowerCase().replace(/\s+/g, " ").trim();
+    };
+
+    const byBookingRef = booking?.spaceId ? workspaceCodeMap[booking.spaceId] : "";
+    const bySnapshotRef = booking?.spaceSnapshot?._id
+      ? workspaceCodeMap[booking.spaceSnapshot._id]
+      : "";
+    const byAddress =
+      workspaceCodeByAddress[
+        normalizeAddressKey(booking?.spaceSnapshot?.address)
+      ] || "";
+    const byShortAddress =
+      workspaceCodeByShortAddress[
+        normalizeAddressKey(
+          getShortAddress(booking?.spaceSnapshot?.address || ""),
+        )
+      ] || "";
+    const snapshotCode = normalizeSpaceCode(booking?.spaceSnapshot?.spaceId);
+    const codeFromName = normalizeSpaceCode(booking?.spaceSnapshot?.name);
+
+    const resolvedCode =
+      byBookingRef ||
+      bySnapshotRef ||
+      byAddress ||
+      byShortAddress ||
+      snapshotCode ||
+      codeFromName;
+
+    if (!resolvedCode) return "Space ID Not Available";
+    return resolvedCode;
+  }
 
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -344,8 +532,8 @@ const MyBookings: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
-              My <span className="text-primary italic">Bookings</span>
+            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+              My <span className="text-[#35503F] italic">Bookings</span>
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your virtual offices and coworking spaces
@@ -583,7 +771,7 @@ const MyBookings: React.FC = () => {
                   {/* Main Content */}
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-[#35503F] transition-colors line-clamp-1">
-                      {booking.spaceSnapshot?.spaceId || booking.spaceSnapshot?.name}
+                      {getWorkspaceDisplayName(booking)}
                     </h3>
                     <div className="flex items-start gap-1.5 text-gray-500 text-xs mb-2 h-8">
                       <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0 text-[#35503F]" />
@@ -711,7 +899,7 @@ const MyBookings: React.FC = () => {
                     selectedBooking.spaceSnapshot?.image ||
                     "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"
                   }
-                  alt={selectedBooking.spaceSnapshot?.name}
+                  alt={getWorkspaceDisplayName(selectedBooking)}
                   className="w-full h-48 object-cover"
                 />
                 <button
@@ -738,7 +926,7 @@ const MyBookings: React.FC = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h2 className="text-xl font-bold text-gray-900">
-                      {selectedBooking.spaceSnapshot?.spaceId || selectedBooking.spaceSnapshot?.name}
+                      {getWorkspaceDisplayName(selectedBooking)}
                     </h2>
                     <p className="text-gray-500 flex items-center gap-1 mt-1">
                       <MapPin className="w-4 h-4 text-[#35503F]" />{" "}
@@ -885,7 +1073,7 @@ const MyBookings: React.FC = () => {
                       Raise a Query
                     </h2>
                     <p className="text-sm text-gray-500 mt-0.5">
-                      {queryModalBooking.spaceSnapshot?.name} —{" "}
+                      {getWorkspaceDisplayName(queryModalBooking)} —{" "}
                       {queryModalBooking.bookingNumber}
                     </p>
                   </div>

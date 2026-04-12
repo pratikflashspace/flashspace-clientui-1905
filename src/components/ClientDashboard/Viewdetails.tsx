@@ -474,10 +474,10 @@ const ViewDetails: React.FC = () => {
                                   ? "bg-green-100 text-green-700"
                                   : doc.status === "pending"
                                   ? "bg-yellow-100 text-yellow-700"
-                                  : "bg-red-100 text-red-700"
+                                  : "bg-green-100 text-green-700"
                               }`}
                             >
-                              {doc.status === "verified" ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+                              <CheckCircle2 className="w-3 h-3" />
                               {doc.name}
                             </span>
                           ))}
