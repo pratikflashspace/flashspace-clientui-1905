@@ -199,19 +199,19 @@ export default function SpacePartnerKycRequest({
       {kycList.map((kyc) => (
         <div
           key={kyc._id}
-          className="bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+          className="bg-white rounded-2xl border border-border shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
         >
-          <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="p-6 border-b border-border bg-gradient-to-r from-gray-50 to-white">
             <div className="flex items-center justify-between mb-4 gap-3">
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#35503f] flex items-center justify-center text-white font-bold text-lg">
                   {kyc.fullName?.charAt(0) || "P"}
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-bold text-gray-900 truncate">
+                  <h3 className="font-bold text-foreground truncate">
                     {kyc.fullName}
                   </h3>
-                  <p className="text-sm text-gray-500 truncate">{kyc.email}</p>
+                  <p className="text-sm text-muted-foreground truncate">{kyc.email}</p>
                 </div>
               </div>
               <div className="flex flex-col items-end gap-2">
@@ -232,15 +232,15 @@ export default function SpacePartnerKycRequest({
           <div className="p-6 space-y-4 flex-1">
             <button
               onClick={() => navigate(`/admin/kyc-partners/${kyc._id}`)}
-              className="w-full bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl p-4 transition-colors text-left"
+              className="w-full bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded-xl p-4 transition-colors text-left"
             >
               <div className="flex items-center justify-between mb-1">
-                <h4 className="text-sm font-semibold text-blue-900">
+                <h4 className="text-sm font-semibold text-primary">
                   Partner Identity
                 </h4>
-                <User className="w-4 h-4 text-blue-600" />
+                <User className="w-4 h-4 text-primary" />
               </div>
-              <p className="text-xs text-blue-700">
+              <p className="text-xs text-primary/70">
                 Review identity documents & personal info
               </p>
             </button>
@@ -268,7 +268,7 @@ export default function SpacePartnerKycRequest({
 
             {kyc.overallStatus !== "approved" && (
               <div className="space-y-2">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                   Submitted Documents
                 </h4>
                 <div className="space-y-1">
@@ -299,14 +299,14 @@ export default function SpacePartnerKycRequest({
                     .map((doc) => (
                       <div
                         key={doc.id}
-                        className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-sm"
+                        className="flex items-center justify-between p-2 bg-muted/30 rounded-lg text-sm"
                       >
                         <span className="capitalize">{doc.label}</span>
                         <button
                           onClick={() =>
                             openDocumentModal({ ...doc, fileUrl: doc.url }, kyc)
                           }
-                          className="text-blue-600 hover:underline font-medium"
+                          className="text-primary hover:underline font-medium"
                         >
                           Verify
                         </button>
@@ -315,7 +315,7 @@ export default function SpacePartnerKycRequest({
                   {!kyc.aadhaarImageUrl &&
                     !kyc.panImageUrl &&
                     !kyc.videoKycUrl && (
-                      <div className="p-2 text-xs text-gray-500 italic">
+                      <div className="p-2 text-xs text-muted-foreground italic">
                         No documents uploaded yet
                       </div>
                     )}
@@ -328,7 +328,7 @@ export default function SpacePartnerKycRequest({
             {kyc.overallStatus !== "approved" && (
               <button
                 onClick={() => navigate(`/admin/kyc-partners/${kyc._id}`)}
-                className="w-full py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-semibold shadow-md"
+                className="w-full py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all font-semibold shadow-md"
               >
                 Complete Review
               </button>
@@ -346,7 +346,7 @@ export default function SpacePartnerKycRequest({
           }
         >
           <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="p-6 border-b flex justify-between items-center bg-gray-50">
+            <div className="p-6 border-b flex justify-between items-center bg-muted/30">
               <h3 className="text-xl font-bold">Document Verification</h3>
               <button onClick={() => setShowDocumentModal(false)}>
                 <X className="w-6 h-6" />
@@ -354,22 +354,22 @@ export default function SpacePartnerKycRequest({
             </div>
             <div className="p-6 overflow-y-auto flex-1 bg-white">
               <div className="grid grid-cols-2 gap-6 mb-6">
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-xs font-bold text-gray-400 uppercase mb-1">
+                <div className="p-4 bg-muted/30 rounded-xl">
+                  <p className="text-xs font-bold text-muted-foreground/70 uppercase mb-1">
                     Type
                   </p>
                   <p className="text-lg font-bold capitalize">
                     {selectedDocument.label}
                   </p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-xs font-bold text-gray-400 uppercase mb-1">
+                <div className="p-4 bg-muted/30 rounded-xl">
+                  <p className="text-xs font-bold text-muted-foreground/70 uppercase mb-1">
                     Status
                   </p>
                   {getStatusBadge(selectedDocument.status || "pending")}
                 </div>
               </div>
-              <div className="aspect-video bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center">
+              <div className="aspect-video bg-muted/50 rounded-xl overflow-hidden flex items-center justify-center">
                 {isImageFile(selectedDocument.fileUrl) ? (
                   <img
                     src={getFullUrl(selectedDocument.fileUrl)}
@@ -385,11 +385,11 @@ export default function SpacePartnerKycRequest({
                 ) : (
                   <div className="text-center p-8">
                     <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Preview not available</p>
+                    <p className="text-muted-foreground">Preview not available</p>
                     <a
                       href={getFullUrl(selectedDocument.fileUrl)}
                       target="_blank"
-                      className="text-blue-600 underline font-bold"
+                      className="text-primary underline font-bold"
                       rel="noreferrer"
                     >
                       Download File
@@ -398,11 +398,11 @@ export default function SpacePartnerKycRequest({
                 )}
               </div>
             </div>
-            <div className="p-6 bg-gray-50 border-t flex gap-4">
+            <div className="p-6 bg-muted/30 border-t flex gap-4">
               <button
                 onClick={() => handleDocumentReview("approve")}
                 disabled={submitting}
-                className="flex-1 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 shadow-md disabled:opacity-50"
+                className="flex-1 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 shadow-md disabled:opacity-50"
               >
                 Approve Document
               </button>

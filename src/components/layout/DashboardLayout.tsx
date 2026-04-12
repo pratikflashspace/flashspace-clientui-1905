@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -25,9 +25,38 @@ export const DashboardLayout = ({
   portalDescription,
   navItems,
 }: DashboardLayoutProps) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem("admin-sidebar-collapsed");
+    return saved === "true";
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Persist collapsed state
+  useEffect(() => {
+    localStorage.setItem("admin-sidebar-collapsed", String(collapsed));
+  }, [collapsed]);
+
+  // Persist scroll position across navigation
+  useEffect(() => {
+    const scrollContainer = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+    
+    // Restore scroll position
+    const savedScrollPos = sessionStorage.getItem("admin-sidebar-scroll");
+    if (savedScrollPos && scrollContainer) {
+      scrollContainer.scrollTop = parseInt(savedScrollPos, 10);
+    }
+
+    const handleScroll = () => {
+      if (scrollContainer) {
+        sessionStorage.setItem("admin-sidebar-scroll", String(scrollContainer.scrollTop));
+      }
+    };
+
+    scrollContainer?.addEventListener('scroll', handleScroll);
+    return () => scrollContainer?.removeEventListener('scroll', handleScroll);
+  }, [location.pathname]); // Update on each route change to ensure restoration after component remount
 
   const isActive = (href: string) => location.pathname === href;
 
@@ -82,7 +111,7 @@ export const DashboardLayout = ({
           </div>
 
           {/* Navigation */}
-          <ScrollArea className="flex-1 py-4 min-h-0" data-lenis-prevent>
+          <ScrollArea ref={scrollAreaRef} className="flex-1 py-4 min-h-0" data-lenis-prevent>
             <nav className="px-3 space-y-1">
               {navItems.map((item) => (
                 <div key={item.href}>

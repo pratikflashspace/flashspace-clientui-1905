@@ -312,15 +312,19 @@ export default function ChatSupport() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
-            <div className="max-w-7xl mx-auto space-y-6">
-                {/* Header */}
-                <div className="mb-6 pl-1">
-                    <h1 className="text-2xl md:text-3xl font-extrabold text-[#35503F]">
-                        My <span className="text-[#35503F] italic">Queries</span>
-                    </h1>
-                    <p className="text-gray-500 mt-2">Get instant AI help for your workspace account queries</p>
-                </div>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+              My <span className="text-primary italic">Queries</span>
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 font-medium">
+              Chat with your space partner about your bookings
+            </p>
+          </div>
+        </div>
 
                 {tickets.length === 0 ? (
                     <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">

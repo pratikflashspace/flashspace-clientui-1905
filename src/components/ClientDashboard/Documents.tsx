@@ -150,55 +150,87 @@ export default function Documents() {
     };
 
     return (
-        <div className="p-8 max-w-7xl mx-auto">
-            <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-extrabold text-[#35503F] mb-2 flex items-center gap-2">
-                        My <span className="text-[#35503F] italic">Documents</span>
-                    </h1>
-                    <p className="text-gray-500">Manage your agreements, invoices, and KYC documents</p>
-                </div>
-                <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto mt-4 md:mt-0">
-                    <div className="relative">
-                        <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                        <input
-                            type="text"
-                            placeholder="Search documents..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 pr-4 py-2 w-full md:w-64 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all bg-white"
-                        />
-                    </div>
-                    <div className="relative">
-                        <Filter className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        <select
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="pl-10 pr-10 py-2 w-full md:w-48 appearance-none border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all bg-white cursor-pointer"
-                        >
-                            <option value="all">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="paid">Paid</option>
-                            <option value="overdue">Overdue</option>
-                            <option value="verified">Verified</option>
-                            <option value="rejected">Rejected</option>
-                            <option value="approved">Approved</option>
-                        </select>
-                        <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+              Docu<span className="text-primary italic">ments</span>
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 font-medium">
+              Manage your agreements, invoices, and KYC documents
+            </p>
+          </div>
+          <a
+            href="/services/virtual-office"
+            className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
+          >
+            <span className="text-xl">+</span>
+            Book New Space
+          </a>
+        </div>
+
+        <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
+          <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center w-full lg:w-auto">
+            {/* Search */}
+            <div className="relative flex-1 lg:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search documents..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-[#35503F]/10 text-sm font-medium transition-all"
+              />
             </div>
 
-            <Tabs defaultValue="invoice" className="w-full">
-                <TabsList className="grid grid-cols-3 max-w-md mb-8">
-                    <TabsTrigger value="agreement">Agreement</TabsTrigger>
-                    <TabsTrigger value="invoice">Invoice</TabsTrigger>
-                    <TabsTrigger value="kyc">KYC Documents</TabsTrigger>
-                </TabsList>
+            {/* Status Filter */}
+            <div className="relative flex-1 sm:w-48 sm:flex-none">
+              <Filter className="w-4 h-4 text-primary absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none" />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full pl-11 pr-10 py-3 bg-white border border-gray-100 rounded-2xl text-sm font-semibold text-gray-700 outline-none focus:ring-4 focus:ring-[#35503F]/10 transition-all appearance-none cursor-pointer"
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="paid">Paid</option>
+                <option value="overdue">Overdue</option>
+                <option value="verified">Verified</option>
+                <option value="rejected">Rejected</option>
+                <option value="approved">Approved</option>
+              </select>
+              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Tabs defaultValue="invoice" className="w-full space-y-6">
+          <TabsList className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 w-fit max-w-full overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth h-auto">
+            <TabsTrigger
+              value="agreement"
+              className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+            >
+              Agreement
+            </TabsTrigger>
+            <TabsTrigger
+              value="invoice"
+              className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+            >
+              Invoice
+            </TabsTrigger>
+            <TabsTrigger
+              value="kyc"
+              className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+            >
+              KYC Documents
+            </TabsTrigger>
+          </TabsList>
 
                 <TabsContent value="agreement" className="mt-0">
                     <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
@@ -455,5 +487,6 @@ export default function Documents() {
                 </div>
             )}
         </div>
+    </div>
     );
 }

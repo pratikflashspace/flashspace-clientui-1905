@@ -135,84 +135,72 @@ export default function MailRecords() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
-      {/* Header Section */}
-      <div>
-        <h1 className="text-3xl font-extrabold text-[#35503F] flex items-center gap-3">
-          Mail <span className="text-[#35503F] italic">Records</span>
-        </h1>
-        <p className="text-gray-500 mt-2 text-lg">
-          Track all mail and parcels received at your virtual office
-        </p>
-      </div>
-
-      {/* Stats Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 translate-y-0 hover:-translate-y-1 transition-all">
-          <div className="w-14 h-14 rounded-2xl bg-yellow-50 flex items-center justify-center">
-            <Inbox className="w-7 h-7 text-yellow-600" />
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+              Mail <span className="text-primary italic">Records</span>
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 font-medium">
+              Track all mail and parcels received at your virtual office
+            </p>
           </div>
-          <div>
-            <div className="text-3xl font-bold text-gray-900 line-clamp-1">{pendingCount}</div>
-            <div className="text-sm font-medium text-gray-500">Pending Pickup</div>
-          </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 translate-y-0 hover:-translate-y-1 transition-all">
-          <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center">
-            <Send className="w-7 h-7 text-blue-600" />
-          </div>
-          <div>
-            <div className="text-3xl font-bold text-gray-900 line-clamp-1">{forwardedCount}</div>
-            <div className="text-sm font-medium text-gray-500">Forwarded</div>
-          </div>
+          <a
+            href="/services/virtual-office"
+            className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
+          >
+            <span className="text-xl">+</span>
+            Book New Space
+          </a>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 translate-y-0 hover:-translate-y-1 transition-all">
-          <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center">
-            <Package className="w-7 h-7 text-green-600" />
+        {/* Stats Cards Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-yellow-400">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{pendingCount}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending Pickup</p>
           </div>
-          <div>
-            <div className="text-3xl font-bold text-gray-900 line-clamp-1">{totalCount}</div>
-            <div className="text-sm font-medium text-gray-500">Total Received</div>
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-blue-400">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{forwardedCount}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Forwarded</p>
+          </div>
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-green-400">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{totalCount}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Received</p>
           </div>
         </div>
-      </div>
 
-      {/* Navigation Tabs and Search */}
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-x-auto pb-1">
-          <div className="flex bg-gray-100 p-1 rounded-xl w-fit">
-            <button
-              onClick={() => setActiveTab("received")}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
-                activeTab === "received"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Received Mail
-            </button>
-            <button
-              onClick={() => setActiveTab("forwarded")}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
-                activeTab === "forwarded"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Forwarded Mail
-            </button>
+        {/* Navigation Tabs and Search */}
+        <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
+          <div className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
+            {[
+              { id: "received", label: "Received Mail" },
+              { id: "forwarded", label: "Forwarded Mail" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
 
-          <div className="relative flex-1 md:max-w-md w-full">
+          <div className="relative flex-1 lg:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search sender, ID, or office city..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 bg-gray-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-[#35503F]/20 transition-all font-medium"
+              className="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-[#35503F]/10 text-sm font-medium transition-all"
             />
           </div>
         </div>

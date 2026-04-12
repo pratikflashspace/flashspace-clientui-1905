@@ -289,10 +289,10 @@ export default function UserManagement() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-[Poppins]">
-              User Management
+            <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+              User <span className="text-primary italic">Management</span>
             </h1>
-            <p className="text-gray-500 mt-2 text-lg">
+            <p className="text-muted-foreground mt-2">
               Oversee, manage, and analyze user base.
             </p>
           </div>
@@ -302,8 +302,8 @@ export default function UserManagement() {
                 onClick={() => setViewMode("active")}
                 className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   viewMode === "active"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "bg-white text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 Active
@@ -312,8 +312,8 @@ export default function UserManagement() {
                 onClick={() => setViewMode("deleted")}
                 className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                   viewMode === "deleted"
-                    ? "bg-white text-red-600 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "bg-white text-destructive shadow-sm"
+                    : "text-muted-foreground hover:text-destructive"
                 }`}
               >
                 <Trash2 className="w-4 h-4" />
@@ -322,7 +322,7 @@ export default function UserManagement() {
             </div>
             <button
               onClick={() => setIsAddUserModalOpen(true)}
-              className="w-full sm:w-auto px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition-all shadow-lg flex items-center justify-center gap-2 font-medium"
+              className="w-full sm:w-auto px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 font-medium"
             >
               <Plus className="w-5 h-5" />
               Add User
@@ -335,10 +335,10 @@ export default function UserManagement() {
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm font-medium text-gray-500">
+                <p className="text-sm font-medium text-muted-foreground">
                   {viewMode === "active" ? "Total Users" : "Deleted Users"}
                 </p>
-                <h3 className="text-3xl font-bold text-gray-900 mt-1">
+                <h3 className="text-3xl font-bold text-foreground mt-1">
                   {displayTotal}
                 </h3>
               </div>
@@ -350,8 +350,8 @@ export default function UserManagement() {
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm font-medium text-gray-500">Verified</p>
-                <h3 className="text-3xl font-bold text-gray-900 mt-1">
+                <p className="text-sm font-medium text-muted-foreground">Verified</p>
+                <h3 className="text-3xl font-bold text-foreground mt-1">
                   {verifiedUsersCount}
                 </h3>
               </div>
@@ -363,10 +363,10 @@ export default function UserManagement() {
           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm font-medium text-gray-500">
+                <p className="text-sm font-medium text-muted-foreground">
                   New This Month
                 </p>
-                <h3 className="text-3xl font-bold text-gray-900 mt-1">
+                <h3 className="text-3xl font-bold text-foreground mt-1">
                   {newUsersCount}
                 </h3>
               </div>
@@ -388,7 +388,7 @@ export default function UserManagement() {
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-black/5 transition-all text-sm font-medium text-gray-900"
+                className="w-full pl-12 pr-4 py-3 bg-muted/30 border-none rounded-xl focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <div className="flex items-center gap-3 w-full md:w-auto">
@@ -438,11 +438,11 @@ export default function UserManagement() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-gray-50 border-b border-gray-100">
-                        <th className="px-6 py-4 text-sm font-semibold text-gray-900">User Profile</th>
-                        <th className="px-6 py-4 text-sm font-semibold text-gray-900">Role</th>
-                        <th className="px-6 py-4 text-sm font-semibold text-gray-900">Verification</th>
-                        <th className="px-6 py-4 text-sm font-semibold text-gray-900">Joined Date</th>
-                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-widest text-right">Actions</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-foreground">User Profile</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-foreground">Role</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-foreground">Verification</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-foreground">Joined Date</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-widest text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -466,8 +466,8 @@ export default function UserManagement() {
                                   )}
                                 </div>
                                 <div className="min-w-0">
-                                  <p className="font-extrabold text-gray-900 truncate max-w-[200px] leading-tight mb-0.5">{user.fullName}</p>
-                                  <p className="text-[11px] text-gray-400 font-bold truncate max-w-[200px]">{user.email}</p>
+                                  <p className="font-extrabold text-foreground truncate max-w-[200px] leading-tight mb-0.5">{user.fullName}</p>
+                                  <p className="text-[11px] text-muted-foreground font-bold truncate max-w-[200px]">{user.email}</p>
                                 </div>
                               </div>
                             </td>
@@ -515,7 +515,7 @@ export default function UserManagement() {
                               )}
                             </td>
                             <td className="px-6 py-5">
-                              <span className="text-[11px] text-gray-400 font-black uppercase tracking-widest">
+                              <span className="text-[11px] text-muted-foreground font-black uppercase tracking-widest">
                                 {new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                               </span>
                             </td>
@@ -564,8 +564,8 @@ export default function UserManagement() {
                               {getInitials(user.fullName)}
                             </div>
                             <div className="min-w-0">
-                              <h3 className="font-black text-gray-900 truncate max-w-[140px] leading-tight">{user.fullName}</h3>
-                              <p className="text-[11px] text-gray-400 font-bold truncate max-w-[140px]">{user.email}</p>
+                              <h3 className="font-black text-foreground truncate max-w-[140px] leading-tight">{user.fullName}</h3>
+                              <p className="text-[11px] text-muted-foreground font-bold truncate max-w-[140px]">{user.email}</p>
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-2">
@@ -605,11 +605,11 @@ export default function UserManagement() {
                           )}
                         </div>
 
-                        <div className="pt-3 border-t border-gray-50 flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <div className="pt-3 border-t border-muted/50 flex justify-between items-center text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                           <span>Joined {new Date(user.createdAt).toLocaleDateString(undefined, { year: '2-digit', month: 'short', day: 'numeric' })}</span>
                           {viewMode === "active" && (
                             <DropdownMenu>
-                              <DropdownMenuTrigger className="text-blue-500 hover:text-blue-600 font-extrabold flex items-center gap-1">
+                              <DropdownMenuTrigger className="text-primary hover:text-primary/80 font-extrabold flex items-center gap-1">
                                 Role Settings <ChevronDown className="w-3 h-3" />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent
@@ -654,11 +654,11 @@ export default function UserManagement() {
 
         {/* Pagination */}
         <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 md:p-6 rounded-[24px] md:rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 gap-4">
-          <p className="text-[11px] md:text-xs text-gray-400 font-black uppercase tracking-widest text-center sm:text-left">
-            Showing Page <span className="text-gray-900 mx-1">{pagination.page}</span> 
-            of <span className="text-gray-900 mx-1">{pagination.pages}</span>
+          <p className="text-[11px] md:text-xs text-muted-foreground font-black uppercase tracking-widest text-center sm:text-left">
+            Showing Page <span className="text-foreground mx-1">{pagination.page}</span> 
+            of <span className="text-foreground mx-1">{pagination.pages}</span>
             <span className="mx-3 opacity-20">|</span>
-            Total <span className="text-gray-900 mx-1">{pagination.total}</span> Results
+            Total <span className="text-foreground mx-1">{pagination.total}</span> Results
           </p>
           <div className="flex gap-2 w-full sm:w-auto">
             <button
@@ -671,7 +671,7 @@ export default function UserManagement() {
             <button
               disabled={pagination.page >= pagination.pages}
               onClick={() => fetchUsers(pagination.page + 1)}
-              className="flex-1 sm:flex-none px-6 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition-all font-black text-[10px] uppercase tracking-wider shadow-lg shadow-gray-900/10"
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-primary text-primary-foreground rounded-xl hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-all font-black text-[10px] uppercase tracking-wider shadow-lg shadow-primary/10"
             >
               Next
             </button>
@@ -685,10 +685,10 @@ export default function UserManagement() {
               {/* Header */}
               <div className="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-gray-50/50 to-white shrink-0">
                 <div>
-                  <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
+                  <h2 className="text-xl md:text-2xl font-black text-foreground tracking-tight">
                     Add New User
                   </h2>
-                  <p className="text-xs md:text-sm text-gray-500 font-medium mt-1">
+                  <p className="text-xs md:text-sm text-muted-foreground font-medium mt-1">
                     Create a new account and assign permissions.
                   </p>
                 </div>
@@ -720,7 +720,7 @@ export default function UserManagement() {
                         onChange={(e) =>
                           setNewUser({ ...newUser, fullName: e.target.value })
                         }
-                        className="w-full pl-14 pr-4 py-3 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-black/10 focus:ring-4 focus:ring-black/5 outline-none transition-all font-medium text-gray-900 placeholder:text-gray-400"
+                        className="w-full pl-14 pr-4 py-3 bg-muted/30 border-2 border-transparent rounded-2xl focus:bg-background focus:border-primary/10 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground"
                         placeholder="John Doe"
                       />
                     </div>
@@ -744,7 +744,7 @@ export default function UserManagement() {
                         onChange={(e) =>
                           setNewUser({ ...newUser, email: e.target.value })
                         }
-                        className="w-full pl-14 pr-4 py-3 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-black/10 focus:ring-4 focus:ring-black/5 outline-none transition-all font-medium text-gray-900 placeholder:text-gray-400"
+                        className="w-full pl-14 pr-4 py-3 bg-muted/30 border-2 border-transparent rounded-2xl focus:bg-background focus:border-primary/10 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground"
                         placeholder="john@example.com"
                       />
                     </div>
@@ -768,7 +768,7 @@ export default function UserManagement() {
                         onChange={(e) =>
                           setNewUser({ ...newUser, password: e.target.value })
                         }
-                        className="w-full pl-14 pr-4 py-3 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-black/10 focus:ring-4 focus:ring-black/5 outline-none transition-all font-medium text-gray-900 placeholder:text-gray-400"
+                        className="w-full pl-14 pr-4 py-3 bg-muted/30 border-2 border-transparent rounded-2xl focus:bg-background focus:border-primary/10 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-medium text-foreground placeholder:text-muted-foreground"
                         placeholder="••••••••"
                         minLength={8}
                       />
@@ -795,7 +795,7 @@ export default function UserManagement() {
                             role: e.target.value as any,
                           })
                         }
-                        className="w-full pl-14 pr-10 py-3 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-black/10 focus:ring-4 focus:ring-black/5 outline-none transition-all font-medium text-gray-900 appearance-none cursor-pointer"
+                        className="w-full pl-14 pr-10 py-3 bg-muted/30 border-2 border-transparent rounded-2xl focus:bg-background focus:border-primary/10 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-medium text-foreground appearance-none cursor-pointer"
                       >
                         <option value="user">Client</option>
                         <option value="partner">Space Partner</option>
@@ -823,7 +823,7 @@ export default function UserManagement() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-[2] px-6 py-4 bg-gray-900 text-white rounded-2xl hover:bg-black font-black transition-all duration-200 shadow-xl shadow-gray-900/10 hover:shadow-gray-900/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-[2] px-6 py-4 bg-primary text-primary-foreground rounded-2xl hover:opacity-90 font-black transition-all duration-200 shadow-xl shadow-primary/10 hover:shadow-primary/20 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
                       <>

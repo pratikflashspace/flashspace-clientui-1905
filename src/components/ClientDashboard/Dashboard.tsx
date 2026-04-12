@@ -152,36 +152,50 @@ export default function Dashboard() {
 
 
   return (
-    <div className="p-8 max-w-7xl mx-auto min-h-screen">
-      {/* Header Section */}
-      <div className="mb-10">
-        <h1 className="text-3xl font-extrabold text-[#35503F]  mb-2">
-          Welcome back, <span className="italic">{user?.fullName?.split(" ")[0] || "Customer"}</span>
-        </h1>
-        <p className="text-gray-500 text-lg">
-          Manage your workspace subscriptions and track your orders
-        </p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        {statsCards.map((card, idx) => (
-          <div key={idx} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-start justify-between">
-            <div>
-              <p className="text-gray-500 text-sm font-medium mb-4">{card.title}</p>
-              <h3 className={`${card.isSmall ? "text-xl font-medium" : "text-3xl font-bold"} ${card.valueColor || "text-gray-900"}`}>{card.value}</h3>
-            </div>
-            <div className="p-3 bg-gray-50 rounded-full">
-              <card.icon className="w-5 h-5 text-gray-600" />
-            </div>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+              Welcome back, <span className="text-primary italic">{user?.fullName?.split(" ")[0] || "Customer"}</span>
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 font-medium">
+              Manage your workspace subscriptions and track your orders
+            </p>
           </div>
-        ))}
+          <a
+            href="/services/virtual-office"
+            className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
+          >
+            <span className="text-xl">+</span>
+            Book New Space
+          </a>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {statsCards.map((card, idx) => (
+            <div
+              key={idx}
+              className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md flex items-start justify-between"
+            >
+              <div>
+                <p className={`mb-1 ${card.isSmall ? "text-xl font-bold" : "text-3xl font-extrabold"} ${card.valueColor || "text-[#35503F]"}`}>
+                  {card.value}
+                </p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{card.title}</p>
+              </div>
+              <div className="p-2.5 bg-gray-50 rounded-2xl text-[#35503F]">
+                <card.icon className="w-5 h-5 opacity-70" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+
+
       </div>
-
-
-
-
-
     </div>
   );
 }

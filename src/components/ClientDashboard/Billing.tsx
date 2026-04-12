@@ -176,68 +176,47 @@ export default function Billing() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold  text-[#35503F]">
-              Billing & <span className="italic">Payments</span>
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+              Billing & <span className="text-primary italic">Payments</span>
             </h1>
-            <p className="text-gray-500 mt-2">
-              Manage your invoices, active subscriptions, and history.
+            <p className="text-sm md:text-base text-gray-500 font-medium">
+              Manage your invoices, active subscriptions, and payment history
             </p>
           </div>
-          <button className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-6 py-2.5 rounded-full font-medium hover:bg-gray-50 transition-colors shadow-sm">
+          <button className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center">
             <Download className="w-4 h-4" />
             Download Statement
           </button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-4">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-            </div>
-            <p className="text-3xl font-bold text-[#35503F] mb-1">
-              {formatCurrency(stats.totalPaid)}
-            </p>
-            <p className="text-sm text-gray-500">Total Paid</p>
+        {/* Stats Cards Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-green-400">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{formatCurrency(stats.totalPaid)}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Paid</p>
           </div>
-
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center mb-4">
-              <Clock className="w-5 h-5 text-orange-600" />
-            </div>
-            <p className="text-3xl font-bold text-[#35503F] mb-1">
-              {formatCurrency(stats.pendingAmount)}
-            </p>
-            <p className="text-sm text-gray-500">Pending Dues</p>
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-orange-400">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{formatCurrency(stats.pendingAmount)}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending Dues</p>
           </div>
-
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mb-4">
-              <RefreshCw className="w-5 h-5 text-blue-600" />
-            </div>
-            <p className="text-3xl font-bold text-[#35503F] mb-1">
-              {stats.activeSubscriptions}
-            </p>
-            <p className="text-sm text-gray-500">Active Subscriptions</p>
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-blue-400">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{stats.activeSubscriptions}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Subscriptions</p>
           </div>
-
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center mb-4">
-              <Calendar className="w-5 h-5 text-purple-600" />
-            </div>
-            <p className="text-3xl font-bold text-[#35503F] mb-1">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-purple-400">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">
               {stats.nextBilling ? formatDate(stats.nextBilling) : "-"}
             </p>
-            <p className="text-sm text-gray-500">Next Billing</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Next Billing</p>
           </div>
         </div>
 
-        {/* Filters & Tabs */}
-        <div className="flex flex-col md:flex-row justify-between gap-4 items-center">
-          <div className="flex p-1 rounded-lg shadow-sm bg-gray-100">
+        {/* Navigation Tabs and Search */}
+        <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
+          <div className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
             {[
               { id: "invoices", label: "Invoices" },
               { id: "subscriptions", label: "Subscriptions" },
@@ -245,11 +224,11 @@ export default function Billing() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                   activeTab === tab.id
-                    ? "bg-[#35503F] text-[#FEF8C3] shadow-sm"
-                    : "text-gray-500 hover:text-gray-900"
+                    ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
                 }`}
               >
                 {tab.label}

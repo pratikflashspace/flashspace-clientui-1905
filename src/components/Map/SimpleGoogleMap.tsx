@@ -115,7 +115,7 @@ const SimpleGoogleMap: React.FC<SimpleMapProps> = ({
         if (mapRef.current && !mapInstanceRef.current) {
           const options: google.maps.MapOptions = {
             center,
-            zoom,
+            zoom,s
             mapTypeControl: true,
             streetViewControl: false,
             fullscreenControl: true,

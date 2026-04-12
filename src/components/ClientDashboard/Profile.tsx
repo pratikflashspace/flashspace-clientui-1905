@@ -274,25 +274,25 @@ const Profile: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-8">
         {/* Loading State */}
         {loading && (
-          <div className="flex items-center justify-center h-64">
-            <Loader2 className="w-8 h-8 text-[#35503F] animate-spin" />
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Loader2 className="w-10 h-10 text-[#35503F] animate-spin" />
           </div>
         )}
 
         {/* Error State */}
         {error && !loading && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 flex items-center gap-4">
-            <AlertCircle className="w-6 h-6 text-red-500" />
-            <div className="flex-1">
-              <p className="text-red-700 font-medium">Error loading profile</p>
-              <p className="text-red-600 text-sm">{error}</p>
+          <div className="bg-red-50 border border-red-100 rounded-3xl p-8 flex flex-col items-center gap-4 text-center">
+            <AlertCircle className="w-12 h-12 text-red-500" />
+            <div className="space-y-1">
+              <p className="text-xl font-bold text-red-700">Error loading profile</p>
+              <p className="text-red-600 font-medium">{error}</p>
             </div>
             <button
               onClick={() => window.location.reload()}
-              className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-red-100 text-red-700 rounded-2xl font-bold hover:bg-red-200 transition-all active:scale-95"
             >
               <RefreshCw className="w-4 h-4" /> Retry
             </button>
@@ -301,106 +301,103 @@ const Profile: React.FC = () => {
 
         {!loading && !error && (
           <>
-            {/* Header Card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="bg-[#35503F] h-24" />
-              <div className="px-6 pb-6">
-                <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-12">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="space-y-1">
+                <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+                  My <span className="text-primary italic">Profile</span>
+                </h1>
+                <p className="text-sm md:text-base text-gray-500 font-medium">
+                  Manage your personal information and company details
+                </p>
+              </div>
+              {!isEditing ? (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
+                >
+                  <Edit3 className="w-4 h-4" /> Edit Profile
+                </button>
+              ) : (
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
+                  >
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Save Changes
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 px-8 py-3.5 rounded-2xl font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95 text-center"
+                  >
+                    <X className="w-4 h-4" /> Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Profile Info Card */}
+            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="bg-[#35503F]/5 h-32 relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#35503F]/10 to-transparent" />
+              </div>
+              <div className="px-8 pb-8">
+                <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-16 relative z-10">
                   {/* Profile Image */}
-                  <div className="relative">
-                    <div className="w-24 h-24 rounded-full bg-white border-4 border-white shadow-lg overflow-hidden">
+                  <div className="relative group">
+                    <div className="w-32 h-32 rounded-3xl bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02]">
                       {profileImage ? (
-                        <img
-                          src={profileImage}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full bg-[#35503F]/10 flex items-center justify-center">
-                          <User className="w-10 h-10 text-[#35503F]" />
+                        <div className="w-full h-full bg-gray-50 flex items-center justify-center">
+                          <User className="w-12 h-12 text-gray-300" />
                         </div>
                       )}
                     </div>
-                    <label className="absolute bottom-0 right-0 w-8 h-8 bg-[#FAF6D3] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#F2EEB3] transition-colors shadow-md border border-gray-200">
-                      <Camera className="w-4 h-4 text-gray-700" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageUpload}
-                      />
+                    <label className="absolute -bottom-2 -right-2 w-10 h-10 bg-white border border-gray-100 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all shadow-lg text-[#35503F]">
+                      <Camera className="w-5 h-5" />
+                      <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                     </label>
                   </div>
 
                   {/* Name and ID */}
-                  <div className="text-center sm:text-left flex-1">
-                    <h1 className="text-2xl font-bold text-white ">
-                      Welcome back, {user?.fullName?.split(" ")[0] || "User"}!
-                      👋
-                    </h1>
-                    <p className="text-gray-500 text-sm">
+                  <div className="text-center sm:text-left flex-1 pb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-1">
+                      <h2 className="text-2xl font-extrabold text-[#35503F]">
+                        {user?.fullName || "User Name"}
+                      </h2>
+                      {getKYCBadge((kycData as any)?.status || "not_submitted")}
+                    </div>
+                    <p className="text-gray-500 font-medium">
                       {kycData?.businessInfo?.companyName || "No company added"}
                     </p>
-                    <p className="text-gray-400 text-xs mt-1">
-                      Client ID: {user?._id?.slice(-8).toUpperCase() || "N/A"}
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 flex items-center gap-2">
+                       <ShieldCheck className="w-3 h-3 text-[#35503F]" />
+                       Client ID: {user?._id?.slice(-8).toUpperCase() || "N/A"}
                     </p>
-                  </div>
-
-                  {/* KYC Status */}
-                  <div className="flex flex-row items-center sm:items-end gap-3 mt-4 sm:mt-0">
-                    {getKYCBadge((kycData as any)?.status || "not_submitted")}
-                    {!isEditing ? (
-                      <button
-                        onClick={() => setIsEditing(true)}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-lg text-sm font-medium hover:bg-[#35503F]/90 transition-colors"
-                      >
-                        <Edit3 className="w-4 h-4" /> Edit Profile
-                      </button>
-                    ) : (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={handleSave}
-                          disabled={saving}
-                          className="flex items-center gap-1.5 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors disabled:opacity-50"
-                        >
-                          {saving ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Save className="w-4 h-4" />
-                          )}{" "}
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setIsEditing(false)}
-                          className="flex items-center gap-1.5 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
-                        >
-                          <X className="w-4 h-4" /> Cancel
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Tabs */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-1">
-              <div className="flex gap-1">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                      activeTab === tab.id
-                        ? "bg-[#35503F] text-[#FEF8C3]"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    <tab.icon className="w-4 h-4" />
-                    <span className="hidden sm:inline">{tab.label}</span>
-                  </button>
-                ))}
-              </div>
+            {/* Navigation Tabs */}
+            <div className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 w-fit max-w-full overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
+                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+                  }`}
+                >
+                  <tab.icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
             {/* Content */}
