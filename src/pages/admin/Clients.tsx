@@ -446,10 +446,8 @@ const ClientManagement = () => {
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
-                    <h3 className="font-extrabold text-gray-900 truncate">
-                      {client.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 font-medium">
+                    <h3 className="font-extrabold text-foreground truncate max-w-[140px] leading-tight mb-0.5">{client.name}</h3>
+                    <p className="text-sm text-muted-foreground font-medium">
                       {client.contact}
                     </p>
                   </div>
@@ -459,38 +457,38 @@ const ClientManagement = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                     Plan
                   </p>
-                  <p className="text-sm font-bold text-gray-900">
+                  <p className="text-sm font-bold text-foreground">
                     {client.plan}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">
                     Revenue
                   </p>
-                  <p className="text-sm font-bold text-gray-900 text-right">
+                  <p className="text-sm font-bold text-foreground text-right">
                     {client.revenue}
                   </p>
                 </div>
                 <div className="col-span-2 space-y-1">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                     Space
                   </p>
-                  <p className="text-sm font-medium text-gray-600 truncate flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                  <p className="text-sm font-medium text-muted-foreground truncate flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-muted-foreground/70" />
                     {client.space}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <div className="flex justify-between items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <div className="flex justify-between items-center text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                   <span>Health Score</span>
                   <span>{client.healthScore}%</span>
                 </div>
-                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden border border-gray-50">
+                <div className="h-2 w-full bg-muted rounded-full overflow-hidden border border-border/50">
                   <div
                     className={`h-full ${getHealthColor(client.healthScore)} transition-all`}
                     style={{ width: `${client.healthScore}%` }}
@@ -500,7 +498,7 @@ const ClientManagement = () => {
 
               <div className="flex gap-2 pt-2">
                 <Button
-                  className="flex-1 bg-gray-900 hover:bg-black text-white rounded-2xl h-11 font-bold transition-all shadow-lg active:scale-95"
+                  className="flex-1 bg-primary hover:opacity-90 text-primary-foreground rounded-2xl h-11 font-bold transition-all shadow-lg active:scale-95"
                   onClick={() => handleViewClient(client)}
                 >
                   <Eye className="w-4 h-4 mr-2" />
@@ -508,10 +506,10 @@ const ClientManagement = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-12 h-11 p-0 rounded-2xl border-gray-200 active:scale-95 transition-all"
+                  className="w-12 h-11 p-0 rounded-2xl border-border active:scale-95 transition-all"
                   onClick={() => handleChatClient(client)}
                 >
-                  <MessageSquare className="w-5 h-5 text-gray-600" />
+                  <MessageSquare className="w-5 h-5 text-muted-foreground" />
                 </Button>
               </div>
             </div>

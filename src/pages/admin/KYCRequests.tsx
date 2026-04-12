@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SpacePartnerKycRequest from "./SpacePartnerKycRequest";
 import { adminService } from "@/services/admin.service";
 import {
@@ -535,11 +535,11 @@ export default function KYCRequests() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="text-center md:text-left">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
               {viewMode === "user_partners" ? (
                 <>
                   Partners{" "}
-                  <span className="text-teal-500 italic">
+                  <span className="text-[#35503f] italic">
                     for {selectedUserForPartners?.name}
                   </span>
                 </>
@@ -552,11 +552,11 @@ export default function KYCRequests() {
                 </>
               ) : (
                 <>
-                  KYC <span className="text-teal-500 italic">Verification</span>
+                  KYC <span className="text-[#35503f] italic">Verification</span>
                 </>
               )}
             </h1>
-            <p className="text-sm md:text-lg text-gray-500 mt-2 font-light">
+            <p className="text-sm md:text-lg text-muted-foreground mt-2 font-light">
               {viewMode === "user_partners"
                 ? "Review partner applications for this user"
                 : viewMode === "user_business"
@@ -568,13 +568,13 @@ export default function KYCRequests() {
             {(viewMode === "user_partners" || viewMode === "user_business") && (
               <button
                 onClick={handleBackToRequests}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-gray-700 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-medium shadow-sm"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-gray-700 rounded-xl border border-gray-200 hover:bg-muted/30 transition-colors font-medium shadow-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Requests
               </button>
             )}
-            <div className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-50 text-blue-700 rounded-xl border border-blue-200">
+            <div className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-[#35503f]/5 text-[#35503f] rounded-xl border border-[#35503f]/20">
               <AlertCircle className="w-4 h-4" />
               <span className="text-sm font-medium">
                 {viewMode === "user_partners"
@@ -590,35 +590,35 @@ export default function KYCRequests() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
+          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-border flex flex-col justify-center">
             <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-yellow-600">
               {stats.pending}
             </h3>
-            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
+            <p className="text-muted-foreground font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
               Pending
             </p>
           </div>
-          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
+          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-border flex flex-col justify-center">
             <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-green-600">
               {stats.approved}
             </h3>
-            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
+            <p className="text-muted-foreground font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
               Approved
             </p>
           </div>
-          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
+          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-border flex flex-col justify-center">
             <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-red-600">
               {stats.rejected}
             </h3>
-            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
+            <p className="text-muted-foreground font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
               Rejected
             </p>
           </div>
-          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
-            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-gray-900">
+          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-border flex flex-col justify-center">
+            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
               {stats.total}
             </h3>
-            <p className="text-gray-500 font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
+            <p className="text-muted-foreground font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
               Total
             </p>
           </div>
@@ -626,21 +626,21 @@ export default function KYCRequests() {
 
         {viewMode === "user_partners" ? (
           /* Partner View Mode - Keep existing structure but maybe update container style if needed */
-          <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-100 flex items-center gap-4">
+          <div className="bg-white rounded-[24px] border border-border shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-border flex items-center gap-4">
               <button
                 onClick={handleBackToRequests}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-muted/50 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-foreground">
                   Partner Profiles
                 </h2>
-                <p className="text-gray-500 text-sm">
+                <p className="text-muted-foreground text-sm">
                   Managing partners for{" "}
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-foreground">
                     {selectedUserForPartners?.name}
                   </span>
                 </p>
@@ -652,9 +652,9 @@ export default function KYCRequests() {
               {loadingPartnerRequests ? (
                 <ProfileCardGridSkeleton count={4} />
               ) : partnerRequests.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                <div className="text-center py-12 bg-muted/30 rounded-2xl border border-dashed border-gray-200">
                   <User className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500 font-medium">
+                  <p className="text-muted-foreground font-medium">
                     No partners found for this user
                   </p>
                 </div>
@@ -663,7 +663,7 @@ export default function KYCRequests() {
                   {partnerRequests.map((partner) => (
                     <div
                       key={partner._id}
-                      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-6"
+                      className="bg-white rounded-2xl border border-border shadow-sm hover:shadow-md transition-all p-6"
                     >
                       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
                         <div className="flex items-center gap-3">
@@ -671,10 +671,10 @@ export default function KYCRequests() {
                             <User className="w-5 h-5 text-orange-600" />
                           </div>
                           <div className="min-w-0">
-                            <h4 className="font-bold text-gray-900 truncate">
+                            <h4 className="font-bold text-foreground truncate">
                               {partner.fullName}
                             </h4>
-                            <p className="text-sm text-gray-500 truncate">
+                            <p className="text-sm text-muted-foreground truncate">
                               {partner.email}
                             </p>
                           </div>
@@ -684,33 +684,33 @@ export default function KYCRequests() {
 
                       <div className="space-y-2 text-sm text-gray-600 mb-6">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">
+                          <span className="font-medium text-foreground">
                             Phone:
                           </span>{" "}
                           {partner.phone}
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">
+                          <span className="font-medium text-foreground">
                             DOB:
                           </span>{" "}
                           {new Date(partner.dob).toLocaleDateString()}
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">
+                          <span className="font-medium text-foreground">
                             Gender:
                           </span>{" "}
                           <span className="capitalize">{partner.gender}</span>
                         </div>
                       </div>
 
-                      <div className="pt-4 border-t border-gray-100">
+                      <div className="pt-4 border-t border-border">
                         <button
                           onClick={() =>
                             navigate(
                               `/admin/kyc-requests/${partner._id}?type=partner`,
                             )
                           }
-                          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all text-sm font-semibold shadow-md hover:shadow-lg hover:scale-[1.02]"
+                          className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#35503f] text-white hover:bg-[#2a4032] transition-all text-sm font-semibold shadow-md hover:shadow-lg hover:scale-[1.02]"
                         >
                           <Eye className="w-4 h-4" />
                           View Details
@@ -724,21 +724,21 @@ export default function KYCRequests() {
           </div>
         ) : viewMode === "user_business" ? (
           /* Business View Mode */
-          <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-gray-100 flex items-center gap-4">
+          <div className="bg-white rounded-[24px] border border-border shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-border flex items-center gap-4">
               <button
                 onClick={handleBackToRequests}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-muted/50 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-foreground">
                   Business Profiles
                 </h2>
-                <p className="text-gray-500 text-sm">
+                <p className="text-muted-foreground text-sm">
                   Managing business profiles for{" "}
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-foreground">
                     {selectedUserForBusiness?.name}
                   </span>
                 </p>
@@ -749,9 +749,9 @@ export default function KYCRequests() {
               {loadingBusinessInfo ? (
                 <ProfileCardGridSkeleton count={4} />
               ) : businessInfo.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                <div className="text-center py-12 bg-muted/30 rounded-2xl border border-dashed border-gray-200">
                   <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500 font-medium">
+                  <p className="text-muted-foreground font-medium">
                     No business profiles found for this user
                   </p>
                 </div>
@@ -763,16 +763,16 @@ export default function KYCRequests() {
                       className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col"
                     >
                       {/* Card Header */}
-                      <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-white flex justify-between items-start">
+                      <div className="p-5 border-b border-border bg-gradient-to-r from-purple-50 to-white flex justify-between items-start">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
                             <Building2 className="w-5 h-5" />
                           </div>
                           <div>
-                            <h4 className="font-bold text-gray-900 line-clamp-1">
+                            <h4 className="font-bold text-foreground line-clamp-1">
                               {profile.companyName || "N/A"}
                             </h4>
-                            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+                            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
                               {profile.profileName || "Business Profile"}
                             </p>
                           </div>
@@ -783,40 +783,40 @@ export default function KYCRequests() {
                       {/* Card Body */}
                       <div className="p-5 space-y-4 flex-1">
                         <div className="space-y-3">
-                          <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                            <span className="text-xs font-medium text-gray-500 uppercase">
+                          <div className="flex justify-between items-center py-2 border-b border-border/50">
+                            <span className="text-xs font-medium text-muted-foreground uppercase">
                               GST Number
                             </span>
-                            <span className="text-sm font-medium text-gray-900 font-mono">
+                            <span className="text-sm font-medium text-foreground font-mono">
                               {profile.gstNumber || "N/A"}
                             </span>
                           </div>
-                          <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                            <span className="text-xs font-medium text-gray-500 uppercase">
+                          <div className="flex justify-between items-center py-2 border-b border-border/50">
+                            <span className="text-xs font-medium text-muted-foreground uppercase">
                               PAN Number
                             </span>
-                            <span className="text-sm font-medium text-gray-900 font-mono">
+                            <span className="text-sm font-medium text-foreground font-mono">
                               {profile.panNumber || "N/A"}
                             </span>
                           </div>
-                          <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                            <span className="text-xs font-medium text-gray-500 uppercase">
+                          <div className="flex justify-between items-center py-2 border-b border-border/50">
+                            <span className="text-xs font-medium text-muted-foreground uppercase">
                               CIN Number
                             </span>
-                            <span className="text-sm font-medium text-gray-900 font-mono">
+                            <span className="text-sm font-medium text-foreground font-mono">
                               {profile.cinNumber || "N/A"}
                             </span>
                           </div>
                           <div>
-                            <span className="text-xs font-medium text-gray-500 uppercase block mb-1">
+                            <span className="text-xs font-medium text-muted-foreground uppercase block mb-1">
                               Company Type
                             </span>
-                            <span className="text-sm font-medium text-gray-900 font-mono">
+                            <span className="text-sm font-medium text-foreground font-mono">
                               {profile.companyType || "N/A"}
                             </span>
                           </div>
                           <div>
-                            <span className="text-xs font-medium text-gray-500 uppercase block mb-1">
+                            <span className="text-xs font-medium text-muted-foreground uppercase block mb-1">
                               Registered Address
                             </span>
                             <span
@@ -837,7 +837,7 @@ export default function KYCRequests() {
                                 `/admin/kyc-requests/${profile._id}?type=businessinfo`,
                               );
                             }}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700"
+                            className="bg-[#35503f] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#2a4032]"
                           >
                             View Details
                           </button>
@@ -845,8 +845,8 @@ export default function KYCRequests() {
                       </div>
 
                       {/* Card Footer */}
-                      <div className="p-4 bg-gray-50 border-t border-gray-100 mt-auto flex justify-between items-center">
-                        <div className="text-xs text-gray-400">
+                      <div className="p-4 bg-muted/30 border-t border-border mt-auto flex justify-between items-center">
+                        <div className="text-xs text-muted-foreground/70">
                           Updated:{" "}
                           {new Date(
                             profile.updatedAt || Date.now(),
@@ -869,17 +869,17 @@ export default function KYCRequests() {
               className="space-y-6"
             >
               <div className="flex justify-center md:justify-end">
-                <TabsList className="inline-flex w-full md:w-auto h-12 md:h-10 items-center justify-center rounded-xl bg-gray-100/50 p-1 text-gray-500 border border-gray-200 shadow-sm">
+                <TabsList className="inline-flex w-full md:w-auto h-12 md:h-10 items-center justify-center rounded-xl bg-muted/50/50 p-1 text-muted-foreground border border-gray-200 shadow-sm">
                   <TabsTrigger
                     value="users"
-                    className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-md"
+                    className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-[#35503f] data-[state=active]:shadow-md"
                   >
                     <User className="w-4 h-4 mr-2" />
                     Client KYC
                   </TabsTrigger>
                   <TabsTrigger
                     value="partners"
-                    className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-md"
+                    className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-[#35503f] data-[state=active]:shadow-md"
                   >
                     <Building2 className="w-4 h-4 mr-2" />
                     Partner KYC
@@ -889,13 +889,13 @@ export default function KYCRequests() {
               <TabsContent value="users" className="space-y-6">
                 {/* Search Bar */}
                 <div className="relative">
-                  <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <Search className="w-5 h-5 text-muted-foreground/70 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="Search users by name or email..."
                     value={userSearchTerm}
                     onChange={(e) => setUserSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all text-sm shadow-sm"
+                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#35503f]/10 transition-all text-sm shadow-sm"
                   />
                 </div>
 
@@ -903,14 +903,14 @@ export default function KYCRequests() {
                 {loading ? (
                   <KYCRequestGridSkeleton count={6} />
                 ) : filteredRequests.length === 0 ? (
-                  <div className="bg-white rounded-[24px] border border-gray-100 shadow-sm p-16 text-center">
-                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="bg-white rounded-[24px] border border-border shadow-sm p-16 text-center">
+                    <div className="w-20 h-20 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4">
                       <CheckCircle2 className="w-10 h-10 text-gray-300" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-xl font-bold text-foreground mb-2">
                       No Requests Found
                     </h3>
-                    <p className="text-gray-500">
+                    <p className="text-muted-foreground">
                       No KYC requests match your criteria.
                     </p>
                   </div>
@@ -919,25 +919,25 @@ export default function KYCRequests() {
                     {filteredRequests.map((request) => (
                       <div
                         key={request._id}
-                        className="bg-white rounded-[24px] border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group flex flex-col h-full"
+                        className="bg-white rounded-[24px] border border-border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group flex flex-col h-full"
                       >
                         {/* Card Content */}
                         {/* Header */}
-                        <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                        <div className="p-6 border-b border-border bg-gradient-to-r from-gray-50 to-white">
                           <div className="flex items-center justify-between mb-4 gap-3">
                             <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
+                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#35503f] to-[#4a6b54] flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
                                 {request.user?.fullName?.charAt(0) || "U"}
                               </div>
                               <div className="min-w-0 flex-1">
-                                <h3 className="font-bold text-gray-900 truncate">
+                                <h3 className="font-bold text-foreground truncate">
                                   {request.user?.fullName || "Unknown User"}
                                 </h3>
-                                <p className="text-sm text-gray-500 truncate">
+                                <p className="text-sm text-muted-foreground truncate">
                                   {request.user?.email || ""}
                                 </p>
                                 {request.profileName && (
-                                  <p className="text-xs text-blue-600 font-medium truncate mt-0.5">
+                                  <p className="text-xs text-[#35503f] font-medium truncate mt-0.5">
                                     {request.isPartner
                                       ? "≡ƒñ¥ Partner: "
                                       : request.kycType === "business"
@@ -981,7 +981,7 @@ export default function KYCRequests() {
                               </div>
                               <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
-                                  className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full transition-all duration-300"
+                                  className="bg-gradient-to-r from-[#35503f] to-[#4a6b54] h-2 rounded-full transition-all duration-300"
                                   style={{ width: `${request.progress}%` }}
                                 ></div>
                               </div>
@@ -993,17 +993,17 @@ export default function KYCRequests() {
                         <div className="p-6 space-y-4 flex-grow">
                           {request.personalInfo && (
                             <div
-                              className="bg-blue-50 rounded-xl p-4 cursor-pointer hover:bg-blue-100 transition-colors group/personal relative"
+                              className="bg-[#35503f]/5 rounded-xl p-4 cursor-pointer hover:bg-[#35503f]/10 transition-colors group/personal relative"
                               onClick={() =>
                                 navigate(`/admin/kyc-requests/${request._id}`)
                               }
                             >
                               <div className="flex items-center gap-2 mb-3">
-                                <User className="w-4 h-4 text-blue-600" />
-                                <h4 className="text-sm font-semibold text-blue-900">
+                                <User className="w-4 h-4 text-[#35503f]" />
+                                <h4 className="text-sm font-semibold text-[#35503f]">
                                   Personal Info
                                 </h4>
-                                <ExternalLink className="w-3 h-3 text-blue-400 opacity-0 group-hover/personal:opacity-100 transition-opacity ml-auto absolute top-4 right-4" />
+                                <ExternalLink className="w-3 h-3 text-[#35503f]/40 group-hover/personal:opacity-100 transition-opacity ml-auto absolute top-4 right-4" />
                               </div>
                               <div className="space-y-1 text-sm">
                                 {request.personalInfo.fullName && (
@@ -1091,7 +1091,7 @@ export default function KYCRequests() {
                           {/* Documents - Hide if Approved */}
                           {request.overallStatus !== "approved" && (
                             <div>
-                              <h4 className="text-xs font-semibold text-gray-500 uppercase mb-3">
+                              <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-3">
                                 Documents Submitted (
                                 {request.documents?.length || 0})
                               </h4>
@@ -1101,17 +1101,17 @@ export default function KYCRequests() {
                                   {request.documents.map((doc, idx) => (
                                     <div
                                       key={idx}
-                                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors group/doc"
+                                      className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-colors group/doc"
                                     >
                                       <div className="flex items-center gap-2 flex-1 min-w-0">
-                                        <div className="p-1.5 bg-blue-100 rounded-lg">
-                                          <FileText className="w-4 h-4 text-blue-600" />
+                                        <div className="p-1.5 bg-[#35503f]/15 rounded-lg">
+                                          <FileText className="w-4 h-4 text-[#35503f]" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                           <p className="text-sm text-gray-700 font-medium capitalize truncate">
                                             {doc.type}
                                           </p>
-                                          <p className="text-xs text-gray-500 truncate">
+                                          <p className="text-xs text-muted-foreground truncate">
                                             {doc.name}
                                           </p>
                                         </div>
@@ -1120,7 +1120,7 @@ export default function KYCRequests() {
                                         onClick={() =>
                                           openDocumentModal(doc, request)
                                         }
-                                        className="flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                                        className="flex items-center gap-1 px-3 py-1.5 text-xs text-[#35503f] hover:text-[#2a4032] font-semibold bg-[#35503f]/5 hover:bg-[#35503f]/10 rounded-lg transition-colors"
                                       >
                                         <Eye className="w-3 h-3" />
                                         Details
@@ -1151,13 +1151,13 @@ export default function KYCRequests() {
                                 onClick={() =>
                                   navigate(`/admin/kyc-requests/${request._id}`)
                                 }
-                                className="col-span-2 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all text-sm font-semibold shadow-md hover:shadow-lg hover:scale-105"
+                                className="col-span-2 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#35503f] text-white hover:bg-[#2a4032] transition-all text-sm font-semibold shadow-md hover:shadow-lg hover:scale-105"
                               >
                                 <Eye className="w-4 h-4" />
                                 View Details
                               </button>
                             </div>
-                            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+                            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
                               <Clock className="w-3 h-3" />
                               Submitted:{" "}
                               {new Date(request.createdAt).toLocaleDateString()}
@@ -1190,13 +1190,13 @@ export default function KYCRequests() {
           >
             <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[100vh] flex flex-col animate-in fade-in zoom-in duration-200">
               {/* Modal Header */}
-              <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white flex-shrink-0">
+              <div className="p-6 border-b border-border bg-gradient-to-r from-[#35503f]/10 to-white flex-shrink-0">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                    <h3 className="text-2xl font-bold text-foreground mb-1">
                       Document Details
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       Submitted by {selectedRequest.user?.fullName}
                     </p>
                   </div>
@@ -1207,7 +1207,7 @@ export default function KYCRequests() {
                     }}
                     className="p-2 hover:bg-white rounded-lg transition-colors"
                   >
-                    <X className="w-5 h-5 text-gray-500" />
+                    <X className="w-5 h-5 text-muted-foreground" />
                   </button>
                 </div>
               </div>
@@ -1216,47 +1216,47 @@ export default function KYCRequests() {
               <div className="p-6 space-y-6 overflow-y-auto flex-1">
                 {/* Document Info */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-gray-50 rounded-xl p-4">
+                  <div className="bg-muted/30 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <File className="w-4 h-4 text-gray-600" />
-                      <p className="text-xs font-semibold text-gray-500 uppercase">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase">
                         Document Type
                       </p>
                     </div>
-                    <p className="text-lg font-bold text-gray-900 capitalize">
+                    <p className="text-lg font-bold text-foreground capitalize">
                       {selectedDocument.type}
                     </p>
                   </div>
-                  <div className="bg-gray-50 rounded-xl p-4">
+                  <div className="bg-muted/30 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <FileText className="w-4 h-4 text-gray-600" />
-                      <p className="text-xs font-semibold text-gray-500 uppercase">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase">
                         File Name
                       </p>
                     </div>
-                    <p className="text-lg font-bold text-gray-900 truncate">
+                    <p className="text-lg font-bold text-foreground truncate">
                       {selectedDocument.name}
                     </p>
                   </div>
                   {selectedDocument.uploadedAt && (
-                    <div className="bg-gray-50 rounded-xl p-4">
+                    <div className="bg-muted/30 rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Calendar className="w-4 h-4 text-gray-600" />
-                        <p className="text-xs font-semibold text-gray-500 uppercase">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase">
                           Uploaded
                         </p>
                       </div>
-                      <p className="text-lg font-bold text-gray-900">
+                      <p className="text-lg font-bold text-foreground">
                         {new Date(
                           selectedDocument.uploadedAt,
                         ).toLocaleDateString()}
                       </p>
                     </div>
                   )}
-                  <div className="bg-gray-50 rounded-xl p-4">
+                  <div className="bg-muted/30 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle2 className="w-4 h-4 text-gray-600" />
-                      <p className="text-xs font-semibold text-gray-500 uppercase">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase">
                         Status
                       </p>
                     </div>
@@ -1266,7 +1266,7 @@ export default function KYCRequests() {
 
                 {/* Document Preview */}
                 {selectedDocument.fileUrl && (
-                  <div className="bg-gray-50 rounded-xl p-6 relative">
+                  <div className="bg-muted/30 rounded-xl p-6 relative">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="text-sm font-semibold text-gray-700">
                         Document Preview
@@ -1344,14 +1344,14 @@ export default function KYCRequests() {
                     ) : (
                       <div className="bg-white rounded-lg p-8 border border-gray-200 text-center">
                         <FileText className="w-16 h-16 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500 mb-4">
+                        <p className="text-muted-foreground mb-4">
                           Preview not available for this file type
                         </p>
                         <a
                           href={getFullUrl(selectedDocument.fileUrl)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-[#35503f] text-white rounded-lg hover:bg-[#2a4032] transition-colors font-medium"
                         >
                           <Download className="w-4 h-4" />
                           Download File
@@ -1378,14 +1378,14 @@ export default function KYCRequests() {
               </div>
 
               {/* Modal Footer */}
-              <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3 flex-shrink-0">
+              <div className="p-6 border-t border-border bg-muted/30 flex gap-3 flex-shrink-0">
                 {selectedDocument.fileUrl && (
                   <>
                     <a
                       href={getFullUrl(selectedDocument.fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-blue-200 text-blue-600 hover:bg-blue-50 transition-colors font-semibold"
+                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-[#35503f]/20 text-[#35503f] hover:bg-[#35503f]/5 transition-colors font-semibold"
                     >
                       <ExternalLink className="w-4 h-4" />
                       Open in New Tab
@@ -1393,7 +1393,7 @@ export default function KYCRequests() {
                     <a
                       href={getFullUrl(selectedDocument.fileUrl)}
                       download
-                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors font-semibold"
+                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#35503f] text-white hover:bg-[#2a4032] transition-colors font-semibold"
                     >
                       <Download className="w-4 h-4" />
                       Download
@@ -1424,10 +1424,10 @@ export default function KYCRequests() {
                     <XCircle className="w-6 h-6 text-red-600" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-xl font-bold text-foreground">
                       Reject KYC
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {selectedRequest.user?.fullName}
                     </p>
                   </div>
@@ -1438,10 +1438,10 @@ export default function KYCRequests() {
                     setRejectionReason("");
                     setSelectedRequest(null);
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-muted/50 rounded-lg transition-colors"
                   title="Close"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
 
@@ -1465,7 +1465,7 @@ export default function KYCRequests() {
                     setRejectionReason("");
                     setSelectedRequest(null);
                   }}
-                  className="w-full sm:flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors order-2 sm:order-1"
+                  className="w-full sm:flex-1 py-2.5 bg-muted/50 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors order-2 sm:order-1"
                 >
                   Cancel
                 </button>
@@ -1491,58 +1491,58 @@ export default function KYCRequests() {
             }}
           >
             <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full transform transition-all animate-in fade-in zoom-in duration-200">
-              <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white flex items-center justify-between">
-                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <User className="w-5 h-5 text-blue-600" />
+              <div className="p-6 border-b border-border bg-gradient-to-r from-[#35503f]/10 to-white flex items-center justify-between">
+                <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                  <User className="w-5 h-5 text-[#35503f]" />
                   Personal Information
                 </h3>
                 <button
                   onClick={() => {
                     setSelectedPersonalInfo(null);
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-muted/50 rounded-full transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
 
               <div className="p-6 space-y-4">
                 <div className="space-y-4">
-                  <div className="group p-3 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                  <div className="group p-3 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-border">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                       Full Name
                     </p>
-                    <p className="text-gray-900 font-medium text-lg">
+                    <p className="text-foreground font-medium text-lg">
                       {selectedPersonalInfo.fullName || "N/A"}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="group p-3 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <div className="group p-3 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-border">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                         Email Address
                       </p>
-                      <p className="text-gray-900 font-medium break-all md:break-words">
+                      <p className="text-foreground font-medium break-all md:break-words">
                         {selectedPersonalInfo.email || "N/A"}
                       </p>
                     </div>
 
-                    <div className="group p-3 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <div className="group p-3 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-border">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                         Phone Number
                       </p>
-                      <p className="text-gray-900 font-medium">
+                      <p className="text-foreground font-medium">
                         {selectedPersonalInfo.phone || "N/A"}
                       </p>
                     </div>
                   </div>
 
                   {selectedPersonalInfo.dob && (
-                    <div className="group p-3 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <div className="group p-3 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-border">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                         Date of Birth
                       </p>
-                      <p className="text-gray-900 font-medium">
+                      <p className="text-foreground font-medium">
                         {new Date(
                           selectedPersonalInfo.dob,
                         ).toLocaleDateString()}
@@ -1551,11 +1551,11 @@ export default function KYCRequests() {
                   )}
 
                   {selectedPersonalInfo.gender && (
-                    <div className="group p-3 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                    <div className="group p-3 rounded-lg hover:bg-muted/30 transition-colors border border-transparent hover:border-border">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                         Gender
                       </p>
-                      <p className="text-gray-900 font-medium capitalize">
+                      <p className="text-foreground font-medium capitalize">
                         {selectedPersonalInfo.gender}
                       </p>
                     </div>
@@ -1565,7 +1565,7 @@ export default function KYCRequests() {
                   {selectedPersonalInfo.documents &&
                     selectedPersonalInfo.documents.length > 0 && (
                       <div className="pt-2">
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
                           Submitted Documents (
                           {selectedPersonalInfo.documents.length})
                         </p>
@@ -1574,17 +1574,17 @@ export default function KYCRequests() {
                             (doc: any, idx: number) => (
                               <div
                                 key={idx}
-                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors group/doc"
+                                className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border hover:bg-muted/50 transition-colors group/doc"
                               >
                                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                                  <div className="p-1.5 bg-blue-100 rounded-lg">
-                                    <FileText className="w-4 h-4 text-blue-600" />
+                                  <div className="p-1.5 bg-[#35503f]/15 rounded-lg">
+                                    <FileText className="w-4 h-4 text-[#35503f]" />
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm text-gray-700 font-medium capitalize truncate">
                                       {doc.type}
                                     </p>
-                                    <p className="text-xs text-gray-500 truncate">
+                                    <p className="text-xs text-muted-foreground truncate">
                                       {doc.name}
                                     </p>
                                   </div>
@@ -1612,7 +1612,7 @@ export default function KYCRequests() {
                                       );
                                     }
                                   }}
-                                  className="flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                                  className="flex items-center gap-1 px-3 py-1.5 text-xs text-[#35503f] hover:text-[#2a4032] font-semibold bg-[#35503f]/5 hover:bg-[#35503f]/10 rounded-lg transition-colors"
                                 >
                                   <Eye className="w-3 h-3" />
                                   View
@@ -1626,13 +1626,13 @@ export default function KYCRequests() {
                 </div>
               </div>
 
-              <div className="p-6 border-t border-gray-100 flex justify-end bg-gray-50 rounded-b-2xl">
+              <div className="p-6 border-t border-border flex justify-end bg-muted/30 rounded-b-2xl">
                 <button
                   onClick={() => {
                     setShowPersonalInfoModal(false);
                     setSelectedPersonalInfo(null);
                   }}
-                  className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-medium shadow-sm transition-all hover:shadow"
+                  className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-muted/30 font-medium shadow-sm transition-all hover:shadow"
                 >
                   Close
                 </button>

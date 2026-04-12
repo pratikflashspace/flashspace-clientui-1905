@@ -43,20 +43,20 @@ const getStatusBadge = (status?: string) => {
   switch (status) {
     case "approved":
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 uppercase">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 uppercase">
           <CheckCircle2 className="w-3 h-3" /> Verified
         </span>
       );
     case "rejected":
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 uppercase">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-destructive/10 text-destructive uppercase">
           <XCircle className="w-3 h-3" /> Rejected
         </span>
       );
     case "pending":
     default:
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 uppercase">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary uppercase">
           <Clock className="w-3 h-3" /> Pending
         </span>
       );
@@ -335,33 +335,33 @@ export default function SpacePartnerKycDetails() {
       <div className="max-w-7xl mx-auto mb-8 px-4 md:px-0">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center text-gray-500 hover:text-gray-900 transition-colors mb-4"
+          className="flex items-center text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to KYC Requests
         </button>
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="text-center md:text-left">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
-              KYC <span className="text-teal-500 italic">Verification</span>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight">
+              KYC <span className="text-primary italic">Verification</span>
             </h1>
-            <p className="text-gray-500 mt-2 text-sm md:text-base">
+            <p className="text-muted-foreground mt-2 text-sm md:text-base">
               {propertyId
                 ? `Reviewing property: ${focusedProperty?.name || "..."}`
                 : "Review all details, documents, and take an approval decision."}
             </p>
           </div>
-          <div className="flex flex-col items-center md:items-end gap-2 bg-white md:bg-transparent p-4 md:p-0 rounded-2xl md:rounded-none border md:border-0 border-gray-100 shadow-sm md:shadow-none">
+          <div className="flex flex-col items-center md:items-end gap-2 bg-background md:bg-transparent p-4 md:p-0 rounded-2xl md:rounded-none border md:border-0 border-border shadow-sm md:shadow-none">
             {getStatusBadge(
               propertyId
                 ? focusedProperty?.kycStatus
                 : request.kycStatus || request.overallStatus,
             )}
             <div className="flex flex-col items-center md:items-end">
-              <span className="text-xs text-gray-500 font-medium">
+              <span className="text-xs text-muted-foreground font-medium">
                 Progress: {allDocsApproved ? "100" : "80"}%
               </span>
-              <span className="text-[10px] md:text-xs text-gray-400">
+              <span className="text-[10px] md:text-xs text-muted-foreground/60">
                 Submitted:{" "}
                 {request.createdAt
                   ? new Date(request.createdAt).toLocaleString()
@@ -379,19 +379,19 @@ export default function SpacePartnerKycDetails() {
           {!propertyId ? (
             <>
               {/* User Profile Card */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <div className="bg-background rounded-2xl shadow-sm border border-border p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
                     {request.fullName?.charAt(0) || "U"}
                   </div>
                   <div className="flex-1 overflow-hidden">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
                       Main Account Holder
                     </p>
-                    <h3 className="font-bold text-gray-900 text-lg truncate">
+                    <h3 className="font-bold text-foreground text-lg truncate">
                       {request.fullName}
                     </h3>
-                    <p className="text-gray-500 text-sm truncate">
+                    <p className="text-muted-foreground text-sm truncate">
                       {request.email}
                     </p>
                   </div>
@@ -399,39 +399,39 @@ export default function SpacePartnerKycDetails() {
               </div>
 
               {/* Personal Info */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <div className="bg-background rounded-2xl shadow-sm border border-border p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <User className="w-5 h-5 text-blue-500" />
-                  <h3 className="font-bold text-gray-900">Personal Info</h3>
+                  <User className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-foreground">Personal Info</h3>
                 </div>
                 <div className="space-y-4 text-sm">
                   <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                    <span className="text-gray-500 text-xs sm:text-sm">Name:</span>
-                    <span className="font-bold text-gray-900">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Name:</span>
+                    <span className="font-bold text-foreground">
                       {request.fullName}
                     </span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                    <span className="text-gray-500 text-xs sm:text-sm">Phone:</span>
-                    <span className="font-bold text-gray-900 font-mono">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Phone:</span>
+                    <span className="font-bold text-foreground font-mono">
                       {request.phoneNumber || "N/A"}
                     </span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                    <span className="text-gray-500 text-xs sm:text-sm">Email:</span>
-                    <span className="font-bold text-gray-900 break-all sm:break-normal">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Email:</span>
+                    <span className="font-bold text-foreground break-all sm:break-normal">
                       {request.email || "N/A"}
                     </span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                    <span className="text-gray-500 text-xs sm:text-sm">Pan Number:</span>
-                    <span className="font-bold text-gray-900 font-mono">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Pan Number:</span>
+                    <span className="font-bold text-foreground font-mono">
                       {request.panNumber || "N/A"}
                     </span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                    <span className="text-gray-500 text-xs sm:text-sm">Aadhaar Number:</span>
-                    <span className="font-bold text-gray-900 font-mono">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Aadhaar Number:</span>
+                    <span className="font-bold text-foreground font-mono">
                       {request.aadhaarNumber || "N/A"}
                     </span>
                   </div>
@@ -443,39 +443,39 @@ export default function SpacePartnerKycDetails() {
               {/* Focused Property Info */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <Building2 className="w-5 h-5 text-teal-600" />
-                  <h3 className="font-bold text-gray-900">
+                  <Building2 className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-foreground">
                     Property Focus View
                   </h3>
                 </div>
                 {loadingFocusedProperty ? (
                   <div className="animate-pulse space-y-3">
-                    <div className="h-4 bg-gray-100 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-100 rounded w-1/2"></div>
-                    <div className="h-4 bg-gray-100 rounded w-5/6"></div>
+                    <div className="h-4 bg-muted rounded w-3/4"></div>
+                    <div className="h-4 bg-muted rounded w-1/2"></div>
+                    <div className="h-4 bg-muted rounded w-5/6"></div>
                   </div>
                 ) : focusedProperty ? (
                   <div className="space-y-4">
                     <div>
-                      <h4 className="text-lg font-bold text-gray-900">
+                      <h4 className="text-lg font-bold text-foreground">
                         {focusedProperty.name}
                       </h4>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {focusedProperty.address}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         {focusedProperty.area}, {focusedProperty.city}
                       </p>
                     </div>
-                    <div className="pt-4 border-t border-gray-50">
-                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                    <div className="pt-4 border-t border-border">
+                      <p className="text-[10px] uppercase font-bold text-muted-foreground/60 tracking-wider">
                         Amenities
                       </p>
                       <div className="flex flex-wrap gap-1.5 mt-2">
                         {focusedProperty.features?.map((f, i) => (
                           <span
                             key={i}
-                            className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-medium"
+                            className="bg-muted text-muted-foreground px-2 py-0.5 rounded text-[10px] font-medium"
                           >
                             {f}
                           </span>
@@ -496,13 +496,13 @@ export default function SpacePartnerKycDetails() {
               focusedProperty?.kycStatus !== "rejected"
             : request.overallStatus !== "rejected" &&
               request.overallStatus !== "approved") && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h3 className="font-bold text-gray-900 mb-4">Final Decision</h3>
+            <div className="bg-background rounded-2xl shadow-sm border border-border p-6">
+              <h3 className="font-bold text-foreground mb-4">Final Decision</h3>
               <div className="space-y-3">
                 <button
                   onClick={() => setOverallAction("rejected")}
                   disabled={submitting}
-                  className="w-full py-3 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3 border border-destructive/20 text-destructive bg-destructive/5 hover:bg-destructive/10 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                 >
                   <XCircle className="w-4 h-4" /> Reject{" "}
                   {propertyId ? "Property" : "KYC"}
@@ -512,8 +512,8 @@ export default function SpacePartnerKycDetails() {
                   disabled={submitting || !allDocsApproved}
                   className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-sm ${
                     submitting || !allDocsApproved
-                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-green-500 hover:bg-green-600 text-white"
+                      ? "bg-muted text-muted-foreground/50 cursor-not-allowed"
+                      : "bg-primary text-primary-foreground hover:opacity-90"
                   }`}
                 >
                   <CheckCircle2 className="w-4 h-4" /> Approve{" "}
@@ -525,19 +525,19 @@ export default function SpacePartnerKycDetails() {
         </div>
         {/* Right Column: Documents */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-background rounded-2xl shadow-sm border border-border p-6">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h3 className="font-bold text-gray-900 text-lg">
+                <h3 className="font-bold text-foreground text-lg">
                   {propertyId ? "Property Documents" : "Submitted Documents"}
                 </h3>
-                <p className="text-gray-500 text-sm">
+                <p className="text-muted-foreground text-sm">
                   {propertyId
                     ? "Verify all legal documents for this property."
                     : "All documents uploaded for this partner."}
                 </p>
               </div>
-              <span className="text-sm font-medium text-gray-500">
+              <span className="text-sm font-medium text-muted-foreground">
                 Total:{" "}
                 {propertyId ? focusedProperty?.documents?.length || 0 : 3}
               </span>
@@ -548,32 +548,32 @@ export default function SpacePartnerKycDetails() {
                 ? focusedProperty?.documents?.map((doc, idx) => (
                     <div
                       key={idx}
-                      className="group border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all bg-gray-50/50"
+                      className="group border border-border/50 rounded-xl p-4 hover:shadow-md transition-all bg-muted/20"
                     >
                       <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
                         <div className="flex items-center gap-4 w-full sm:w-auto">
-                          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-6 h-6 text-blue-600" />
+                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <FileText className="w-6 h-6 text-primary" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h4 className="font-bold text-gray-900 capitalize truncate">
+                            <h4 className="font-bold text-foreground capitalize truncate">
                               {doc.type.replace(/_/g, " ")}
                             </h4>
-                            <p className="text-xs text-gray-500 truncate mt-0.5">
+                            <p className="text-xs text-muted-foreground truncate mt-0.5">
                               {doc.fileUrl?.split("/").pop() || "No file name"}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                        <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-border">
                           <div className="sm:mr-2">
                             <span
                               className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border ${
                                 doc.status === "approved"
-                                  ? "text-green-600 bg-green-50 border-green-100"
+                                  ? "text-emerald-600 bg-emerald-50 border-emerald-100"
                                   : doc.status === "rejected"
-                                    ? "text-red-600 bg-red-50 border-red-100"
-                                    : "text-yellow-600 bg-yellow-50 border-yellow-100"
+                                    ? "text-destructive bg-destructive/5 border-destructive/10"
+                                    : "text-primary bg-primary/10 border-primary/20"
                               }`}
                             >
                               {doc.status ? (
@@ -669,28 +669,28 @@ export default function SpacePartnerKycDetails() {
                       >
                         <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
                           <div className="flex items-center gap-4 w-full sm:w-auto">
-                            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                              <FileText className="w-6 h-6 text-blue-600" />
+                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <FileText className="w-6 h-6 text-primary" />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <h4 className="font-bold text-gray-900 capitalize truncate">
+                              <h4 className="font-bold text-foreground capitalize truncate">
                                 {doc.title}
                               </h4>
-                              <p className="text-xs text-gray-500 truncate mt-0.5">
+                              <p className="text-xs text-muted-foreground truncate mt-0.5">
                                 {url.split("/").pop()}
                               </p>
                             </div>
                           </div>
 
-                          <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                          <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-border">
                             <div className="sm:mr-2">
                               <span
                                 className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border ${
                                   status === "approved"
-                                    ? "text-green-600 bg-green-50 border-green-100"
+                                    ? "text-emerald-600 bg-emerald-50 border-emerald-100"
                                     : status === "rejected"
-                                      ? "text-red-600 bg-red-50 border-red-100"
-                                      : "text-yellow-600 bg-yellow-50 border-yellow-100"
+                                      ? "text-destructive bg-destructive/5 border-destructive/10"
+                                      : "text-primary bg-primary/10 border-primary/20"
                                 }`}
                               >
                                 {status ? (
@@ -744,7 +744,7 @@ export default function SpacePartnerKycDetails() {
                                     behavior: "smooth",
                                   });
                                 }}
-                                className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all flex items-center gap-2 font-medium text-xs px-4"
+                                className="p-2.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-xl transition-all flex items-center gap-2 font-medium text-xs px-4"
                               >
                                 <Eye className="w-4 h-4" />
                                 <span className="hidden sm:inline">View</span>
@@ -763,14 +763,14 @@ export default function SpacePartnerKycDetails() {
             ? selectedDocument
             : selectedDocument &&
               request[selectedDocument as keyof SpaceUserKycResponse]) && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-in fade-in slide-in-from-top-4">
+            <div className="bg-background rounded-2xl shadow-sm border border-border p-6 animate-in fade-in slide-in-from-top-4">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-blue-600" />
+                  <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary" />
                     SELECTED DOCUMENT
                   </h3>
-                  <p className="text-gray-500 text-sm mt-1 capitalize">
+                  <p className="text-muted-foreground text-sm mt-1 capitalize">
                     {propertyId
                       ? "File Preview"
                       : selectedDocument

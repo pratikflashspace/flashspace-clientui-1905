@@ -48,21 +48,21 @@ const getStatusBadge = (status: string) => {
     case "completed":
     case "paid":
       return (
-        <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+        <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">
           <CheckCircle className="w-3 h-3 mr-1" />
           Paid
         </Badge>
       );
     case "pending":
       return (
-        <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">
+        <Badge className="bg-primary/10 text-primary hover:bg-primary/10">
           <Clock className="w-3 h-3 mr-1" />
           Pending
         </Badge>
       );
     case "failed":
       return (
-        <Badge variant="destructive">
+        <Badge variant="destructive" className="bg-destructive/10 text-destructive border-0 hover:bg-destructive/20">
           <XCircle className="w-3 h-3 mr-1" />
           Failed
         </Badge>
@@ -93,76 +93,76 @@ const InvoiceViewModal = ({
   if (!invoice) return null;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg p-0 overflow-hidden rounded-3xl border-0 shadow-2xl">
-        <DialogHeader className="px-6 py-5 border-b border-gray-100">
-          <DialogTitle className="text-xl font-bold text-gray-900">
+      <DialogContent className="max-w-lg p-0 overflow-hidden rounded-3xl border-border border shadow-2xl bg-background">
+        <DialogHeader className="px-6 py-5 border-b border-border">
+          <DialogTitle className="text-xl font-bold text-foreground">
             Invoice {invoice.invoiceNumber}
           </DialogTitle>
         </DialogHeader>
-        <div className="p-6 space-y-5 text-sm max-h-[80vh] overflow-y-auto">
+        <div className="p-6 space-y-5 text-sm max-h-[80vh] overflow-y-auto scrollbar-none">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-3 rounded-xl">
-              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Customer</p>
-              <p className="font-semibold text-gray-900 leading-tight">
+            <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Customer</p>
+              <p className="font-semibold text-foreground leading-tight">
                 {invoice.userName}
               </p>
-              <p className="text-gray-400 text-xs truncate">
+              <p className="text-muted-foreground/60 text-xs truncate">
                 {invoice.userEmail}
               </p>
             </div>
-            <div className="bg-gray-50 p-3 rounded-xl">
-              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Status</p>
+            <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Status</p>
               <div className="mt-0.5">
                 {getStatusBadge(invoice.status)}
               </div>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-3 rounded-xl">
-              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Space</p>
-              <p className="font-medium text-gray-900">
+            <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Space</p>
+              <p className="font-medium text-foreground">
                 {invoice.spaceName || "—"}
               </p>
             </div>
-            <div className="bg-gray-50 p-3 rounded-xl">
-              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Service Type</p>
-              <p className="font-medium text-gray-900">
+            <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Service Type</p>
+              <p className="font-medium text-foreground">
                 {categoryLabel(invoice.paymentType)}
               </p>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-3 rounded-xl">
-              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Plan</p>
-              <p className="font-medium text-gray-900">
+            <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Plan</p>
+              <p className="font-medium text-foreground">
                 {invoice.planName || "—"}
               </p>
             </div>
-            <div className="bg-gray-50 p-3 rounded-xl">
-              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Date</p>
-              <p className="font-medium text-gray-900">
+            <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Date</p>
+              <p className="font-medium text-foreground">
                 {invoice.createdAt
                   ? format(new Date(invoice.createdAt), "dd MMM yyyy")
                   : "—"}
               </p>
             </div>
           </div>
-          <div className="border-t border-gray-100 pt-5 mt-2">
+          <div className="border-t border-border pt-5 mt-2">
             <div className="flex items-center justify-between gap-4">
-              <p className="text-gray-500 font-medium">Total Amount</p>
-              <p className="text-2xl font-black text-primary">
+              <p className="text-muted-foreground font-medium text-base">Total Amount</p>
+              <p className="text-2xl font-black text-primary italic">
                 {formatCurrency(invoice.totalAmount)}
               </p>
             </div>
-            <div className="mt-4 p-3 bg-gray-50 rounded-xl space-y-1">
+            <div className="mt-4 p-3 bg-muted/30 rounded-xl space-y-1 border border-border/50">
               {invoice.razorpayOrderId && (
-                <p className="text-[10px] text-gray-400 font-medium">
-                  Order ID: <span className="font-mono text-gray-600">{invoice.razorpayOrderId}</span>
+                <p className="text-[10px] text-muted-foreground font-medium">
+                  Order ID: <span className="font-mono text-foreground/80">{invoice.razorpayOrderId}</span>
                 </p>
               )}
               {invoice.razorpayPaymentId && (
-                <p className="text-[10px] text-gray-400 font-medium">
-                  Payment ID: <span className="font-mono text-gray-600">{invoice.razorpayPaymentId}</span>
+                <p className="text-[10px] text-muted-foreground font-medium">
+                  Payment ID: <span className="font-mono text-foreground/80">{invoice.razorpayPaymentId}</span>
                 </p>
               )}
             </div>
@@ -275,27 +275,27 @@ const Invoices = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-yellow-200 transition-colors">
-          <p className="text-2xl font-extrabold text-yellow-600">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
+          <p className="text-2xl font-extrabold text-primary">
             {loading ? "—" : pendingCount}
           </p>
           <p className="text-sm text-muted-foreground font-medium">Pending (This Page)</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-red-200 transition-colors">
-          <p className="text-2xl font-extrabold text-red-600">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-destructive/20 transition-colors">
+          <p className="text-2xl font-extrabold text-destructive">
             {loading ? "—" : failedCount}
           </p>
           <p className="text-sm text-muted-foreground font-medium">Failed</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-blue-200 transition-colors">
-          <p className="text-2xl font-extrabold text-blue-600">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
+          <p className="text-2xl font-extrabold text-foreground">
             {loading ? "—" : total}
           </p>
           <p className="text-sm text-muted-foreground font-medium">Total Invoices</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-green-200 transition-colors">
-          <p className="text-2xl font-extrabold text-green-600">
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-emerald-200 transition-colors">
+          <p className="text-2xl font-extrabold text-emerald-600">
             {loading ? "—" : formatCurrency(totalRevenue)}
           </p>
           <p className="text-sm text-muted-foreground font-medium">Cleared (This Page)</p>

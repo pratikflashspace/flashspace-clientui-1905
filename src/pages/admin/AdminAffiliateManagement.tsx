@@ -92,23 +92,23 @@ const StatCard = ({
   label,
   value,
   icon: Icon,
-  color,
+  isActive,
   sub,
 }: {
   label: string;
   value: string;
   icon: React.ElementType;
-  color: string;
+  isActive?: boolean;
   sub?: string;
 }) => (
-  <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex items-start gap-4">
-    <div className={`p-3 rounded-xl ${color}`}>
+  <div className={`rounded-2xl border p-5 shadow-sm flex items-start gap-4 transition-all duration-300 ${isActive ? 'bg-primary/5 border-primary/20 scale-[1.02]' : 'bg-background border-border hover:border-primary/20'}`}>
+    <div className={`p-3 rounded-xl ${isActive ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'bg-muted text-muted-foreground'}`}>
       <Icon className="w-5 h-5" />
     </div>
     <div>
-      <p className="text-xs text-gray-500 font-medium">{label}</p>
-      <p className="text-xl font-bold text-gray-900 mt-0.5">{value}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{label}</p>
+      <p className={`text-xl font-black mt-0.5 ${isActive ? 'text-primary' : 'text-foreground'}`}>{value}</p>
+      {sub && <p className="text-[10px] text-muted-foreground/60 mt-1 font-bold italic">{sub}</p>}
     </div>
   </div>
 );
@@ -130,56 +130,56 @@ const AffiliateRow = ({
     onClick={onClick}
   >
     <td className="px-5 py-4">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <span
-          className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shadow-sm
                     ${
                       rank === 1
-                        ? "bg-amber-100 text-amber-700"
+                        ? "bg-amber-100 text-amber-700 border border-amber-200"
                         : rank === 2
-                          ? "bg-gray-200 text-gray-600"
+                          ? "bg-muted text-muted-foreground border border-border"
                           : rank === 3
-                            ? "bg-orange-100 text-orange-700"
-                            : "bg-gray-100 text-gray-400"
+                            ? "bg-orange-50 text-orange-700 border border-orange-100"
+                            : "bg-muted/50 text-muted-foreground/60 border border-border/50"
                     }`}
         >
           {rank <= 3 ? <Trophy className="w-3.5 h-3.5" /> : rank}
         </span>
         <div>
-          <p className="font-semibold text-gray-900 text-sm">
+          <p className="font-bold text-foreground text-sm">
             {affiliate.fullName}
           </p>
-          <p className="text-xs text-gray-400">{affiliate.email}</p>
+          <p className="text-xs text-muted-foreground font-medium">{affiliate.email}</p>
         </div>
       </div>
     </td>
     <td className="px-5 py-4">
       {affiliate.couponCode ? (
-        <span className="font-mono text-xs bg-teal-50 text-teal-700 border border-teal-100 px-2.5 py-1 rounded-lg font-bold tracking-wide">
+        <span className="font-mono text-[10px] bg-primary/5 text-primary border border-primary/10 px-3 py-1.5 rounded-lg font-black tracking-widest uppercase">
           {affiliate.couponCode}
         </span>
       ) : (
-        <span className="text-xs text-gray-400 italic">No code</span>
+        <span className="text-xs text-muted-foreground italic">No code</span>
       )}
     </td>
     <td className="px-5 py-4 text-center">
-      <span className="font-bold text-gray-800">{affiliate.totalClients}</span>
+      <span className="font-black text-foreground">{affiliate.totalClients}</span>
     </td>
     <td className="px-5 py-4">
-      <span className="font-semibold text-gray-800">
+      <span className="font-bold text-foreground">
         {formatCurrency(affiliate.totalRevenue)}
       </span>
     </td>
     <td className="px-5 py-4">
-      <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg text-sm">
+      <span className="inline-flex items-center gap-1 font-black text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg text-xs border border-emerald-100 shadow-sm">
         {formatCurrency(affiliate.totalCommission)}
       </span>
     </td>
-    <td className="px-5 py-4 text-xs text-gray-400">
+    <td className="px-5 py-4 text-[11px] text-muted-foreground font-medium">
       {formatDate(affiliate.createdAt)}
     </td>
     <td className="px-5 py-4">
-      <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-teal-600 transition-colors" />
+      <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-all group-hover:translate-x-1" />
     </td>
   </tr>
 );
@@ -228,42 +228,46 @@ const AffiliateDetailPanel = ({
       <div className="flex-1 bg-black/30 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="w-full max-w-3xl bg-white h-full shadow-2xl flex flex-col overflow-hidden">
+      <div className="w-full max-w-3xl bg-background h-full shadow-2xl flex flex-col overflow-hidden border-l border-border">
         {/* Header */}
-        <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-teal-600 to-teal-700 text-white">
+        <div className="px-8 py-8 border-b border-border bg-gradient-to-br from-primary to-primary/80 text-primary-foreground relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none" />
           <button
             onClick={onClose}
-            className="mb-3 flex items-center gap-2 text-teal-100 hover:text-white text-sm transition-colors"
+            className="mb-6 flex items-center gap-2 text-primary-foreground/80 hover:text-white text-xs font-black uppercase tracking-widest transition-all hover:-translate-x-1"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Affiliates
+            <ArrowLeft className="w-4 h-4" /> Back to Partners
           </button>
           {loading ? (
-            <div className="animate-pulse h-6 bg-teal-500 rounded w-48 mb-2" />
+            <div className="animate-pulse space-y-3">
+               <div className="h-8 bg-white/20 rounded-xl w-64" />
+               <div className="h-4 bg-white/10 rounded-lg w-48" />
+            </div>
           ) : (
             <>
-              <h2 className="text-2xl font-bold">{data?.affiliate.fullName}</h2>
-              <p className="text-teal-100 text-sm mt-0.5">
-                {data?.affiliate.email}
+              <h2 className="text-3xl font-black tracking-tight">{data?.affiliate.fullName}</h2>
+              <p className="text-primary-foreground/70 text-sm mt-1 font-medium flex items-center gap-2">
+                <Mail className="w-3.5 h-3.5" /> {data?.affiliate.email}
               </p>
             </>
           )}
 
           {/* Mini Stats */}
           {data && (
-            <div className="mt-4 grid grid-cols-3 gap-3">
-              <div className="bg-white/15 rounded-xl p-3 text-center">
-                <p className="text-xs text-teal-100">Total Clients</p>
-                <p className="text-xl font-bold">{data.stats.totalClients}</p>
+            <div className="mt-8 grid grid-cols-3 gap-4">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center border border-white/10 shadow-inner">
+                <p className="text-[10px] text-primary-foreground/60 uppercase font-black tracking-widest mb-1">Total Clients</p>
+                <p className="text-2xl font-black">{data.stats.totalClients}</p>
               </div>
-              <div className="bg-white/15 rounded-xl p-3 text-center">
-                <p className="text-xs text-teal-100">Revenue</p>
-                <p className="text-xl font-bold">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center border border-white/10 shadow-inner">
+                <p className="text-[10px] text-primary-foreground/60 uppercase font-black tracking-widest mb-1">Revenue</p>
+                <p className="text-2xl font-black">
                   {formatCurrency(data.stats.totalRevenue)}
                 </p>
               </div>
-              <div className="bg-white/15 rounded-xl p-3 text-center">
-                <p className="text-xs text-teal-100">Commission</p>
-                <p className="text-xl font-bold">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center border border-white/10 shadow-inner">
+                <p className="text-[10px] text-primary-foreground/60 uppercase font-black tracking-widest mb-1">Commission</p>
+                <p className="text-2xl font-black text-emerald-300">
                   {formatCurrency(data.stats.totalCommission)}
                 </p>
               </div>
@@ -273,19 +277,21 @@ const AffiliateDetailPanel = ({
 
         {/* Coupon Info */}
         {data?.coupon && (
-          <div className="px-8 py-4 bg-teal-50 border-b border-teal-100 flex items-center gap-4">
-            <Tag className="w-4 h-4 text-teal-600 flex-shrink-0" />
+          <div className="px-8 py-5 bg-primary/5 border-b border-primary/10 flex items-center gap-5">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+               <Tag className="w-5 h-5" />
+            </div>
             <div className="flex-1">
-              <p className="text-xs text-teal-700 font-medium">
+              <p className="text-[10px] text-primary/60 font-black uppercase tracking-widest">
                 Referral Coupon Code
               </p>
-              <p className="font-mono font-bold text-teal-800 text-sm">
+              <p className="font-mono font-black text-primary text-base">
                 {data.coupon.code}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-500">Total Uses</p>
-              <p className="font-bold text-teal-700">
+              <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Total Uses</p>
+              <p className="text-lg font-black text-foreground">
                 {data.coupon.usageCount}
               </p>
             </div>
@@ -293,96 +299,81 @@ const AffiliateDetailPanel = ({
         )}
 
         {/* Client List */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto scrollbar-none bg-background">
           {/* Search */}
-          <div className="px-8 py-4 border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur-sm">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <div className="px-8 py-5 border-b border-border sticky top-0 bg-background/95 backdrop-blur-md z-10 transition-all">
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
-                placeholder="Search clients…"
+                placeholder="Search clients by name, email or booking ID…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-300"
+                className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-transparent rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/5 focus:bg-background focus:border-primary/20 transition-all placeholder:text-muted-foreground/60"
               />
             </div>
           </div>
 
           {loading ? (
-            <div className="px-8 py-4 space-y-3 animate-pulse">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="bg-white rounded-xl border border-gray-100 p-4 h-32 flex flex-col gap-3">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-2">
-                       <div className="h-4 w-40 bg-gray-200 rounded" />
-                       <div className="h-3 w-56 bg-gray-100 rounded" />
-                    </div>
-                    <div className="h-4 w-20 bg-emerald-100/50 rounded" />
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="h-3 w-full bg-gray-50 rounded" />
-                    <div className="h-3 w-full bg-gray-50 rounded" />
-                    <div className="h-3 w-full bg-gray-50 rounded" />
-                  </div>
-                  <div className="flex justify-between mt-auto">
-                    <div className="h-4 w-24 bg-gray-100 rounded" />
-                    <div className="h-3 w-20 bg-gray-50 rounded" />
-                  </div>
-                </div>
-              ))}
-            </div>
+             <div className="px-8 py-6 space-y-4">
+               {[1, 2, 3, 4].map((i) => (
+                 <div key={i} className="h-32 bg-muted/50 rounded-2xl animate-pulse" />
+               ))}
+             </div>
           ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-              <UserCheck className="w-12 h-12 mb-3 opacity-30" />
-              <p className="font-medium">No clients found</p>
+            <div className="flex flex-col items-center justify-center py-24 text-muted-foreground/60 gap-4">
+              <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
+                <UserCheck className="w-8 h-8 opacity-40 text-primary" />
+              </div>
+              <p className="font-bold text-sm uppercase tracking-widest">No clients found</p>
             </div>
           ) : (
-            <div className="px-8 py-4 space-y-3">
+            <div className="px-8 py-6 space-y-4">
               {filtered.map((client) => (
                 <div
                   key={client.bookingId.toString()}
-                  className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 hover:border-teal-200 transition-colors"
+                  className="bg-background rounded-2xl border border-border shadow-sm p-5 hover:border-primary/20 hover:shadow-md transition-all group"
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 text-sm truncate mb-0.5">
+                      <p className="font-black text-foreground text-base tracking-tight mb-0.5 group-hover:text-primary transition-colors">
                         {client.user.fullName}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">
-                        {client.user.email}
+                      <p className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
+                        <Mail className="w-3 h-3 opacity-60" /> {client.user.email}
                       </p>
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="font-bold text-emerald-700 text-sm">
+                    <div className="text-right flex-shrink-0 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-xl shadow-sm">
+                      <p className="font-black text-emerald-700 text-sm leading-none mb-1">
                         {formatCurrency(client.commissionAmount)}
                       </p>
-                      <p className="text-xs text-gray-400">commission</p>
+                      <p className="text-[9px] uppercase tracking-widest font-black text-emerald-600/70">Commission</p>
                     </div>
                   </div>
-                  <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-gray-600">
+                  <div className="grid grid-cols-3 gap-4 py-4 border-y border-border/50 bg-muted/20 -mx-5 px-5">
                     <div>
-                      <p className="text-gray-400 font-medium">Space</p>
-                      <p className="font-medium truncate">{client.space}</p>
+                      <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1.5 opacity-60">Space</p>
+                      <p className="text-xs font-bold text-foreground truncate">{client.space}</p>
                     </div>
                     <div>
-                      <p className="text-gray-400 font-medium">Plan</p>
-                      <p className="font-medium">
+                      <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1.5 opacity-60">Plan & Tenure</p>
+                      <p className="text-xs font-bold text-foreground truncate">
                         {client.plan} · {client.tenure}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-gray-400 font-medium">Paid</p>
-                      <p className="font-medium">
+                    <div className="text-right">
+                      <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1.5 opacity-60">Revenue</p>
+                      <p className="text-xs font-black text-primary">
                         {formatCurrency(client.amount)}
                       </p>
                     </div>
                   </div>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="font-mono text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-500">
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="font-mono text-[10px] bg-muted px-2.5 py-1 rounded-lg text-muted-foreground font-bold tracking-tighter">
                       {client.bookingNumber}
                     </span>
-                    <span className="text-xs text-gray-400">
-                      {formatDate(client.createdAt)}
+                    <span className="text-[10px] text-muted-foreground font-bold flex items-center gap-1.5">
+                      <Calendar className="w-3 h-3" /> {formatDate(client.createdAt)}
                     </span>
                   </div>
                 </div>
@@ -452,14 +443,15 @@ export default function AdminAffiliateManagement() {
     >
       <div className="space-y-8">
         {/* Page Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Affiliate Management
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Monitor all affiliate partners, their referral codes, clients, and
-            commission earnings.
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
+              Affiliate <span className="text-primary italic">Management</span>
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground font-medium">
+              Monitor partners, referral codes, clients, and commission earnings.
+            </p>
+          </div>
         </div>
 
         {/* Summary Stats */}
@@ -468,41 +460,41 @@ export default function AdminAffiliateManagement() {
             label="Total Affiliates"
             value={String(summary.totalAffiliates)}
             icon={Users}
-            color="bg-teal-100 text-teal-600"
+            isActive={true}
           />
           <StatCard
-            label="Total Revenue Generated"
+            label="Revenue Generated"
             value={formatCurrency(summary.totalRevenue)}
             icon={TrendingUp}
-            color="bg-indigo-100 text-indigo-600"
             sub="From affiliate referrals"
           />
           <StatCard
-            label="Total Commission Payable"
+            label="Commission Payable"
             value={formatCurrency(summary.totalCommissionPayable)}
             icon={DollarSign}
-            color="bg-emerald-100 text-emerald-600"
             sub="15% of referred revenue"
           />
         </div>
 
         {/* Table Card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-background rounded-3xl border border-border shadow-xl shadow-muted/20 overflow-hidden">
           {/* Toolbar */}
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <div className="px-6 py-5 border-b border-border flex flex-col md:flex-row items-center gap-5 bg-background">
+            <div className="flex-1 relative w-full">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search by name, email, or coupon code…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-300"
+                className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-transparent rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/5 focus:bg-background focus:border-primary/20 transition-all"
               />
             </div>
-            <span className="text-xs text-gray-400 whitespace-nowrap">
-              {filtered.length} of {affiliates.length}
-            </span>
+            <div className="px-4 py-2 bg-muted/50 rounded-xl border border-border/50">
+              <span className="text-xs font-black text-muted-foreground uppercase tracking-widest">
+                {filtered.length} <span className="text-primary/60">/ {affiliates.length}</span> Partners
+              </span>
+            </div>
           </div>
 
           {/* Table */}
@@ -521,17 +513,17 @@ export default function AdminAffiliateManagement() {
               <p className="font-medium">No affiliates found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto scrollbar-none">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
-                    <th className="px-5 py-3">Affiliate</th>
-                    <th className="px-5 py-3">Coupon Code</th>
-                    <th className="px-5 py-3 text-center">Clients</th>
-                    <th className="px-5 py-3">Revenue</th>
-                    <th className="px-5 py-3">Commission</th>
-                    <th className="px-5 py-3">Joined</th>
-                    <th className="px-5 py-3" />
+                  <tr className="bg-muted/50 text-left text-xs font-black text-muted-foreground uppercase tracking-widest border-b border-border">
+                    <th className="px-5 py-4">Affiliate Partner</th>
+                    <th className="px-5 py-4">Promotional Code</th>
+                    <th className="px-5 py-4 text-center">Clients</th>
+                    <th className="px-5 py-4">Revenue</th>
+                    <th className="px-5 py-4">Commission</th>
+                    <th className="px-5 py-4">Joined On</th>
+                    <th className="px-5 py-4" />
                   </tr>
                 </thead>
                 <tbody>

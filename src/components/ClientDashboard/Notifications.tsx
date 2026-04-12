@@ -1,10 +1,11 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
   Bell,
   CheckCircle2,
   Info,
   Mail,
+  Search,
   Trash2,
   UserCircle2,
 } from "lucide-react";
@@ -46,7 +47,7 @@ const buildPreferences = (
 });
 
 const getNotificationVisualMeta = (notification: INotification): NotificationVisualMeta => {
-  const combinedText = `${notification.title} ${notification.message}`.toLowerCase();
+  const combinedText = `${notification.title || ''} ${notification.message || ''}`.toLowerCase();
 
   if (combinedText.includes("payment") || combinedText.includes("invoice") || combinedText.includes("due")) {
     return {
@@ -207,9 +208,11 @@ const Notifications = () => {
 
     const query = searchQuery.toLowerCase();
     return notifications.filter((notification) => {
+      const title = notification.title || "";
+      const message = notification.message || "";
       return (
-        notification.title.toLowerCase().includes(query) ||
-        notification.message.toLowerCase().includes(query)
+        title.toLowerCase().includes(query) ||
+        message.toLowerCase().includes(query)
       );
     });
   }, [notifications, searchQuery]);
@@ -244,47 +247,49 @@ const Notifications = () => {
   };
 
   return (
-    <div className="h-full bg-[#f4f6f5] px-3 py-4 sm:px-5 lg:px-6 lg:py-5">
-      <div className="mx-auto grid w-full max-w-[1280px] items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <section className="h-fit rounded-2xl border border-[#d8e3df] bg-white p-4 shadow-sm sm:p-5 lg:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold italic leading-none text-[#2FA4A0] sm:text-4xl">Notifications</h1>
-              <p className="mt-2 text-sm text-[#496065] sm:text-base">
-                Stay updated with all your workspace activities
-              </p>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] items-start gap-8">
+          <section className="space-y-8">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="space-y-1">
+                <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+                  Notifica<span className="text-primary italic">tions</span>
+                </h1>
+                <p className="text-sm md:text-base text-gray-500 font-medium">
+                  Stay updated with all your workspace activities
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={markAllAsRead}
+                disabled={notifications.length === 0 || unreadCount === 0}
+                className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 px-6 py-2.5 rounded-2xl font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Mark all as read
+              </button>
             </div>
 
-            <button
-              type="button"
-              onClick={markAllAsRead}
-              disabled={notifications.length === 0 || unreadCount === 0}
-              className="rounded-xl border border-[#d8e3df] px-4 py-2 text-sm font-semibold text-[#1a3134] transition hover:bg-[#eef4f2] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Mark all as read
-            </button>
-          </div>
-
-          <div className="mt-4">
-            <label className="sr-only" htmlFor="notification-search">
-              Search notifications
-            </label>
-            <input
-              id="notification-search"
-              type="text"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search notifications"
-              className="w-full rounded-xl border border-[#d8e3df] bg-white px-4 py-2.5 text-sm text-[#1a3134] outline-none transition focus:border-[#39A6A0]"
-            />
-          </div>
-
-          <div className="mt-5 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-[#1a3134] sm:text-2xl">Recent Notifications</h2>
-            <div className="text-sm font-medium text-[#577076]">
-              {filteredNotifications.length} total
+            {/* Search */}
+            <div className="relative w-full lg:w-96">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                id="notification-search"
+                type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search notifications"
+                className="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-[#35503F]/10 text-sm font-medium transition-all"
+              />
             </div>
-          </div>
+
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-[#35503F]">Recent Notifications</h2>
+              <div className="text-sm font-bold text-gray-400 uppercase tracking-wider">
+                {filteredNotifications.length} total
+              </div>
+            </div>
 
           <div className="mt-4 space-y-2.5">
             {filteredNotifications.length === 0 ? (
@@ -370,9 +375,10 @@ const Notifications = () => {
             ))}
           </div>
         </aside>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default Notifications;

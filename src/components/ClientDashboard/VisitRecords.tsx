@@ -97,62 +97,57 @@ export default function VisitRecords() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500 font-[Inter]">
-      {/* Header Section */}
-      <div>
-        <h1 className="text-4xl font-bold text-[#35503F] flex items-center gap-3 font-[Inter]">
-          Visit <span className="text-[#35503F]/70 italic">Records</span>
-        </h1>
-        <p className="text-gray-500 mt-2 text-lg">
-          Track all visits made to your registered virtual office
-        </p>
-      </div>
-
-      {/* Stats Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 translate-y-0 hover:-translate-y-1 transition-all">
-          <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center">
-            <Users className="w-6 h-6 text-gray-500" />
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+              Visit <span className="text-primary italic">Records</span>
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 font-medium">
+              Track all visits made to your registered virtual office
+            </p>
           </div>
-          <div>
-            <div className="text-3xl font-bold text-gray-900 line-clamp-1">{totalVisits}</div>
-            <div className="text-sm font-semibold text-gray-500">Total Visits</div>
-          </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 translate-y-0 hover:-translate-y-1 transition-all">
-          <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center">
-            <ShieldCheck className="w-6 h-6 text-[#35503F]" />
-          </div>
-          <div>
-            <div className="text-3xl font-bold text-gray-900 line-clamp-1">{officialVisits}</div>
-            <div className="text-sm font-semibold text-gray-500">Official Visits</div>
-          </div>
+          <a
+            href="/services/virtual-office"
+            className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
+          >
+            <span className="text-xl">+</span>
+            Book New Space
+          </a>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 translate-y-0 hover:-translate-y-1 transition-all">
-          <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center">
-            <Package className="w-6 h-6 text-blue-600" />
+        {/* Stats Cards Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{totalVisits}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Visits</p>
           </div>
-          <div>
-            <div className="text-3xl font-bold text-gray-900 line-clamp-1">{deliveryVisits}</div>
-            <div className="text-sm font-semibold text-gray-500">Deliveries</div>
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-[#35503F]">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{officialVisits}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Official Visits</p>
+          </div>
+          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-blue-400">
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{deliveryVisits}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Deliveries</p>
           </div>
         </div>
-      </div>
 
-      <div className="space-y-6">
-        {/* Search Bar */}
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search visitor or purpose..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 transition-all font-medium"
-          />
-        </div>
+        <div className="space-y-6">
+          <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
+            {/* Search Bar */}
+            <div className="relative flex-1 lg:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search visitor or purpose..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-[#35503F]/10 text-sm font-medium transition-all"
+              />
+            </div>
+          </div>
 
         {/* Visits Table */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -233,6 +228,7 @@ export default function VisitRecords() {
         </div>
       </div>
     </div>
+  </div>
   );
 }
 
