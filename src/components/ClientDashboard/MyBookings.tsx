@@ -787,6 +787,16 @@ const MyBookings: React.FC = () => {
                         {formatDate(booking.endDate || "")}
                       </span>
                     </div>
+
+                    {/* Auto-renewal Status */}
+                    {booking.autoRenew && (
+                      <div className="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-green-50/50 border border-green-100 rounded-xl w-fit">
+                        <div className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-[10px] font-bold text-green-700 uppercase tracking-tight">
+                          Auto-renewal on {formatDate(booking.endDate || "")}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="h-px bg-gray-100 my-3" />
