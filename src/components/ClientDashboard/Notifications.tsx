@@ -12,6 +12,7 @@ import {
 import { useNotifications, type INotification } from "@/contexts/NotificationContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/auth.service";
+import { maskSpaceName } from "@/utils/masking";
 
 type NotificationPreferencesState = {
   email: boolean;
@@ -184,6 +185,7 @@ const Notifications = () => {
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    workspaceCodeMap,
   } = useNotifications();
   const { user, updateUser } = useAuth();
 
@@ -315,7 +317,7 @@ const Notifications = () => {
 
                         <div className="min-w-0">
                           <p className="text-base font-semibold text-[#13282b]">{notification.title}</p>
-                          <p className="mt-0.5 text-sm text-[#4f666c]">{notification.message}</p>
+                          <p className="mt-0.5 text-sm text-[#4f666c]">{maskSpaceName(notification.message, notification.metadata, workspaceCodeMap)}</p>
                           <p className="mt-1.5 text-xs text-[#6a8288]">{formatRelativeTime(notification.createdAt)}</p>
                         </div>
                       </div>
