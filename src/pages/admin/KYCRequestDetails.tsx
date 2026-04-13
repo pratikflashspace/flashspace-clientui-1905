@@ -449,12 +449,13 @@ export default function KYCRequestDetails() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center justify-start sm:justify-end gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0">
                       {doc.status && (
-                        <span className="px-2 py-0.5 text-[11px] rounded-full bg-white text-gray-600 border border-gray-200 capitalize">
+                        <span className="px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold rounded-full bg-white text-gray-500 border border-gray-200 capitalize">
                           {doc.status}
                         </span>
                       )}
+
                       <button
                         onClick={() => handleDocumentReview(doc, "approve")}
                         disabled={docActionLoadingId === doc._id}
@@ -477,12 +478,13 @@ export default function KYCRequestDetails() {
                       </button>
                       <button
                         onClick={() => setSelectedDocument(doc)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold bg-blue-50 hover:bg-blue-100 rounded-lg"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-blue-600 hover:text-white hover:bg-blue-600 font-bold bg-blue-50/80 rounded-lg transition-all"
                       >
-                        <Eye className="w-3 h-3" />
-                        View
+                        <Eye className="w-3 h-3 shrink-0" />
+                        <span>View</span>
                       </button>
                     </div>
+
                   </div>
                 ))}
               </div>

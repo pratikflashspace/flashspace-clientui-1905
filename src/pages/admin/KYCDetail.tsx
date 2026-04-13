@@ -528,13 +528,13 @@ export default function KYCDetail() {
                     >
                       <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
                         {/* File Icon & Info */}
-                        <div className="flex items-center gap-4 w-full sm:w-auto">
+                        <div className="flex items-center gap-4 w-full lg:w-1/2">
                           <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                             <FileText className="w-6 h-6 text-blue-600" />
                           </div>
                           <div className="min-w-0 flex-1">
                             <h4
-                              className="font-bold text-gray-900 capitalize"
+                              className="font-bold text-gray-900 capitalize truncate text-sm md:text-base"
                               title={doc.name || doc.type.replace(/_/g, " ")}
                             >
                               {truncateFileName(
@@ -542,14 +542,8 @@ export default function KYCDetail() {
                                 20,
                               )}
                             </h4>
-                            <p
-                              className="text-xs text-gray-500 mt-0.5"
-                              title={doc.fileUrl?.split("/").pop()}
-                            >
-                              {truncateFileName(
-                                doc.fileUrl?.split("/").pop() || "",
-                                30,
-                              )}
+                            <p className="text-xs text-gray-400 truncate mt-0.5">
+                              {doc.fileUrl?.split("/").pop()}
                             </p>
                             {doc.rejectionReason &&
                               doc.status === "rejected" && (
@@ -561,7 +555,8 @@ export default function KYCDetail() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                        <div className="flex flex-wrap items-center justify-start sm:justify-end gap-3 w-full lg:w-1/2 pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+
                           {/* Status Label */}
                           <div className="sm:mr-2">
                             {doc.status === "approved" && (

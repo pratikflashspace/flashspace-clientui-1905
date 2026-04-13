@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -25,6 +25,7 @@ import {
   Phone,
   Flame,
   Map as MapIcon,
+  GitCompareArrows,
 } from "lucide-react";
 import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import MapLibreMap from "@/components/Map/MapLibreMap";
@@ -38,6 +39,10 @@ import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
 import { ListingItem } from "@/components/services/ListingCardModern";
 import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 import { getShortAddress } from "@/utils/address";
+import CompareDrawer from "@/components/CompareSpaces/CompareDrawer";
+import CompareFloatingBar from "@/components/CompareSpaces/CompareFloatingBar";
+import type { CompareSpace } from "@/components/CompareSpaces/CompareDrawer";
+import CompetitorComparison from "@/components/CompareSpaces/CompetitorComparison";
 
 // Static placeholders for fallback/missing data
 // import connaughtPlace1 from "@/assets/connaught-place-1.png";
@@ -171,10 +176,14 @@ const WorkspaceCard = ({
   ws,
   view,
   type,
+  isCompareSelected,
+  onToggleCompare,
 }: {
   ws: UnifiedWorkspace;
   view: ViewMode;
   type: string;
+  isCompareSelected?: boolean;
+  onToggleCompare?: (ws: UnifiedWorkspace) => void;
 }) => {
   const { toast } = useToast();
   const [liked, setLiked] = useState(false);
@@ -597,6 +606,34 @@ const GetWorkspaces = () => {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
 
+  // ─── COMPARE FEATURE STATE ───
+  const [compareSelected, setCompareSelected] = useState<UnifiedWorkspace[]>([]);
+  const [showCompareDrawer, setShowCompareDrawer] = useState(false);
+
+  const toggleCompareSpace = useCallback((ws: UnifiedWorkspace) => {
+    setCompareSelected((prev) => {
+      const exists = prev.find((s) => s.id === ws.id);
+      if (exists) return prev.filter((s) => s.id !== ws.id);
+      if (prev.length >= 4) return prev; // Max 4
+      return [...prev, ws];
+    });
+  }, []);
+
+  const removeCompareSpace = useCallback((id: string) => {
+    setCompareSelected((prev) => prev.filter((s) => s.id !== id));
+  }, []);
+
+  const clearCompare = useCallback(() => {
+    setCompareSelected([]);
+    setShowCompareDrawer(false);
+  }, []);
+
+  // Reset compare selection when type or city changes
+  useEffect(() => {
+    setCompareSelected([]);
+    setShowCompareDrawer(false);
+  }, [workspaceType, activeCity]);
+
   const goPrevPage = () => {
     if (workspaceType !== "virtual-office") return;
     if (pagination?.hasPrevPage) {
@@ -835,6 +872,43 @@ const GetWorkspaces = () => {
     "on-demand": "On Demand",
   };
 
+  // ─── FLASHSPACE PRICING (computed from loaded spaces for competitor comparison) ───
+  const flashSpacePricing = useMemo(() => {
+    const extractNum = (s?: string) => {
+      if (!s) return Infinity;
+      const n = Number(String(s).replace(/[^0-9.]/g, ""));
+      return Number.isFinite(n) && n > 0 ? n : Infinity;
+    };
+    const formatPrice = (n: number, suffix: string) =>
+      n < Infinity ? `₹${n.toLocaleString("en-IN")}${suffix}` : undefined;
+
+    let gstMin = Infinity, mailingMin = Infinity, brMin = Infinity, coworkMin = Infinity;
+
+    workspaces.forEach((ws) => {
+      ws.plans.forEach((p) => {
+        const num = extractNum(p.price);
+        if (p.label.toLowerCase().includes("gst")) gstMin = Math.min(gstMin, num);
+        if (p.label.toLowerCase().includes("mail")) mailingMin = Math.min(mailingMin, num);
+        if (p.label.toLowerCase().includes("business")) brMin = Math.min(brMin, num);
+        if (p.label.toLowerCase().includes("basic") || p.label.toLowerCase().includes("desk"))
+          coworkMin = Math.min(coworkMin, num);
+      });
+    });
+
+    return {
+      gstMin: formatPrice(gstMin, "/yr"),
+      mailingMin: formatPrice(mailingMin, "/yr"),
+      brMin: formatPrice(brMin, "/yr"),
+      coworkingMin: formatPrice(coworkMin, "/mo"),
+    };
+  }, [workspaces]);
+
+  const flashSpaceAvgRating = useMemo(() => {
+    const rated = workspaces.filter((ws) => ws.rating > 0);
+    if (rated.length === 0) return 4.5;
+    return Math.round((rated.reduce((sum, ws) => sum + ws.rating, 0) / rated.length) * 10) / 10;
+  }, [workspaces]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
@@ -1021,6 +1095,20 @@ const GetWorkspaces = () => {
                 </div>
               </div>
             </div>
+
+            {/* ─── COMPETITOR COMPARISON SECTION ─── */}
+            {!loading && (
+              <div className="mb-5">
+                <CompetitorComparison
+                  city={activeCity}
+                  spaceType={workspaceType}
+                  flashSpacePricing={flashSpacePricing}
+                  flashSpaceRating={flashSpaceAvgRating}
+                  flashSpaceCount={sortedWorkspaces.length}
+                />
+              </div>
+            )}
+
             {loading ? (
               <div
                 className={
@@ -1046,6 +1134,8 @@ const GetWorkspaces = () => {
                       ws={ws}
                       view={viewMode}
                       type={workspaceType}
+                      isCompareSelected={compareSelected.some((s) => s.id === ws.id)}
+                      onToggleCompare={toggleCompareSpace}
                     />
                   ))
                 ) : (
@@ -1111,6 +1201,19 @@ const GetWorkspaces = () => {
       {/* Mobile: full-width listings + expandable map */}
       <div className="lg:hidden flex-1 relative">
         <div className="px-4 py-3">
+          {/* Mobile Competitor Comparison */}
+          {!loading && (
+            <div className="mb-4">
+              <CompetitorComparison
+                city={activeCity}
+                spaceType={workspaceType}
+                flashSpacePricing={flashSpacePricing}
+                flashSpaceRating={flashSpaceAvgRating}
+                flashSpaceCount={sortedWorkspaces.length}
+              />
+            </div>
+          )}
+
           {loading ? (
             <div
               className={
@@ -1136,6 +1239,8 @@ const GetWorkspaces = () => {
                     ws={ws}
                     view={viewMode}
                     type={workspaceType}
+                    isCompareSelected={compareSelected.some((s) => s.id === ws.id)}
+                    onToggleCompare={toggleCompareSpace}
                   />
                 ))
               ) : (
@@ -1189,6 +1294,27 @@ const GetWorkspaces = () => {
           </div>
         )}
       </div>
+
+      {/* ─── COMPARE FLOATING BAR ─── */}
+      <CompareFloatingBar
+        selectedSpaces={compareSelected}
+        onRemove={removeCompareSpace}
+        onCompare={() => setShowCompareDrawer(true)}
+        onClearAll={clearCompare}
+      />
+
+      {/* ─── COMPARE DRAWER ─── */}
+      {showCompareDrawer && compareSelected.length >= 2 && (
+        <CompareDrawer
+          spaces={compareSelected}
+          spaceType={workspaceType}
+          onClose={() => setShowCompareDrawer(false)}
+          onRemoveSpace={(id) => {
+            removeCompareSpace(id);
+            if (compareSelected.length <= 2) setShowCompareDrawer(false);
+          }}
+        />
+      )}
     </div>
   );
 };

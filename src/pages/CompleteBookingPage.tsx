@@ -19,7 +19,8 @@ import {
     simulatePayment,
 } from '@/services/payment.service';
 import hotToast from 'react-hot-toast';
-import userDashboardService from '@/services/userDashboard.service';
+import { userDashboardService } from '@/services/userDashboard.service';
+
 
 // ─────────────────────────────────────────────
 // Types
@@ -61,6 +62,12 @@ const CompleteBookingPage = () => {
     const [planFeatures, setPlanFeatures] = useState<string[]>([]);
     const [planDisplayName, setPlanDisplayName] = useState('');
     const [yearlyBasePrice, setYearlyBasePrice] = useState(0);
+
+    // KYC check
+    const [isKycChecking, setIsKycChecking] = useState(false);
+    const [isKycVerified, setIsKycVerified] = useState(false);
+    const [hasKycRedirected, setHasKycRedirected] = useState(false);
+
 
     // Coupon
     const [couponCode, setCouponCode] = useState('');
@@ -120,54 +127,82 @@ const CompleteBookingPage = () => {
         }
     }, [authLoading, isAuthenticated]);
 
-    // ─── KYC STATUS CHECK ──────────────────
+    // ─── KYC CHECK ────────────────────────────
+    const isApprovedKycStatus = (status?: string) => {
+        const normalizedStatus = (status || "").toLowerCase().trim();
+        return normalizedStatus === "approved" || normalizedStatus === "verified";
+    };
+
+    const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+
     useEffect(() => {
+        let isMounted = true;
         const checkKycStatus = async () => {
-            if (!isAuthenticated || !user) {
-                setKycLoading(false);
-                setKycStatus(null);
+            if (!isAuthenticated || !user || isAdmin) {
+                if (isMounted) {
+                    setIsKycChecking(false);
+                    setIsKycVerified(isAdmin); // Admins are always "verified" for booking
+                    setHasKycRedirected(false);
+                }
                 return;
             }
 
-            // Bypass KYC for admins
-            if (user.role === 'admin' || user.role === 'super_admin') {
-                setKycStatus('approved');
-                setKycLoading(false);
-                return;
-            }
+            setIsKycChecking(true);
             try {
-                setKycLoading(true);
-                const response = await userDashboardService.getKYC();
-                if (response.success && response.data) {
-                    const kycRecords = Array.isArray(response.data) ? response.data : [response.data];
-                    const approved = kycRecords.find((k: any) => k.overallStatus === 'approved');
-                    if (approved) {
-                        setKycStatus('approved');
-                    } else {
-                        hotToast("KYC Verification Required", {
-                            icon: "🛡️",
-                            duration: 4000,
-                        });
-                        navigate('/dashboard/profile');
-                        return;
-                    }
-                } else {
-                    hotToast("KYC Verification Required", {
-                        icon: "🛡️",
-                        duration: 4000,
-                    });
-                    navigate('/dashboard/profile');
+                // If user object already has the flag, use it first
+                if (user.kycVerified) {
+                    if (isMounted) setIsKycVerified(true);
                     return;
                 }
-            } catch (err) {
-                console.error('KYC check failed:', err);
-                setKycStatus('not_started');
+
+                const response = await userDashboardService.getKYC();
+                if (response.success && response.data) {
+                    const kycProfiles = Array.isArray(response.data) ? response.data : [response.data];
+                    const verified = kycProfiles.some(profile =>
+                        isApprovedKycStatus(profile.overallStatus || profile.status)
+                    );
+                    if (isMounted) setIsKycVerified(verified);
+                } else if (isMounted) {
+                    setIsKycVerified(false);
+                }
+            } catch (error) {
+                console.error("Failed to check KYC status before booking", error);
+                if (isMounted) setIsKycVerified(false);
             } finally {
-                setKycLoading(false);
+                if (isMounted) setIsKycChecking(false);
             }
         };
+
         checkKycStatus();
-    }, [isAuthenticated, user]);
+        return () => { isMounted = false; };
+    }, [isAuthenticated, user, user?._id, user?.kycVerified, isAdmin]);
+
+    useEffect(() => {
+        if (!isAuthenticated || !user || isAdmin) return;
+        if (isKycChecking || isKycVerified || hasKycRedirected) return;
+
+        setHasKycRedirected(true);
+        hotToast.error("Complete your KYC first for booking. Redirecting to Profile & KYC...");
+        navigate("/dashboard/profile");
+    }, [isAuthenticated, user, isKycChecking, isKycVerified, hasKycRedirected, navigate, isAdmin]);
+
+    const enforceKycForBooking = () => {
+        if (!isAuthenticated || !user || isAdmin) return false;
+
+        if (isKycChecking) {
+            hotToast.loading("Checking KYC status...", { duration: 2000 });
+            return true;
+        }
+
+        if (!isKycVerified) {
+            hotToast.error("Complete your KYC first for booking");
+            navigate("/dashboard/profile");
+            return true;
+        }
+
+        return false;
+    };
+
 
     // ─── PRICING CALCULATION ──────────────────
     const selectedOption = tenureOptions.find(t => t.years === selectedTenure);
@@ -234,9 +269,11 @@ const CompleteBookingPage = () => {
     // ─── STEP 1: Open payment modal + create order ─
     const handleOpenPaymentModal = async () => {
         if (!spaceDetails || !user || !selectedOption) return;
+        if (enforceKycForBooking()) return;
         setPaymentLoading(true);
         try {
             const order = await createPaymentOrder(buildPayload());
+
             setPaymentOrder(order);
             setShowPaymentModal(true);
         } catch (err: any) {
@@ -401,17 +438,22 @@ const CompleteBookingPage = () => {
                                         )}
 
                                         <p className="text-base font-semibold text-foreground mb-1">{opt.label}</p>
-                                        <p className="text-2xl font-bold text-foreground">
-                                            {formatCurrency(opt.totalPrice)}
-                                            <span className="text-sm font-normal text-muted-foreground"> Total</span>
-                                        </p>
-                                        <p className="text-xs text-muted-foreground mt-1">Valid for {opt.years} Year{opt.years > 1 ? 's' : ''}</p>
+                                        <div className="flex flex-col xl:flex-row xl:items-baseline gap-x-1">
+                                            <p className="text-xl sm:text-2xl font-bold text-foreground whitespace-nowrap">
+                                                {formatCurrency(opt.totalPrice)}
+                                            </p>
+                                            <span className="text-xs sm:text-sm font-normal text-muted-foreground"> Total</span>
+                                        </div>
+                                        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Valid for {opt.years} Year{opt.years > 1 ? 's' : ''}</p>
 
                                         {opt.savingsPercent > 0 && (
-                                            <span className="inline-block mt-2 text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                                                Save {formatCurrency(opt.savings)} ({opt.savingsPercent}% OFF)
-                                            </span>
+                                            <div className="mt-3">
+                                                <span className="inline-flex items-center justify-center text-[10px] font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-full whitespace-normal text-center">
+                                                    Save {formatCurrency(opt.savings)} ({opt.savingsPercent}% OFF)
+                                                </span>
+                                            </div>
                                         )}
+
                                     </button>
                                 ))}
                             </div>
@@ -539,35 +581,18 @@ const CompleteBookingPage = () => {
                                 </div>
 
                                 {/* CTA */}
-                                {!user?.kycVerified && user?.role === "user" ? (
-                                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-center">
-                                        <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                                            <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                                        </div>
-                                        <p className="text-sm font-bold text-amber-900 dark:text-amber-100 mb-1">KYC Required</p>
-                                        <p className="text-[11px] text-amber-800 dark:text-amber-200/70 mb-3">
-                                            Your KYC must be approved before you can book a space.
-                                        </p>
-                                        <button
-                                            onClick={() => navigate("/dashboard/kyc")}
-                                            className="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-lg transition-colors"
-                                        >
-                                            Complete KYC Verification
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <button
-                                        onClick={handleOpenPaymentModal}
-                                        disabled={paymentLoading}
-                                        className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md disabled:opacity-70"
-                                    >
-                                        {paymentLoading ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin" /> Creating order…</>
-                                        ) : (
-                                            'Proceed to Payment'
-                                        )}
-                                    </button>
-                                )}
+                                <button
+                                    onClick={handleOpenPaymentModal}
+                                    disabled={paymentLoading}
+                                    className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md disabled:opacity-70 px-4"
+                                >
+                                    {paymentLoading ? (
+                                        <><Loader2 className="w-4 h-4 animate-spin shrink-0" /> <span className="truncate">Creating order…</span></>
+                                    ) : (
+                                        <span className="truncate">Proceed to Payment</span>
+                                    )}
+                                </button>
+
 
                                 <p className="text-center text-[11px] text-muted-foreground">
                                     By proceeding, you agree to our{' '}
@@ -625,11 +650,12 @@ const CompleteBookingPage = () => {
                         <button
                             onClick={handleRazorpayPayment}
                             disabled={paymentLoading}
-                            className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70"
+                            className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 px-6 overflow-hidden"
                         >
-                            <Shield className="w-4 h-4" />
-                            Pay {formatCurrency(finalTotal)} with Razorpay
+                            <Shield className="w-4 h-4 shrink-0" />
+                            <span className="truncate">Pay {formatCurrency(finalTotal)} with Razorpay</span>
                         </button>
+
 
                         {/* Simulate button */}
                         <button
