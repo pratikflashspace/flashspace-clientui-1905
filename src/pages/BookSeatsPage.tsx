@@ -27,47 +27,6 @@ const BookSeatsPage = () => {
   const [isHolding, setIsHolding] = useState(false);
   const [holdData, setHoldData] = useState<any>(null);
 
-  // KYC status
-  const [isKycChecking, setIsKycChecking] = useState(false);
-  const [isKycVerified, setIsKycVerified] = useState(false);
-  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
-
-  useEffect(() => {
-    let isMounted = true;
-    const checkKycStatus = async () => {
-      if (!isAuthenticated || !user || isAdmin) {
-        if (isMounted) {
-          setIsKycChecking(false);
-          setIsKycVerified(isAdmin);
-        }
-        return;
-      }
-      setIsKycChecking(true);
-      try {
-        if (user.kycVerified) {
-          if (isMounted) setIsKycVerified(true);
-          return;
-        }
-        const res = await axios.get(`${API_CONFIG.BASE_URL}${API_ENDPOINTS.USER.KYC}`, { withCredentials: true });
-        if (res.data.success && res.data.data) {
-          const profiles = Array.isArray(res.data.data) ? res.data.data : [res.data.data];
-          const verified = profiles.some((p: any) =>
-            (p.overallStatus || p.status || "").toLowerCase().trim() === "approved" ||
-            (p.overallStatus || p.status || "").toLowerCase().trim() === "verified"
-          );
-          if (isMounted) setIsKycVerified(verified);
-        }
-      } catch (err) {
-        console.error("KYC check failed", err);
-      } finally {
-        if (isMounted) setIsKycChecking(false);
-      }
-    };
-    checkKycStatus();
-    return () => { isMounted = false; };
-  }, [isAuthenticated, user, user?.kycVerified, isAdmin]);
-
-
   // Get requested desk count from query parameters
   const requestedDesks = parseInt(searchParams.get("desks") || "1");
   const requestedDateParam = searchParams.get("date");
@@ -84,27 +43,10 @@ const BookSeatsPage = () => {
   });
 
   useEffect(() => {
-    let isMounted = true;
     const init = async () => {
       if (!id) return;
-      setIsKycChecking(true);
       setLoading(true);
       try {
-        // If user object already has the flag, use it first
-        if (isAuthenticated && user?.kycVerified) {
-          if (isMounted) setIsKycVerified(true);
-        } else if (isAuthenticated && !isAdmin) {
-          const res = await userDashboardService.getKYC();
-          const profiles = Array.isArray(res.data) ? res.data : [res.data];
-          const verified = profiles.some((p: any) =>
-            (p.overallStatus || p.status || "").toLowerCase().trim() === "approved" ||
-            (p.overallStatus || p.status || "").toLowerCase().trim() === "verified"
-          );
-          if (isMounted) setIsKycVerified(verified);
-        } else if (isAdmin) {
-          if (isMounted) setIsKycVerified(true);
-        }
-
         const space = await getCoworkingSpaceById(id);
         setSpaceDetails(space);
         await loadSeats(schedule.start, schedule.end);
@@ -176,17 +118,7 @@ const BookSeatsPage = () => {
       );
     }
 
-    if (!isAdmin && !isKycVerified) {
-      toast({
-        title: "Complete your KYC",
-        description: "Please complete your KYC from Profile & KYC to reserve seats.",
-        variant: "destructive",
-      });
-      return navigate("/dashboard/profile");
-    }
-
     if (selectedSeats.length === 0) return;
-
 
     try {
       setIsHolding(true);

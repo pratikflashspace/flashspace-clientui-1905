@@ -18,72 +18,6 @@ interface APIResponse<T> {
   data: T;
 }
 
-type KYCRecord = {
-  overallStatus?: string;
-  status?: string;
-  kycStatus?: string;
-};
-
-const BOOKING_KYC_REQUIRED_MESSAGE = "Complete your KYC first for booking";
-
-const isApprovedKycStatus = (value?: string) => {
-  const normalized = (value || "").toLowerCase().trim();
-  return normalized === "approved" || normalized === "verified";
-};
-
-const isKycRelatedMessage = (message?: unknown) => {
-  const normalized = String(message || "").toLowerCase();
-  return normalized.includes("kyc") || normalized.includes("verify");
-};
-
-const redirectUserToKycProfile = () => {
-  if (typeof window === "undefined") return;
-  if (window.location.pathname.startsWith("/dashboard/profile")) return;
-  window.location.assign("/dashboard/profile");
-};
-
-const assertKycVerifiedForBooking = async () => {
-  try {
-    const response = await axiosInstance.get<APIResponse<KYCRecord | KYCRecord[]>>(
-      "/api/user/kyc",
-    );
-
-    if (!response.data?.success) {
-      throw new Error(response.data?.message || "KYC verification check failed");
-    }
-
-    const kycData = response.data.data;
-    const records = Array.isArray(kycData)
-      ? kycData
-      : kycData
-        ? [kycData]
-        : [];
-
-    const isVerified = records.some((record) =>
-      isApprovedKycStatus(
-        record.overallStatus || record.status || record.kycStatus,
-      ),
-    );
-
-    if (!isVerified) {
-      throw new Error(BOOKING_KYC_REQUIRED_MESSAGE);
-    }
-  } catch (error: any) {
-    const serverMessage =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.message ||
-      "";
-
-    if (isKycRelatedMessage(serverMessage)) {
-      throw new Error(BOOKING_KYC_REQUIRED_MESSAGE);
-    }
-
-    // Fail safe: booking must not proceed if KYC cannot be validated.
-    throw new Error("Unable to verify your KYC right now. Please try again.");
-  }
-};
-
 export interface CreateOrderPayload {
   userId: string;
   userEmail: string;
@@ -142,8 +76,6 @@ export const createPaymentOrder = async (
   payload: CreateOrderPayload,
 ): Promise<CreateOrderResponse> => {
   try {
-    await assertKycVerifiedForBooking();
-
     const response = await axiosInstance.post<APIResponse<CreateOrderResponse>>(
       API_ENDPOINTS.PAYMENT.CREATE_ORDER,
       payload,
@@ -162,12 +94,6 @@ export const createPaymentOrder = async (
       error.response?.data?.message ||
       error.message ||
       "Failed to create order";
-
-    if (isKycRelatedMessage(errorMessage)) {
-      redirectUserToKycProfile();
-      throw new Error(BOOKING_KYC_REQUIRED_MESSAGE);
-    }
-
     throw new Error(errorMessage);
   }
 };
