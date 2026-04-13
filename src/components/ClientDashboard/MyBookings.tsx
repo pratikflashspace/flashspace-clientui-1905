@@ -920,14 +920,22 @@ const MyBookings: React.FC = () => {
                 </button>
                 <div className="absolute bottom-4 left-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${selectedBooking.type === "virtual_office"
-                      ? "bg-yellow-400 text-black"
-                      : "bg-blue-500 text-white"
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${selectedBooking.type === "VirtualOffice" ||
+                      selectedBooking.type === "virtual_office"
+                      ? "bg-gray-100 text-gray-700"
+                      : selectedBooking.type === "MeetingRoom" ||
+                        selectedBooking.type === "meeting_room"
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-blue-500 text-white"
                       }`}
                   >
-                    {selectedBooking.type === "virtual_office"
+                    {selectedBooking.type === "VirtualOffice" ||
+                      selectedBooking.type === "virtual_office"
                       ? "Virtual Office"
-                      : "Coworking"}
+                      : selectedBooking.type === "MeetingRoom" ||
+                        selectedBooking.type === "meeting_room"
+                        ? "On Demand"
+                        : "Coworking"}
                   </span>
                 </div>
               </div>
