@@ -2,6 +2,8 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext'; // Assuming you have an AuthContext
 import toast from 'react-hot-toast';
+import { maskSpaceName } from '@/utils/masking';
+import userDashboardService from '@/services/userDashboard.service';
 
 // Types (Match Backend)
 export enum NotificationType {
@@ -56,6 +58,7 @@ interface NotificationContextType {
     fetchNotifications: () => void;
     deleteNotification: (id: string) => void;
     deleteAllNotifications: () => void;
+    workspaceCodeMap: Record<string, string>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -64,6 +67,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const { user } = useAuth(); // Get current user
     const [socket, setSocket] = useState<Socket | null>(null);
     const [notifications, setNotifications] = useState<INotification[]>([]);
+    const [workspaceCodeMap, setWorkspaceCodeMap] = useState<Record<string, string>>({});
 
     const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -102,10 +106,39 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     }, [user]);
 
+    const fetchWorkspaceCodes = useCallback(async () => {
+        if (!user) return;
+        try {
+            const response = await userDashboardService.getBookings({ status: "active" });
+            if (response.success && Array.isArray(response.data)) {
+                const map: Record<string, string> = {};
+                response.data.forEach((b: any) => {
+                    const normalizeSpaceCode = (value?: string) => {
+                        const trimmed = value?.trim();
+                        if (!trimmed) return "";
+                        const match = trimmed.toUpperCase().match(/\b[A-Z]{2,}\d{1,}\b/);
+                        return match?.[0] || "";
+                    };
+                    const code = normalizeSpaceCode(b.spaceSnapshot?.spaceId) || 
+                                 normalizeSpaceCode(b.spaceSnapshot?.name);
+                    
+                    if (code) {
+                        if (b.spaceId) map[b.spaceId] = code;
+                        if (b.spaceSnapshot?._id) map[b.spaceSnapshot._id] = code;
+                    }
+                });
+                setWorkspaceCodeMap(map);
+            }
+        } catch (err) {
+            console.error("Failed to fetch workspace codes", err);
+        }
+    }, [user]);
+
     // 2. Initial Fetch
     useEffect(() => {
         if (user) {
             fetchNotifications();
+            fetchWorkspaceCodes();
         } else {
             setNotifications([]);
         }
@@ -136,7 +169,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 (t) => (
                     <div onClick={() => toast.dismiss(t.id)}>
                         <strong>{normalizedIncoming.title}</strong>
-                        <p>{normalizedIncoming.message}</p>
+                        <p>{maskSpaceName(normalizedIncoming.message, normalizedIncoming.metadata, workspaceCodeMap)}</p>
                     </div>
                 ),
                 { duration: 4000, position: 'top-right' }
@@ -215,7 +248,16 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
 
     return (
-        <NotificationContext.Provider value={{ notifications, unreadCount, markAsRead, markAllAsRead, fetchNotifications, deleteNotification, deleteAllNotifications }}>
+        <NotificationContext.Provider value={{
+            notifications,
+            unreadCount,
+            markAsRead,
+            markAllAsRead,
+            fetchNotifications,
+            deleteNotification,
+            deleteAllNotifications,
+            workspaceCodeMap
+        }}>
             {children}
         </NotificationContext.Provider>
     );

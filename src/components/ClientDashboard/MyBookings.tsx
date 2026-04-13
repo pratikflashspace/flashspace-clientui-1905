@@ -787,6 +787,16 @@ const MyBookings: React.FC = () => {
                         {formatDate(booking.endDate || "")}
                       </span>
                     </div>
+
+                    {/* Auto-renewal Status */}
+                    {booking.autoRenew && (
+                      <div className="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-green-50/50 border border-green-100 rounded-xl w-fit">
+                        <div className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-[10px] font-bold text-green-700 uppercase tracking-tight">
+                          Auto-renewal on {formatDate(booking.endDate || "")}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="h-px bg-gray-100 my-3" />
@@ -910,14 +920,22 @@ const MyBookings: React.FC = () => {
                 </button>
                 <div className="absolute bottom-4 left-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${selectedBooking.type === "virtual_office"
-                      ? "bg-yellow-400 text-black"
-                      : "bg-blue-500 text-white"
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${selectedBooking.type === "VirtualOffice" ||
+                      selectedBooking.type === "virtual_office"
+                      ? "bg-gray-100 text-gray-700"
+                      : selectedBooking.type === "MeetingRoom" ||
+                        selectedBooking.type === "meeting_room"
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-blue-500 text-white"
                       }`}
                   >
-                    {selectedBooking.type === "virtual_office"
+                    {selectedBooking.type === "VirtualOffice" ||
+                      selectedBooking.type === "virtual_office"
                       ? "Virtual Office"
-                      : "Coworking"}
+                      : selectedBooking.type === "MeetingRoom" ||
+                        selectedBooking.type === "meeting_room"
+                        ? "On Demand"
+                        : "Coworking"}
                   </span>
                 </div>
               </div>

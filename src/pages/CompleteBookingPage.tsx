@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import {
-    ArrowLeft, Check, Shield, Clock, Star, Loader2, Tag, X,
+    ArrowLeft, Check, Shield, ShieldAlert, AlertTriangle, Clock, Star, Loader2, Tag, X,
     Building2, MapPin, IndianRupee, CheckCircle2, Package, CreditCard,
 } from 'lucide-react';
 import Header from '@/components/Header';
@@ -79,6 +79,10 @@ const CompleteBookingPage = () => {
     const [couponLoading, setCouponLoading] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [paymentOrder, setPaymentOrder] = useState<any>(null);
+
+    // KYC STATE
+    const [kycStatus, setKycStatus] = useState<string | null>(null);
+    const [kycLoading, setKycLoading] = useState(true);
 
     // ─── LOAD SPACE ───────────────────────────
     useEffect(() => {
@@ -219,7 +223,7 @@ const CompleteBookingPage = () => {
             const result = await validateCoupon(couponCode.trim().toUpperCase());
             if (result.valid && result.data) {
                 setAppliedCoupon({
-                    code: result.data.code,
+                    code: result.data.code,      
                     discountValue: result.data.discountValue,
                     affiliateId: result.data.affiliateId,
                 });
@@ -273,6 +277,12 @@ const CompleteBookingPage = () => {
             setPaymentOrder(order);
             setShowPaymentModal(true);
         } catch (err: any) {
+            // Handle KYC-required error from backend
+            if (err?.response?.data?.kycRequired || err?.kycRequired) {
+                hotToast.error(err?.response?.data?.message || 'KYC verification required before booking.');
+                navigate('/dashboard/profile');
+                return;
+            }
             hotToast.error(err?.message || 'Failed to initiate payment. Please try again.');
         } finally {
             setPaymentLoading(false);
@@ -334,14 +344,19 @@ const CompleteBookingPage = () => {
             navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(planDisplayName)}&amount=${finalTotal}`);
         } catch (err: any) {
             hotToast.dismiss('sim');
+            if (err?.response?.status === 403 || err?.response?.data?.kycRequired || err?.kycRequired) {
+                hotToast.error(err?.response?.data?.message || 'KYC verification required.');
+                navigate('/dashboard/profile');
+                return;
+            }
             hotToast.error(err?.message || 'Simulation failed.');
         } finally {
             setPaymentLoading(false);
         }
     };
 
-    // ─── RENDER ───────────────────────────────
-    if (loading || authLoading) {
+    // ─── RENDER ───────────────────────────
+    if (loading || authLoading || kycLoading) {
         return (
             <div className="min-h-screen flex flex-col bg-background text-foreground">
                 <Header />
@@ -355,6 +370,7 @@ const CompleteBookingPage = () => {
             </div>
         );
     }
+
 
     if (error) {
         return (

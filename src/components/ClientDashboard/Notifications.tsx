@@ -4,13 +4,16 @@ import {
   CheckCircle2,
   Info,
   Mail,
+  Search,
   Trash2,
   UserCircle2,
 } from "lucide-react";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 
 import { useNotifications, type INotification } from "@/contexts/NotificationContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/auth.service";
+import { maskSpaceName } from "@/utils/masking";
 
 type NotificationPreferencesState = {
   email: boolean;
@@ -45,7 +48,7 @@ const buildPreferences = (
 });
 
 const getNotificationVisualMeta = (notification: INotification): NotificationVisualMeta => {
-  const combinedText = `${notification.title} ${notification.message}`.toLowerCase();
+  const combinedText = `${notification.title || ''} ${notification.message || ''}`.toLowerCase();
 
   if (combinedText.includes("payment") || combinedText.includes("invoice") || combinedText.includes("due")) {
     return {
@@ -175,6 +178,98 @@ const ToggleButton = ({
   );
 };
 
+/* --- Swipeable Notification Item Component (Original Style) --- */
+const NotificationItem = ({ 
+  notification, 
+  onDelete, 
+  onMarkRead, 
+  workspaceCodeMap 
+}: { 
+  notification: INotification; 
+  onDelete: (id: string) => void;
+  onMarkRead: (id: string) => void;
+  workspaceCodeMap: Record<string, string>;
+}) => {
+  const x = useMotionValue(0);
+  const opacity = useTransform(x, [-150, 0, 150], [0, 1, 0]);
+  const visual = getNotificationVisualMeta(notification);
+
+  const handleDragEnd = (_: any, info: any) => {
+    if (Math.abs(info.offset.x) > 150) {
+      onDelete(notification._id);
+    }
+  };
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl mb-2.5">
+      {/* Absolute Background Delete Indicator */}
+      <div className="absolute inset-0 bg-red-50 flex items-center justify-between px-8 text-red-500">
+        <Trash2 className="w-5 h-5" />
+        <Trash2 className="w-5 h-5" />
+      </div>
+
+      <motion.article
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        onDragEnd={handleDragEnd}
+        style={{ x, opacity }}
+        initial={{ x: 0, opacity: 1 }}
+        exit={{ 
+          x: x.get() > 0 ? 500 : -500, 
+          opacity: 0, 
+          height: 0, 
+          marginBottom: 0,
+          transition: { duration: 0.2 } 
+        }}
+        className={`relative z-10 rounded-2xl border px-4 py-3.5 transition hover:shadow-sm sm:px-5 touch-pan-y bg-white cursor-pointer ${
+          !notification.read ? visual.cardClassName : "border-[#e3ebe8]"
+        }`}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <span className={`mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white ${visual.iconClassName}`}>
+              <visual.Icon className="h-5 w-5" />
+            </span>
+
+            <div className="min-w-0">
+              <p className="text-base font-semibold text-[#13282b]">{notification.title}</p>
+              <p className="mt-0.5 text-sm text-[#4f666c]">{maskSpaceName(notification.message, notification.metadata, workspaceCodeMap)}</p>
+              <p className="mt-1.5 text-xs text-[#6a8288]">{formatRelativeTime(notification.createdAt)}</p>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 items-start gap-2">
+            {!notification.read ? (
+              <span className="rounded-full bg-[#35503F] px-2.5 py-1 text-xs font-semibold text-white">
+                New
+              </span>
+            ) : null}
+
+            {!notification.read ? (
+              <button
+                type="button"
+                onClick={() => onMarkRead(notification._id)}
+                className="rounded-lg border border-[#d8e3df] px-2.5 py-1.5 text-xs font-semibold text-[#1a3134] transition hover:bg-[#eef4f2]"
+              >
+                Mark read
+              </button>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={() => onDelete(notification._id)}
+              className="rounded-lg border border-transparent p-2 text-[#7a9095] transition hover:bg-red-50 hover:text-red-500"
+              title="Delete notification"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </motion.article>
+    </div>
+  );
+};
+
 const Notifications = () => {
   const {
     notifications,
@@ -183,6 +278,7 @@ const Notifications = () => {
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    workspaceCodeMap,
   } = useNotifications();
   const { user, updateUser } = useAuth();
 
@@ -206,9 +302,11 @@ const Notifications = () => {
 
     const query = searchQuery.toLowerCase();
     return notifications.filter((notification) => {
+      const title = notification.title || "";
+      const message = notification.message || "";
       return (
-        notification.title.toLowerCase().includes(query) ||
-        notification.message.toLowerCase().includes(query)
+        title.toLowerCase().includes(query) ||
+        message.toLowerCase().includes(query)
       );
     });
   }, [notifications, searchQuery]);
@@ -243,134 +341,98 @@ const Notifications = () => {
   };
 
   return (
-    <div className="h-full bg-[#f4f6f5] px-3 py-4 sm:px-5 lg:px-6 lg:py-5">
-      <div className="mx-auto grid w-full max-w-[1280px] items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <section className="h-fit rounded-2xl border border-[#d8e3df] bg-white p-4 shadow-sm sm:p-5 lg:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-extrabold text-[#35503F]">
-                My <span className="italic">Notifications</span>
-              </h1>
-              <p className="mt-2 text-sm text-[#496065] sm:text-base">
-                Stay updated with all your workspace activities
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={markAllAsRead}
-              disabled={notifications.length === 0 || unreadCount === 0}
-              className="rounded-xl border border-[#d8e3df] px-4 py-2 text-sm font-semibold text-[#1a3134] transition hover:bg-[#eef4f2] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Mark all as read
-            </button>
-          </div>
-
-          <div className="mt-4">
-            <label className="sr-only" htmlFor="notification-search">
-              Search notifications
-            </label>
-            <input
-              id="notification-search"
-              type="text"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search notifications"
-              className="w-full rounded-xl border border-[#d8e3df] bg-white px-4 py-2.5 text-sm text-[#1a3134] outline-none transition focus:border-[#35503F]"
-            />
-          </div>
-
-          <div className="mt-5 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-[#1a3134] sm:text-2xl">Recent Notifications</h2>
-            <div className="text-sm font-medium text-[#577076]">
-              {filteredNotifications.length} total
-            </div>
-          </div>
-
-          <div className="mt-4 space-y-2.5">
-            {filteredNotifications.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[#d8e3df] bg-[#f7faf8] px-6 py-7 text-center">
-                <Bell className="mx-auto h-8 w-8 text-[#6a8288]" />
-                <p className="mt-3 text-sm font-medium text-[#496065]">No notifications found</p>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] items-start gap-8">
+          <section className="space-y-8">
+            {/* Header Section */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="space-y-1">
+                <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+                  My <span className="text-primary italic">Notifications</span>
+                </h1>
+                <p className="text-sm md:text-base text-gray-500 font-medium">
+                  Stay updated with all your workspace activities
+                </p>
               </div>
-            ) : (
-              filteredNotifications.map((notification) => {
-                const visual = getNotificationVisualMeta(notification);
+              <button
+                type="button"
+                onClick={markAllAsRead}
+                disabled={notifications.length === 0 || unreadCount === 0}
+                className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 px-6 py-2.5 rounded-2xl font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Mark all as read
+              </button>
+            </div>
 
-                return (
-                  <article
-                    key={notification._id}
-                    className={`rounded-2xl border px-4 py-3.5 transition hover:shadow-sm sm:px-5 ${
-                      !notification.read ? visual.cardClassName : "border-[#e3ebe8] bg-white"
-                    }`}
+            {/* Search */}
+            <div className="relative w-full lg:w-96">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                id="notification-search"
+                type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search notifications"
+                className="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-[#35503F]/10 text-sm font-medium transition-all"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-[#35503F]">Recent Notifications</h2>
+              <div className="text-sm font-bold text-gray-400 uppercase tracking-wider">
+                {filteredNotifications.length} total
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <AnimatePresence initial={false}>
+                {filteredNotifications.length === 0 ? (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="rounded-2xl border border-dashed border-[#d8e3df] bg-[#f7faf8] px-6 py-7 text-center"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex min-w-0 items-start gap-3">
-                        <span className={`mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white ${visual.iconClassName}`}>
-                          <visual.Icon className="h-5 w-5" />
-                        </span>
+                    <Bell className="mx-auto h-8 w-8 text-[#6a8288]" />
+                    <p className="mt-3 text-sm font-medium text-[#496065]">No notifications found</p>
+                  </motion.div>
+                ) : (
+                  filteredNotifications.map((notification) => (
+                    <NotificationItem 
+                      key={notification._id}
+                      notification={notification}
+                      onDelete={deleteNotification}
+                      onMarkRead={markAsRead}
+                      workspaceCodeMap={workspaceCodeMap}
+                    />
+                  ))
+                )}
+              </AnimatePresence>
+            </div>
+          </section>
 
-                        <div className="min-w-0">
-                          <p className="text-base font-semibold text-[#13282b]">{notification.title}</p>
-                          <p className="mt-0.5 text-sm text-[#4f666c]">{notification.message}</p>
-                          <p className="mt-1.5 text-xs text-[#6a8288]">{formatRelativeTime(notification.createdAt)}</p>
-                        </div>
-                      </div>
+          <aside className="h-fit rounded-2xl border border-[#d8e3df] bg-white p-4 shadow-sm sm:p-5">
+            <h3 className="text-xl font-semibold leading-none text-[#13282b]">Notification Preferences</h3>
 
-                      <div className="flex shrink-0 items-start gap-2">
-                        {!notification.read ? (
-                          <span className="rounded-full bg-[#35503F] px-2.5 py-1 text-xs font-semibold text-white">
-                            New
-                          </span>
-                        ) : null}
+            <div className="mt-4 space-y-4">
+              {preferenceItems.map((item) => (
+                <div key={item.key} className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-base font-semibold text-[#13282b]">{item.label}</p>
+                    <p className="text-sm text-[#577076]">{item.description}</p>
+                  </div>
 
-                        {!notification.read ? (
-                          <button
-                            type="button"
-                            onClick={() => markAsRead(notification._id)}
-                            className="rounded-lg border border-[#d8e3df] px-2.5 py-1.5 text-xs font-semibold text-[#1a3134] transition hover:bg-[#eef4f2]"
-                          >
-                            Mark read
-                          </button>
-                        ) : null}
-
-                        <button
-                          type="button"
-                          onClick={() => deleteNotification(notification._id)}
-                          className="rounded-lg border border-transparent p-2 text-[#7a9095] transition hover:bg-red-50 hover:text-red-500"
-                          title="Delete notification"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })
-            )}
-          </div>
-        </section>
-
-        <aside className="h-fit rounded-2xl border border-[#d8e3df] bg-white p-4 shadow-sm sm:p-5">
-          <h3 className="text-2xl font-semibold leading-none text-[#13282b]">Notification Preferences</h3>
-
-          <div className="mt-4 space-y-4">
-            {preferenceItems.map((item) => (
-              <div key={item.key} className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-base font-semibold text-[#13282b]">{item.label}</p>
-                  <p className="text-sm text-[#577076]">{item.description}</p>
+                  <ToggleButton
+                    checked={preferences[item.key]}
+                    disabled={updatingPreferenceKey === item.key}
+                    onClick={() => handleTogglePreference(item.key)}
+                  />
                 </div>
-
-                <ToggleButton
-                  checked={preferences[item.key]}
-                  disabled={updatingPreferenceKey === item.key}
-                  onClick={() => handleTogglePreference(item.key)}
-                />
-              </div>
-            ))}
-          </div>
-        </aside>
+              ))}
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );

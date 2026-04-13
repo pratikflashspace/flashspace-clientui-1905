@@ -776,6 +776,26 @@ export default function KYCVerification() {
     return true;
   };
 
+  if (user?.role === 'admin' || user?.role === 'super_admin') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-gray-100 shadow-sm text-center">
+          <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Shield className="w-10 h-10 text-green-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Verified Administrator</h2>
+          <p className="text-gray-500 mb-6">
+            As an administrator, your KYC is automatically approved. 
+            You have full access to all booking and dashboard features.
+          </p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-bold border border-green-100">
+            <CheckCircle2 className="w-4 h-4" /> KYC Skipped & Approved
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
@@ -1124,26 +1144,72 @@ export default function KYCVerification() {
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 font-medium"
           >
             <ChevronRight className="w-4 h-4 rotate-180" /> Back to profiles
+            <X className="w-5 h-5" />
+            Close
           </button>
+        </div>
 
-          {profileId !== "new" && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-gray-900">
-                  Verification Progress
-                </h2>
-                <span className="text-2xl font-bold text-yellow-500 transition-all duration-300">
-                  {completionPercentage}%
-                </span>
+        {/* Status and Progress Card */}
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className={`w-14 h-14 rounded-2xl ${getOverallStatusConfig(kycData?.overallStatus || "not_started").bg.replace("500", "100")} flex items-center justify-center`}>
+                {React.createElement(getOverallStatusConfig(kycData?.overallStatus || "not_started").icon, { className: `w-7 h-7 ${getOverallStatusConfig(kycData?.overallStatus || "not_started").bg.replace("bg-", "text-")}` })}
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Current Status</p>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {getOverallStatusConfig(kycData?.overallStatus || "not_started").text}
+                </h3>
+              </div>
+            </div>
+            <div className="flex-1 max-w-md">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-bold text-gray-500">Profile Completion</span>
+                <span className="text-sm font-extrabold text-[#35503F]">{getCompletionPercentage()}%</span>
               </div>
               <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-[#35503F] to-[#4a6b55] rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${completionPercentage}%` }}
+                  className="h-full bg-[#35503F] transition-all duration-700 ease-out rounded-full"
+                  style={{ width: `${getCompletionPercentage()}%` }}
                 />
               </div>
             </div>
-          )}
+          </div>
+
+          {/* Stepper Navigation */}
+          <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar py-2">
+            {steps.map((step, idx) => {
+              const isActive = activeStep === step.id;
+              const isAccessible = isStepAccessible(step.id as VerificationStep);
+              const StepIcon = step.icon;
+
+              return (
+                <button
+                  key={step.id}
+                  disabled={!isAccessible}
+                  onClick={() => setActiveStep(step.id as VerificationStep)}
+                  className={`flex flex-col items-center gap-3 min-w-[100px] group transition-all ${
+                    !isAccessible ? "opacity-40 grayscale cursor-not-allowed" : "cursor-pointer"
+                  }`}
+                >
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                    isActive
+                      ? "bg-[#35503F] text-[#FEF8C3] shadow-lg shadow-[#35503F]/20 scale-110"
+                      : "bg-gray-50 text-gray-400 group-hover:bg-gray-100 group-hover:text-gray-600"
+                  }`}>
+                    <StepIcon className="w-6 h-6" />
+                  </div>
+                  <span className={`text-[10px] font-bold uppercase tracking-widest text-center transition-all ${
+                    isActive ? "text-[#35503F]" : "text-gray-400"
+                  }`}>
+                    {step.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
           {/* Profile Name Input (Hide for Partner Mode) */}
           {(profileId === "new" || editMode) && !isPartnerMode && (
@@ -1172,43 +1238,7 @@ export default function KYCVerification() {
             </div>
           )}
 
-          {(
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2">
-              <div className="flex gap-1">
-                {steps.map((step) => {
-                  const isAccessible = isStepAccessible(
-                    step.id as VerificationStep,
-                  );
-                  return (
-                    <button
-                      key={step.id}
-                      onClick={() => {
-                        if (isAccessible) {
-                          setActiveStep(step.id as VerificationStep);
-                        }
-                      }}
-                      disabled={!isAccessible}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors relative ${activeStep === step.id
-                        ? "bg-[#35503F] text-[#FEF8C3]"
-                        : isAccessible
-                          ? "text-gray-600 hover:bg-gray-100 cursor-pointer"
-                          : "text-gray-300 cursor-not-allowed opacity-50 bg-gray-50"
-                        }`}
-                      title={
-                        !isAccessible ? "Complete previous steps first" : ""
-                      }
-                    >
-                      {!isAccessible && (
-                        <Lock className="w-3 h-3 absolute top-1 right-1" />
-                      )}
-                      <step.icon className="w-4 h-4" />
-                      <span className="hidden sm:inline">{step.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+
 
           {/* Display Forms */}
           {(profileId !== "new" || isPartnerMode || kycType === "business" || kycType === "individual") && (
@@ -2274,6 +2304,5 @@ export default function KYCVerification() {
           )}
         </div>
       </div>
-    </div >
-  );
+    );
 }

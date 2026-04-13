@@ -475,7 +475,7 @@ const Blog = () => {
             <div className="max-w-lg mx-auto">
               <div className="flex items-center bg-card rounded-xl border border-border px-5 py-2">
                 <input
-                  type="text"
+                  type="text"d
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for articles, guides, or news..."

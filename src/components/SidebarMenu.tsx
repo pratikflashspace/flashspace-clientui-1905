@@ -182,7 +182,16 @@ const UpdatesPopup = ({
                     </p>
                     <div className="flex items-center justify-between mt-auto">
                       <span className="text-[11px] text-slate-400">
-                        {notif.createdAt ? formatDistanceToNow(new Date(notif.createdAt), { addSuffix: true }) : ''}
+                        {(() => {
+                          if (!notif.createdAt) return '';
+                          try {
+                            const d = new Date(notif.createdAt);
+                            if (isNaN(d.getTime())) return '';
+                            return formatDistanceToNow(d, { addSuffix: true });
+                          } catch {
+                            return '';
+                          }
+                        })()}
                       </span>
                     </div>
                   </div>

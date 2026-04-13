@@ -373,6 +373,14 @@ const getPhotos = () => {
         return;
       }
 
+      if (!user.kycVerified && user.role === "user") {
+        hotToast.error(
+          "Your KYC has not been approved yet. Please complete your KYC verification to book a space.",
+        );
+        navigate("/dashboard/kyc");
+        return;
+      }
+
       setIsProcessing(true);
       try {
         const order = await createPaymentOrder({
@@ -496,13 +504,35 @@ const getPhotos = () => {
           </div>
         </div>
 
-        <button
-          onClick={handleBookNow}
-          disabled={isProcessing}
-          className={`w-full font-bold py-3.5 rounded-[10px] transition-all duration-300 ${isProcessing ? "bg-muted text-muted-foreground cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
-        >
-          {isProcessing ? "Processing Payment..." : `Pay ₹${totalPrice}`}
-        </button>
+        {user && !user.kycVerified && user.role === "user" ? (
+          <div className="bg-amber-50 border border-amber-100 rounded-[10px] p-4 mb-4">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="w-5 h-5 text-amber-600 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-amber-900 mb-1">
+                  KYC Required
+                </p>
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  Your KYC verification is mandatory before booking. Please complete it to continue.
+                </p>
+                <button
+                  onClick={() => navigate("/dashboard/kyc")}
+                  className="mt-2 text-[11px] font-bold text-amber-700 underline"
+                >
+                  Verify Now →
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={handleBookNow}
+            disabled={isProcessing}
+            className={`w-full font-bold py-3.5 rounded-[10px] transition-all duration-300 ${isProcessing ? "bg-muted text-muted-foreground cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+          >
+            {isProcessing ? "Processing Payment..." : `Pay ₹${totalPrice}`}
+          </button>
+        )}
         <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
           <ShieldCheck className="w-3.5 h-3.5" /> Secure Payment via Razorpay
         </div>

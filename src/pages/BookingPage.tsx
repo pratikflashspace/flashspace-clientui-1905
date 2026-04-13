@@ -5,6 +5,8 @@ import {
   ArrowRight,
   Check,
   Shield,
+  ShieldAlert,
+  AlertTriangle,
   Clock,
   Star,
   Building2,
@@ -46,6 +48,7 @@ import {
 import userDashboardService from "@/services/userDashboard.service";
 import { API_CONFIG, API_ENDPOINTS } from "@/config/api.config";
 import axiosInstance from "@/services/api.service";
+import userDashboardService from "@/services/userDashboard.service";
 
 // ============ STEP DEFINITIONS ============
 const STEPS = [
@@ -89,6 +92,10 @@ const BookingPage = () => {
     phone: "",
     company: "",
   });
+
+  // KYC STATE
+  const [kycStatus, setKycStatus] = useState<string | null>(null); // null = loading, 'approved', 'pending', 'in_progress', 'not_started', 'rejected'
+  const [kycLoading, setKycLoading] = useState(true);
 
   // COUPON STATE
   const [couponCode, setCouponCode] = useState("");
@@ -714,6 +721,16 @@ const BookingPage = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Payment initiation error:", error);
+      // Handle KYC-required error from backend
+      if (error?.response?.data?.kycRequired || error?.kycRequired) {
+        toast({
+          title: "KYC Required",
+          description: error?.response?.data?.message || error?.message || "Please complete your KYC verification before booking.",
+          variant: "destructive",
+        });
+        navigate("/dashboard/profile");
+        return;
+      }
       toast({
         title: "Error",
         description: error?.message || "Failed to initiate payment.",
@@ -814,6 +831,16 @@ const BookingPage = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Payment simulation error:", error);
+      // Handle KYC-required error from backend
+      if (error?.response?.data?.kycRequired || error?.kycRequired) {
+        toast({
+          title: "KYC Required",
+          description: error?.response?.data?.message || error?.message || "Please complete your KYC verification before booking.",
+          variant: "destructive",
+        });
+        navigate("/dashboard/profile");
+        return;
+      }
       toast({
         title: "Simulation Failed",
         description: error?.message || "Failed to simulate payment.",
@@ -825,7 +852,7 @@ const BookingPage = () => {
   };
 
   // ============ LOADING / ERROR STATES ============
-  if (loading) {
+  if (loading || kycLoading) {
     return (
       <div className="flex flex-col min-h-screen bg-background text-foreground">
         <Header />
@@ -836,6 +863,8 @@ const BookingPage = () => {
       </div>
     );
   }
+
+
 
   if (error || !spaceDetails || !selectedPlanDetails) {
     return (

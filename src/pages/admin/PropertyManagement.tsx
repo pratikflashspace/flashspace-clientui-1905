@@ -450,19 +450,19 @@ export default function PropertyManagement() {
               </button>
 
               <div className="space-y-1">
-                <h1 className="text-4xl font-black text-gray-900 tracking-tight flex flex-wrap items-baseline gap-x-3">
+                <h1 className="text-4xl font-extrabold text-foreground tracking-tight flex flex-wrap items-baseline gap-x-3">
                   Manage{" "}
-                  <span className="text-teal-500 italic pr-2">
+                  <span className="text-primary italic pr-2">
                     {property.name}
                   </span>
                 </h1>
-                <div className="flex flex-wrap items-center gap-6 text-sm font-semibold text-slate-500">
-                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
-                    <MapPin size={14} className="text-teal-500" />
+                <div className="flex flex-wrap items-center gap-6 text-sm font-semibold text-muted-foreground">
+                  <div className="flex items-center gap-2 bg-muted/30 px-3 py-1.5 rounded-full border border-border">
+                    <MapPin size={14} className="text-primary" />
                     {property.area}, {property.city}
                   </div>
-                  <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
-                    <Building2 size={14} className="text-blue-500" />
+                  <div className="flex items-center gap-2 bg-muted/30 px-3 py-1.5 rounded-full border border-border">
+                    <Building2 size={14} className="text-primary" />
                     {property.address}
                   </div>
                 </div>
@@ -470,11 +470,11 @@ export default function PropertyManagement() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="bg-white p-1 rounded-2xl shadow-inner border border-gray-50 flex gap-1">
-                <button className="px-4 py-2 rounded-xl bg-teal-500 text-white text-xs font-bold shadow-lg shadow-teal-200">
+              <div className="bg-background p-1 rounded-2xl shadow-inner border border-border flex gap-1">
+                <button className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-lg shadow-primary/10">
                   Overview
                 </button>
-                <button className="px-4 py-2 rounded-xl text-slate-400 hover:text-teal-600 text-xs font-bold transition-colors">
+                <button className="px-4 py-2 rounded-xl text-muted-foreground hover:text-primary text-xs font-bold transition-colors">
                   Settings
                 </button>
               </div>
@@ -537,26 +537,32 @@ export default function PropertyManagement() {
               >
                 <div className="flex justify-between items-start gap-4">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       {stat.title}
                     </p>
-                    <p className="text-2xl font-black text-gray-900 break-words leading-tight">
+                    <p className="text-2xl font-black text-foreground break-words leading-tight">
                       {stat.value}
                     </p>
                   </div>
                   <div
-                    className={`p-3 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 group-hover:scale-110 transition-transform shrink-0`}
+                    className={cn(
+                      "p-3 rounded-2xl transition-transform shrink-0",
+                      stat.color === "emerald" || stat.color === "teal" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                    )}
                   >
                     <stat.icon size={20} />
                   </div>
                 </div>
 
                 <div className="mt-auto pt-4">
-                  <p className="text-[11px] font-bold text-slate-500">
+                  <p className="text-[11px] font-bold text-muted-foreground">
                     {stat.subtitle}
                   </p>
                   <div
-                    className={`mt-3 h-1 w-0 group-hover:w-full transition-all duration-500 rounded-full bg-gradient-to-r from-${stat.color}-400 to-${stat.color}-600`}
+                    className={cn(
+                      "mt-3 h-1 w-0 group-hover:w-full transition-all duration-500 rounded-full",
+                      stat.color === "emerald" || stat.color === "teal" ? "bg-primary" : "bg-muted-foreground"
+                    )}
                   ></div>
                 </div>
               </div>
@@ -568,10 +574,10 @@ export default function PropertyManagement() {
         <div className="space-y-8 pt-4">
           <div className="flex items-center justify-between mx-6">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-gray-900">
+              <h2 className="text-2xl font-black text-foreground">
                 Platform Services
               </h2>
-              <p className="text-slate-500 text-sm font-medium">
+              <p className="text-muted-foreground text-sm font-medium">
                 Manage specific inventory categories for this property.
               </p>
             </div>
@@ -586,33 +592,33 @@ export default function PropertyManagement() {
                   onClick={() => setActiveCategory(card.id as SpaceCategory)}
                   className={`relative flex flex-col items-center p-8 rounded-[32px] border-2 transition-all duration-300 group ${
                     isSelected
-                      ? "border-teal-500 bg-teal-50/30 shadow-xl shadow-teal-100/50"
-                      : "border-gray-100 bg-white hover:border-teal-200 hover:bg-gray-50/50"
+                      ? "border-primary bg-primary/5 shadow-xl shadow-primary/5"
+                      : "border-border bg-background hover:border-primary/20 hover:bg-muted/30"
                   }`}
                 >
                   <div
                     className={`p-5 rounded-2xl mb-5 transition-all duration-300 ${
                       isSelected
-                        ? "bg-teal-500 text-white scale-110 shadow-lg shadow-teal-200"
-                        : "bg-gray-100 text-slate-400 group-hover:bg-teal-100 group-hover:text-teal-600"
+                        ? "bg-primary text-primary-foreground scale-110 shadow-lg shadow-primary/20"
+                        : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                     }`}
                   >
                     <card.icon className="w-8 h-8" />
                   </div>
                   <h3
                     className={`text-lg font-bold mb-2 transition-colors ${
-                      isSelected ? "text-teal-600" : "text-gray-900"
+                      isSelected ? "text-primary" : "text-foreground"
                     }`}
                   >
                     {card.label}
                   </h3>
-                  <p className="text-xs text-center text-slate-500 leading-relaxed font-medium">
+                  <p className="text-xs text-center text-muted-foreground leading-relaxed font-medium">
                     {card.desc}
                   </p>
 
                   {isSelected && (
-                    <div className="absolute top-6 right-6 text-teal-500 animate-in zoom-in duration-300">
-                      <CheckCircle2 className="w-6 h-6 fill-white" />
+                    <div className="absolute top-6 right-6 text-primary animate-in zoom-in duration-300">
+                      <CheckCircle2 className="w-6 h-6 fill-background" />
                     </div>
                   )}
                 </button>

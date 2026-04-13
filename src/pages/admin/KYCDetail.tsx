@@ -50,6 +50,12 @@ export default function KYCDetail() {
     return `${API_CONFIG.BASE_URL}${cleanPath}`;
   };
 
+  const truncateFileName = (name: string, maxLength: number = 25) => {
+    if (!name) return "";
+    if (name.length <= maxLength) return name;
+    return name.substring(0, maxLength) + "...";
+  };
+
   const renderPreview = (doc: any) => {
     if (!doc?.fileUrl) return null;
     const url = getFullFileUrl(doc.fileUrl);
@@ -260,7 +266,7 @@ export default function KYCDetail() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
-                KYC <span className="text-teal-500 italic">Verification</span>
+                KYC <span className="text-[#35503F] italic">Verification</span>
               </h1>
               <p className="text-gray-500 mt-2 text-sm md:text-base">
                 Review all details, documents, and take an approval decision.
@@ -531,7 +537,10 @@ export default function KYCDetail() {
                               className="font-bold text-gray-900 capitalize truncate text-sm md:text-base"
                               title={doc.name || doc.type.replace(/_/g, " ")}
                             >
-                              {doc.name || doc.type.replace(/_/g, " ")}
+                              {truncateFileName(
+                                doc.name || doc.type.replace(/_/g, " "),
+                                20,
+                              )}
                             </h4>
                             <p className="text-xs text-gray-400 truncate mt-0.5">
                               {doc.fileUrl?.split("/").pop()}

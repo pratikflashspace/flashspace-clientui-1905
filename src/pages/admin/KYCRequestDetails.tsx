@@ -49,6 +49,12 @@ const isVideoFile = (url?: string) => {
   return ["mp4", "webm", "mov", "avi", "mkv"].includes(ext);
 };
 
+const truncateFileName = (name: string, maxLength: number = 25) => {
+  if (!name) return "";
+  if (name.length <= maxLength) return name;
+  return name.substring(0, maxLength) + "...";
+};
+
 const getStatusBadge = (status: string) => {
   const config: Record<string, { bg: string; text: string; icon: any }> = {
     pending: { bg: "bg-yellow-100", text: "text-yellow-700", icon: Clock },
@@ -429,11 +435,17 @@ export default function KYCRequestDetails() {
                         <FileText className="w-4 h-4 text-blue-600" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-800 capitalize truncate">
-                          {doc.type}
+                        <p
+                          className="text-sm font-medium text-gray-800 capitalize"
+                          title={doc.type}
+                        >
+                          {truncateFileName(doc.type, 20)}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {doc.name}
+                        <p
+                          className="text-xs text-gray-500"
+                          title={doc.name}
+                        >
+                          {truncateFileName(doc.name || "", 30)}
                         </p>
                       </div>
                     </div>

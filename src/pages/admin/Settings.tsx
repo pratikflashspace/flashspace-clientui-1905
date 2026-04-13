@@ -88,56 +88,55 @@ export default function AdminSettings() {
 
   const renderAccountTab = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-100/50">
+      <div className="bg-background p-6 md:p-8 rounded-[32px] border border-border shadow-xl shadow-muted/50">
         <div className="flex items-center gap-4 mb-8">
-          <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl">
+          <div className="p-3 bg-primary/10 text-primary rounded-2xl">
             <User className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Profile Information</h3>
-            {/* <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-0.5">Global Admin Profile</p> */}
+            <h3 className="text-xl font-bold text-foreground">Profile Information</h3>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">
               First Name
             </label>
             <input
               disabled
               value={user?.firstName || ""}
-              className="w-full px-5 py-3 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-500 font-bold text-sm"
+              className="w-full px-5 py-3 bg-muted/30 border-2 border-transparent rounded-2xl text-muted-foreground font-bold text-sm cursor-not-allowed"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">
               Last Name
             </label>
             <input
               disabled
               value={user?.lastName || ""}
-              className="w-full px-5 py-3 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-500 font-bold text-sm"
+              className="w-full px-5 py-3 bg-muted/30 border-2 border-transparent rounded-2xl text-muted-foreground font-bold text-sm cursor-not-allowed"
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">
               Email Address
             </label>
             <input
               disabled
               value={user?.email || ""}
-              className="w-full px-5 py-3 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-500 font-bold text-sm"
+              className="w-full px-5 py-3 bg-muted/30 border-2 border-transparent rounded-2xl text-muted-foreground font-bold text-sm cursor-not-allowed"
             />
-            <p className="text-[10px] text-gray-400 font-bold ml-1 flex items-center gap-1.5 mt-2">
+            <p className="text-[10px] text-muted-foreground/60 font-bold ml-1 flex items-center gap-1.5 mt-2">
               <Mail className="w-3 h-3" />
               Contact support to update your global ID.
             </p>
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Current Role</label>
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Current Role</label>
             <div className="flex">
-              <div className="inline-flex px-6 py-2 rounded-xl bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest">
+              <div className="inline-flex px-6 py-2 rounded-xl bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest">
                 <Shield className="w-3 h-3 mr-2" />
                 {user?.role || "Admin"}
               </div>
@@ -157,7 +156,7 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        <p className="text-sm text-gray-500 mb-6 font-medium leading-relaxed">
+        <p className="text-sm text-muted-foreground mb-6 font-medium leading-relaxed">
           Sign out of your administrative session on this device. This will end all current platform operations for this account.
         </p>
 
@@ -174,20 +173,20 @@ export default function AdminSettings() {
 
   const renderSecurityTab = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-100/50">
+      <div className="bg-background p-6 md:p-8 rounded-[32px] border border-border shadow-xl shadow-muted/50">
         <div className="flex items-center gap-4 mb-10">
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
+          <div className="p-3 bg-primary/10 text-primary rounded-2xl">
             <Lock className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900 tracking-tight">Change Password</h3>
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-0.5">Secure Credentials</p>
+            <h3 className="text-xl font-bold text-foreground tracking-tight">Change Password</h3>
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mt-0.5">Secure Credentials</p>
           </div>
         </div>
 
         <form onSubmit={handlePasswordChange} className="space-y-6 max-w-lg">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">
               Current Password
             </label>
             <div className="relative group">
@@ -200,7 +199,7 @@ export default function AdminSettings() {
                     currentPassword: e.target.value,
                   }))
                 }
-                className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-black/5 focus:ring-4 focus:ring-black/5 outline-none transition-all font-bold text-sm h-14"
+                className="w-full px-6 py-4 bg-muted/30 border-2 border-transparent rounded-[20px] focus:bg-background focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-sm h-14 text-foreground"
                 placeholder="••••••••"
                 required
               />
@@ -212,7 +211,7 @@ export default function AdminSettings() {
                     current: !prev.current,
                   }))
                 }
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-black transition-colors"
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-primary transition-colors"
               >
                 {showPasswords.current ? (
                   <EyeOff className="w-5 h-5" />
@@ -225,7 +224,7 @@ export default function AdminSettings() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">
                 New Password
               </label>
               <div className="relative group">
@@ -238,7 +237,7 @@ export default function AdminSettings() {
                       newPassword: e.target.value,
                     }))
                   }
-                  className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-black/5 focus:ring-4 focus:ring-black/5 outline-none transition-all font-bold text-sm h-14"
+                  className="w-full px-6 py-4 bg-muted/30 border-2 border-transparent rounded-[20px] focus:bg-background focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-sm h-14 text-foreground"
                   placeholder="••••••••"
                   minLength={6}
                   required
@@ -248,7 +247,7 @@ export default function AdminSettings() {
                   onClick={() =>
                     setShowPasswords((prev) => ({ ...prev, new: !prev.new }))
                   }
-                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-black transition-colors"
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-primary transition-colors"
                 >
                   {showPasswords.new ? (
                     <EyeOff className="w-5 h-5" />
@@ -260,7 +259,7 @@ export default function AdminSettings() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">
                 Confirm New Password
               </label>
               <div className="relative group">
@@ -273,7 +272,7 @@ export default function AdminSettings() {
                       confirmPassword: e.target.value,
                     }))
                   }
-                  className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-black/5 focus:ring-4 focus:ring-black/5 outline-none transition-all font-bold text-sm h-14"
+                  className="w-full px-6 py-4 bg-muted/30 border-2 border-transparent rounded-[20px] focus:bg-background focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-sm h-14 text-foreground"
                   placeholder="••••••••"
                   required
                 />
@@ -285,7 +284,7 @@ export default function AdminSettings() {
                       confirm: !prev.confirm,
                     }))
                   }
-                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-black transition-colors"
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-primary transition-colors"
                 >
                   {showPasswords.confirm ? (
                     <EyeOff className="w-5 h-5" />
@@ -301,7 +300,7 @@ export default function AdminSettings() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full sm:w-auto px-10 py-4 bg-gray-900 text-white rounded-2xl hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed transition-all font-black text-[10px] uppercase tracking-widest shadow-xl shadow-gray-900/10 hover:shadow-gray-900/20 hover:-translate-y-0.5 flex items-center justify-center gap-3"
+              className="w-full sm:w-auto px-10 py-4 bg-primary text-primary-foreground rounded-2xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/10 hover:shadow-primary/20 hover:-translate-y-0.5 flex items-center justify-center gap-3"
             >
               {isLoading ? (
                 <>
@@ -323,14 +322,14 @@ export default function AdminSettings() {
 
   const renderNotificationsTab = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-xl shadow-gray-100/50">
+      <div className="bg-background p-6 md:p-8 rounded-[32px] border border-border shadow-xl shadow-muted/50">
         <div className="flex items-center gap-4 mb-10">
-          <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">
+          <div className="p-3 bg-primary/10 text-primary rounded-2xl">
             <Bell className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900 tracking-tight">Notification Preferences</h3>
-            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-0.5">Alert Configuration</p>
+            <h3 className="text-xl font-bold text-foreground tracking-tight">Notification Preferences</h3>
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mt-0.5">Alert Configuration</p>
           </div>
         </div>
 
@@ -342,17 +341,17 @@ export default function AdminSettings() {
           ].map((item) => (
             <div key={item.id} className="flex items-center justify-between gap-6">
               <div className="space-y-1">
-                <div className="font-extrabold text-gray-900 flex items-center gap-2.5">
-                  <item.icon className="w-4 h-4 text-gray-400" />
+                <div className="font-extrabold text-foreground flex items-center gap-2.5">
+                  <item.icon className="w-4 h-4 text-muted-foreground" />
                   {item.label}
                 </div>
-                <p className="text-sm text-gray-500 font-medium leading-relaxed max-w-md">
+                <p className="text-sm text-muted-foreground font-medium leading-relaxed max-w-md">
                   {item.desc}
                 </p>
               </div>
               <button
                 onClick={() => toggleNotification(item.id as any)}
-                className={`w-14 h-7 rounded-full transition-all relative shrink-0 ${notifications[item.id as keyof typeof notifications] ? "bg-black shadow-lg shadow-black/10" : "bg-gray-100"}`}
+                className={`w-14 h-7 rounded-full transition-all relative shrink-0 ${notifications[item.id as keyof typeof notifications] ? "bg-primary shadow-lg shadow-primary/10" : "bg-muted"}`}
               >
                 <span
                   className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${notifications[item.id as keyof typeof notifications] ? "translate-x-7" : "translate-x-0"}`}
@@ -373,17 +372,17 @@ export default function AdminSettings() {
     >
       <div className="space-y-8 animate-in fade-in duration-500">
         <div className="space-y-2">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight font-[Poppins]">
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
             Settings
           </h1>
-          <p className="text-sm md:text-base text-gray-500 font-medium max-w-2xl">
+          <p className="text-sm md:text-base text-muted-foreground font-medium max-w-2xl">
             Manage your account and platform preferences.
           </p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Sidebar Navigation - Responsive */}
-          <div className="w-full lg:w-72 flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 no-scrollbar sticky top-0 bg-gray-50 lg:bg-transparent z-10 -mx-4 px-4 lg:mx-0 lg:px-0">
+          <div className="w-full lg:w-72 flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 no-scrollbar sticky top-0 bg-muted/10 lg:bg-transparent z-10 -mx-4 px-4 lg:mx-0 lg:px-0">
             {[
               { id: "account", label: "Account", icon: User },
               { id: "security", label: "Security", icon: Shield },
@@ -393,8 +392,8 @@ export default function AdminSettings() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-3 px-6 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap lg:w-full border-2 ${activeTab === tab.id
-                    ? "bg-gray-900 text-white shadow-xl shadow-gray-900/10 border-transparent"
-                    : "bg-white text-gray-400 hover:text-gray-900 border-gray-50 hover:border-gray-100"
+                    ? "bg-primary text-primary-foreground shadow-xl shadow-primary/10 border-transparent"
+                    : "bg-background text-muted-foreground hover:text-foreground border-border hover:border-primary/20"
                   }`}
               >
                 <tab.icon className="w-4 h-4" />

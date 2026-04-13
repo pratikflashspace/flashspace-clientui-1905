@@ -327,58 +327,69 @@ export default function Support() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="mb-8 pl-1">
-          <h1 className="text-3xl font-extrabold  text-[#35503F]">
-            Help & <span className="text-[#35503F] italic">Support</span>
-          </h1>
-          <p className="text-gray-500 mt-2">Get help with your virtual office and coworking services</p>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
+              Help & <span className="text-primary italic">Support</span>
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 font-medium">
+              Get help with your virtual office and coworking services
+            </p>
+          </div>
+          <button
+            onClick={() => setActiveTab("contact")}
+            className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
+          >
+            <Send className="w-4 h-4" />
+            Send Message
+          </button>
         </div>
 
-        {/* Quick Contact Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Quick Contact Cards Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {contactOptions.map((option, idx) => (
             <a
               key={idx}
               href={option.action}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#35503F]/30 transition-all group"
+              className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md group relative overflow-hidden"
             >
-              <div className={`w-12 h-12 rounded-xl ${option.color} flex items-center justify-center mb-4`}>
-                <option.icon className="w-6 h-6" />
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#35503F]/5 rounded-bl-full -mr-12 -mt-12 transition-transform group-hover:scale-110" />
+              <div className={`w-14 h-14 rounded-2xl ${option.color} flex items-center justify-center mb-6`}>
+                <option.icon className="w-7 h-7" />
               </div>
-              <h3 className="font-semibold text-gray-900 mb-1">{option.title}</h3>
-              <p className="text-sm text-gray-500 mb-2">{option.description}</p>
-              <p className="text-sm font-medium text-[#35503F] group-hover:text-[#35503F]/80 flex items-center gap-1">
+              <h3 className="text-xl font-bold text-[#35503F] mb-1">{option.title}</h3>
+              <p className="text-sm text-gray-500 font-medium mb-4">{option.description}</p>
+              <div className="flex items-center gap-2 text-[#35503F] font-extrabold group-hover:gap-3 transition-all">
                 {option.value}
-                <ExternalLink className="w-3 h-3" />
-              </p>
+                <ExternalLink className="w-4 h-4" />
+              </div>
             </a>
           ))}
         </div>
 
-        {/* Tabs */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-1">
-          <div className="flex gap-1">
-            {[
-              { id: "help", label: "Help Center", icon: HelpCircle },
-              { id: "tickets", label: "My Tickets", icon: FileText },
-              { id: "contact", label: "Contact Form", icon: Send },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                  ? "bg-[#35503F] text-[#FEF8C3]"
-                  : "text-gray-600 hover:bg-gray-100"
-                  }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{tab.label}</span>
-              </button>
-            ))}
-          </div>
+        {/* Navigation Tabs */}
+        <div className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 w-fit max-w-full overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
+          {[
+            { id: "help", label: "Help Center", icon: HelpCircle },
+            { id: "tickets", label: "My Tickets", icon: FileText },
+            { id: "contact", label: "Contact Form", icon: Send },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                activeTab === tab.id
+                  ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Help Center Tab */}
