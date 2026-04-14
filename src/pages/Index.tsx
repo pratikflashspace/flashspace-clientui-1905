@@ -11,6 +11,8 @@ import Footer from "@/components/Footer";
 import { TrustedByFilmstrip } from "@/components/sections/TrustedByFilmstrip";
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
+import { useRegion } from "@/contexts/RegionContext";
+import { UAELanding } from "./regional/UAELanding";
 
 const FadeInSection = ({
   children,
@@ -35,6 +37,13 @@ interface IndexProps {
 }
 
 const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
+  const { region } = useRegion();
+
+  // Completely different frontend for UAE
+  if (region === "AE") {
+    return <UAELanding />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col scroll-smooth relative w-full">
       <Header openLogin={openLogin} openSignup={openSignup} />
