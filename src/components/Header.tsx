@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 // import ModernFlairButton from "@/components/ui/ModernFlairButton";
@@ -27,6 +28,7 @@ import { LoginModal } from "@/components/auth/LoginModal";
 import { SignupModal } from "@/components/auth/SignupModal";
 import { PartnerChoiceModal } from "@/components/auth/PartnerChoiceModal";
 import { GetInTouchModal } from "@/components/modals/GetInTouchModal";
+import { RegionSwitcher } from "@/components/RegionSwitcher";
 
 interface HeaderProps {
     forceWhiteBackground?: boolean;
@@ -37,6 +39,7 @@ interface HeaderProps {
 }
 
 const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = false, openLogin = false, openSignup = false }: HeaderProps): ReactNode => {
+    const { t } = useTranslation();
     const { darkMode, toggleDarkMode } = useDarkMode();
     const navigate = useNavigate();
     const location = useLocation();
@@ -203,7 +206,10 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
         <>
             <header
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 bg-white dark:bg-[#0a0a0a] border-b border-border dark:border-white/10 shadow-sm py-1"
+                    "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 py-1",
+                    (scrolled || forceWhiteBackground) 
+                        ? "bg-white dark:bg-[#0a0a0a] border-b border-border dark:border-white/10 shadow-sm" 
+                        : "bg-transparent border-transparent"
                 )}
                 style={{ fontFamily: "'Inter Tight', sans-serif", fontWeight: 500 }}
             >
@@ -238,11 +244,11 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                     onMouseEnter={() => setIsSolutionsOpen(true)}
                                     className={cn(
                                         "flex items-center gap-1.5 text-sm font-medium transition-all duration-300 py-2 px-4 rounded-xl hover:bg-black/10 dark:hover:bg-white/5 hover:shadow-[0_8px_30px_rgba(51,77,61,0.12)]",
-                                        scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white",
+                                        (scrolled || forceWhiteBackground) ? "text-[#164e4e] dark:text-white" : (lightText ? "text-white" : "text-[#164e4e] dark:text-white"),
                                         "hover:text-[#2D3F33] dark:hover:text-[#FDE68A]"
                                     )}
                                 >
-                                    Solutions
+                                    {t('nav.solutions')}
                                     <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isSolutionsOpen && "rotate-180")} />
                                 </button>
 
@@ -274,10 +280,10 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 onClick={() => handleNavigation("/services/virtual-office")}
                                 className={cn(
                                     "text-sm font-medium transition-all duration-300 py-2 px-4 rounded-xl hover:bg-black/10 dark:hover:bg-white/5 hover:shadow-[0_8px_30px_rgba(51,77,61,0.12)]",
-                                    scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white"
+                                    (scrolled || forceWhiteBackground) ? "text-[#164e4e] dark:text-white" : (lightText ? "text-white" : "text-[#164e4e] dark:text-white")
                                 )}
                             >
-                                Workspaces
+                                {t('nav.workspaces')}
                             </button>
 
                             {/* Partner with Us */}
@@ -285,15 +291,16 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 onClick={() => handleNavigation("/partner")}
                                 className={cn(
                                     "text-sm font-medium transition-all duration-300 py-2 px-4 rounded-xl hover:bg-black/10 dark:hover:bg-white/5 hover:shadow-[0_8px_30px_rgba(51,77,61,0.12)]",
-                                    scrolled || forceWhiteBackground ? "text-[#164e4e] dark:text-white" : "text-[#164e4e] dark:text-white"
+                                    (scrolled || forceWhiteBackground) ? "text-[#164e4e] dark:text-white" : (lightText ? "text-white" : "text-[#164e4e] dark:text-white")
                                 )}
                             >
-                                Partner with Us
+                                {t('nav.partner')}
                             </button>
                         </nav>
 
                         {/* RIGHT: Actions */}
                         <div className="flex items-center gap-2 md:gap-3">
+                            <RegionSwitcher />
                             <div
                                 onClick={() => setIsContactOpen(true)}
                                 className="inline-flex group px-4 sm:px-6 py-2 sm:py-2.5 bg-[#2D3F33] text-[#FDE68A] cursor-pointer hover:scale-95 text-xs sm:text-sm font-medium rounded-xl sm:rounded-2xl transition-all duration-300 hover:bg-[#344C3D] shadow-md hover:shadow-lg active:scale-95 overflow-hidden border-none"
