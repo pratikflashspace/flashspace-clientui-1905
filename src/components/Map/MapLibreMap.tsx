@@ -230,6 +230,8 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
         style: MAP_STYLES[currentStyle].url,
         center: [center.lng, center.lat],
         zoom: zoom,
+        minZoom: 4, // Never show whole world
+        maxZoom: 20,
         scrollZoom: true,
         dragRotate: false,
         touchZoomRotate: true,
@@ -605,6 +607,13 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
             maxZoom: 16.5,
             duration: 1200
           });
+          
+          // If the markers are so far apart that we zoomed out to see full India (zoom < 5),
+          // focus back on the center point instead.
+          const currentZoom = map.current?.getZoom() || 0;
+          if (currentZoom < 6) {
+             map.current?.flyTo({ center: [center.lng, center.lat], zoom: 11, duration: 1000 });
+          }
         });
       }
     }
