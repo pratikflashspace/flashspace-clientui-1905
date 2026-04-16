@@ -170,11 +170,25 @@ const SupportTickets = () => {
         }
     };
 
+
     const filteredTickets = tickets.filter(
         (ticket) =>
             ticket.ticketNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             ticket.subject.toLowerCase().includes(searchQuery.toLowerCase()),
     );
+
+    // Helper to show assignee name and role
+    const renderAssignee = (assignee) => {
+        if (!assignee) return <span className="text-gray-400">Unassigned</span>;
+        return (
+            <span>
+                {assignee.fullName}
+                {assignee.role && (
+                    <span className="text-xs text-gray-400 ml-1">({assignee.role})</span>
+                )}
+            </span>
+        );
+    };
 
     if (selectedTicket) {
         return (
@@ -224,7 +238,7 @@ const SupportTickets = () => {
                 </div>
 
                 {/* Reply Interface */}
-                {selectedTicket.status !== "closed" && selectedTicket.status !== "resolved" ? (
+                {selectedTicket.status !== "closed" && selectedTicket.status !== "resolved" && (
                     <div className="bg-[#f9fafb] rounded-[1.5rem] p-2 ring-1 ring-black/5 flex items-end gap-2 focus-within:ring-2 focus-within:ring-[#2d5a4c]/20 focus-within:bg-white transition-all">
                         <textarea
                             value={replyMessage}
@@ -239,19 +253,7 @@ const SupportTickets = () => {
                                 }
                             }}
                         />
-                        <Button
-                            onClick={handleReply}
-                            disabled={submitting || !replyMessage.trim()}
-                            className="bg-[#2d5a4c] text-white hover:bg-[#1a3a3a] rounded-xl h-11 px-6 shadow-lg shadow-[#2d5a4c]/10"
-                        >
-                            {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                        </Button>
-                    </div>
-                ) : (
-                    <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 md:p-6 text-center border border-gray-100">
-                        <CheckCircle2 className="w-8 h-8 md:w-10 md:h-10 text-gray-400 mx-auto mb-3" />
-                        <p className="text-gray-600 font-medium">This ticket has been {selectedTicket.status === "resolved" ? "resolved" : "closed"}.</p>
-                        <p className="text-sm text-gray-400 mt-1">Please create a new ticket if you need further assistance.</p>
+                        {/* ...other reply UI elements if any... */}
                     </div>
                 )}
             </div>
@@ -259,70 +261,69 @@ const SupportTickets = () => {
     }
 
     return (
-        <div className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden animate-in fade-in duration-500">
+        <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             {showNewTicket ? (
-                <div className="p-6 md:p-8 animate-in slide-in-from-bottom-4 duration-300">
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h3 className="text-xl font-bold text-gray-900">Create New Ticket</h3>
-                            <p className="text-sm text-gray-500 mt-1">We're here to help! Please describe your issue.</p>
-                        </div>
-                        <Button variant="ghost" className="text-gray-400 hover:text-gray-600" onClick={() => setShowNewTicket(false)}>
-                            Cancel
-                        </Button>
-                    </div>
+                <div className="p-6 md:p-8">
+                    <button
+                        onClick={() => setShowNewTicket(false)}
+                        className="flex items-center gap-2 text-[#6b7280] hover:text-[#2d5a4c] mb-6 transition-colors font-bold text-sm"
+                    >
+                        <ArrowLeft className="w-4 h-4" /> Back to Tickets
+                    </button>
 
                     {submitted ? (
-                        <div className="text-center py-12 bg-[#f2faf9] rounded-2xl border border-[#5bb09c]/20">
-                            <CheckCircle2 className="w-16 h-16 text-[#5bb09c] mx-auto mb-4" />
-                            <h4 className="text-xl font-bold text-gray-900 mb-2">Ticket Submitted Successfully!</h4>
-                            <p className="text-gray-500">Our support team has been notified and will respond shortly.</p>
+                        <div className="text-center py-16">
+                            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100">
+                                <CheckCircle2 className="w-8 h-8 text-green-500" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Ticket Submitted!</h3>
+                            <p className="text-sm text-gray-500">We'll get back to you shortly.</p>
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700">Subject</label>
-                                    <Input
-                                        required
-                                        value={formData.subject}
-                                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                        placeholder="Brief description of the issue"
-                                        className="h-12 bg-gray-50 border-gray-200 focus:bg-white focus:border-[#5bb09c]"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700">Category</label>
-                                    <select
-                                        required
-                                        value={formData.category}
-                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full h-12 px-4 rounded-xl bg-gray-50 border border-gray-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#2d5a4c]/10 focus:border-[#2d5a4c] transition-colors appearance-none"
-                                    >
-                                        <option value="">Select Category</option>
-                                        <option value="billing">Commissions & Payouts</option>
-                                        <option value="technical">Platform Issue</option>
-                                        <option value="leads">Lead Tracking</option>
-                                        <option value="other">Other Inquiry</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-bold text-gray-700">Description</label>
-                                <textarea
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Subject</label>
+                                <Input
                                     required
-                                    rows={6}
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5bb09c]/20 focus:bg-white focus:border-[#5bb09c] transition-colors resize-none"
-                                    placeholder="Please provide as much detail as possible..."
+                                    value={formData.subject}
+                                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                                    placeholder="Brief summary of your issue"
+                                    className="h-12 rounded-xl"
                                 />
                             </div>
-                            <div className="flex justify-end pt-2">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
+                                <select
+                                    required
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    className="w-full h-12 rounded-xl border border-gray-200 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#5bb09c]/50"
+                                >
+                                    <option value="">Select a category</option>
+                                    <option value="billing">Billing</option>
+                                    <option value="technical">Technical</option>
+                                    <option value="booking">Booking</option>
+                                    <option value="general">General</option>
+                                    <option value="leads">Leads</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                                <textarea
+                                    required
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="Describe your issue in detail..."
+                                    rows={5}
+                                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#5bb09c]/50 resize-none"
+                                />
+                            </div>
+                            <div className="flex justify-end">
                                 <Button
                                     type="submit"
-                                    disabled={submitting || formData.description.length < 10}
-                                    className="bg-[#2d5a4c] text-white hover:bg-[#1a3a3a] h-14 px-10 rounded-2xl shadow-xl shadow-[#2d5a4c]/20 w-full md:w-auto text-base font-black"
+                                    disabled={submitting}
+                                    className="bg-[#2d5a4c] text-white hover:bg-[#1a3a3a] h-12 px-8 rounded-xl font-black"
                                 >
                                     {submitting ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                                     {submitting ? "Submitting..." : "Submit Ticket"}
@@ -409,4 +410,3 @@ const SupportTickets = () => {
 };
 
 export default SupportTickets;
-

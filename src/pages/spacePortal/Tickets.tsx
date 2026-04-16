@@ -18,7 +18,6 @@ export default function Tickets() {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [priorityFilter, setPriorityFilter] = useState("ALL");
   const { socket } = useSocket();
 
   const fetchTickets = useCallback(async (silent = false) => {
@@ -65,16 +64,14 @@ export default function Tickets() {
       const matchesQuery =
         t.subject.toLowerCase().includes(q) ||
         t.ticketNumber.toLowerCase().includes(q) ||
-        t.user?.fullName.toLowerCase().includes(q);
+        (t.user?.fullName || "").toLowerCase().includes(q);
 
       const matchesStatus =
-        statusFilter === "ALL" ? true : t.status === statusFilter;
-      const matchesPriority =
-        priorityFilter === "ALL" ? true : t.priority === priorityFilter;
+        statusFilter === "ALL" ? true : t.status.toLowerCase() === statusFilter.toLowerCase();
 
-      return matchesQuery && matchesStatus && matchesPriority;
+      return matchesQuery && matchesStatus;
     });
-  }, [tickets, query, statusFilter, priorityFilter]);
+  }, [tickets, query, statusFilter]);
 
   if (loading) {
     return (
@@ -122,17 +119,6 @@ export default function Tickets() {
               { label: "Closed", value: "CLOSED" },
             ]}
           />
-          <SelectBox
-            value={priorityFilter}
-            onChange={setPriorityFilter}
-            options={[
-              { label: "All Priority", value: "ALL" },
-              { label: "Low", value: "LOW" },
-              { label: "Medium", value: "MEDIUM" },
-              { label: "High", value: "HIGH" },
-              { label: "Urgent", value: "URGENT" },
-            ]}
-          />
         </div>
       </div>
 
@@ -147,9 +133,6 @@ export default function Tickets() {
                 </th>
                 <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
                   Client
-                </th>
-                <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
-                  Priority
                 </th>
                 <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
                   Date
@@ -200,9 +183,6 @@ export default function Tickets() {
                         </span>
                       </div>
                     </td>
-                    <td className="p-4">
-                      <PriorityBadge priority={ticket.priority} />
-                    </td>
                     <td className="p-4 text-xs font-medium text-muted-foreground whitespace-nowrap">
                       {format(new Date(ticket.createdAt), "MMM d, yyyy")}
                     </td>
@@ -238,24 +218,7 @@ export default function Tickets() {
   );
 }
 
-function PriorityBadge({ priority }: { priority: string }) {
-  const p = priority?.toLowerCase();
-  const styles =
-    {
-      urgent: "bg-rose-100 text-rose-700",
-      high: "bg-orange-100 text-orange-700",
-      medium: "bg-amber-100 text-amber-700",
-      low: "bg-slate-100 text-slate-700",
-    }[p] || "bg-slate-100 text-slate-700";
 
-  return (
-    <Badge
-      className={`${styles} border-none font-extrabold text-[10px] uppercase px-2 py-0.5 rounded-full`}
-    >
-      {priority}
-    </Badge>
-  );
-}
 
 function StatusBadge({ status }: { status: string }) {
   const s = status?.toLowerCase();

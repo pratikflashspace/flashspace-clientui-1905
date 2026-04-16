@@ -1,294 +1,635 @@
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  MessageSquare,
-  CheckCircle,
-  Send,
+import React, { useState, useEffect, useRef } from "react";
+import { format } from "date-fns";
+import { 
+  Send, 
+  X, 
+  Phone, 
+  Mail, 
+  Calendar, 
+  ChevronDown,
+  UserCheck,
+  CheckCircle2,
   AlertCircle,
-  User,
-  Clock,
+  XCircle,
   ArrowUpRight,
+  Lock
 } from "lucide-react";
-import { AdminTicketData } from "@/services/admin.service";
-
-interface TicketViewModalProps {
-  ticket: AdminTicketData | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  handleAssignTicket: (ticketId: string) => void;
-  handleResolveTicket: (ticketId: string) => void;
-  handleEscalateTicket: (ticketId: string) => void;
-  handleCloseTicket: (ticketId: string) => void;
-  handleReply: (ticketId: string, message: string) => Promise<void>;
-}
 
 export const TicketViewModal = ({
   ticket,
   open,
   onOpenChange,
+  staffMembers,
   handleAssignTicket,
   handleResolveTicket,
   handleEscalateTicket,
   handleCloseTicket,
   handleReply,
-}: TicketViewModalProps) => {
+}: any) => {
   const [replyMessage, setReplyMessage] = useState("");
+  const [selectedAssignee, setSelectedAssignee] = useState(ticket?.assignee?._id || ticket?.assignee?.id || ticket?.assignee || "");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  if (!ticket) return null;
+  useEffect(() => {
+    setSelectedAssignee(ticket?.assignee?._id || ticket?.assignee?.id || ticket?.assignee || "");
+  }, [ticket]);
 
-  const getStatusStyle = (status: string) => {
-    if (!status) return "bg-gray-50 text-gray-600 border-gray-100";
-    switch (status.toLowerCase()) {
-      case "open":
-        return "bg-white border-gray-200 text-gray-700";
-      case "in_progress":
-        return "bg-blue-50 text-blue-600 border-blue-100";
-      case "escalated":
-        return "bg-orange-50 text-orange-600 border-orange-100";
-      case "resolved":
-        return "bg-green-50 text-green-600 border-green-100";
-      case "closed":
-        return "bg-gray-50 text-gray-600 border-gray-100";
-      default:
-        return "bg-gray-50 text-gray-600 border-gray-100";
+  // Auto-scroll to bottom of conversation
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  };
+  }, [ticket?.messages, open]);
 
-  const formatStatus = (status: string) => {
-    if (!status) return "Unknown";
-    switch (status.toLowerCase()) {
-      case "in_progress":
-        return "In Progress";
-      case "escalated":
-        return "Escalated";
-      case "open":
-        return "Open";
-      case "resolved":
-        return "Resolved";
-      case "closed":
-        return "Closed";
-      default:
-        return status
-          .split("_")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ");
-    }
-  };
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (isDropdownOpen && !event.target.closest('.assignment-dropdown')) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen]);
 
-  const formatCategory = (category: string) => {
-    if (!category) return "General";
-    return category
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
+  if (!open) return null;
 
-  const submitReply = async () => {
-    if (!replyMessage.trim()) return;
-    await handleReply(ticket._id, replyMessage);
+  const isReadOnly = ["resolved", "closed"].includes(ticket?.status?.toLowerCase());
+
+  const submitReply = () => {
+    if (isReadOnly || !replyMessage.trim() || !ticket?._id) return;
+    handleReply(ticket._id, replyMessage);
     setReplyMessage("");
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl bg-white rounded-3xl border border-gray-100 shadow-2xl overflow-hidden min-h-[200px]">
-        <DialogHeader className="px-4 md:px-6 py-5 border-b border-gray-100">
-          <div>
-            <DialogTitle className="text-xl md:text-2xl font-bold text-gray-900 pr-10">
-              {ticket.subject}
-            </DialogTitle>
-            <p className="text-xs md:text-sm text-gray-500 mt-1">{ticket.ticketNumber}</p>
-          </div>
-        </DialogHeader>
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "open": return "#3b82f6";
+      case "in_progress": return "#f59e0b";
+      case "resolved": return "#10b981";
+      case "escalated": return "#ef4444";
+      case "closed": return "#6b7280";
+      default: return "#6b7280";
+    }
+  };
 
-        <div className="p-4 md:p-6 max-h-[80vh] md:max-h-[70vh] overflow-y-auto">
-          {/* Ticket Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-            <div className="bg-gray-50 p-3 md:p-4 rounded-xl">
-              <p className="text-xs md:text-sm text-gray-500 uppercase font-bold tracking-wider">Client</p>
-              <p className="font-semibold text-sm md:text-base">
-                {ticket.user?.fullName || "Unknown"}
-              </p>
-              <p className="text-[10px] md:text-xs text-gray-400 truncate">{ticket.user?.email}</p>
-            </div>
-            <div className="bg-gray-50 p-3 md:p-4 rounded-xl">
-              <p className="text-xs md:text-sm text-gray-500 uppercase font-bold tracking-wider">Status</p>
-              <div className="mt-1">
-                <span
-                  className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] md:text-xs font-bold ${getStatusStyle(ticket.status)}`}
-                >
-                  {formatStatus(ticket.status)}
-                </span>
+  return (
+    <div style={{
+      position: 'fixed',
+      inset: 0,
+      backgroundColor: 'rgba(0,0,0,0.65)',
+      backdropFilter: 'blur(12px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 99999,
+      padding: '20px'
+    }} onClick={() => onOpenChange(false)}>
+      <div style={{
+        backgroundColor: '#fff',
+        width: '100%',
+        maxWidth: '1100px',
+        height: '90vh',
+        borderRadius: '40px',
+        display: 'flex',
+        overflow: 'hidden',
+        boxShadow: '0 30px 60px -12px rgba(0,0,0,0.4)',
+        color: '#111827',
+        border: '1px solid rgba(255,255,255,0.2)'
+      }} onClick={(e) => e.stopPropagation()}>
+        
+        {/* Detail Sidebar */}
+        <div style={{
+          width: '340px',
+          borderRight: '1px solid #f1f5f9',
+          backgroundColor: '#fafafa',
+          display: 'flex',
+          flexDirection: 'column',
+          overflowY: 'auto'
+        }}>
+          <div style={{ padding: '40px 28px' }}>
+            {/* Customer Info Section */}
+            <div style={{ marginBottom: '40px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+                <div style={{ 
+                  width: '56px', 
+                  height: '56px', 
+                  borderRadius: '20px', 
+                  backgroundColor: '#35503f', 
+                  color: '#fff', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  fontSize: '20px',
+                  fontWeight: 900,
+                  boxShadow: '0 8px 16px rgba(53, 80, 63, 0.2)'
+                }}>
+                  {ticket?.user?.fullName?.substring(0, 1).toUpperCase()}
+                </div>
+                <div>
+                  <h2 style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '-0.02em', margin: 0 }}>{ticket?.user?.fullName}</h2>
+                  <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Verified Client</p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px', backgroundColor: '#fff', borderRadius: '24px', border: '1px solid #f1f5f9' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#475569', fontWeight: 500 }}>
+                  <Mail size={14} style={{ opacity: 0.5 }} /> {ticket?.user?.email}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#475569', fontWeight: 500 }}>
+                  <Phone size={14} style={{ opacity: 0.5 }} /> {ticket?.user?.phoneNumber || (ticket?.user as any)?.phone || "No phone linked"}
+                </div>
               </div>
             </div>
-            <div className="bg-gray-50 p-3 md:p-4 rounded-xl">
-              <p className="text-xs md:text-sm text-gray-500 uppercase font-bold tracking-wider">Category</p>
-              <p className="font-semibold text-sm md:text-base mt-1">
-                {formatCategory(ticket.category)}
-              </p>
-            </div>
-            <div className="bg-gray-50 p-3 md:p-4 rounded-xl">
-              <p className="text-xs md:text-sm text-gray-500 uppercase font-bold tracking-wider">Assignee</p>
-              <p className="font-semibold text-sm md:text-base mt-1">
-                {ticket.assignee?.fullName || "Unassigned"}
-              </p>
-            </div>
-          </div>
 
-          {/* Description */}
-          <div className="mb-6">
-            <h3 className="font-semibold text-gray-900 mb-2">
-              Issue Description
-            </h3>
-            <p className="text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
-              {ticket.description}
-            </p>
-          </div>
-
-          {/* Chat Messages Section */}
-          <div className="mb-6">
-            <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-teal-500" />
-              Conversation ({ticket.messages?.length || 0} messages)
-            </h3>
-            <div className="bg-gray-50 rounded-2xl p-3 md:p-5 max-h-[400px] overflow-y-auto space-y-4 border border-gray-100 scrollbar-thin scrollbar-thumb-gray-300">
-              {ticket.messages?.length === 0 ? (
-                <div className="text-center py-10 md:py-12">
-                  <MessageSquare className="w-10 h-10 md:w-12 md:h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-400 font-medium">No messages yet</p>
-                  <p className="text-gray-400 text-sm">
-                    Start the conversation below!
-                  </p>
-                </div>
-              ) : (
-                ticket.messages?.map((msg, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex ${["admin", "support"].includes(msg.sender) ? "justify-end" : "justify-start"}`}
+            {/* Assignment Section */}
+            <div style={{ marginBottom: '40px', opacity: isReadOnly ? 0.6 : 1, pointerEvents: isReadOnly ? 'none' : 'auto', position: 'relative' }}>
+              <h3 style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#94a3b8', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <UserCheck size={14} /> Assign Ticket
+              </h3>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {/* Custom Styled Dropdown */}
+                <div className="assignment-dropdown" style={{ position: 'relative', width: '100%' }}>
+                  <div 
+                    onClick={() => !isReadOnly && setIsDropdownOpen(!isDropdownOpen)}
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 16px', 
+                      borderRadius: '16px', 
+                      border: '1px solid #e2e8f0', 
+                      backgroundColor: isReadOnly ? '#f8fafc' : '#fff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: isReadOnly ? 'not-allowed' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: isDropdownOpen ? '0 0 0 3px rgba(53, 80, 63, 0.05)' : 'none'
+                    }}
                   >
-                    <div
-                      className={`max-w-[85%] md:max-w-[75%] px-3 md:px-4 py-2.5 md:py-3 rounded-2xl shadow-sm ${
-                        ["admin", "support"].includes(msg.sender)
-                          ? "bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-br-sm"
-                          : "bg-white border border-gray-200 text-gray-800 rounded-bl-sm"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span
-                          className={`text-[10px] md:text-xs font-bold uppercase tracking-tight ${["admin", "support"].includes(msg.sender) ? "text-teal-100" : "text-gray-500"}`}
-                        >
-                          {msg.sender === "user"
-                            ? ticket.user?.fullName
-                            : (msg.sender === "admin" || msg.sender === "support") ? "You (Support)" : msg.sender}
-                        </span>
-                        <span
-                          className={`text-[10px] md:text-xs ${["admin", "support"].includes(msg.sender) ? "text-teal-200" : "text-gray-400"}`}
-                        >
-                          {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString("en-IN", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }) : ""}
-                        </span>
-                      </div>
-                      <p
-                        className={`text-sm leading-relaxed ${["admin", "support"].includes(msg.sender) ? "text-white" : "text-gray-700"}`}
-                      >
-                        {msg.message}
-                      </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {selectedAssignee ? (
+                        <>
+                          <div style={{ width: '24px', height: '24px', borderRadius: '8px', backgroundColor: '#35503f', color: '#fff', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                            {staffMembers.find((s: any) => (s._id || s.id) === selectedAssignee)?.fullName?.charAt(0).toUpperCase()}
+                          </div>
+                          <span style={{ fontSize: '13px', fontWeight: 600, color: '#1e293b' }}>
+                            {staffMembers.find((s: any) => (s._id || s.id) === selectedAssignee)?.fullName}
+                          </span>
+                        </>
+                      ) : (
+                        <span style={{ fontSize: '13px', color: '#94a3b8', fontWeight: 500 }}>Select Department Official...</span>
+                      )}
                     </div>
+                    <ChevronDown size={14} style={{ color: '#94a3b8', transition: 'transform 0.2s ease', transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />
                   </div>
-                ))
-              )}
+
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div style={{ 
+                      position: 'absolute',
+                      top: 'calc(100% + 8px)',
+                      left: 0,
+                      right: 0,
+                      backgroundColor: '#fff',
+                      borderRadius: '20px',
+                      border: '1px solid #f1f5f9',
+                      boxShadow: '0 20px 40px -12px rgba(0,0,0,0.15)',
+                      zIndex: 100,
+                      maxHeight: '260px',
+                      overflowY: 'auto',
+                      padding: '8px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px'
+                    }}>
+                      {staffMembers?.length === 0 && (
+                        <div style={{ padding: '12px', textAlign: 'center', color: '#94a3b8', fontSize: '12px' }}>No officials found</div>
+                      )}
+                      {staffMembers?.map((s: any) => {
+                        const roleColors: any = {
+                          super_admin: { bg: '#fef2f2', text: '#991b1b', border: '#fecaca' },
+                          admin: { bg: '#fdf2f8', text: '#9d174d', border: '#fbcfe8' },
+                          partner: { bg: '#fff7ed', text: '#9a3412', border: '#fed7aa' },
+                          affiliate: { bg: '#ecfeff', text: '#0891b2', border: '#a5f3fc' },
+                          sales: { bg: '#f0fdf4', text: '#166534', border: '#bbf7d0' },
+                          support: { bg: '#fefce8', text: '#854d0e', border: '#fef08a' }
+                        };
+                        const colors = roleColors[s.role] || { bg: '#f8fafc', text: '#475569', border: '#e2e8f0' };
+                        
+                        const staffId = s._id || s.id;
+                        return (
+                          <div 
+                            key={staffId}
+                            onClick={() => {
+                              setSelectedAssignee(staffId);
+                              setIsDropdownOpen(false);
+                              handleAssignTicket(ticket._id, staffId);
+                            }}
+                            style={{ 
+                              padding: '10px 12px',
+                              borderRadius: '12px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              cursor: 'pointer',
+                              backgroundColor: selectedAssignee === staffId ? '#f8fafc' : 'transparent',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = selectedAssignee === staffId ? '#f8fafc' : 'transparent')}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div style={{ width: '32px', height: '32px', borderRadius: '10px', backgroundColor: '#35503f', color: '#fff', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                                {s.fullName?.charAt(0).toUpperCase()}
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{s.fullName}</span>
+                                <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 500 }}>{s.email}</span>
+                              </div>
+                            </div>
+                            <span style={{ 
+                              fontSize: '9px', 
+                              fontWeight: 900, 
+                              textTransform: 'uppercase', 
+                              letterSpacing: '0.05em',
+                              backgroundColor: colors.bg,
+                              color: colors.text,
+                              border: `1px solid ${colors.border}`,
+                              padding: '2px 8px',
+                              borderRadius: '6px'
+                            }}>
+                              {s.role?.replace('_', ' ')}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
+
+            {/* Linked Booking */}
+            {ticket?.bookingId && (
+              <div style={{ marginBottom: '40px' }}>
+                <h3 style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#94a3b8', marginBottom: '16px' }}>
+                  Linked Booking
+                </h3>
+                <div style={{ 
+                  backgroundColor: '#fff', 
+                  padding: '16px', 
+                  borderRadius: '24px', 
+                  border: '1px solid #f1f5f9'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ fontWeight: 900, fontSize: '14px', color: '#0f172a' }}>
+                      #{typeof ticket.bookingId === 'string' ? ticket.bookingId.slice(-8).toUpperCase() : (ticket.bookingId as any).bookingNumber || ticket.bookingId._id?.slice(-8).toUpperCase()}
+                    </div>
+                    <ArrowUpRight size={14} color="#35503f" style={{ cursor: 'pointer' }} />
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
+                    {((ticket.bookingId as any).type || "WORKSPACE").replace('_', ' ').toUpperCase()}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {isReadOnly && (
+              <div style={{ 
+                marginTop: 'auto', 
+                padding: '20px', 
+                backgroundColor: '#fffbeb', 
+                borderRadius: '24px', 
+                border: '1px solid #fef3c7',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <Lock size={18} color="#d97706" />
+                <div>
+                  <p style={{ margin: 0, fontSize: '13px', fontWeight: 800, color: '#92400e' }}>Locked</p>
+                  <p style={{ margin: 0, fontSize: '11px', color: '#b45309', fontWeight: 500 }}>This ticket is resolved/closed.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Chat Interface */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#fff' }}>
+          {/* Top Bar */}
+          <div style={{ 
+            padding: '24px 40px', 
+            borderBottom: '1px solid #f1f5f9', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            background: 'linear-gradient(to right, #fff, #fafafa)'
+          }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h2 style={{ fontSize: '22px', fontWeight: 900, letterSpacing: '-0.02em' }}>{ticket?.subject}</h2>
+                <div style={{ 
+                  backgroundColor: getStatusColor(ticket?.status),
+                  color: '#fff',
+                  fontSize: '9px',
+                  fontWeight: 900,
+                  textTransform: 'uppercase',
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  letterSpacing: '0.05em'
+                }}>
+                  {ticket?.status}
+                </div>
+              </div>
+              <p style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600, marginTop: '4px' }}>
+                Ticket ID: {ticket?.ticketNumber} • Last updated {format(new Date(ticket?.updatedAt || ticket?.createdAt), "MMM d, h:mm a")}
+              </p>
+            </div>
+            <button 
+              onClick={() => onOpenChange(false)}
+              style={{ 
+                padding: '10px', 
+                borderRadius: '14px', 
+                border: 'none', 
+                background: '#f1f5f9', 
+                color: '#64748b', 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.background = '#e2e8f0')}
+              onMouseOut={(e) => (e.currentTarget.style.background = '#f1f5f9')}
+            >
+              <X size={20} />
+            </button>
           </div>
 
-          {/* Reply Section - Disabled when resolved/closed */}
-          {ticket.status === "resolved" || ticket.status === "closed" ? (
-            <div className="border-t border-gray-100 pt-4">
-              <div className="bg-gray-100 rounded-xl p-4 text-center">
-                <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                <p className="text-gray-600 font-medium">
-                  This ticket has been{" "}
-                  {ticket.status === "resolved" ? "resolved" : "closed"}
-                </p>
-                <p className="text-sm text-gray-400">
-                  No further replies can be sent
-                </p>
-                {ticket.status === "resolved" && (
-                  <button
-                    onClick={() => handleCloseTicket(ticket._id)}
-                    className="mt-3 px-6 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors"
-                  >
-                    Close Ticket Permanently
+          {/* Messages */}
+          <div 
+            ref={scrollRef}
+            style={{ 
+              flex: 1, 
+              padding: '40px', 
+              overflowY: 'auto', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '30px',
+              backgroundColor: '#f8fafc',
+              scrollBehavior: 'smooth'
+            }}
+          >
+            {/* Start point */}
+            <div style={{ alignSelf: 'center', textAlign: 'center' }}>
+               <div style={{ fontSize: '10px', fontWeight: 900, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '10px' }}>
+                 Initial Query
+               </div>
+               <div style={{ 
+                 maxWidth: '500px', 
+                 backgroundColor: '#fff', 
+                 padding: '24px', 
+                 borderRadius: '24px', 
+                 border: '1px solid #e2e8f0',
+                 boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)',
+                 textAlign: 'left'
+               }}>
+                 <p style={{ margin: 0, fontSize: '14px', color: '#1e293b', lineHeight: 1.6, fontWeight: 500 }}>{ticket?.description}</p>
+                 <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                    <div style={{ width: '24px', height: '24px', borderRadius: '8px', backgroundColor: '#35503f', color: '#fff', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                      {ticket?.user?.fullName?.charAt(0)}
+                    </div>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#475569' }}>{ticket?.user?.fullName}</span>
+                    <span style={{ fontSize: '11px', color: '#94a3b8' }}>• {format(new Date(ticket?.createdAt), "MMM d, h:mm a")}</span>
+                 </div>
+               </div>
+            </div>
+
+            {/* Conversation Flow */}
+            {ticket?.messages?.map((msg: any, i: number) => {
+              const isAdmin = ["admin", "support"].includes(msg.sender);
+              const isPartner = msg.sender === "partner";
+              const isAffiliate = msg.sender === "affiliate";
+              const isStaff = isAdmin || isPartner;
+
+              // System messages (e.g. "[Admin joined the conversation]")
+              const isSystem = msg.message?.startsWith("[") && msg.message?.endsWith("]");
+              if (isSystem) {
+                return (
+                  <div key={i} style={{ alignSelf: 'center', textAlign: 'center' }}>
+                    <span style={{ fontSize: '10px', color: '#94a3b8', backgroundColor: '#f1f5f9', padding: '4px 12px', borderRadius: '20px', fontWeight: 600 }}>
+                      {msg.message.replace(/\[|\]/g, "")}
+                    </span>
+                  </div>
+                );
+              }
+
+              const getSenderLabel = () => {
+                switch (msg.sender) {
+                  case "admin": return "ADMIN";
+                  case "support": return "SUPPORT";
+                  case "partner": return "PARTNER";
+                  case "affiliate": return "AFFILIATE";
+                  default: return "CUSTOMER";
+                }
+              };
+
+              const getBubbleStyle = () => {
+                if (isAdmin) return { backgroundColor: '#35503f', color: '#fff', border: 'none' };
+                if (isPartner) return { backgroundColor: '#fff7ed', color: '#1e293b', border: '1px solid #fed7aa' };
+                if (isAffiliate) return { backgroundColor: '#ecfeff', color: '#1e293b', border: '1px solid #a5f3fc' };
+                return { backgroundColor: '#fff', color: '#1e293b', border: '1px solid #e2e8f0' };
+              };
+
+              const getLabelColor = () => {
+                if (isAdmin) return '#94a3b8';
+                if (isPartner) return '#ea580c';
+                if (isAffiliate) return '#0891b2';
+                return '#94a3b8';
+              };
+
+              const bubbleStyle = getBubbleStyle();
+
+              return (
+                <div key={i} style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignSelf: isStaff ? 'flex-end' : 'flex-start', 
+                  maxWidth: '75%',
+                  alignItems: isStaff ? 'flex-end' : 'flex-start'
+                }}>
+                   <div style={{ 
+                     backgroundColor: bubbleStyle.backgroundColor, 
+                     color: bubbleStyle.color,
+                     padding: '16px 24px', 
+                     borderRadius: '26px', 
+                     borderBottomRightRadius: isStaff ? '4px' : '26px',
+                     borderBottomLeftRadius: !isStaff ? '4px' : '26px',
+                     boxShadow: isAdmin ? '0 10px 15px -3px rgba(53, 80, 63, 0.2)' : '0 4px 6px -1px rgba(0,0,0,0.02)',
+                     border: bubbleStyle.border,
+                     fontSize: '14px',
+                     fontWeight: 500,
+                     lineHeight: 1.5
+                   }}>
+                     {msg.message}
+                   </div>
+                   <div style={{ 
+                     fontSize: '10px', 
+                     color: getLabelColor(), 
+                     fontWeight: 700,
+                     marginTop: '6px',
+                     display: 'flex',
+                     alignItems: 'center',
+                     gap: '4px'
+                   }}>
+                      {getSenderLabel()} • {format(new Date(msg.createdAt), "h:mm a")}
+                   </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Action Bar */}
+          {!isReadOnly ? (
+            <div style={{ padding: '30px 40px', borderTop: '1px solid #f1f5f9', background: '#fff' }}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                 <div style={{ flex: 1, position: 'relative' }}>
+                   <textarea 
+                     style={{ 
+                       width: '100%', 
+                       minHeight: '60px', 
+                       maxHeight: '150px', 
+                       padding: '18px 60px 18px 24px', 
+                       borderRadius: '24px', 
+                       border: '1px solid #e2e8f0', 
+                       backgroundColor: '#f8fafc',
+                       fontSize: '15px',
+                       fontWeight: 500,
+                       resize: 'none',
+                       outline: 'none',
+                       transition: 'border-color 0.2s ease'
+                     }}
+                     placeholder="Write your response here..."
+                     value={replyMessage}
+                     onChange={(e) => setReplyMessage(e.target.value)}
+                     onKeyDown={(e) => {
+                       if (e.key === 'Enter' && !e.shiftKey) {
+                         e.preventDefault();
+                         submitReply();
+                       }
+                     }}
+                   />
+                   <button 
+                     onClick={submitReply}
+                     disabled={!replyMessage.trim()}
+                     style={{ 
+                       position: 'absolute',
+                       right: '10px',
+                       top: '50%',
+                       transform: 'translateY(-50%)',
+                       width: '44px', 
+                       height: '44px', 
+                       borderRadius: '16px', 
+                       backgroundColor: '#35503f', 
+                       color: '#fff', 
+                       border: 'none', 
+                       display: 'flex', 
+                       alignItems: 'center', 
+                       justifyContent: 'center',
+                       cursor: 'pointer',
+                       opacity: replyMessage.trim() ? 1 : 0.4,
+                       transition: 'all 0.2s ease',
+                       boxShadow: replyMessage.trim() ? '0 8px 16px rgba(53, 80, 63, 0.2)' : 'none'
+                     }}
+                   >
+                     <Send size={18} />
+                   </button>
+                 </div>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+                  <button 
+                    onClick={() => handleResolveTicket(ticket._id)}
+                    style={{ 
+                      flex: 1, 
+                      padding: '12px', 
+                      borderRadius: '16px', 
+                      backgroundColor: '#10b981', 
+                      color: '#fff', 
+                      border: 'none', 
+                      fontWeight: 900, 
+                      fontSize: '11px', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '0.08em', 
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}>
+                    <CheckCircle2 size={14} /> Mark Resolved
                   </button>
-                )}
+                  <button 
+                    onClick={() => handleEscalateTicket(ticket._id)}
+                    style={{ 
+                      flex: 1, 
+                      padding: '12px', 
+                      borderRadius: '16px', 
+                      backgroundColor: '#fff', 
+                      color: '#f59e0b', 
+                      border: '1px solid #f59e0b', 
+                      fontWeight: 900, 
+                      fontSize: '11px', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '0.08em', 
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}>
+                    <AlertCircle size={14} /> Escalate
+                  </button>
+                  <button 
+                    onClick={() => handleCloseTicket(ticket._id)}
+                    style={{ 
+                      flex: 1, 
+                      padding: '12px', 
+                      borderRadius: '16px', 
+                      backgroundColor: '#fff', 
+                      color: '#ef4444', 
+                      border: '1px solid #ef4444', 
+                      fontWeight: 900, 
+                      fontSize: '11px', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '0.08em', 
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}>
+                    <XCircle size={14} /> Close Permanently
+                  </button>
               </div>
             </div>
           ) : (
-            <div className="border-t border-gray-100 pt-5">
-              {/* Reply Input */}
-              <div className="flex gap-4 mb-5">
-                <textarea
-                  value={replyMessage}
-                  onChange={(e) => setReplyMessage(e.target.value)}
-                  placeholder="Type your reply to the client..."
-                  rows={3}
-                  className="flex-1 px-5 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none text-sm placeholder:text-gray-400 bg-gray-50 hover:bg-white transition-colors"
-                />
-                <button
-                  onClick={submitReply}
-                  disabled={!replyMessage.trim()}
-                  className="px-6 py-4 bg-teal-600 text-white rounded-2xl font-semibold hover:bg-teal-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed self-end flex items-center gap-2 shadow-lg shadow-teal-200 hover:shadow-xl hover:shadow-teal-300 active:scale-95"
-                >
-                  <Send className="w-5 h-5" />
-                  <span className="hidden sm:inline">Send</span>
-                </button>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 md:pt-3 border-t border-gray-100">
-                <div className="flex gap-2">
-                  {ticket.status !== "escalated" && (
-                    <button
-                      onClick={() => handleEscalateTicket(ticket._id)}
-                      className="flex-1 md:flex-none px-4 py-2 bg-orange-100 text-orange-600 rounded-lg text-sm font-medium hover:bg-orange-200 transition-colors border border-orange-200"
-                    >
-                      <AlertCircle className="w-4 h-4 inline mr-1" />
-                      Escalate
-                    </button>
-                  )}
-                  {ticket.status === "open" && (
-                    <button
-                      onClick={() => handleAssignTicket(ticket._id)}
-                      className="flex-1 md:flex-none px-4 py-2 bg-blue-100 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors border border-blue-200"
-                    >
-                      <User className="w-4 h-4 inline mr-1" />
-                      Assign
-                    </button>
-                  )}
-                </div>
-
-                {/* Prominent Resolve Button */}
-                <button
-                  onClick={() => handleResolveTicket(ticket._id)}
-                  className="w-full md:w-auto px-6 py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-200 flex items-center justify-center gap-2"
-                >
-                  <CheckCircle className="w-5 h-5" />
-                  Resolve Now
-                </button>
-              </div>
+            <div style={{ 
+              padding: '30px 40px', 
+              borderTop: '1px solid #f1f5f9', 
+              background: '#fafafa',
+              textAlign: 'center'
+            }}>
+              <p style={{ margin: 0, color: '#94a3b8', fontSize: '14px', fontWeight: 700 }}>
+                This conversation has been concluded and is now read-only.
+              </p>
             </div>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };

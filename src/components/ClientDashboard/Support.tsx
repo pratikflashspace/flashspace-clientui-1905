@@ -148,8 +148,8 @@ export default function Support() {
         setTickets(ticketsData);
       }
     } catch (err: unknown) {
-      console.error("Failed to fetch tickets", err);
-      alert("Failed to load tickets. Please try again.");
+      console.error("Failed to fetch tickets:", err);
+      toast.error("Failed to load tickets. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -208,6 +208,24 @@ export default function Support() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.subject || formData.subject.length < 5) {
+      toast.error("Subject must be at least 5 characters long");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!formData.category) {
+      toast.error("Please select a category");
+      setSubmitting(false);
+      return;
+    }
+
+    if (!formData.description || formData.description.length < 10) {
+      toast.error("Description must be at least 10 characters long");
+      setSubmitting(false);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const response = await userDashboardService.createTicket({
@@ -225,11 +243,11 @@ export default function Support() {
           setFormData({ subject: "", category: "", description: "" });
         }, 3000);
       } else {
-        alert(response.message || "Failed to create ticket");
+        toast.error(response.message || "Failed to create ticket");
       }
-    } catch (err: unknown) {
-      console.error("Failed to create ticket", err);
-      alert("Failed to create ticket. Please try again.");
+    } catch (err: any) {
+      console.error("Failed to create ticket:", err);
+      toast.error(err.message || "Failed to create ticket. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -239,36 +257,25 @@ export default function Support() {
     e.preventDefault();
     setContactSubmitting(true);
     try {
-      // Use FormSubmit.co via AJAX
-      const response = await fetch("https://formsubmit.co/ajax/komalmishra2008@gmail.com", {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          name: contactFormData.name,
-          email: contactFormData.email,
-          phone: contactFormData.phone,
-          subject: contactFormData.subject,
-          message: contactFormData.message,
-          _subject: `Support Request: ${contactFormData.subject}`,
-          _template: "table"
-        })
+      // Instead of using FormSubmit.co, create a support ticket in our own system
+      // This ensures the message gets tracked in the Admin Dashboard
+      const response = await userDashboardService.createTicket({
+        subject: `Contact Request: ${contactFormData.subject || "General Inquiry"}`,
+        category: "leads" as any,
+        description: `Name: ${contactFormData.name}\nEmail: ${contactFormData.email}\nPhone: ${contactFormData.phone}\n\nMessage:\n${contactFormData.message}`,
       });
 
-      if (response.ok) {
+      if (response.success) {
         setContactSubmitted(true);
-        setTimeout(() => {
-          setContactSubmitted(false);
-          setContactFormData(prev => ({ ...prev, subject: "", message: "" }));
-        }, 3000);
+        setContactFormData(prev => ({ ...prev, subject: "", message: "" }));
+        toast.success("Message sent! Our team will contact you soon.");
+        setTimeout(() => setContactSubmitted(false), 3000);
       } else {
-        alert("Failed to send message via FormSubmit. Please try again later.");
+        throw new Error(response.message || "Failed to send message");
       }
-    } catch (err: unknown) {
-      console.error("Failed to send contact message via FormSubmit", err);
-      alert("Failed to send message. Please check your internet connection and try again.");
+    } catch (err: any) {
+      console.error("Failed to send contact message:", err);
+      toast.error(err.message || "Failed to send message. Please try again.");
     } finally {
       setContactSubmitting(false);
     }
@@ -285,11 +292,11 @@ export default function Support() {
         fetchTickets();
         toast.success("Reply sent!");
       } else {
-        alert(response.message || "Failed to send reply");
+        toast.error(response.message || "Failed to send reply");
       }
     } catch (err: unknown) {
       console.error("Failed to reply", err);
-      alert("Failed to send reply. Please try again.");
+      toast.error("Failed to send reply. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -551,14 +558,18 @@ export default function Support() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-sm text-gray-600 mb-1">Subject</label>
-                            <input
-                              type="text"
-                              required
-                              value={formData.subject}
-                              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
-                              placeholder="Brief description of your issue"
-                            />
+                              <input
+                                type="text"
+                                required
+                                minLength={5}
+                                value={formData.subject}
+                                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]"
+                                placeholder="Brief description of your issue (min 5 characters)"
+                              />
+                              {formData.subject.length > 0 && formData.subject.length < 5 && (
+                                <p className="text-red-500 text-xs mt-1">Subject must be at least 5 characters.</p>
+                              )}
                           </div>
                           <div>
                             <label className="block text-sm text-gray-600 mb-1">Category</label>
