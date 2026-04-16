@@ -34,6 +34,12 @@ export interface PartnerTicketData {
             city?: string;
         };
     };
+    assignee?: {
+        _id: string;
+        fullName: string;
+        email: string;
+        role: string;
+    };
     createdAt: string;
     updatedAt: string;
     closedAt?: string;

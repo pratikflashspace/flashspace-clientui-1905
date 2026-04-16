@@ -57,6 +57,7 @@ export default function TicketSystem() {
     totalTickets: 0,
   });
   const [searchTerm, setSearchTerm] = useState("");
+  const [staffMembers, setStaffMembers] = useState<any[]>([]);
 
   const fetchTickets = async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -102,6 +103,21 @@ export default function TicketSystem() {
     }
   };
 
+  const fetchStaff = async () => {
+    try {
+      const response = await adminService.getStaffMembers();
+      if (response.success && response.data) {
+        setStaffMembers(response.data);
+      }
+    } catch (err: unknown) {
+      console.error("Failed to fetch staff", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchStaff();
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchTickets();
@@ -116,7 +132,7 @@ export default function TicketSystem() {
     socket.emit("join_ticket", selectedTicket._id);
 
     const handleNewMessage = (data: { ticketId: string; message: any }) => {
-      if (data.ticketId === selectedTicket._id) {
+      if (selectedTicket && data.ticketId === selectedTicket._id) {
         setSelectedTicket((prev) => {
           if (!prev) return null;
           const currentMessages = prev.messages || [];
@@ -137,7 +153,7 @@ export default function TicketSystem() {
     };
 
     const handleTicketUpdated = (data: { ticketId: string; ticket: any }) => {
-      if (data.ticketId === selectedTicket._id) {
+      if (selectedTicket && data.ticketId === selectedTicket._id) {
         setSelectedTicket(data.ticket);
         fetchTickets();
         fetchStats();
@@ -194,11 +210,13 @@ export default function TicketSystem() {
     setCreateModalOpen(true);
   };
 
-  const handleAssignTicket = async (ticketId: string) => {
+  const handleAssignTicket = async (ticketId: string, assigneeId: string) => {
+    console.log("[handleAssignTicket] called with:", { ticketId, assigneeId });
     try {
-      if (user?._id || user?.id) {
-        const userId = user._id || user.id;
-        const response = await adminService.assignTicket(ticketId, userId);
+      if (assigneeId) {
+        console.log("[handleAssignTicket] Making API call...");
+        const response = await adminService.assignTicket(ticketId, assigneeId);
+        console.log("[handleAssignTicket] Response:", response);
         if (response.success) {
           toast({
             title: "Success",
@@ -208,10 +226,19 @@ export default function TicketSystem() {
           if (selectedTicket?._id === ticketId) {
             setSelectedTicket(response.data || null);
           }
+        } else {
+          console.error("[handleAssignTicket] API returned failure:", response);
+          toast({
+            title: "Error",
+            description: response.message || "Failed to assign ticket",
+            variant: "destructive",
+          });
         }
+      } else {
+        console.warn("[handleAssignTicket] No assigneeId provided");
       }
     } catch (err: unknown) {
-      console.error("Failed to assign ticket", err);
+      console.error("[handleAssignTicket] Exception:", err);
       toast({
         title: "Error",
         description: "Failed to assign ticket",
@@ -228,6 +255,7 @@ export default function TicketSystem() {
           title: "Success",
           description: "Ticket resolved successfully!",
         });
+        setModalOpen(false); // Auto-close modal
         fetchTickets();
         fetchStats();
         if (selectedTicket?._id === ticketId) {
@@ -269,6 +297,7 @@ export default function TicketSystem() {
       const response = await adminService.closeTicket(ticketId);
       if (response.success) {
         toast({ title: "Success", description: "Ticket closed permanently" });
+        setModalOpen(false); // Auto-close modal
         fetchTickets();
         fetchStats();
         if (selectedTicket?._id === ticketId) {
@@ -436,9 +465,14 @@ export default function TicketSystem() {
                           : "UA"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm text-muted-foreground">
-                      {ticket.assignee?.fullName || "Unassigned"}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-sm text-muted-foreground">
+                        {ticket.assignee?.fullName || "Unassigned"}
+                      </span>
+                      {ticket.assignee?.role && (
+                        <span className="text-xs text-muted-foreground/70">{ticket.assignee.role}</span>
+                      )}
+                    </div>
                   </div>
                 </td>
                 <td className="p-4 text-sm text-muted-foreground">
@@ -512,6 +546,9 @@ export default function TicketSystem() {
                   <span className="text-xs font-medium text-foreground">
                     {ticket.assignee?.fullName || "Unassigned"}
                   </span>
+                  {ticket.assignee?.role && (
+                    <span className="text-[10px] text-muted-foreground/70">{ticket.assignee.role}</span>
+                  )}
                 </div>
               </div>
               <div className="text-right">
@@ -576,10 +613,7 @@ export default function TicketSystem() {
             Manage and resolve support tickets
           </p>
         </div>
-        <Button onClick={handleCreateTicket} className="w-full md:w-auto shadow-lg shadow-primary/10">
-          <Plus className="w-4 h-4 mr-2" />
-          Create Ticket
-        </Button>
+
       </div>
 
       {/* Stats */}
@@ -665,6 +699,7 @@ export default function TicketSystem() {
         handleEscalateTicket={handleEscalateTicket}
         handleCloseTicket={handleCloseTicket}
         handleReply={handleReply}
+        staffMembers={staffMembers}
       />
 
       <CreateTicketModal

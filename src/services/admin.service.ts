@@ -185,6 +185,16 @@ export interface AdminTicketData {
     fullName: string;
     email: string;
   };
+  bookingId?: {
+    _id: string;
+    bookingNumber: string;
+    spaceSnapshot: {
+      name: string;
+      city: string;
+    };
+    type: string;
+    status: string;
+  };
   createdAt: string;
   updatedAt: string;
   deadline?: string;
@@ -236,6 +246,38 @@ class AdminService {
       ApiResponse<{ users: UserData[]; stats: any; pagination: any }>
     >("/api/admin/users", { params });
     return response.data;
+  }
+
+  async getStaffMembers(): Promise<ApiResponse<UserData[]>> {
+    // Roles that are considered staff/internal and can be assigned tickets
+    const staffRoles = [
+      "super_admin",
+      "admin",
+      "support",
+      "sales",
+      "affiliate_manager",
+      "space_partner_manager",
+      "partner",
+      "space_manager",
+      "affiliate"
+    ];
+
+    const response = await axiosInstance.get<ApiResponse<{ users: UserData[] }>>(
+      "/api/admin/users",
+      {
+        params: {
+          role: staffRoles.join(","),
+          limit: 100, // Reasonable limit for staff
+          status: "active"
+        }
+      }
+    );
+
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: response.data.data.users
+    };
   }
 
   async getPendingKYC(

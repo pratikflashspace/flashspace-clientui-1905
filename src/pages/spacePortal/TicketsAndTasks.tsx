@@ -21,31 +21,11 @@ import partnerTicketService, {
 import { fetchPartnerActiveRequests } from "@/services/spacePortal/spacePartner.service";
 import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
+import { useMemo } from "react";
+import SearchBar from "@/components/ui/SpacePartner/SearchBar";
+import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
 
-const getPriorityBadge = (priority: string) => {
-  const p = (priority || "low").toLowerCase();
-  switch (p) {
-    case "high":
-    case "urgent":
-      return <Badge variant="destructive">High</Badge>;
-    case "medium":
-      return (
-        <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-yellow-200">
-          Medium
-        </Badge>
-      );
-    case "low":
-    default:
-      return (
-        <Badge
-          variant="secondary"
-          className="bg-slate-100 text-slate-600 border-slate-200"
-        >
-          Low
-        </Badge>
-      );
-  }
-};
+
 
 const getStatusBadge = (status: string) => {
   const s = (status || "open").toLowerCase();
@@ -90,7 +70,8 @@ export default function TicketsAndTasks() {
     null,
   );
   const [messageInput, setMessageInput] = useState("");
-  const [hasTakenOver, setHasTakenOver] = useState(false);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -132,13 +113,22 @@ export default function TicketsAndTasks() {
     loadData();
   }, []);
 
-  const handleTakeOver = () => {
-    setHasTakenOver(true);
-    toast({
-      title: "Joined Chat",
-      description: "You have joined the conversation with the client.",
+  const filteredTickets = useMemo(() => {
+    return tickets.filter((t) => {
+      const q = query.toLowerCase();
+      const matchesQuery =
+        t.subject.toLowerCase().includes(q) ||
+        t.ticketNumber.toLowerCase().includes(q) ||
+        (t.user?.fullName || "").toLowerCase().includes(q);
+
+      const matchesStatus =
+        statusFilter === "ALL" ? true : t.status.toLowerCase() === statusFilter.toLowerCase();
+
+      return matchesQuery && matchesStatus;
     });
-  };
+  }, [tickets, query, statusFilter]);
+
+
 
   const handleResolve = async () => {
     if (!activeTicket) return;
@@ -294,6 +284,29 @@ export default function TicketsAndTasks() {
           value="tickets"
           className="animate-in fade-in slide-in-from-bottom-2 duration-300"
         >
+          {/* Controls */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <SearchBar
+              value={query}
+              onChange={setQuery}
+              placeholder="Search by ID, subject, or client name..."
+            />
+            <div className="flex gap-3">
+              <SelectBox
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={[
+                  { label: "All Status", value: "ALL" },
+                  { label: "Open", value: "OPEN" },
+                  { label: "Pending", value: "PENDING" },
+                  { label: "In Progress", value: "IN_PROGRESS" },
+                  { label: "Resolved", value: "RESOLVED" },
+                  { label: "Closed", value: "CLOSED" },
+                ]}
+              />
+            </div>
+          </div>
+
           {/* Tickets Table */}
           <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
@@ -305,9 +318,6 @@ export default function TicketsAndTasks() {
                     </th>
                     <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
                       Client
-                    </th>
-                    <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
-                      Priority
                     </th>
                     <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
                       Assignee
@@ -324,7 +334,7 @@ export default function TicketsAndTasks() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#2D3F33]/5 dark:divide-white/10">
-                  {tickets.length === 0 ? (
+                  {filteredTickets.length === 0 ? (
                     <tr>
                       <td
                         colSpan={7}
@@ -334,7 +344,7 @@ export default function TicketsAndTasks() {
                       </td>
                     </tr>
                   ) : (
-                    tickets.map((ticket) => (
+                    filteredTickets.map((ticket) => (
                       <tr
                         key={ticket._id}
                         className="hover:bg-[#fcfcfc] dark:hover:bg-white/5 transition-colors"
@@ -353,21 +363,25 @@ export default function TicketsAndTasks() {
                           {ticket.user?.fullName}
                         </td>
                         <td className="p-5">
-                          {getPriorityBadge(ticket.priority)}
-                        </td>
-                        <td className="p-5">
                           <div className="flex items-center gap-2">
                             <Avatar className="w-8 h-8 border border-[#2D3F33]/10">
                               <AvatarFallback className="text-[10px] bg-[#2D3F33]/10 text-[#2D3F33] dark:text-[#FDE68A] font-bold uppercase">
-                                {ticket.user?.fullName
+                                {ticket.assignee?.fullName
                                   ?.split(" ")
                                   .map((n) => n[0])
                                   .join("") || "U"}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="text-xs text-[#164e4e]/70 dark:text-gray-400 font-semibold">
-                              Partner
-                            </span>
+                            <div className="flex flex-col">
+                              <span className="text-xs text-[#164e4e] dark:text-white font-bold">
+                                {ticket.assignee?.fullName || "Unassigned"}
+                              </span>
+                              {ticket.assignee?.role && (
+                                <span className="text-[10px] text-[#164e4e]/60 dark:text-gray-400 font-bold uppercase tracking-wider">
+                                  {ticket.assignee.role.replace('_', ' ')}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </td>
                         <td className="p-5 text-sm text-[#164e4e]/70 dark:text-gray-400 font-medium">
@@ -376,12 +390,13 @@ export default function TicketsAndTasks() {
                         <td className="p-5">{getStatusBadge(ticket.status)}</td>
                         <td className="p-5 text-right">
                           <Button
-                            variant="ghost"
-                            size="icon"
+                            variant="outline"
+                            size="sm"
                             onClick={() => setActiveTicket(ticket)}
-                            className="rounded-xl text-[#2D3F33] dark:text-[#FDE68A] hover:bg-[#2D3F33]/5 dark:hover:bg-white/5"
+                            className="rounded-xl text-[#2D3F33] dark:text-[#FDE68A] hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 gap-1.5"
                           >
-                            <Eye className="w-5 h-5" />
+                            <Eye className="w-4 h-4" />
+                            View Details
                           </Button>
                         </td>
                       </tr>
@@ -415,17 +430,6 @@ export default function TicketsAndTasks() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {activeTicket.status !== "resolved" &&
-                    activeTicket.status !== "closed" &&
-                    !hasTakenOver && (
-                      <Button
-                        size="sm"
-                        onClick={handleTakeOver}
-                        className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl"
-                      >
-                        🎯 Tap In
-                      </Button>
-                    )}
                   {activeTicket.status !== "resolved" &&
                     activeTicket.status !== "closed" && (
                       <Button
@@ -585,34 +589,27 @@ export default function TicketsAndTasks() {
               {/* Messages Input Area */}
               {activeTicket.status !== "resolved" &&
               activeTicket.status !== "closed" ? (
-                hasTakenOver ? (
-                  <div className="p-6 bg-white border-t border-gray-100">
-                    <div className="flex items-center gap-4 bg-gray-50 p-2 pr-2 rounded-2xl border border-gray-200 focus-within:ring-2 focus-within:ring-[#2D3F33]/10 transition-all">
-                      <input
-                        type="text"
-                        value={messageInput}
-                        onChange={(e) => setMessageInput(e.target.value)}
-                        onKeyDown={(e) =>
-                          e.key === "Enter" && handleSendMessage()
-                        }
-                        placeholder="Type your reply..."
-                        className="flex-1 bg-transparent border-none focus:outline-none px-4 text-sm text-gray-700 placeholder:text-gray-400"
-                      />
-                      <Button
-                        onClick={handleSendMessage}
-                        disabled={!messageInput.trim()}
-                        className="bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90 rounded-xl"
-                      >
-                        <Send className="w-4 h-4" />
-                      </Button>
-                    </div>
+                <div className="p-6 bg-white border-t border-gray-100">
+                  <div className="flex items-center gap-4 bg-gray-50 p-2 pr-2 rounded-2xl border border-gray-200 focus-within:ring-2 focus-within:ring-[#2D3F33]/10 transition-all">
+                    <input
+                      type="text"
+                      value={messageInput}
+                      onChange={(e) => setMessageInput(e.target.value)}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && handleSendMessage()
+                      }
+                      placeholder="Type your reply..."
+                      className="flex-1 bg-transparent border-none focus:outline-none px-4 text-sm text-gray-700 placeholder:text-gray-400"
+                    />
+                    <Button
+                      onClick={handleSendMessage}
+                      disabled={!messageInput.trim()}
+                      className="bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90 rounded-xl"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
                   </div>
-                ) : (
-                  <div className="p-6 bg-amber-50 border-t border-amber-100 text-center text-amber-700 text-sm font-medium">
-                    Click <strong>Tap In</strong> to start chatting with this
-                    user.
-                  </div>
-                )
+                </div>
               ) : (
                 <div className="p-6 bg-gray-50 border-t border-gray-100 text-center text-gray-500 text-sm">
                   This query is closed.

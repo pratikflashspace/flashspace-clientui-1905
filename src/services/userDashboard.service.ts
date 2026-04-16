@@ -396,7 +396,7 @@ class UserDashboardService {
     try {
       const response = await axiosInstance.post<
         ApiResponse<CreateTicketResponse>
-      >("/api/tickets", data);
+      >("/tickets", data);
       return response.data;
     } catch (error: unknown) {
       const errorMessage =
