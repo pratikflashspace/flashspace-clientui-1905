@@ -2,10 +2,8 @@ import { createRoot } from "react-dom/client";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import App from "./App.tsx";
 import "./index.css";
-import "./i18n.ts";
 import { ContactModalProvider } from "./components/ui/ContactModalContext";
 import { DarkModeProvider } from "./contexts/DarkModeContext.tsx";
-import { RegionProvider } from "./contexts/RegionContext.tsx";
 import { initLenis } from "@/lib/lenis";
 
 // Initialize Lenis smooth scroll
@@ -25,9 +23,7 @@ createRoot(document.getElementById("root")!).render(
     <ContactModalProvider>
       {/* Wrap up App by dark mode provider */}
       <DarkModeProvider>
-        <RegionProvider>
-          <App />
-        </RegionProvider>
+        <App />
       </DarkModeProvider>
     </ContactModalProvider>
   </GoogleOAuthProvider>,

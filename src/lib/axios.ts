@@ -23,14 +23,6 @@ axiosInstance.interceptors.request.use(
     }
     
     // Cookies are automatically sent by the browser when withCredentials is true
-    
-    // Add region header for global expansion (except for auth endpoints)
-    const isAuthRequest = config.url?.includes('/auth/');
-    if (!isAuthRequest) {
-      const region = typeof window !== 'undefined' ? localStorage.getItem('user-region') || 'IN' : 'IN';
-      config.headers['x-region'] = region;
-    }
-
     return config;
   },
   (error: any) => {
