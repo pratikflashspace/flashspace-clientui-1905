@@ -23,9 +23,6 @@ import {
   ArrowUpRight,
   Menu,
   X,
-  Search,
-  Instagram,
-  Linkedin
 } from 'lucide-react';
 import { RegionSwitcher } from '@/components/RegionSwitcher';
 import UAEParticles from '@/components/UAEParticles';
@@ -172,59 +169,6 @@ const uaeBenefits = [
   { num: '05', title: 'Global Gateway', desc: 'Direct connectivity to two-thirds of the world’s population within an 8-hour flight.', img: validDubaiUrls[4] }
 ];
 
-const JURISDICTION_LIST = [
-  "UAE Free Zones",
-  "Offshore",
-  "Dubai Mainland",
-  "Abu Dhabi Mainland",
-  "International"
-];
-
-const FREE_ZONES = [
-  "Masdar City",
-  "DIFC (Finance)",
-  "DMCC (Commodities)",
-  "DWTC (Trade)",
-  "D3 (Design)",
-  "Dubai South",
-  "Meydan Free Zone",
-  "Shams (Sharjah Media)",
-  "SPCFZ (Publishing)",
-  "KIZAD (Logistics)",
-  "FCC (Fujairah)",
-  "AFZ (Ajman)",
-  "UAQFTZ (Trade)",
-  "RAK DAO",
-  "Rakez"
-];
-
-const OFFSHORE_LIST = [
-  "British Virgin Islands (BVI)",
-  "Ajman Free Zone (AFZ)",
-  "Jebel Ali Free Zone (JAFZA)",
-  "Ras Al-Khaimah (RAK ICC)",
-  "Mauritius"
-];
-
-const SERVICES_CATEGORIZED = [
-  {
-    category: "Business Setup",
-    items: ["Company Formation", "Offshore Setup", "SPVs & Holdings", "Foundations & Trusts"]
-  },
-  {
-    category: "Operations & Finance",
-    items: ["Tax & Accounting", "Banking Assistance", "ISO Certification", "Intellectual Property"]
-  },
-  {
-    category: "Resource & Growth",
-    items: ["Human Resources", "Recruitment", "Media & Marketing", "Education & Training"]
-  },
-  {
-    category: "Concierge & Hub",
-    items: ["Concierge Services", "Communication Hub", "Business Hub", "Fit out & Renovations"]
-  }
-];
-
 const UAEAdvantageAccordion = () => {
   const [activeRow, setActiveRow] = useState<number | null>(0);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
@@ -361,15 +305,9 @@ export const UAELanding: React.FC = () => {
   const navigate = useNavigate();
   const [navScrolled,  setNavScrolled]  = useState(false);
   const [mobileOpen,   setMobileOpen]   = useState(false);
-  const [sideMenuOpen, setSideMenuOpen] = useState(false);
   const [openFaq,      setOpenFaq]      = useState<number | null>(null);
   const [activePlan,   setActivePlan]   = useState(1);
   const [hoveredService, setHoveredService] = useState<number | null>(null);
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
-  const [hoveredJuris, setHoveredJuris] = useState<string | null>("UAE Free Zones");
-  const [activeStep, setActiveStep] = useState<number | null>(null);
-  const [serviceCat, setServiceCat] = useState('setup');
-  const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
 
   /* nav scroll detection */
   useEffect(() => {
@@ -385,18 +323,6 @@ export const UAELanding: React.FC = () => {
   const contentY = useTransform(heroP, [0, 1], ['0%', '12%']);
   const overlayO = useTransform(heroP, [0, 1], [0.76, 0.9]);
 
-  /* lock body scroll when menu is open */
-  useEffect(() => {
-    if (sideMenuOpen || mobileOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [sideMenuOpen, mobileOpen]);
-
   /* ─────────────── RENDER ─────────────── */
   return (
     <div
@@ -405,257 +331,97 @@ export const UAELanding: React.FC = () => {
     >
       <MouseGlow color={C.gold} opacity={0.08} size={500} />
 
-      {/* 
-          CINEMATIC ENTRANCE REVEAL
-          The page starts with a deep, dark brand-colored overlay that fades out,
-          providing a high-end, cinematic "lighting up" effect on load.
-      */}
-      <motion.div
-        initial={{ opacity: 1 }}
-        animate={{ opacity: 0 }}
-        transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed inset-0 z-[10000] bg-[#040806] pointer-events-none"
-      />
-
-      <motion.div
-        initial={{ opacity: 0, scale: 1.03 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10"
+      {/* ══════════ NAVIGATION ══════════ */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`fixed top-0 left-0 w-full z-[60] transition-all duration-500 ${
+          navScrolled 
+            ? 'h-[74px] bg-[#111e17]/90 backdrop-blur-xl border-b border-white/5 shadow-2xl' 
+            : 'h-[100px] bg-transparent'
+        }`}
       >
-
-      {/* ══════════ UNIFIED NAVBAR ══════════ */}
-      <motion.header 
-        className={`fixed top-0 left-0 w-full h-[100px] z-[300] hidden lg:flex items-center justify-between px-10 transition-all duration-500 ${navScrolled ? 'bg-black/10 backdrop-blur-md border-b border-white/5 h-[84px]' : 'bg-transparent'}`}
-      >
-          <div className="flex items-center gap-6">
-            <Magnetic strength={20}>
-              <button 
-                onClick={() => setSideMenuOpen(!sideMenuOpen)}
-                className={`w-14 h-14 rounded-full border border-white/10 flex items-center justify-center group transition-all duration-500 ${sideMenuOpen ? 'bg-white shadow-xl rotate-90' : 'bg-white/10 hover:bg-[#FFC700] hover:border-transparent'}`}
-              >
-                {sideMenuOpen ? <X className="w-6 h-6 text-[#1a2e1f]" /> : <Menu className="w-6 h-6 text-white" />}
-              </button>
-            </Magnetic>
-            <div className="h-9 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/')}>
-              <img src="/Logo/Flashspace Logo.png" alt="FlashSpace Logo" className="h-full object-contain" />
+        <div className="max-w-[1400px] mx-auto h-full px-6 lg:px-10 flex items-center justify-between">
+          {/* Logo at Left */}
+          <div className="flex items-center gap-4 cursor-pointer group" onClick={() => navigate('/ae')}>
+            <div className="flex items-center gap-0.5" style={{ fontFamily: HEADING }}>
+              <span className="text-white font-black text-[24px] tracking-[-0.04em]">FLASH</span>
+              <Zap className="w-[18px] h-[18px] text-[#FFC700] fill-[#FFC700] -rotate-12 mb-1" />
+              <span className="text-[#FFC700] italic font-bold text-[24px] tracking-[-0.02em]">Space</span>
             </div>
+            <span className="hidden sm:inline-flex text-[10px] items-center font-black tracking-[0.2em] px-2.5 py-1 rounded-full bg-[#FFC700]/10 border border-[#FFC700]/20 text-[#FFC700]">
+              UAE
+            </span>
           </div>
 
-         {/* RIGHT: Links & CTA */}
-         <div className="flex items-center gap-8">
-            <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-[12px] font-black uppercase tracking-widest text-white hover:text-[#FFC700] transition-colors font-body">Pricing</button>
-            <button className="text-[12px] font-black uppercase tracking-widest text-white hover:text-[#FFC700] transition-colors font-body">Contact Us</button>
-            <div className="flex transition-all hover:scale-105">
-               <RegionSwitcher forcedDark={false} />
+          <div className="flex items-center gap-12">
+            {/* Nav Links */}
+            <nav className="hidden lg:flex items-center gap-10">
+              {['Solutions', 'Workspaces', 'Pricing', 'Contact'].map(l => (
+                <button
+                  key={l}
+                  onClick={() => l === 'Pricing' && document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="relative text-[13px] font-black uppercase tracking-[0.2em] text-white/70 hover:text-[#FFC700] transition-all duration-300 group"
+                  style={{ fontFamily: BODY }}
+                >
+                  {l}
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-[#FFC700] transition-all duration-500 group-hover:w-full" />
+                </button>
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-6">
+            <div className="hidden md:block transition-all hover:scale-105"><RegionSwitcher forcedDark={true} /></div>
+              <Magnetic strength={15}>
+                <button 
+                  onClick={() => navigate('/login')} 
+                  className="h-[46px] px-8 rounded-full bg-[#FFC700] text-[#111e17] font-black text-[12px] uppercase tracking-[0.15em] hover:bg-white transition-all duration-300"
+                  style={{ fontFamily: BODY }}
+                >
+                  Get Started
+                </button>
+              </Magnetic>
+              <button className="lg:hidden" onClick={() => setMobileOpen(true)}>
+                <Menu className="w-6 h-6 text-white" />
+              </button>
             </div>
-            <Magnetic strength={15}>
-               <button className="h-11 px-6 bg-[#FFC700] text-[#111e17] font-black text-[11px] uppercase tracking-widest hover:bg-white hover:shadow-xl transition-all shadow-lg rounded-sm">
-                  Cost Calculator
-               </button>
-            </Magnetic>
-         </div>
+          </div>
+        </div>
       </motion.header>
 
-      {/* ══════════ SIDE DRAWER MENU ══════════ */}
+      {/* Mobile overlay menu */}
       <AnimatePresence>
-        {sideMenuOpen && (
-          <>
-            <motion.div 
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               exit={{ opacity: 0 }}
-               onClick={() => setSideMenuOpen(false)}
-               className="fixed inset-0 bg-black/30 z-[180]"
-            />
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed left-0 top-0 h-[100dvh] w-full sm:w-[500px] bg-[#f1ede1] z-[190] border-r border-black/5 shadow-[30px_0_60px_rgba(0,0,0,0.1)] flex flex-col pointer-events-auto"
-            >
-               <div className="flex-1 overflow-y-auto overscroll-contain flex flex-col p-16 sm:p-20" data-lenis-prevent="true">
-                  <div className="mb-14">
-                     <span className="text-[10px] font-black text-[#1a2e1f]/40 tracking-[.5em] uppercase">Success Starts Here</span>
-                  </div>
-
-               <nav className="flex flex-col gap-10">
-                  {['Jurisdictions', 'Services', 'Resources', 'About Us'].map((l, i) => {
-                    const isMenu = l === 'Jurisdictions' || l === 'Services';
-                    return (
-                      <div key={l} className="group flex flex-col">
-                        <motion.button
-                          initial={{ opacity: 0, x: -30 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.1 + i * 0.05 }}
-                          onClick={() => {
-                             if (isMenu) {
-                               setActiveMenu(activeMenu === l ? null : l);
-                             } else {
-                               if (l === 'Pricing') document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-                               setSideMenuOpen(false);
-                             }
-                          }}
-                          className={`text-left text-2xl sm:text-3xl font-black uppercase tracking-tighter flex items-center justify-between transition-colors ${activeMenu === l ? 'text-[#35503f]' : 'text-[#1a2e1f]/40 hover:text-[#1a2e1f]'}`}
-                        >
-                          {l}
-                          {isMenu && (
-                            <div className={`w-8 h-8 rounded-full border border-black/10 flex items-center justify-center transition-all ${activeMenu === l ? 'rotate-180 bg-[#35503f] border-[#35503f]' : 'group-hover:border-black/30'}`}>
-                               <ChevronDown className={`w-3.5 h-3.5 ${activeMenu === l ? 'text-white' : 'text-[#1a2e1f]/40'}`} />
-                            </div>
-                          )}
-                        </motion.button>
-
-                        <AnimatePresence>
-                          {activeMenu === l && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden"
-                            >
-                                <div className="py-6 grid grid-cols-1 gap-4">
-                                   {l === 'Jurisdictions' ? (
-                                      <div className="grid grid-cols-1 gap-1">
-                                         {JURISDICTION_LIST.map((sub, si) => (
-                                           <motion.div 
-                                             key={sub}
-                                             initial={{ opacity: 0, scale: 0.98 }}
-                                             animate={{ opacity: 1, scale: 1 }}
-                                             transition={{ delay: si * 0.02 }}
-                                             className="group/sub flex items-center justify-between py-3 border-b border-black/[0.05] cursor-pointer"
-                                           >
-                                             <span className="text-[#1a2e1f]/40 text-[14px] font-black uppercase tracking-widest group-hover/sub:text-[#35503f] transition-colors">{sub}</span>
-                                             <ArrowRight className="w-4 h-4 text-[#35503f] opacity-0 group-hover/sub:opacity-100 transition-all -translate-x-3 group-hover/sub:translate-x-0" />
-                                           </motion.div>
-                                         ))}
-                                      </div>
-                                   ) : (
-                                      <div className="space-y-4">
-                                         {SERVICES_CATEGORIZED.map((cat, ci) => {
-                                           const isCatOpen = activeSubMenu === cat.category;
-                                           return (
-                                             <div key={cat.category} className="border-b border-black/[0.03] last:border-0 pb-2">
-                                                <button 
-                                                  onClick={() => setActiveSubMenu(isCatOpen ? null : cat.category)}
-                                                  className="w-full flex items-center justify-between py-3 group/catTrigger"
-                                                >
-                                                   <span className={`text-[13px] font-black uppercase tracking-[.25em] transition-all duration-300 ${isCatOpen ? 'text-[#35503f]' : 'text-[#1a2e1f]/30 group-hover/catTrigger:text-[#1a2e1f]'}`}>
-                                                      {cat.category}
-                                                   </span>
-                                                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-transform duration-500 ${isCatOpen ? 'rotate-180 bg-[#35503f]/10' : 'group-hover/catTrigger:bg-black/5'}`}>
-                                                      <ChevronDown className={`w-3 h-3 ${isCatOpen ? 'text-[#35503f]' : 'text-[#1a2e1f]/20'}`} />
-                                                   </div>
-                                                </button>
-                                                <AnimatePresence>
-                                                   {isCatOpen && (
-                                                      <motion.div
-                                                         initial={{ height: 0, opacity: 0 }}
-                                                         animate={{ height: 'auto', opacity: 1 }}
-                                                         exit={{ height: 0, opacity: 0 }}
-                                                         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                                                         className="overflow-hidden"
-                                                      >
-                                                         <div className="flex flex-col gap-1 pb-4 pl-4 border-l-2 border-[#35503f]/10 my-2">
-                                                            {cat.items.map((sub, si) => (
-                                                              <motion.div 
-                                                                key={sub}
-                                                                initial={{ opacity: 0, x: -10 }}
-                                                                animate={{ opacity: 1, x: 0 }}
-                                                                transition={{ delay: si * 0.05 }}
-                                                                className="group/sub cursor-pointer py-2 flex items-center gap-3"
-                                                              >
-                                                                 <div className="w-1 h-1 rounded-full bg-[#35503f] opacity-0 group-hover/sub:opacity-100 transition-opacity" />
-                                                                 <span className="text-[#1a2e1f]/40 text-[14px] font-bold uppercase tracking-widest group-hover/sub:text-[#1a2e1f] transition-all duration-300">
-                                                                    {sub}
-                                                                 </span>
-                                                              </motion.div>
-                                                            ))}
-                                                         </div>
-                                                      </motion.div>
-                                                   )}
-                                                </AnimatePresence>
-                                             </div>
-                                           );
-                                         })}
-                                      </div>
-                                   )}
-                                </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    );
-                  })}
-               </nav>
-
-               <div className="mt-16 space-y-10 pt-12 border-t border-black/5">
-                  <div className="flex flex-col gap-3">
-                     <span className="text-[#1a2e1f]/20 text-[10px] font-black uppercase tracking-[0.4em]">Digital First</span>
-                     <span className="text-[#1a2e1f] font-black text-lg leading-tight tracking-tight">
-                        Reach out to our specialists at <br/>
-                        <span className="text-[#35503f] opacity-60">support@flashspace.ae</span>
-                     </span>
-                  </div>
-                  <Magnetic strength={10}>
-                    <button 
-                      onClick={() => { setSideMenuOpen(false); navigate('/login'); }}
-                      className="w-full h-16 rounded-full bg-[#1a2e1f] text-white font-black text-[13px] uppercase tracking-[0.25em] hover:bg-[#35503f] transition-all shadow-xl"
-                    >
-                      Initialize Setup
-                    </button>
-                  </Magnetic>
-               </div>
-            </div>
-          </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-       {/* ══════════ MOBILE HEADER ══════════ */}
-       <header className="fixed top-0 left-0 w-full h-[80px] z-[150] lg:hidden flex items-center justify-between px-6 bg-[#0a140f] border-b border-white/5">
-           <div className="h-8 cursor-pointer" onClick={() => navigate('/')}>
-              <img src="/Logo/Flashspace Logo.png" alt="FlashSpace Logo" className="h-full object-contain invert brightness-200" />
-           </div>
-           <button onClick={() => setMobileOpen(true)} className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center">
-              <Menu className="w-6 h-6 text-white" />
-           </button>
-       </header>
-
-       {/* Existing mobile menu overlay logic */}
-       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[2000] flex flex-col bg-[#0a140f] overflow-y-auto overscroll-contain pointer-events-auto"
-            data-lenis-prevent="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] flex flex-col"
+            style={{ background: C.brandDeep }}
           >
-            <div className="flex items-center justify-between px-6 h-[80px] border-b border-white/5 shrink-0">
-              <div className="h-8 cursor-pointer" onClick={() => navigate('/')}>
-                <img src="/Logo/Flashspace Logo.png" alt="FlashSpace Logo" className="h-full object-contain invert brightness-200" />
+            <div className="flex items-center justify-between px-6 h-[70px]">
+              <div className="flex items-center gap-0.5" style={{ fontFamily: HEADING }}>
+                <span className="text-white font-black text-[20px] tracking-[-0.04em]">FLASH</span>
+                <Zap className="w-[15px] h-[15px] text-[#FFC700] fill-[#FFC700] -rotate-12 mb-0.5" />
+                <span className="text-[#FFC700] italic font-bold text-[20px] tracking-[-0.02em]">Space</span>
               </div>
-              <button onClick={() => setMobileOpen(false)} className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center"><X className="w-6 h-6 text-white" /></button>
+              <button onClick={() => setMobileOpen(false)} className="text-white/50 p-1"><X className="w-5 h-5" /></button>
             </div>
-            <div className="flex flex-col p-10 gap-8 min-h-max">
-              {['Jurisdictions', 'Services', 'Pricing', 'Contact Us'].map((l, i) => (
+            <div className="flex flex-col items-center justify-center flex-1 gap-7">
+              {['Solutions', 'Workspaces', 'Pricing', 'Contact'].map((l, i) => (
                 <motion.button
                   key={l}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.07 }}
                   onClick={() => { setMobileOpen(false); if (l === 'Pricing') document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className="text-left font-black uppercase text-3xl tracking-tighter text-white/50 hover:text-white"
+                  className="font-black uppercase text-[28px]"
+                  style={{ fontFamily: HEADING, letterSpacing: '0.05em', color: C.white }}
                 >{l}</motion.button>
               ))}
-              <div className="mt-10">
-                 <GoldBtn onClick={() => { setMobileOpen(false); navigate('/login'); }} className="w-full h-16">
-                   Get Started <ArrowRight className="ml-2 w-5 h-5" />
-                 </GoldBtn>
-              </div>
+              <GoldBtn onClick={() => { setMobileOpen(false); navigate('/login'); }} className="mt-6">
+                Get Started <ArrowRight className="w-4 h-4" />
+              </GoldBtn>
             </div>
           </motion.div>
         )}
@@ -714,9 +480,9 @@ export const UAELanding: React.FC = () => {
         {/* Content */}
         <motion.div
           style={{ y: contentY }}
-          className="relative z-10 w-full lg:max-w-none pl-6 pr-6 lg:pl-10 lg:pl-[max(2.5rem,calc((100vw-1200px)/2-40px))] py-16 mt-24 lg:mt-12"
+          className="relative z-10 w-full lg:max-w-none pl-6 pr-6 lg:pl-10 lg:pl-[max(2.5rem,calc((100vw-1200px)/2-40px))] py-16"
         >
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.8 }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}>
             <Label light>FlashSpace UAE — Business Made Simple</Label>
           </motion.div>
 
@@ -738,8 +504,8 @@ export const UAELanding: React.FC = () => {
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
                   transition={{ 
-                    delay: 0.9 + (i * 0.15), 
-                    duration: 1.2, 
+                    delay: 0.4 + (i * 0.15), 
+                    duration: 1, 
                     ease: [0.16, 1, 0.3, 1] 
                   }}
                   style={{ color: line.includes('UAE') ? C.gold : C.white }}
@@ -753,18 +519,19 @@ export const UAELanding: React.FC = () => {
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
+            transition={{ delay: 0.65, duration: 0.6 }}
             className="max-w-[480px] text-[16px] leading-[1.65] mb-10"
             style={{ color: C.textDim, fontFamily: BODY }}
           >
-            Set up your UAE company from anywhere in the world.
-We handle everything — so you can focus on growth.
+            Premium workspace solutions and seamless company formation.
+            From Free Zone setups to luxury managed offices —
+            launch your business in Dubai today.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.4, duration: 0.8 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
             className="flex flex-wrap gap-4 mb-16"
           >
             <Magnetic strength={25}>
@@ -783,7 +550,7 @@ We handle everything — so you can focus on growth.
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.7 }}
+            transition={{ delay: 1.05 }}
             className="flex flex-wrap gap-7"
           >
             {['100% Ownership', '24-Hour Setup', 'Golden Visa', '500+ Businesses'].map(t => (
@@ -863,413 +630,106 @@ We handle everything — so you can focus on growth.
       ══════════════════════════════════════ */}
       <section className="py-28 lg:py-36 bg-[#f8f9fa]">
         <div className="max-w-[1240px] mx-auto px-6 lg:px-10">
-          <FadeLeft className="mb-16 flex flex-col md:flex-row justify-between items-end gap-10">
-            <div className="max-w-[600px]">
-              <Label>Our Expertise</Label>
+          <FadeLeft className="mb-20 flex flex-col md:flex-row justify-between items-end gap-6">
+            <div>
+              <Label>Why FlashSpace UAE</Label>
               <h2
-                className="mt-2"
+                className="mt-1"
                 style={{
                   fontFamily: HEADING,
                   fontWeight: 900,
-                  fontSize: 'clamp(40px, 5vw, 70px)',
-                  lineHeight: 0.9,
-                  letterSpacing: '-0.04em',
+                  fontSize: 'clamp(44px, 6vw, 76px)',
+                  lineHeight: 0.92,
+                  letterSpacing: '-0.03em',
                   textTransform: 'uppercase',
                   color: C.brand,
                 }}
               >
-                ONE PLATFORM.<br />EVERY <span className="text-[#111e17]/20 italic">SOLUTION.</span>
+                EVERYTHING YOU NEED<br />TO SCALE <span className="text-[#111e17]/30 italic">GLOBALLY</span>
               </h2>
             </div>
-            
-            {/* Premium Category Switcher */}
-            <div className="relative p-1.5 bg-black/5 rounded-2xl backdrop-blur-md flex gap-1 border border-black/5">
-              {['setup', 'residency', 'workspace'].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setServiceCat(cat)}
-                  className={`relative z-10 px-8 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${serviceCat === cat ? 'text-white' : 'text-[#35503f]/50 hover:text-[#35503f]'}`}
-                >
-                  {serviceCat === cat && (
-                    <motion.div 
-                      layoutId="catBg"
-                      className="absolute inset-0 bg-[#35503f] rounded-xl z-[-1]"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                    />
-                  )}
-                  {cat}
-                </button>
-              ))}
-            </div>
+            <p className="max-w-[340px] text-[15px] leading-[1.65] mb-2" style={{ color: C.grayText }}>
+              Gain a competitive edge with our premium suite of corporate services, crafted exclusively for the modern enterprise.
+            </p>
           </FadeLeft>
 
-          <div className="min-h-[500px]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={serviceCat}
-                initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
-                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, scale: 1.02, filter: 'blur(10px)' }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              >
-                {(serviceCat === 'setup' ? [
-                  { Icon: Building2,  t: 'Free Zone',   d: '100% foreign ownership. Strategic locations — DIFC, DMCC, DAFZA. Ready in 24h.', img: validDubaiUrls[0] },
-                  { Icon: ShieldCheck, t: 'Mainland',    d: 'Direct access to UAE market with full regulatory compliance and PRO support.', img: validDubaiUrls[1] },
-                  { Icon: Zap,        t: '24h Setup',   d: 'Optimized internal workflows for lightning-fast business registration and licensing.', img: validDubaiUrls[2] },
-                ] : serviceCat === 'residency' ? [
-                  { Icon: Gem,        t: 'Golden Visa', d: 'Secure 10-year residency for yourself, family, and team members. Fully managed.', img: validDubaiUrls[3] },
-                  { Icon: Users,      t: 'Family Visas', d: 'Seamless sponsorship for dependents including medical, biometrics and ID processing.', img: validDubaiUrls[4] },
-                  { Icon: ShieldCheck, t: 'PRO Support',  d: 'Dedicated government relations and legal compliance to keep your firm protected.', img: validDubaiUrls[0] },
-                ] : [
-                  { Icon: Globe2,     t: 'Virtual Hub',  d: 'Prestigious Dubai business addresses with digital mail and reception services.', img: validDubaiUrls[1] },
-                  { Icon: Users,      t: 'Workspace',    d: 'Premium flexible desks and private offices in heart of the business district.', img: validDubaiUrls[2] },
-                  { Icon: Building2,  t: 'Banking',      d: 'Priority corporate account opening with top UAE banks via direct channels.', img: validDubaiUrls[0] },
-                ]).map(({ Icon, t, d, img }, i) => (
-                  <motion.div
-                    key={t}
-                    whileHover={{ y: -10 }}
-                    className="group relative overflow-hidden p-10 bg-white rounded-2xl cursor-pointer h-full border border-black/5 shadow-sm hover:shadow-2xl transition-all duration-500"
-                    style={{ minHeight: 400 }}
-                  >
-                    {/* Visual Image Background (Enhanced) */}
-                    <div 
-                       className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-all duration-700 bg-cover bg-center scale-110 group-hover:scale-100" 
-                       style={{ backgroundImage: `url(${img})` }} 
-                    />
-                    
-                    {/* Dark Overlay for contrast when image is visible */}
-                    <div className="absolute inset-0 bg-[#111e17]/70 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-[1]" />
-                    
-                    <div className="relative z-10 flex flex-col h-full pointer-events-none">
-                      <div className="w-16 h-16 rounded-2xl bg-black/5 flex items-center justify-center mb-10 group-hover:bg-[#FFC700] transition-all duration-500">
-                         <Icon className="w-7 h-7 text-[#111e17] transition-transform duration-500 group-hover:scale-110" />
-                      </div>
-                      
-                      <h3
-                        className="mb-4 text-[#111e17] uppercase font-black group-hover:text-white transition-colors duration-500"
-                        style={{ fontFamily: HEADING, fontSize: '26px', lineHeight: 1.1, letterSpacing: '0.02em' }}
-                      >{t}</h3>
-                      
-                      <p className="text-[14px] leading-[1.8] text-[#111e17]/60 group-hover:text-white/80 transition-colors duration-500">{d}</p>
-                      
-                      <div className="mt-auto pt-10 flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.3em] text-[#35503f] group-hover:text-[#FFC700] transition-colors duration-500">
-                        <span className="group-hover:translate-x-1 transition-transform">Explore Full Service</span> <ArrowUpRight className="w-4 h-4" />
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-
-        </div>
-      </section>
-
-
-      {/* ══════════════════════════════════════
-          STEPS TO START YOUR BUSINESS — Awwwards Interactive Accordion
-      ══════════════════════════════════════ */}
-      <section className="relative overflow-hidden" style={{ background: C.brandDeep }}>
-        {/* Massive watermark */}
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 pointer-events-none select-none opacity-[0.015] whitespace-nowrap">
-          <span className="text-[28vw] font-black text-white" style={{ fontFamily: HEADING, letterSpacing: '-0.06em' }}>
-            PROCESS
-          </span>
-        </div>
-
-        {/* Section Header */}
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-10 pt-28 lg:pt-40 pb-16 relative z-10">
-          <FadeUp>
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
-              <div>
-                <Label light>The Journey</Label>
-                <h2
-                  className="mt-1"
-                  style={{
-                    fontFamily: HEADING,
-                    fontWeight: 900,
-                    fontSize: 'clamp(40px, 6vw, 80px)',
-                    lineHeight: 0.88,
-                    letterSpacing: '-0.04em',
-                    textTransform: 'uppercase',
-                    color: C.white,
-                  }}
-                >
-                  YOUR PATH TO<br />
-                  <span className="text-transparent" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.25)' }}>BUSINESS</span>{' '}
-                  <span className="text-[#FFC700]">SUCCESS</span>
-                </h2>
-              </div>
-              <p className="max-w-[380px] text-[14px] leading-[1.7] mb-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                From first consultation to fully operational — we handle the complexity so you can focus on what matters.
-              </p>
-            </div>
-          </FadeUp>
-        </div>
-
-        {/* Steps Accordion */}
-        <div className="relative z-10 border-t border-white/[0.04]">
-          {[
-            { step: '01', title: 'Choose Your Jurisdiction', desc: 'Free Zone, Mainland, or Offshore — we help you pick the best structure based on your activity, budget, and visa needs.', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format' },
-            { step: '02', title: 'Select Your License', desc: 'Commercial, Professional, Industrial, or E-commerce. We guide you through the right license type for your business model.', img: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2070&auto=format' },
-            { step: '03', title: 'Register Your Company', desc: 'We handle all paperwork — trade name reservation, MOA drafting, and legal documentation submitted on your behalf.', img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2070&auto=format' },
-            { step: '04', title: 'Get Your Visa & Emirates ID', desc: 'Investor, partner, or employee visas processed end-to-end. Medical, biometrics, and Emirates ID — all coordinated.', img: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2070&auto=format' },
-            { step: '05', title: 'Open a Bank Account', desc: 'We connect you with top UAE banks and prepare your application for the fastest possible approval.', img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format' },
-            { step: '06', title: 'Start Operating', desc: "Your license is active, your visa is stamped, and your bank account is open. You're officially in business.", img: 'https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?q=80&w=2070&auto=format' },
-          ].map(({ step, title, desc, img }, i) => (
-            <FadeUp key={step} delay={i * 0.05}>
-              <motion.div 
-                layout
-                className="group relative border-b border-white/[0.04] cursor-pointer overflow-hidden"
-                onClick={() => setActiveStep(activeStep === i ? null : i)}
-              >
-                {/* Background image on hover (Hardware Accelerated) */}
-                <motion.div 
-                  initial={false}
-                  animate={{ 
-                    opacity: activeStep === i ? 0.5 : 0,
-                    scale: activeStep === i ? 1.05 : 1.15 
-                  }}
-                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute inset-0 bg-cover bg-center z-0 pointer-events-none"
-                  style={{ backgroundImage: `url(${img})` }}
-                />
-                <motion.div 
-                   initial={false}
-                   animate={{ opacity: activeStep === i ? 1 : 0 }}
-                   transition={{ duration: 0.6 }}
-                   className="absolute inset-0 bg-gradient-to-r from-[#111e17] via-[#111e17]/80 to-transparent z-[1] pointer-events-none" 
-                />
-
-                {/* Row content */}
-                <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-10">
-                   <div className="flex items-center gap-6 lg:gap-12 py-8 lg:py-12">
-                    {/* Step Number (Simplified for better performance) */}
-                    <motion.span 
-                      animate={{ 
-                        color: activeStep === i ? '#FFC700' : 'rgba(255,255,255,0.1)',
-                        x: activeStep === i ? 5 : 0
-                      }}
-                      className="text-[60px] lg:text-[100px] xl:text-[140px] font-black leading-none shrink-0 w-[80px] lg:w-[180px]"
-                      style={{ 
-                        fontFamily: HEADING,
-                        letterSpacing: '-0.04em',
-                      }}
-                    >
-                      {step}
-                    </motion.span>
-
-                    {/* Title */}
-                    <motion.h3 
-                      animate={{ 
-                        color: activeStep === i ? '#ffffff' : 'rgba(255,255,255,0.25)',
-                        x: activeStep === i ? 10 : 0
-                      }}
-                      className="flex-1 font-black text-[22px] lg:text-[36px] xl:text-[44px] uppercase tracking-tight"
-                      style={{ fontFamily: HEADING, letterSpacing: '-0.02em' }}
-                    >
-                      {title}
-                    </motion.h3>
-
-                    {/* Expand indicator */}
-                    <div className={`w-12 h-12 lg:w-20 lg:h-20 rounded-full border flex items-center justify-center shrink-0 transition-all duration-500 ${activeStep === i ? 'border-[#FFC700] bg-[#FFC700] scale-110' : 'border-white/10 group-hover:border-white/30'}`}>
-                      <span className={`text-[24px] lg:text-[32px] font-light transition-colors duration-500 ${activeStep === i ? 'text-[#111e17]' : 'text-white/20'}`}>
-                        {activeStep === i ? '−' : '+'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Expandable content */}
-                  <AnimatePresence initial={false}>
-                    {activeStep === i && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pb-12 lg:pb-20 pl-[86px] lg:pl-[192px] max-w-[800px]">
-                          <motion.p 
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="text-[16px] lg:text-[19px] leading-[1.8] mb-10 text-white/50"
-                          >
-                            {desc}
-                          </motion.p>
-                          <div className="flex items-center gap-4 text-[13px] font-black uppercase tracking-[0.3em] text-[#FFC700] group/link cursor-pointer">
-                            <span className="group-hover/link:mr-2 transition-all">Start Registration</span>
-                            <ArrowRight className="w-5 h-5 group-hover/link:translate-x-3 transition-transform" />
-                          </div>
-                        </div>
-
-                        {/* Animated gold progress line */}
-                        <motion.div 
-                          initial={{ scaleX: 0 }}
-                          animate={{ scaleX: 1 }}
-                          transition={{ duration: 1, ease: "circOut" }}
-                          className="h-[3px] bg-[#FFC700] origin-left"
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </motion.div>
-            </FadeUp>
-          ))}
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-28 relative z-10">
-          <FadeUp className="flex flex-col sm:flex-row items-center gap-8">
-            <Magnetic strength={20}>
-              <GoldBtn large onClick={() => navigate('/services/virtual-office')}>
-                Get Started Today <ArrowRight className="w-5 h-5" />
-              </GoldBtn>
-            </Magnetic>
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-[1px] bg-white/10" />
-              <span className="text-[11px] font-black uppercase tracking-[0.3em]" style={{ color: C.textMuted }}>
-                Average setup: 24–72 hours
-              </span>
-            </div>
-          </FadeUp>
-        </div>
-      </section>
-
-
-      {/* ══════════════════════════════════════
-          CHOOSE YOUR JURISDICTION
-      ══════════════════════════════════════ */}
-      <section className="relative py-28 lg:py-40 overflow-hidden bg-[#f8f9fa]">
-        {/* Section Header */}
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-10 mb-16 lg:mb-20">
-          <FadeUp>
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
-              <div>
-                <Label>Jurisdictions</Label>
-                <h2
-                  className="mt-1"
-                  style={{
-                    fontFamily: HEADING,
-                    fontWeight: 900,
-                    fontSize: 'clamp(40px, 6vw, 76px)',
-                    lineHeight: 0.92,
-                    letterSpacing: '-0.03em',
-                    textTransform: 'uppercase',
-                    color: C.brand,
-                  }}
-                >
-                  CHOOSE YOUR<br />
-                  <span className="text-[#111e17]/25 italic">JURISDICTION</span>
-                </h2>
-              </div>
-              <p className="max-w-[380px] text-[15px] leading-[1.65] mb-2" style={{ color: C.grayText }}>
-                Each jurisdiction offers unique advantages. We help you select the ideal setup based on your business activity, ownership needs, and growth plans.
-              </p>
-            </div>
-          </FadeUp>
-        </div>
-
-        {/* Jurisdiction Cards */}
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              {
-                title: 'Free Zone',
-                subtitle: '100% Foreign Ownership',
-                desc: 'Tax-free business setup with full repatriation of profits. Ideal for international trade, tech, consulting, and e-commerce ventures.',
-                features: ['0% Corporate Tax', '100% Ownership', 'No Currency Restrictions', 'Fast Processing'],
-                img: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2070&auto=format',
-                color: '#FFC700',
-              },
-              {
-                title: 'Mainland',
-                subtitle: 'Direct UAE Market Access',
-                desc: 'Trade directly with UAE consumers and government entities. Full flexibility to operate anywhere in the Emirates without restrictions.',
-                features: ['Unlimited Visas', 'Government Contracts', 'No Trade Barriers', 'Any Location'],
-                img: 'https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?q=80&w=2070&auto=format',
-                color: '#ffffff',
-              },
-              {
-                title: 'Offshore',
-                subtitle: 'International Asset Protection',
-                desc: 'Perfect for holding companies, international asset management, and intellectual property protection with maximum privacy.',
-                features: ['Full Privacy', 'Asset Protection', 'No Physical Office', 'Multi-Currency'],
-                img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format',
-                color: '#FFC700',
-              },
-            ].map(({ title, subtitle, desc, features, img, color }, i) => (
-              <FadeUp key={title} delay={i * 0.12} className="h-full">
+              { Icon: Building2,  t: 'Free Zone Formation', d: '100% foreign ownership. Strategic locations — DIFC, DMCC, DAFZA, and more. Ready in 24 hours.' },
+              { Icon: ShieldCheck, t: 'Mainland License',    d: 'Direct access to the UAE market with full regulatory compliance and dedicated PRO support.' },
+              { Icon: Gem,        t: 'Golden Visa',         d: 'Exclusive concierge services for 10-year residency and investor visa applications.' },
+              { Icon: Globe2,     t: 'Virtual Office',      d: 'Premium addresses in prime Dubai locations with mail handling, phone answering, and reception.' },
+              { Icon: Users,      t: 'Coworking Spaces',    d: 'Fully equipped desks and offices with high-speed internet and 24/7 access.' },
+              { Icon: Zap,        t: '24-Hour Setup',       d: 'Trade license in as fast as 24 hours. DED, immigration, and bank account — we handle it all.' },
+            ].map(({ Icon, t, d }, i) => {
+              const isActive = hoveredService === i;
+              const isOtherHovered = hoveredService !== null && hoveredService !== i;
+              
+              return (
+              <FadeUp key={i} delay={i * 0.08} className="h-full">
                 <motion.div
-                  whileHover={{ y: -6 }}
+                  onMouseEnter={() => setHoveredService(i)}
+                  onMouseLeave={() => setHoveredService(null)}
+                  whileHover={{ y: -8, scale: 1.01 }}
                   transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  className="group relative overflow-hidden rounded-lg cursor-pointer h-full"
-                  style={{ minHeight: 560 }}
+                  className="relative overflow-hidden p-10 bg-white cursor-pointer h-full border border-black/5 rounded-md shadow-sm"
+                  style={{ minHeight: 320 }}
                 >
-                  {/* Background Image with Parallax */}
+                  {/* Dynamic Background Image that appears when ANOTHER card is hovered */}
                   <div 
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-[1200ms] ease-[0.16,1,0.3,1] group-hover:scale-110"
-                    style={{ backgroundImage: `url(${img})` }}
+                    className="absolute inset-0 bg-cover bg-center transition-all duration-[700ms] ease-[0.16,1,0.3,1] z-0" 
+                    style={{ 
+                      backgroundImage: `url(${validDubaiUrls[i % validDubaiUrls.length]})`,
+                      opacity: isOtherHovered ? 1 : 0,
+                      transform: isOtherHovered ? 'scale(1)' : 'scale(1.1)',
+                      filter: isOtherHovered ? 'grayscale(40%) blur(0px)' : 'grayscale(100%) blur(4px)'
+                    }} 
+                  />
+                  {/* Heavy dark overlay over the image to keep text readable */}
+                  <div 
+                     className="absolute inset-0 bg-[#0a110d]/80 transition-opacity duration-[700ms] ease-[0.16,1,0.3,1]" 
+                     style={{ opacity: isOtherHovered ? 1 : 0 }} 
+                  />
+
+                  {/* Deep Hover Gradient (REMOVED: User requested active card stays white) */}
+                  <div 
+                    className="absolute inset-0 bg-[#111e17] transition-opacity duration-500 ease-in-out pointer-events-none"
+                    style={{ opacity: 0 }}
                   />
                   
-                  {/* Multi-layer overlays */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a110d] via-[#0a110d]/60 to-transparent" />
-                  <div className="absolute inset-0 bg-[#0a110d]/20 group-hover:bg-[#0a110d]/40 transition-colors duration-700" />
+                  {/* Oversized Watermark Icon */}
+                  <Icon className={`absolute -right-8 -bottom-8 w-64 h-64 pointer-events-none stroke-1 transition-all duration-[800ms] ease-out ${isActive ? 'opacity-[0.04] -rotate-12 text-[#111e17]' : 'opacity-[0.02] text-[#111e17]'}`} />
 
-                  {/* Content */}
-                  <div className="relative z-10 h-full flex flex-col justify-end p-8 lg:p-10" style={{ minHeight: 560 }}>
-                    {/* Gold accent line */}
-                    <div className="w-10 h-[2px] mb-6 transition-all duration-500 group-hover:w-16" style={{ background: color }} />
-                    
-                    {/* Subtitle */}
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] mb-3 transition-colors duration-500" style={{ color }}>
-                      {subtitle}
-                    </span>
-
-                    {/* Title */}
-                    <h3
-                      className="text-white font-black text-[36px] lg:text-[44px] uppercase leading-none tracking-tight mb-4"
-                      style={{ fontFamily: HEADING }}
-                    >
-                      {title}
-                    </h3>
-
-                    {/* Description - slides up on hover */}
-                    <div className="overflow-hidden">
-                      <div className="transform lg:translate-y-4 lg:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-[0.16,1,0.3,1]">
-                        <p className="text-[14px] leading-[1.7] text-white/50 mb-6 max-w-[320px]">
-                          {desc}
-                        </p>
-
-                        {/* Feature tags */}
-                        <div className="flex flex-wrap gap-2 mb-8">
-                          {features.map(f => (
-                            <span key={f} className="text-[10px] font-black uppercase tracking-widest text-white/70 bg-white/5 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
-                              {f}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+                  <div className="relative z-10 flex flex-col h-full pointer-events-none">
+                    {/* Icon Circle */}
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-10 transition-all duration-500 ease-out ${isActive ? 'bg-[#FFC700]' : (isOtherHovered ? 'bg-[#FFC700]/10 backdrop-blur-md' : 'bg-[#111e17]/5')}`}>
+                       <Icon className={`w-6 h-6 transition-transform duration-500 ${isActive ? 'text-[#111e17] scale-110' : (isOtherHovered ? 'text-[#FFC700]' : 'text-[#111e17]')}`} />
                     </div>
-
-                    {/* CTA */}
-                    <div className="flex items-center gap-3">
-                      <span className="text-[11px] font-black uppercase tracking-[0.25em] text-white/60 group-hover:text-[#FFC700] transition-colors duration-500">
-                        Explore Options
-                      </span>
-                      <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-[#FFC700] group-hover:translate-x-2 transition-all duration-500" />
+                    
+                    <h3
+                      className={`mb-4 transition-colors duration-500 ease-out ${isOtherHovered ? 'text-white' : 'text-[#111e17]'}`}
+                      style={{ fontFamily: HEADING, fontWeight: 900, fontSize: '26px', lineHeight: 1.05, letterSpacing: '0.02em', textTransform: 'uppercase' }}
+                    >{t}</h3>
+                    
+                    <p className={`text-[14px] leading-[1.7] transition-colors duration-500 ease-out ${isOtherHovered ? 'text-white/60' : 'text-[#111e17]/60'}`}>{d}</p>
+                    
+                    {/* Interactive 'Learn More' Button */}
+                    <div className={`mt-auto pt-10 flex items-center gap-2 text-[12px] font-black uppercase tracking-[0.2em] transform transition-all duration-500 ease-out ${isActive ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`} style={{ color: C.brand }}>
+                      Explore <ArrowUpRight className="w-4 h-4" />
                     </div>
                   </div>
                 </motion.div>
               </FadeUp>
-            ))}
+            )})}
           </div>
         </div>
       </section>
+
+
+      {/* ══════════════════════════════════════
+          DUBAI SKYLINE PARALLAX SECTION
+      ══════════════════════════════════════ */}
+      <SkylineSection navigate={navigate} />
 
 
       {/* ══════════════════════════════════════
@@ -1660,8 +1120,10 @@ We handle everything — so you can focus on growth.
         <div className="max-w-[1200px] mx-auto px-6 lg:px-10 py-16">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-14">
             <div>
-              <div className="h-8 mb-6 cursor-pointer" onClick={() => navigate('/')}>
-                 <img src="/Logo/Flashspace Logo.png" alt="FlashSpace Logo" className="h-full object-contain invert brightness-200" />
+              <div className="flex items-center gap-0.5 mb-5" style={{ fontFamily: HEADING }}>
+                <span className="text-white font-black text-[18px] tracking-[-0.04em]">FLASH</span>
+                <Zap className="w-[14px] h-[14px] text-[#FFC700] fill-[#FFC700] -rotate-12 mb-0.5" />
+                <span className="text-[#FFC700] italic font-bold text-[18px] tracking-[-0.02em]">Space</span>
               </div>
               <p className="text-[12px] leading-[1.8]" style={{ color: C.textMuted }}>Premium workspace and business setup in the UAE.</p>
             </div>
@@ -1696,8 +1158,110 @@ We handle everything — so you can focus on growth.
           </div>
         </div>
       </footer>
-    </motion.div>
     </div>
   );
 };
 
+
+/* ═══════════════════════════════════════════
+   SKYLINE PARALLAX SECTION  (split-screen)
+═══════════════════════════════════════════ */
+const SkylineSection: React.FC<{ navigate: ReturnType<typeof useNavigate> }> = ({ navigate }) => {
+  const ref  = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const imgY    = useTransform(scrollYProgress, [0, 1], ['-15%', '15%']);
+  const textX   = useTransform(scrollYProgress, [0, 1], ['10%', '-30%']);
+  const opacity = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [0.4, 1, 1, 0.4]);
+
+  const contentRef = useRef(null);
+  const isInView = useInView(contentRef, { once: true, margin: "-100px" });
+
+  return (
+    <section ref={ref} className="relative h-[85vh] min-h-[600px] overflow-hidden flex items-center bg-[#0a110d]">
+      
+      {/* 1. Large Background Scrolling Text (Awwwards Style) */}
+      <motion.div 
+        style={{ x: textX }} 
+        className="absolute top-1/2 -translate-y-1/2 left-0 whitespace-nowrap pointer-events-none z-0 select-none"
+      >
+        <span 
+          className="text-[25vw] font-black leading-none opacity-[0.03] text-white"
+          style={{ fontFamily: HEADING, letterSpacing: '-0.05em' }}
+        >
+          DUBAI EXCELLENCE DXB
+        </span>
+      </motion.div>
+
+      {/* 2. Parallax Image Background */}
+      <motion.div className="absolute inset-0 z-[1] w-full h-[130%]" style={{ y: imgY, opacity }}>
+        <div
+          className="w-full h-full bg-cover bg-center grayscale-[30%] brightness-[0.6]"
+          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?q=80&w=2070&auto=format)' }}
+        />
+        {/* Dynamic Shadow Mask */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a110d] via-[#0a110d]/40 to-transparent" />
+      </motion.div>
+
+      {/* 3. Main Content Container */}
+      <div className="relative z-10 max-w-[1240px] mx-auto px-6 lg:px-10 w-full" ref={contentRef}>
+        <div className="max-w-[700px]">
+          {/* Label with Line */}
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="flex items-center gap-4 mb-8"
+          >
+            <div className="w-12 h-[1px] bg-[#FFC700]" />
+            <span className="text-[12px] font-black uppercase tracking-[0.3em] text-[#FFC700]">★ Prime Corporate Locations</span>
+          </motion.div>
+
+          {/* Heading with Mask Reveal */}
+          <div className="overflow-hidden mb-8">
+            <motion.h2
+              initial={{ y: "100%" }}
+              animate={isInView ? { y: 0 } : {}}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              style={{
+                fontFamily: HEADING,
+                fontWeight: 900,
+                fontSize: 'clamp(48px, 8vw, 110px)',
+                lineHeight: 0.88,
+                letterSpacing: '-0.04em',
+                textTransform: 'uppercase',
+                color: C.white,
+              }}
+            >
+              YOUR OFFICE IN <br />
+              <span className="text-transparent" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.3)' }}>THE HEART</span> OF <span className="text-[#FFC700]">DUBAI</span>
+            </motion.h2>
+          </div>
+
+          {/* Description and Locations Tagline */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <p className="text-[16px] md:text-[18px] leading-relaxed mb-12 max-w-[500px]" style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>
+              DIFC · Business Bay · Dubai Marina · Downtown · JLT · DMCC · Abu Dhabi
+            </p>
+
+            {/* Interactive Button */}
+            <GoldBtn large onClick={() => navigate('/services/virtual-office')} className="group">
+              Explore Available Spaces 
+              <motion.div 
+                className="inline-block ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+              >
+                <ArrowUpRight className="w-5 h-5" />
+              </motion.div>
+            </GoldBtn>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Bottom Border Accent */}
+      <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white/5" />
+    </section>
+  );
+};
