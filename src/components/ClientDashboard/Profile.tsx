@@ -23,6 +23,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Country, State, City } from "country-state-city";
+import { toast } from "sonner";
+import { authService } from "@/services/auth.service";
+import { cn } from "@/lib/utils";
 
 import KYCVerification from "./KYCVerification";
 
@@ -40,7 +43,7 @@ interface ProfileDataState {
 }
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<"personal" | "company" | "kyc">(
     "personal",
@@ -88,8 +91,12 @@ const Profile: React.FC = () => {
             ...prev,
             fullName: user.fullName || "",
             email: user.email || "",
-            phone: (user as any).phone || "",
+            phone: user.phoneNumber || (user as any).phone || "",
           }));
+          
+          if (user.profilePicture) {
+            setProfileImage(user.profilePicture);
+          }
         }
 
         // Fetch KYC data for business info
@@ -109,21 +116,25 @@ const Profile: React.FC = () => {
           if (kyc) {
             setKycData(kyc);
 
-            if (kyc.businessInfo) {
-              setProfileData((prev) => ({
-                ...prev,
-                registeredAddress: kyc.businessInfo?.address || "",
-              }));
-              setBusinessInfoForm({
-                companyName: kyc.businessInfo.companyName || "",
-                companyType: kyc.businessInfo.companyType || "",
-                gstNumber: kyc.businessInfo.gstNumber || "",
-                panNumber: kyc.businessInfo.panNumber || "",
-                cinNumber: kyc.businessInfo.cinNumber || "",
-                address: kyc.businessInfo.address || "",
-                businessNature: kyc.businessInfo.businessNature || "",
-              });
-            }
+            // Populate form and profile data from KYC response
+            setProfileData((prev) => ({
+              ...prev,
+              registeredAddress: kyc.businessInfo?.registeredAddress || "",
+              city: kyc.personalInfo?.city || "",
+              state: kyc.personalInfo?.state || "",
+              country: kyc.personalInfo?.country || "",
+              pincode: kyc.personalInfo?.pincode || "",
+            }));
+
+            setBusinessInfoForm({
+              companyName: kyc.businessInfo?.companyName || "",
+              companyType: kyc.businessInfo?.companyType || "",
+              address: kyc.businessInfo?.registeredAddress || "",
+              gstNumber: kyc.businessInfo?.gstNumber || "",
+              panNumber: kyc.businessInfo?.panNumber || "",
+              cinNumber: kyc.businessInfo?.cinNumber || "",
+              businessNature: kyc.businessInfo?.businessNature || "",
+            });
           }
         }
 
@@ -191,14 +202,33 @@ const Profile: React.FC = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      // Update business info if KYC data exists
+      
+      // 1. Update Personal Info (fullName, phoneNumber)
+      const profileUpdateResponse = await authService.updateProfile({
+        fullName: profileData.fullName,
+        phoneNumber: profileData.phone,
+      });
+
+      if (!profileUpdateResponse.success) {
+        throw new Error(profileUpdateResponse.message || "Failed to update personal info");
+      }
+
+      // 2. Update Business info if KYC data exists
       if (kycData) {
+        // Sync address across forms
+        const finalAddress = profileData.registeredAddress || businessInfoForm.address;
+        
         await userDashboardService.updateBusinessInfo({
           profileId: kycData._id,
           ...businessInfoForm,
-          registeredAddress: profileData.registeredAddress, // Sync registered address
+          registeredAddress: finalAddress, 
+          city: profileData.city,
+          state: profileData.state,
+          country: profileData.country,
+          pincode: profileData.pincode,
         });
-        // Refresh data after save
+        
+        // Refresh KYC data
         const kycResponse = await userDashboardService.getKYC();
         if (kycResponse.success && kycResponse.data) {
           const profiles = Array.isArray(kycResponse.data)
@@ -215,19 +245,51 @@ const Profile: React.FC = () => {
           }
         }
       }
+
+      // 3. Sync local auth context
+      if (profileUpdateResponse.data) {
+        updateUser(profileUpdateResponse.data);
+      }
+
+      toast.success("Profile updated successfully");
       setIsEditing(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error saving profile:", err);
+      toast.error(err.message || "Failed to save profile changes");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfileImage(imageUrl);
+    if (!file) return;
+
+    try {
+      setUploadingImage(true);
+      
+      // Upload to server
+      const response = await authService.uploadProfilePicture(file);
+      
+      if (response.success && response.data) {
+        setProfileImage(response.data.profilePicture);
+        
+        // Sync local auth context
+        if (user) {
+          updateUser({ ...user, profilePicture: response.data.profilePicture });
+        }
+        
+        toast.success("Profile picture updated");
+      } else {
+        toast.error(response.message || "Failed to upload image");
+      }
+    } catch (err) {
+      console.error("Image upload error:", err);
+      toast.error("An error occurred during upload");
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -347,18 +409,31 @@ const Profile: React.FC = () => {
                 <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-16 relative z-10">
                   {/* Profile Image */}
                   <div className="relative group">
-                    <div className="w-32 h-32 rounded-3xl bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02]">
+                    <div className="w-32 h-32 rounded-3xl bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02] relative">
                       {profileImage ? (
-                        <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                        <img 
+                          src={profileImage.startsWith('http') ? profileImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${profileImage}`} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover" 
+                        />
                       ) : (
                         <div className="w-full h-full bg-gray-50 flex items-center justify-center">
                           <User className="w-12 h-12 text-gray-300" />
                         </div>
                       )}
+                      
+                      {uploadingImage && (
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center backdrop-blur-[2px]">
+                          <Loader2 className="w-8 h-8 text-white animate-spin" />
+                        </div>
+                      )}
                     </div>
-                    <label className="absolute -bottom-2 -right-2 w-10 h-10 bg-white border border-gray-100 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all shadow-lg text-[#35503F]">
+                    <label className={cn(
+                      "absolute -bottom-2 -right-2 w-10 h-10 bg-white border border-gray-100 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all shadow-lg text-[#35503F]",
+                      uploadingImage && "opacity-50 pointer-events-none"
+                    )}>
                       <Camera className="w-5 h-5" />
-                      <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                      <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploadingImage} />
                     </label>
                   </div>
 

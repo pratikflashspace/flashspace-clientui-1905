@@ -222,6 +222,30 @@ class AuthService {
   }
 
   /**
+   * Upload profile picture
+   */
+  async uploadProfilePicture(file: File): Promise<AuthResponse<{ profilePicture: string }>> {
+    try {
+      const formData = new FormData();
+      formData.append('profilePicture', file);
+
+      // Explicitly pass token if available in cookies for redundancy
+      const response = await axiosInstance.post('/user/upload-avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true // Ensure cookies are sent
+      });
+      return response.data as AuthResponse<{ profilePicture: string }>;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || 'Failed to upload profile picture',
+      } as AuthResponse<{ profilePicture: string }>;
+    }
+  }
+
+  /**
    * Refresh access token
    */
   async refreshToken(): Promise<AuthResponse<{ accessToken: string; refreshToken: string }>> {
