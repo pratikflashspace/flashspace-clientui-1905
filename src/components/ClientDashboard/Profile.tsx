@@ -23,6 +23,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Country, State, City } from "country-state-city";
+import { toast } from "sonner";
+import { authService } from "@/services/auth.service";
+import { cn } from "@/lib/utils";
 
 import KYCVerification from "./KYCVerification";
 
@@ -40,7 +43,7 @@ interface ProfileDataState {
 }
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<"personal" | "company" | "kyc">(
     "personal",
@@ -75,6 +78,19 @@ const Profile: React.FC = () => {
     businessNature: "",
   });
 
+  const extractAddressFromKYC = (profile: KYCData | null | undefined) => {
+    if (!profile) return "";
+    return (
+      profile.businessInfo?.registeredAddress ||
+      profile.businessInfo?.address ||
+      profile.personalInfo?.registeredAddress ||
+      profile.personalInfo?.address ||
+      (profile as any).registeredAddress ||
+      (profile as any).address ||
+      ""
+    );
+  };
+
   // Fetch user profile and KYC data
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -88,8 +104,22 @@ const Profile: React.FC = () => {
             ...prev,
             fullName: user.fullName || "",
             email: user.email || "",
-            phone: (user as any).phone || "",
+            phone: user.phoneNumber || (user as any).phone || "",
+            alternatePhone: (user as any).alternatePhone || prev.alternatePhone || "",
+            city: (user as any).city || prev.city || "",
+            state: (user as any).state || prev.state || "",
+            country: (user as any).country || prev.country || "IN",
+            pincode: (user as any).pincode || prev.pincode || "",
+            registeredAddress:
+              (user as any).address ||
+              (user as any).registeredAddress ||
+              prev.registeredAddress ||
+              "",
           }));
+          
+          if (user.profilePicture) {
+            setProfileImage(user.profilePicture);
+          }
         }
 
         // Fetch KYC data for business info
@@ -99,31 +129,49 @@ const Profile: React.FC = () => {
             ? kycResponse.data
             : [kycResponse.data];
 
-          // Find the best profile: approved/verified first, then any profile
-          const approvedKyc = profiles.find(
-            (p) =>
-              p.overallStatus === "approved" || p.overallStatus === "verified",
-          );
-          const kyc = approvedKyc || profiles[0];
+          // Prefer profile with address, then approved/verified, then latest updated.
+          const sortedProfiles = [...profiles].sort((a, b) => {
+            const aHasAddress = Boolean(extractAddressFromKYC(a));
+            const bHasAddress = Boolean(extractAddressFromKYC(b));
+            if (aHasAddress !== bHasAddress) return Number(bHasAddress) - Number(aHasAddress);
+
+            const aIsApproved =
+              a.overallStatus === "approved" || a.overallStatus === "verified";
+            const bIsApproved =
+              b.overallStatus === "approved" || b.overallStatus === "verified";
+            if (aIsApproved !== bIsApproved) return Number(bIsApproved) - Number(aIsApproved);
+
+            const aUpdatedAt = Date.parse((a as any).updatedAt || "") || 0;
+            const bUpdatedAt = Date.parse((b as any).updatedAt || "") || 0;
+            return bUpdatedAt - aUpdatedAt;
+          });
+
+          const kyc = sortedProfiles[0];
 
           if (kyc) {
             setKycData(kyc);
 
-            if (kyc.businessInfo) {
-              setProfileData((prev) => ({
-                ...prev,
-                registeredAddress: kyc.businessInfo?.address || "",
-              }));
-              setBusinessInfoForm({
-                companyName: kyc.businessInfo.companyName || "",
-                companyType: kyc.businessInfo.companyType || "",
-                gstNumber: kyc.businessInfo.gstNumber || "",
-                panNumber: kyc.businessInfo.panNumber || "",
-                cinNumber: kyc.businessInfo.cinNumber || "",
-                address: kyc.businessInfo.address || "",
-                businessNature: kyc.businessInfo.businessNature || "",
-              });
-            }
+            // Populate form and profile data from KYC response.
+            const fetchedAddress = extractAddressFromKYC(kyc);
+
+            setProfileData((prev) => ({
+              ...prev,
+              registeredAddress: fetchedAddress || prev.registeredAddress || "",
+              city: kyc.personalInfo?.city || (kyc as any).city || prev.city || "",
+              state: kyc.personalInfo?.state || (kyc as any).state || prev.state || "",
+              country: kyc.personalInfo?.country || (kyc as any).country || prev.country || "IN",
+              pincode: kyc.personalInfo?.pincode || (kyc as any).pincode || prev.pincode || "",
+            }));
+
+            setBusinessInfoForm((prev) => ({
+              companyName: kyc.businessInfo?.companyName || prev.companyName || "",
+              companyType: kyc.businessInfo?.companyType || prev.companyType || "",
+              address: fetchedAddress || prev.address || "",
+              gstNumber: kyc.businessInfo?.gstNumber || prev.gstNumber || "",
+              panNumber: kyc.businessInfo?.panNumber || prev.panNumber || "",
+              cinNumber: kyc.businessInfo?.cinNumber || prev.cinNumber || "",
+              businessNature: kyc.businessInfo?.businessNature || prev.businessNature || "",
+            }));
           }
         }
 
@@ -191,43 +239,128 @@ const Profile: React.FC = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      // Update business info if KYC data exists
-      if (kycData) {
-        await userDashboardService.updateBusinessInfo({
-          profileId: kycData._id,
-          ...businessInfoForm,
-          registeredAddress: profileData.registeredAddress, // Sync registered address
+      
+      // 1. Update Personal Info (User model) - Reverted to basic fields to avoid 401 errors
+      let profileUpdateResponse;
+      try {
+        profileUpdateResponse = await authService.updateProfile({
+          fullName: profileData.fullName,
+          phoneNumber: profileData.phone,
         });
-        // Refresh data after save
-        const kycResponse = await userDashboardService.getKYC();
-        if (kycResponse.success && kycResponse.data) {
-          const profiles = Array.isArray(kycResponse.data)
-            ? kycResponse.data
-            : [kycResponse.data];
 
-          const approvedKyc = profiles.find(
-            (p) => p.overallStatus === "approved",
-          );
-          const kyc = approvedKyc || profiles[0];
-
-          if (kyc) {
-            setKycData(kyc);
-          }
+        if (profileUpdateResponse.success && profileUpdateResponse.data) {
+          updateUser(profileUpdateResponse.data);
+        } else {
+          console.warn("Personal info update failed:", profileUpdateResponse.message);
         }
+      } catch (err) {
+        console.error("Personal info update exception:", err);
       }
+
+      // 2. Update Business/Address info (Always attempt to save address details)
+      const finalAddress = profileData.registeredAddress || businessInfoForm.address;
+      
+      console.log("DEBUG: Final Address from state:", finalAddress);
+      
+      const payload = {
+        profileId: kycData?._id,
+        ...businessInfoForm,
+        registeredAddress: finalAddress, 
+        address: finalAddress, 
+        city: profileData.city,
+        state: profileData.state,
+        country: profileData.country,
+        pincode: profileData.pincode,
+        personalAddress: finalAddress,
+        personalCity: profileData.city,
+        personalState: profileData.state,
+        personalCountry: profileData.country,
+        personalPincode: profileData.pincode,
+        personalPhone: profileData.phone,
+        personalEmail: profileData.email,
+        personalFullName: profileData.fullName,
+        kycType: kycData?.kycType || (businessInfoForm.companyName ? "business" : "individual"),
+        personalInfo: {
+          address: finalAddress,
+          registeredAddress: finalAddress,
+          city: profileData.city,
+          state: profileData.state,
+          country: profileData.country,
+          pincode: profileData.pincode,
+          phone: profileData.phone,
+          fullName: profileData.fullName
+        },
+        businessInfo: {
+          registeredAddress: finalAddress,
+          address: finalAddress,
+          companyName: businessInfoForm.companyName,
+          companyType: businessInfoForm.companyType
+        }
+      };
+
+      console.log("DEBUG: Sending KYC Payload:", payload);
+
+      const kycUpdateResponse = await userDashboardService.updateBusinessInfo(payload);
+
+      if (!kycUpdateResponse.success) {
+        console.error("KYC/Address update failure:", kycUpdateResponse.message);
+        // Throw here if KYC update is critical for the user's intent
+        throw new Error(kycUpdateResponse.message || "Failed to update address details");
+      } else if (kycUpdateResponse.data) {
+        console.log("KYC/Address update success:", kycUpdateResponse.data);
+        // Update kycData with new response
+        setKycData(kycUpdateResponse.data);
+      }
+
+      // Keep UI state in sync immediately after save.
+      setProfileData((prev) => ({
+        ...prev,
+        registeredAddress: finalAddress || prev.registeredAddress,
+      }));
+      setBusinessInfoForm((prev) => ({
+        ...prev,
+        address: finalAddress || prev.address,
+      }));
+
+      toast.success("Profile updated successfully");
       setIsEditing(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error saving profile:", err);
+      toast.error(err.message || "Failed to save profile changes");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfileImage(imageUrl);
+    if (!file) return;
+
+    try {
+      setUploadingImage(true);
+      
+      // Upload to server
+      const response = await authService.uploadProfilePicture(file);
+      
+      if (response.success && response.data) {
+        setProfileImage(response.data.profilePicture);
+        
+        // Sync local auth context
+        if (user) {
+          updateUser({ ...user, profilePicture: response.data.profilePicture });
+        }
+        
+        toast.success("Profile picture updated");
+      } else {
+        toast.error(response.message || "Failed to upload image");
+      }
+    } catch (err) {
+      console.error("Image upload error:", err);
+      toast.error("An error occurred during upload");
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -347,18 +480,31 @@ const Profile: React.FC = () => {
                 <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-16 relative z-10">
                   {/* Profile Image */}
                   <div className="relative group">
-                    <div className="w-32 h-32 rounded-3xl bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02]">
+                    <div className="w-32 h-32 rounded-3xl bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02] relative">
                       {profileImage ? (
-                        <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                        <img 
+                          src={profileImage.startsWith('http') ? profileImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${profileImage}`} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover" 
+                        />
                       ) : (
                         <div className="w-full h-full bg-gray-50 flex items-center justify-center">
                           <User className="w-12 h-12 text-gray-300" />
                         </div>
                       )}
+                      
+                      {uploadingImage && (
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center backdrop-blur-[2px]">
+                          <Loader2 className="w-8 h-8 text-white animate-spin" />
+                        </div>
+                      )}
                     </div>
-                    <label className="absolute -bottom-2 -right-2 w-10 h-10 bg-white border border-gray-100 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all shadow-lg text-[#35503F]">
+                    <label className={cn(
+                      "absolute -bottom-2 -right-2 w-10 h-10 bg-white border border-gray-100 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all shadow-lg text-[#35503F]",
+                      uploadingImage && "opacity-50 pointer-events-none"
+                    )}>
                       <Camera className="w-5 h-5" />
-                      <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                      <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploadingImage} />
                     </label>
                   </div>
 

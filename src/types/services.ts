@@ -421,7 +421,11 @@ export interface PersonalInfo {
   aadhaarNumber?: string;
   panNumber?: string;
   address?: string;
+  registeredAddress?: string;
   city?: string;
+  state?: string;
+  country?: string;
+  pincode?: string;
   area?: string;
 }
 
