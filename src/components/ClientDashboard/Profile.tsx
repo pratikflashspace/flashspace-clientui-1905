@@ -78,6 +78,19 @@ const Profile: React.FC = () => {
     businessNature: "",
   });
 
+  const extractAddressFromKYC = (profile: KYCData | null | undefined) => {
+    if (!profile) return "";
+    return (
+      profile.businessInfo?.registeredAddress ||
+      profile.businessInfo?.address ||
+      profile.personalInfo?.registeredAddress ||
+      profile.personalInfo?.address ||
+      (profile as any).registeredAddress ||
+      (profile as any).address ||
+      ""
+    );
+  };
+
   // Fetch user profile and KYC data
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -92,6 +105,16 @@ const Profile: React.FC = () => {
             fullName: user.fullName || "",
             email: user.email || "",
             phone: user.phoneNumber || (user as any).phone || "",
+            alternatePhone: (user as any).alternatePhone || prev.alternatePhone || "",
+            city: (user as any).city || prev.city || "",
+            state: (user as any).state || prev.state || "",
+            country: (user as any).country || prev.country || "IN",
+            pincode: (user as any).pincode || prev.pincode || "",
+            registeredAddress:
+              (user as any).address ||
+              (user as any).registeredAddress ||
+              prev.registeredAddress ||
+              "",
           }));
           
           if (user.profilePicture) {
@@ -106,35 +129,49 @@ const Profile: React.FC = () => {
             ? kycResponse.data
             : [kycResponse.data];
 
-          // Find the best profile: approved/verified first, then any profile
-          const approvedKyc = profiles.find(
-            (p) =>
-              p.overallStatus === "approved" || p.overallStatus === "verified",
-          );
-          const kyc = approvedKyc || profiles[0];
+          // Prefer profile with address, then approved/verified, then latest updated.
+          const sortedProfiles = [...profiles].sort((a, b) => {
+            const aHasAddress = Boolean(extractAddressFromKYC(a));
+            const bHasAddress = Boolean(extractAddressFromKYC(b));
+            if (aHasAddress !== bHasAddress) return Number(bHasAddress) - Number(aHasAddress);
+
+            const aIsApproved =
+              a.overallStatus === "approved" || a.overallStatus === "verified";
+            const bIsApproved =
+              b.overallStatus === "approved" || b.overallStatus === "verified";
+            if (aIsApproved !== bIsApproved) return Number(bIsApproved) - Number(aIsApproved);
+
+            const aUpdatedAt = Date.parse((a as any).updatedAt || "") || 0;
+            const bUpdatedAt = Date.parse((b as any).updatedAt || "") || 0;
+            return bUpdatedAt - aUpdatedAt;
+          });
+
+          const kyc = sortedProfiles[0];
 
           if (kyc) {
             setKycData(kyc);
 
-            // Populate form and profile data from KYC response
+            // Populate form and profile data from KYC response.
+            const fetchedAddress = extractAddressFromKYC(kyc);
+
             setProfileData((prev) => ({
               ...prev,
-              registeredAddress: kyc.businessInfo?.registeredAddress || "",
-              city: kyc.personalInfo?.city || "",
-              state: kyc.personalInfo?.state || "",
-              country: kyc.personalInfo?.country || "",
-              pincode: kyc.personalInfo?.pincode || "",
+              registeredAddress: fetchedAddress || prev.registeredAddress || "",
+              city: kyc.personalInfo?.city || (kyc as any).city || prev.city || "",
+              state: kyc.personalInfo?.state || (kyc as any).state || prev.state || "",
+              country: kyc.personalInfo?.country || (kyc as any).country || prev.country || "IN",
+              pincode: kyc.personalInfo?.pincode || (kyc as any).pincode || prev.pincode || "",
             }));
 
-            setBusinessInfoForm({
-              companyName: kyc.businessInfo?.companyName || "",
-              companyType: kyc.businessInfo?.companyType || "",
-              address: kyc.businessInfo?.registeredAddress || "",
-              gstNumber: kyc.businessInfo?.gstNumber || "",
-              panNumber: kyc.businessInfo?.panNumber || "",
-              cinNumber: kyc.businessInfo?.cinNumber || "",
-              businessNature: kyc.businessInfo?.businessNature || "",
-            });
+            setBusinessInfoForm((prev) => ({
+              companyName: kyc.businessInfo?.companyName || prev.companyName || "",
+              companyType: kyc.businessInfo?.companyType || prev.companyType || "",
+              address: fetchedAddress || prev.address || "",
+              gstNumber: kyc.businessInfo?.gstNumber || prev.gstNumber || "",
+              panNumber: kyc.businessInfo?.panNumber || prev.panNumber || "",
+              cinNumber: kyc.businessInfo?.cinNumber || prev.cinNumber || "",
+              businessNature: kyc.businessInfo?.businessNature || prev.businessNature || "",
+            }));
           }
         }
 
@@ -203,53 +240,87 @@ const Profile: React.FC = () => {
     try {
       setSaving(true);
       
-      // 1. Update Personal Info (fullName, phoneNumber)
-      const profileUpdateResponse = await authService.updateProfile({
-        fullName: profileData.fullName,
-        phoneNumber: profileData.phone,
-      });
+      // 1. Update Personal Info (User model) - Reverted to basic fields to avoid 401 errors
+      let profileUpdateResponse;
+      try {
+        profileUpdateResponse = await authService.updateProfile({
+          fullName: profileData.fullName,
+          phoneNumber: profileData.phone,
+        });
 
-      if (!profileUpdateResponse.success) {
-        throw new Error(profileUpdateResponse.message || "Failed to update personal info");
+        if (profileUpdateResponse.success && profileUpdateResponse.data) {
+          updateUser(profileUpdateResponse.data);
+        } else {
+          console.warn("Personal info update failed:", profileUpdateResponse.message);
+        }
+      } catch (err) {
+        console.error("Personal info update exception:", err);
       }
 
-      // 2. Update Business info if KYC data exists
-      if (kycData) {
-        // Sync address across forms
-        const finalAddress = profileData.registeredAddress || businessInfoForm.address;
-        
-        await userDashboardService.updateBusinessInfo({
-          profileId: kycData._id,
-          ...businessInfoForm,
-          registeredAddress: finalAddress, 
+      // 2. Update Business/Address info (Always attempt to save address details)
+      const finalAddress = profileData.registeredAddress || businessInfoForm.address;
+      
+      console.log("DEBUG: Final Address from state:", finalAddress);
+      
+      const payload = {
+        profileId: kycData?._id,
+        ...businessInfoForm,
+        registeredAddress: finalAddress, 
+        address: finalAddress, 
+        city: profileData.city,
+        state: profileData.state,
+        country: profileData.country,
+        pincode: profileData.pincode,
+        personalAddress: finalAddress,
+        personalCity: profileData.city,
+        personalState: profileData.state,
+        personalCountry: profileData.country,
+        personalPincode: profileData.pincode,
+        personalPhone: profileData.phone,
+        personalEmail: profileData.email,
+        personalFullName: profileData.fullName,
+        kycType: kycData?.kycType || (businessInfoForm.companyName ? "business" : "individual"),
+        personalInfo: {
+          address: finalAddress,
+          registeredAddress: finalAddress,
           city: profileData.city,
           state: profileData.state,
           country: profileData.country,
           pincode: profileData.pincode,
-        });
-        
-        // Refresh KYC data
-        const kycResponse = await userDashboardService.getKYC();
-        if (kycResponse.success && kycResponse.data) {
-          const profiles = Array.isArray(kycResponse.data)
-            ? kycResponse.data
-            : [kycResponse.data];
-
-          const approvedKyc = profiles.find(
-            (p) => p.overallStatus === "approved",
-          );
-          const kyc = approvedKyc || profiles[0];
-
-          if (kyc) {
-            setKycData(kyc);
-          }
+          phone: profileData.phone,
+          fullName: profileData.fullName
+        },
+        businessInfo: {
+          registeredAddress: finalAddress,
+          address: finalAddress,
+          companyName: businessInfoForm.companyName,
+          companyType: businessInfoForm.companyType
         }
+      };
+
+      console.log("DEBUG: Sending KYC Payload:", payload);
+
+      const kycUpdateResponse = await userDashboardService.updateBusinessInfo(payload);
+
+      if (!kycUpdateResponse.success) {
+        console.error("KYC/Address update failure:", kycUpdateResponse.message);
+        // Throw here if KYC update is critical for the user's intent
+        throw new Error(kycUpdateResponse.message || "Failed to update address details");
+      } else if (kycUpdateResponse.data) {
+        console.log("KYC/Address update success:", kycUpdateResponse.data);
+        // Update kycData with new response
+        setKycData(kycUpdateResponse.data);
       }
 
-      // 3. Sync local auth context
-      if (profileUpdateResponse.data) {
-        updateUser(profileUpdateResponse.data);
-      }
+      // Keep UI state in sync immediately after save.
+      setProfileData((prev) => ({
+        ...prev,
+        registeredAddress: finalAddress || prev.registeredAddress,
+      }));
+      setBusinessInfoForm((prev) => ({
+        ...prev,
+        address: finalAddress || prev.address,
+      }));
 
       toast.success("Profile updated successfully");
       setIsEditing(false);

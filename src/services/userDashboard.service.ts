@@ -187,12 +187,18 @@ class UserDashboardService {
     panNumber?: string;
     cinNumber?: string;
     registeredAddress?: string;
+    address?: string;
     industry?: string;
     partners?: string[];
     personalPhone?: string;
     personalDob?: string;
     personalAadhaar?: string;
     personalPan?: string;
+    personalAddress?: string;
+    personalCity?: string;
+    personalState?: string;
+    personalCountry?: string;
+    personalPincode?: string;
     personalFullName?: string;
     personalEmail?: string;
   }): Promise<ApiResponse<KYCData>> {

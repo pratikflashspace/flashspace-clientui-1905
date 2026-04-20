@@ -8,6 +8,12 @@ export interface User {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
+  alternatePhone?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  pincode?: string;
   role: 'user' | 'super_admin' | 'admin' | 'vendor' | 'partner' | 'space_manager' | 'sales' | 'affiliate_manager' | 'space_partner_manager' | 'support' | 'affiliate';
   isEmailVerified: boolean;
   kycVerified?: boolean;
