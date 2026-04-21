@@ -156,6 +156,14 @@ export interface KYCData {
     email: string;
     phoneNumber?: string;
   };
+  partnerInfo?: {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    panNumber?: string;
+    aadhaarNumber?: string;
+    verified?: boolean;
+  };
   profileName?: string;
   kycType?: "individual" | "business";
   isPartner?: boolean;

@@ -146,18 +146,55 @@ export default function KYCDetail() {
         reason,
       );
       if (response.success) {
-        if (response.data) {
-          setKycData(response.data);
+        const nextStatus = action === "approve" ? "approved" : "rejected";
 
-          // Keep preview panel in sync if the selected document was just updated.
-          setSelectedDoc((prev: any) => {
-            if (!prev) return prev;
-            const updatedDoc = (response.data.documents || []).find(
-              (doc: any) => doc._id === docId,
-            );
-            return updatedDoc ?? prev;
+        setKycData((prev) => {
+          if (!prev) return prev;
+
+          const optimisticDocs = (prev.documents || []).map((doc) => {
+            const docWithId = doc as typeof doc & {
+              _id?: string;
+              id?: string;
+              rejectionReason?: string;
+            };
+            const isTarget = docWithId._id === docId || docWithId.id === docId;
+            if (!isTarget) return doc;
+            return {
+              ...doc,
+              status: nextStatus,
+              rejectionReason: action === "reject" ? reason || "" : "",
+            };
           });
-        }
+
+          if (!response.data || typeof response.data !== "object") {
+            return {
+              ...prev,
+              documents: optimisticDocs,
+            };
+          }
+
+          return {
+            ...prev,
+            ...response.data,
+            documents:
+              Array.isArray(response.data.documents) &&
+              response.data.documents.length > 0
+                ? response.data.documents
+                : optimisticDocs,
+          };
+        });
+
+        // Keep preview panel in sync if the selected document was just updated.
+        setSelectedDoc((prev) => {
+          if (!prev) return prev;
+          if (prev?._id !== docId && prev?.id !== docId) return prev;
+          return {
+            ...prev,
+            status: nextStatus,
+            rejectionReason: action === "reject" ? reason || "" : "",
+          };
+        });
+
         toast.success(`Document ${action}ed successfully`);
         if (action === "reject") {
           setShowRejectModal(false);
@@ -254,9 +291,50 @@ export default function KYCDetail() {
     );
   }
 
-  if (!kycData) return null;
+  if (!kycData) {
+    return (
+      <DashboardLayout
+        portalName="FlashSpace Admin"
+        portalDescription="Complete platform management"
+        navItems={ADMIN_NAV_ITEMS}
+      >
+        <div className="min-h-[40vh] flex flex-col items-center justify-center text-center px-4">
+          <p className="text-gray-700 font-medium">Unable to load KYC details.</p>
+          <div className="mt-4 flex gap-3">
+            <button
+              onClick={() => id && fetchKYCDetails(id)}
+              className="px-4 py-2 rounded-lg bg-[#35503F] text-white text-sm font-medium hover:opacity-90"
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => navigate(-1)}
+              className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Back
+            </button>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const isCompany = kycData.kycType === "business";
+  const displayName =
+    kycData.user?.fullName ||
+    kycData.partnerInfo?.fullName ||
+    kycData.personalInfo?.fullName ||
+    "Unknown";
+  const normalizedDisplayName = displayName.trim() || "Unknown";
+  const displayEmail =
+    kycData.user?.email ||
+    kycData.partnerInfo?.email ||
+    kycData.personalInfo?.email ||
+    "N/A";
+  const displayInitial = normalizedDisplayName.charAt(0).toUpperCase() || "U";
+  const submittedAt = kycData.createdAt
+    ? new Date(kycData.createdAt).toLocaleString()
+    : "N/A";
 
   return (
     <DashboardLayout
@@ -290,7 +368,7 @@ export default function KYCDetail() {
                   Progress: {kycData.progress || 0}%
                 </span>
                 <span className="text-[10px] md:text-xs text-gray-400">
-                  Submitted: {new Date(kycData.createdAt).toLocaleString()}
+                  Submitted: {submittedAt}
                 </span>
               </div>
             </div>
@@ -304,7 +382,7 @@ export default function KYCDetail() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
-                  {kycData.user.fullName.charAt(0)}
+                  {displayInitial}
                 </div>
                 <div className="flex-1 overflow-hidden">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
@@ -313,10 +391,10 @@ export default function KYCDetail() {
                       : "Main Account Holder"}
                   </p>
                   <h3 className="font-bold text-gray-900 text-lg truncate">
-                    {kycData.user.fullName}
+                    {normalizedDisplayName}
                   </h3>
                   <p className="text-gray-500 text-sm truncate">
-                    {kycData.user.email}
+                    {displayEmail}
                   </p>
                   {/* <p className="text-gray-500 text-sm mt-1 flex items-center gap-1">
                   <Phone className="w-3 h-3" /> {kycData.user.phoneNumber || "N/A"}
@@ -532,11 +610,17 @@ export default function KYCDetail() {
 
               <div className="space-y-4">
                 {kycData.documents && kycData.documents.length > 0 ? (
-                  kycData.documents.map((doc: any, index: number) => (
-                    <div
-                      key={doc._id || index}
-                      className="group border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all bg-gray-50/50"
-                    >
+                  kycData.documents.map((doc: any, index: number) => {
+                    const docTypeLabel =
+                      typeof doc.type === "string"
+                        ? doc.type.replace(/_/g, " ")
+                        : "document";
+
+                    return (
+                      <div
+                        key={doc._id || doc.id || index}
+                        className="group border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all bg-gray-50/50"
+                      >
                       <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
                         {/* File Icon & Info */}
                         <div className="flex items-center gap-4 w-full sm:w-auto">
@@ -546,10 +630,10 @@ export default function KYCDetail() {
                           <div className="min-w-0 flex-1">
                             <h4
                               className="font-bold text-gray-900 capitalize"
-                              title={doc.name || doc.type.replace(/_/g, " ")}
+                              title={doc.name || docTypeLabel}
                             >
                               {truncateFileName(
-                                doc.name || doc.type.replace(/_/g, " "),
+                                doc.name || docTypeLabel,
                                 20,
                               )}
                             </h4>
@@ -596,11 +680,13 @@ export default function KYCDetail() {
                           <div className="flex gap-1.5 shrink-0">
                             {doc.status !== "approved" && (
                               <button
-                                onClick={() =>
-                                  handleDocumentAction(doc._id, "approve")
-                                }
+                                onClick={() => {
+                                  const docId = doc._id || doc.id;
+                                  if (!docId) return;
+                                  handleDocumentAction(docId, "approve");
+                                }}
                                 title="Approve"
-                                disabled={processing}
+                                disabled={processing || !(doc._id || doc.id)}
                                 className="p-2.5 bg-white border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm"
                               >
                                 <CheckCircle2 className="w-4 h-4" />
@@ -609,9 +695,13 @@ export default function KYCDetail() {
 
                             {doc.status !== "rejected" && (
                               <button
-                                onClick={() => openRejectModal(doc._id)}
+                                onClick={() => {
+                                  const docId = doc._id || doc.id;
+                                  if (!docId) return;
+                                  openRejectModal(docId);
+                                }}
                                 title="Reject"
-                                disabled={processing}
+                                disabled={processing || !(doc._id || doc.id)}
                                 className="p-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"
                               >
                                 <XCircle className="w-4 h-4" />
@@ -633,7 +723,8 @@ export default function KYCDetail() {
                         </div>
                       </div>
                     </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="text-center py-12 text-gray-400">
                     <FileText className="w-12 h-12 mx-auto mb-2 opacity-20" />
