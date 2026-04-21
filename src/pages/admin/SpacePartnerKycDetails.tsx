@@ -102,6 +102,53 @@ const getFullUrl = (url?: string) => {
   return `${baseUrl}${path}`;
 };
 
+const DOC_STATUS_KEY_MAP: Record<
+  SpaceUserKycDocumentType,
+  keyof SpaceUserKycResponse
+> = {
+  aadhaar_image: "aadhaarImageStatus",
+  pan_image: "panImageStatus",
+  video_kyc: "videoKycStatus",
+};
+
+const DOC_REJECT_KEY_MAP: Record<
+  SpaceUserKycDocumentType,
+  keyof SpaceUserKycResponse
+> = {
+  aadhaar_image: "aadhaarImageRejectMessage",
+  pan_image: "panImageRejectMessage",
+  video_kyc: "videoKycRejectMessage",
+};
+
+const mergeKycResponse = (
+  current: SpaceUserKycResponse,
+  server?: SpaceUserKycResponse | null,
+): SpaceUserKycResponse => {
+  if (!server || typeof server !== "object") return current;
+  return {
+    ...current,
+    ...server,
+    _id: server._id || current._id,
+    userId: server.userId || current.userId,
+  };
+};
+
+const applyDocStatusUpdate = (
+  current: SpaceUserKycResponse,
+  type: SpaceUserKycDocumentType,
+  action: KycDecisionStatus,
+  rejectMessage?: string,
+): SpaceUserKycResponse => {
+  const statusKey = DOC_STATUS_KEY_MAP[type];
+  const rejectKey = DOC_REJECT_KEY_MAP[type];
+
+  return {
+    ...current,
+    [statusKey]: action,
+    [rejectKey]: action === "rejected" ? rejectMessage || "" : "",
+  };
+};
+
 export default function SpacePartnerKycDetails() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -191,7 +238,16 @@ export default function SpacePartnerKycDetails() {
         action,
         rejectMessage,
       );
-      setRequest(updatedKyc);
+      setRequest((prev) => {
+        if (!prev) return prev;
+        const optimistic = applyDocStatusUpdate(
+          prev,
+          type,
+          action,
+          rejectMessage,
+        );
+        return mergeKycResponse(optimistic, updatedKyc);
+      });
       toast.success(
         `Document ${action === "approved" ? "approved" : "rejected"} successfully`,
       );
@@ -220,11 +276,29 @@ export default function SpacePartnerKycDetails() {
           kycStatus: action === "approved" ? "approved" : "rejected",
           kycRejectionReason: rejectMessage,
         });
-        setFocusedProperty(updatedProperty);
+        const nextStatus = action === "approved" ? "approved" : "rejected";
+        setFocusedProperty((prev) => {
+          if (!prev) return prev;
+          if (!updatedProperty || typeof updatedProperty !== "object") {
+            return {
+              ...prev,
+              kycStatus: nextStatus,
+              kycRejectionReason: rejectMessage,
+            };
+          }
+          return {
+            ...prev,
+            ...updatedProperty,
+            _id: updatedProperty._id || prev._id,
+          };
+        });
         setProperties((prev) =>
           prev.map((property) =>
-            property._id === updatedProperty._id
-              ? { ...property, kycStatus: updatedProperty.kycStatus }
+            property._id === (updatedProperty?._id || propertyId)
+              ? {
+                  ...property,
+                  kycStatus: updatedProperty?.kycStatus || nextStatus,
+                }
               : property,
           ),
         );
@@ -256,7 +330,16 @@ export default function SpacePartnerKycDetails() {
         action,
         rejectMessage,
       );
-      setRequest(updatedKyc);
+      setRequest((prev) => {
+        if (!prev) return prev;
+        const optimistic = {
+          ...prev,
+          overallStatus: action,
+          kycStatus: action,
+          overallRejectMessage: action === "rejected" ? rejectMessage || "" : "",
+        };
+        return mergeKycResponse(optimistic, updatedKyc);
+      });
       toast.success(
         `KYC ${action === "approved" ? "approved" : "rejected"} successfully`,
       );
@@ -292,7 +375,19 @@ export default function SpacePartnerKycDetails() {
       const updatedProperty = await updateProperty(propertyId, {
         documents: updatedDocs,
       });
-      setFocusedProperty(updatedProperty);
+      setFocusedProperty((prev) => {
+        if (!prev) return prev;
+        const fallback = { ...prev, documents: updatedDocs };
+        if (!updatedProperty || typeof updatedProperty !== "object") {
+          return fallback;
+        }
+        return {
+          ...fallback,
+          ...updatedProperty,
+          _id: updatedProperty._id || prev._id,
+          documents: updatedProperty.documents ?? fallback.documents,
+        };
+      });
       toast.success(
         `Document ${action === "approved" ? "approved" : "rejected"} successfully`,
       );
