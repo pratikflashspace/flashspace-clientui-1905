@@ -1,6 +1,102 @@
 import axiosInstance from "@/lib/axios";
 import { handleApiError } from "@/services/api.service";
 
+export interface SpacePartnerTeamMember {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  role: string;
+  status: "active" | "inactive";
+  loginPassword?: string | null;
+  createdAt?: string;
+}
+
+export interface CreateSpacePartnerTeamMemberPayload {
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  password?: string;
+}
+
+export interface CreateSpacePartnerTeamMemberResponse {
+  member: SpacePartnerTeamMember;
+  generatedPassword: string;
+}
+
+const TEAM_MEMBER_BASE_PATHS = [
+  "/api/user/partner/team-members",
+  "/api/spacePartner/team-members",
+];
+
+const requestTeamMemberApi = async <T>(
+  request: (basePath: string) => Promise<T>,
+) => {
+  let lastNotFoundError: any = null;
+
+  for (const basePath of TEAM_MEMBER_BASE_PATHS) {
+    try {
+      return await request(basePath);
+    } catch (error: any) {
+      if (error?.response?.status === 404) {
+        lastNotFoundError = error;
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  if (lastNotFoundError) {
+    throw lastNotFoundError;
+  }
+
+  throw new Error("Team member API endpoints are unavailable");
+};
+
+/**
+ * Fetch all team members created by the current partner account.
+ */
+export const fetchPartnerTeamMembers = async () => {
+  try {
+    const response: any = await requestTeamMemberApi((basePath) =>
+      axiosInstance.get(basePath),
+    );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
+ * Create a team member for the current partner and get generated password.
+ */
+export const createPartnerTeamMember = async (
+  payload: CreateSpacePartnerTeamMemberPayload,
+) => {
+  try {
+    const response: any = await requestTeamMemberApi((basePath) =>
+      axiosInstance.post(basePath, payload),
+    );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
+ * Remove (soft-delete) a team member.
+ */
+export const deletePartnerTeamMember = async (memberId: string) => {
+  try {
+    const response: any = await requestTeamMemberApi((basePath) =>
+      axiosInstance.delete(`${basePath}/${memberId}`),
+    );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
 /**
  * Fetch all coworking spaces for the logged-in partner.
  * Uses cookies for authentication.
