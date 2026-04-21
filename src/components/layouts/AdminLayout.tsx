@@ -172,6 +172,12 @@ export default function AdminLayout() {
       roles: ["admin", "super_admin", "sales", "partner"],
     },
     {
+      icon: FileCheck,
+      label: "Invoices Management",
+      path: "/admin/partner-invoices",
+      roles: ["admin", "super_admin"],
+    },
+    {
       icon: Tag,
       label: "Coupons & Vouchers",
       path: "/admin/coupons",

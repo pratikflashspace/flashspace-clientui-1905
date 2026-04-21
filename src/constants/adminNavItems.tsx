@@ -78,6 +78,11 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     icon: <Receipt className="w-5 h-5" />,
   },
   {
+    label: "Partner Invoices",
+    href: "/admin/partner-invoices",
+    icon: <Receipt className="w-5 h-5" />,
+  },
+  {
     label: "Receivable/Payable",
     href: "/admin/finance",
     icon: <Calculator className="w-5 h-5" />,
