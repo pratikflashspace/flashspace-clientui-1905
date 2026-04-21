@@ -185,18 +185,18 @@ export default function SpacePartnerKycDetails() {
     }
     setSubmitting(true);
     try {
-      await reviewSpaceUserKycDocument(
+      const updatedKyc = await reviewSpaceUserKycDocument(
         request.userId,
         type,
         action,
         rejectMessage,
       );
+      setRequest(updatedKyc);
       toast.success(
         `Document ${action === "approved" ? "approved" : "rejected"} successfully`,
       );
       setDocAction(null);
       setDocRejectReason("");
-      fetchKyc();
     } catch (e: any) {
       toast.error(
         e?.response?.data?.message ||
@@ -216,16 +216,23 @@ export default function SpacePartnerKycDetails() {
     if (propertyId && focusedProperty) {
       setSubmitting(true);
       try {
-        await updateProperty(propertyId, {
+        const updatedProperty = await updateProperty(propertyId, {
           kycStatus: action === "approved" ? "approved" : "rejected",
           kycRejectionReason: rejectMessage,
         });
+        setFocusedProperty(updatedProperty);
+        setProperties((prev) =>
+          prev.map((property) =>
+            property._id === updatedProperty._id
+              ? { ...property, kycStatus: updatedProperty.kycStatus }
+              : property,
+          ),
+        );
         toast.success(
           `Property KYC ${action === "approved" ? "approved" : "rejected"} successfully`,
         );
         setOverallAction(null);
         setOverallRejectReason("");
-        fetchKyc();
       } catch (e: any) {
         toast.error("Failed to update property KYC status");
       } finally {
@@ -244,13 +251,17 @@ export default function SpacePartnerKycDetails() {
     }
     setSubmitting(true);
     try {
-      await reviewSpaceUserKycOverall(request.userId, action, rejectMessage);
+      const updatedKyc = await reviewSpaceUserKycOverall(
+        request.userId,
+        action,
+        rejectMessage,
+      );
+      setRequest(updatedKyc);
       toast.success(
         `KYC ${action === "approved" ? "approved" : "rejected"} successfully`,
       );
       setOverallAction(null);
       setOverallRejectReason("");
-      fetchKyc();
     } catch (e: any) {
       toast.error(
         e?.response?.data?.message ||
@@ -278,13 +289,15 @@ export default function SpacePartnerKycDetails() {
         return doc;
       });
 
-      await updateProperty(propertyId, { documents: updatedDocs });
+      const updatedProperty = await updateProperty(propertyId, {
+        documents: updatedDocs,
+      });
+      setFocusedProperty(updatedProperty);
       toast.success(
         `Document ${action === "approved" ? "approved" : "rejected"} successfully`,
       );
       setDocAction(null);
       setDocRejectReason("");
-      fetchKyc();
     } catch (e: any) {
       toast.error("Failed to update property document status");
     } finally {

@@ -2,7 +2,6 @@ import {
   LayoutDashboard,
   BarChart3,
   CalendarDays,
-  FileText,
   Users,
   MessageSquareText,
   CreditCard,
@@ -40,11 +39,6 @@ export const sidebarConfig = [
     label: "Booking Calendar",
     path: "/spaceportal/booking-calendar",
     icon: CalendarDays,
-  },
-  {
-    label: "Active Requests",
-    path: "/spaceportal/active-requests",
-    icon: FileText,
   },
   {
     label: "Clients",
