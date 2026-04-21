@@ -1,7 +1,6 @@
 import axiosInstance from "@/lib/axios";
 import { ApiResponse } from "@/types/services";
 import {
-  Client,
   ClientActivity,
   ClientOrder,
   ClientQuery,
@@ -87,6 +86,66 @@ export interface BookingData {
   };
   createdAt: string;
   amount?: number; // Added for SalesAnalytics compatibility
+}
+
+export interface AdminClientListItem {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  bookingCount: number;
+  activeBookings: number;
+  totalRevenue: number;
+  firstBookingDate: string | null;
+  lastBookingDate: string | null;
+  statusLabel: "Active" | "At Risk" | "Churned";
+  initials: string;
+}
+
+export interface AdminClientListResponse {
+  clients: AdminClientListItem[];
+  stats: {
+    total: number;
+    active: number;
+    atRisk: number;
+    churned: number;
+  };
+  pagination: {
+    total: number;
+    page: number;
+    pages: number;
+  };
+}
+
+export interface AdminClientBookingItem {
+  id: string;
+  bookingNumber: string;
+  type: string;
+  status: "pending_payment" | "pending_kyc" | "active" | "expired" | "cancelled";
+  planName: string;
+  planTenure: string | null;
+  amount: number;
+  spaceName: string;
+  spaceCity: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  createdAt: string | null;
+}
+
+export interface AdminClientDetailResponse {
+  client: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    totalBookings: number;
+    activeBookings: number;
+    totalRevenue: number;
+    firstBookingDate: string | null;
+    lastBookingDate: string | null;
+    statusLabel: "Active" | "At Risk" | "Churned";
+  };
+  bookings: AdminClientBookingItem[];
 }
 
 export interface KYCData {
@@ -669,16 +728,21 @@ class AdminService {
   }
 
   // Client Management
-  async getClients(params?: any): Promise<ApiResponse<Client[]>> {
-    const response = await axiosInstance.get<ApiResponse<Client[]>>(
+  async getClients(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: "all" | "active" | "at_risk" | "churned";
+  }): Promise<ApiResponse<AdminClientListResponse>> {
+    const response = await axiosInstance.get<ApiResponse<AdminClientListResponse>>(
       "/api/admin/clients",
       { params },
     );
     return response.data;
   }
 
-  async getClientDetails(clientId: string): Promise<ApiResponse<Client>> {
-    const response = await axiosInstance.get<ApiResponse<Client>>(
+  async getClientDetails(clientId: string): Promise<ApiResponse<AdminClientDetailResponse>> {
+    const response = await axiosInstance.get<ApiResponse<AdminClientDetailResponse>>(
       `/api/admin/clients/${clientId}`,
     );
     return response.data;
