@@ -115,7 +115,6 @@ import PropertyDetails from "./pages/spacePortal/PropertyDetails";
 
 import SpacePortalFeedbackNPS from "./pages/spacePortal/FeedbackNPS";
 import SpacePortalTicketAndTasks from "./pages/spacePortal/TicketsAndTasks";
-import ActiveRequests from "./pages/spacePortal/ActiveRequests";
 import MailAndVisits from "./pages/spacePortal/MailAndVisits";
 // import TeamManagement from "./pages/spacePortal/TeamManagement";
 import { PartnerRoute } from "./components/auth/PartnerRoute";
@@ -475,7 +474,7 @@ const App = () => (
                         <Route path="booking-calendar" element={<Calendar />} />
                         <Route
                           path="active-requests"
-                          element={<ActiveRequests />}
+                          element={<Navigate to="/spaceportal/dashboard" replace />}
                         />
                         <Route
                           path="booking-analytics"

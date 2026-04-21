@@ -146,8 +146,19 @@ export default function KYCDetail() {
         reason,
       );
       if (response.success) {
+        if (response.data) {
+          setKycData(response.data);
+
+          // Keep preview panel in sync if the selected document was just updated.
+          setSelectedDoc((prev: any) => {
+            if (!prev) return prev;
+            const updatedDoc = (response.data.documents || []).find(
+              (doc: any) => doc._id === docId,
+            );
+            return updatedDoc ?? prev;
+          });
+        }
         toast.success(`Document ${action}ed successfully`);
-        fetchKYCDetails(id); // Refresh data
         if (action === "reject") {
           setShowRejectModal(false);
           setRejectionReason("");

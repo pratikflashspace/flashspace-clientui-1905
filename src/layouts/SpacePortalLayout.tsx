@@ -278,12 +278,6 @@ export default function SpacePortalLayout() {
         hideTopBar: true,
         pageBg: "#f3f4f3",
       },
-      "/spaceportal/active-requests": {
-        title: makeTitle("Active", "Requests"),
-        subtitle: "Review and manage space booking requests.",
-        hideTopBar: true,
-        pageBg: "#f3f4f3",
-      },
       "/spaceportal/clients": {
         title: makeTitle("My", "Clients"),
         subtitle: "Manage all your client relationships",
