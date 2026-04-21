@@ -204,13 +204,13 @@ const ClientManagement = () => {
                     className="hover:bg-muted/30 transition-colors cursor-pointer"
                   >
                     <td className="p-4">
-                      <div className="flex items-center gap-3">
+                      <div className="flex min-w-0 items-center gap-3">
                         <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm">
                           <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
                             {client.initials || "CL"}
                           </AvatarFallback>
                         </Avatar>
-                        <p className="font-semibold text-foreground">{client.name}</p>
+                        <p className="font-semibold text-foreground whitespace-nowrap">{client.name}</p>
                       </div>
                     </td>
                     <td className="p-4 text-sm text-muted-foreground">{client.email}</td>
@@ -263,8 +263,10 @@ const ClientManagement = () => {
               className="bg-white border border-border rounded-2xl p-5 shadow-sm space-y-4"
             >
               <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="font-bold text-foreground">{client.name}</p>
+                <div className="min-w-0">
+                  <p className="font-bold text-foreground whitespace-nowrap">
+                    {client.name}
+                  </p>
                   <p className="text-sm text-muted-foreground break-all">{client.email}</p>
                   <p className="text-sm text-muted-foreground">{client.phone}</p>
                 </div>
