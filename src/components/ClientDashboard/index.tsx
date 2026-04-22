@@ -53,7 +53,7 @@ const menuItems = [
   { name: "Visit Records", icon: CalendarCheck, section: "main", path: "/dashboard/visit-records" },
   { name: "Payments", icon: CreditCard, section: "main", path: "/dashboard/payments" },
   { name: "Documents", icon: FileText, section: "main", path: "/dashboard/documents" },
-  { name: "Chat Support", icon: MessageSquare, section: "main", path: "/dashboard/support" },
+  { name: "Ticket and Support", icon: MessageSquare, section: "main", path: "/dashboard/support" },
   { name: "Notifications", icon: Bell, section: "main", path: "/dashboard/notifications" },
   { name: "Help Center", icon: HelpCircle, section: "main", path: "/dashboard/help" },
   { name: "Profile & KYC", icon: User, section: "main", path: "/dashboard/profile" },
