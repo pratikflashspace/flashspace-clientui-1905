@@ -17,22 +17,23 @@ const renderStars = (rating: number) => {
 const FeedbackNPS = () => {
   const [reviews, setReviews] = useState<any[]>([]);
   const [npsStats, setNpsStats] = useState<any>(null);
-  const [aiInsight, setAiInsight] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 3;
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [reviewsRes, statsRes, insightRes] = await Promise.all([
-          reviewService.getPartnerReviews({ limit: 4 }),
+        const [reviewsRes, statsRes] = await Promise.all([
+          reviewService.getPartnerReviews({ limit, page }),
           reviewService.getPartnerNpsStats(),
-          reviewService.getAiInsight(),
         ]);
 
         setReviews(reviewsRes.reviews || []);
+        setTotalPages(reviewsRes.pagination?.pages || 1);
         setNpsStats(statsRes);
-        setAiInsight(insightRes);
       } catch (err) {
         console.error("Failed to load feedback data", err);
         toast({
@@ -45,9 +46,9 @@ const FeedbackNPS = () => {
       }
     };
     loadData();
-  }, []);
+  }, [page]);
 
-  if (loading) {
+  if (loading && page === 1) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -111,11 +112,10 @@ const FeedbackNPS = () => {
               {npsScore}
             </div>
             <div>
-              <div className="flex items-center gap-1 text-green-600">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-sm font-medium">+5 from last month</span>
+              <div className="flex items-center gap-1 text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded text-xs">
+                Performance Score
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mt-1">
                 Based on {totalResponses} responses
               </p>
             </div>
@@ -143,17 +143,16 @@ const FeedbackNPS = () => {
 
         <div className="bg-background border border-border rounded-xl p-6">
           <h3 className="text-sm font-medium text-muted-foreground mb-4">
-            Response Rate
+            Total Responses
           </h3>
           <div className="flex items-center gap-4">
-            <div className="text-5xl font-extrabold text-foreground">72%</div>
+            <div className="text-5xl font-extrabold text-foreground">{totalResponses}</div>
             <div>
-              <div className="flex items-center gap-1 text-green-600">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-sm font-medium">+8% improvement</span>
+              <div className="flex items-center gap-1 text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded text-xs">
+                Active Feedback
               </div>
-              <p className="text-sm text-muted-foreground">
-                {totalResponses} of 108 clients
+              <p className="text-sm text-muted-foreground mt-1">
+                Cumulative feedback
               </p>
             </div>
           </div>
@@ -162,52 +161,86 @@ const FeedbackNPS = () => {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Feedback */}
-        <div className="lg:col-span-2 space-y-4">
-          <h2 className="font-semibold text-foreground">Recent Feedback</h2>
+        <div className="lg:col-span-2 flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-foreground">Recent Feedback</h2>
+            
+            {/* Header Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center gap-3">
+                <button
+                  disabled={page === 1 || loading}
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  className="p-1.5 border rounded-md hover:bg-muted disabled:opacity-30 transition-colors"
+                  title="Previous Page"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                  {page} / {totalPages}
+                </span>
+                <button
+                  disabled={page === totalPages || loading}
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  className="p-1.5 border rounded-md hover:bg-muted disabled:opacity-30 transition-colors"
+                  title="Next Page"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+              </div>
+            )}
+          </div>
 
-          {reviews.length === 0 ? (
-            <div className="bg-background border border-border rounded-xl p-10 text-center">
-              <p className="text-muted-foreground italic">
-                No feedback received yet
-              </p>
-            </div>
-          ) : (
-            reviews.map((feedback) => (
-              <div
-                key={feedback._id}
-                className="bg-background border border-border rounded-xl p-5 shadow-sm"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h4 className="font-semibold text-foreground">
-                      {feedback.company}
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      {feedback.spaceName || feedback.location}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 justify-end">
-                      {renderStars(feedback.rating)}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {feedback.createdAt
-                        ? format(new Date(feedback.createdAt), "MMM d, yyyy")
-                        : "Recent"}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {feedback.review}
+          <div className="space-y-4 flex-1">
+            {reviews.length === 0 ? (
+              <div className="bg-background border border-border rounded-xl p-10 text-center">
+                <p className="text-muted-foreground italic">
+                  No feedback received yet
                 </p>
               </div>
-            ))
-          )}
+            ) : (
+              reviews.map((feedback) => (
+                <div
+                  key={feedback._id}
+                  className="bg-background border border-border rounded-xl p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h4 className="font-semibold text-foreground">
+                        {feedback.company}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        {feedback.spaceName || feedback.location}
+                        {feedback.spaceId && (
+                          <span className="ml-2 text-[10px] bg-muted px-1.5 py-0.5 rounded font-mono">
+                            ID: {feedback.spaceId}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center gap-1 justify-end">
+                        {renderStars(feedback.rating)}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {feedback.createdAt
+                          ? format(new Date(feedback.createdAt), "MMM d, yyyy")
+                          : "Recent"}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {feedback.review}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
         {/* NPS Breakdown */}
         <div className="space-y-4">
-          <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
+          <div className="bg-background border border-border rounded-xl p-5 shadow-sm h-fit">
             <h3 className="font-semibold text-foreground mb-4">
               NPS Breakdown
             </h3>
@@ -228,12 +261,11 @@ const FeedbackNPS = () => {
               ))}
             </div>
           </div>
-
-          <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 shadow-sm">
-            <h3 className="font-semibold text-foreground mb-2">AI Insight</h3>
+          
+          <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
+            <h3 className="font-semibold text-foreground mb-2 text-sm uppercase tracking-wider text-muted-foreground">Feedback Tip</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              {aiInsight ||
-                "Your NPS score of 48 is above industry average (35). Focus on improving parking facilities at Chennai location to convert more passives to promoters."}
+              Consistently high ratings from support tickets translate to higher customer retention. Engage with promoters to collect success stories!
             </p>
           </div>
         </div>

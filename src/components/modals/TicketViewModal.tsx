@@ -12,7 +12,8 @@ import {
   AlertCircle,
   XCircle,
   ArrowUpRight,
-  Lock
+  Lock,
+  Search
 } from "lucide-react";
 
 export const TicketViewModal = ({
@@ -29,6 +30,7 @@ export const TicketViewModal = ({
   const [replyMessage, setReplyMessage] = useState("");
   const [selectedAssignee, setSelectedAssignee] = useState(ticket?.assignee?._id || ticket?.assignee?.id || ticket?.assignee || "");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -193,78 +195,113 @@ export const TicketViewModal = ({
                       left: 0,
                       right: 0,
                       backgroundColor: '#fff',
-                      borderRadius: '20px',
+                      borderRadius: '24px',
                       border: '1px solid #f1f5f9',
-                      boxShadow: '0 20px 40px -12px rgba(0,0,0,0.15)',
+                      boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
                       zIndex: 100,
-                      maxHeight: '260px',
-                      overflowY: 'auto',
-                      padding: '8px',
+                      maxHeight: '320px',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '4px'
+                      overflow: 'hidden'
                     }}>
-                      {staffMembers?.length === 0 && (
-                        <div style={{ padding: '12px', textAlign: 'center', color: '#94a3b8', fontSize: '12px' }}>No officials found</div>
-                      )}
-                      {staffMembers?.map((s: any) => {
-                        const roleColors: any = {
-                          super_admin: { bg: '#fef2f2', text: '#991b1b', border: '#fecaca' },
-                          admin: { bg: '#fdf2f8', text: '#9d174d', border: '#fbcfe8' },
-                          partner: { bg: '#fff7ed', text: '#9a3412', border: '#fed7aa' },
-                          affiliate: { bg: '#ecfeff', text: '#0891b2', border: '#a5f3fc' },
-                          sales: { bg: '#f0fdf4', text: '#166534', border: '#bbf7d0' },
-                          support: { bg: '#fefce8', text: '#854d0e', border: '#fef08a' }
-                        };
-                        const colors = roleColors[s.role] || { bg: '#f8fafc', text: '#475569', border: '#e2e8f0' };
-                        
-                        const staffId = s._id || s.id;
-                        return (
-                          <div 
-                            key={staffId}
-                            onClick={() => {
-                              setSelectedAssignee(staffId);
-                              setIsDropdownOpen(false);
-                              handleAssignTicket(ticket._id, staffId);
-                            }}
+                      {/* Search Bar */}
+                      <div style={{ padding: '12px', borderBottom: '1px solid #f1f5f9', backgroundColor: '#fafafa' }}>
+                        <div style={{ position: 'relative' }}>
+                          <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                          <input 
+                            type="text"
+                            placeholder="Find official..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
                             style={{ 
-                              padding: '10px 12px',
+                              width: '100%',
+                              padding: '8px 12px 8px 34px',
                               borderRadius: '12px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              cursor: 'pointer',
-                              backgroundColor: selectedAssignee === staffId ? '#f8fafc' : 'transparent',
+                              border: '1px solid #e2e8f0',
+                              fontSize: '13px',
+                              fontWeight: 500,
+                              outline: 'none',
                               transition: 'all 0.2s ease'
                             }}
-                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
-                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = selectedAssignee === staffId ? '#f8fafc' : 'transparent')}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <div style={{ width: '32px', height: '32px', borderRadius: '10px', backgroundColor: '#35503f', color: '#fff', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                                {s.fullName?.charAt(0).toUpperCase()}
-                              </div>
-                              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{s.fullName}</span>
-                                <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 500 }}>{s.email}</span>
-                              </div>
-                            </div>
-                            <span style={{ 
-                              fontSize: '9px', 
-                              fontWeight: 900, 
-                              textTransform: 'uppercase', 
-                              letterSpacing: '0.05em',
-                              backgroundColor: colors.bg,
-                              color: colors.text,
-                              border: `1px solid ${colors.border}`,
-                              padding: '2px 8px',
-                              borderRadius: '6px'
-                            }}>
-                              {s.role?.replace('_', ' ')}
-                            </span>
+                          />
+                        </div>
+                      </div>
+
+                      <div style={{ overflowY: 'auto', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {staffMembers?.filter((s: any) => 
+                          s.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          s.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          s.role?.toLowerCase().includes(searchTerm.toLowerCase())
+                        ).length === 0 && (
+                          <div style={{ padding: '24px 12px', textAlign: 'center', color: '#94a3b8', fontSize: '12px', fontWeight: 600 }}>
+                            No matches found for "{searchTerm}"
                           </div>
-                        );
-                      })}
+                        )}
+                        {staffMembers?.filter((s: any) => 
+                          s.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          s.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          s.role?.toLowerCase().includes(searchTerm.toLowerCase())
+                        ).map((s: any) => {
+                          const roleColors: any = {
+                            super_admin: { bg: '#fef2f2', text: '#991b1b', border: '#fecaca' },
+                            admin: { bg: '#fdf2f8', text: '#9d174d', border: '#fbcfe8' },
+                            partner: { bg: '#fff7ed', text: '#9a3412', border: '#fed7aa' },
+                            affiliate: { bg: '#ecfeff', text: '#0891b2', border: '#a5f3fc' },
+                            sales: { bg: '#f0fdf4', text: '#166534', border: '#bbf7d0' },
+                            support: { bg: '#fefce8', text: '#854d0e', border: '#fef08a' }
+                          };
+                          const colors = roleColors[s.role] || { bg: '#f8fafc', text: '#475569', border: '#e2e8f0' };
+                          
+                          const staffId = s._id || s.id;
+                          return (
+                            <div 
+                              key={staffId}
+                              onClick={() => {
+                                setSelectedAssignee(staffId);
+                                setIsDropdownOpen(false);
+                                setSearchTerm(""); // Reset search on select
+                                handleAssignTicket(ticket._id, staffId);
+                              }}
+                              style={{ 
+                                padding: '10px 12px',
+                                borderRadius: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                cursor: 'pointer',
+                                backgroundColor: selectedAssignee === staffId ? '#f8fafc' : 'transparent',
+                                transition: 'all 0.2s ease'
+                              }}
+                              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+                              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = selectedAssignee === staffId ? '#f8fafc' : 'transparent')}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '10px', backgroundColor: '#35503f', color: '#fff', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                                  {s.fullName?.charAt(0).toUpperCase()}
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{s.fullName}</span>
+                                  <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 500 }}>{s.email}</span>
+                                </div>
+                              </div>
+                              <span style={{ 
+                                fontSize: '9px', 
+                                fontWeight: 900, 
+                                textTransform: 'uppercase', 
+                                letterSpacing: '0.05em',
+                                backgroundColor: colors.bg,
+                                color: colors.text,
+                                border: `1px solid ${colors.border}`,
+                                padding: '2px 8px',
+                                borderRadius: '6px'
+                              }}>
+                                {s.role?.replace('_', ' ')}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
