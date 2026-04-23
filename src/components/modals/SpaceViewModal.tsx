@@ -43,6 +43,26 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
     if (!space) return null;
 
     const onClose = () => onOpenChange(false);
+    const derivedStatus =
+        typeof space.isActive === "boolean"
+            ? space.isActive
+                ? "active"
+                : "inactive"
+            : (() => {
+                  const raw = String(space.status || "inactive").toLowerCase();
+                  return raw === "active" || raw === "maintenance" || raw === "inactive"
+                      ? raw
+                      : "inactive";
+              })();
+    const statusLabel = derivedStatus
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char: string) => char.toUpperCase());
+    const statusClass =
+        derivedStatus === "active"
+            ? "bg-emerald-100 text-emerald-600"
+            : derivedStatus === "inactive"
+              ? "bg-rose-100 text-rose-600"
+              : "bg-slate-100 text-slate-600";
 
     return (
         <>
@@ -64,8 +84,8 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
                                 Space Details
                             </h2>
                             <div className="flex items-center gap-3">
-                                <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-100 border-none font-bold px-3 py-1 rounded-full text-xs">
-                                    {space.status || "Active"}
+                                <Badge className={`${statusClass} hover:opacity-90 border-none font-bold px-3 py-1 rounded-full text-xs`}>
+                                    {statusLabel}
                                 </Badge>
                                 <button
                                     onClick={onClose}
@@ -220,5 +240,3 @@ export const SpaceViewModal: React.FC<SpaceViewModalProps> = ({
         </>
     );
 };
-
-

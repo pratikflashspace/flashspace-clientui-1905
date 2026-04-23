@@ -79,6 +79,27 @@ type PaginationMeta = {
   prevPage?: number | null;
 };
 
+const isPubliclyVisibleWorkspace = (space: any) => {
+  const approvalStatus = String(space?.approvalStatus ?? "").toLowerCase();
+  const propertyStatus = String(space?.property?.status ?? "").toLowerCase();
+  const isPublished =
+    approvalStatus === "active" || propertyStatus === "active";
+  const isExplicitlyPending = [
+    "draft",
+    "pending_kyc",
+    "pending_admin",
+    "rejected",
+    "suspended",
+  ].includes(approvalStatus) && propertyStatus !== "active";
+
+  return (
+    space?.isDeleted !== true &&
+    space?.isActive !== false &&
+    (isPublished || (!approvalStatus && !propertyStatus)) &&
+    !isExplicitlyPending
+  );
+};
+
 /** Custom city dropdown with always-visible clickable chevron arrows */
 const CityDropdown = ({
   activeCity,
@@ -633,7 +654,7 @@ const GetWorkspaces = () => {
             PAGE_SIZE,
           );
           setPagination(pagination || null);
-          fetchedData = offices;
+          fetchedData = offices.filter(isPubliclyVisibleWorkspace);
           setWorkspaces(
             fetchedData.map((vo) => ({
               id: vo._id || "",
@@ -674,7 +695,9 @@ const GetWorkspaces = () => {
             })),
           );
         } else if (workspaceType === "coworking") {
-          fetchedData = await getCoworkingSpacesByCity(activeCity);
+          fetchedData = (await getCoworkingSpacesByCity(activeCity)).filter(
+            isPubliclyVisibleWorkspace,
+          );
           setPagination(null);
           setWorkspaces(
             fetchedData.map((cw) => ({
@@ -708,7 +731,9 @@ const GetWorkspaces = () => {
             })),
           );
         } else if (workspaceType === "on-demand") {
-          fetchedData = await getMeetingRoomsByCity(activeCity);
+          fetchedData = (await getMeetingRoomsByCity(activeCity)).filter(
+            isPubliclyVisibleWorkspace,
+          );
           setWorkspaces(
             fetchedData.map((mr) => ({
               id: mr._id || "",

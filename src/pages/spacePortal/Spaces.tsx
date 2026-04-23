@@ -21,6 +21,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import propertyService from "@/services/property.service";
+import { updateCoworkingSpace } from "@/services/coworkingSpace.service";
+import { updateVirtualOffice } from "@/services/virtualOffice.service";
+import { updateMeetingRoom } from "@/services/meetingRoom.service";
+import { getMySpaceUserKyc } from "@/Api/spacePartnerKyc.service";
 import {
   fetchAllPartnerSpaces,
   fetchPartnerSpaces,
@@ -57,6 +62,24 @@ const getStatusBadge = (status: string) => {
   }
 };
 
+const normalizeStatus = (space: any) => {
+  if (typeof space?.isActive === "boolean") {
+    return space.isActive ? "active" : "inactive";
+  }
+
+  const status = String(space?.status || "inactive").toLowerCase();
+  if (status === "active" || status === "maintenance" || status === "inactive") {
+    return status;
+  }
+
+  return "inactive";
+};
+
+const humanizeStatus = (status: string) =>
+  status
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
 import { getSafeImageUrl } from "@/utils/imageUrl";
 
 const MySpaces = () => {
@@ -65,134 +88,228 @@ const MySpaces = () => {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [spaces, setSpaces] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+  const [partnerKycStatus, setPartnerKycStatus] = useState<string>("not_started");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const loadSpaces = async () => {
-      setLoading(true);
-      try {
-        console.log("Fetching spaces data...");
-        const [propertiesRes, coworkingRes, meetingRoomsRes] =
-          await Promise.all([
-            fetchAllPartnerSpaces(),
-            fetchPartnerSpaces(),
-            fetchPartnerMeetingRooms(),
-          ]);
+  const loadSpaces = async () => {
+    setLoading(true);
+    try {
+      console.log("Fetching spaces data...");
+      const [propertiesRes, coworkingRes, meetingRoomsRes] =
+        await Promise.all([
+          fetchAllPartnerSpaces(),
+          fetchPartnerSpaces(),
+          fetchPartnerMeetingRooms(),
+        ]);
 
-        console.log("Raw API responses:", {
-          propertiesRes,
-          coworkingRes,
-          meetingRoomsRes,
-        });
+      const partnerKyc = await getMySpaceUserKyc().catch(() => null);
+      setPartnerKycStatus(
+        partnerKyc?.overallStatus || partnerKyc?.kycStatus || "not_started",
+      );
 
-        if (propertiesRes?.success) {
-          // Flatten property data
-          const propertiesArr = Array.isArray(propertiesRes.data)
-            ? propertiesRes.data
-            : propertiesRes.data?.properties ||
+      console.log("Raw API responses:", {
+        propertiesRes,
+        coworkingRes,
+        meetingRoomsRes,
+      });
+
+      if (propertiesRes?.success) {
+        // Flatten property data
+        const propertiesArr = Array.isArray(propertiesRes.data)
+          ? propertiesRes.data
+          : propertiesRes.data?.properties ||
             propertiesRes.data?.spaces ||
             [];
 
-          // Flatten coworking data
-          const coSpacesArr = Array.isArray(coworkingRes)
-            ? coworkingRes
-            : coworkingRes?.data ||
+        // Flatten coworking data
+        const coSpacesArr = Array.isArray(coworkingRes)
+          ? coworkingRes
+          : coworkingRes?.data ||
             coworkingRes?.spaces ||
             coworkingRes?.coworkingSpaces ||
             [];
 
-          // Flatten meeting room data
-          const mRoomsArr = Array.isArray(meetingRoomsRes)
-            ? meetingRoomsRes
-            : meetingRoomsRes?.data ||
+        // Flatten meeting room data
+        const mRoomsArr = Array.isArray(meetingRoomsRes)
+          ? meetingRoomsRes
+          : meetingRoomsRes?.data ||
             meetingRoomsRes?.meetingRooms ||
             meetingRoomsRes?.rooms ||
             [];
 
-          console.log("[Spaces DEBUG] Raw Counts:", {
-            properties: propertiesArr.length,
-            coworking: coSpacesArr.length,
-            meeting: mRoomsArr.length,
-          });
-
-          const mappedSpaces = propertiesArr.map((prop: any) => {
-            const propId = String(prop._id || prop.id);
-            const propName = (prop.name || "").toLowerCase().trim();
-            const propCity = (prop.city || "").toLowerCase().trim();
-
-            // Match Coworking
-            const associatedCoworking = coSpacesArr.filter((cs: any) => {
-              const csPropId = cs.propertyId || (typeof cs.property === 'string' ? cs.property : cs.property?._id);
-              const idMatch = String(csPropId) === propId;
-
-              const nameMatch = (cs.name || "").toLowerCase().trim() === propName &&
-                (cs.city || "").toLowerCase().trim() === propCity;
-
-              if (!idMatch && nameMatch) console.log(`[Spaces DEBUG] Coworking Fallback Match: ${cs.name} -> ${prop.name}`);
-              return idMatch || nameMatch;
-            });
-
-            const totalWS = associatedCoworking.reduce(
-              (sum: number, cs: any) => sum + (Number(cs.capacity) || 0),
-              0,
-            );
-
-            // Match Meeting Rooms
-            const associatedMR = mRoomsArr.filter((mr: any) => {
-              const mrPropId = mr.propertyId || (typeof mr.property === 'string' ? mr.property : mr.property?._id);
-              const idMatch = String(mrPropId) === propId;
-
-              const nameMatch = (mr.name || "").toLowerCase().trim() === propName &&
-                (mr.city || "").toLowerCase().trim() === propCity;
-
-              if (!idMatch && nameMatch) console.log(`[Spaces DEBUG] MeetingRoom Fallback Match: ${mr.name} -> ${prop.name}`);
-              return idMatch || nameMatch;
-            });
-
-            const totalMR = associatedMR.reduce(
-              (sum: number, mr: any) => sum + (Number(mr.count) || Number(mr.capacity) || (associatedMR.length > 0 ? 1 : 0)),
-              0,
-            );
-
-            console.log(`[Spaces DEBUG] Final for ${prop.name}: WS=${totalWS}, MR=${totalMR}`);
-
-            return {
-              id: propId,
-              name: prop.name,
-              location: [prop.city || prop.address, prop.area].filter(Boolean).join(" - ") || "Unknown Location",
-              type: prop.type || "Space",
-              workstations: totalWS,
-              meetingRooms: totalMR,
-              occupancy:
-                prop.occupancyRate || Math.floor(Math.random() * 30) + 70,
-              status: prop.status || "active",
-              rating: prop.avgRating || 4.5,
-              image: getSafeImageUrl(
-                prop.image ||
-                (prop.images && prop.images.length > 0
-                  ? prop.images[0]
-                  : null),
-                "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80",
-              ),
-            };
-          });
-
-          console.log("[Spaces DEBUG] Final Mapped Spaces:", mappedSpaces);
-          setSpaces(mappedSpaces);
-        }
-      } catch (err) {
-        console.error("Failed to fetch spaces", err);
-        toast({
-          title: "Error",
-          description: "Failed to load spaces from server.",
-          variant: "destructive",
+        console.log("[Spaces DEBUG] Raw Counts:", {
+          properties: propertiesArr.length,
+          coworking: coSpacesArr.length,
+          meeting: mRoomsArr.length,
         });
-      } finally {
-        setLoading(false);
+
+        const mappedSpaces = propertiesArr.map((prop: any) => {
+          const propId = String(prop._id || prop.id);
+          const propName = (prop.name || "").toLowerCase().trim();
+          const propCity = (prop.city || "").toLowerCase().trim();
+
+          // Match Coworking
+          const associatedCoworking = coSpacesArr.filter((cs: any) => {
+            const csPropId =
+              cs.propertyId ||
+              (typeof cs.property === "string" ? cs.property : cs.property?._id);
+            const idMatch = String(csPropId) === propId;
+
+            const nameMatch =
+              (cs.name || "").toLowerCase().trim() === propName &&
+              (cs.city || "").toLowerCase().trim() === propCity;
+
+            if (!idMatch && nameMatch)
+              console.log(
+                `[Spaces DEBUG] Coworking Fallback Match: ${cs.name} -> ${prop.name}`,
+              );
+            return idMatch || nameMatch;
+          });
+
+          const totalWS = associatedCoworking.reduce(
+            (sum: number, cs: any) => sum + (Number(cs.capacity) || 0),
+            0,
+          );
+
+          // Match Meeting Rooms
+          const associatedMR = mRoomsArr.filter((mr: any) => {
+            const mrPropId =
+              mr.propertyId ||
+              (typeof mr.property === "string" ? mr.property : mr.property?._id);
+            const idMatch = String(mrPropId) === propId;
+
+            const nameMatch =
+              (mr.name || "").toLowerCase().trim() === propName &&
+              (mr.city || "").toLowerCase().trim() === propCity;
+
+            if (!idMatch && nameMatch)
+              console.log(
+                `[Spaces DEBUG] MeetingRoom Fallback Match: ${mr.name} -> ${prop.name}`,
+              );
+            return idMatch || nameMatch;
+          });
+
+          const totalMR = associatedMR.reduce(
+            (sum: number, mr: any) =>
+              sum +
+              (Number(mr.count) ||
+                Number(mr.capacity) ||
+                (associatedMR.length > 0 ? 1 : 0)),
+            0,
+          );
+
+          console.log(
+            `[Spaces DEBUG] Final for ${prop.name}: WS=${totalWS}, MR=${totalMR}`,
+          );
+
+          const activeState = normalizeStatus(prop);
+          const approvalState = prop.approvalStatus || prop.status || "draft";
+
+          return {
+            id: propId,
+            name: prop.name,
+            location:
+              [prop.city || prop.address, prop.area]
+                .filter(Boolean)
+                .join(" - ") || "Unknown Location",
+            type: prop.type || "Space",
+            workstations: totalWS,
+            meetingRooms: totalMR,
+            occupancy: prop.occupancyRate || Math.floor(Math.random() * 30) + 70,
+            isActive: activeState === "active",
+            status: activeState,
+            approvalStatus: approvalState,
+            rating: prop.avgRating || 4.5,
+            image: getSafeImageUrl(
+              prop.image ||
+                (prop.images && prop.images.length > 0 ? prop.images[0] : null),
+              "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80",
+            ),
+          };
+        });
+
+        console.log("[Spaces DEBUG] Final Mapped Spaces:", mappedSpaces);
+        setSpaces(mappedSpaces);
       }
-    };
+    } catch (err) {
+      console.error("Failed to fetch spaces", err);
+      toast({
+        title: "Error",
+        description: "Failed to load spaces from server.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadSpaces();
   }, []);
+
+  const syncActivationState = async (space: any, shouldActivate: boolean) => {
+    setStatusUpdatingId(space.id);
+    try {
+      const propertyUpdates: Record<string, any> = {
+        isActive: shouldActivate,
+        status: shouldActivate ? "active" : "suspended",
+      };
+
+      await propertyService.updateProperty(space.id, propertyUpdates);
+
+      const propertySpaces = await propertyService.getPropertySpaces(space.id);
+      const updatePayload = shouldActivate
+        ? { isActive: true, approvalStatus: "active" }
+        : { isActive: false };
+
+      const coworkingSpaces = propertySpaces?.coworkingSpaces || [];
+      const virtualOffices = propertySpaces?.virtualOffices || [];
+      const meetingRooms = propertySpaces?.meetingRooms || [];
+
+      await Promise.all([
+        ...coworkingSpaces.map((item: any) =>
+          updateCoworkingSpace(item._id, updatePayload),
+        ),
+        ...virtualOffices.map((item: any) =>
+          updateVirtualOffice(item._id, updatePayload),
+        ),
+        ...meetingRooms.map((item: any) =>
+          updateMeetingRoom(item._id, updatePayload),
+        ),
+      ]);
+
+      setSpaces((prev) =>
+        prev.map((item) =>
+          item.id === space.id
+            ? {
+                ...item,
+                isActive: shouldActivate,
+                status: shouldActivate ? "active" : "inactive",
+                approvalStatus: shouldActivate
+                  ? "active"
+                  : item.approvalStatus,
+              }
+            : item,
+        ),
+      );
+
+      toast({
+        title: shouldActivate ? "Space Activated" : "Space Deactivated",
+        description: `${space.name} is now ${shouldActivate ? "live for bookings" : "hidden from checkout"}.`,
+      });
+    } catch (error) {
+      console.error("Failed to update space status", error);
+      toast({
+        title: "Update Failed",
+        description: "Could not change the space status right now.",
+        variant: "destructive",
+      });
+      await loadSpaces();
+    } finally {
+      setStatusUpdatingId(null);
+    }
+  };
 
   const handleView = (space: any) => {
     setSelectedSpace(space);
@@ -203,7 +320,7 @@ const MySpaces = () => {
     navigate(`/spaceportal/space-management/${spaceId}`);
   };
 
-  const handleSpaceAction = (action: string, space: any) => {
+  const handleSpaceAction = async (action: string, space: any) => {
     switch (action) {
       case "view_calendar":
         navigate("/spaceportal/booking-calendar");
@@ -215,13 +332,16 @@ const MySpaces = () => {
         navigate("/spaceportal/booking-analytics");
         break;
       case "toggle_status":
-        toast({
-          title:
-            space.status.toLowerCase() === "active"
-              ? "Space Deactivated"
-              : "Space Activated",
-          description: `${space.name} status has been updated`,
-        });
+        if (partnerKycStatus !== "approved") {
+          toast({
+            title: "KYC Approval Required",
+            description:
+              "Please get your personal KYC approved before activating a space.",
+            variant: "destructive",
+          });
+          return;
+        }
+        await syncActivationState(space, normalizeStatus(space) !== "active");
         break;
     }
   };
@@ -347,8 +467,12 @@ const MySpaces = () => {
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="w-4 h-4" />
+                        <Button variant="ghost" size="sm" disabled={statusUpdatingId === space.id}>
+                          {statusUpdatingId === space.id ? (
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
+                          ) : (
+                            <MoreVertical className="w-4 h-4" />
+                          )}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -377,10 +501,13 @@ const MySpaces = () => {
                           onClick={() =>
                             handleSpaceAction("toggle_status", space)
                           }
+                          disabled={partnerKycStatus !== "approved"}
                         >
-                          {space.status.toLowerCase() === "active"
-                            ? "Deactivate Space"
-                            : "Activate Space"}
+                          {partnerKycStatus !== "approved"
+                            ? "KYC Pending"
+                            : normalizeStatus(space) === "active"
+                              ? "Deactivate Space"
+                              : "Activate Space"}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
