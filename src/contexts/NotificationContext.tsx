@@ -26,6 +26,110 @@ export interface INotification {
     metadata?: any;
 }
 
+type NotificationPreferenceKey =
+    | "email"
+    | "push"
+    | "promotional"
+    | "reminders"
+    | "loginAlerts";
+
+type NotificationPreferencesState = Record<NotificationPreferenceKey, boolean>;
+
+const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferencesState = {
+    email: true,
+    push: true,
+    promotional: false,
+    reminders: true,
+    loginAlerts: true,
+};
+
+const normalizeNotificationPreferences = (
+    raw?: Partial<NotificationPreferencesState>
+): NotificationPreferencesState => ({
+    email: typeof raw?.email === "boolean" ? raw.email : DEFAULT_NOTIFICATION_PREFERENCES.email,
+    push: typeof raw?.push === "boolean" ? raw.push : DEFAULT_NOTIFICATION_PREFERENCES.push,
+    promotional:
+        typeof raw?.promotional === "boolean"
+            ? raw.promotional
+            : DEFAULT_NOTIFICATION_PREFERENCES.promotional,
+    reminders:
+        typeof raw?.reminders === "boolean"
+            ? raw.reminders
+            : DEFAULT_NOTIFICATION_PREFERENCES.reminders,
+    loginAlerts:
+        typeof raw?.loginAlerts === "boolean"
+            ? raw.loginAlerts
+            : DEFAULT_NOTIFICATION_PREFERENCES.loginAlerts,
+});
+
+const inferPreferenceKeyFromNotification = (
+    notification: INotification
+): NotificationPreferenceKey | null => {
+    const explicitPreference = notification?.metadata?.__preferenceKey;
+    if (
+        explicitPreference === "email" ||
+        explicitPreference === "push" ||
+        explicitPreference === "promotional" ||
+        explicitPreference === "reminders" ||
+        explicitPreference === "loginAlerts"
+    ) {
+        return explicitPreference;
+    }
+
+    const combinedText = `${notification?.title || ""} ${notification?.message || ""}`.toLowerCase();
+    const metadata = notification?.metadata;
+
+    if (
+        combinedText.includes("kyc") ||
+        combinedText.includes("partner application") ||
+        combinedText.includes("business profile") ||
+        Boolean(metadata?.kycId) ||
+        Boolean(metadata?.partnerId) ||
+        Boolean(metadata?.businessId)
+    ) {
+        return "reminders";
+    }
+
+    if (
+        combinedText.includes("mail") ||
+        combinedText.includes("parcel") ||
+        combinedText.includes("courier") ||
+        Boolean(metadata?.mailRecordId) ||
+        Boolean(metadata?.mailId)
+    ) {
+        return "push";
+    }
+
+    if (
+        combinedText.includes("visit") ||
+        combinedText.includes("visitor") ||
+        Boolean(metadata?.visitId) ||
+        Boolean(metadata?.visitorId)
+    ) {
+        return "loginAlerts";
+    }
+
+    if (
+        combinedText.includes("marketing") ||
+        combinedText.includes("offer") ||
+        combinedText.includes("announcement") ||
+        combinedText.includes("promo")
+    ) {
+        return "promotional";
+    }
+
+    return null;
+};
+
+const isNotificationEnabledByPreference = (
+    notification: INotification,
+    preferences: NotificationPreferencesState
+) => {
+    const preferenceKey = inferPreferenceKeyFromNotification(notification);
+    if (!preferenceKey) return true;
+    return preferences[preferenceKey];
+};
+
 const getCreatedAtTime = (value?: string): number => {
     if (!value) return 0;
     const parsed = Date.parse(value);
@@ -99,7 +203,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             // console.log("Notification API Response:", data);
 
             if (data.success && Array.isArray(data.data)) {
-                setNotifications(normalizeNotifications(data.data));
+                const preferences = normalizeNotificationPreferences(user.notifications);
+                const filteredData = data.data.filter((notification: INotification) =>
+                    isNotificationEnabledByPreference(notification, preferences)
+                );
+                setNotifications(normalizeNotifications(filteredData));
             }
         } catch (err) {
             console.error("Failed to fetch notifications", err);
@@ -163,6 +271,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 ...newNotification,
                 _id: newNotification?._id || `notification-${Date.now()}`,
             };
+            const preferences = normalizeNotificationPreferences(user.notifications);
+
+            if (!isNotificationEnabledByPreference(normalizedIncoming, preferences)) {
+                return;
+            }
 
             // Show Toast
             toast(

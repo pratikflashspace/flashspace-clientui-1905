@@ -124,24 +124,19 @@ const preferenceItems: Array<{
   description: string;
 }> = [
   {
-    key: "email",
-    label: "Email Notifications",
-    description: "Receive updates via email",
-  },
-  {
     key: "reminders",
-    label: "Payment Alerts",
-    description: "Get billing and due-date reminders",
+    label: "KYC Alerts",
+    description: "Updates for KYC pending, approval, or rejection",
   },
   {
     key: "push",
     label: "Mail Notifications",
-    description: "Updates for incoming mail and parcels",
+    description: "Updates when partner logs new mail records",
   },
   {
     key: "loginAlerts",
     label: "Visit Alerts",
-    description: "Notify when visitors are logged",
+    description: "Updates when partner logs new visit records",
   },
   {
     key: "promotional",
@@ -329,6 +324,7 @@ const Notifications = () => {
 
       if (response.success && response.data) {
         updateUser(response.data);
+        await fetchNotifications();
       } else {
         setPreferences(prevPreferences);
       }
