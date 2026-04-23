@@ -679,8 +679,8 @@ export default function SpacePartnerKycDetails() {
                           </div>
                         </div>
 
-                        <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-border">
-                          <div className="sm:mr-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto sm:ml-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-border">
+                          <div className="sm:mr-2 shrink-0">
                             <span
                               className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border ${
                                 doc.status === "approved"
@@ -703,7 +703,7 @@ export default function SpacePartnerKycDetails() {
                             </span>
                           </div>
 
-                          <div className="flex gap-1.5 shrink-0">
+                          <div className="flex items-center gap-1.5 shrink-0 sm:justify-end">
                             {doc.status !== "approved" && (
                               <button
                                 onClick={() =>
@@ -796,8 +796,8 @@ export default function SpacePartnerKycDetails() {
                             </div>
                           </div>
 
-                          <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-border">
-                            <div className="sm:mr-2">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto sm:ml-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-border">
+                            <div className="sm:mr-2 shrink-0">
                               <span
                                 className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border ${
                                   status === "approved"
@@ -820,7 +820,7 @@ export default function SpacePartnerKycDetails() {
                               </span>
                             </div>
 
-                            <div className="flex gap-1.5 shrink-0">
+                            <div className="flex items-center gap-1.5 shrink-0 sm:justify-end">
                               {status !== "approved" && (
                                 <button
                                   onClick={() =>
