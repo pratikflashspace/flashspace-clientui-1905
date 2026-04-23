@@ -45,6 +45,79 @@ type VerificationStep =
   | "review";
 type KYCType = "individual" | "business";
 
+const getApiOrigin = (): string =>
+  API_CONFIG.BASE_URL.replace(/\/api\/?$/, "").replace(/\/$/, "");
+
+const toAbsoluteUrl = (url: string): string => {
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  const normalized = url.startsWith("/") ? url : `/${url}`;
+  return `${getApiOrigin()}${normalized}`;
+};
+
+const buildDocumentUrlCandidates = (
+  rawUrl: string,
+  docType?: string,
+): string[] => {
+  const trimmed = rawUrl.trim();
+  if (!trimmed) return [];
+
+  const normalized = trimmed.startsWith("http")
+    ? trimmed
+    : trimmed.startsWith("/")
+      ? trimmed
+      : `/${trimmed}`;
+
+  const candidates: string[] = [toAbsoluteUrl(normalized)];
+  const filename = decodeURIComponent(normalized.split("/").pop() || "");
+
+  if (filename) {
+    // Handle legacy/malformed values like '/uploads/<filename>' or '/uploads/kyc-do...'
+    if (normalized.startsWith("/uploads/")) {
+      if (!normalized.startsWith("/uploads/kyc-documents/")) {
+        candidates.push(toAbsoluteUrl(`/uploads/kyc-documents/${filename}`));
+      }
+      if (!normalized.startsWith("/uploads/video-kyc/")) {
+        candidates.push(toAbsoluteUrl(`/uploads/video-kyc/${filename}`));
+      }
+    } else {
+      if (docType === "video_kyc") {
+        candidates.push(toAbsoluteUrl(`/uploads/video-kyc/${filename}`));
+      } else {
+        candidates.push(toAbsoluteUrl(`/uploads/kyc-documents/${filename}`));
+      }
+    }
+  }
+
+  return [...new Set(candidates)];
+};
+
+const urlExists = async (url: string): Promise<boolean> => {
+  try {
+    const response = await fetch(url, {
+      method: "HEAD",
+      credentials: "include",
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
+
+const resolveDocumentUrl = async (
+  rawUrl: string,
+  docType?: string,
+): Promise<{ url: string | null; exists: boolean }> => {
+  const candidates = buildDocumentUrlCandidates(rawUrl, docType);
+  if (!candidates.length) return { url: null, exists: false };
+
+  for (const candidate of candidates) {
+    // eslint-disable-next-line no-await-in-loop
+    if (await urlExists(candidate)) return { url: candidate, exists: true };
+  }
+
+  return { url: candidates[0], exists: false };
+};
+
 export default function KYCVerification() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -103,6 +176,31 @@ export default function KYCVerification() {
     type: string;
     mimeType: string;
   } | null>(null);
+
+  const openDocumentPreview = async (doc: {
+    url: string;
+    type: string;
+    mimeType: string;
+  }) => {
+    if (!doc.url) {
+      toast.error("Document URL not found. Please upload again.");
+      return;
+    }
+
+    const resolved = await resolveDocumentUrl(doc.url, doc.type);
+    if (!resolved.url) {
+      toast.error("Unable to open this document.");
+      return;
+    }
+
+    if (!resolved.exists) {
+      toast.error(
+        "Document file is missing on server. Please replace and upload again.",
+      );
+    }
+
+    setPreviewDoc({ ...doc, url: resolved.url });
+  };
 
 
   const fetchKYC = async (preserveState = false) => {
@@ -1752,7 +1850,7 @@ export default function KYCVerification() {
                                     //   videoDoc.fileUrl,
                                     // );
                                     if (videoDoc.fileUrl) {
-                                      setPreviewDoc({
+                                      openDocumentPreview({
                                         url: videoDoc.fileUrl,
                                         type: "video_kyc",
                                         mimeType: "video/mp4",
@@ -1895,7 +1993,7 @@ export default function KYCVerification() {
                               {uploadedDoc?.fileUrl && (
                                 <button
                                   onClick={() =>
-                                    setPreviewDoc({
+                                    openDocumentPreview({
                                       url: uploadedDoc.fileUrl!,
                                       type: docType.type,
                                       mimeType: uploadedDoc.name
@@ -2253,7 +2351,7 @@ export default function KYCVerification() {
                         {(() => {
                           const fullUrl = previewDoc.url.startsWith("http")
                             ? previewDoc.url
-                            : `${API_CONFIG.BASE_URL}${previewDoc.url}`;
+                            : toAbsoluteUrl(previewDoc.url);
 
                           // console.log("Preview Doc:", previewDoc);
                           // console.log("Full URL:", fullUrl);
