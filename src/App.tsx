@@ -481,6 +481,10 @@ const App = () => (
                           element={<BookingAnalytics />}
                         />
                         <Route
+                          path="booking-analytics/:propertyId"
+                          element={<BookingAnalytics />}
+                        />
+                        <Route
                           path="kyc-verification"
                           element={<KycVerification />}
                         />

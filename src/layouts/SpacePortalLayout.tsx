@@ -272,6 +272,13 @@ export default function SpacePortalLayout() {
         hideTopBar: true,
         pageBg: "#f3f4f3",
       },
+      "/spaceportal/booking-analytics/:propertyId": {
+        title: makeTitle("Booking", "Analytics"),
+        subtitle:
+          "View all bookings and clients linked to a specific space.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
       "/spaceportal/booking-calendar": {
         title: makeTitle("Booking", "Calendar"),
         subtitle: "Plan schedules and manage booking requests.",
@@ -378,6 +385,9 @@ export default function SpacePortalLayout() {
    * Resolve header key for dynamic routes.
    */
   const headerKey = useMemo(() => {
+    if (location.pathname.startsWith("/spaceportal/booking-analytics/")) {
+      return "/spaceportal/booking-analytics/:propertyId";
+    }
     if (location.pathname.startsWith("/spaceportal/clients/")) {
       return "/spaceportal/clients/:id";
     }

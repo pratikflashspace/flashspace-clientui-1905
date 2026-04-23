@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchBookingAnalytics } from "@/services/spacePortal/spacePartner.service";
+import { fetchBookingAnalytics, fetchAllPartnerSpaces } from "@/services/spacePortal/spacePartner.service";
+import { getPropertyBookingsForPartner } from "@/services/property.service";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import {
   Users,
   CalendarCheck,
@@ -9,54 +12,287 @@ import {
   Clock,
   TrendingUp,
   AlertCircle,
-  BarChart3,
   ArrowUpRight,
   ArrowDownRight,
+  MapPin,
+  Building2,
+  ChevronLeft,
+  CalendarDays,
+  ReceiptText,
+  UserRound,
+  ExternalLink,
 } from "lucide-react";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-  Area,
-  AreaChart,
 } from "recharts";
-import { Badge } from "@/components/ui/badge";
+
+type PartnerSpace = {
+  _id?: string;
+  id?: string;
+  name?: string;
+  city?: string;
+  area?: string;
+  address?: string;
+  image?: string;
+  images?: string[];
+  status?: string;
+  propertyStatus?: string;
+  isActive?: boolean;
+};
+
+type PartnerBooking = {
+  _id?: string;
+  bookingNumber?: string;
+  status?: string;
+  createdAt?: string;
+  startDate?: string;
+  endDate?: string;
+  totalAmount?: number;
+  spaceId?: string;
+  type?: string;
+  plan?: {
+    name?: string;
+    price?: number;
+    finalPrice?: number;
+    tenure?: number;
+    tenureUnit?: string;
+  };
+  spaceSnapshot?: {
+    _id?: string;
+    name?: string;
+    address?: string;
+    city?: string;
+    image?: string;
+  };
+  user?: {
+    _id?: string;
+    id?: string;
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    phoneNumber?: string;
+    company?: string;
+  };
+  daysRemaining?: number;
+};
+
+type SpaceRollup = PartnerSpace & {
+  bookings: PartnerBooking[];
+  totalRevenue: number;
+  activeClients: number;
+  activeBookings: number;
+  cancelledBookings: number;
+  pendingBookings: number;
+  latestBooking?: PartnerBooking | null;
+};
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(Number(value || 0));
+
+const formatDate = (value?: string) => {
+  if (!value) return "N/A";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "N/A";
+  return parsed.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const toSpaceId = (space: PartnerSpace) =>
+  String(space?._id || space?.id || "").trim();
+
+const toBookingAmount = (booking: PartnerBooking) =>
+  Number(booking?.totalAmount ?? booking?.plan?.finalPrice ?? booking?.plan?.price ?? 0);
+
+const getClientId = (booking: PartnerBooking) =>
+  String(booking?.user?._id || booking?.user?.id || booking?.user || "").trim();
+
+const getClientName = (booking: PartnerBooking) =>
+  booking?.user?.fullName ||
+  booking?.user?.company ||
+  booking?.user?.email ||
+  "Client";
+
+const getClientContact = (booking: PartnerBooking) =>
+  booking?.user?.email || booking?.user?.phone || booking?.user?.phoneNumber || "";
+
+const getBookingStatus = (booking: PartnerBooking) =>
+  String(booking?.status || "unknown").toLowerCase();
+
+const isActiveBooking = (booking: PartnerBooking) =>
+  ["active", "confirmed"].includes(getBookingStatus(booking));
+
+const isCancelledBooking = (booking: PartnerBooking) =>
+  ["cancelled", "canceled"].includes(getBookingStatus(booking));
+
+const isPendingBooking = (booking: PartnerBooking) =>
+  ["pending", "pending_payment", "pending_kyc"].includes(getBookingStatus(booking));
+
+const extractSpaces = (response: any): PartnerSpace[] => {
+  const payload = response?.data ?? response;
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.data?.spaces)) return payload.data.spaces;
+  if (Array.isArray(payload?.data?.properties)) return payload.data.properties;
+  if (Array.isArray(payload?.spaces)) return payload.spaces;
+  if (Array.isArray(payload?.properties)) return payload.properties;
+  return [];
+};
 
 export default function BookingAnalytics() {
+  const navigate = useNavigate();
+  const { propertyId } = useParams<{ propertyId?: string }>();
+
   const {
     data: analyticsData,
-    isLoading,
-    error,
+    isLoading: analyticsLoading,
+    error: analyticsError,
   } = useQuery({
     queryKey: ["partner-booking-analytics"],
     queryFn: fetchBookingAnalytics,
   });
 
-  const analytics = analyticsData?.data;
+  const [spaces, setSpaces] = useState<PartnerSpace[]>([]);
+  const [spaceBookings, setSpaceBookings] = useState<Record<string, PartnerBooking[]>>({});
+  const [spacesLoading, setSpacesLoading] = useState(true);
+  const [spacesError, setSpacesError] = useState<string | null>(null);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(value || 0);
-  };
+  useEffect(() => {
+    let alive = true;
+
+    const loadSpacesAndBookings = async () => {
+      setSpacesLoading(true);
+      setSpacesError(null);
+
+      try {
+        const response = await fetchAllPartnerSpaces();
+        const rawSpaces = extractSpaces(response);
+
+        const bookingPairs = await Promise.all(
+          rawSpaces.map(async (space) => {
+            const id = toSpaceId(space);
+            if (!id) return null;
+
+            try {
+              const bookings = await getPropertyBookingsForPartner(id);
+              return [id, Array.isArray(bookings) ? bookings : []] as const;
+            } catch (error) {
+              console.error("Failed to load bookings for space", id, error);
+              return [id, []] as const;
+            }
+          }),
+        );
+
+        if (!alive) return;
+
+        setSpaces(rawSpaces);
+        setSpaceBookings(Object.fromEntries(bookingPairs.filter(Boolean) as Array<
+          readonly [string, PartnerBooking[]]
+        >));
+      } catch (error) {
+        console.error("Failed to load partner spaces", error);
+        if (!alive) return;
+        setSpacesError("Failed to load spaces.");
+        setSpaces([]);
+        setSpaceBookings({});
+      } finally {
+        if (alive) setSpacesLoading(false);
+      }
+    };
+
+    loadSpacesAndBookings();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const analytics = analyticsData?.data;
 
   const growth = useMemo(() => {
     if (!analytics?.summary?.revenueLastMonth) return 0;
     return (
-      ((analytics.summary.revenueThisMonth -
-        analytics.summary.revenueLastMonth) /
+      ((analytics.summary.revenueThisMonth - analytics.summary.revenueLastMonth) /
         analytics.summary.revenueLastMonth) *
       100
     );
   }, [analytics]);
 
-  if (isLoading) {
+  const rollups = useMemo<SpaceRollup[]>(() => {
+    return spaces.map((space) => {
+      const id = toSpaceId(space);
+      const bookings = spaceBookings[id] || [];
+      const activeClients = new Set(
+        bookings
+          .filter(isActiveBooking)
+          .map(getClientId)
+          .filter(Boolean),
+      ).size;
+
+      const totalRevenue = bookings.reduce(
+        (sum, booking) => sum + toBookingAmount(booking),
+        0,
+      );
+
+      const activeBookings = bookings.filter(isActiveBooking).length;
+      const cancelledBookings = bookings.filter(isCancelledBooking).length;
+      const pendingBookings = bookings.filter(isPendingBooking).length;
+
+      return {
+        ...space,
+        bookings,
+        totalRevenue,
+        activeClients,
+        activeBookings,
+        cancelledBookings,
+        pendingBookings,
+        latestBooking: bookings[0] || null,
+      };
+    });
+  }, [spaces, spaceBookings]);
+
+  const selectedSpace = useMemo(() => {
+    if (!propertyId) return null;
+    return rollups.find((space) => toSpaceId(space) === propertyId) || null;
+  }, [propertyId, rollups]);
+
+  const selectedBookings = selectedSpace?.bookings || [];
+
+  const selectedSummary = useMemo(() => {
+    const totalBookings = selectedBookings.length;
+    const activeClients = new Set(
+      selectedBookings
+        .filter(isActiveBooking)
+        .map(getClientId)
+        .filter(Boolean),
+    ).size;
+    const cancelledBookings = selectedBookings.filter(isCancelledBooking).length;
+    const revenue = selectedBookings.reduce(
+      (sum, booking) => sum + toBookingAmount(booking),
+      0,
+    );
+
+    return {
+      totalBookings,
+      activeClients,
+      cancelledBookings,
+      revenue,
+    };
+  }, [selectedBookings]);
+
+  if (analyticsLoading || spacesLoading) {
     return (
       <div className="space-y-8 animate-pulse">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
@@ -72,7 +308,7 @@ export default function BookingAnalytics() {
     );
   }
 
-  if (error) {
+  if (analyticsError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] bg-background border border-border rounded-2xl p-12">
         <AlertCircle size={48} className="mb-4 text-rose-500 opacity-50" />
@@ -80,16 +316,281 @@ export default function BookingAnalytics() {
           Analytics Unavailable
         </h2>
         <p className="mt-2 text-sm text-muted-foreground text-center max-w-xs">
-          We're having trouble reaching the analytics engine. Please refresh or
+          We are having trouble reaching the analytics engine. Please refresh or
           try again later.
         </p>
       </div>
     );
   }
 
+  if (propertyId) {
+    return (
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <button
+          onClick={() => navigate("/spaceportal/booking-analytics")}
+          className="mb-6 inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted/40 transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Back to Analytics
+        </button>
+
+        {!selectedSpace ? (
+          <div className="rounded-2xl border border-border bg-background p-10 text-center">
+            <Building2 className="mx-auto mb-4 h-14 w-14 text-muted-foreground/60" />
+            <h2 className="text-2xl font-bold text-foreground">
+              Space not found
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              We could not find this space in your partner account.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="mb-8 rounded-3xl border border-border bg-background p-6 shadow-sm">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                <div className="flex items-start gap-5">
+                  <div className="h-20 w-20 overflow-hidden rounded-2xl border border-border bg-muted">
+                    <img
+                      src={
+                        selectedSpace.image ||
+                        selectedSpace.images?.[0] ||
+                        "/hero-illustrated.jpg"
+                      }
+                      alt={selectedSpace.name || "Space"}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+                      Booking Drilldown
+                    </p>
+                    <h1 className="mt-1 text-3xl font-extrabold text-foreground">
+                      {selectedSpace.name || "Space"}
+                    </h1>
+                    <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                      <span className="inline-flex items-center gap-1.5">
+                        <MapPin className="h-4 w-4" />
+                        {[selectedSpace.city, selectedSpace.area]
+                          .filter(Boolean)
+                          .join(" - ") || selectedSpace.address || "Unknown location"}
+                      </span>
+                      <Badge
+                        variant="outline"
+                        className="border-primary/20 bg-primary/5 text-primary"
+                      >
+                        {String(selectedSpace.status || "active").toUpperCase()}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                  <MetricCard
+                    label="Total Bookings"
+                    value={selectedSummary.totalBookings}
+                    icon={CalendarCheck}
+                  />
+                  <MetricCard
+                    label="Active Clients"
+                    value={selectedSummary.activeClients}
+                    icon={Users}
+                  />
+                  <MetricCard
+                    label="Cancelled"
+                    value={selectedSummary.cancelledBookings}
+                    icon={XCircle}
+                  />
+                  <MetricCard
+                    label="Revenue"
+                    value={formatCurrency(selectedSummary.revenue)}
+                    icon={ReceiptText}
+                    isCurrency
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <div className="xl:col-span-2 rounded-3xl border border-border bg-background p-6 shadow-sm">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-lg font-bold text-foreground uppercase tracking-wider opacity-70">
+                      Client Bookings
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Every booking linked to this space, with client details.
+                    </p>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className="font-bold text-xs uppercase bg-primary/5 text-primary border-primary/20 px-3 py-1"
+                  >
+                    {selectedBookings.length} Records
+                  </Badge>
+                </div>
+
+                <div className="mt-6 overflow-x-auto">
+                  <table className="w-full min-w-[860px] border-collapse text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-border text-muted-foreground">
+                        <th className="py-3 pr-4">Booking</th>
+                        <th className="py-3 pr-4">Client</th>
+                        <th className="py-3 pr-4">Plan</th>
+                        <th className="py-3 pr-4">Date</th>
+                        <th className="py-3 pr-4">Status</th>
+                        <th className="py-3 text-right">Amount</th>
+                        <th className="py-3 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedBookings.map((booking) => {
+                        const clientId = getClientId(booking);
+                        const clientName = getClientName(booking);
+                        const clientContact = getClientContact(booking);
+                        const amount = toBookingAmount(booking);
+                        const status = getBookingStatus(booking);
+
+                        return (
+                          <tr
+                            key={booking._id || booking.bookingNumber}
+                            className="border-b border-border/60 hover:bg-muted/30 transition-colors"
+                          >
+                            <td className="py-4 pr-4 font-semibold text-foreground">
+                              {booking.bookingNumber || booking._id || "Booking"}
+                            </td>
+                            <td className="py-4 pr-4">
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                  <UserRound className="h-4 w-4" />
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-foreground">
+                                    {clientName}
+                                  </p>
+                                  <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                                    {clientContact && (
+                                      <span className="inline-flex items-center gap-1">
+                                        <Mail className="h-3 w-3" />
+                                        {clientContact}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 pr-4 text-muted-foreground">
+                              {booking.plan?.name || "Plan"}
+                            </td>
+                            <td className="py-4 pr-4 text-muted-foreground">
+                              {formatDate(booking.startDate || booking.createdAt)}
+                            </td>
+                            <td className="py-4 pr-4">
+                              <BookingBadge status={status} />
+                            </td>
+                            <td className="py-4 text-right font-extrabold text-foreground">
+                              {formatCurrency(amount)}
+                            </td>
+                            <td className="py-4 text-right">
+                              <button
+                                onClick={() =>
+                                  clientId &&
+                                  navigate(`/spaceportal/clients/${clientId}`)
+                                }
+                                disabled={!clientId}
+                                className="inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                View Client
+                                <ExternalLink className="h-3.5 w-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+
+                  {selectedBookings.length === 0 && (
+                    <div className="py-16 text-center">
+                      <CalendarDays className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+                      <h3 className="text-lg font-bold text-foreground">
+                        No bookings yet
+                      </h3>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        This space has no bookings to show right now.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-border bg-background p-6 shadow-sm">
+                <h2 className="text-lg font-bold text-foreground uppercase tracking-wider opacity-70">
+                  Space Snapshot
+                </h2>
+                <div className="mt-6 space-y-4">
+                  <SnapshotRow label="City" value={selectedSpace.city || "N/A"} />
+                  <SnapshotRow label="Area" value={selectedSpace.area || "N/A"} />
+                  <SnapshotRow
+                    label="Address"
+                    value={selectedSpace.address || "N/A"}
+                  />
+                  <SnapshotRow
+                    label="Latest Booking"
+                    value={
+                      selectedSpace.latestBooking
+                        ? formatDate(
+                            selectedSpace.latestBooking.startDate ||
+                              selectedSpace.latestBooking.createdAt,
+                          )
+                        : "N/A"
+                    }
+                  />
+                  <SnapshotRow
+                    label="Revenue"
+                    value={formatCurrency(selectedSpace.totalRevenue)}
+                  />
+                </div>
+
+                <div className="mt-8 rounded-2xl border border-border bg-muted/20 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Recent Clients
+                  </p>
+                  <div className="mt-4 space-y-3">
+                    {selectedBookings.slice(0, 4).map((booking) => (
+                      <div
+                        key={booking._id || booking.bookingNumber}
+                        className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 py-3"
+                      >
+                        <div>
+                          <p className="font-semibold text-foreground">
+                            {getClientName(booking)}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {booking.bookingNumber || booking._id}
+                          </p>
+                        </div>
+                        <Badge variant="secondary" className="capitalize">
+                          {getBookingStatus(booking).replace(/_/g, " ")}
+                        </Badge>
+                      </div>
+                    ))}
+                    {selectedBookings.length === 0 && (
+                      <p className="text-sm text-muted-foreground">
+                        No client data available.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl">
           Booking <span className="text-primary italic">Analytics</span>
@@ -100,7 +601,6 @@ export default function BookingAnalytics() {
         </p>
       </div>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
         <AnalyticsStat
           title="Total Bookings"
@@ -134,9 +634,7 @@ export default function BookingAnalytics() {
         />
       </div>
 
-      {/* Revenue Section */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-10">
-        {/* Chart Card */}
         <div className="xl:col-span-2 bg-background border border-border rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -189,10 +687,7 @@ export default function BookingAnalytics() {
                     border: "none",
                     boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
                   }}
-                  formatter={(value: number) => [
-                    formatCurrency(value),
-                    "Revenue",
-                  ]}
+                  formatter={(value: number) => [formatCurrency(value), "Revenue"]}
                 />
                 <Area
                   type="monotone"
@@ -207,7 +702,6 @@ export default function BookingAnalytics() {
           </div>
         </div>
 
-        {/* Revenue Summary Card */}
         <div className="bg-background border border-border rounded-2xl p-6 shadow-sm flex flex-col">
           <h2 className="text-lg font-bold text-foreground uppercase tracking-wider opacity-70 mb-6">
             Summary
@@ -236,10 +730,7 @@ export default function BookingAnalytics() {
               className={`p-4 rounded-xl flex items-center justify-between ${growth >= 0 ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}
             >
               <div className="flex items-center gap-2">
-                <TrendingUp
-                  size={20}
-                  className={growth < 0 ? "rotate-180" : ""}
-                />
+                <TrendingUp size={20} className={growth < 0 ? "rotate-180" : ""} />
                 <span className="font-extrabold text-lg">Growth Rate</span>
               </div>
               <span className="text-2xl font-black">{growth.toFixed(1)}%</span>
@@ -263,8 +754,7 @@ export default function BookingAnalytics() {
         </div>
       </div>
 
-      {/* Breakdown Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
         <DivisionCard
           title="Plan Analytics"
           subtitle="Revenue distribution by plan type"
@@ -288,6 +778,141 @@ export default function BookingAnalytics() {
           }))}
           formatCurrency={formatCurrency}
         />
+      </div>
+
+      <div className="mb-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground">
+              Space-wise Bookings
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Click a space to open the full booking and client view.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Building2 className="h-4 w-4" />
+            {rollups.length} linked spaces
+          </div>
+        </div>
+
+        {spacesError ? (
+          <div className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 p-5 text-rose-700">
+            {spacesError}
+          </div>
+        ) : rollups.length === 0 ? (
+          <div className="mt-8 py-16 text-center">
+            <Building2 className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+            <h3 className="text-lg font-bold text-foreground">
+              No linked spaces found
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Add a space in My Spaces and it will appear here automatically.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
+            {rollups.map((space) => (
+              <button
+                key={toSpaceId(space)}
+                onClick={() =>
+                  navigate(`/spaceportal/booking-analytics/${toSpaceId(space)}`)
+                }
+                className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-background p-5 text-left transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
+              >
+                <div className="flex items-start gap-4 min-w-0">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-muted ring-1 ring-border/60">
+                    <img
+                      src={space.image || space.images?.[0] || "/hero-illustrated.jpg"}
+                      alt={space.name || "Space"}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-col gap-2">
+                      <div className="min-w-0">
+                        <h3 className="truncate text-[17px] font-bold leading-6 text-foreground">
+                          {space.name || "Space"}
+                        </h3>
+                        <p className="mt-1 flex items-start gap-1.5 text-sm leading-5 text-muted-foreground">
+                          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                          <span className="line-clamp-2">
+                            {[space.city, space.area].filter(Boolean).join(" - ") ||
+                              space.address ||
+                              "Unknown location"}
+                          </span>
+                        </p>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className="w-fit shrink-0 whitespace-nowrap border-primary/20 bg-primary/5 text-primary"
+                      >
+                        {String(space.status || "active").toUpperCase()}
+                      </Badge>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-3 gap-2.5 min-w-0">
+                      <div className="rounded-2xl border border-border bg-muted/20 px-3 py-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Bookings
+                        </p>
+                        <p className="mt-1 text-2xl font-black leading-none text-foreground">
+                          {space.bookings.length}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-border bg-muted/20 px-3 py-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Clients
+                        </p>
+                        <p className="mt-1 text-2xl font-black leading-none text-foreground">
+                          {space.activeClients}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-border bg-muted/20 px-3 py-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Revenue
+                        </p>
+                        <p className="mt-1 truncate text-lg font-black leading-tight text-foreground">
+                          {formatCurrency(space.totalRevenue)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-1 flex-col justify-between gap-4 border-t border-border/60 pt-4">
+                  <div className="flex flex-wrap gap-2">
+                    {space.bookings.slice(0, 2).map((booking) => (
+                      <span
+                        key={booking._id || booking.bookingNumber}
+                        className="inline-flex max-w-full items-center gap-1 rounded-full bg-muted/40 px-3 py-1 text-xs font-semibold text-muted-foreground"
+                      >
+                        <UserRound className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{getClientName(booking)}</span>
+                      </span>
+                    ))}
+                    {space.bookings.length === 0 && (
+                      <span className="text-xs text-muted-foreground">
+                        No bookings yet
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-muted-foreground">
+                      {space.activeBookings} active bookings
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-semibold text-primary">
+                      View bookings
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -324,6 +949,45 @@ function AnalyticsStat({
   );
 }
 
+function MetricCard({
+  label,
+  value,
+  icon: Icon,
+  isCurrency = false,
+}: {
+  label: string;
+  value: string | number;
+  icon: any;
+  isCurrency?: boolean;
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-muted/20 p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </p>
+        <Icon className="h-4 w-4 text-primary" />
+      </div>
+      <p className={`mt-2 font-extrabold ${isCurrency ? "text-xl" : "text-2xl"} text-foreground`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function SnapshotRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4 rounded-2xl border border-border bg-muted/10 p-4">
+      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+      <span className="text-right text-sm font-semibold text-foreground">
+        {value}
+      </span>
+    </div>
+  );
+}
+
 function DivisionCard({ title, subtitle, items, formatCurrency }: any) {
   return (
     <div className="bg-background border border-border rounded-2xl p-6 shadow-sm">
@@ -340,12 +1004,14 @@ function DivisionCard({ title, subtitle, items, formatCurrency }: any) {
             key={item.key}
             className="group flex items-center justify-between p-4 rounded-xl border border-border bg-muted/20 hover:bg-muted/40 transition-colors"
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 min-w-0">
               <div className="h-10 w-10 rounded-lg bg-background border border-border flex items-center justify-center font-bold text-primary group-hover:scale-110 transition-transform">
-                {item.name[0]}
+                {item.name?.[0] || "S"}
               </div>
-              <div>
-                <p className="font-extrabold text-foreground">{item.name}</p>
+              <div className="min-w-0">
+                <p className="font-extrabold text-foreground truncate">
+                  {item.name}
+                </p>
                 <div className="flex items-center gap-2">
                   <Badge
                     variant="secondary"
@@ -368,5 +1034,27 @@ function DivisionCard({ title, subtitle, items, formatCurrency }: any) {
         ))}
       </div>
     </div>
+  );
+}
+
+function BookingBadge({ status }: { status: string }) {
+  const normalized = String(status || "unknown").toLowerCase();
+  const styles: Record<string, string> = {
+    active: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    confirmed: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    cancelled: "bg-rose-50 text-rose-700 border-rose-100",
+    canceled: "bg-rose-50 text-rose-700 border-rose-100",
+    pending: "bg-amber-50 text-amber-700 border-amber-100",
+    pending_payment: "bg-amber-50 text-amber-700 border-amber-100",
+    pending_kyc: "bg-amber-50 text-amber-700 border-amber-100",
+  };
+
+  return (
+    <Badge
+      variant="outline"
+      className={`capitalize font-semibold ${styles[normalized] || "bg-muted text-muted-foreground border-border"}`}
+    >
+      {normalized.replace(/_/g, " ")}
+    </Badge>
   );
 }
