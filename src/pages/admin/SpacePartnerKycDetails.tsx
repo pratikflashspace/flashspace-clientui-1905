@@ -664,8 +664,8 @@ export default function SpacePartnerKycDetails() {
                       key={idx}
                       className="group border border-border/50 rounded-xl p-4 hover:shadow-md transition-all bg-muted/20"
                     >
-                      <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
-                        <div className="flex items-center gap-4 w-full sm:w-auto">
+                      <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] gap-4 sm:gap-6 items-start">
+                        <div className="flex items-center gap-4 min-w-0">
                           <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                             <FileText className="w-6 h-6 text-primary" />
                           </div>
@@ -679,8 +679,8 @@ export default function SpacePartnerKycDetails() {
                           </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto sm:ml-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-border">
-                          <div className="sm:mr-2 shrink-0">
+                        <div className="flex flex-wrap items-center gap-3 justify-start sm:justify-end pt-4 sm:pt-0 border-t sm:border-t-0 border-border sm:pl-4 sm:border-l sm:border-t-0">
+                          <div className="shrink-0">
                             <span
                               className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border ${
                                 doc.status === "approved"
@@ -703,7 +703,7 @@ export default function SpacePartnerKycDetails() {
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0 sm:justify-end">
+                          <div className="flex items-center gap-1.5 shrink-0">
                             {doc.status !== "approved" && (
                               <button
                                 onClick={() =>
@@ -781,8 +781,8 @@ export default function SpacePartnerKycDetails() {
                         key={doc.id}
                         className="group border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all bg-gray-50/50"
                       >
-                        <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
-                          <div className="flex items-center gap-4 w-full sm:w-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] gap-4 sm:gap-6 items-start">
+                          <div className="flex items-center gap-4 min-w-0">
                             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                               <FileText className="w-6 h-6 text-primary" />
                             </div>
@@ -796,8 +796,8 @@ export default function SpacePartnerKycDetails() {
                             </div>
                           </div>
 
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto sm:ml-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-border">
-                            <div className="sm:mr-2 shrink-0">
+                          <div className="flex flex-wrap items-center gap-3 justify-start sm:justify-end pt-4 sm:pt-0 border-t sm:border-t-0 border-border sm:pl-4 sm:border-l sm:border-t-0">
+                            <div className="shrink-0">
                               <span
                                 className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border ${
                                   status === "approved"
@@ -820,7 +820,7 @@ export default function SpacePartnerKycDetails() {
                               </span>
                             </div>
 
-                            <div className="flex items-center gap-1.5 shrink-0 sm:justify-end">
+                            <div className="flex items-center gap-1.5 shrink-0">
                               {status !== "approved" && (
                                 <button
                                   onClick={() =>
