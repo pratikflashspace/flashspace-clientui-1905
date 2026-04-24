@@ -21,15 +21,23 @@ export interface AdminDashboardStats {
   }>;
 }
 
+export type AdminSpaceType =
+  | "virtual-office"
+  | "coworking-space"
+  | "meeting-room";
+
 export interface SpaceItem {
   _id: string;
   name: string;
-  type: "virtual-office" | "coworking-space";
+  type: AdminSpaceType;
+  spaceType?: string;
   city: string;
   area: string;
   price: string;
   isActive?: boolean;
   isDeleted?: boolean;
+  partner?: string | { _id?: string; id?: string; fullName?: string; email?: string };
+  partnerId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -315,6 +323,13 @@ class AdminService {
     return response.data;
   }
 
+  async getPartnerUsers(): Promise<ApiResponse<{ partners: UserData[] }>> {
+    const response = await axiosInstance.get<
+      ApiResponse<{ partners: UserData[] }>
+    >("/api/admin/partners");
+    return response.data;
+  }
+
   async getStaffMembers(): Promise<ApiResponse<UserData[]>> {
     // Roles that are considered staff/internal and can be assigned tickets
     const staffRoles = [
@@ -439,16 +454,82 @@ class AdminService {
     return response.data;
   }
 
-  async getAllSpaces(
-    deleted: boolean = false,
-  ): Promise<ApiResponse<SpaceItem[]>> {
+  private normalizeAdminSpace(space: any): SpaceItem | null {
+    const rawType = space.spaceType || space.type;
+    const normalizedType = String(rawType || "").replace(/_/g, "-");
+    const type: AdminSpaceType | null =
+      normalizedType === "virtual-office"
+        ? "virtual-office"
+        : normalizedType === "coworking" || normalizedType === "coworking-space"
+          ? "coworking-space"
+          : normalizedType === "meeting-room"
+            ? "meeting-room"
+            : null;
+
+    if (!type) return null;
+
+    const property =
+      space.property && typeof space.property === "object"
+        ? space.property
+        : undefined;
+
+    return {
+      ...space,
+      type,
+      name: space.name || space.propertyName || property?.name || "",
+      city: space.city || space.propertyCity || property?.city || "",
+      area: space.area || property?.area || "",
+      price:
+        space.price ||
+        space.finalPricePerYear ||
+        space.finalPricePerMonth ||
+        space.finalPricePerHour ||
+        space.finalPricePerDay ||
+        "",
+      propertyId:
+        space.propertyId ||
+        property?._id ||
+        (typeof space.property === "string" ? space.property : undefined),
+      partner: space.partner || property?.partner,
+    } as SpaceItem;
+  }
+
+  async getAllSpaces(deleted: boolean = false): Promise<ApiResponse<SpaceItem[]>> {
     try {
-      const [voRes, coRes] = await Promise.all([
+      const adminResponse = await axiosInstance.get<
+        ApiResponse<{ spaces: any[]; pagination: any }>
+      >("/api/admin/spaces", {
+        params: {
+          deleted,
+          limit: 500,
+        },
+      });
+
+      if (adminResponse.data.success) {
+        const spaces = (adminResponse.data.data?.spaces || [])
+          .map((space) => this.normalizeAdminSpace(space))
+          .filter((space): space is SpaceItem => Boolean(space));
+
+        return {
+          success: true,
+          message: adminResponse.data.message || "Spaces fetched successfully",
+          data: spaces,
+        };
+      }
+    } catch (adminError) {
+      console.warn("Admin spaces endpoint failed, using public fallback", adminError);
+    }
+
+    try {
+      const [voRes, coRes, meetingRes] = await Promise.all([
         axiosInstance.get<ApiResponse<SpaceItem[]>>(
           `/api/virtualOffice/getAll?deleted=${deleted}`,
         ),
         axiosInstance.get<ApiResponse<SpaceItem[]>>(
           `/api/coworkingSpace/getAll?deleted=${deleted}`,
+        ),
+        axiosInstance.get<ApiResponse<SpaceItem[]>>(
+          `/api/meetingRoom/getAll?deleted=${deleted}`,
         ),
       ]);
 
@@ -460,11 +541,17 @@ class AdminService {
         ...s,
         type: "coworking-space" as const,
       }));
+      const meetingSpaces = (meetingRes.data.data || []).map(
+        (s: SpaceItem) => ({
+          ...s,
+          type: "meeting-room" as const,
+        }),
+      );
 
       return {
         success: true,
         message: "Spaces fetched successfully",
-        data: [...voSpaces, ...coSpaces],
+        data: [...voSpaces, ...coSpaces, ...meetingSpaces],
       };
     } catch (error: unknown) {
       const errorMessage =
@@ -478,30 +565,34 @@ class AdminService {
 
   async deleteSpace(
     id: string,
-    type: "virtual-office" | "coworking-space",
+    type: AdminSpaceType,
     restore: boolean = false,
   ): Promise<ApiResponse<void>> {
-    const endpoint =
-      type === "virtual-office"
-        ? `/api/virtualOffice/delete/${id}?restore=${restore}`
-        : `/api/coworkingSpace/delete/${id}?restore=${restore}`;
+    const endpointByType: Record<AdminSpaceType, string> = {
+      "virtual-office": `/api/virtualOffice/delete/${id}?restore=${restore}`,
+      "coworking-space": `/api/coworkingSpace/delete/${id}?restore=${restore}`,
+      "meeting-room": `/api/meetingRoom/delete/${id}?restore=${restore}`,
+    };
 
-    const response = await axiosInstance.delete<ApiResponse<void>>(endpoint);
+    const response = await axiosInstance.delete<ApiResponse<void>>(
+      endpointByType[type],
+    );
     return response.data;
   }
 
   async updateSpace(
     id: string,
-    type: "virtual-office" | "coworking-space",
+    type: AdminSpaceType,
     data: Partial<SpaceItem>,
   ): Promise<ApiResponse<SpaceItem>> {
-    const endpoint =
-      type === "virtual-office"
-        ? `/api/virtualOffice/update/${id}`
-        : `/api/coworkingSpace/update/${id}`;
+    const endpointByType: Record<AdminSpaceType, string> = {
+      "virtual-office": `/api/virtualOffice/update/${id}`,
+      "coworking-space": `/api/coworkingSpace/update/${id}`,
+      "meeting-room": `/api/meetingRoom/update/${id}`,
+    };
 
     const response = await axiosInstance.put<ApiResponse<SpaceItem>>(
-      endpoint,
+      endpointByType[type],
       data,
     );
     return response.data;
