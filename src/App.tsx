@@ -94,6 +94,7 @@ import RevenueDashboard from "./pages/admin/RevenueDashboard";
 import SupportChat from "./pages/admin/SupportChat";
 import Leaderboard from "./pages/admin/Leaderboard";
 import AdminAffiliateManagement from "./pages/admin/AdminAffiliateManagement";
+import AdminPartnerInvoices from "./pages/admin/PartnerInvoices";
 
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
@@ -428,6 +429,7 @@ const App = () => (
                           path="affiliates"
                           element={<AdminAffiliateManagement />}
                         />
+                        <Route path="partner-invoices" element={<AdminPartnerInvoices />} />
                         <Route path="*" element={<AdminDashboard />} />
                       </Route>
                     </Route>

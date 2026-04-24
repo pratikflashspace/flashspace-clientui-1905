@@ -21,6 +21,18 @@ axiosInstance.interceptors.request.use(
     if (config.url && config.url.startsWith('/') && !config.url.startsWith('/api')) {
       config.url = `/api${config.url}`;
     }
+
+    // Let the browser set the multipart boundary for FormData uploads.
+    // Leaving a JSON content-type on these requests can break Multer parsing.
+    if (typeof FormData !== "undefined" && config.data instanceof FormData && config.headers) {
+      if (typeof config.headers.delete === "function") {
+        config.headers.delete("Content-Type");
+        config.headers.delete("content-type");
+      } else {
+        delete config.headers["Content-Type"];
+        delete config.headers["content-type"];
+      }
+    }
     
     // Cookies are automatically sent by the browser when withCredentials is true
     return config;
