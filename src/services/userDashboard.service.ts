@@ -59,10 +59,14 @@ class UserDashboardService {
 
   // ========== MAIL & VISITS ==========
 
-  async getUserMails(): Promise<ApiResponse<MailRecord[]>> {
+  async getUserMails(params?: {
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResponse<MailRecord[]>> {
     try {
       const response = await axiosInstance.get<ApiResponse<MailRecord[]>>(
         API_ENDPOINTS.USER.MAIL,
+        { params },
       );
       return response.data;
     } catch (error: unknown) {
@@ -639,6 +643,23 @@ class UserDashboardService {
         error instanceof Error
           ? error.message
           : "Failed to fetch analytics";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
+  async updateVisitStatus(id: string, status: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.patch<ApiResponse<any>>(
+        `/api/visit/${id}/status`,
+        { status },
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update visit status";
       return {
         success: false,
         message: errorMessage,

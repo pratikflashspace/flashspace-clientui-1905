@@ -650,3 +650,85 @@ export const deleteVirtualOffice = async (id: string, restore = false) => {
     return handleApiError(error);
   }
 };
+/**
+ * --- 5. KYC & Profile Module ---
+ */
+
+/**
+ * Fetch the authenticated partner's KYC record.
+ */
+export const fetchMyKyc = async () => {
+  try {
+    const response = await axiosInstance.get("/api/spacePartner/kyc");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
+ * Update KYC personal information.
+ */
+export const updateKycPersonal = async (data: any) => {
+  try {
+    const response = await axiosInstance.put("/api/spacePartner/kyc", data);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
+ * Update KYC business information.
+ */
+export const updateKycBusiness = async (data: any) => {
+  try {
+    const response = await axiosInstance.put("/api/spacePartner/kyc/business-info", data);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
+ * Update KYC bank information.
+ */
+export const updateKycBank = async (data: any) => {
+  try {
+    const response = await axiosInstance.put("/api/spacePartner/kyc/bank-info", data);
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
+ * Upload a KYC document.
+ */
+export const uploadKycDoc = async (documentType: string, file: File) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("documentType", documentType);
+    const response = await axiosInstance.post("/api/spacePartner/kyc/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
+ * Submit KYC for overall review.
+ */
+export const submitKycForReview = async () => {
+  try {
+    const response = await axiosInstance.post("/api/spacePartner/kyc/submit");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};

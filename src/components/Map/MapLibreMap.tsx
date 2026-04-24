@@ -408,6 +408,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
               src="${markerData.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop'}" 
               alt="${markerData.title || 'Office'}"
               style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"
+              onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80'; this.onerror=null;"
             />
             <div style="position: absolute; top: 12px; right: 12px; display: flex; gap: 8px;">
                <div style="

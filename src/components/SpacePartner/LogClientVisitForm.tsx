@@ -7,10 +7,11 @@ import {
   CheckCircle2,
   Loader2,
   Briefcase,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { visitService } from "../../services/visitService";
-import { fetchPartnerDashboard } from "../../services/spacePortal/spacePartner.service";
+import { fetchPartnerDashboard, fetchAllPartnerSpaces } from "../../services/spacePortal/spacePartner.service";
 
 interface LogClientVisitFormProps {
   onSuccess?: () => void;
@@ -31,20 +32,22 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
   };
 
   const [formData, setFormData] = useState({
-    clientEmail: "", // used for search and backend 'email'
-    visitor: "", // required by backend
-    purpose: "Coworking Day Pass", // required by backend
-    space: "Mumbai - BKC",
+    clientEmail: "",
+    visitor: "",
+    purpose: "Coworking Day Pass",
+    space: "",
     date: getLocalDatetimePattern(),
   });
 
   // Real email autocomplete
   const [showEmailDropdown, setShowEmailDropdown] = useState(false);
   const [emailOptions, setEmailOptions] = useState<string[]>([]);
+  const [spaceOptions, setSpaceOptions] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
-    const loadClients = async () => {
+    const loadData = async () => {
       try {
+        // Load client emails
         const response: any = await fetchPartnerDashboard();
         if (response?.data?.clients) {
           const clients = response.data.clients;
@@ -60,11 +63,27 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
           ) as string[];
           setEmailOptions(emails);
         }
+
+        // Load partner spaces
+        const spacesRes: any = await fetchAllPartnerSpaces();
+        if (spacesRes?.success && spacesRes?.data) {
+          const data = spacesRes.data;
+          if (Array.isArray(data)) {
+            const allSpaces = data.map((s: any) => ({ id: s._id || s.id, name: s.name }));
+            setSpaceOptions(allSpaces);
+          } else if (data.virtualOffices || data.coworkingSpaces || data.meetingRooms) {
+            const allSpaces: { id: string; name: string }[] = [];
+            if (data.virtualOffices) data.virtualOffices.forEach((s: any) => allSpaces.push({ id: s._id, name: s.name }));
+            if (data.coworkingSpaces) data.coworkingSpaces.forEach((s: any) => allSpaces.push({ id: s._id, name: s.name }));
+            if (data.meetingRooms) data.meetingRooms.forEach((s: any) => allSpaces.push({ id: s._id, name: s.name }));
+            setSpaceOptions(allSpaces);
+          }
+        }
       } catch (err) {
-        console.error("Failed to load partner clients", err);
+        console.error("Failed to load partner data", err);
       }
     };
-    loadClients();
+    loadData();
   }, []);
 
   const matchedEmails = emailOptions
@@ -103,12 +122,12 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
     try {
       // Create backend payload matching CreateVisitData interface
       const payload = {
-        client: formData.clientEmail.split("@")[0] || "Unknown Client", // Placeholder client name
+        client: formData.clientEmail.split("@")[0] || "Unknown Client",
         email: formData.clientEmail,
         visitor: formData.visitor,
         purpose: formData.purpose,
         space: formData.space,
-        date: new Date(formData.date).toISOString(), // convert local to UTC ISO string
+        date: new Date(formData.date).toISOString(),
       };
 
       await visitService.create(payload as any);
@@ -119,7 +138,7 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
         clientEmail: "",
         visitor: "",
         purpose: "Coworking Day Pass",
-        space: "Mumbai - BKC",
+        space: "",
         date: getLocalDatetimePattern(),
       });
 
@@ -134,48 +153,60 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-background rounded-2xl shadow-2xl border border-border overflow-hidden flex flex-col max-h-[90vh]">
-      <div className="bg-[#2D3F33] px-8 py-8 text-[#FDE68A] text-center shrink-0 border-b border-border">
-        <h2 className="text-3xl font-extrabold tracking-tight uppercase">
-          Log Client <span className="italic text-primary">Visit</span>
-        </h2>
-        <p className="text-muted-foreground mt-2 font-medium">
-          Record a client's physical presence at the coworking space. 
-        </p>
+    <div className="w-full max-w-2xl mx-auto bg-background rounded-2xl shadow-2xl border border-border flex flex-col" style={{ maxHeight: 'calc(90vh)' }}>
+      {/* Header */}
+      <div className="px-6 py-5 flex items-center justify-between border-b border-border shrink-0">
+        <div>
+          <h2 className="text-xl font-extrabold tracking-tight text-foreground">
+            Log Client <span className="italic text-primary">Visit</span>
+          </h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Record a client's physical visit to the space
+          </p>
+        </div>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="p-8 space-y-6 overflow-y-auto flex-1"
+        className="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0"
       >
-        {/* Client Search */}
-        <div className="space-y-1.5 relative">
-          <label className="block text-sm font-semibold text-gray-700">
-            Client Search <span className="text-red-500">*</span>
+        {/* Client Email */}
+        <div className="space-y-2 relative">
+          <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Client Email <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               name="clientEmail"
-              placeholder="Search client by name or email..."
+              placeholder="Search by client email..."
               value={formData.clientEmail}
               onFocus={() => setShowEmailDropdown(true)}
               onBlur={() => setTimeout(() => setShowEmailDropdown(false), 200)}
               onChange={handleChange}
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all placeholder:text-gray-400"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-muted-foreground text-sm text-foreground"
               required
             />
           </div>
 
-          {/* Simulated Autocomplete Dropdown */}
+          {/* Autocomplete Dropdown */}
           {showEmailDropdown && formData.clientEmail.length > 0 && (
-            <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl max-h-48 overflow-y-auto">
+            <ul className="absolute z-10 w-full mt-1 bg-background border border-border rounded-xl shadow-lg max-h-48 overflow-y-auto">
               {matchedEmails.length > 0 ? (
                 matchedEmails.map((email) => (
                   <li
                     key={email}
-                    className="px-4 py-3 hover:bg-slate-50 cursor-pointer text-sm text-gray-700 transition-colors border-b border-gray-50 last:border-0 flex flex-col"
+                    className="px-4 py-2.5 hover:bg-muted cursor-pointer text-sm transition-colors border-b border-border/30 last:border-0 flex flex-col"
                     onMouseDown={() => {
                       setFormData((prev) => ({
                         ...prev,
@@ -185,14 +216,14 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
                       setShowEmailDropdown(false);
                     }}
                   >
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-foreground">
                       {email.split("@")[0]}
                     </span>
-                    <span className="text-xs text-gray-500">{email}</span>
+                    <span className="text-xs text-muted-foreground">{email}</span>
                   </li>
                 ))
               ) : (
-                <li className="px-4 py-3 text-sm text-gray-500 italic">
+                <li className="px-4 py-3 text-sm text-muted-foreground italic">
                   No matching clients found.
                 </li>
               )}
@@ -200,156 +231,132 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Visitor Name */}
-          <div className="space-y-1.5">
-            <label className="block text-sm font-semibold text-gray-700">
+        {/* Visitor Name + Purpose */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               Visitor Name <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
                 name="visitor"
                 placeholder="Name of the person visiting"
                 value={formData.visitor}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all placeholder:text-gray-400"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-muted-foreground text-sm text-foreground"
                 required
               />
             </div>
           </div>
 
-          {/* Purpose */}
-          <div className="space-y-1.5">
-            <label className="block text-sm font-semibold text-gray-700">
+          <div className="space-y-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               Purpose <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <select
                 name="purpose"
                 value={formData.purpose}
                 onChange={handleChange}
                 required
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all appearance-none bg-white font-medium text-gray-700"
+                className="w-full pl-10 pr-8 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none text-sm text-foreground font-medium"
               >
                 <option value="Coworking Day Pass">Coworking Day Pass</option>
-                <option value="Meeting Room Booking">
-                  Meeting Room Booking
-                </option>
+                <option value="Meeting Room Booking">Meeting Room Booking</option>
                 <option value="Event Attendance">Event Attendance</option>
                 <option value="Facility Tour">Facility Tour</option>
                 <option value="Other">Other</option>
               </select>
-              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                <svg
-                  className="w-4 h-4 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  ></path>
+              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
-          {/* Date & Time */}
-          <div className="space-y-1.5">
-            <label className="block text-sm font-semibold text-gray-700">
+        {/* Date + Space Location */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               Date & Time <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <input
                 type="datetime-local"
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-foreground"
                 required
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Adjust if logging a past visit.
-            </p>
           </div>
 
-          {/* Location Context */}
-          <div className="space-y-1.5 flex flex-col justify-start">
-            <label className="block text-sm font-semibold text-gray-700">
-              Location / Space <span className="text-red-500">*</span>
+          <div className="space-y-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Space Location <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <select
                 name="space"
                 value={formData.space}
                 onChange={handleChange}
                 required
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none transition-all appearance-none bg-white font-medium text-gray-700"
+                className="w-full pl-10 pr-8 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none text-sm text-foreground font-medium"
               >
-                <option value="Flashspace HQ">Flashspace HQ</option>
-                <option value="Mumbai - BKC">Mumbai - BKC</option>
-                <option value="Delhi - Connaught Place">
-                  Delhi - Connaught Place
+                <option value="" disabled>
+                  Select location
                 </option>
-                <option value="Bangalore - Indiranagar">
-                  Bangalore - Indiranagar
-                </option>
+                {spaceOptions.map((space) => (
+                  <option key={space.id} value={space.name}>{space.name}</option>
+                ))}
+                {spaceOptions.length === 0 && (
+                  <option value="" disabled>No spaces found</option>
+                )}
               </select>
-              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                <svg
-                  className="w-4 h-4 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  ></path>
+              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Actions */}
-        <div className="pt-6 border-t border-border flex items-center justify-end gap-3 shrink-0 mt-auto px-8 pb-8 bg-muted/20">
-          {onCancel && (
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-6 py-2.5 rounded-xl border border-border text-foreground font-bold hover:bg-muted transition-all active:scale-95"
-            >
-              Cancel
-            </button>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-8 py-2.5 rounded-xl bg-[#2D3F33] text-[#FDE68A] font-bold hover:bg-[#2D3F33]/90 shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed min-w-[150px]"
-          >
-            {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <CheckCircle2 className="w-4 h-4" />
-            )}
-            Confirm Visit
-          </button>
-        </div>
       </form>
+
+      {/* Footer */}
+      <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-3 shrink-0 bg-muted/10">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-5 py-2.5 rounded-xl border border-border text-foreground font-bold text-sm hover:bg-muted transition-all active:scale-95"
+          >
+            Cancel
+          </button>
+        )}
+        <button
+          type="submit"
+          form=""
+          disabled={loading}
+          onClick={handleSubmit}
+          className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <CheckCircle2 className="w-4 h-4" />
+          )}
+          Confirm Visit
+        </button>
+      </div>
     </div>
   );
 };

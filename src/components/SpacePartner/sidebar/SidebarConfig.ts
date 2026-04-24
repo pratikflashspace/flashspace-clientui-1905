@@ -10,7 +10,7 @@ import {
   Star,
   Mail,
   UserPlus,
-  Settings,
+  User,
   ShieldCheck,
 } from "lucide-react";
 
@@ -51,7 +51,7 @@ export const sidebarConfig = [
     icon: CreditCard,
   },
   {
-    label: "Client Enquiries",
+    label: "Tickets",
     path: "/spaceportal/client-enquiries",
     icon: MessageSquareText,
   },
@@ -61,14 +61,10 @@ export const sidebarConfig = [
     icon: Star,
   },
   {
-    label: "Tickets & Tasks",
+    label: "Team Tasks",
     path: "/spaceportal/tasks",
     icon: Ticket,
-  },
-  {
-    label: "Ticket System",
-    path: "/spaceportal/tickets",
-    icon: Ticket,
+    disabled: true,
   },
   {
     label: "Mail & Visits",
@@ -83,6 +79,6 @@ export const sidebarConfig = [
   {
     label: "Profile",
     path: "/spaceportal/profile",
-    icon: Settings,
+    icon: User,
   },
 ];

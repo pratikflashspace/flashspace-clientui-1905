@@ -22,20 +22,46 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { API_CONFIG } from "@/config/api.config";
+import { toast } from "react-hot-toast";
+import { mailService } from "@/services/mailService";
 
 export default function MailRecords() {
   const [mails, setMails] = useState<MailRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"received" | "forwarded">("received");
+  const [activeTab, setActiveTab] = useState<"received" | "forwarded" | "collected">("received");
+  const [forwardingIds, setForwardingIds] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    pages: 1,
+    limit: 10
+  });
+  const [stats, setStats] = useState({
+    pending: 0,
+    forwarded: 0,
+    collected: 0
+  });
 
-  const fetchMails = async () => {
+  const fetchMails = async (pageNumber = page) => {
     setLoading(true);
     try {
-      const response = await userDashboardService.getUserMails();
+      const response = await userDashboardService.getUserMails({ page: pageNumber, limit: 10 });
+      console.log("Frontend Mail Response (DEBUG V):", (response as any).debug_v, response);
       if (response.success && response.data) {
         setMails(response.data);
+        if (response.pagination) {
+          setPagination(response.pagination);
+        }
+        const apiStats = (response as any).stats;
+        if (apiStats) {
+          setStats({
+            pending: apiStats.pending || 0,
+            forwarded: apiStats.forwarded || 0,
+            collected: apiStats.collected || 0
+          });
+        }
       } else {
         setError(response.message || "Failed to load mail records");
       }
@@ -47,12 +73,36 @@ export default function MailRecords() {
   };
 
   useEffect(() => {
-    fetchMails();
-  }, []);
+    fetchMails(page);
+  }, [page]);
 
-  const pendingCount = mails.filter(m => m.status === "Pending Action").length;
-  const forwardedCount = mails.filter(m => m.status === "Forwarded").length;
-  const totalCount = mails.length;
+  const handleForward = async (id: string) => {
+    if (forwardingIds.has(id)) return;
+    
+    setForwardingIds(prev => new Set(prev).add(id));
+    try {
+      const response = await mailService.updateStatus(id, "Forwarded");
+      if (response.success) {
+        toast.success("Forward request sent successfully!");
+        setMails(prev => prev.map(m => m._id === id ? { ...m, status: "Forwarded" } : m));
+        setStats(prev => ({
+          ...prev,
+          pending: Math.max(0, prev.pending - 1),
+          forwarded: prev.forwarded + 1
+        }));
+      } else {
+        toast.error(response.message || "Failed to send forward request");
+      }
+    } catch (err) {
+      toast.error("Failed to send forward request");
+    } finally {
+      setForwardingIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
+  };
 
   const filteredMails = mails.filter((m) => {
     const matchSearch =
@@ -61,10 +111,10 @@ export default function MailRecords() {
       m.mailId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       m.space.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // In the screenshot, "Forwarded Mail" tab likely shows only Forwarded status
-    // and "Received Mail" shows Pending or Collected? Or everything?
-    // Let's assume Received is everything except Forwarded for now, or just a toggle.
-    const matchTab = activeTab === "forwarded" ? m.status === "Forwarded" : m.status !== "Forwarded";
+    const matchTab = 
+      activeTab === "forwarded" ? m.status === "Forwarded" :
+      activeTab === "collected" ? m.status === "Collected" :
+      m.status === "Pending Action";
     
     return matchSearch && matchTab;
   });
@@ -159,38 +209,52 @@ export default function MailRecords() {
         {/* Stats Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-yellow-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{pendingCount}</p>
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{stats.pending}</p>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending Pickup</p>
           </div>
           <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-blue-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{forwardedCount}</p>
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{stats.forwarded}</p>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Forwarded</p>
           </div>
           <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-green-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{totalCount}</p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Received</p>
+            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{stats.collected}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Collected</p>
           </div>
         </div>
 
         {/* Navigation Tabs and Search */}
         <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
-          <div className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
-            {[
-              { id: "received", label: "Received Mail" },
-              { id: "forwarded", label: "Forwarded Mail" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <div className="flex gap-1 p-1 bg-gray-50 rounded-2xl border border-gray-100">
+            <button
+              onClick={() => { setActiveTab("received"); setPage(1); }}
+              className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                activeTab === "received"
+                  ? "bg-[#35503F] text-[#FEF8C3] shadow-md"
+                  : "text-gray-500 hover:text-[#35503F] hover:bg-white"
+              }`}
+            >
+              Received Mail
+            </button>
+            <button
+              onClick={() => { setActiveTab("forwarded"); setPage(1); }}
+              className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                activeTab === "forwarded"
+                  ? "bg-[#35503F] text-[#FEF8C3] shadow-md"
+                  : "text-gray-500 hover:text-[#35503F] hover:bg-white"
+              }`}
+            >
+              Forwarded Mail
+            </button>
+            <button
+              onClick={() => { setActiveTab("collected"); setPage(1); }}
+              className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                activeTab === "collected"
+                  ? "bg-[#35503F] text-[#FEF8C3] shadow-md"
+                  : "text-gray-500 hover:text-[#35503F] hover:bg-white"
+              }`}
+            >
+              Collected Mail
+            </button>
           </div>
 
           <div className="relative flex-1 lg:w-80">
@@ -273,15 +337,22 @@ export default function MailRecords() {
                               <ExternalLink className="w-4 h-4" />
                             </a>
                           )}
-                          <button 
-                            className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-900 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm active:scale-95"
-                            onClick={() => {
-                              // Forwarding logic would go here
-                              alert(`Request forwarded for ${mail.mailId}`);
-                            }}
-                          >
-                            Request Forward
-                          </button>
+                          {mail.status !== "Collected" && (
+                            <button 
+                              className={`inline-flex items-center px-4 py-2 border rounded-xl text-sm font-bold transition-all shadow-sm active:scale-95 ${
+                                mail.status === "Forwarded" 
+                                  ? "bg-blue-50 border-blue-100 text-blue-600 cursor-default"
+                                  : "bg-white border-gray-200 text-gray-900 hover:bg-gray-50 hover:border-gray-300"
+                              }`}
+                              onClick={() => mail.status !== "Forwarded" && handleForward(mail._id)}
+                              disabled={forwardingIds.has(mail._id) || mail.status === "Forwarded"}
+                            >
+                              {forwardingIds.has(mail._id) ? (
+                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                              ) : null}
+                              {mail.status === "Forwarded" ? "Request Forwarded" : "Request Forward"}
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -290,6 +361,48 @@ export default function MailRecords() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {pagination.pages > 1 && (
+            <div className="px-6 py-4 border-t border-gray-50 flex items-center justify-between bg-gray-50/30">
+              <p className="text-sm text-gray-500 font-medium">
+                Showing <span className="font-bold text-gray-900">{(page - 1) * pagination.limit + 1}</span> to{" "}
+                <span className="font-bold text-gray-900">{Math.min(page * pagination.limit, pagination.total)}</span> of{" "}
+                <span className="font-bold text-gray-900">{pagination.total}</span> records
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="px-4 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                >
+                  Previous
+                </button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
+                        page === p
+                          ? "bg-[#35503F] text-[#FEF8C3] shadow-md"
+                          : "bg-white border border-gray-200 text-gray-600 hover:border-[#35503F] hover:text-[#35503F]"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
+                  disabled={page === pagination.pages}
+                  className="px-4 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -57,6 +57,7 @@ import {
   bulkSaveMeetingRooms,
 } from "@/services/meetingRoom.service";
 import { Property } from "@/types/services";
+import MapLibreMap from "@/components/Map/MapLibreMap";
 
 type Step =
   | "property"
@@ -144,7 +145,6 @@ export default function AddSpace() {
     { id: "review", label: "Review", icon: CheckCircle2 },
   ], []);
 
-  // --- Step 1: Property Data ---
   const [propertyData, setPropertyData] = useState({
     name: "",
     address: "",
@@ -152,6 +152,8 @@ export default function AddSpace() {
     area: "",
     features: [] as string[],
     images: [] as string[],
+    googleMapLink: "",
+    location: undefined as any,
   });
   const [pendingImages, setPendingImages] = useState<
     { file: File; preview: string }[]
@@ -200,6 +202,8 @@ export default function AddSpace() {
           area: prop.area || "",
           features: prop.features || [],
           images: prop.images || [],
+          googleMapLink: prop.googleMapLink || "",
+          location: prop.location,
         });
         setPropertyKycStatus(prop.kycStatus || "not_started");
         setPropertyKycRejectionReason(prop.kycRejectionReason || "");
@@ -915,7 +919,73 @@ export default function AddSpace() {
              className={errors.address ? "border-destructive ring-destructive" : ""}
            />
         </div>
+
+        <div className="space-y-2">
+           <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Google Maps Link</label>
+           <Input
+             placeholder="https://www.google.com/maps/place/..."
+             value={propertyData.googleMapLink}
+             onChange={(e) => {
+               const link = e.target.value;
+               const newPropData = { ...propertyData, googleMapLink: link };
+               
+               // Attempt to extract coordinates for preview
+               // 1. Try @lat,lng
+               // 2. Try q=lat,lng
+               // 3. Try any lat,lng pair found in the URL
+               const atMatch = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+               const qMatch = link.match(/[q|ll|cbll]=(-?\d+\.\d+),(-?\d+\.\d+)/);
+               const genericMatch = link.match(/(-?\d+\.\d+),(-?\d+\.\d+)/);
+
+               const match = atMatch || qMatch || genericMatch;
+
+               if (match) {
+                 newPropData.location = {
+                   type: "Point",
+                   coordinates: [parseFloat(match[2]), parseFloat(match[1])]
+                 };
+               }
+               
+               setPropertyData(newPropData);
+             }}
+             className="border-primary/20"
+           />
+           <p className="text-[10px] text-muted-foreground italic px-1 mt-1">
+             {propertyData.googleMapLink.includes("maps.app.goo.gl") || propertyData.googleMapLink.includes("goo.gl/maps") ? (
+               <span className="text-amber-600 font-bold flex items-center gap-1">
+                 <AlertTriangle className="w-3 h-3" /> Short links will be processed after saving. For immediate preview, use the full URL from your browser address bar.
+               </span>
+             ) : (
+               "Paste the Google Maps link to automatically extract coordinates."
+             )}
+           </p>
+        </div>
       </div>
+
+      {propertyData.location?.coordinates && (
+        <div className="space-y-4">
+          <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Map Preview</label>
+          <div className="h-64 rounded-2xl overflow-hidden border border-border shadow-sm">
+            <MapLibreMap
+                markers={[{
+                  id: "preview",
+                  position: { 
+                    lat: propertyData.location.coordinates[1], 
+                    lng: propertyData.location.coordinates[0] 
+                  },
+                  title: propertyData.name || "Preview Location",
+                  address: propertyData.address,
+                  image: propertyData.images && propertyData.images.length > 0 ? getSafeImageUrl(propertyData.images[0]) : undefined,
+                }]}
+              center={{ 
+                lat: propertyData.location.coordinates[1], 
+                lng: propertyData.location.coordinates[0] 
+              }}
+              zoom={15}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="space-y-4">
         <label className={`text-[10px] uppercase tracking-widest font-black ml-1 ${errors.features ? "text-destructive" : "text-muted-foreground"}`}>
@@ -1813,7 +1883,7 @@ export default function AddSpace() {
     const isPropertyKycApproved = propertyKycStatus === "approved";
     const isPropertyKycPending = propertyKycStatus === "pending";
     const isPropertyKycRejected = propertyKycStatus === "rejected";
-    const isPartnerKycApproved = partnerKycStatus === "approved";
+    const isPartnerKycApproved = partnerKycStatus === "approved" || user?.kycVerified === true;
  
     return (
       <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
@@ -1890,6 +1960,38 @@ export default function AddSpace() {
                   <span>Rejection Feedback: {propertyKycRejectionReason}</span>
                 </div>
               )}
+            </div>
+          )}
+
+          {propertyData.location?.coordinates && (
+            <div className="p-8 bg-background rounded-[40px] border-2 border-border shadow-sm space-y-4">
+              <div className="flex items-center gap-3 mb-2">
+                <MapPin className="w-6 h-6 text-primary" />
+                <h4 className="text-xl font-black text-foreground">Property Location</h4>
+              </div>
+              <div className="h-64 rounded-3xl overflow-hidden border border-border">
+                <MapLibreMap
+                  markers={[{
+                    id: "final-preview",
+                    position: { 
+                      lat: propertyData.location.coordinates[1], 
+                      lng: propertyData.location.coordinates[0] 
+                    },
+                    title: propertyData.name || "Preview Location",
+                    address: propertyData.address,
+                    image: propertyData.images && propertyData.images.length > 0 ? getSafeImageUrl(propertyData.images[0]) : undefined,
+                  }]}
+                  center={{ 
+                    lat: propertyData.location.coordinates[1], 
+                    lng: propertyData.location.coordinates[0] 
+                  }}
+                  zoom={15}
+                />
+              </div>
+              <div className="flex items-center justify-between text-xs font-bold text-muted-foreground px-2 italic">
+                <span>{propertyData.address}</span>
+                <span className="text-[10px] uppercase tracking-widest bg-primary/5 px-2 py-1 rounded-lg">Verified via Google Maps</span>
+              </div>
             </div>
           )}
 

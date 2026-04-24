@@ -59,6 +59,7 @@ export interface Property {
   status?: string;
   isActive?: boolean;
   partner: string;
+  googleMapLink?: string;
   createdAt?: string;
   updatedAt?: string;
 }
