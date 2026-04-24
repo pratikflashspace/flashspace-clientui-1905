@@ -35,11 +35,7 @@ const LogInvoiceModal = ({ isOpen, onClose, onSuccess }: LogInvoiceModalProps) =
         data.append('invoiceFile', invoiceFile);
 
         try {
-            const response = await axiosInstance.post('/api/partnerInvoices', data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const response = await axiosInstance.post('/api/partnerInvoices', data);
 
             if (response.data.success) {
                 onSuccess();

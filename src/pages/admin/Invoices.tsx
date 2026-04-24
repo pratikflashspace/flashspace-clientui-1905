@@ -326,6 +326,7 @@ const Invoices = () => {
             <option value="virtual_office">Virtual Office</option>
             <option value="coworking_space">Coworking Space</option>
             <option value="meeting_room">Meeting Room</option>
+            <option value="partner_invoice">Partner Invoice</option>
           </select>
           <select
             value={statusFilter}
