@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Send, Loader2, X } from "lucide-react";
+import { MessageSquare, Send, Loader2, X, CheckCircle } from "lucide-react";
 import partnerTicketService, { PartnerTicketMessage } from "@/services/spacePortal/partnerTicket.service";
 import { toast } from "@/hooks/use-toast";
 import { useSocket } from "@/contexts/SocketContext";
@@ -83,24 +83,32 @@ export const EnquiryChatModal = ({
       // Find ticket for this request
       const allTicketsRes = await partnerTicketService.getPartnerTickets(1, 100);
       if (allTicketsRes.success && allTicketsRes.data) {
-        // Find ticket where user matches and booking matches (if it's a booking)
-        const leadTicket = allTicketsRes.data.tickets.find((t: any) => {
-          // Normalize IDs for comparison (handle both populated objects and ID strings)
-          const tUserId = t.user?.id || t.user?._id || (typeof t.user === 'string' ? t.user : null);
-          const eUserId = enquiry.user?.id;
-          
-          const tBookingId = t.bookingId?.id || t.bookingId?._id || (typeof t.bookingId === 'string' ? t.bookingId : null);
-          const eInquiryId = enquiry.id;
+        // First try direct match by ticket ID (for Converted tab where enquiry.id = ticket._id)
+        let leadTicket = allTicketsRes.data.tickets.find((t: any) => t._id === enquiry.id);
 
-          const userMatch = eUserId && tUserId === eUserId;
-          const bookingMatch = eInquiryId && tBookingId === eInquiryId;
+        // If no direct match, fall back to user/booking matching (for In Progress tab)
+        if (!leadTicket) {
+          leadTicket = allTicketsRes.data.tickets.find((t: any) => {
+            const tUserId = t.user?.id || t.user?._id || (typeof t.user === 'string' ? t.user : null);
+            const eUserId = enquiry.user?.id;
+            
+            const tBookingId = t.bookingId?.id || t.bookingId?._id || (typeof t.bookingId === 'string' ? t.bookingId : null);
+            const eInquiryId = enquiry.id;
 
-          if (enquiry.category === "Booking") {
-            return userMatch && bookingMatch;
-          }
-          // For meetings/visits, match on either user OR the inquiry/booking ID
-          return bookingMatch || userMatch;
-        });
+            const userMatch = eUserId && tUserId === eUserId;
+            const bookingMatch = eInquiryId && tBookingId === eInquiryId;
+
+            if (enquiry.category === "Booking") {
+              return userMatch && bookingMatch;
+            }
+            return bookingMatch || userMatch;
+          });
+        }
+
+        // Also try matching by ticketNumber (for In Progress tab where id might be ticketNumber)
+        if (!leadTicket) {
+          leadTicket = allTicketsRes.data.tickets.find((t: any) => t.ticketNumber === enquiry.id || t.ticketNumber === enquiry.ticketNumber);
+        }
 
         if (leadTicket) {
           setMessages(leadTicket.messages || []);
@@ -179,7 +187,7 @@ export const EnquiryChatModal = ({
                 <div className="flex items-center gap-2 text-xl font-bold">
                   <MessageSquare className="w-5 h-5 text-primary" />
                   Chat with {name}
-                  {activeTicketStatus === "resolved" && (
+                  {(activeTicketStatus === "resolved" || activeTicketStatus === "closed") && (
                     <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium ml-1">
                       Resolved
                     </span>
@@ -187,12 +195,43 @@ export const EnquiryChatModal = ({
                 </div>
                 <p className="text-sm text-muted-foreground">{company} • {interest}</p>
               </div>
-              <button
-                onClick={() => onOpenChange(false)}
-                className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                {activeTicketId && activeTicketStatus !== "resolved" && activeTicketStatus !== "closed" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 text-[10px] font-bold uppercase tracking-wider border-green-200 text-green-600 hover:bg-green-50 hover:text-green-700"
+                    onClick={async () => {
+                      if (!activeTicketId) return;
+                      try {
+                        const res = await partnerTicketService.closeTicket(activeTicketId);
+                        if (res.success) {
+                          setActiveTicketStatus("resolved");
+                          toast({
+                            title: "Resolved",
+                            description: "Inquiry marked as resolved.",
+                          });
+                        }
+                      } catch (err) {
+                        toast({
+                          title: "Error",
+                          description: "Failed to resolve inquiry.",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                  >
+                    <CheckCircle className="w-3 h-3 mr-1" />
+                    Mark as Resolved
+                  </Button>
+                )}
+                <button
+                  onClick={() => onOpenChange(false)}
+                  className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Chat Area */}
@@ -270,11 +309,11 @@ export const EnquiryChatModal = ({
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={activeTicketStatus === "resolved" ? "This inquiry has been resolved" : "Type your message..."}
-                  disabled={sending || activeTicketStatus === "resolved"}
+                  placeholder={(activeTicketStatus === "resolved" || activeTicketStatus === "closed") ? "This inquiry has been resolved" : "Type your message..."}
+                  disabled={sending || activeTicketStatus === "resolved" || activeTicketStatus === "closed"}
                   className="w-full pl-4 pr-12 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 bg-muted/20 text-sm disabled:opacity-50"
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey && activeTicketStatus !== "resolved") {
+                    if (e.key === "Enter" && !e.shiftKey && activeTicketStatus !== "resolved" && activeTicketStatus !== "closed") {
                       e.preventDefault();
                       handleSendMessage();
                     }
@@ -283,7 +322,7 @@ export const EnquiryChatModal = ({
                 <Button 
                   type="submit"
                   size="icon" 
-                  disabled={sending || !inputValue.trim() || activeTicketStatus === "resolved"}
+                  disabled={sending || !inputValue.trim() || activeTicketStatus === "resolved" || activeTicketStatus === "closed"}
                   className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg"
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}

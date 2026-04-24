@@ -129,8 +129,12 @@ const Profile: React.FC = () => {
             ? kycResponse.data
             : [kycResponse.data];
 
-          // Prefer profile with address, then approved/verified, then latest updated.
+          // Prefer profile with company name, then address, then approved/verified, then latest updated.
           const sortedProfiles = [...profiles].sort((a, b) => {
+            const aHasCompany = Boolean(a.businessInfo?.companyName);
+            const bHasCompany = Boolean(b.businessInfo?.companyName);
+            if (aHasCompany !== bHasCompany) return Number(bHasCompany) - Number(aHasCompany);
+
             const aHasAddress = Boolean(extractAddressFromKYC(a));
             const bHasAddress = Boolean(extractAddressFromKYC(b));
             if (aHasAddress !== bHasAddress) return Number(bHasAddress) - Number(aHasAddress);
@@ -166,7 +170,7 @@ const Profile: React.FC = () => {
             setBusinessInfoForm((prev) => ({
               companyName: kyc.businessInfo?.companyName || prev.companyName || "",
               companyType: kyc.businessInfo?.companyType || prev.companyType || "",
-              address: fetchedAddress || prev.address || "",
+              address: kyc.businessInfo?.registeredAddress || fetchedAddress || prev.address || "",
               gstNumber: kyc.businessInfo?.gstNumber || prev.gstNumber || "",
               panNumber: kyc.businessInfo?.panNumber || prev.panNumber || "",
               cinNumber: kyc.businessInfo?.cinNumber || prev.cinNumber || "",
@@ -279,7 +283,7 @@ const Profile: React.FC = () => {
         personalPhone: profileData.phone,
         personalEmail: profileData.email,
         personalFullName: profileData.fullName,
-        kycType: kycData?.kycType || (businessInfoForm.companyName ? "business" : "individual"),
+        kycType: kycData?.kycType || "individual",
         personalInfo: {
           address: finalAddress,
           registeredAddress: finalAddress,
@@ -887,7 +891,7 @@ const Profile: React.FC = () => {
                             />
                           ) : (
                             <p className="text-gray-900">
-                              {kycData.businessInfo?.address || "N/A"}
+                              {kycData.businessInfo?.registeredAddress || kycData.businessInfo?.address || "N/A"}
                             </p>
                           )}
                         </div>

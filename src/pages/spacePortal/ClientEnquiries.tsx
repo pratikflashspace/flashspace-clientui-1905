@@ -16,14 +16,29 @@ import {
   UserPlus,
   Settings,
   Loader2,
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { StatsSkeleton, TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectScrollUpButton,
+  SelectScrollDownButton,
+} from "@/components/ui/select";
 import { EnquiryChatModal } from "@/components/modals/EnquiryChatModal";
 import { toast } from "@/hooks/use-toast";
 import userDashboardService from "@/services/userDashboard.service";
+import partnerTicketService from "@/services/spacePortal/partnerTicket.service";
 import { useSocket } from "@/contexts/SocketContext";
 
 const getStatusBadge = (status: string) => {
@@ -37,8 +52,10 @@ const getStatusBadge = (status: string) => {
       );
     case "contacted":
     case "pending_kyc":
+    case "in_progress":
       return (
-        <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">
+        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 w-fit">
+          <Clock className="w-3 h-3" />
           In Progress
         </Badge>
       );
@@ -73,30 +90,99 @@ const getStatusBadge = (status: string) => {
   }
 };
 
+// Map raw category values to full display names
+const categoryDisplayName: Record<string, string> = {
+  virtual_office: "Virtual Office",
+  coworking: "Coworking",
+  billing: "Billing & Payments",
+  kyc: "KYC & Documents",
+  technical: "Technical Issue",
+  mail_services: "Mail Services",
+  bookings: "Bookings",
+  compliance: "Compliance",
+  leads: "Leads",
+  other: "Other",
+  "Virtual Office": "Virtual Office",
+  "Coworking": "Coworking",
+  "Meeting Room": "Meeting Room",
+  "Meeting": "Meeting",
+  "Visit": "Visit",
+  "Booking": "Booking",
+  "General": "General",
+  "Ticket": "Ticket",
+};
+
+const getCategoryLabel = (category: string) => {
+  return categoryDisplayName[category] || category?.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()) || "General";
+};
+
 const ClientEnquiries = () => {
   const [activeRequests, setActiveRequests] = useState<any[]>([]);
   const [convertedClients, setConvertedClients] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
+  const [avgResponseTime, setAvgResponseTime] = useState<string>("--");
   const [loading, setLoading] = useState(true);
   const [selectedEnquiry, setSelectedEnquiry] = useState<any>(null);
   const [chatModalOpen, setChatModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [productFilter, setProductFilter] = useState("all");
+  const [dealValueFilter, setDealValueFilter] = useState("all");
+  const [convertedPage, setConvertedPage] = useState(1);
+  const CONVERTED_PER_PAGE = 5;
   const { socket } = useSocket();
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [requestsRes, clientsRes, analyticsRes] = await Promise.all([
+      const [requestsRes, ticketsRes, analyticsRes] = await Promise.all([
         userDashboardService.getPartnerActiveRequests(),
-        userDashboardService.getPartnerClients(),
+        partnerTicketService.getPartnerTickets(1, 100),
         userDashboardService.getPartnerAnalytics(),
       ]);
 
       if (requestsRes.success) setActiveRequests(requestsRes.data || []);
-      if (clientsRes.success) {
-        // Filter out inactive ones for the converted list if needed,
-        // but usually clients returned here are already converted.
-        setConvertedClients(clientsRes.data || []);
+
+      // Filter resolved/closed tickets for the Converted tab + calculate avg response time
+      if (ticketsRes.success && ticketsRes.data?.tickets) {
+        const allTickets = ticketsRes.data.tickets;
+        const resolved = allTickets.filter(
+          (t: any) => t.status === "resolved" || t.status === "closed"
+        );
+        setConvertedClients(resolved);
+
+        // Calculate real avg response time
+        // = average time between ticket createdAt and first partner reply
+        const responseTimes: number[] = [];
+        allTickets.forEach((ticket: any) => {
+          if (!ticket.messages || !ticket.createdAt) return;
+          const partnerReply = ticket.messages.find(
+            (m: any) => m.sender === "partner"
+          );
+          if (partnerReply?.createdAt) {
+            const created = new Date(ticket.createdAt).getTime();
+            const replied = new Date(partnerReply.createdAt).getTime();
+            const diffMs = replied - created;
+            if (diffMs > 0) responseTimes.push(diffMs);
+          }
+        });
+
+        if (responseTimes.length > 0) {
+          const avgMs = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
+          const avgMins = Math.round(avgMs / 60000);
+          if (avgMins < 60) {
+            setAvgResponseTime(`${avgMins}m`);
+          } else if (avgMins < 1440) {
+            const hrs = (avgMins / 60).toFixed(1);
+            setAvgResponseTime(`${hrs}h`);
+          } else {
+            const days = (avgMins / 1440).toFixed(1);
+            setAvgResponseTime(`${days}d`);
+          }
+        } else {
+          setAvgResponseTime("--");
+        }
       }
+
       if (analyticsRes.success) setAnalytics(analyticsRes.data);
     } catch (error) {
       console.error("Error fetching enquiries data:", error);
@@ -198,33 +284,54 @@ const ClientEnquiries = () => {
   }
 
   const stats = {
-    new: activeRequests.filter((r) => r.status === "pending_payment").length,
-    inProgress: activeRequests.filter((r) => r.status === "pending_kyc").length,
-    converted: convertedClients.length,
-    rate:
-      analytics?.summary?.totalBookings > 0
-        ? Math.round(
-            (convertedClients.length / analytics.summary.totalBookings) * 100,
-          )
-        : 0,
+    total: activeRequests.length + convertedClients.length,
+    inProgress: activeRequests.length,
+    resolved: convertedClients.length,
+    avgTime: avgResponseTime,
   };
+
+  const filteredRequests = activeRequests.filter((request) => {
+    const matchesSearch = 
+      request.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      request.user?.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      request.id?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Product Filter Logic
+    const matchesProduct = productFilter === "all" || 
+      (request.category?.toLowerCase() === productFilter.toLowerCase()) ||
+      (request.space?.toLowerCase().includes(productFilter.replace("_", " ")));
+    
+    return matchesSearch && matchesProduct;
+  });
+
+  const filteredConverted = convertedClients.filter((ticket: any) => {
+    const matchesSearch = 
+      ticket.user?.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ticket.ticketNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ticket.subject?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesProduct = productFilter === "all" || 
+      (ticket.category?.toLowerCase() === productFilter.toLowerCase());
+    
+    return matchesSearch && matchesProduct;
+  });
 
   return (
     <div className="animate-in fade-in duration-500">
       <div className="mb-8">
         <h1 className="text-4xl">
-          Client <span className="text-primary italic">Enquiries</span>
+          <span className="text-primary italic">Tickets</span>
         </h1>
         <p className="text-muted-foreground mt-2">
-          Manage and convert incoming client enquiries
+          Manage and track client support tickets and enquiries
         </p>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-4 mb-8">
         <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
-          <p className="text-2xl font-extrabold text-foreground">{stats.new}</p>
-          <p className="text-sm text-muted-foreground">New Enquiries</p>
+          <p className="text-2xl font-extrabold text-foreground">{stats.total}</p>
+          <p className="text-sm text-muted-foreground">Total Tickets</p>
         </div>
         <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
           <p className="text-2xl font-extrabold text-foreground">
@@ -234,115 +341,116 @@ const ClientEnquiries = () => {
         </div>
         <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
           <p className="text-2xl font-extrabold text-foreground">
-            {stats.converted}
+            {stats.resolved}
           </p>
-          <p className="text-sm text-muted-foreground">Converted</p>
+          <p className="text-sm text-muted-foreground">Resolved</p>
         </div>
         <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
           <p className="text-2xl font-extrabold text-foreground">
-            {stats.rate}%
+            {stats.avgTime}
           </p>
-          <p className="text-sm text-muted-foreground">Conversion Rate</p>
+          <p className="text-sm text-muted-foreground">Avg Response Time</p>
         </div>
       </div>
 
-      <Tabs defaultValue="new" className="space-y-6">
-        <TabsList className="bg-muted/50 p-1">
-          <TabsTrigger value="new">New & In Progress</TabsTrigger>
-          <TabsTrigger value="converted">Converted</TabsTrigger>
+      {/* Search & Filter Bar - Below Stats */}
+      <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input 
+            placeholder="Search by name, company or ID..." 
+            className="pl-10 h-11 rounded-xl border-border bg-background shadow-sm"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        
+        <Select value={productFilter} onValueChange={setProductFilter}>
+          <SelectTrigger className="w-full sm:w-[220px] h-11 rounded-xl border-border bg-background">
+            <Building2 className="w-4 h-4 mr-2 text-muted-foreground" />
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl max-h-[300px]">
+            <SelectScrollUpButton />
+            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="virtual_office">Virtual Office</SelectItem>
+            <SelectItem value="coworking">Coworking</SelectItem>
+            <SelectItem value="billing">Billing & Payments</SelectItem>
+            <SelectItem value="kyc">KYC & Documents</SelectItem>
+            <SelectItem value="technical">Technical Issue</SelectItem>
+            <SelectItem value="mail_services">Mail Services</SelectItem>
+            <SelectItem value="bookings">Bookings</SelectItem>
+            <SelectItem value="compliance">Compliance</SelectItem>
+            <SelectItem value="leads">Leads</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+            <SelectScrollDownButton />
+          </SelectContent>
+        </Select>
+      </div>
+
+
+      <Tabs defaultValue="in_progress" className="space-y-6">
+        <TabsList className="bg-muted/50 p-1 rounded-xl">
+          <TabsTrigger value="in_progress" className="rounded-lg">In Progress</TabsTrigger>
+          <TabsTrigger value="converted" className="rounded-lg">Converted</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="new">
+        <TabsContent value="in_progress">
           <div className="space-y-4">
-            {activeRequests.length > 0 ? (
-              activeRequests.map((request) => (
+            {/* Table Header for Rows */}
+            <div className="grid grid-cols-[130px_1fr_150px_130px_120px_120px] gap-4 px-6 py-3 bg-muted/30 rounded-xl text-[11px] font-bold uppercase tracking-wider text-muted-foreground border border-transparent">
+              <span>Ticket Number</span>
+              <span>Name</span>
+              <span>Opened Date</span>
+              <span>Category</span>
+              <span>Status</span>
+              <span className="text-center">Action</span>
+            </div>
+
+            {filteredRequests.length > 0 ? (
+              filteredRequests.map((request) => (
                 <div
                   key={request.id}
-                  className="bg-background border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                  className="grid grid-cols-[130px_1fr_150px_130px_120px_120px] gap-4 items-center bg-background border border-border rounded-xl p-4 px-6 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                          {request.id}
-                        </span>
-                        {getStatusBadge(request.status)}
-                      </div>
-                      <h3 className="font-bold text-foreground text-xl">
-                        {request.user?.name}
-                      </h3>
-                      <p className="text-muted-foreground font-medium">
-                        {request.user?.company}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-3 py-1 rounded-full">
-                      <Clock className="w-4 h-4" />
-                      {request.date}
-                    </div>
+                  {/* Ticket Number */}
+                  <span className="text-sm font-mono text-muted-foreground truncate" title={request.ticketNumber || request.id}>
+                    {request.ticketNumber || `#${request.id.substring(0, 8)}...`}
+                  </span>
+
+                  {/* Name */}
+                  <div className="truncate">
+                    <h3 className="font-bold text-[#1a2e2a] text-base truncate">
+                      {request.user?.name || "No Name"}
+                    </h3>
                   </div>
 
-                  <div className="grid gap-6 sm:grid-cols-4 py-6 border-y border-border/60">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                        Space
-                      </p>
-                      <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
-                        <MapPin className="w-4 h-4 text-primary" />
-                        {request.space}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                        Email
-                      </p>
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {request.user?.email}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                        Phone
-                      </p>
-                      <p className="text-sm font-medium text-foreground">
-                        {request.user?.phone}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                        Last Update
-                      </p>
-                      <p className="text-sm font-medium text-foreground">
-                        {request.date}
-                      </p>
-                    </div>
+                  {/* Opened Date */}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4 opacity-40" />
+                    <span className="truncate">{request.date}</span>
                   </div>
 
-                  <div className="flex gap-3 mt-6">
+                  {/* Category */}
+                  <div>
+                    <Badge variant="outline" className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider py-0.5 px-2 bg-muted/20 border-border truncate max-w-full">
+                      {getCategoryLabel(request.category)}
+                    </Badge>
+                  </div>
+
+                  {/* Status */}
+                  <div>
+                    {getStatusBadge(request.status)}
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="flex justify-center">
                     <Button
                       size="sm"
-                      className="h-9 px-4"
+                      className="h-9 w-full bg-[#fdf2d0] text-[#786119] hover:bg-[#fae8b4] font-bold text-xs uppercase tracking-wider rounded-xl border-none shadow-none"
                       onClick={() => handleStartChat(request)}
                     >
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      Start Chat
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-9 px-4"
-                      onClick={() => handleCall(request.user?.phone)}
-                    >
-                      <Phone className="w-4 h-4 mr-2 text-primary" />
-                      Call
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="h-9 px-4"
-                      onClick={() => handleMarkConverted(request)}
-                    >
-                      <CheckCircle className="w-4 h-4 mr-2 text-primary" />
-                      Mark Converted
+                      View Chat
                     </Button>
                   </div>
                 </div>
@@ -358,73 +466,135 @@ const ClientEnquiries = () => {
         </TabsContent>
 
         <TabsContent value="converted">
-          <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-muted/30">
-                  <tr>
-                    <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      ID
-                    </th>
-                    <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Client
-                    </th>
-                    <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Company
-                    </th>
-                    <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Product
-                    </th>
-                    <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Converted Date
-                    </th>
-                    <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Deal Value
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {convertedClients.length > 0 ? (
-                    convertedClients.map((client) => (
-                      <tr
-                        key={client.id}
-                        className="hover:bg-muted/10 transition-colors"
-                      >
-                        <td className="p-4 text-sm font-mono text-muted-foreground">
-                          {client.id}
-                        </td>
-                        <td className="p-4 text-sm font-semibold text-foreground">
-                          {client.contactName}
-                        </td>
-                        <td className="p-4 text-sm text-muted-foreground">
-                          {client.companyName}
-                        </td>
-                        <td className="p-4 text-sm text-muted-foreground">
-                          {client.plan}
-                        </td>
-                        <td className="p-4 text-sm text-muted-foreground">
-                          {client.startDate !== "N/A"
-                            ? new Date(client.startDate).toLocaleDateString()
-                            : "N/A"}
-                        </td>
-                        <td className="p-4 text-sm font-bold text-primary">
-                          ₹{client.dealValue?.toLocaleString()}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={6}
-                        className="p-12 text-center text-muted-foreground"
-                      >
-                        No converted enquiries found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+          <div className="space-y-4">
+            {/* Table Header */}
+            <div className="grid grid-cols-[130px_1fr_150px_130px_120px_120px] gap-4 px-6 py-3 bg-muted/30 rounded-xl text-[11px] font-bold uppercase tracking-wider text-muted-foreground border border-transparent">
+              <span>Ticket Number</span>
+              <span>Name</span>
+              <span>Resolved Date</span>
+              <span>Category</span>
+              <span>Status</span>
+              <span className="text-center">Action</span>
             </div>
+
+            {(() => {
+              const totalPages = Math.ceil(filteredConverted.length / CONVERTED_PER_PAGE);
+              const startIdx = (convertedPage - 1) * CONVERTED_PER_PAGE;
+              const paginatedTickets = filteredConverted.slice(startIdx, startIdx + CONVERTED_PER_PAGE);
+
+              return paginatedTickets.length > 0 ? (
+                <>
+                  {paginatedTickets.map((ticket: any) => (
+                    <div
+                      key={ticket._id}
+                      className="grid grid-cols-[130px_1fr_150px_130px_120px_120px] gap-4 items-center bg-background border border-border rounded-xl p-4 px-6 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      {/* Ticket Number */}
+                      <span className="text-sm font-mono text-muted-foreground truncate" title={ticket.ticketNumber}>
+                        {ticket.ticketNumber}
+                      </span>
+
+                      {/* Name */}
+                      <div className="truncate">
+                        <h3 className="font-bold text-[#1a2e2a] text-base truncate">
+                          {ticket.user?.fullName || "Unknown"}
+                        </h3>
+                      </div>
+
+                      {/* Resolved Date */}
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <CheckCircle className="w-4 h-4 opacity-40" />
+                        <span className="truncate">
+                          {ticket.updatedAt
+                            ? new Date(ticket.updatedAt).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })
+                            : "N/A"}
+                        </span>
+                      </div>
+
+                      {/* Category */}
+                      <div>
+                        <Badge variant="outline" className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider py-0.5 px-2 bg-muted/20 border-border truncate max-w-full">
+                          {getCategoryLabel(ticket.category)}
+                        </Badge>
+                      </div>
+
+                      {/* Status */}
+                      <div>
+                        <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                          Resolved
+                        </Badge>
+                      </div>
+
+                      {/* Action - View Chat */}
+                      <div className="flex justify-center">
+                        <Button
+                          size="sm"
+                          className="h-9 w-full bg-[#fdf2d0] text-[#786119] hover:bg-[#fae8b4] font-bold text-xs uppercase tracking-wider rounded-xl border-none shadow-none"
+                          onClick={() => handleStartChat({
+                            id: ticket._id,
+                            user: {
+                              id: ticket.user?._id || ticket.user?.id,
+                              name: ticket.user?.fullName,
+                              email: ticket.user?.email,
+                              phone: ticket.user?.phoneNumber,
+                            },
+                            space: ticket.bookingId?.spaceSnapshot?.name || ticket.subject || "Query",
+                            category: ticket.category,
+                            status: ticket.status,
+                          })}
+                        >
+                          View Chat
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-between pt-4 px-2">
+                      <p className="text-sm text-muted-foreground">
+                        Showing {startIdx + 1}–{Math.min(startIdx + CONVERTED_PER_PAGE, filteredConverted.length)} of {filteredConverted.length} resolved tickets
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-9 rounded-xl"
+                          disabled={convertedPage <= 1}
+                          onClick={() => setConvertedPage(p => p - 1)}
+                        >
+                          <ChevronLeft className="w-4 h-4 mr-1" />
+                          Previous
+                        </Button>
+                        <span className="text-sm font-medium text-muted-foreground px-3">
+                          {convertedPage} / {totalPages}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-9 rounded-xl"
+                          disabled={convertedPage >= totalPages}
+                          onClick={() => setConvertedPage(p => p + 1)}
+                        >
+                          Next
+                          <ChevronRight className="w-4 h-4 ml-1" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="bg-background border border-dashed border-border rounded-xl p-12 text-center">
+                  <p className="text-muted-foreground">
+                    No resolved tickets found.
+                  </p>
+                </div>
+              );
+            })()}
           </div>
         </TabsContent>
       </Tabs>

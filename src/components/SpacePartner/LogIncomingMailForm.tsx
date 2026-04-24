@@ -9,12 +9,12 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
-  Bell,
   Scale,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { mailService } from "../../services/mailService";
-import { fetchPartnerDashboard } from "../../services/spacePortal/spacePartner.service";
+import { fetchPartnerDashboard, fetchAllPartnerSpaces } from "../../services/spacePortal/spacePartner.service";
 
 interface LogIncomingMailFormProps {
   onSuccess?: () => void;
@@ -32,16 +32,17 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
     type: "Letter",
     trackingNumber: "",
     space: "",
-    notifyClient: true,
   });
 
   // Real email autocomplete
   const [showEmailDropdown, setShowEmailDropdown] = useState(false);
   const [emailOptions, setEmailOptions] = useState<string[]>([]);
+  const [spaceOptions, setSpaceOptions] = useState<{ id: string; name: string }[]>([]);
 
   React.useEffect(() => {
-    const loadClients = async () => {
+    const loadData = async () => {
       try {
+        // Load client emails
         const response: any = await fetchPartnerDashboard();
         if (response?.data?.clients) {
           const clients = response.data.clients;
@@ -57,11 +58,28 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
           ) as string[];
           setEmailOptions(emails);
         }
+
+        // Load partner spaces
+        const spacesRes: any = await fetchAllPartnerSpaces();
+        if (spacesRes?.success && spacesRes?.data) {
+          const data = spacesRes.data;
+          // Backend returns a flat array of spaces
+          if (Array.isArray(data)) {
+            const allSpaces = data.map((s: any) => ({ id: s._id || s.id, name: s.name }));
+            setSpaceOptions(allSpaces);
+          } else if (data.virtualOffices || data.coworkingSpaces || data.meetingRooms) {
+            const allSpaces: { id: string; name: string }[] = [];
+            if (data.virtualOffices) data.virtualOffices.forEach((s: any) => allSpaces.push({ id: s._id, name: s.name }));
+            if (data.coworkingSpaces) data.coworkingSpaces.forEach((s: any) => allSpaces.push({ id: s._id, name: s.name }));
+            if (data.meetingRooms) data.meetingRooms.forEach((s: any) => allSpaces.push({ id: s._id, name: s.name }));
+            setSpaceOptions(allSpaces);
+          }
+        }
       } catch (err) {
-        console.error("Failed to load partner clients", err);
+        console.error("Failed to load partner data", err);
       }
     };
-    loadClients();
+    loadData();
   }, []);
 
   const matchedEmails = emailOptions
@@ -154,7 +172,6 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
         type: "Letter",
         trackingNumber: "",
         space: "",
-        notifyClient: true,
       });
       setSelectedFile(null);
 
@@ -169,340 +186,250 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-background rounded-2xl shadow-2xl border border-border overflow-hidden flex flex-col max-h-[90vh]">
-      <div className="bg-[#2D3F33] px-8 py-8 text-[#FDE68A] shrink-0 border-b border-border">
-        <h2 className="text-3xl font-extrabold tracking-tight uppercase">
-          Log Incoming <span className="italic text-primary">Mail</span>
-        </h2>
-        <p className="text-muted-foreground mt-2 font-medium">
-          Record a new package or letter received and notify the client.
-        </p>
+    <div className="w-full max-w-2xl mx-auto bg-background rounded-2xl shadow-2xl border border-border flex flex-col" style={{ maxHeight: 'calc(90vh)' }}>
+      {/* Header */}
+      <div className="px-6 py-5 flex items-center justify-between border-b border-border shrink-0">
+        <div>
+          <h2 className="text-xl font-extrabold tracking-tight text-foreground">
+            Log Incoming <span className="italic text-primary">Mail</span>
+          </h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Record a new delivery and notify the client
+          </p>
+        </div>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="p-2 hover:bg-muted rounded-xl transition-colors text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="p-8 space-y-10 overflow-y-auto flex-1"
+        className="px-6 py-5 space-y-6 overflow-y-auto flex-1 min-h-0"
       >
-        {/* SECTION 1: Client Identification */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
-            <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
-              1
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Client Identification
-            </h3>
-          </div>
-
+        {/* Client Email */}
+        <div className="space-y-2">
+          <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Client Email <span className="text-red-500">*</span>
+          </label>
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Client Email <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                name="clientEmail"
-                placeholder="Search by client email address..."
-                value={formData.clientEmail}
-                onFocus={() => setShowEmailDropdown(true)}
-                onBlur={() =>
-                  setTimeout(() => setShowEmailDropdown(false), 200)
-                }
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-gray-400"
-                required
-              />
-            </div>
-
-            {/* Simulated Autocomplete Dropdown */}
-            {showEmailDropdown && formData.clientEmail.length > 0 && (
-              <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
-                {matchedEmails.length > 0 ? (
-                  matchedEmails.map((email) => (
-                    <li
-                      key={email}
-                      className="px-4 py-2.5 hover:bg-slate-50 cursor-pointer text-sm text-gray-700 transition-colors"
-                      onMouseDown={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          clientEmail: email,
-                        }));
-                        setShowEmailDropdown(false);
-                      }}
-                    >
-                      {email}
-                    </li>
-                  ))
-                ) : (
-                  <li className="px-4 py-3 text-sm text-gray-500 italic">
-                    No matching clients found. Press Enter to use literal value.
-                  </li>
-                )}
-              </ul>
-            )}
-            <p className="mt-1.5 text-xs text-gray-500">
-              Start typing to find a registered client in your space.
-            </p>
-          </div>
-        </section>
-
-        {/* SECTION 2: Delivery Details */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
-            <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
-              2
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Delivery Details
-            </h3>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              name="clientEmail"
+              placeholder="Search by client email..."
+              value={formData.clientEmail}
+              onFocus={() => setShowEmailDropdown(true)}
+              onBlur={() =>
+                setTimeout(() => setShowEmailDropdown(false), 200)
+              }
+              onChange={handleChange}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-muted-foreground text-sm text-foreground"
+              required
+            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-gray-700">
-                Sender / Origin <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="sender"
-                placeholder="e.g. Amazon, DHL, HDFC Bank..."
-                value={formData.sender}
-                onChange={handleChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-gray-400"
-                required
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-gray-700">
-                Tracking Number{" "}
-                <span className="text-gray-400 font-normal">(Optional)</span>
-              </label>
-              <input
-                type="text"
-                name="trackingNumber"
-                placeholder="e.g. AWB123456789"
-                value={formData.trackingNumber}
-                onChange={handleChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all placeholder:text-gray-400"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700">
-              Item Type <span className="text-red-500">*</span>
-            </label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {itemTypes.map((type) => {
-                const isSelected = formData.type === type.id;
-                return (
-                  <button
-                    key={type.id}
-                    type="button"
-                    onClick={() =>
-                      setFormData((prev) => ({ ...prev, type: type.id }))
-                    }
-                    className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left ${
-                      isSelected
-                        ? "border-blue-600 bg-blue-50 text-blue-700"
-                        : "border-gray-100 bg-white text-gray-600 hover:border-gray-200 hover:bg-gray-50"
-                    }`}
+          {/* Autocomplete Dropdown */}
+          {showEmailDropdown && formData.clientEmail.length > 0 && (
+            <ul className="absolute z-10 w-[calc(100%-3rem)] mt-1 bg-background border border-border rounded-xl shadow-lg max-h-48 overflow-y-auto">
+              {matchedEmails.length > 0 ? (
+                matchedEmails.map((email) => (
+                  <li
+                    key={email}
+                    className="px-4 py-2.5 hover:bg-muted cursor-pointer text-sm text-foreground transition-colors"
+                    onMouseDown={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        clientEmail: email,
+                      }));
+                      setShowEmailDropdown(false);
+                    }}
                   >
-                    <div
-                      className={`p-2 rounded-lg ${
-                        isSelected ? "bg-blue-100" : "bg-gray-100"
-                      }`}
-                    >
-                      <type.icon
-                        className={`w-4 h-4 ${
-                          isSelected ? "text-blue-600" : "text-gray-500"
-                        }`}
-                      />
-                    </div>
-                    <span className="text-sm font-medium">{type.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+                    {email}
+                  </li>
+                ))
+              ) : (
+                <li className="px-4 py-3 text-sm text-muted-foreground italic">
+                  No matching clients found.
+                </li>
+              )}
+            </ul>
+          )}
+        </div>
+
+        {/* Sender + Tracking */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Sender / Origin <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="sender"
+              placeholder="e.g. Amazon, DHL, HDFC Bank..."
+              value={formData.sender}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-muted-foreground text-sm text-foreground"
+              required
+            />
           </div>
-        </section>
 
-        {/* SECTION 3: Evidence & Location */}
-        <section className="space-y-6">
-          <div className="flex items-center gap-2 border-b border-gray-100 pb-2">
-            <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
-              3
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Evidence & Location
-            </h3>
+          <div className="space-y-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Tracking Number <span className="text-muted-foreground/60 font-normal normal-case">(Optional)</span>
+            </label>
+            <input
+              type="text"
+              name="trackingNumber"
+              placeholder="e.g. AWB123456789"
+              value={formData.trackingNumber}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-muted-foreground text-sm text-foreground"
+            />
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Photo Upload{" "}
-                <span className="text-gray-400 font-normal">(Optional)</span>
-              </label>
-              <div
-                className={`border-2 border-dashed rounded-2xl p-6 text-center transition-colors cursor-pointer group ${
-                  selectedFile
-                    ? "border-blue-400 bg-blue-50/50"
-                    : "border-gray-200 hover:border-blue-400 hover:bg-slate-50"
-                }`}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                />
+        {/* Item Type */}
+        <div className="space-y-2">
+          <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Item Type <span className="text-red-500">*</span>
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {itemTypes.map((type) => {
+              const isSelected = formData.type === type.id;
+              return (
+                <button
+                  key={type.id}
+                  type="button"
+                  onClick={() =>
+                    setFormData((prev) => ({ ...prev, type: type.id }))
+                  }
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 transition-all text-left ${
+                    isSelected
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-muted/10 text-muted-foreground hover:border-primary/40 hover:bg-muted/30"
+                  }`}
+                >
+                  <type.icon className={`w-4 h-4 shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className="text-xs font-bold">{type.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-                {selectedFile ? (
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-1">
-                      <CheckCircle2 className="w-6 h-6" />
-                    </div>
-                    <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+        {/* Photo + Space Location */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Photo Upload */}
+          <div className="space-y-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Photo <span className="text-muted-foreground/60 font-normal normal-case">(Optional)</span>
+            </label>
+            <div
+              className={`border-2 border-dashed rounded-xl p-4 text-center transition-colors cursor-pointer group ${
+                selectedFile
+                  ? "border-primary/40 bg-primary/5"
+                  : "border-border hover:border-primary/40 hover:bg-muted/30"
+              }`}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileSelect}
+              />
+
+              {selectedFile ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-primary/10 text-primary rounded-lg flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {selectedFile.name}
                     </p>
-                    <p className="text-xs text-green-600 font-medium">
+                    <p className="text-[10px] text-primary font-bold uppercase tracking-wider">
                       Ready to upload
                     </p>
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="w-12 h-12 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <UploadCloud className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-blue-600">
-                        Click to upload{" "}
-                        <span className="text-gray-500 font-normal">
-                          or drag and drop
-                        </span>
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        SVG, PNG, JPG or GIF (max. 5MB)
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-1.5 flex flex-col justify-end">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Space Location <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <select
-                  name="space"
-                  value={formData.space}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all appearance-none bg-white font-medium text-gray-700"
-                >
-                  <option value="" disabled>
-                    Select a location branch
-                  </option>
-                  <option value="Mumbai - BKC">Mumbai - BKC</option>
-                  <option value="Delhi - Connaught Place">
-                    Delhi - Connaught Place
-                  </option>
-                  <option value="Bangalore - Indiranagar">
-                    Bangalore - Indiranagar
-                  </option>
-                  <option value="Hyderabad - HITEC City">
-                    Hyderabad - HITEC City
-                  </option>
-                </select>
-                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                  <svg
-                    className="w-4 h-4 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    ></path>
-                  </svg>
                 </div>
-              </div>
-              <p className="mt-2 text-xs text-gray-500">
-                Select the specific center where the asset is currently being
-                held.
-              </p>
+              ) : (
+                <div className="flex flex-col items-center gap-2 py-2">
+                  <UploadCloud className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <p className="text-xs text-muted-foreground">
+                    <span className="text-primary font-medium">Click</span> or drag & drop
+                  </p>
+                </div>
+              )}
             </div>
           </div>
-        </section>
 
-        {/* SECTION 4: Actions (Sticky Footer Effect) */}
-        <div className="pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-6 shrink-0 mt-auto px-8 pb-8 bg-muted/20">
-          <label className="flex items-center gap-3 cursor-pointer group">
+          {/* Space Location */}
+          <div className="space-y-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Space Location <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
-              <input
-                type="checkbox"
-                name="notifyClient"
-                className="sr-only"
-                checked={formData.notifyClient}
+              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <select
+                name="space"
+                value={formData.space}
                 onChange={handleChange}
-              />
-              <div
-                className={`block w-12 h-7 rounded-full transition-colors ${formData.notifyClient ? "bg-primary" : "bg-muted"}`}
-              ></div>
-              <div
-                className={`absolute left-1 top-1 bg-white w-5 h-5 rounded-full transition-transform ${formData.notifyClient ? "transform translate-x-5" : ""}`}
-              ></div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Bell
-                className={`w-4 h-4 ${formData.notifyClient ? "text-primary" : "text-muted-foreground"}`}
-              />
-              <div>
-                <span className="block text-sm font-bold text-foreground group-hover:text-primary transition-colors">
-                  Notify client via email
-                </span>
-                <span className="block text-xs text-muted-foreground">
-                  Sends an automated alert immediately
-                </span>
+                required
+                className="w-full pl-10 pr-8 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none text-sm text-foreground font-medium"
+              >
+                <option value="" disabled>
+                  Select location
+                </option>
+                {spaceOptions.map((space) => (
+                  <option key={space.id} value={space.name}>{space.name}</option>
+                ))}
+                {spaceOptions.length === 0 && (
+                  <option value="" disabled>No spaces found</option>
+                )}
+              </select>
+              <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
               </div>
             </div>
-          </label>
-
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            {onCancel && (
-              <button
-                type="button"
-                onClick={onCancel}
-                className="px-6 py-3 rounded-xl border border-border text-foreground font-bold hover:bg-muted transition-all active:scale-95 w-full sm:w-auto"
-              >
-                Cancel
-              </button>
-            )}
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-8 py-3 rounded-xl bg-[#2D3F33] text-[#FDE68A] font-bold hover:bg-[#2D3F33]/90 shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed w-full sm:w-auto"
-            >
-              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              {!loading && <CheckCircle2 className="w-4 h-4" />}
-              Log Delivery
-            </button>
           </div>
         </div>
       </form>
+
+      {/* Footer */}
+      <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-3 shrink-0 bg-muted/10">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-5 py-2.5 rounded-xl border border-border text-foreground font-bold text-sm hover:bg-muted transition-all active:scale-95"
+          >
+            Cancel
+          </button>
+        )}
+        <button
+          type="submit"
+          form=""
+          disabled={loading}
+          onClick={handleSubmit}
+          className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+          {!loading && <CheckCircle2 className="w-4 h-4" />}
+          Log Delivery
+        </button>
+      </div>
     </div>
   );
 };

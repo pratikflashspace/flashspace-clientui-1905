@@ -9,9 +9,24 @@ type SidebarItemProps = {
   label: string;
   to: string;
   collapsed?: boolean;
+  disabled?: boolean;
 };
 
-function SidebarItem({ icon, label, to, collapsed }: SidebarItemProps) {
+function SidebarItem({ icon, label, to, collapsed, disabled }: SidebarItemProps) {
+  if (disabled) {
+    return (
+      <div
+        title={`${label} (Coming Soon)`}
+        className={`flex w-full items-center rounded-xl text-left text-sm font-semibold transition opacity-40 cursor-not-allowed text-[#485753] dark:text-slate-200 ${collapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"}`}
+      >
+        <span className="text-[#7a8682] dark:text-gray-400">
+          {icon}
+        </span>
+        {collapsed ? null : <span>{label}</span>}
+      </div>
+    );
+  }
+
   return (
     <NavLink
       to={to}
@@ -146,6 +161,7 @@ export default function Sidebar({
             icon={<item.icon size={18} />}
             label={item.label}
             collapsed={isCollapsed}
+            disabled={item.disabled}
           />
         ))}
       </div>

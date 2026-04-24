@@ -459,6 +459,14 @@ const MailAndVisits = () => {
                                 Mark as Pending
                               </DropdownMenuItem>
                               <DropdownMenuItem
+                                className="font-bold text-xs"
+                                onClick={() =>
+                                  handleVisitUpdate(record._id, "Forwarded")
+                                }
+                              >
+                                Mark as Forwarded
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
                                 className="font-bold text-xs text-emerald-600"
                                 onClick={() =>
                                   handleVisitUpdate(record._id, "Completed")
@@ -514,6 +522,7 @@ function VisitStatusBadge({ status }: { status: string }) {
   const styles =
     {
       Pending: "bg-amber-100 text-amber-700",
+      Forwarded: "bg-blue-100 text-blue-700",
       Completed: "bg-emerald-100 text-emerald-700",
     }[status] || "bg-slate-100 text-slate-700";
 
