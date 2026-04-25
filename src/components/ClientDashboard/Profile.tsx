@@ -405,8 +405,8 @@ const Profile: React.FC = () => {
 
   const tabs = [
     { id: "personal", label: "Personal Info", icon: User },
-    { id: "company", label: "Company Details", icon: Building2 },
     { id: "kyc", label: "KYC Verification", icon: ShieldCheck },
+    { id: "company", label: "Company Details", icon: Building2 },
   ];
 
   return (
@@ -903,7 +903,7 @@ const Profile: React.FC = () => {
                           <Shield className="w-4 h-4 text-[#35503F]" /> Legal &
                           Tax Information
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="bg-gray-50 p-4 rounded-lg">
                             <label className="block text-xs text-gray-500 mb-1">
                               GST Number
@@ -923,29 +923,6 @@ const Profile: React.FC = () => {
                             ) : (
                               <p className="text-gray-900 font-mono text-sm">
                                 {kycData.businessInfo?.gstNumber ||
-                                  "Not provided"}
-                              </p>
-                            )}
-                          </div>
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <label className="block text-xs text-gray-500 mb-1">
-                              PAN Number
-                            </label>
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={businessInfoForm.panNumber}
-                                onChange={(e) =>
-                                  setBusinessInfoForm({
-                                    ...businessInfoForm,
-                                    panNumber: e.target.value,
-                                  })
-                                }
-                                className="w-full px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm"
-                              />
-                            ) : (
-                              <p className="text-gray-900 font-mono text-sm">
-                                {kycData.businessInfo?.panNumber ||
                                   "Not provided"}
                               </p>
                             )}
