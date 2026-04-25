@@ -272,6 +272,13 @@ export default function SpacePortalLayout() {
         hideTopBar: true,
         pageBg: "#f3f4f3",
       },
+      "/spaceportal/summary-analytics": {
+        title: makeTitle("Summary", "Reports"),
+        subtitle:
+          "High-level overview of bookings, mail, and visitor activity.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
       "/spaceportal/booking-analytics/:propertyId": {
         title: makeTitle("Booking", "Analytics"),
         subtitle:

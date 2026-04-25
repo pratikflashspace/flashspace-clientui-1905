@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Mail,
   User,
@@ -30,7 +31,9 @@ import { visitService, VisitRecord } from "@/services/visitService";
 import { format } from "date-fns";
 
 const MailAndVisits = () => {
-  const [activeTab, setActiveTab] = useState<"mail" | "visits">("mail");
+  const [searchParams] = useSearchParams();
+  const initialTab = (searchParams.get("tab") as "mail" | "visits") || "mail";
+  const [activeTab, setActiveTab] = useState<"mail" | "visits">(initialTab);
   const [mailRecords, setMailRecords] = useState<MailRecord[]>([]);
   const [visitRecords, setVisitRecords] = useState<VisitRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -215,7 +218,7 @@ const MailAndVisits = () => {
         ))}
       </div>
 
-      <Tabs defaultValue="mail" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "mail" | "visits")} className="space-y-6">
         <div className="flex items-center justify-between">
           <TabsList className="bg-muted/50 p-1 rounded-xl w-fit">
             <TabsTrigger

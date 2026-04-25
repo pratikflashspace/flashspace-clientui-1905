@@ -18,6 +18,7 @@ import {
   Building2,
   Settings,
   ShieldCheck,
+  Handshake,
 } from "lucide-react";
 
 export interface NavItem {
@@ -51,6 +52,11 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     label: "Ticket System",
     href: "/admin/tickets",
     icon: <Ticket className="w-5 h-5" />,
+  },
+  {
+    label: "Partners",
+    href: "/admin/partners",
+    icon: <Handshake className="w-5 h-5" />,
   },
   {
     label: "Support Chats",

@@ -62,6 +62,7 @@ import CompleteBookingPage from "./pages/CompleteBookingPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentFailedPage from "./pages/PaymentFailedPage";
 import AdminDashboard from "./pages/admin/Dashboard";
+import PartnersManagement from "./pages/admin/Partners";
 import UserManagement from "./pages/admin/UserManagement";
 import AdminTeamManagement from "./pages/admin/TeamManagement";
 import Coupons from "./pages/admin/Coupons";
@@ -109,6 +110,7 @@ import ClientEnquiries from "./pages/spacePortal/ClientEnquiries";
 import SpacePortalProfile from "./pages/spacePortal/Profile";
 import Notifications from "./pages/spacePortal/Notifications";
 import SpacePortalSettings from "./pages/spacePortal/Settings";
+import SummaryAnalytics from "./pages/spacePortal/SummaryAnalytics";
 import AddSpace from "./pages/spacePortal/AddSpace";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "./constants/adminNavItems";
@@ -364,6 +366,7 @@ const App = () => (
                     <Route element={<AdminRoute />}>
                       <Route path="/admin" element={<AdminLayout />}>
                         <Route index element={<AdminDashboard />} />
+                        <Route path="partners" element={<PartnersManagement />} />
                         <Route path="users" element={<UserManagement />} />
                         <Route path="team" element={<AdminTeamManagement />} />
                         <Route path="kyc-requests" element={<KYCRequests />} />
@@ -505,11 +508,8 @@ const App = () => (
                           path="feedback-nps"
                           element={<SpacePortalFeedbackNPS />}
                         />
-                        <Route
-                          path="tasks"
-                          element={<SpacePortalTicketAndTasks />}
-                        />
                         <Route path="mail-visits" element={<MailAndVisits />} />
+                        <Route path="summary-analytics" element={<SummaryAnalytics />} />
                         <Route
                           path="team-management"
                           element={<TeamManagement />}
