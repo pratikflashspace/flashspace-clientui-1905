@@ -405,8 +405,8 @@ const Profile: React.FC = () => {
 
   const tabs = [
     { id: "personal", label: "Personal Info", icon: User },
-    { id: "company", label: "Company Details", icon: Building2 },
     { id: "kyc", label: "KYC Verification", icon: ShieldCheck },
+    { id: "company", label: "Company Details", icon: Building2 },
   ];
 
   return (

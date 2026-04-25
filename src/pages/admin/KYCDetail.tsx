@@ -463,12 +463,14 @@ export default function KYCDetail() {
                         {kycData.personalInfo.email || "N/A"}
                       </span>
                     </div>
-                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                      <span className="text-gray-500 text-xs sm:text-sm">Pan Number:</span>
-                      <span className="font-bold text-gray-900 font-mono">
-                        {kycData.personalInfo.panNumber || "N/A"}
-                      </span>
-                    </div>
+                    {kycData.personalInfo.panNumber && !["NA", "N/A"].includes(kycData.personalInfo.panNumber.toUpperCase()) && (
+                      <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                        <span className="text-gray-500 text-xs sm:text-sm">Pan Number:</span>
+                        <span className="font-bold text-gray-900 font-mono">
+                          {kycData.personalInfo.panNumber}
+                        </span>
+                      </div>
+                    )}
                     {kycData.personalInfo.aadhaarNumber && (
                       <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
                         <span className="text-gray-500 text-xs sm:text-sm">Aadhaar Number:</span>

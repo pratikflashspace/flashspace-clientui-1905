@@ -134,6 +134,7 @@ export default function KYCVerification() {
   const [kycType, setKycType] = useState<KYCType>("individual");
   const [kycData, setKycData] = useState<KYCData | null>(null);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const today = new Date().toISOString().split("T")[0];
 
   // Multi-Level State
   const [profiles, setProfiles] = useState<KYCData[]>([]);
@@ -176,6 +177,37 @@ export default function KYCVerification() {
     type: string;
     mimeType: string;
   } | null>(null);
+
+  const resetForm = (isPartner: boolean, type: KYCType = "individual") => {
+    const info = individualProfile?.personalInfo || {};
+    const flatData = individualProfile as any || {};
+
+    setPersonalForm({
+      phone: isPartner ? "" : (info.phone || flatData.phone || user?.phoneNumber || ""),
+      dateOfBirth: isPartner ? "" : (info.dateOfBirth || flatData.dob
+        ? new Date(info.dateOfBirth || flatData.dob).toISOString().split("T")[0]
+        : ""),
+      aadhaar: isPartner ? "" : (info.aadhaarNumber || flatData.aadhaarNumber || ""),
+      pan: isPartner ? "" : (info.panNumber || flatData.panNumber || ""),
+      fullName: isPartner ? "" : (info.fullName || flatData.fullName || user?.fullName || ""),
+      email: isPartner ? "" : (info.email || flatData.email || user?.email || ""),
+    });
+    setBusinessForm({
+      profileName: "",
+      companyName: "",
+      companyType: "",
+      gstNumber: "",
+      cinNumber: "",
+      registeredAddress: "",
+      industry: "",
+      partners: [],
+    });
+    setIsPartnerMode(isPartner);
+    setKycType(type);
+    pendingStepRef.current = type === "business" ? "business" : "personal";
+    setActiveStep(type === "business" ? "business" : "personal");
+    setKycData(null);
+  };
 
   const openDocumentPreview = async (doc: {
     url: string;
@@ -292,9 +324,14 @@ export default function KYCVerification() {
           setPersonalForm((prev) => {
             const info = data.personalInfo || {};
             const flatData = data as any; // Fallback to root level properties
+            
+            // Only use user fallbacks if NOT in partner mode
+            const phoneFallback = isPartner ? "" : (user?.phoneNumber || "");
+            const emailFallback = isPartner ? "" : (user?.email || "");
+            const nameFallback = isPartner ? "" : (user?.fullName || "");
 
             return {
-              phone: info.phone || flatData.phone || user?.phoneNumber || "",
+              phone: info.phone || flatData.phone || phoneFallback,
               dateOfBirth:
                 info.dateOfBirth || flatData.dob
                   ? new Date(info.dateOfBirth || flatData.dob)
@@ -302,13 +339,12 @@ export default function KYCVerification() {
                     .split("T")[0]
                   : "",
               aadhaar:
-                prev.aadhaar ||
                 info.aadhaarNumber ||
                 flatData.aadhaarNumber ||
                 "",
               pan: info.panNumber || flatData.panNumber || "",
-              fullName: info.fullName || flatData.fullName || "",
-              email: info.email || flatData.email || user?.email || "",
+              fullName: info.fullName || flatData.fullName || nameFallback,
+              email: info.email || flatData.email || emailFallback,
             };
           });
 
@@ -319,6 +355,33 @@ export default function KYCVerification() {
             setKycType(data.kycType as KYCType);
           }
         } else {
+          // Handle new profile pre-filling logic
+          if (profileId === "new") {
+            const info = individualProfile?.personalInfo || {};
+            const flatData = individualProfile as any || {};
+
+            setPersonalForm({
+              phone: isPartnerMode ? "" : (info.phone || flatData.phone || user?.phoneNumber || ""),
+              dateOfBirth: isPartnerMode ? "" : (info.dateOfBirth || flatData.dob
+                ? new Date(info.dateOfBirth || flatData.dob).toISOString().split("T")[0]
+                : ""),
+              aadhaar: isPartnerMode ? "" : (info.aadhaarNumber || flatData.aadhaarNumber || ""),
+              pan: isPartnerMode ? "" : (info.panNumber || flatData.panNumber || ""),
+              fullName: isPartnerMode ? "" : (info.fullName || flatData.fullName || user?.fullName || ""),
+              email: isPartnerMode ? "" : (info.email || flatData.email || user?.email || ""),
+            });
+            setBusinessForm({
+              profileName: "",
+              companyName: "",
+              companyType: "",
+              gstNumber: "",
+              cinNumber: "",
+              registeredAddress: "",
+              industry: "",
+              partners: [],
+            });
+          }
+
           // All profiles loaded
           const profilesList = Array.isArray(response.data)
             ? response.data
@@ -432,22 +495,22 @@ export default function KYCVerification() {
           await userDashboardService.addPartner(partnerData);
 
         if (partnerResponse.success) {
+          toast.success("Partner added successfully");
           setEditMode(false);
           // Redirect to new partner profile
           if (partnerResponse.data && partnerResponse.data._id) {
             const newPartnerId = partnerResponse.data._id;
+            pendingStepRef.current = "video"; // Move to video step for partner
             setProfileId(newPartnerId);
             setSearchParams((params) => {
               params.set("profileId", newPartnerId);
               return params;
             });
-            // Force fetch to load partner data
-            setTimeout(() => fetchKYC(), 100);
           } else {
             fetchKYC();
             setProfileId(null);
           }
-          return;
+          return true;
         } else {
           setError(partnerResponse.message || "Failed to add partner");
           setSaving(false);
@@ -471,6 +534,7 @@ export default function KYCVerification() {
       });
 
       if (response.success && response.data) {
+        toast.success("Information saved successfully");
         setEditMode(false);
         if (profileId === "new" && response.data._id) {
           // New profile created, redirect to it
@@ -663,7 +727,7 @@ export default function KYCVerification() {
   };
 
   const steps = [
-    { id: "personal", label: "Personal Info", icon: User },
+    ...(kycType !== "business" ? [{ id: "personal", label: "Personal Info", icon: User }] : []),
     ...(kycType === "business"
       ? [{ id: "business", label: "Business Info", icon: Building2 }]
       : []),
@@ -957,11 +1021,21 @@ export default function KYCVerification() {
               <h1 className="text-2xl md:text-3xl font-bold  text-[#35503F]">
                 KYC <span className="text-[#35503F] opacity-100">Verification</span>
               </h1>
-              <span className="px-3 py-1 bg-red-50 text-red-600 text-xs font-semibold rounded-full border border-red-100 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" /> Action Required
-              </span>
+              {isPersonalVerified ? (
+                <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full border border-green-100 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> Verified
+                </span>
+              ) : (
+                <span className="px-3 py-1 bg-red-50 text-red-600 text-xs font-semibold rounded-full border border-red-100 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" /> Action Required
+                </span>
+              )}
             </div>
-            <p className="text-gray-500">Complete your personal identity to unlock business and partner features.</p>
+            <p className="text-gray-500">
+              {isPersonalVerified
+                ? "Your identity is verified. You can now manage your business and partner profiles."
+                : "Complete your personal identity to unlock business and partner features."}
+            </p>
           </div>
 
           {/* 1. Personal Identity Section */}
@@ -1005,8 +1079,8 @@ export default function KYCVerification() {
                       setSearchParams({ profileId: individualProfile._id });
                     } else {
                       // Start new
+                      resetForm(false, "individual");
                       setProfileId("new");
-                      setKycType("individual");
                       setSearchParams({ profileId: "new" });
                     }
                   }}
@@ -1036,9 +1110,8 @@ export default function KYCVerification() {
               ) : (
                 <button
                   onClick={() => {
+                    resetForm(true, "individual");
                     setProfileId("new");
-                    setKycType("individual");
-                    setIsPartnerMode(true);
                     setSearchParams({ profileId: "new" });
                   }}
                   className="text-sm font-medium text-[#35503F] hover:underline flex items-center gap-1"
@@ -1104,8 +1177,8 @@ export default function KYCVerification() {
               {isPersonalVerified && (
                 <button
                   onClick={() => {
+                    resetForm(false, "business");
                     setProfileId("new");
-                    setKycType("business");
                     setSearchParams({ profileId: "new" });
                   }}
                   className="text-sm font-medium text-[#35503F] hover:underline flex items-center gap-1"
@@ -1133,8 +1206,8 @@ export default function KYCVerification() {
                   <p className="text-sm text-gray-400 mt-1 mb-4">Add your company details to unlock business services.</p>
                   <button
                     onClick={() => {
+                      resetForm(false, "business");
                       setProfileId("new");
-                      setKycType("business");
                       setSearchParams({ profileId: "new" });
                     }}
                     className="text-[#35503F] font-medium text-sm flex items-center gap-1 hover:underline"
@@ -1176,6 +1249,7 @@ export default function KYCVerification() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => {
+                            pendingStepRef.current = "business";
                             setProfileId(biz._id || null);
                             setSearchParams({ profileId: biz._id || "" });
                           }}
@@ -1237,6 +1311,7 @@ export default function KYCVerification() {
                 params.delete("profileId");
                 return params;
               });
+              setIsPartnerMode(false);
               fetchKYC();
             }}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 font-medium"
@@ -1435,6 +1510,7 @@ export default function KYCVerification() {
                       </label>
                       <input
                         type="date"
+                        max={today}
                         value={personalForm.dateOfBirth}
                         onChange={(e) =>
                           setPersonalForm({
@@ -1499,7 +1575,7 @@ export default function KYCVerification() {
                     <button
                       onClick={async () => {
                         const success = await handleSaveBusinessInfo();
-                        if (success && profileId !== "new") {
+                        if (success) {
                           setActiveStep(kycType === "business" ? "business" : "video");
                         }
                       }}
