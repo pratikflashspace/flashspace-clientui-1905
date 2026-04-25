@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBookingAnalytics, fetchAllPartnerSpaces } from "@/services/spacePortal/spacePartner.service";
 import { getPropertyBookingsForPartner } from "@/services/property.service";
@@ -155,6 +155,18 @@ const extractSpaces = (response: any): PartnerSpace[] => {
 export default function BookingAnalytics() {
   const navigate = useNavigate();
   const { propertyId } = useParams<{ propertyId?: string }>();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === "#space-bookings") {
+      const element = document.getElementById("space-bookings");
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 500); // Wait for data to likely be rendered
+      }
+    }
+  }, [location]);
 
   const {
     data: analyticsData,
@@ -781,7 +793,7 @@ export default function BookingAnalytics() {
         />
       </div>
 
-      <div className="mb-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
+      <div id="space-bookings" className="mb-10 rounded-3xl border border-border bg-background p-6 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-foreground">

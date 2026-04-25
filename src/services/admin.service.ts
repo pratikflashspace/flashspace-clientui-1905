@@ -156,6 +156,26 @@ export interface AdminClientDetailResponse {
   bookings: AdminClientBookingItem[];
 }
 
+export interface AdminPartnerListItem {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  totalSpaces: number;
+  spaces: Array<{ name: string; type: string; location?: string }>;
+  kycVerified: boolean;
+  createdAt: string;
+}
+
+export interface AdminPartnerListResponse {
+  partners: AdminPartnerListItem[];
+  pagination: {
+    total: number;
+    page: number;
+    pages: number;
+  };
+}
+
 export interface KYCData {
   _id: string;
   user: {
@@ -843,6 +863,18 @@ class AdminService {
   async getClientDetails(clientId: string): Promise<ApiResponse<AdminClientDetailResponse>> {
     const response = await axiosInstance.get<ApiResponse<AdminClientDetailResponse>>(
       `/api/admin/clients/${clientId}`,
+    );
+    return response.data;
+  }
+
+  async getPartners(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<ApiResponse<AdminPartnerListResponse>> {
+    const response = await axiosInstance.get<ApiResponse<AdminPartnerListResponse>>(
+      "/admin/space-partners",
+      { params },
     );
     return response.data;
   }
