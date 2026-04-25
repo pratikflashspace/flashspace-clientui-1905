@@ -389,6 +389,7 @@ class AdminService {
       "/api/admin/kyc/pending",
       {
         params: includeApproved ? { includeApproved: true } : undefined,
+        timeout: includeApproved ? 90000 : 45000,
       },
     );
     return response.data;

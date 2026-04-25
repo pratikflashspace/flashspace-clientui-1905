@@ -22,9 +22,20 @@ interface PartnerInvoiceRecord {
   invoiceNumber: string;
   date: string;
   amount: number;
-  status: "Pending" | "Paid";
+  status: "Pending" | "Paid" | "PENDING" | "PAID";
   fileUrl: string;
   createdAt: string;
+  paymentDetails?: PaymentDetails;
+}
+
+interface PaymentDetails {
+  paymentMethod?: string;
+  amountPaid?: number;
+  paymentDate?: string;
+  utrNumber?: string;
+  paymentProof?: string;
+  fetchMode?: "AUTO" | "MANUAL";
+  markedPaidAt?: string;
 }
 
 interface InvoiceStats {
@@ -79,9 +90,27 @@ const InvoicesAndPayments = () => {
     }).format(amount);
   };
 
+  const normalizeInvoiceStatus = (status?: string) =>
+    String(status || "").toLowerCase() === "paid" ? "Paid" : "Pending";
+
+  const hasSettlementDetails = (record: PartnerInvoiceRecord) =>
+    !!(
+      record.paymentDetails?.paymentMethod &&
+      record.paymentDetails?.amountPaid &&
+      record.paymentDetails?.paymentDate &&
+      record.paymentDetails?.utrNumber &&
+      record.paymentDetails?.paymentProof
+    );
+
+  const formatPaymentDate = (dateString?: string) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("en-IN");
+  };
+
   const filteredInvoices = invoices.filter((i) => {
     const matchesSearch = i.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTab = activeTab === "All" || i.status === activeTab;
+    const matchesTab =
+      activeTab === "All" || normalizeInvoiceStatus(i.status) === activeTab;
     return matchesSearch && matchesTab;
   });
 
@@ -198,7 +227,7 @@ const InvoicesAndPayments = () => {
         <div className="bg-background border border-border rounded-2xl shadow-sm overflow-hidden min-h-[450px]">
           {loading ? (
             <div className="p-8">
-              <TableSkeleton rows={8} cols={5} />
+              <TableSkeleton rows={8} cols={6} />
             </div>
           ) : (
             <AnimatePresence mode="wait">
@@ -235,20 +264,28 @@ const InvoicesAndPayments = () => {
                           <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
                             Status
                           </th>
+                          <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                            Payment Details
+                          </th>
                           <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase text-center">
-                            File
+                            Files
                           </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
-                        {filteredInvoices.map((record, idx) => (
-                          <motion.tr
-                            key={record._id}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: idx * 0.03 }}
-                            className="group hover:bg-muted/30 transition-colors"
-                          >
+                        {filteredInvoices.map((record, idx) => {
+                          const status = normalizeInvoiceStatus(record.status);
+                          const details = record.paymentDetails;
+                          const settlementComplete = hasSettlementDetails(record);
+
+                          return (
+                            <motion.tr
+                              key={record._id}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: idx * 0.03 }}
+                              className="group hover:bg-muted/30 transition-colors"
+                            >
                             <td className="px-6 py-4">
                               <span className="font-bold text-foreground">
                                 {record.invoiceNumber}
@@ -268,13 +305,35 @@ const InvoicesAndPayments = () => {
                               <Badge
                                 variant="secondary"
                                 className={`font-bold text-[10px] uppercase ${
-                                  record.status === "Paid" 
+                                  status === "Paid"
                                     ? "bg-emerald-100 text-emerald-800 border-emerald-200" 
                                     : "bg-amber-100 text-amber-800 border-amber-200"
                                 }`}
                               >
-                                {record.status}
+                                {status}
                               </Badge>
+                            </td>
+                            <td className="px-6 py-4 min-w-[260px]">
+                              {status === "Paid" && settlementComplete ? (
+                                <div className="space-y-1 text-xs">
+                                  <p className="font-semibold text-foreground">
+                                    {details.paymentMethod || "-"} -{" "}
+                                    {formatCurrency(details.amountPaid || record.amount)}
+                                  </p>
+                                  <p className="text-muted-foreground">
+                                    Payment Date: {formatPaymentDate(details.paymentDate)}
+                                  </p>
+                                  <p className="font-mono text-[11px] text-foreground">
+                                    UTR: {details.utrNumber || "-"}
+                                  </p>
+                                </div>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">
+                                  {status === "Paid"
+                                    ? "Payment details will appear once admin adds settlement proof"
+                                    : "Not settled yet"}
+                                </span>
+                              )}
                             </td>
                             <td className="px-6 py-4">
                               <div className="flex justify-center gap-2">
@@ -292,10 +351,27 @@ const InvoicesAndPayments = () => {
                                     <Eye className="w-4 h-4" />
                                   </Button>
                                 </a>
+                                {details?.paymentProof && (
+                                  <a
+                                    href={getUploadedFileUrl(details.paymentProof)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      title="View payment proof"
+                                      className="h-8 px-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700"
+                                    >
+                                      Proof
+                                    </Button>
+                                  </a>
+                                )}
                               </div>
                             </td>
-                          </motion.tr>
-                        ))}
+                            </motion.tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>

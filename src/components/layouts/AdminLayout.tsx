@@ -51,7 +51,7 @@ export default function AdminLayout() {
               index === self.findIndex((r) => r._id === req._id),
           );
           const pendingCount = uniqueRequests.filter(
-            (req: any) => req.overallStatus === "pending",
+            (req: any) => ["pending", "resubmit"].includes(req.overallStatus),
           ).length;
           setPendingKycCount(pendingCount);
         }
