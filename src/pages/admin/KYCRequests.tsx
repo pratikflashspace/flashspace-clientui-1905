@@ -25,7 +25,7 @@ import {
   AdminPageSkeleton,
 } from "@/components/ui/skeleton-loaders";
 import { toast } from "sonner";
-import { API_CONFIG } from "@/config/api.config";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
@@ -134,13 +134,7 @@ export default function KYCRequests() {
       cleanUrl = cleanUrl.replace(/https?:\/\/localhost:5000(\/api)?/, "");
     }
 
-    if (cleanUrl.startsWith("http")) return cleanUrl;
-
-    const baseUrl = API_CONFIG.BASE_URL.endsWith("/")
-      ? API_CONFIG.BASE_URL.slice(0, -1)
-      : API_CONFIG.BASE_URL;
-    const path = cleanUrl.startsWith("/") ? cleanUrl : `/${cleanUrl}`;
-    return `${baseUrl}${path}`;
+    return getUploadedFileUrl(cleanUrl);
   };
 
   useEffect(() => {

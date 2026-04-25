@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_CONFIG } from "@/config/api.config";
 import { adminService, type PartnerKYCData } from "@/services/admin.service";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 import type { KYCDocument } from "@/types/adminKyc";
 import {
   ArrowLeft,
@@ -20,13 +20,7 @@ import {
 import { toast } from "sonner";
 
 const getFullUrl = (url?: string): string => {
-  if (!url) return "";
-  if (url.startsWith("http")) return url;
-  const baseUrl = API_CONFIG.BASE_URL.endsWith("/")
-    ? API_CONFIG.BASE_URL.slice(0, -1)
-    : API_CONFIG.BASE_URL;
-  const path = url.startsWith("/") ? url : `/${url}`;
-  return `${baseUrl}${path}`;
+  return getUploadedFileUrl(url);
 };
 
 const getFileExtension = (url?: string) => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { axiosInstance } from "@/lib/axios";
-import { API_CONFIG } from "@/config/api.config";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 import {
   FileText,
   Search,
@@ -346,7 +346,7 @@ const AdminPartnerInvoices = () => {
                           <td className="px-6 py-4">
                             <div className="flex items-center justify-center gap-3">
                               <a 
-                                href={`${API_CONFIG.BASE_URL}${record.fileUrl}`} 
+                                href={getUploadedFileUrl(record.fileUrl)}
                                 target="_blank" 
                                 rel="noreferrer"
                               >
