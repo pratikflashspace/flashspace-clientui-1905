@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +42,17 @@ interface Invoice {
   createdAt: string;
   razorpayOrderId: string;
   razorpayPaymentId?: string;
+  fileUrl?: string;
+  invoiceType?: string;
+  paymentDetails?: {
+    paymentMethod?: string;
+    amountPaid?: number;
+    paymentDate?: string;
+    utrNumber?: string;
+    paymentProof?: string;
+    fetchMode?: "AUTO" | "MANUAL";
+    markedPaidAt?: string;
+  };
 }
 
 const getStatusBadge = (status: string) => {
@@ -167,6 +179,63 @@ const InvoiceViewModal = ({
               )}
             </div>
           </div>
+          {invoice.paymentDetails && (
+            <div className="border-t border-border pt-5">
+              <p className="text-xs uppercase font-bold tracking-wider text-muted-foreground mb-3">
+                Settlement Details
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-emerald-50/60 p-3 rounded-xl border border-emerald-100">
+                  <p className="text-[10px] uppercase font-bold text-emerald-700 mb-1">
+                    Payment Method
+                  </p>
+                  <p className="font-semibold text-foreground">
+                    {invoice.paymentDetails.paymentMethod || "-"}
+                  </p>
+                </div>
+                <div className="bg-emerald-50/60 p-3 rounded-xl border border-emerald-100">
+                  <p className="text-[10px] uppercase font-bold text-emerald-700 mb-1">
+                    Amount Paid
+                  </p>
+                  <p className="font-semibold text-foreground">
+                    {formatCurrency(
+                      invoice.paymentDetails.amountPaid || invoice.totalAmount,
+                    )}
+                  </p>
+                </div>
+                <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">
+                    Payment Date
+                  </p>
+                  <p className="font-medium text-foreground">
+                    {invoice.paymentDetails.paymentDate
+                      ? new Date(
+                          invoice.paymentDetails.paymentDate,
+                        ).toLocaleDateString("en-IN")
+                      : "-"}
+                  </p>
+                </div>
+                <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">
+                    UTR Number
+                  </p>
+                  <p className="font-mono text-xs font-semibold text-foreground">
+                    {invoice.paymentDetails.utrNumber || "-"}
+                  </p>
+                </div>
+              </div>
+              {invoice.paymentDetails.paymentProof && (
+                <a
+                  href={getUploadedFileUrl(invoice.paymentDetails.paymentProof)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-3 inline-flex h-9 items-center rounded-lg border border-border px-3 text-xs font-bold text-primary hover:bg-primary/10"
+                >
+                  View / Download Payment Proof
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

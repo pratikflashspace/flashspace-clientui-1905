@@ -20,6 +20,10 @@ import {
   Calendar,
   File,
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  File,
+  ArrowLeft,
   ArrowRight,
   ShieldCheck,
   Briefcase,
@@ -55,12 +59,12 @@ interface KYCRequest {
   profileName?: string;
   kycType?: "individual" | "business";
   isPartner?: boolean;
-  user: {
+  user?: {
     _id: string;
     fullName: string;
     email: string;
     phoneNumber?: string;
-  };
+  } | null;
   personalInfo?: {
     fullName?: string;
     email?: string;
@@ -85,11 +89,27 @@ interface KYCRequest {
   businessInfoCount?: number;
 }
 
+type KYCStatusFilter = "all" | "pending" | "approved" | "rejected" | "resubmit";
+
+const kycStatusFilters: Array<{ label: string; value: KYCStatusFilter }> = [
+  { label: "All Status", value: "all" },
+  { label: "Pending", value: "pending" },
+  { label: "Approved", value: "approved" },
+  { label: "Rejected", value: "rejected" },
+  { label: "Resubmit", value: "resubmit" },
+];
+
+const pageSizeOptions = [6, 9, 12, 24];
+
 export default function KYCRequests() {
   const navigate = useNavigate();
   const [requests, setRequests] = useState<KYCRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [userSearchTerm, setUserSearchTerm] = useState("");
+  const [kycStatusFilter, setKycStatusFilter] =
+    useState<KYCStatusFilter>("all");
+  const [kycPage, setKycPage] = useState(1);
+  const [kycPageSize, setKycPageSize] = useState(6);
   const [partnerSearchTerm, setPartnerSearchTerm] = useState("");
   const [selectedRequest, setSelectedRequest] = useState<KYCRequest | null>(
     null,
@@ -194,7 +214,10 @@ export default function KYCRequests() {
       return {
         total: businessInfo.length,
         pending: businessInfo.filter(
-          (r) => r.status === "pending" || r.overallStatus === "pending",
+          (r) =>
+            r.status === "pending" ||
+            r.overallStatus === "pending" ||
+            r.overallStatus === "resubmit",
         ).length,
         approved: businessInfo.filter(
           (r) => r.status === "approved" || r.overallStatus === "approved",
@@ -207,7 +230,9 @@ export default function KYCRequests() {
     }
     return {
       total: requests.length,
-      pending: requests.filter((r) => r.overallStatus === "pending").length,
+      pending: requests.filter((r) =>
+        ["pending", "resubmit"].includes(r.overallStatus),
+      ).length,
       approved: requests.filter((r) => r.overallStatus === "approved").length,
       rejected: requests.filter((r) => r.overallStatus === "rejected").length,
       partners: partnerRequests.length, // This might need adjustment if we want total partners here
@@ -240,7 +265,7 @@ export default function KYCRequests() {
   const fetchKYCRequests = async () => {
     setLoading(true);
     try {
-      const response = await adminService.getPendingKYC();
+      const response = await adminService.getPendingKYC(true);
       // console.log("KYC Response:", response);
       if (response.success && response.data) {
         // Deduplicate by _id
@@ -452,13 +477,55 @@ export default function KYCRequests() {
     setShowPersonalInfoModal(true);
   };
 
-  const filteredRequests = requests.filter(
-    (request) =>
-      request.user?.fullName
-        ?.toLowerCase()
-        .includes(userSearchTerm.toLowerCase()) ||
-      request.user?.email?.toLowerCase().includes(userSearchTerm.toLowerCase()),
+  const getRequestUserId = (request: KYCRequest) =>
+    request.user?._id || (request.user as any)?.id || "";
+
+  const getRequestUserName = (request: KYCRequest) =>
+    request.user?.fullName ||
+    request.personalInfo?.fullName ||
+    request.profileName ||
+    request.businessInfo?.companyName ||
+    "Unknown User";
+
+  const getRequestUserEmail = (request: KYCRequest) =>
+    request.user?.email || request.personalInfo?.email || "";
+
+  const filteredRequests = requests.filter((request) => {
+    const search = userSearchTerm.trim().toLowerCase();
+    const statusMatches =
+      kycStatusFilter === "all" || request.overallStatus === kycStatusFilter;
+
+    if (!statusMatches) return false;
+    if (!search) return true;
+
+    return [
+      getRequestUserName(request),
+      getRequestUserEmail(request),
+      request.personalInfo?.phone,
+      request.profileName,
+      request.businessInfo?.companyName,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(search);
+  });
+
+  const kycTotalPages = Math.max(
+    1,
+    Math.ceil(filteredRequests.length / kycPageSize),
   );
+  const kycPageStart = (kycPage - 1) * kycPageSize;
+  const kycPageEnd = Math.min(kycPageStart + kycPageSize, filteredRequests.length);
+  const paginatedRequests = filteredRequests.slice(kycPageStart, kycPageEnd);
+
+  useEffect(() => {
+    setKycPage(1);
+  }, [userSearchTerm, kycStatusFilter, kycPageSize]);
+
+  useEffect(() => {
+    setKycPage((page) => Math.min(Math.max(page, 1), kycTotalPages));
+  }, [kycTotalPages]);
 
   const filteredPartnerRequests = partnerRequests.filter(
     (request) =>
@@ -777,7 +844,10 @@ export default function KYCRequests() {
           <div className="space-y-6">
             <Tabs
               value={activeTab}
-              onValueChange={setActiveTab}
+              onValueChange={(value) => {
+                setActiveTab(value);
+                setKycPage(1);
+              }}
               className="space-y-6"
             >
               <div className="flex justify-center md:justify-end">
@@ -799,21 +869,61 @@ export default function KYCRequests() {
                 </TabsList>
               </div>
               <TabsContent value="users" className="space-y-6">
-                {/* Search Bar */}
-                <div className="relative">
-                  <Search className="w-5 h-5 text-muted-foreground/70 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="Search users by name or email..."
-                    value={userSearchTerm}
-                    onChange={(e) => setUserSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#35503f]/10 transition-all text-sm shadow-sm"
-                  />
+                <div className="grid gap-3 lg:grid-cols-[1fr_180px_150px_auto]">
+                  <div className="relative">
+                    <Search className="w-5 h-5 text-muted-foreground/70 absolute left-4 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Search by name, email, phone, profile, company..."
+                      value={userSearchTerm}
+                      onChange={(e) => setUserSearchTerm(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#35503f]/10 transition-all text-sm shadow-sm"
+                    />
+                  </div>
+
+                  <select
+                    value={kycStatusFilter}
+                    onChange={(e) =>
+                      setKycStatusFilter(e.target.value as KYCStatusFilter)
+                    }
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-[#35503f] shadow-sm outline-none transition-all focus:ring-2 focus:ring-[#35503f]/10"
+                  >
+                    {kycStatusFilters.map((filter) => (
+                      <option key={filter.value} value={filter.value}>
+                        {filter.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={kycPageSize}
+                    onChange={(e) => setKycPageSize(Number(e.target.value))}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-[#35503f] shadow-sm outline-none transition-all focus:ring-2 focus:ring-[#35503f]/10"
+                  >
+                    {pageSizeOptions.map((size) => (
+                      <option key={size} value={size}>
+                        {size} / page
+                      </option>
+                    ))}
+                  </select>
+
+                  {(userSearchTerm || kycStatusFilter !== "all") && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserSearchTerm("");
+                        setKycStatusFilter("all");
+                      }}
+                      className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-muted-foreground shadow-sm transition-colors hover:bg-muted/40 hover:text-foreground"
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
 
                 {/* User KYC Requests Grid */}
                 {loading ? (
-                  <KYCRequestGridSkeleton count={6} />
+                  <KYCRequestGridSkeleton count={kycPageSize} />
                 ) : filteredRequests.length === 0 ? (
                   <div className="bg-white rounded-[24px] border border-border shadow-sm p-16 text-center">
                     <div className="w-20 h-20 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -827,8 +937,9 @@ export default function KYCRequests() {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredRequests.map((request) => (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {paginatedRequests.map((request) => (
                       <div
                         key={request._id}
                         className="bg-white rounded-[24px] border border-border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group flex flex-col h-full"
@@ -839,14 +950,14 @@ export default function KYCRequests() {
                           <div className="flex items-center justify-between mb-4 gap-3">
                             <div className="flex items-center gap-3 min-w-0">
                               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#35503f] to-[#4a6b54] flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
-                                {request.user?.fullName?.charAt(0) || "U"}
+                                {getRequestUserName(request).charAt(0) || "U"}
                               </div>
                               <div className="min-w-0 flex-1">
                                 <h3 className="font-bold text-foreground truncate">
-                                  {request.user?.fullName || "Unknown User"}
+                                  {getRequestUserName(request)}
                                 </h3>
                                 <p className="text-sm text-muted-foreground truncate">
-                                  {request.user?.email || ""}
+                                  {getRequestUserEmail(request)}
                                 </p>
                                 {request.profileName && (
                                   <p className="text-xs text-[#35503f] font-medium truncate mt-0.5">
@@ -937,12 +1048,17 @@ export default function KYCRequests() {
                           {/* Partner Info Button - Show if Approved */}
                           {request.overallStatus === "approved" && (
                             <button
-                              onClick={() =>
+                              onClick={() => {
+                                const userId = getRequestUserId(request);
+                                if (!userId) {
+                                  toast.error("Cannot view partners: User ID missing");
+                                  return;
+                                }
                                 handleViewUserPartners(
-                                  request.user._id || (request.user as any).id,
-                                  request.user.fullName,
-                                )
-                              }
+                                  userId,
+                                  getRequestUserName(request),
+                                );
+                              }}
                               className="w-full bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl p-4 transition-colors text-left group/partner"
                             >
                               <div className="flex items-center justify-between mb-1">
@@ -965,12 +1081,19 @@ export default function KYCRequests() {
                           {/* Business Info Button - Only show if Approved */}
                           {request.overallStatus === "approved" && (
                             <button
-                              onClick={() =>
+                              onClick={() => {
+                                const userId = getRequestUserId(request);
+                                if (!userId) {
+                                  toast.error(
+                                    "Cannot view business info: User ID missing",
+                                  );
+                                  return;
+                                }
                                 handleViewBusinessInfo(
-                                  request.user._id || (request.user as any).id,
-                                  request.user.fullName,
-                                )
-                              }
+                                  userId,
+                                  getRequestUserName(request),
+                                );
+                              }}
                               className="w-full bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl p-4 transition-colors text-left group/business"
                             >
                               <div className="flex items-center justify-between mb-1">
@@ -1077,8 +1200,52 @@ export default function KYCRequests() {
                           </div>
                         )}
                       </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+
+                    <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Showing{" "}
+                        <span className="font-bold text-foreground">
+                          {filteredRequests.length === 0 ? 0 : kycPageStart + 1}
+                          -{kycPageEnd}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-bold text-foreground">
+                          {filteredRequests.length}
+                        </span>{" "}
+                        KYC profiles
+                      </p>
+
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setKycPage((page) => Math.max(1, page - 1))}
+                          disabled={kycPage === 1}
+                          className="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-bold text-[#35503f] shadow-sm transition-colors hover:bg-[#35503f]/5 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                          Previous
+                        </button>
+                        <div className="min-w-[96px] rounded-xl bg-[#35503f]/5 px-4 py-2 text-center text-sm font-bold text-[#35503f]">
+                          {kycPage} / {kycTotalPages}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setKycPage((page) =>
+                              Math.min(kycTotalPages, page + 1),
+                            )
+                          }
+                          disabled={kycPage === kycTotalPages}
+                          className="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-bold text-[#35503f] shadow-sm transition-colors hover:bg-[#35503f]/5 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Next
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </>
                 )}
               </TabsContent>
 
