@@ -140,7 +140,7 @@ export default function BusinessKYCDetails() {
 										<span className="font-medium">GST:</span> {request.businessInfo.gstNumber}
 									</p>
 								)}
-								{request.businessInfo.panNumber && (
+								{request.businessInfo.panNumber && !["NA", "N/A"].includes(request.businessInfo.panNumber.toUpperCase()) && (
 									<p className="text-gray-700">
 										<span className="font-medium">PAN:</span> {request.businessInfo.panNumber}
 									</p>
