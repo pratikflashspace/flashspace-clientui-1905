@@ -1,7 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { adminService } from "@/services/admin.service";
-import { Search, MapPin, Star, Plus, Trash2, RotateCcw } from "lucide-react";
+import {
+  adminService,
+  AdminSpaceType,
+  UserData,
+} from "@/services/admin.service";
+import {
+  Search,
+  MapPin,
+  Star,
+  Plus,
+  Trash2,
+  RotateCcw,
+  UserRound,
+} from "lucide-react";
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
@@ -10,6 +22,10 @@ import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 const FALLBACK_IMAGE = "/hero-illustrated.jpg";
 const SECONDARY_FALLBACK =
   "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80";
+
+type PartnerEntity =
+  | string
+  | { _id?: string; id?: string; fullName?: string; email?: string };
 
 interface Space {
   _id: string;
@@ -25,12 +41,26 @@ interface Space {
   features: string[];
   availability?: string;
   isActive?: boolean;
-  type: "virtual-office" | "coworking-space";
+  type: AdminSpaceType;
   price?: string;
   originalPrice?: string;
   propertyId?: string;
+  partner?: PartnerEntity;
+  property?: {
+    partner?: PartnerEntity;
+  };
 }
 
+type PartnerOption = Pick<UserData, "_id" | "id" | "fullName" | "email">;
+
+const getEntityId = (entity: Space["partner"]) => {
+  if (!entity) return "";
+  if (typeof entity === "string") return entity;
+  return entity._id || entity.id || "";
+};
+
+const getSpacePartnerId = (space: Space) =>
+  getEntityId(space.partner) || getEntityId(space.property?.partner);
 
 // Helper to get the best available image from a space
 const getSpaceImage = (space: Space): string => {
@@ -83,14 +113,18 @@ export default function SpaceManagement() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"active" | "deleted">("active");
-  const [typeFilter, setTypeFilter] = useState<
-    "all" | "virtual-office" | "coworking-space"
-  >("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | AdminSpaceType>("all");
   const [cityFilter, setCityFilter] = useState<string>("all");
+  const [partners, setPartners] = useState<PartnerOption[]>([]);
+  const [assigningSpaceId, setAssigningSpaceId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSpaces();
   }, [viewMode]);
+
+  useEffect(() => {
+    fetchPartners();
+  }, []);
 
   const fetchSpaces = async () => {
     setLoading(true);
@@ -110,6 +144,21 @@ export default function SpaceManagement() {
     }
   };
 
+  const fetchPartners = async () => {
+    try {
+      const response = await adminService.getPartnerUsers();
+
+      if (response.success && response.data?.partners) {
+        setPartners(response.data.partners);
+      } else {
+        setPartners([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch partners", error);
+      setPartners([]);
+    }
+  };
+
   const handleEditClick = (space: Space) => {
     const propertyId = space.propertyId || space._id;
     navigate(`/admin/spaces/add?id=${propertyId}`);
@@ -117,7 +166,7 @@ export default function SpaceManagement() {
 
   const handleSaveSpace = async (
     id: string,
-    type: "virtual-office" | "coworking-space",
+    type: AdminSpaceType,
     data: any,
   ) => {
     try {
@@ -141,6 +190,24 @@ export default function SpaceManagement() {
     } catch (error) {
       console.error("Failed to create space", error);
       toast.error("Failed to create space");
+    }
+  };
+
+  const handleAssignPartner = async (space: Space, partnerId: string) => {
+    if (!partnerId || partnerId === getSpacePartnerId(space)) return;
+
+    setAssigningSpaceId(space._id);
+    try {
+      await adminService.updateSpace(space._id, space.type, {
+        partner: partnerId,
+      } as any);
+      toast.success("Partner assigned successfully");
+      fetchSpaces();
+    } catch (error) {
+      console.error("Failed to assign partner", error);
+      toast.error("Failed to assign partner");
+    } finally {
+      setAssigningSpaceId(null);
     }
   };
 
@@ -289,6 +356,7 @@ export default function SpaceManagement() {
                   <option value="all">All Types</option>
                   <option value="virtual-office">Virtual Office</option>
                   <option value="coworking-space">Coworking</option>
+                  <option value="meeting-room">Meeting Rooms</option>
                 </select>
               </div>
             </div>
@@ -390,6 +458,41 @@ export default function SpaceManagement() {
                     )}
                   </div>
 
+                  {viewMode === "active" && (
+                    <div className="mb-5">
+                      <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
+                        <UserRound className="w-3.5 h-3.5" />
+                        Partner
+                      </label>
+                      <select
+                        value={getSpacePartnerId(space)}
+                        disabled={assigningSpaceId === space._id}
+                        onChange={(e) =>
+                          handleAssignPartner(space, e.target.value)
+                        }
+                        className="w-full h-11 rounded-2xl border-2 border-border/50 bg-background px-3 text-xs font-bold text-foreground outline-none transition-all hover:border-border focus:border-primary disabled:opacity-60"
+                      >
+                        <option value="" disabled>
+                          Assign Partner
+                        </option>
+                        {partners.length === 0 ? (
+                          <option value="" disabled>
+                            No partners available
+                          </option>
+                        ) : (
+                          partners.map((partner) => (
+                            <option
+                              key={partner._id || partner.id}
+                              value={partner._id || partner.id}
+                            >
+                              {partner.fullName || partner.email}
+                            </option>
+                          ))
+                        )}
+                      </select>
+                    </div>
+                  )}
+
                   {/* Actions */}
                   <div className="flex items-center gap-3 mt-auto pt-5 border-t border-border/50">
                     {viewMode === "active" ? (
@@ -409,6 +512,9 @@ export default function SpaceManagement() {
                                 ? "Available Now"
                                 : "Unavailable",
                               isActive: willBeNowActive,
+                              ...(willBeNowActive
+                                ? { approvalStatus: "active" }
+                                : {}),
                             });
                           }}
                           className={`flex-[1.5] py-3 font-extrabold rounded-2xl border-2 transition-all text-xs uppercase tracking-widest whitespace-nowrap px-4 ${

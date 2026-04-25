@@ -734,13 +734,31 @@ export default function AddSpace() {
         
         if (spaces.coworkingSpaces && spaces.coworkingSpaces.length > 0) {
           for (const cs of spaces.coworkingSpaces) {
-            await updateCoworkingSpace(cs._id, { isActive: true, availability: "Available Now" });
+            await updateCoworkingSpace(cs._id, {
+              isActive: true,
+              approvalStatus: "active",
+              availability: "Available Now",
+            } as any);
           }
         }
         
         if (spaces.virtualOffices && spaces.virtualOffices.length > 0) {
           for (const vo of spaces.virtualOffices) {
-            await updateVirtualOffice(vo._id, { isActive: true, availability: "Available Now" });
+            await updateVirtualOffice(vo._id, {
+              isActive: true,
+              approvalStatus: "active",
+              availability: "Available Now",
+            } as any);
+          }
+        }
+
+        if (spaces.meetingRooms && spaces.meetingRooms.length > 0) {
+          for (const room of spaces.meetingRooms) {
+            await updateMeetingRoom(room._id, {
+              isActive: true,
+              approvalStatus: "active",
+              availability: "Available Now",
+            } as any);
           }
         }
 
