@@ -21,6 +21,7 @@ import {
   ReceiptText,
   UserRound,
   ExternalLink,
+  Mail,
 } from "lucide-react";
 import {
   AreaChart,

@@ -6,7 +6,7 @@ import { Invoice, KYCData, KYCDocument } from "@/types/services";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { generateInvoicePDF } from "@/utils/pdfGenerator";
-import { API_CONFIG } from "@/config/api.config";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 
 export default function Documents() {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -397,16 +397,7 @@ export default function Documents() {
                                                         <button
                                                             onClick={() => {
                                                                 let normalizedUrl = doc.fileUrl!.replace(/\\/g, '/');
-                                                                let fullUrl = normalizedUrl;
-                                                                if (!normalizedUrl.startsWith("http") && !normalizedUrl.startsWith("blob:")) {
-                                                                    let baseUrl = API_CONFIG.BASE_URL.replace(/\/$/, '');
-                                                                    // Fix static file requests failing on live servers that append /api
-                                                                    if (baseUrl.endsWith('/api')) {
-                                                                        baseUrl = baseUrl.slice(0, -4);
-                                                                    }
-                                                                    const path = normalizedUrl.startsWith('/') ? normalizedUrl : `/${normalizedUrl}`;
-                                                                    fullUrl = `${baseUrl}${path}`;
-                                                                }
+                                                                let fullUrl = getUploadedFileUrl(normalizedUrl);
                                                                 const docType = isPdf(normalizedUrl) ? 'pdf' : isVideo(normalizedUrl) ? 'video' : 'image';
                                                                 console.log(`[Document Preview] Details:
 - Name: ${doc.name}

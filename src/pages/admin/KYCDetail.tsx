@@ -1,4 +1,3 @@
-import { API_CONFIG } from "@/config/api.config";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { adminService, KYCData } from "@/services/admin.service";
@@ -22,6 +21,7 @@ import {
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { KYCDetailSkeleton } from "@/components/ui/skeleton-loaders";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 
 export default function KYCDetail() {
   const { id } = useParams<{ id: string }>();
@@ -44,10 +44,7 @@ export default function KYCDetail() {
   }, [id]);
 
   const getFullFileUrl = (path: string) => {
-    if (!path) return "";
-    if (path.startsWith("http")) return path;
-    const cleanPath = path.startsWith("/") ? path : `/${path}`;
-    return `${API_CONFIG.BASE_URL}${cleanPath}`;
+    return getUploadedFileUrl(path);
   };
 
   const truncateFileName = (name: string, maxLength: number = 25) => {

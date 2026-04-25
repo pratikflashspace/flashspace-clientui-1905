@@ -13,7 +13,7 @@ import { StatsSkeleton, TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { axiosInstance } from "../../lib/axios";
-import { API_CONFIG } from "@/config/api.config";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 import LogInvoiceModal from "../../components/SpacePartner/LogInvoiceModal";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -279,7 +279,7 @@ const InvoicesAndPayments = () => {
                             <td className="px-6 py-4">
                               <div className="flex justify-center gap-2">
                                 <a 
-                                  href={`${API_CONFIG.BASE_URL}${record.fileUrl}`} 
+                                  href={getUploadedFileUrl(record.fileUrl)}
                                   target="_blank" 
                                   rel="noreferrer"
                                 >
