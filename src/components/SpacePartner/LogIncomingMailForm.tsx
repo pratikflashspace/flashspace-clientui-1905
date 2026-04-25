@@ -374,7 +374,7 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
           </div>
 
           {/* Space Location */}
-          <div className="space-y-2">
+          <div className="space-y-2 flex flex-col justify-center">
             <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               Space Location <span className="text-red-500">*</span>
             </label>
