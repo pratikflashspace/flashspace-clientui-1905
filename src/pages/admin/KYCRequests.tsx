@@ -22,8 +22,6 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
-  File,
-  ArrowLeft,
   ArrowRight,
   ShieldCheck,
   Briefcase,

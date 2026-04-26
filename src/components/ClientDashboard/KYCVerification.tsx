@@ -500,7 +500,7 @@ export default function KYCVerification() {
           // Redirect to new partner profile
           if (partnerResponse.data && partnerResponse.data._id) {
             const newPartnerId = partnerResponse.data._id;
-            pendingStepRef.current = "video"; // Move to video step for partner
+            pendingStepRef.current = "documents"; // Partners do not need video KYC
             setProfileId(newPartnerId);
             setSearchParams((params) => {
               params.set("profileId", newPartnerId);
@@ -541,7 +541,8 @@ export default function KYCVerification() {
           const newProfileId = response.data._id;
           // Preserve kycType so tabs render correctly after reload
           pendingKycTypeRef.current = kycType;
-          pendingStepRef.current = kycType === "business" ? "business" : "video";
+          pendingStepRef.current =
+            kycType === "business" || isPartnerMode ? "documents" : "video";
           setProfileId(newProfileId);
           setSearchParams((params) => {
             params.set("profileId", newProfileId);
@@ -726,12 +727,16 @@ export default function KYCVerification() {
     }
   };
 
+  const requiresVideoKYC = () => kycType !== "business" && !isPartnerMode;
+
   const steps = [
     ...(kycType !== "business" ? [{ id: "personal", label: "Personal Info", icon: User }] : []),
     ...(kycType === "business"
       ? [{ id: "business", label: "Business Info", icon: Building2 }]
       : []),
-    { id: "video", label: "Video KYC", icon: FileVideo },
+    ...(requiresVideoKYC()
+      ? [{ id: "video", label: "Video KYC", icon: FileVideo }]
+      : []),
     { id: "documents", label: "Documents", icon: FileText },
     { id: "review", label: "Review", icon: Shield },
   ];
@@ -785,21 +790,22 @@ export default function KYCVerification() {
     // Check if business info is filled (form state OR saved on server)
     const businessReady = isBusinessInfoSaved() || isBusinessInfoComplete();
 
-    // Video KYC - accessible after personal (individual) or business (business) is filled
+    // Video KYC is only part of the main individual flow.
     if (step === "video") {
-      if (kycType === "business") return personalReady && businessReady;
-      return personalReady;
+      return requiresVideoKYC() && personalReady;
     }
 
     // Documents - accessible after previous steps are filled
     if (step === "documents") {
-      if (kycType === "business") return personalReady && businessReady && isVideoKYCComplete();
+      if (kycType === "business") return personalReady && businessReady;
+      if (!requiresVideoKYC()) return personalReady;
       return personalReady && isVideoKYCComplete();
     }
 
     // Review - accessible after all previous steps
     if (step === "review") {
-      if (kycType === "business") return personalReady && businessReady && isVideoKYCComplete();
+      if (kycType === "business") return personalReady && businessReady;
+      if (!requiresVideoKYC()) return personalReady;
       return personalReady && isVideoKYCComplete();
     }
 
@@ -830,17 +836,26 @@ export default function KYCVerification() {
       // Personal Info - 20%
       if (hasPersonalInfo) progress += 20;
 
-      // Business Info - 20%
-      if (hasBusinessInfo) progress += 20;
-
-      // Video KYC - 20%
-      if (hasVideoKYC) progress += 20;
+      // Business Info - 40%
+      if (hasBusinessInfo) progress += 40;
 
       // Documents - 40% (reaches 100% when all docs uploaded)
       const uploadedDocsCount =
         kycData?.documents?.filter((d) => d.type !== "video_kyc").length || 0;
-      const requiredDocsCount = 4;
+      const requiredDocsCount = 3;
       const docWeight = 40;
+      progress += Math.min(
+        docWeight,
+        Math.round((uploadedDocsCount / requiredDocsCount) * docWeight),
+      );
+    } else if (isPartnerMode) {
+      // Partner profiles do not require video KYC
+      if (hasPersonalInfo) progress += 50;
+
+      const uploadedDocsCount =
+        kycData?.documents?.filter((d) => d.type !== "video_kyc").length || 0;
+      const requiredDocsCount = 2;
+      const docWeight = 50;
       progress += Math.min(
         docWeight,
         Math.round((uploadedDocsCount / requiredDocsCount) * docWeight),
@@ -932,8 +947,8 @@ export default function KYCVerification() {
     // All required documents must be uploaded
     if (!areAllRequiredDocsUploaded()) return false;
 
-    // Video KYC must be uploaded (only for non-partners)
-    if (!isPartnerMode && !isVideoKYCComplete()) return false;
+    // Video KYC is only required for main individual KYC
+    if (requiresVideoKYC() && !isVideoKYCComplete()) return false;
 
     return true;
   };
@@ -1033,8 +1048,8 @@ export default function KYCVerification() {
             </div>
             <p className="text-gray-500">
               {isPersonalVerified
-                ? "Your identity is verified. You can now manage your business and partner profiles."
-                : "Complete your personal identity to unlock business and partner features."}
+                ? "Your identity is verified. You can start business or partner verification in any order."
+                : "Complete your personal identity to unlock business and partner profile creation."}
             </p>
           </div>
 
@@ -1057,7 +1072,7 @@ export default function KYCVerification() {
                     </h3>
                     <p className="text-sm text-gray-500 max-w-xl">
                       {isPersonalVerified
-                        ? "Your personal identity has been verified. You can now proceed with business and partner verifications."
+                        ? "Your personal identity has been verified. Business and partner verifications can be completed independently."
                         : "Verify your Aadhaar and PAN to establish your identity. This is required to create business profiles."}
                     </p>
                     {individualProfile?.overallStatus && individualProfile.overallStatus !== 'not_started' && !isPersonalVerified && (
@@ -1102,10 +1117,12 @@ export default function KYCVerification() {
           {/* 2. Partner Profiles Section */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className={`text-lg font-bold ${!isPersonalVerified ? "text-gray-400" : "text-gray-800"}`}>2. Partner Profiles</h2>
+              <h2 className={`text-lg font-bold ${!isPersonalVerified ? "text-gray-400" : "text-gray-800"}`}>
+                2. Partner Profiles <span className="text-gray-400 font-normal text-sm ml-1">(Optional)</span>
+              </h2>
               {!isPersonalVerified ? (
                 <span className="text-xs text-gray-400 italic flex items-center gap-1">
-                  <Info className="w-3 h-3" /> Adding a company with partners? Add them here first!
+                  <Info className="w-3 h-3" /> Personal verification required
                 </span>
               ) : (
                 <button
@@ -1133,7 +1150,7 @@ export default function KYCVerification() {
                   <Users className="w-8 h-8 text-gray-300 mb-3" />
                   <p className="text-gray-500 font-medium">No partners added yet</p>
                   <p className="text-sm text-gray-400 mt-1 max-w-sm">
-                    If your business has multiple partners or directors, add their profiles here before creating the business profile.
+                    Add partners or directors only when needed. Business profiles can be created without adding partners first.
                   </p>
                 </>
               ) : (
@@ -1203,7 +1220,7 @@ export default function KYCVerification() {
                 <div className="flex flex-col items-center justify-center py-8 text-center">
                   <Building2 className="w-10 h-10 text-gray-300 mb-3" />
                   <p className="text-gray-600 font-medium">No business profiles</p>
-                  <p className="text-sm text-gray-400 mt-1 mb-4">Add your company details to unlock business services.</p>
+                  <p className="text-sm text-gray-400 mt-1 mb-4">Add your company details now. Partner profiles can be linked later if needed.</p>
                   <button
                     onClick={() => {
                       resetForm(false, "business");
@@ -1576,7 +1593,7 @@ export default function KYCVerification() {
                       onClick={async () => {
                         const success = await handleSaveBusinessInfo();
                         if (success) {
-                          setActiveStep(kycType === "business" ? "business" : "video");
+                          setActiveStep(requiresVideoKYC() ? "video" : "documents");
                         }
                       }}
                       disabled={
@@ -1738,20 +1755,19 @@ export default function KYCVerification() {
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-medium text-gray-900 flex items-center gap-2">
                         <Users className="w-4 h-4 text-gray-500" /> Company
-                        Partners
+                        Partners <span className="text-xs font-normal text-gray-400">(Optional)</span>
                       </h3>
                     </div>
 
                     <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                       <p className="text-sm text-gray-500 mb-2">
-                        Select verified partners to link to this company:
+                        Optionally link verified partners to this company. You can continue without selecting anyone.
                       </p>
                       {[individualProfile, ...partnerProfiles].filter(
                         (p) => p && p.overallStatus === "approved",
                       ).length === 0 && (
-                          <p className="text-sm text-red-400 italic">
-                            No verified partners found. Please complete personal
-                            verification for yourself and any partners first.
+                          <p className="text-sm text-gray-400 italic">
+                            No verified partners available yet. Save this business profile now and link partners later.
                           </p>
                         )}
 
@@ -1801,7 +1817,7 @@ export default function KYCVerification() {
                       onClick={async () => {
                         const success = await handleSaveBusinessInfo();
                         if (success) {
-                          setActiveStep(isPartnerMode ? "documents" : "video");
+                          setActiveStep(requiresVideoKYC() ? "video" : "documents");
                         }
                       }}
                       disabled={
@@ -1825,7 +1841,7 @@ export default function KYCVerification() {
                 </div>
               )}
 
-              {activeStep === "video" && (
+              {requiresVideoKYC() && activeStep === "video" && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
@@ -2196,7 +2212,7 @@ export default function KYCVerification() {
                       </div>
                     )}
 
-                    {!isPartnerMode && (
+                    {requiresVideoKYC() && (
                       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <FileVideo className="w-5 h-5 text-gray-400" />
@@ -2289,7 +2305,7 @@ export default function KYCVerification() {
                                   ΓÇó Business Information
                                 </span>
                               )}
-                            {!isPartnerMode && !isVideoKYCComplete() && (
+                            {requiresVideoKYC() && !isVideoKYCComplete() && (
                               <span className="block">ΓÇó Video KYC</span>
                             )}
                             {!areAllRequiredDocsUploaded() && (
