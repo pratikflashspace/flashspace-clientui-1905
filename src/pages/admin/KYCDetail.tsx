@@ -36,6 +36,8 @@ export default function KYCDetail() {
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<any | null>(null);
   const [showApproveModal, setShowApproveModal] = useState(false);
+  const [partnerKYCs, setPartnerKYCs] = useState<any[]>([]);
+  const [loadingPartners, setLoadingPartners] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -116,6 +118,23 @@ export default function KYCDetail() {
       }
       if (response.success && response.data) {
         setKycData(response.data);
+
+        // If this is a user KYC, also fetch their linked partner KYCs
+        if (type !== "partner" && response.data.user?._id) {
+          try {
+            setLoadingPartners(true);
+            const partnersRes = await adminService.getPartnerKYCList({
+              userId: response.data.user._id,
+            });
+            if (partnersRes.success && partnersRes.data) {
+              setPartnerKYCs(partnersRes.data);
+            }
+          } catch (err) {
+            console.error("Error fetching partner KYCs:", err);
+          } finally {
+            setLoadingPartners(false);
+          }
+        }
       } else {
         toast.error("Failed to load KYC details");
         navigate(-1);
@@ -132,18 +151,32 @@ export default function KYCDetail() {
     docId: string,
     action: "approve" | "reject",
     reason?: string,
+    targetKycId?: string,
   ) => {
-    if (!id) return;
+    const effectiveId = targetKycId || id;
+    if (!effectiveId) return;
     setProcessing(true);
     try {
       const response = await adminService.reviewKYCDocument(
-        id,
+        effectiveId,
         docId,
         action,
         reason,
       );
       if (response.success) {
         const nextStatus = action === "approve" ? "approved" : "rejected";
+
+        // If it was a partner document, refresh the partner list
+        if (targetKycId && targetKycId !== id) {
+          if (kycData?.user?._id) {
+            const partnersRes = await adminService.getPartnerKYCList({
+              userId: kycData.user._id,
+            });
+            if (partnersRes.success && partnersRes.data) {
+              setPartnerKYCs(partnersRes.data);
+            }
+          }
+        }
 
         setKycData((prev) => {
           if (!prev) return prev;
@@ -175,7 +208,7 @@ export default function KYCDetail() {
             ...response.data,
             documents:
               Array.isArray(response.data.documents) &&
-              response.data.documents.length > 0
+                response.data.documents.length > 0
                 ? response.data.documents
                 : optimisticDocs,
           };
@@ -564,13 +597,12 @@ export default function KYCDetail() {
                           (doc) => doc.status === "approved",
                         )
                       }
-                      className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-sm ${
-                        !kycData.documents?.every(
-                          (doc) => doc.status === "approved",
-                        )
+                      className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 shadow-sm ${!kycData.documents?.every(
+                        (doc) => doc.status === "approved",
+                      )
                           ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                           : "bg-green-500 hover:bg-green-600 text-white"
-                      }`}
+                        }`}
                     >
                       <CheckCircle2 className="w-4 h-4" />{" "}
                       {type === "property"
@@ -580,11 +612,11 @@ export default function KYCDetail() {
                     {!kycData.documents?.every(
                       (doc) => doc.status === "approved",
                     ) && (
-                      <p className="text-xs text-orange-500 text-center mt-2 flex items-center justify-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        All documents must be approved before approving KYC.
-                      </p>
-                    )}
+                        <p className="text-xs text-orange-500 text-center mt-2 flex items-center justify-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          All documents must be approved before approving KYC.
+                        </p>
+                      )}
                   </div>
                 </div>
               )}
@@ -620,108 +652,108 @@ export default function KYCDetail() {
                         key={doc._id || doc.id || index}
                         className="group border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all bg-gray-50/50"
                       >
-                      <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
-                        {/* File Icon & Info */}
-                        <div className="flex items-center gap-4 w-full sm:w-auto">
-                          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-6 h-6 text-blue-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h4
-                              className="font-bold text-gray-900 capitalize"
-                              title={doc.name || docTypeLabel}
-                            >
-                              {truncateFileName(
-                                doc.name || docTypeLabel,
-                                20,
-                              )}
-                            </h4>
-                            <p
-                              className="text-xs text-gray-500 mt-0.5"
-                              title={doc.fileUrl?.split("/").pop()}
-                            >
-                              {truncateFileName(
-                                doc.fileUrl?.split("/").pop() || "",
-                                30,
-                              )}
-                            </p>
-                            {doc.rejectionReason &&
-                              doc.status === "rejected" && (
-                                <div className="mt-2 text-[10px] md:text-xs text-red-600 font-medium bg-red-50 p-2 rounded-lg border border-red-100 leading-tight">
-                                  <span className="font-bold">Reason:</span> {doc.rejectionReason}
-                                </div>
-                              )}
-                          </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
-                          {/* Status Label */}
-                          <div className="sm:mr-2">
-                            {doc.status === "approved" && (
-                              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-600 bg-green-50 px-2.5 py-1.5 rounded-lg border border-green-100">
-                                <CheckCircle2 className="w-3 h-3" /> APPROVED
-                              </span>
-                            )}
-                            {doc.status === "rejected" && (
-                              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-red-600 bg-red-50 px-2.5 py-1.5 rounded-lg border border-red-100">
-                                <XCircle className="w-3 h-3" /> REJECTED
-                              </span>
-                            )}
-                            {doc.status === "pending" && (
-                              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2.5 py-1.5 rounded-lg border border-yellow-100">
-                                <Clock className="w-3 h-3" /> PENDING
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="flex gap-1.5 shrink-0">
-                            {doc.status !== "approved" && (
-                              <button
-                                onClick={() => {
-                                  const docId = doc._id || doc.id;
-                                  if (!docId) return;
-                                  handleDocumentAction(docId, "approve");
-                                }}
-                                title="Approve"
-                                disabled={processing || !(doc._id || doc.id)}
-                                className="p-2.5 bg-white border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm"
+                        <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
+                          {/* File Icon & Info */}
+                          <div className="flex items-center gap-4 w-full sm:w-auto">
+                            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                              <FileText className="w-6 h-6 text-blue-600" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <h4
+                                className="font-bold text-gray-900 capitalize"
+                                title={doc.name || docTypeLabel}
                               >
-                                <CheckCircle2 className="w-4 h-4" />
-                              </button>
-                            )}
-
-                            {doc.status !== "rejected" && (
-                              <button
-                                onClick={() => {
-                                  const docId = doc._id || doc.id;
-                                  if (!docId) return;
-                                  openRejectModal(docId);
-                                }}
-                                title="Reject"
-                                disabled={processing || !(doc._id || doc.id)}
-                                className="p-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"
+                                {truncateFileName(
+                                  doc.name || docTypeLabel,
+                                  20,
+                                )}
+                              </h4>
+                              <p
+                                className="text-xs text-gray-500 mt-0.5"
+                                title={doc.fileUrl?.split("/").pop()}
                               >
-                                <XCircle className="w-4 h-4" />
-                              </button>
-                            )}
+                                {truncateFileName(
+                                  doc.fileUrl?.split("/").pop() || "",
+                                  30,
+                                )}
+                              </p>
+                              {doc.rejectionReason &&
+                                doc.status === "rejected" && (
+                                  <div className="mt-2 text-[10px] md:text-xs text-red-600 font-medium bg-red-50 p-2 rounded-lg border border-red-100 leading-tight">
+                                    <span className="font-bold">Reason:</span> {doc.rejectionReason}
+                                  </div>
+                                )}
+                            </div>
+                          </div>
 
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setSelectedDoc(doc);
-                                window.scrollTo({ top: 0, behavior: "smooth" });
-                              }}
-                              className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all flex items-center gap-2 font-medium text-xs px-4"
-                            >
-                              <Eye className="w-4 h-4" />
-                              <span className="hidden sm:inline">View</span>
-                            </button>
+                          {/* Actions */}
+                          <div className="flex flex-row sm:items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                            {/* Status Label */}
+                            <div className="sm:mr-2">
+                              {doc.status === "approved" && (
+                                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-600 bg-green-50 px-2.5 py-1.5 rounded-lg border border-green-100">
+                                  <CheckCircle2 className="w-3 h-3" /> APPROVED
+                                </span>
+                              )}
+                              {doc.status === "rejected" && (
+                                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-red-600 bg-red-50 px-2.5 py-1.5 rounded-lg border border-red-100">
+                                  <XCircle className="w-3 h-3" /> REJECTED
+                                </span>
+                              )}
+                              {doc.status === "pending" && (
+                                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2.5 py-1.5 rounded-lg border border-yellow-100">
+                                  <Clock className="w-3 h-3" /> PENDING
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex gap-1.5 shrink-0">
+                              {doc.status !== "approved" && (
+                                <button
+                                  onClick={() => {
+                                    const docId = doc._id || doc.id;
+                                    if (!docId) return;
+                                    handleDocumentAction(docId, "approve", undefined, selectedDoc?.kycId);
+                                  }}
+                                  title="Approve"
+                                  disabled={processing || !(doc._id || doc.id)}
+                                  className="p-2.5 bg-white border border-green-200 text-green-600 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm"
+                                >
+                                  <CheckCircle2 className="w-4 h-4" />
+                                </button>
+                              )}
+
+                              {doc.status !== "rejected" && (
+                                <button
+                                  onClick={() => {
+                                    const docId = doc._id || doc.id;
+                                    if (!docId) return;
+                                    openRejectModal(docId);
+                                  }}
+                                  title="Reject"
+                                  disabled={processing || !(doc._id || doc.id)}
+                                  className="p-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                              )}
+
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setSelectedDoc(doc);
+                                  window.scrollTo({ top: 0, behavior: "smooth" });
+                                }}
+                                className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all flex items-center gap-2 font-medium text-xs px-4"
+                              >
+                                <Eye className="w-4 h-4" />
+                                <span className="hidden sm:inline">View</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
                     );
                   })
                 ) : (
@@ -767,6 +799,139 @@ export default function KYCDetail() {
                 )}
 
                 {renderPreview(selectedDoc)}
+              </div>
+            )}
+
+            {/* Partner KYC Section */}
+            {type !== "partner" && partnerKYCs.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mt-4">
+                  <Shield className="w-6 h-6 text-orange-500" />
+                  <h3 className="text-xl font-extrabold text-gray-900">
+                    Linked <span className="text-orange-500 italic">Partners</span>
+                  </h3>
+                </div>
+
+                {partnerKYCs.map((partner) => (
+                  <div
+                    key={partner._id}
+                    className="bg-white rounded-2xl shadow-sm border border-orange-100 overflow-hidden"
+                  >
+                    <div className="p-6 bg-orange-50/50 border-b border-orange-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
+                          {partner.partnerInfo?.fullName?.charAt(0) || "P"}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-gray-900">
+                            {partner.partnerInfo?.fullName}
+                          </h4>
+                          <p className="text-xs text-gray-500">
+                            {partner.partnerInfo?.email} • {partner.partnerInfo?.phone}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        {getStatusBadge(partner.overallStatus)}
+                        {partner.overallStatus === "pending" && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={async () => {
+                                setProcessing(true);
+                                try {
+                                  const res = await adminService.updatePartnerStatus(partner._id, "approve");
+                                  if (res.success) {
+                                    toast.success("Partner KYC approved");
+                                    // Refresh partners
+                                    const partnersRes = await adminService.getPartnerKYCList({ userId: kycData.user._id });
+                                    if (partnersRes.success) setPartnerKYCs(partnersRes.data);
+                                  }
+                                } finally {
+                                  setProcessing(false);
+                                }
+                              }}
+                              disabled={processing}
+                              className="px-3 py-1 bg-green-500 text-white rounded-lg text-xs font-bold hover:bg-green-600 transition-colors"
+                            >
+                              Approve Partner
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedDocId("partner_kyc");
+                                setSelectedDoc({ kycId: partner._id });
+                                setShowRejectModal(true);
+                              }}
+                              disabled={processing}
+                              className="px-3 py-1 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600 transition-colors"
+                            >
+                              Reject Partner
+                            </button>
+                          </div>
+                        )}
+                        <button
+                          onClick={() => navigate(`/admin/kyc-partners/${partner._id}`)}
+                          className="text-xs font-bold text-orange-600 hover:underline px-2 py-1 bg-orange-100 rounded-lg"
+                        >
+                          Details
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="p-6">
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+                        Partner Documents
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {partner.documents?.map((doc: any, dIdx: number) => (
+                          <div
+                            key={doc._id || dIdx}
+                            className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 group"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center border border-gray-100 shadow-sm">
+                                <FileText className="w-5 h-5 text-gray-400" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-bold text-gray-900 truncate capitalize">
+                                  {doc.type?.replace(/_/g, " ")}
+                                </p>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  {doc.status === "approved" ? (
+                                    <span className="text-[10px] font-bold text-green-600 uppercase">
+                                      Verified
+                                    </span>
+                                  ) : doc.status === "rejected" ? (
+                                    <span className="text-[10px] font-bold text-red-600 uppercase">
+                                      Rejected
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] font-bold text-yellow-600 uppercase">
+                                      Pending
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => {
+                                // For partner documents, we need to pass the partner's KYC ID for reviews
+                                // but the renderPreview uses the document object.
+                                setSelectedDoc({
+                                  ...doc,
+                                  kycId: partner._id, // Attach partner KYC ID to handle review correctly if needed
+                                });
+                                window.scrollTo({ top: 0, behavior: "smooth" });
+                              }}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -856,12 +1021,43 @@ export default function KYCDetail() {
                           setShowRejectModal(false);
                           setRejectionReason("");
                         }
+                      } else if (selectedDocId === "partner_kyc") {
+                        setProcessing(true);
+                        try {
+                          const response = await adminService.updatePartnerStatus(
+                            selectedDoc.kycId,
+                            "reject",
+                            rejectionReason,
+                          );
+                          if (response.success) {
+                            toast.success("Partner KYC rejected");
+                            if (kycData?.user?._id) {
+                              const partnersRes = await adminService.getPartnerKYCList({
+                                userId: kycData.user._id,
+                              });
+                              if (partnersRes.success)
+                                setPartnerKYCs(partnersRes.data);
+                            }
+                          } else {
+                            toast.error(
+                              response.message || "Failed to reject partner KYC",
+                            );
+                          }
+                        } catch (error) {
+                          console.error("Error rejecting partner KYC:", error);
+                          toast.error("Failed to reject partner KYC");
+                        } finally {
+                          setProcessing(false);
+                          setShowRejectModal(false);
+                          setRejectionReason("");
+                        }
                       } else {
                         // This case is for rejecting a specific document
                         handleDocumentAction(
                           selectedDocId,
                           "reject",
-                          rejectionReason
+                          rejectionReason,
+                          selectedDoc?.kycId,
                         );
                       }
                     }

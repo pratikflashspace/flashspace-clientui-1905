@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext'; // Assuming you have an AuthContext
 import toast from 'react-hot-toast';
@@ -22,6 +23,7 @@ export interface INotification {
     title: string;
     message: string;
     read: boolean;
+    archived: boolean;
     createdAt: string;
     metadata?: any;
 }
@@ -161,7 +163,9 @@ interface NotificationContextType {
     markAllAsRead: () => void;
     fetchNotifications: () => void;
     deleteNotification: (id: string) => void;
+    archiveNotification: (id: string) => void;
     deleteAllNotifications: () => void;
+    handleNavigate: (notification: INotification) => void;
     workspaceCodeMap: Record<string, string>;
 }
 
@@ -169,9 +173,58 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user } = useAuth(); // Get current user
+    const navigate = useNavigate();
     const [socket, setSocket] = useState<Socket | null>(null);
     const [notifications, setNotifications] = useState<INotification[]>([]);
     const [workspaceCodeMap, setWorkspaceCodeMap] = useState<Record<string, string>>({});
+
+    const handleNavigate = useCallback((notification: INotification) => {
+        const metadata = notification.metadata || {};
+        const message = (notification.message || "").toLowerCase();
+        const title = (notification.title || "").toLowerCase();
+
+        // 1. Mail Records
+        if (metadata.mailRecordId || message.includes("mail") || message.includes("parcel") || title.includes("mail")) {
+            navigate("/dashboard/mail-records");
+            return;
+        }
+
+        // 2. Visit Records
+        if (metadata.visitId || message.includes("visit") || message.includes("visitor") || title.includes("visit")) {
+            navigate("/dashboard/visit-records");
+            return;
+        }
+
+        // 3. KYC / Profile
+        if (message.includes("kyc") || message.includes("verified") || message.includes("approved") || title.includes("kyc")) {
+            navigate("/dashboard/profile");
+            return;
+        }
+
+        // 4. Support
+        if (metadata.ticketId || message.includes("ticket") || message.includes("support") || title.includes("ticket") || title.includes("support") || notification.type === "TICKET_UPDATE") {
+            navigate("/dashboard/support");
+            return;
+        }
+
+        // 5. Bookings
+        if (message.includes("booking") || message.includes("booked") || title.includes("booking") || notification.type === "MEETING_BOOKED") {
+            navigate("/dashboard/my-bookings");
+            return;
+        }
+
+        // 6. Payments/Invoices
+        if (message.includes("payment") || message.includes("invoice") || message.includes("due") || title.includes("payment") || title.includes("invoice")) {
+            navigate("/dashboard/payments");
+            return;
+        }
+
+        // 7. Documents
+        if (message.includes("document") || title.includes("document")) {
+            navigate("/dashboard/documents");
+            return;
+        }
+    }, [navigate]);
 
     const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -179,13 +232,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const fetchNotifications = useCallback(async () => {
         if (!user) return;
 
-        // Debug user object to see why _id is undefined
-        // console.log("Current User Object:", user);
-        // Fallback for ID if _id is missing
-        const userId = user._id || user.id;
-        // console.log("Fetching notifications for user ID:", userId);
-
-        const baseUrl = API_CONFIG.BASE_URL; // Use config with fallback
+        const baseUrl = API_CONFIG.BASE_URL;
 
         try {
             const res = await fetch(`${baseUrl}/api/notifications`, {
@@ -280,7 +327,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             // Show Toast
             toast(
                 (t) => (
-                    <div onClick={() => toast.dismiss(t.id)}>
+                    <div 
+                        className="cursor-pointer"
+                        onClick={() => {
+                            handleNavigate(normalizedIncoming);
+                            toast.dismiss(t.id);
+                        }}
+                    >
                         <strong>{normalizedIncoming.title}</strong>
                         <p>{maskSpaceName(normalizedIncoming.message, normalizedIncoming.metadata, workspaceCodeMap)}</p>
                     </div>
@@ -348,6 +401,21 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     };
 
+    const archiveNotification = async (id: string) => {
+        // Optimistic Update: Toggle archived status in state instead of filtering out
+        setNotifications(prev => prev.map(n => n._id === id ? { ...n, archived: !n.archived } : n));
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/notifications/${id}/archive`, {
+                method: 'PATCH',
+                credentials: 'include'
+            });
+        } catch (err) {
+            console.error("Failed to archive notification", err);
+            // Revert on error if necessary, but for now we trust the toggle
+        }
+    };
+
     const deleteAllNotifications = async () => {
         setNotifications([]);
         try {
@@ -368,7 +436,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             markAllAsRead,
             fetchNotifications,
             deleteNotification,
+            archiveNotification,
             deleteAllNotifications,
+            handleNavigate,
             workspaceCodeMap
         }}>
             {children}

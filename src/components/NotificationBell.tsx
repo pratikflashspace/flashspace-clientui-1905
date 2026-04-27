@@ -3,8 +3,11 @@ import { useNotifications } from '../contexts/NotificationContext';
 import { Bell, Check, Trash2, X } from 'lucide-react';
 import { format } from 'date-fns';
 
+import { useNavigate } from 'react-router-dom';
+
 export const NotificationBell: React.FC = () => {
-    const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications } = useNotifications();
+    const navigate = useNavigate();
+    const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications, handleNavigate } = useNotifications();
     const [isOpen, setIsOpen] = useState(false);
     const [clearedIds, setClearedIds] = useState<Set<string>>(new Set());
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -67,25 +70,29 @@ export const NotificationBell: React.FC = () => {
                                 }}
                                 className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1 font-medium transition-colors"
                                 title="Clear all notifications permanently"
-                            >
-                                <X className="w-3.5 h-3.5" /> Clear all
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* List */}
-                    <div className="max-h-96 overflow-y-auto divide-y divide-gray-100">
-                        {visibleNotifications.length === 0 ? (
-                            <div className="p-8 text-center text-gray-500">
-                                <p className="text-sm text-gray-400">No notifications yet.</p>
-                            </div>
-                        ) : (
-                            visibleNotifications.slice(0, 10).map(n => (
-                                <div
-                                    key={n._id}
-                                    className={`group p-4 hover:bg-gray-50/80 transition-colors cursor-pointer relative ${!n.read ? 'bg-[#f0f9f4]' : 'bg-white'}`}
-                                    onClick={() => markAsRead(n._id)}
-                                >
+                              >
+                                  <X className="w-3.5 h-3.5" /> Clear all
+                              </button>
+                          </div>
+                      </div>
+  
+                      {/* List */}
+                      <div className="max-h-96 overflow-y-auto divide-y divide-gray-100">
+                          {visibleNotifications.length === 0 ? (
+                              <div className="p-8 text-center text-gray-500">
+                                  <p className="text-sm text-gray-400">No notifications yet.</p>
+                              </div>
+                          ) : (
+                              visibleNotifications.slice(0, 10).map(n => (
+                                  <div
+                                      key={n._id}
+                                      className={`group p-4 hover:bg-gray-50/80 transition-colors cursor-pointer relative ${!n.read ? 'bg-[#f0f9f4]' : 'bg-white'}`}
+                                      onClick={() => {
+                                          markAsRead(n._id);
+                                          handleNavigate(n);
+                                          setIsOpen(false);
+                                      }}
+                                  >
                                     <div className="flex justify-between items-start gap-3">
                                         <div className="flex-1 min-w-0 pr-8">
                                             <p className={`text-sm truncate ${!n.read ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>

@@ -43,6 +43,7 @@ import propertyService from "@/services/property.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { getMySpaceUserKyc } from "@/Api/spacePartnerKyc.service";
 import { getSafeImageUrl } from "@/utils/imageUrl";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 import {
   createCoworkingSpace,
   updateCoworkingSpace,
@@ -1279,7 +1280,7 @@ export default function AddSpace() {
                       {doc ? (
                         <>
                           <a
-                            href={doc.fileUrl}
+                            href={getUploadedFileUrl(doc.fileUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-1 px-4 py-2 text-primary bg-primary/5 rounded-xl text-sm font-bold hover:bg-primary/10 transition-colors"

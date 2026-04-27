@@ -6,6 +6,7 @@ import {
   Users,
   Building2,
   FileCheck,
+  FileText,
   CreditCard,
   Settings,
   LogOut,
@@ -200,6 +201,12 @@ export default function AdminLayout() {
       label: "Space Management",
       path: "/admin/spaces",
       roles: ["admin", "super_admin", "partner", "space_partner_manager"],
+    },
+    {
+      icon: FileText,
+      label: "Document Management",
+      path: "/admin/documents",
+      roles: ["admin", "super_admin"],
     },
     {
       icon: Settings,

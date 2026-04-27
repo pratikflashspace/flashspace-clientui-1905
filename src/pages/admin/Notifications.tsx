@@ -23,6 +23,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
@@ -80,6 +81,44 @@ export default function Notifications() {
       setNotifications((prev) => prev.map((n) => (n._id === id ? updated : n)));
     } catch (error) {
       console.error("Failed to mark as read", error);
+    }
+  };
+
+  const navigate = useNavigate();
+
+  const handleNotificationClick = (notification: AdminNotification) => {
+    // 1. Mark as read if unread
+    if (!notification.read) {
+      handleMarkAsRead(notification._id, {} as any);
+    }
+
+    // 2. Determine target route based on metadata or type
+    const { type, metadata } = notification;
+    let targetRoute = "";
+
+    // Priority 1: KYC Documents
+    if (metadata?.kycId) {
+      targetRoute = `/admin/kyc-requests`;
+    } 
+    // Priority 2: Tickets/Support
+    else if (metadata?.ticketId || type === NotificationType.TICKET_UPDATE) {
+      targetRoute = `/admin/tickets`;
+    } 
+    // Priority 3: Space/Property Updates
+    else if (metadata?.propertyId) {
+      targetRoute = `/admin/space-details/${metadata.propertyId}`;
+    }
+    // Priority 4: Booking/Meeting Alerts
+    else if (metadata?.bookingId || type === NotificationType.MEETING_BOOKED) {
+      targetRoute = `/admin/dashboard`;
+    }
+
+    // 3. Navigate or Open Modal
+    if (targetRoute) {
+      navigate(targetRoute);
+    } else {
+      // General notifications just show details in modal
+      setSelectedNotification(notification);
     }
   };
 
@@ -221,11 +260,7 @@ export default function Notifications() {
               {filteredNotifications.map((notification) => (
                 <div
                   key={notification._id}
-                  onClick={() => {
-                    if (!notification.read)
-                      handleMarkAsRead(notification._id, {} as any);
-                    setSelectedNotification(notification);
-                  }}
+                  onClick={() => handleNotificationClick(notification)}
                   className={`p-5 md:p-6 hover:bg-muted/30 transition-all group flex gap-4 md:gap-7 cursor-pointer items-start md:items-center relative ${
                     !notification.read ? "bg-primary/5 border-l-[6px] border-l-primary" : "border-l-[6px] border-l-transparent"
                   }`}
