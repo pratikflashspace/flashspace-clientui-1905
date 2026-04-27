@@ -43,6 +43,9 @@ export interface PartnerTicketData {
     createdAt: string;
     updatedAt: string;
     closedAt?: string;
+    rating?: number;
+    ratingRemarks?: string;
+    feedbackSubmittedAt?: string;
 }
 
 export interface PartnerTicketsResponse {

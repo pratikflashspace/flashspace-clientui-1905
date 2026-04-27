@@ -145,10 +145,35 @@ const ClientEnquiries = () => {
       // Filter resolved/closed tickets for the Converted tab + calculate avg response time
       if (ticketsRes.success && ticketsRes.data?.tickets) {
         const allTickets = ticketsRes.data.tickets;
+        
+        // Converted tab: Resolved/Closed tickets
         const resolved = allTickets.filter(
           (t: any) => t.status === "resolved" || t.status === "closed"
         );
         setConvertedClients(resolved);
+
+        // In Progress tab: Combine Leads + In-Progress Tickets
+        const inProgressTickets = allTickets
+          .filter((t: any) => t.status !== "resolved" && t.status !== "closed")
+          .map((t: any) => ({
+            id: t._id,
+            ticketNumber: t.ticketNumber,
+            user: {
+              name: t.user?.fullName,
+              company: t.bookingId?.spaceSnapshot?.name || "Support Ticket",
+            },
+            date: t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "Recent",
+            category: t.category,
+            status: t.status,
+            subject: t.subject,
+            isSupportTicket: true
+          }));
+
+        setActiveRequests(prev => {
+          // Prevent duplicates if re-fetching
+          const existingLeads = prev.filter(p => !p.isSupportTicket);
+          return [...existingLeads, ...inProgressTickets];
+        });
 
         // Calculate real avg response time
         // = average time between ticket createdAt and first partner reply
@@ -524,9 +549,25 @@ const ClientEnquiries = () => {
 
                       {/* Status */}
                       <div>
-                        <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                          Resolved
-                        </Badge>
+                        <div className="flex flex-col gap-1">
+                          <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider w-fit">
+                            Resolved
+                          </Badge>
+                          {Number(ticket.rating) > 0 && (
+                            <div className="flex items-center gap-0.5 mt-0.5">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-2.5 h-2.5 ${
+                                    i < Number(ticket.rating)
+                                      ? "fill-yellow-400 text-yellow-400"
+                                      : "text-muted/20"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       {/* Action - View Chat */}

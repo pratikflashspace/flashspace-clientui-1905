@@ -9,6 +9,7 @@ import {
   MessageSquare,
   Send,
   Headphones,
+  Star,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -328,6 +329,9 @@ export default function TicketsAndTasks() {
                     <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
                       Status
                     </th>
+                    <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
+                      Rating
+                    </th>
                     <th className="text-right p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
                       Actions
                     </th>
@@ -388,6 +392,24 @@ export default function TicketsAndTasks() {
                           {format(new Date(ticket.createdAt), "MMM d, yyyy")}
                         </td>
                         <td className="p-5">{getStatusBadge(ticket.status)}</td>
+                        <td className="p-5">
+                          {Number(ticket.rating) > 0 ? (
+                            <div className="flex items-center gap-0.5">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-3 h-3 ${
+                                    i < Number(ticket.rating)
+                                      ? "fill-yellow-400 text-yellow-400"
+                                      : "text-muted/30"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-[#164e4e]/30">-</span>
+                          )}
+                        </td>
                         <td className="p-5 text-right">
                           <Button
                             variant="outline"
@@ -424,9 +446,17 @@ export default function TicketsAndTasks() {
                     <h3 className="font-bold text-[#164e4e]">
                       {activeTicket.subject}
                     </h3>
-                    <p className="text-xs text-[#164e4e]/60">
-                      {activeTicket.user?.fullName}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-[#164e4e]/60">
+                        {activeTicket.user?.fullName}
+                      </p>
+                      {activeTicket.rating && (
+                        <div className="flex items-center gap-0.5">
+                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                          <span className="text-[10px] font-bold text-yellow-700">{activeTicket.rating}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2">

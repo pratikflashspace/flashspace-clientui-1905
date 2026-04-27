@@ -57,7 +57,7 @@ export const sidebarConfig = [
   },
   {
     label: "Tickets",
-    path: "/spaceportal/client-enquiries",
+    path: "/spaceportal/tickets",
     icon: MessageSquareText,
   },
   {
