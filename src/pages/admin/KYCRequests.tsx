@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import BusinessKYCCard from "../../components/AdminDashboard/BusinessKYCCard";
 
 import SpacePartnerKycRequest from "./SpacePartnerKycRequest";
@@ -75,11 +75,11 @@ interface KYCRequest {
     panNumber?: string;
   };
   overallStatus:
-    | "pending"
-    | "approved"
-    | "rejected"
-    | "resubmit"
-    | "not_started";
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "resubmit"
+  | "not_started";
   documents: KYCDocument[];
   progress?: number;
   createdAt: string;
@@ -826,10 +826,10 @@ export default function KYCRequests() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {businessInfo.map((profile, index) => (
-                    <BusinessKYCCard 
-                      key={profile._id || index} 
-                      profile={profile} 
-                      getStatusBadge={getStatusBadge} 
+                    <BusinessKYCCard
+                      key={profile._id || index}
+                      profile={profile}
+                      getStatusBadge={getStatusBadge}
                     />
                   ))}
 
@@ -850,20 +850,20 @@ export default function KYCRequests() {
             >
               <div className="flex justify-center md:justify-end">
                 <TabsList className="inline-flex w-full md:w-auto h-12 md:h-10 items-center justify-center rounded-xl bg-muted/50/50 p-1 text-muted-foreground border border-gray-200 shadow-sm">
-                  <TabsTrigger
-                    value="users"
-                    className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-[#35503f] data-[state=active]:shadow-md"
-                  >
-                    <User className="w-4 h-4 mr-2" />
-                    Client KYC
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="partners"
-                    className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-[#35503f] data-[state=active]:shadow-md"
-                  >
-                    <Building2 className="w-4 h-4 mr-2" />
-                    Partner KYC
-                  </TabsTrigger>
+                    <TabsTrigger
+                      value="users"
+                      className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-[#35503f] data-[state=active]:shadow-md"
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      Client KYC
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="partners"
+                      className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-[#35503f] data-[state=active]:shadow-md"
+                    >
+                      <Briefcase className="w-4 h-4 mr-2" />
+                      Partner KYC
+                    </TabsTrigger>
                 </TabsList>
               </div>
               <TabsContent value="users" className="space-y-6">
@@ -1129,7 +1129,7 @@ export default function KYCRequests() {
                                 {request.documents?.length || 0})
                               </h4>
                               {request.documents &&
-                              request.documents.length > 0 ? (
+                                request.documents.length > 0 ? (
                                 <div className="space-y-2">
                                   {request.documents.map((doc, idx) => (
                                     <div

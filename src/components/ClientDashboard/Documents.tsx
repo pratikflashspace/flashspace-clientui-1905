@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { generateInvoicePDF } from "@/utils/pdfGenerator";
 import { getUploadedFileUrl } from "@/utils/fileUrl";
+import { cn } from "@/lib/utils";
 
 export default function Documents() {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -38,9 +39,11 @@ export default function Documents() {
     });
 
     const filteredKycDocuments = kycDocuments.filter(doc => {
+        const ownerName = (doc as any).ownerName || "";
         const matchesSearch = doc.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             doc.type?.replace('_', ' ').toLowerCase().includes(searchQuery.toLowerCase()) ||
-            doc.status?.toLowerCase().includes(searchQuery.toLowerCase());
+            doc.status?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            ownerName.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesFilter = filterStatus === "all" || doc.status?.toLowerCase() === filterStatus;
         return matchesSearch && matchesFilter;
     });
@@ -65,14 +68,25 @@ export default function Documents() {
                 const profiles = Array.isArray(kycRes.data) ? kycRes.data : [kycRes.data];
 
                 // Flatten all documents from all profiles into a single array
-                const allDocuments: KYCDocument[] = [];
+                const allDocuments: (KYCDocument & { ownerName?: string })[] = [];
                 profiles.forEach(profile => {
                     if (profile.documents && Array.isArray(profile.documents)) {
-                        allDocuments.push(...profile.documents);
+                        const name = profile.personalInfo?.fullName || profile.profileName || "Partner";
+                        const ownerName = profile.isPartner 
+                            ? `Partner: ${name}`
+                            : profile.kycType === 'business'
+                                ? "Business Docs"
+                                : "Personal Docs";
+                        
+                        const docsWithNames = profile.documents.map(doc => ({
+                            ...doc,
+                            ownerName: ownerName
+                        }));
+                        allDocuments.push(...docsWithNames);
                     }
                 });
 
-                setKycDocuments(allDocuments);
+                setKycDocuments(allDocuments as KYCDocument[]);
             }
         } catch (error) {
             console.error("Failed to fetch documents data", error);
@@ -118,12 +132,15 @@ export default function Documents() {
     };
 
     const getStatusBadge = (status: string) => {
-        switch (status.toLowerCase()) {
+        const lowerStatus = status.toLowerCase();
+        switch (lowerStatus) {
             case "paid":
+            case "approved":
+            case "verified":
                 return (
                     <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        Paid
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
                     </span>
                 );
             case "pending":
@@ -134,10 +151,11 @@ export default function Documents() {
                     </span>
                 );
             case "overdue":
+            case "rejected":
                 return (
-                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Overdue
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
                     </span>
                 );
             default:
@@ -361,6 +379,7 @@ export default function Documents() {
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="bg-gray-50/80 border-b border-gray-100">
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Belongs To</th>
                                             <th className="px-6 py-4 text-sm font-semibold text-gray-600">Document Name</th>
                                             <th className="px-6 py-4 text-sm font-semibold text-gray-600">Type</th>
                                             <th className="px-6 py-4 text-sm font-semibold text-gray-600">Upload Date</th>
@@ -371,12 +390,24 @@ export default function Documents() {
                                     <tbody className="divide-y divide-gray-100">
                                         {filteredKycDocuments.length === 0 ? (
                                             <tr>
-                                                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                                                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                                                     No KYC documents match your search.
                                                 </td>
                                             </tr>
-                                        ) : filteredKycDocuments.map((doc, idx) => (
+                                        ) : filteredKycDocuments.map((doc: any, idx) => (
                                             <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <span className={cn(
+                                                        "px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest",
+                                                        doc.ownerName === "Personal Docs" 
+                                                            ? "bg-blue-50 text-blue-700 border border-blue-100" 
+                                                            : doc.ownerName === "Business Docs"
+                                                                ? "bg-amber-50 text-amber-700 border border-amber-100"
+                                                                : "bg-purple-50 text-purple-700 border border-purple-100"
+                                                    )}>
+                                                        {doc.ownerName}
+                                                    </span>
+                                                </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
                                                         <FileText className="w-5 h-5 text-gray-400" />
@@ -443,29 +474,26 @@ export default function Documents() {
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <div className="flex-1 bg-gray-100 p-4">
+                        <div className="flex-1 bg-gray-950 flex flex-col items-center justify-center overflow-hidden p-2 sm:p-4">
                             {previewDocument.type === 'pdf' ? (
                                 <iframe
                                     src={previewDocument.url}
-                                    className="w-full h-full rounded-xl border border-gray-200 shadow-sm"
+                                    className="w-full h-full rounded-xl border border-gray-800 shadow-sm"
                                     title="Document Preview"
                                 />
                             ) : previewDocument.type === 'video' ? (
-                                <div className="w-full h-full flex items-center justify-center bg-black rounded-xl border border-gray-200 shadow-sm overflow-hidden p-4">
-                                    <video
-                                        controls
-                                        autoPlay
-                                        playsInline
-                                        className="max-w-full max-h-full object-contain"
-                                        key={previewDocument.url}
-                                    >
-                                        <source src={previewDocument.url} type="video/mp4" />
-                                        <source src={previewDocument.url} />
-                                        Your browser does not support the video tag.
-                                    </video>
-                                </div>
+                                <video
+                                    controls
+                                    playsInline
+                                    className="max-w-full max-h-full rounded-lg shadow-2xl"
+                                    key={previewDocument.url}
+                                >
+                                    <source src={previewDocument.url} type="video/mp4" />
+                                    <source src={previewDocument.url} />
+                                    Your browser does not support the video tag.
+                                </video>
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden p-4">
+                                <div className="w-full h-full flex items-center justify-center bg-gray-900 rounded-xl border border-gray-800 shadow-sm overflow-hidden p-4">
                                     <img
                                         src={previewDocument.url}
                                         alt="Document Preview"

@@ -1097,6 +1097,18 @@ class AdminService {
     );
     return response.data;
   }
+
+  async getAllDocuments(params?: {
+    search?: string;
+    type?: string;
+    status?: string;
+  }): Promise<ApiResponse<any[]>> {
+    const response = await axiosInstance.get<ApiResponse<any[]>>(
+      "/api/admin/documents",
+      { params },
+    );
+    return response.data;
+  }
 }
 
 export const adminService = new AdminService();

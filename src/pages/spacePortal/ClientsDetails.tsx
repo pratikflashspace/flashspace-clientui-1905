@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { userDashboardService } from "@/services/userDashboard.service";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 
 import {
   Dialog,
@@ -83,7 +84,8 @@ export default function ClientDetails() {
       toast.error(`${label} is not available yet.`);
       return;
     }
-    window.open(url, "_blank", "noopener,noreferrer");
+    const fullUrl = getUploadedFileUrl(url);
+    window.open(fullUrl, "_blank", "noopener,noreferrer");
   };
 
   /**
@@ -98,7 +100,8 @@ export default function ClientDetails() {
       toast.error(`${label} is not available yet.`);
       return;
     }
-    setViewingDoc({ url, type, label });
+    const fullUrl = getUploadedFileUrl(url);
+    setViewingDoc({ url: fullUrl, type, label });
     setViewerOpen(true);
   };
 

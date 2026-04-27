@@ -129,6 +129,11 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     icon: <Building2 className="w-5 h-5" />,
   },
   {
+    label: "Document Management",
+    href: "/admin/documents",
+    icon: <FileText className="w-5 h-5" />,
+  },
+  {
     label: "Settings",
     href: "/admin/settings",
     icon: <Settings className="w-5 h-5" />,

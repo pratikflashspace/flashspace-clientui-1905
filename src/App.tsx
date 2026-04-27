@@ -96,6 +96,7 @@ import SupportChat from "./pages/admin/SupportChat";
 import Leaderboard from "./pages/admin/Leaderboard";
 import AdminAffiliateManagement from "./pages/admin/AdminAffiliateManagement";
 import AdminPartnerInvoices from "./pages/admin/PartnerInvoices";
+import DocumentManagement from "./pages/admin/DocumentManagement";
 
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
@@ -433,6 +434,18 @@ const App = () => (
                           element={<AdminAffiliateManagement />}
                         />
                         <Route path="partner-invoices" element={<AdminPartnerInvoices />} />
+                        <Route
+                          path="documents"
+                          element={
+                            <DashboardLayout
+                              portalName="FlashSpace Admin"
+                              portalDescription="Complete platform management"
+                              navItems={ADMIN_NAV_ITEMS}
+                            >
+                              <DocumentManagement />
+                            </DashboardLayout>
+                          }
+                        />
                         <Route path="*" element={<AdminDashboard />} />
                       </Route>
                     </Route>
