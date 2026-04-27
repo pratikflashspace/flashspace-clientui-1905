@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Building2, X, Sparkles, ArrowRight } from "lucide-react";
+import { Plus, Building2, X, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { getMySpaceUserKyc } from "@/Api/spacePartnerKyc.service";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 interface AddSpaceDialogProps {
     open: boolean;
@@ -14,7 +17,47 @@ export const AddSpaceDialog: React.FC<AddSpaceDialogProps> = ({
     onOpenChange,
 }) => {
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const [checkingKyc, setCheckingKyc] = useState(false);
     const onClose = () => onOpenChange(false);
+    const canBypassKyc =
+        user?.role === "admin" ||
+        user?.role === "super_admin" ||
+        user?.role === "space_partner_manager";
+
+    const handleStartOnboarding = async () => {
+        if (canBypassKyc) {
+            onClose();
+            navigate("/spaceportal/space-management/add");
+            return;
+        }
+
+        setCheckingKyc(true);
+        try {
+            const kyc = await getMySpaceUserKyc().catch(() => null);
+            const isApproved =
+                kyc?.overallStatus === "approved" ||
+                kyc?.kycStatus === "approved" ||
+                user?.kycVerified === true;
+
+            if (!isApproved) {
+                onClose();
+                toast({
+                    title: "Personal KYC Required",
+                    description:
+                        "Please complete and get your personal KYC approved before registering a new space.",
+                    variant: "destructive",
+                });
+                navigate("/spaceportal/kyc-verification");
+                return;
+            }
+
+            onClose();
+            navigate("/spaceportal/space-management/add");
+        } finally {
+            setCheckingKyc(false);
+        }
+    };
 
     return (
         <>
@@ -83,14 +126,16 @@ export const AddSpaceDialog: React.FC<AddSpaceDialogProps> = ({
 
                                 <div className="flex flex-col gap-3 pt-2">
                                     <Button
-                                        onClick={() => {
-                                            onClose();
-                                            navigate("/spaceportal/space-management/add");
-                                        }}
+                                        onClick={handleStartOnboarding}
+                                        disabled={checkingKyc}
                                         className="h-14 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-base shadow-lg shadow-primary/10 flex items-center justify-center gap-2 group"
                                     >
-                                        Start Onboarding
-                                        <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+                                        {checkingKyc ? "Checking KYC..." : "Start Onboarding"}
+                                        {checkingKyc ? (
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                        ) : (
+                                            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+                                        )}
                                     </Button>
                                     <Button
                                         onClick={onClose}
@@ -108,4 +153,3 @@ export const AddSpaceDialog: React.FC<AddSpaceDialogProps> = ({
         </>
     );
 };
-

@@ -91,6 +91,7 @@ const MySpaces = () => {
   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
   const [partnerKycStatus, setPartnerKycStatus] = useState<string>("not_started");
   const navigate = useNavigate();
+  const isPartnerKycApproved = partnerKycStatus === "approved";
 
   const loadSpaces = async () => {
     setLoading(true);
@@ -105,7 +106,12 @@ const MySpaces = () => {
 
       const partnerKyc = await getMySpaceUserKyc().catch(() => null);
       setPartnerKycStatus(
-        partnerKyc?.overallStatus || partnerKyc?.kycStatus || "not_started",
+        partnerKyc?.overallStatus === "approved" ||
+          partnerKyc?.kycStatus === "approved"
+          ? "approved"
+          : partnerKyc?.overallStatus ||
+              partnerKyc?.kycStatus ||
+              "not_started",
       );
 
       console.log("Raw API responses:", {
@@ -320,6 +326,21 @@ const MySpaces = () => {
     navigate(`/spaceportal/space-management/${spaceId}`);
   };
 
+  const handleAddSpace = () => {
+    if (!isPartnerKycApproved) {
+      toast({
+        title: "Personal KYC Required",
+        description:
+          "Please complete and get your personal KYC approved before adding a new space.",
+        variant: "destructive",
+      });
+      navigate("/spaceportal/kyc-verification");
+      return;
+    }
+
+    setAddSpaceOpen(true);
+  };
+
   const handleSpaceAction = async (action: string, space: any) => {
     switch (action) {
       case "view_calendar":
@@ -332,7 +353,7 @@ const MySpaces = () => {
         navigate("/spaceportal/booking-analytics");
         break;
       case "toggle_status":
-        if (partnerKycStatus !== "approved") {
+        if (!isPartnerKycApproved) {
           toast({
             title: "KYC Approval Required",
             description:
@@ -374,9 +395,9 @@ const MySpaces = () => {
             Manage all your workspace listings
           </p>
         </div>
-        <Button onClick={() => setAddSpaceOpen(true)} className="w-full sm:w-auto rounded-xl font-bold h-11">
+        <Button onClick={handleAddSpace} className="w-full sm:w-auto rounded-xl font-bold h-11">
           <Plus className="w-4 h-4 mr-2" />
-          Add New Space
+          {isPartnerKycApproved ? "Add New Space" : "Complete KYC to Add Space"}
         </Button>
       </div>
 
@@ -501,9 +522,9 @@ const MySpaces = () => {
                           onClick={() =>
                             handleSpaceAction("toggle_status", space)
                           }
-                          disabled={partnerKycStatus !== "approved"}
+                          disabled={!isPartnerKycApproved}
                         >
-                          {partnerKycStatus !== "approved"
+                          {!isPartnerKycApproved
                             ? "KYC Pending"
                             : normalizeStatus(space) === "active"
                               ? "Deactivate Space"
