@@ -72,7 +72,8 @@ export const getAllSpacePartnerKyc = async (): Promise<
 };
 
 export type SpaceUserKycResponse = {
-  _id: string;
+  _id?: string;
+  id?: string;
   userId: string;
   fullName: string;
   email: string;
@@ -116,7 +117,9 @@ export const getMySpaceUserKyc =
 
       if (response.status === 200 && response.data.success) {
         const userId = response.data.data?.userId;
-        localStorage.setItem("spaceUserId", userId);
+        if (userId) {
+          localStorage.setItem("spaceUserId", userId);
+        }
 
         return response.data.data ?? null;
       }
