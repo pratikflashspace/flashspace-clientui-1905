@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/auth.service";
 import {
@@ -51,8 +52,8 @@ export default function AdminSettings() {
       return;
     }
 
-    if (passwordForm.newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    if (passwordForm.newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
       return;
     }
 
@@ -220,6 +221,14 @@ export default function AdminSettings() {
                 )}
               </button>
             </div>
+            <div className="text-right">
+              <Link
+                to="/forgot-password"
+                className="text-xs font-bold text-primary hover:underline"
+              >
+                Forgot current password?
+              </Link>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -239,7 +248,7 @@ export default function AdminSettings() {
                   }
                   className="w-full px-6 py-4 bg-muted/30 border-2 border-transparent rounded-[20px] focus:bg-background focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-sm h-14 text-foreground"
                   placeholder="••••••••"
-                  minLength={6}
+                  minLength={8}
                   required
                 />
                 <button

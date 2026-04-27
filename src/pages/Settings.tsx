@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/auth.service";
 import Header from "@/components/Header";
@@ -78,6 +78,11 @@ export default function Settings() {
     e.preventDefault();
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       toast.error("New passwords do not match");
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
       return;
     }
 
@@ -306,6 +311,14 @@ export default function Settings() {
                     }
                     required
                   />
+                  <div className="text-right">
+                    <Link
+                      to="/forgot-password"
+                      className="text-xs font-medium text-primary hover:underline"
+                    >
+                      Forgot current password?
+                    </Link>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -322,7 +335,7 @@ export default function Settings() {
                         }))
                       }
                       required
-                      minLength={6}
+                      minLength={8}
                     />
                   </div>
                   <div className="space-y-2">

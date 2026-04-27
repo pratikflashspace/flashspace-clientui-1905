@@ -123,11 +123,19 @@ export type SpaceType = {
   navs: NavItem[];
 };
 
+const normalizeProfileId = (value?: string | null) => {
+  const trimmed = value?.trim();
+  if (!trimmed || trimmed === "undefined" || trimmed === "null") {
+    return null;
+  }
+  return trimmed;
+};
+
 export default function KYCVerification() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [profileId, setProfileId] = useState<string | null>(
-    searchParams.get("profileId"),
+    normalizeProfileId(searchParams.get("profileId")),
   );
   const userSpaceId = "userSpaceId"; // Replace with actual user space id if available
   const linkBookingId =
@@ -203,6 +211,19 @@ export default function KYCVerification() {
 
   const [termsAccepted, setTermsAccepted] = useState(false);
 
+  useEffect(() => {
+    const rawProfileId = searchParams.get("profileId");
+    if (rawProfileId && !normalizeProfileId(rawProfileId)) {
+      setSearchParams(
+        (params) => {
+          params.delete("profileId");
+          return params;
+        },
+        { replace: true },
+      );
+    }
+  }, [searchParams, setSearchParams]);
+
   const mapBackendKycToFrontend = (
     backend: SpaceUserKycResponse | null,
     fullName?: string | null,
@@ -257,8 +278,10 @@ export default function KYCVerification() {
       });
     }
 
+    const backendId = normalizeProfileId(backend._id || backend.id);
+
     return {
-      _id: backend._id,
+      _id: backendId || undefined,
       profileName: fullName
         ? `${fullName} (Personal)`
         : "My Personal KYC Profile",
@@ -296,10 +319,10 @@ export default function KYCVerification() {
         user?.fullName || null,
         user?.email || null,
       );
-      if (mapped) {
+      if (mapped?._id) {
         setIndividualProfile(mapped);
         setKycData(mapped);
-        setProfileId(mapped._id || null);
+        setProfileId(mapped._id);
 
         setPersonalForm({
           fullName: mapped.personalInfo?.fullName || "",
@@ -313,6 +336,14 @@ export default function KYCVerification() {
         setIndividualProfile(null);
         setKycData(null);
         setProfileId(null);
+        setPersonalForm({
+          fullName: mapped?.personalInfo?.fullName || user?.fullName || "",
+          email: mapped?.personalInfo?.email || user?.email || "",
+          phone: mapped?.personalInfo?.phone || "",
+          dateOfBirth: mapped?.personalInfo?.dateOfBirth || "",
+          aadhaar: mapped?.personalInfo?.aadhaarNumber || "",
+          pan: mapped?.personalInfo?.panNumber || "",
+        });
       }
     } catch (err: unknown) {
       console.error("Failed to fetch KYC from backend", err);
@@ -412,18 +443,32 @@ export default function KYCVerification() {
       const backendKyc = await upsertSpaceUserKycBusinessInfo(payload);
       const mapped = mapBackendKycToFrontend(backendKyc);
 
-      if (mapped) {
+      if (backendKyc.userId && mapped?._id) {
         setKycData(mapped);
         setIndividualProfile(mapped);
 
-        const newId = mapped._id;
-        if (newId) {
-          setProfileId(newId);
-          setSearchParams((params) => {
-            params.set("profileId", newId);
-            return params;
-          });
-        }
+        setProfileId(mapped._id);
+        setSearchParams((params) => {
+          params.set("profileId", mapped._id!);
+          return params;
+        });
+      } else {
+        setKycData((prev) =>
+          prev
+            ? {
+                ...prev,
+                businessInfo: {
+                  companyName: businessForm.companyName,
+                  companyType: businessForm.companyType,
+                  gstNumber: businessForm.gstNumber,
+                  cinNumber: businessForm.cinNumber,
+                  registeredAddress: businessForm.registeredAddress,
+                  industry: businessForm.industry,
+                  partners: businessForm.partners,
+                },
+              }
+            : prev,
+        );
       }
     } catch (err) {
       setError("Failed to save business information");
@@ -917,7 +962,7 @@ export default function KYCVerification() {
                 </h2>
               </div>
 
-              {individualProfile ? (
+              {individualProfile?._id ? (
                 <div className="bg-background border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
@@ -948,9 +993,20 @@ export default function KYCVerification() {
                   <div className="mt-8">
                     <Button
                       onClick={() => {
-                        setProfileId(individualProfile._id!);
+                        const selectedProfileId = normalizeProfileId(
+                          individualProfile._id,
+                        );
+                        if (!selectedProfileId) {
+                          setProfileId("new");
+                          setKycType("individual");
+                          setActiveStep("personal");
+                          setKycData(null);
+                          return;
+                        }
+
+                        setProfileId(selectedProfileId);
                         setSearchParams((params) => {
-                          params.set("profileId", individualProfile._id!);
+                          params.set("profileId", selectedProfileId);
                           return params;
                         });
                         setKycData(individualProfile);
@@ -985,6 +1041,12 @@ export default function KYCVerification() {
                       setProfileId("new");
                       setKycType("individual");
                       setActiveStep("personal");
+                      setKycData(null);
+                      setPersonalForm((prev) => ({
+                        ...prev,
+                        fullName: prev.fullName || user?.fullName || "",
+                        email: prev.email || user?.email || "",
+                      }));
                       // Reset form
                       setBusinessForm({
                         profileName: user?.fullName
@@ -1465,7 +1527,7 @@ export default function KYCVerification() {
                         onClick={async () => {
                           setSaving(true);
                           try {
-                            await upsertSpaceUserKyc({
+                            const savedKyc = await upsertSpaceUserKyc({
                               fullName:
                                 personalForm.fullName || user?.fullName || "",
                               email: personalForm.email || user?.email || "",
@@ -1474,6 +1536,20 @@ export default function KYCVerification() {
                               aadhaarNumber: personalForm.aadhaar,
                               panNumber: personalForm.pan,
                             });
+                            const mapped = mapBackendKycToFrontend(
+                              savedKyc,
+                              user?.fullName || null,
+                              user?.email || null,
+                            );
+                            if (mapped?._id) {
+                              setIndividualProfile(mapped);
+                              setKycData(mapped);
+                              setProfileId(mapped._id);
+                              setSearchParams((params) => {
+                                params.set("profileId", mapped._id!);
+                                return params;
+                              });
+                            }
                             setActiveStep("business");
                           } catch (err) {
                             setError("Failed to save personal information");
