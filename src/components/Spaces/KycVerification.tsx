@@ -214,10 +214,12 @@ export default function KYCVerification() {
   useEffect(() => {
     const rawProfileId = searchParams.get("profileId");
     if (rawProfileId && !normalizeProfileId(rawProfileId)) {
+      setProfileId(null);
       setSearchParams(
         (params) => {
-          params.delete("profileId");
-          return params;
+          const nextParams = new URLSearchParams(params);
+          nextParams.delete("profileId");
+          return nextParams;
         },
         { replace: true },
       );
