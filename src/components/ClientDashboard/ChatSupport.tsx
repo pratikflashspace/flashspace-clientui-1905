@@ -219,10 +219,6 @@ export default function ChatSupport() {
             toast.error("Please select a category");
             return;
         }
-        if (newTicketData.category === 'bookings' && !newTicketData.bookingId) {
-            toast.error("Please select a booking");
-            return;
-        }
         if (!newTicketData.description || newTicketData.description.length < 10) {
             toast.error("Description must be at least 10 characters long");
             return;

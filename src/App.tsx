@@ -522,6 +522,7 @@ const App = () => (
                         />
 
                         <Route path="tickets" element={<Tickets />} />
+                        <Route path="tasks" element={<SpacePortalTicketAndTasks />} />
                         <Route
                           path="feedback-nps"
                           element={<SpacePortalFeedbackNPS />}

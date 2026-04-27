@@ -13,7 +13,8 @@ import {
   XCircle,
   ArrowUpRight,
   Lock,
-  Search
+  Search,
+  Star
 } from "lucide-react";
 
 export const TicketViewModal = ({
@@ -333,7 +334,40 @@ export const TicketViewModal = ({
               </div>
             )}
 
-            {isReadOnly && (
+            {/* Customer Feedback */}
+            {ticket?.rating && (
+              <div style={{ marginBottom: '40px' }}>
+                <h3 style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#94a3b8', marginBottom: '16px' }}>
+                  Customer Feedback
+                </h3>
+                <div style={{ 
+                  backgroundColor: '#fff', 
+                  padding: '16px', 
+                  borderRadius: '24px', 
+                  border: '1px solid #fef3c7',
+                  backgroundColor: '#fffbeb'
+                }}>
+                  <div style={{ display: 'flex', gap: '4px', marginBottom: '10px' }}>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star 
+                        key={i} 
+                        size={14} 
+                        fill={i < ticket.rating ? "#f59e0b" : "transparent"} 
+                        color="#f59e0b" 
+                      />
+                    ))}
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#92400e', fontWeight: 600, fontStyle: 'italic', margin: 0, lineHeight: 1.4 }}>
+                    "{ticket.ratingRemarks || "No remarks provided"}"
+                  </p>
+                  <div style={{ marginTop: '10px', fontSize: '10px', color: '#b45309', fontWeight: 700 }}>
+                    SUBMITTED {ticket.feedbackSubmittedAt ? format(new Date(ticket.feedbackSubmittedAt), "MMM d, yyyy") : "RECENTLY"}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {isReadOnly && !ticket?.rating && (
               <div style={{ 
                 marginTop: 'auto', 
                 padding: '20px', 

@@ -149,7 +149,11 @@ export default function SpaceManagement() {
       const response = await adminService.getPartnerUsers();
 
       if (response.success && response.data?.partners) {
-        setPartners(response.data.partners);
+        // Sort partners by name for a more professional feel
+        const sortedPartners = [...response.data.partners].sort((a, b) => 
+          (a.fullName || "").localeCompare(b.fullName || "")
+        );
+        setPartners(sortedPartners);
       } else {
         setPartners([]);
       }
@@ -459,37 +463,46 @@ export default function SpaceManagement() {
                   </div>
 
                   {viewMode === "active" && (
-                    <div className="mb-5">
-                      <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
+                    <div className="mb-5 group/partner relative">
+                      <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground mb-2.5 transition-colors group-hover/partner:text-primary">
                         <UserRound className="w-3.5 h-3.5" />
-                        Partner
+                        Management & Partner
                       </label>
-                      <select
-                        value={getSpacePartnerId(space)}
-                        disabled={assigningSpaceId === space._id}
-                        onChange={(e) =>
-                          handleAssignPartner(space, e.target.value)
-                        }
-                        className="w-full h-11 rounded-2xl border-2 border-border/50 bg-background px-3 text-xs font-bold text-foreground outline-none transition-all hover:border-border focus:border-primary disabled:opacity-60"
-                      >
-                        <option value="" disabled>
-                          Assign Partner
-                        </option>
-                        {partners.length === 0 ? (
-                          <option value="" disabled>
-                            No partners available
+                      <div className="relative">
+                        <select
+                          value={getSpacePartnerId(space)}
+                          disabled={assigningSpaceId === space._id}
+                          onChange={(e) =>
+                            handleAssignPartner(space, e.target.value)
+                          }
+                          className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50/50 px-4 pr-10 text-[13px] font-semibold text-gray-700 outline-none appearance-none transition-all hover:bg-white hover:border-primary/50 focus:border-primary focus:ring-4 focus:ring-primary/5 disabled:opacity-60 cursor-pointer shadow-sm"
+                        >
+                          <option value="" disabled className="text-gray-400">
+                            Select Partner...
                           </option>
-                        ) : (
-                          partners.map((partner) => (
-                            <option
-                              key={partner._id || partner.id}
-                              value={partner._id || partner.id}
-                            >
-                              {partner.fullName || partner.email}
+                          {partners.length === 0 ? (
+                            <option value="" disabled>
+                              Loading partners...
                             </option>
-                          ))
-                        )}
-                      </select>
+                          ) : (
+                            partners.map((partner) => (
+                              <option
+                                key={partner._id || partner.id}
+                                value={partner._id || partner.id}
+                                className="py-2 text-gray-900"
+                              >
+                                {partner.fullName} ({partner.email})
+                              </option>
+                            ))
+                          )}
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                          <Plus className="w-3.5 h-3.5 rotate-45" />
+                        </div>
+                      </div>
+                      {assigningSpaceId === space._id && (
+                        <div className="absolute inset-x-0 bottom-[-2px] h-[2px] bg-primary animate-pulse rounded-full" />
+                      )}
                     </div>
                   )}
 

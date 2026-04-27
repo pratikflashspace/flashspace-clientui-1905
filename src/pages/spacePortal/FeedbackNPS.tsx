@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { Star, TrendingUp, MessageSquare, Activity } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 import reviewService from "@/services/review.service";
 import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
 
-const renderStars = (rating: number) => {
+const renderStars = (rating: any) => {
+  const r = Number(rating) || 0;
   return Array.from({ length: 5 }, (_, i) => (
     <Star
       key={i}
-      className={`w-4 h-4 ${i < rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
+      className={`w-4 h-4 ${i < r ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
     />
   ));
 };
@@ -56,35 +56,35 @@ const FeedbackNPS = () => {
     );
   }
 
-  const npsScore = npsStats?.nps || 0;
-  const avgRating = npsStats?.avgRating || 0;
-  const totalResponses = npsStats?.totalResponses || 0;
+  const npsScore = Number(npsStats?.nps) || 0;
+  const avgRating = Number(npsStats?.avgRating) || 0;
+  const totalResponses = Number(npsStats?.totalResponses) || 0;
 
   const npsBreakdown = [
     {
       label: "Promoters (9-10)",
-      count: npsStats?.promoters || 0,
+      count: Number(npsStats?.promoters) || 0,
       percentage:
         totalResponses > 0
-          ? Math.round(((npsStats?.promoters || 0) / totalResponses) * 100)
+          ? Math.round(((Number(npsStats?.promoters) || 0) / totalResponses) * 100)
           : 0,
       color: "bg-green-500",
     },
     {
       label: "Passives (7-8)",
-      count: npsStats?.passives || 0,
+      count: Number(npsStats?.passives) || 0,
       percentage:
         totalResponses > 0
-          ? Math.round(((npsStats?.passives || 0) / totalResponses) * 100)
+          ? Math.round(((Number(npsStats?.passives) || 0) / totalResponses) * 100)
           : 0,
       color: "bg-yellow-500",
     },
     {
       label: "Detractors (0-6)",
-      count: npsStats?.detractors || 0,
+      count: Number(npsStats?.detractors) || 0,
       percentage:
         totalResponses > 0
-          ? Math.round(((npsStats?.detractors || 0) / totalResponses) * 100)
+          ? Math.round(((Number(npsStats?.detractors) || 0) / totalResponses) * 100)
           : 0,
       color: "bg-red-500",
     },
@@ -103,7 +103,7 @@ const FeedbackNPS = () => {
 
       {/* NPS Score Card */}
       <div className="grid gap-6 lg:grid-cols-3 mb-8">
-        <div className="bg-background border border-border rounded-xl p-6">
+        <div className="bg-background border border-border rounded-xl p-6 shadow-sm">
           <h3 className="text-sm font-medium text-muted-foreground mb-4">
             Net Promoter Score
           </h3>
@@ -122,7 +122,7 @@ const FeedbackNPS = () => {
           </div>
         </div>
 
-        <div className="bg-background border border-border rounded-xl p-6">
+        <div className="bg-background border border-border rounded-xl p-6 shadow-sm">
           <h3 className="text-sm font-medium text-muted-foreground mb-4">
             Average Rating
           </h3>
@@ -141,7 +141,7 @@ const FeedbackNPS = () => {
           </div>
         </div>
 
-        <div className="bg-background border border-border rounded-xl p-6">
+        <div className="bg-background border border-border rounded-xl p-6 shadow-sm">
           <h3 className="text-sm font-medium text-muted-foreground mb-4">
             Total Responses
           </h3>
@@ -193,7 +193,7 @@ const FeedbackNPS = () => {
 
           <div className="space-y-4 flex-1">
             {reviews.length === 0 ? (
-              <div className="bg-background border border-border rounded-xl p-10 text-center">
+              <div className="bg-background border border-border rounded-xl p-10 text-center shadow-sm">
                 <p className="text-muted-foreground italic">
                   No feedback received yet
                 </p>
@@ -202,7 +202,7 @@ const FeedbackNPS = () => {
               reviews.map((feedback) => (
                 <div
                   key={feedback._id}
-                  className="bg-background border border-border rounded-xl p-5 shadow-sm"
+                  className="bg-background border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -214,6 +214,11 @@ const FeedbackNPS = () => {
                         {feedback.spaceId && (
                           <span className="ml-2 text-[10px] bg-muted px-1.5 py-0.5 rounded font-mono">
                             ID: {feedback.spaceId}
+                          </span>
+                        )}
+                        {feedback.source === 'support_ticket' && (
+                          <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-bold uppercase">
+                            Ticket {feedback.ticketNumber ? `#${feedback.ticketNumber}` : ""}
                           </span>
                         )}
                       </p>
@@ -229,8 +234,8 @@ const FeedbackNPS = () => {
                       </p>
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {feedback.review}
+                  <p className="text-sm text-muted-foreground leading-relaxed italic bg-muted/20 p-3 rounded-lg border-l-2 border-primary/20">
+                    "{feedback.review || "No remarks provided"}"
                   </p>
                 </div>
               ))
@@ -253,10 +258,12 @@ const FeedbackNPS = () => {
                       {item.count} ({item.percentage}%)
                     </span>
                   </div>
-                  <Progress
-                    value={item.percentage}
-                    className={`h-2 ${item.color}`}
-                  />
+                  <div className={`h-2 w-full bg-muted rounded-full mt-1 overflow-hidden shadow-inner`}>
+                    <div 
+                      className={`h-full ${item.color} transition-all duration-1000 ease-out rounded-full`} 
+                      style={{ width: `${item.percentage}%` }}
+                    ></div>
+                  </div>
                 </div>
               ))}
             </div>

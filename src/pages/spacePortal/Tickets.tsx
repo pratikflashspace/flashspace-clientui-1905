@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Eye, MoreVertical } from "lucide-react";
+import { Eye, MoreVertical, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -12,12 +12,15 @@ import partnerTicketService, {
 import SearchBar from "@/components/ui/SpacePartner/SearchBar";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
 import { useSocket } from "@/contexts/SocketContext";
+import { EnquiryChatModal } from "@/components/modals/EnquiryChatModal";
 
 export default function Tickets() {
   const [tickets, setTickets] = useState<PartnerTicketData[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [selectedTicket, setSelectedTicket] = useState<any>(null);
+  const [chatOpen, setChatOpen] = useState(false);
   const { socket } = useSocket();
 
   const fetchTickets = useCallback(async (silent = false) => {
@@ -72,6 +75,24 @@ export default function Tickets() {
       return matchesQuery && matchesStatus;
     });
   }, [tickets, query, statusFilter]);
+
+  const handleViewDetails = (ticket: PartnerTicketData) => {
+    setSelectedTicket({
+      id: ticket._id,
+      ticketNumber: ticket.ticketNumber,
+      user: {
+        id: ticket.user?._id || ticket.user?.id,
+        name: ticket.user?.fullName,
+        email: ticket.user?.email,
+        phone: ticket.user?.phoneNumber,
+      },
+      space: ticket.bookingId?.spaceSnapshot?.name || ticket.subject || "Support Ticket",
+      category: ticket.category,
+      status: ticket.status,
+      subject: ticket.subject,
+    });
+    setChatOpen(true);
+  };
 
   if (loading) {
     return (
@@ -140,6 +161,9 @@ export default function Tickets() {
                 <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
                   Status
                 </th>
+                <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                  Rating
+                </th>
                 <th className="text-right p-4 text-xs font-extrabold text-foreground uppercase tracking-wider pr-6">
                   Actions
                 </th>
@@ -189,11 +213,30 @@ export default function Tickets() {
                     <td className="p-4">
                       <StatusBadge status={ticket.status} />
                     </td>
+                    <td className="p-4">
+                      {ticket.rating && Number(ticket.rating) > 0 ? (
+                        <div className="flex items-center gap-0.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-3 h-3 ${
+                                i < Number(ticket.rating)
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-muted/30"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground/30">-</span>
+                      )}
+                    </td>
                     <td className="p-4 text-right pr-6">
                       <div className="flex justify-end gap-1">
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => handleViewDetails(ticket)}
                           className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary"
                         >
                           <Eye className="w-4 h-4" />
@@ -214,6 +257,12 @@ export default function Tickets() {
           </table>
         </div>
       </div>
+
+      <EnquiryChatModal
+        enquiry={selectedTicket}
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+      />
     </div>
   );
 }

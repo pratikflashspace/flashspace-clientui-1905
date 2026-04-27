@@ -299,6 +299,9 @@ export interface AdminTicketData {
     createdAt: string;
   }>;
   unreadCount?: number;
+  rating?: number;
+  ratingRemarks?: string;
+  feedbackSubmittedAt?: string;
 }
 
 export interface TicketStats {
