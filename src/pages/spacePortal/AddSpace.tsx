@@ -28,6 +28,7 @@ import {
   AlertTriangle,
   Check,
   Send,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -67,6 +68,15 @@ type Step =
   | "virtual"
   | "meeting"
   | "review";
+
+type ApiErrorLike = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message?: string;
+};
 
 const INDIAN_CITIES = [
   "Mumbai",
@@ -167,6 +177,7 @@ export default function AddSpace() {
 
   const [partnerKycStatus, setPartnerKycStatus] =
     useState<string>("not_started");
+  const [checkingPartnerKyc, setCheckingPartnerKyc] = useState(true);
   const [propertyKycStatus, setPropertyKycStatus] =
     useState<string>("not_started");
   const [propertyKycRejectionReason, setPropertyKycRejectionReason] =
@@ -183,6 +194,15 @@ export default function AddSpace() {
       });
     }
   };
+
+  const canBypassPartnerKyc =
+    user?.role === "admin" ||
+    user?.role === "super_admin" ||
+    user?.role === "space_partner_manager";
+  const isPartnerKycApproved =
+    canBypassPartnerKyc ||
+    partnerKycStatus === "approved" ||
+    user?.kycVerified === true;
 
   useEffect(() => {
     if (initialStep) {
@@ -283,17 +303,30 @@ export default function AddSpace() {
     }
 
     const fetchPartnerKyc = async () => {
+      if (canBypassPartnerKyc) {
+        setPartnerKycStatus("approved");
+        setCheckingPartnerKyc(false);
+        return;
+      }
+
+      setCheckingPartnerKyc(true);
       try {
         const kycData = await getMySpaceUserKyc();
-        if (kycData) {
-          setPartnerKycStatus(kycData.overallStatus || "not_started");
-        }
+        setPartnerKycStatus(
+          kycData?.overallStatus === "approved" ||
+            kycData?.kycStatus === "approved"
+            ? "approved"
+            : kycData?.overallStatus || kycData?.kycStatus || "not_started",
+        );
       } catch (err) {
         console.error("Failed to fetch partner KYC status", err);
+        setPartnerKycStatus("not_started");
+      } finally {
+        setCheckingPartnerKyc(false);
       }
     };
     fetchPartnerKyc();
-  }, [editId]);
+  }, [editId, canBypassPartnerKyc]);
 
   useEffect(() => {
     if (propertyId && currentStep === "property_kyc") {
@@ -487,6 +520,14 @@ export default function AddSpace() {
   };
 
   const saveProperty = async () => {
+    if (!editId && !isPartnerKycApproved) {
+      toast.error(
+        "Please complete and get your personal KYC approved before adding a new space.",
+      );
+      navigate("/spaceportal/kyc-verification");
+      return;
+    }
+
     const newErrors: Record<string, boolean> = {};
     if (!propertyData.name) newErrors.name = true;
     if (!propertyData.address) newErrors.address = true;
@@ -545,11 +586,14 @@ export default function AddSpace() {
         toast.success("Property details saved!");
       }
       setCurrentStep("property_kyc");
-    } catch (err) {
+    } catch (err: unknown) {
+      const error = err as ApiErrorLike;
       toast.error(
-        editId
-          ? "Failed to update property"
-          : "Failed to save property details",
+        error.response?.data?.message ||
+          error.message ||
+          (editId
+            ? "Failed to update property"
+            : "Failed to save property details"),
       );
     } finally {
       setLoading(false);
@@ -558,6 +602,11 @@ export default function AddSpace() {
 
   const saveCoworking = async () => {
     if (!propertyId) return;
+    if (!isPartnerKycApproved) {
+      toast.error("Please complete personal KYC before adding space services.");
+      navigate("/spaceportal/kyc-verification");
+      return;
+    }
 
     const newErrors: Record<string, boolean> = {};
     const validFloors = coworkingData.floors.filter((f) => f.tables.length > 0);
@@ -617,6 +666,11 @@ export default function AddSpace() {
 
   const saveVirtual = async () => {
     if (!propertyId) return;
+    if (!isPartnerKycApproved) {
+      toast.error("Please complete personal KYC before adding space services.");
+      navigate("/spaceportal/kyc-verification");
+      return;
+    }
 
     const newErrors: Record<string, boolean> = {};
     if (!virtualData.finalGstPricePerYear) newErrors.gstPrice = true;
@@ -665,6 +719,11 @@ export default function AddSpace() {
 
   const saveMeeting = async () => {
     if (!propertyId) return;
+    if (!isPartnerKycApproved) {
+      toast.error("Please complete personal KYC before adding space services.");
+      navigate("/spaceportal/kyc-verification");
+      return;
+    }
 
     const newErrors: Record<string, boolean> = {};
     if (meetingData.rooms.length === 0) {
@@ -716,6 +775,12 @@ export default function AddSpace() {
     if (!propertyId) return;
     if (!policyAccepted) {
       toast.error("Please accept the policy terms");
+      return;
+    }
+
+    if (!isPartnerKycApproved) {
+      toast.error("Please complete personal KYC before submitting a space.");
+      navigate("/spaceportal/kyc-verification");
       return;
     }
 
@@ -2105,6 +2170,75 @@ export default function AddSpace() {
     };
     return labelMap[d.type] || d.type;
   });
+
+  if (!editId && checkingPartnerKyc && !canBypassPartnerKyc) {
+    return (
+      <div className="flex-1 min-h-[60vh] flex items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          <div>
+            <h2 className="text-xl font-black text-foreground">
+              Checking your KYC status
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Please wait while we verify your partner eligibility.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!editId && !isPartnerKycApproved) {
+    return (
+      <div className="flex-1 max-w-4xl mx-auto p-4 md:p-8">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="group px-0 hover:bg-transparent text-muted-foreground hover:text-foreground mb-6"
+        >
+          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          Back to Portal
+        </Button>
+
+        <div className="bg-background border border-amber-200 rounded-3xl shadow-xl p-8 md:p-12 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-6">
+            <Shield className="w-8 h-8" />
+          </div>
+          <Badge
+            variant="outline"
+            className="mb-4 border-amber-200 bg-amber-50 text-amber-700 font-black"
+          >
+            Personal KYC Required
+          </Badge>
+          <h1 className="text-3xl font-black text-foreground tracking-tight">
+            Complete KYC before adding a new space
+          </h1>
+          <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
+            New space registration is locked until your personal identity
+            verification is approved by the FlashSpace team.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-3 mt-8">
+            <Button
+              onClick={() => navigate("/spaceportal/kyc-verification")}
+              className="h-12 rounded-xl font-black"
+            >
+              Complete Personal KYC
+              <ExternalLink className="w-4 h-4 ml-2" />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/spaceportal/space-management")}
+              className="h-12 rounded-xl font-black"
+            >
+              View My Spaces
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 max-w-7xl mx-auto p-4 md:p-8 animate-in fade-in duration-700">

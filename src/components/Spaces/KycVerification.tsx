@@ -1202,13 +1202,19 @@ export default function KYCVerification() {
                   onClick={() => {
                     navigate("/spaceportal/space-management/add");
                   }}
-                  className="bg-background border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-foreground transition-all group min-h-[180px]"
+                  disabled={
+                    !individualProfile ||
+                    individualProfile.overallStatus !== "approved"
+                  }
+                  className="bg-background border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-foreground transition-all group min-h-[180px] disabled:cursor-not-allowed disabled:hover:border-border disabled:hover:text-muted-foreground"
                 >
                   <div className="p-5 bg-primary/10 rounded-full group-hover:scale-110 mb-3 transition-all">
                     <Building2 className="w-10 h-10 text-primary" />
                   </div>
                   <span className="font-bold text-base">
-                    Register New Space
+                    {individualProfile?.overallStatus === "approved"
+                      ? "Register New Space"
+                      : "Complete Personal KYC First"}
                   </span>
                 </button>
               </div>
