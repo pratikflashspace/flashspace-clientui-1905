@@ -579,6 +579,22 @@ class UserDashboardService {
     }
   }
 
+  async getPartnerClientBookings(): Promise<ApiResponse<any[]>> {
+    try {
+      const response = await axiosInstance.get<ApiResponse<any[]>>(
+        API_ENDPOINTS.USER.PARTNER_CLIENT_BOOKINGS,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to fetch bookings";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
+
   async getPartnerClientDetails(id: string): Promise<ApiResponse<any>> {
     try {
       const response = await axiosInstance.get<ApiResponse<any>>(
