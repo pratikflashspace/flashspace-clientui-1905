@@ -341,7 +341,6 @@ export const TicketViewModal = ({
                   Customer Feedback
                 </h3>
                 <div style={{ 
-                  backgroundColor: '#fff', 
                   padding: '16px', 
                   borderRadius: '24px', 
                   border: '1px solid #fef3c7',
