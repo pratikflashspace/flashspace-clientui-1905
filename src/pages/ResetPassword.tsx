@@ -77,18 +77,19 @@ const ResetPassword = () => {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center px-4 py-12"
-      style={{ fontFamily: "Poppins" }}
+      className="min-h-screen bg-[#F8FAF7] flex items-center justify-center px-4 py-10"
+      style={{ fontFamily: '"Inner Tight", system-ui, sans-serif' }}
     >
-      <div className="w-full max-w-lg">
-        <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
+      <div className="w-full max-w-[520px]">
+        <div className="bg-white rounded-2xl border border-[#E5E9E3] shadow-[0_18px_50px_rgba(31,46,38,0.10)] p-6 sm:p-8 md:p-10">
           <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-3">
-              <span className="text-[#172A3A]">FLASH</span>
-              <span className="text-[#EDB003]">Space</span>
-            </h1>
+            <img
+              src="/Logo/Flashspace Logo.png"
+              alt="FlashSpace"
+              className="mx-auto mb-5 h-14 w-auto object-contain"
+            />
             <div className="flex justify-center mb-5">
-              <div className="w-16 h-16 rounded-2xl bg-[#172A3A] text-white flex items-center justify-center shadow-lg shadow-slate-900/10">
+              <div className="w-16 h-16 rounded-2xl bg-[#EAF6EF] text-[#35503F] flex items-center justify-center shadow-lg shadow-[#35503F]/10">
                 {isSuccess ? (
                   <CheckCircle className="h-8 w-8" />
                 ) : (
@@ -96,10 +97,10 @@ const ResetPassword = () => {
                 )}
               </div>
             </div>
-            <h2 className="text-3xl font-bold text-[#172A3A] mb-2">
+            <h1 className="text-3xl font-bold text-[#1F2E26] mb-2">
               {isSuccess ? "Password Updated" : "Reset Password"}
-            </h2>
-            <p className="text-slate-600 text-base font-medium">
+            </h1>
+            <p className="text-[#677E73] text-sm font-medium">
               {isSuccess
                 ? "Redirecting you to sign in."
                 : "Choose a new password for your account."}
@@ -122,7 +123,7 @@ const ResetPassword = () => {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="block text-sm font-semibold text-[#172A3A]"
+                className="block text-sm font-bold text-[#1F2E26]"
               >
                 New Password
               </label>
@@ -140,13 +141,13 @@ const ResetPassword = () => {
                   disabled={isLoading || isSuccess || !token}
                   minLength={8}
                   required
-                  className="w-full pl-4 pr-12 py-3.5 border rounded-xl bg-white/50 backdrop-blur-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/50 focus:border-[#4DA1FF] focus:bg-white placeholder:text-slate-400 text-[#172A3A] font-medium border-slate-200 hover:border-slate-300"
+                  className="w-full pl-4 pr-12 py-3.5 border rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#35503F]/15 focus:border-[#35503F] placeholder:text-[#A2AEA8] text-[#1F2E26] font-medium border-[#DDE5DA] hover:border-[#B8C6BD]"
                   placeholder="Enter new password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#172A3A]"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#93A59B] hover:text-[#1F2E26]"
                   disabled={isLoading || isSuccess || !token}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
@@ -158,7 +159,7 @@ const ResetPassword = () => {
             <div className="space-y-2">
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-semibold text-[#172A3A]"
+                className="block text-sm font-bold text-[#1F2E26]"
               >
                 Confirm Password
               </label>
@@ -176,13 +177,13 @@ const ResetPassword = () => {
                   disabled={isLoading || isSuccess || !token}
                   minLength={8}
                   required
-                  className="w-full pl-4 pr-12 py-3.5 border rounded-xl bg-white/50 backdrop-blur-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/50 focus:border-[#4DA1FF] focus:bg-white placeholder:text-slate-400 text-[#172A3A] font-medium border-slate-200 hover:border-slate-300"
+                  className="w-full pl-4 pr-12 py-3.5 border rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#35503F]/15 focus:border-[#35503F] placeholder:text-[#A2AEA8] text-[#1F2E26] font-medium border-[#DDE5DA] hover:border-[#B8C6BD]"
                   placeholder="Confirm new password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#172A3A]"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#93A59B] hover:text-[#1F2E26]"
                   disabled={isLoading || isSuccess || !token}
                   aria-label={
                     showConfirmPassword ? "Hide password" : "Show password"
@@ -195,7 +196,7 @@ const ResetPassword = () => {
 
             <Button
               type="submit"
-              className="w-full bg-[#172A3A] hover:bg-[#22394c] text-white font-bold py-6 rounded-xl shadow-lg shadow-slate-900/20 transition-all duration-300 text-base"
+              className="w-full h-12 bg-[#35503F] hover:bg-[#1F2E26] text-[#FEF8C3] font-bold rounded-xl shadow-lg shadow-[#35503F]/15 transition-all duration-200 text-base"
               disabled={isLoading || isSuccess || !token}
             >
               {isLoading ? (
@@ -212,7 +213,7 @@ const ResetPassword = () => {
           <div className="mt-6 text-center">
             <Link
               to="/login"
-              className="text-sm text-slate-600 hover:text-[#4DA1FF] font-semibold inline-flex items-center gap-2 transition-colors duration-200"
+              className="text-sm text-[#677E73] hover:text-[#1F2E26] font-semibold inline-flex items-center gap-2 transition-colors duration-200"
             >
               <ArrowLeft size={16} />
               Back to Login

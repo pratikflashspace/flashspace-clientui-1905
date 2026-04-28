@@ -1,61 +1,53 @@
-import { LoginForm } from '@/components/auth/LoginForm';
-import { Link, Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { LoginForm } from "@/components/auth/LoginForm";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
 
 const Login = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
-  // Show loading spinner while checking auth
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-[#F8FAF7] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#35503F]" />
       </div>
     );
   }
 
-  // Redirect to dashboard if already authenticated
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center px-4 py-12"
-      style={{ fontFamily: 'Poppins' }}
+      className="min-h-screen bg-[#F8FAF7] flex items-center justify-center px-4 py-10"
+      style={{ fontFamily: '"Inner Tight", system-ui, sans-serif' }}
     >
-      <div className="w-full max-w-lg">
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
-          
-          {/* Header */}
+      <div className="w-full max-w-[520px]">
+        <div className="bg-white rounded-2xl border border-[#E5E9E3] shadow-[0_18px_50px_rgba(31,46,38,0.10)] p-6 sm:p-8 md:p-10">
           <div className="text-center mb-8">
-            {/* LOGO (Replaces FLASH SPACE text) */}
             <img
-              src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
-              alt="FlashSpace Logo"
-              className="w-80 mx-auto mb-4"
+              src="/Logo/Flashspace Logo.png"
+              alt="FlashSpace"
+              className="mx-auto mb-5 h-14 w-auto object-contain"
             />
 
-            <h2 className="text-xl font-bold text-[#172A3A] mb-2">
+            <h1 className="text-3xl font-bold text-[#1F2E26] mb-2">
               Welcome Back
-            </h2>
-            <p className="text-slate-600 text-base font-medium">
+            </h1>
+            <p className="text-[#677E73] text-sm font-medium">
               Sign in to access your virtual office
             </p>
           </div>
 
-          {/* Form */}
           <LoginForm />
 
-          {/* Footer */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-slate-600">
-              Don't have an account?{' '}
+            <p className="text-sm text-[#677E73]">
+              Don&apos;t have an account?{" "}
               <Link
                 to="/signup"
-                className="font-bold text-[#4DA1FF] hover:text-[#3B82F6] transition-colors duration-200"
+                className="font-bold text-[#35503F] hover:text-[#1F2E26] transition-colors duration-200"
               >
                 Sign up for free
               </Link>
@@ -63,9 +55,8 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Bottom Text */}
-        <p className="text-center text-sm text-slate-500 mt-8 font-medium">
-          🔒 Secure login powered by FlashSpace
+        <p className="text-center text-sm text-[#677E73] mt-6 font-medium">
+          Secure login powered by FlashSpace
         </p>
       </div>
     </div>

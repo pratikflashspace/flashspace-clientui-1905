@@ -40,7 +40,7 @@ export const LoginModal = ({
       {/* Center Container */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <div
-          className="relative w-full max-w-[440px] bg-white rounded-2xl shadow-xl p-8 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh] scrollbar-hide"
+          className="relative w-full max-w-[460px] bg-white rounded-2xl border border-[#E5E9E3] shadow-[0_24px_70px_rgba(0,0,0,0.22)] p-6 sm:p-8 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh] scrollbar-hide"
           onClick={(e) => e.stopPropagation()}
           style={{ fontFamily: '"Inner Tight", system-ui, sans-serif' }}
           data-lenis-prevent
@@ -55,9 +55,9 @@ export const LoginModal = ({
           {/* Content of the Login Card */}
           <div className="text-center mb-6">
             <img
-              src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
-              alt="FlashSpace Logo"
-              className="w-40 mx-auto mb-4"
+              src="/Logo/Flashspace Logo.png"
+              alt="FlashSpace"
+              className="mx-auto mb-4 h-12 w-auto object-contain"
             />
             <h2 className="text-2xl font-bold text-[#1F2E26] mb-1.5">
               Welcome Back

@@ -98,12 +98,14 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-5" style={{ fontFamily: '"Inner Tight", system-ui, sans-serif' }}>
       {twoFactorRequired && (
-        <div className="rounded-2xl border border-[#35503F]/20 bg-[#35503F]/5 p-4">
+        <div className="rounded-2xl border border-[#DDE5DA] bg-[#F8FAF7] p-4">
           <div className="flex items-start gap-3">
-            <ShieldCheck className="mt-0.5 h-5 w-5 text-[#35503F]" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EAF6EF] text-[#35503F]">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
             <div>
               <p className="text-sm font-bold text-[#1F2E26]">Two-factor authentication</p>
-              <p className="mt-1 text-xs font-medium text-[#677E73]">
+              <p className="mt-1 text-xs leading-5 font-medium text-[#677E73]">
                 We sent a 6-digit OTP to {formData.email}. This browser will be trusted after verification.
               </p>
             </div>
@@ -127,7 +129,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
             value={formData.email}
             onChange={handleChange}
             disabled={isLoading || twoFactorRequired}
-            className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/20 focus:border-[#4DA1FF] placeholder:text-slate-400 text-[#172A3A]"
+            className="w-full pl-12 pr-4 py-3 border border-[#DDE5DA] rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#35503F]/15 focus:border-[#35503F] placeholder:text-[#A2AEA8] text-[#1F2E26]"
           />
         </div>
         {errors.email && <p className="text-xs font-medium text-red-600">{errors.email}</p>}
@@ -151,7 +153,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
               if (errors.otp) setErrors((prev) => ({ ...prev, otp: '' }));
             }}
             disabled={isLoading}
-            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/20 focus:border-[#4DA1FF] placeholder:text-slate-400 text-[#172A3A] tracking-[0.35em] font-bold text-center"
+            className="w-full px-4 py-3 border border-[#DDE5DA] rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#35503F]/15 focus:border-[#35503F] placeholder:text-[#A2AEA8] text-[#1F2E26] tracking-[0.35em] font-bold text-center"
           />
           {errors.otp && <p className="text-xs font-medium text-red-600">{errors.otp}</p>}
         </div>
@@ -172,7 +174,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
               value={formData.password}
               onChange={handleChange}
               disabled={isLoading}
-              className="w-full pl-12 pr-12 py-3 border border-slate-200 rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4DA1FF]/20 focus:border-[#4DA1FF] placeholder:text-slate-400 text-[#172A3A]"
+              className="w-full pl-12 pr-12 py-3 border border-[#DDE5DA] rounded-xl bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#35503F]/15 focus:border-[#35503F] placeholder:text-[#A2AEA8] text-[#1F2E26]"
             />
             <button
               type="button"
@@ -193,7 +195,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
               type="checkbox"
               checked={rememberMe}
               onChange={(event) => setRememberMe(event.target.checked)}
-              className="w-4 h-4 rounded border-slate-300 text-[#4DA1FF] focus:ring-[#4DA1FF]/20"
+              className="w-4 h-4 rounded border-[#B8C6BD] text-[#35503F] focus:ring-[#35503F]/20"
             />
             <span className="text-sm font-medium text-[#172A3A]">Remember me</span>
           </label>
@@ -208,7 +210,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
 
       <Button
         type="submit"
-        className="w-full bg-[#FEF8C3] hover:bg-[#FDF4A6] text-[#172A3A] font-semibold py-3 rounded-xl transition-all duration-200 text-[15px] border-0"
+        className="w-full h-12 bg-[#FEF8C3] hover:bg-[#FDF4A6] text-[#1F2E26] font-bold rounded-xl transition-all duration-200 text-[15px] border-0 shadow-sm"
         disabled={isLoading}
       >
         {isLoading ? (
