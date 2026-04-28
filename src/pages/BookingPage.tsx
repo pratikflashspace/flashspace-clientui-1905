@@ -1482,9 +1482,15 @@ const BookingPage = () => {
                         </div>
                       )}
                       <div className="flex justify-between text-sm text-gray-500">
-                        <span>GST (18%)</span>
+                        <span>CGST (9%)</span>
                         <span className="font-semibold">
-                          ₹{gstAmount.toLocaleString()}
+                          ₹{Math.round(gstAmount / 2).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-500">
+                        <span>SGST (9%)</span>
+                        <span className="font-semibold">
+                          ₹{Math.round(gstAmount / 2).toLocaleString()}
                         </span>
                       </div>
                       <div className="border-t border-gray-700 pt-3 flex justify-between">
