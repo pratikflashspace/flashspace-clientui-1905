@@ -182,6 +182,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const metadata = notification.metadata || {};
         const message = (notification.message || "").toLowerCase();
         const title = (notification.title || "").toLowerCase();
+        const actionUrl = typeof metadata.actionUrl === "string" ? metadata.actionUrl : "";
+
+        if (actionUrl.startsWith("/dashboard/")) {
+            navigate(actionUrl);
+            return;
+        }
 
         // 1. Mail Records
         if (metadata.mailRecordId || message.includes("mail") || message.includes("parcel") || title.includes("mail")) {
@@ -207,15 +213,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             return;
         }
 
-        // 5. Bookings
-        if (message.includes("booking") || message.includes("booked") || title.includes("booking") || notification.type === "MEETING_BOOKED") {
-            navigate("/dashboard/my-bookings");
+        // 5. Payments/Invoices
+        if (metadata.invoiceId || metadata.invoiceNumber || message.includes("payment") || message.includes("invoice") || message.includes("due") || title.includes("payment") || title.includes("invoice")) {
+            navigate("/dashboard/payments");
             return;
         }
 
-        // 6. Payments/Invoices
-        if (message.includes("payment") || message.includes("invoice") || message.includes("due") || title.includes("payment") || title.includes("invoice")) {
-            navigate("/dashboard/payments");
+        // 6. Bookings
+        if (metadata.bookingId || message.includes("booking") || message.includes("booked") || title.includes("booking") || notification.type === "MEETING_BOOKED") {
+            navigate("/dashboard/my-bookings");
             return;
         }
 
