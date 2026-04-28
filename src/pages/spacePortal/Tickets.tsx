@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Eye, MoreVertical, Star } from "lucide-react";
+import { Eye, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -232,7 +232,7 @@ export default function Tickets() {
                       )}
                     </td>
                     <td className="p-4 text-right pr-6">
-                      <div className="flex justify-end gap-1">
+                      <div className="flex justify-end">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -240,13 +240,6 @@ export default function Tickets() {
                           className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary"
                         >
                           <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 rounded-lg"
-                        >
-                          <MoreVertical className="w-4 h-4" />
                         </Button>
                       </div>
                     </td>

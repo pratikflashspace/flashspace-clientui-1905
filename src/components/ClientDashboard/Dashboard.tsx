@@ -34,6 +34,7 @@ import { getAllVirtualOffices } from "@/services/virtualOffice.service";
 import { getAllCoworkingSpaces } from "@/services/coworkingSpace.service";
 import { getAllMeetingRooms } from "@/services/meetingRoom.service";
 import { getShortAddress } from "@/utils/address";
+import BookingDetailsModal from "./BookingDetailsModal";
 
 type WorkspaceCodeSource = {
   _id?: string;
@@ -52,6 +53,7 @@ export default function Dashboard() {
   const [togglingAutoRenew, setTogglingAutoRenew] = useState<string | null>(
     null,
   );
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
   // Workspace Code Mapping Logic (Replicated from MyBookings)
   const [workspaceCodeMap, setWorkspaceCodeMap] = useState<
@@ -470,19 +472,24 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
-        {/* Upcoming Renewals Section */}
-        {Array.isArray(bookings) && bookings.filter((b) => b.status === "active" || b.status === "pending_payment" || b.autoRenew).length > 0 && (
+        {/* Manage Bookings Section */}
+        {Array.isArray(bookings) && bookings.filter((b) => b.status === "active" || b.status === "pending_payment" || b.status === "pending_kyc" || b.autoRenew).length > 0 && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-[#35503F] tracking-tight">
-                Upcoming <span className="italic">Renewals</span>
+                Manage <span className="italic">Bookings</span>
               </h2>
-        
+              <button 
+                onClick={() => navigate("/dashboard/bookings")}
+                className="text-sm font-bold text-[#35503F] hover:underline flex items-center gap-1"
+              >
+                View all <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {bookings
-                .filter((b) => b.status === "active" || b.status === "pending_payment" || b.autoRenew)
+                .filter((b) => b.status === "active" || b.status === "pending_payment" || b.status === "pending_kyc" || b.autoRenew)
                 .sort((a, b) => {
                   const dateA = new Date(a.endDate || 0).getTime();
                   const dateB = new Date(b.endDate || 0).getTime();
@@ -550,12 +557,22 @@ export default function Dashboard() {
                         </div>
 
                         {/* Auto-renewal Status */}
-                        <div className="mt-4 flex items-center gap-2 px-3 py-2 bg-green-50/50 border border-green-100 rounded-xl w-fit">
-                          <div className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                          <span className="text-[10px] font-bold text-green-700 uppercase tracking-tight">
-                            Renewal on: {formatDate(booking.endDate || "")}
-                          </span>
-                        </div>
+                        {(booking.status === "active" || booking.status === "pending_payment" || booking.autoRenew) && (
+                          <div className="mt-4 flex items-center gap-2 px-3 py-2 bg-green-50/50 border border-green-100 rounded-xl w-fit">
+                            <div className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-[10px] font-bold text-green-700 uppercase tracking-tight">
+                              Renewal on: {formatDate(booking.endDate || "")}
+                            </span>
+                          </div>
+                        )}
+                        {booking.status === "pending_kyc" && (
+                          <div className="mt-4 flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-100 rounded-xl w-fit">
+                            <AlertCircle className="w-3.5 h-3.5 text-yellow-600" />
+                            <span className="text-[10px] font-bold text-yellow-700 uppercase tracking-tight">
+                              Verification Required
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="h-px bg-gray-100 my-4" />
@@ -573,14 +590,31 @@ export default function Dashboard() {
                             {booking.plan.tenure} {booking.plan.tenureUnit} Plan
                           </p>
                         </div>
-
-
+                        
+                        <button
+                          onClick={() => setSelectedBooking(booking)}
+                          className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:bg-[#35503F] hover:text-white transition-all shadow-sm border border-gray-100"
+                        >
+                          <Eye className="w-5 h-5" />
+                        </button>
                       </div>
                     </div>
                   );
                 })}
             </div>
           </div>
+        )}
+
+        {/* Booking Detail Modal */}
+        {selectedBooking && (
+          <BookingDetailsModal
+            booking={selectedBooking}
+            onClose={() => setSelectedBooking(null)}
+            getWorkspaceDisplayName={getWorkspaceDisplayName}
+            getStatusConfig={getStatusConfig}
+            formatCurrency={formatCurrency}
+            formatDate={formatDate}
+          />
         )}
       </div>
     </div>

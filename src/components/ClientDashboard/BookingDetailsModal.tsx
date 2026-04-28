@@ -128,9 +128,21 @@ export default function BookingDetailsModal({
   };
 
   const getBookingDoc = (type: string) => {
-    if (!booking.documents) return null;
-    // Matching logic for booking documents
-    return booking.documents.find((d: any) => d.type?.toLowerCase().includes(type.toLowerCase()) || d.name?.toLowerCase().includes(type.toLowerCase()));
+    // 1. Check booking documents first
+    let doc = booking.documents?.find((d: any) => 
+      d.type?.toLowerCase().includes(type.toLowerCase()) || 
+      d.name?.toLowerCase().includes(type.toLowerCase())
+    );
+
+    // 2. Fallback to KYC profile documents (where user uploads them via the modal)
+    if (!doc && kycProfile?.documents) {
+      doc = kycProfile.documents.find((d: any) => 
+        d.type?.toLowerCase().includes(type.toLowerCase()) || 
+        d.name?.toLowerCase().includes(type.toLowerCase())
+      );
+    }
+    
+    return doc;
   };
 
   const renderStep1 = () => (

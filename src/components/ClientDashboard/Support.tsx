@@ -103,7 +103,7 @@ export default function Support() {
   const [contactFormData, setContactFormData] = useState({
     name: user?.fullName || "",
     email: user?.email || "",
-    phone: (user as any)?.phone || "",
+    phone: user?.phoneNumber || (user as any)?.phone || "",
     subject: "",
     message: "",
   });
