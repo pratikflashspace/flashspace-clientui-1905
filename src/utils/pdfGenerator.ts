@@ -64,12 +64,19 @@ export const generateInvoicePDF = async (
             : format(new Date((invoice as Invoice).createdAt || new Date()), "dd/MM/yy");
 
         // Financial extraction 
-        const baseRate = isAffiliateInvoice
-            ? (invoice as AffiliateInvoice).amount
-            : (invoice as Invoice).subtotal || (invoice as Invoice).total || 0;
+        let baseRate = 0;
+        if (isAffiliateInvoice) {
+            baseRate = (invoice as AffiliateInvoice).amount;
+        } else {
+            const inv = invoice as Invoice;
+            if (inv.subtotal) {
+                baseRate = inv.subtotal;
+            } else if (inv.total) {
+                // If subtotal is missing but total exists, reverse-calculate base rate to avoid double GST
+                baseRate = inv.total / 1.18;
+            }
+        }
 
-        // Calculate splits (Assuming standard pricing includes GST or we calculate on top)
-        // Adjust these logic checks as needed; currently mocking 9% splits off base
         const cgst = baseRate * 0.09;
         const sgst = baseRate * 0.09;
         const totalAmount = baseRate + cgst + sgst;

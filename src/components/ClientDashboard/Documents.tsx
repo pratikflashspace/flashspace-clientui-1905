@@ -19,6 +19,15 @@ export default function Documents() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filterStatus, setFilterStatus] = useState("all");
 
+    const [currentInvoicePage, setCurrentInvoicePage] = useState(1);
+    const [currentKycPage, setCurrentKycPage] = useState(1);
+    const itemsPerPage = 10;
+
+    useEffect(() => {
+        setCurrentInvoicePage(1);
+        setCurrentKycPage(1);
+    }, [searchQuery, filterStatus]);
+
     const isPdf = (url: string) => {
         const lowerUrl = url.split('?')[0].toLowerCase();
         return lowerUrl.endsWith('.pdf') || (url.startsWith('blob:') && !isVideo(url));
@@ -47,6 +56,18 @@ export default function Documents() {
         const matchesFilter = filterStatus === "all" || doc.status?.toLowerCase() === filterStatus;
         return matchesSearch && matchesFilter;
     });
+
+    const totalInvoicePages = Math.ceil(filteredInvoices.length / itemsPerPage);
+    const paginatedInvoices = filteredInvoices.slice(
+        (currentInvoicePage - 1) * itemsPerPage,
+        currentInvoicePage * itemsPerPage
+    );
+
+    const totalKycPages = Math.ceil(filteredKycDocuments.length / itemsPerPage);
+    const paginatedKycDocuments = filteredKycDocuments.slice(
+        (currentKycPage - 1) * itemsPerPage,
+        currentKycPage * itemsPerPage
+    );
 
     useEffect(() => {
         fetchData();
@@ -297,7 +318,7 @@ export default function Documents() {
                                                     No invoices match your search.
                                                 </td>
                                             </tr>
-                                        ) : filteredInvoices.map((invoice) => (
+                                        ) : paginatedInvoices.map((invoice) => (
                                             <tr key={invoice._id} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-6 py-4">
                                                     <span className="font-medium text-gray-900">{invoice.invoiceNumber}</span>
@@ -348,6 +369,27 @@ export default function Documents() {
                                 </table>
                             </div>
                         )}
+                        {totalInvoicePages > 1 && (
+                            <div className="flex justify-center items-center gap-4 py-4 px-6 border-t border-gray-100 bg-gray-50">
+                                <button
+                                    onClick={() => setCurrentInvoicePage((p) => Math.max(1, p - 1))}
+                                    disabled={currentInvoicePage === 1}
+                                    className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Previous
+                                </button>
+                                <span className="text-sm font-medium text-gray-600">
+                                    Page {currentInvoicePage} of {totalInvoicePages}
+                                </span>
+                                <button
+                                    onClick={() => setCurrentInvoicePage((p) => Math.min(totalInvoicePages, p + 1))}
+                                    disabled={currentInvoicePage === totalInvoicePages}
+                                    className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </TabsContent>
 
@@ -394,7 +436,7 @@ export default function Documents() {
                                                     No KYC documents match your search.
                                                 </td>
                                             </tr>
-                                        ) : filteredKycDocuments.map((doc: any, idx) => (
+                                        ) : paginatedKycDocuments.map((doc: any, idx) => (
                                             <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-6 py-4">
                                                     <span className={cn(
@@ -455,6 +497,27 @@ export default function Documents() {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+                        )}
+                        {totalKycPages > 1 && (
+                            <div className="flex justify-center items-center gap-4 py-4 px-6 border-t border-gray-100 bg-gray-50">
+                                <button
+                                    onClick={() => setCurrentKycPage((p) => Math.max(1, p - 1))}
+                                    disabled={currentKycPage === 1}
+                                    className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Previous
+                                </button>
+                                <span className="text-sm font-medium text-gray-600">
+                                    Page {currentKycPage} of {totalKycPages}
+                                </span>
+                                <button
+                                    onClick={() => setCurrentKycPage((p) => Math.min(totalKycPages, p + 1))}
+                                    disabled={currentKycPage === totalKycPages}
+                                    className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Next
+                                </button>
                             </div>
                         )}
                     </div>

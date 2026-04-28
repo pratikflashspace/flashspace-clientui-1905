@@ -174,7 +174,10 @@ const CompleteBookingPage = () => {
     const rawTotal = selectedOption?.totalPrice || 0;
     const couponDiscount = appliedCoupon ? Math.round(rawTotal * appliedCoupon.discountValue / 100) : 0;
     const tenureSavings = selectedOption?.savings || 0;
-    const finalTotal = rawTotal - couponDiscount;
+    const taxableAmount = Math.max(rawTotal - couponDiscount, 0);
+    const cgstAmount = Math.round(taxableAmount * 0.09);
+    const sgstAmount = Math.round(taxableAmount * 0.09);
+    const finalTotal = taxableAmount + cgstAmount + sgstAmount;
 
     // ─── COUPON HANDLER ───────────────────────
     const handleApplyCoupon = async () => {
@@ -492,6 +495,14 @@ const CompleteBookingPage = () => {
                                                 <span className="font-medium">−{formatCurrency(couponDiscount)}</span>
                                             </div>
                                         )}
+                                        <div className="flex justify-between text-muted-foreground">
+                                            <span>CGST (9%)</span>
+                                            <span className="font-medium text-foreground">{formatCurrency(cgstAmount)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-muted-foreground">
+                                            <span>SGST (9%)</span>
+                                            <span className="font-medium text-foreground">{formatCurrency(sgstAmount)}</span>
+                                        </div>
                                     </div>
                                 </div>
 

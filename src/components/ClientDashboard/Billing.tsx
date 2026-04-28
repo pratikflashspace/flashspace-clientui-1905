@@ -34,6 +34,10 @@ export default function Billing() {
   const [subscriptions, setSubscriptions] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentSubscriptionPage, setCurrentSubscriptionPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchData = async () => {
     setLoading(true);
@@ -62,6 +66,11 @@ export default function Billing() {
   useEffect(() => {
     fetchData();
   }, [statusFilter]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setCurrentSubscriptionPage(1);
+  }, [statusFilter, searchQuery, activeTab]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -132,6 +141,63 @@ export default function Billing() {
     return matchSearch;
   });
 
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+  const paginatedInvoices = filteredInvoices.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalSubscriptionPages = Math.ceil(subscriptions.length / itemsPerPage);
+  const paginatedSubscriptions = subscriptions.slice(
+    (currentSubscriptionPage - 1) * itemsPerPage,
+    currentSubscriptionPage * itemsPerPage
+  );
+
+  const handleDownload = () => {
+    let dataToDownload: any[] = [];
+    let filename = "";
+
+    if (activeTab === "invoices") {
+      dataToDownload = filteredInvoices.map((inv) => ({
+        "Invoice ID": inv.invoiceNumber,
+        "Service": inv.description || "Subscription Invoice",
+        "Date": inv.paidAt ? formatDate(inv.paidAt) : (inv.dueDate ? formatDate(inv.dueDate) : ""),
+        "Amount": inv.total,
+        "Status": inv.status,
+      }));
+      filename = "invoices_statement.csv";
+    } else if (activeTab === "subscriptions") {
+      dataToDownload = subscriptions.map((sub) => ({
+        "Plan Name": sub.plan.name,
+        "Space Name": sub.spaceSnapshot?.name || "Space",
+        "Address": sub.spaceSnapshot?.address || "",
+        "Price": sub.plan.price,
+        "Tenure": `${sub.plan.tenure} ${sub.plan.tenureUnit || "months"}`,
+        "Status": sub.status,
+        "End Date": sub.endDate ? formatDate(sub.endDate) : "",
+      }));
+      filename = "subscriptions_statement.csv";
+    }
+
+    if (dataToDownload.length === 0) return;
+
+    const headers = Object.keys(dataToDownload[0]).join(",");
+    const rows = dataToDownload.map((obj) => Object.values(obj).map(v => `"${v}"`).join(",")).join("\n");
+    const csvContent = `${headers}\n${rows}`;
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", filename);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   // Calculate totals
   const stats = {
     totalPaid: invoices
@@ -186,10 +252,15 @@ export default function Billing() {
               Manage your invoices, active subscriptions, and payment history
             </p>
           </div>
-          <button className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center">
-            <Download className="w-4 h-4" />
-            Download Statement
-          </button>
+          {activeTab !== "payments" && (
+            <button
+              onClick={handleDownload}
+              className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
+            >
+              <Download className="w-4 h-4" />
+              {activeTab === "invoices" ? "Download Invoices" : "Download Subscriptions"}
+            </button>
+          )}
         </div>
 
         {/* Stats Cards Section */}
@@ -320,7 +391,7 @@ export default function Billing() {
                       </td>
                     </tr>
                   ) : (
-                    filteredInvoices.map((invoice) => {
+                    paginatedInvoices.map((invoice) => {
                       const statusConfig = getStatusConfig(invoice.status);
                       return (
                         <tr
@@ -375,6 +446,27 @@ export default function Billing() {
                 </tbody>
               </table>
             </div>
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 py-4 px-6 border-t border-gray-100 bg-gray-50">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+                <span className="text-sm font-medium text-gray-600">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -387,7 +479,7 @@ export default function Billing() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {subscriptions.map((sub) => {
+                {paginatedSubscriptions.map((sub) => {
                   const endDate = sub.endDate || new Date().toISOString();
                   const daysRemaining = Math.ceil(
                     (new Date(endDate).getTime() - Date.now()) /
@@ -446,6 +538,27 @@ export default function Billing() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+            {totalSubscriptionPages > 1 && (
+              <div className="flex justify-center items-center gap-4 py-4 px-6 mt-4">
+                <button
+                  onClick={() => setCurrentSubscriptionPage((p) => Math.max(1, p - 1))}
+                  disabled={currentSubscriptionPage === 1}
+                  className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+                <span className="text-sm font-medium text-gray-600">
+                  Page {currentSubscriptionPage} of {totalSubscriptionPages}
+                </span>
+                <button
+                  onClick={() => setCurrentSubscriptionPage((p) => Math.min(totalSubscriptionPages, p + 1))}
+                  disabled={currentSubscriptionPage === totalSubscriptionPages}
+                  className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
               </div>
             )}
           </div>
