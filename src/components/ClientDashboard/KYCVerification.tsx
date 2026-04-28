@@ -1077,10 +1077,10 @@ export default function KYCVerification() {
                     </p>
                     {individualProfile?.overallStatus && individualProfile.overallStatus !== 'not_started' && !isPersonalVerified && (
                       <div className="mt-3 flex items-center gap-2">
-                        <span className={`text-xs font-medium px-2 py-1 rounded-full capitalize ${individualProfile.overallStatus === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg capitalize ${individualProfile.overallStatus === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                           individualProfile.overallStatus === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-gray-100'
                           }`}>
-                          Status: {individualProfile.overallStatus.replace('_', ' ')}
+                          {individualProfile.overallStatus.replace('_', ' ')}
                         </span>
                       </div>
                     )}
@@ -2100,46 +2100,44 @@ export default function KYCVerification() {
                                   <Eye className="w-4 h-4" /> View
                                 </button>
                               )}
-                              {status !== "approved" && (
-                                <>
+                              <>
+                                <button
+                                  onClick={() =>
+                                    triggerFileUpload(docType.type)
+                                  }
+                                  disabled={isUploading || !!deleting}
+                                  className={`flex items-center gap-1.5 px-3 py-2 ${uploadedDoc ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90"} rounded-lg text-sm font-medium transition-colors disabled:opacity-50`}
+                                >
+                                  {isUploading ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : uploadedDoc ? (
+                                    <RefreshCw className="w-4 h-4" />
+                                  ) : (
+                                    <Upload className="w-4 h-4" />
+                                  )}
+                                  {uploadedDoc ? "Replace" : "Upload"}
+                                </button>
+
+                                {uploadedDoc && status !== "approved" && (
                                   <button
                                     onClick={() =>
-                                      triggerFileUpload(docType.type)
+                                      handleDeleteDocument(docType.type)
                                     }
-                                    disabled={isUploading || !!deleting}
-                                    className={`flex items-center gap-1.5 px-3 py-2 ${uploadedDoc ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : "bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90"} rounded-lg text-sm font-medium transition-colors disabled:opacity-50`}
+                                    disabled={
+                                      deleting === docType.type ||
+                                      isUploading
+                                    }
+                                    className="flex items-center justify-center px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 border border-red-100"
+                                    title="Delete Document"
                                   >
-                                    {isUploading ? (
+                                    {deleting === docType.type ? (
                                       <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : uploadedDoc ? (
-                                      <RefreshCw className="w-4 h-4" />
                                     ) : (
-                                      <Upload className="w-4 h-4" />
+                                      <Trash2 className="w-4 h-4" />
                                     )}
-                                    {uploadedDoc ? "Replace" : "Upload"}
                                   </button>
-
-                                  {uploadedDoc && (
-                                    <button
-                                      onClick={() =>
-                                        handleDeleteDocument(docType.type)
-                                      }
-                                      disabled={
-                                        deleting === docType.type ||
-                                        isUploading
-                                      }
-                                      className="flex items-center justify-center px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 border border-red-100"
-                                      title="Delete Document"
-                                    >
-                                      {deleting === docType.type ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                      ) : (
-                                        <Trash2 className="w-4 h-4" />
-                                      )}
-                                    </button>
-                                  )}
-                                </>
-                              )}
+                                )}
+                              </>
                             </div>
                           </div>
                         </div>

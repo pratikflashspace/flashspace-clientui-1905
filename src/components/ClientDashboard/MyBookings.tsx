@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import userDashboardService from "@/services/userDashboard.service";
 import { Booking, BookingType, BookingStatus } from "@/types/services";
 import {
@@ -42,6 +42,7 @@ import { getAllVirtualOffices } from "@/services/virtualOffice.service";
 import { getAllCoworkingSpaces } from "@/services/coworkingSpace.service";
 import { getAllMeetingRooms } from "@/services/meetingRoom.service";
 import { getShortAddress } from "@/utils/address";
+import BookingDetailsModal from "./BookingDetailsModal";
 
 const MyBookings: React.FC = () => {
   type WorkspaceCodeSource = {
@@ -50,6 +51,7 @@ const MyBookings: React.FC = () => {
   };
 
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<"all" | BookingType>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | BookingStatus>(
     "all",
@@ -157,6 +159,20 @@ const MyBookings: React.FC = () => {
   useEffect(() => {
     fetchBookings();
   }, [activeTab, statusFilter]);
+
+  useEffect(() => {
+    const openBookingId = searchParams.get("openBooking");
+    if (openBookingId && bookings.length > 0) {
+      const targetBooking = bookings.find((b) => b._id === openBookingId);
+      if (targetBooking) {
+        setSelectedBooking(targetBooking);
+        // Clear the param so it doesn't reopen on reload
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete("openBooking");
+        setSearchParams(newParams, { replace: true });
+      }
+    }
+  }, [searchParams, bookings, setSearchParams]);
 
   useEffect(() => {
     let isMounted = true;
@@ -432,9 +448,20 @@ const MyBookings: React.FC = () => {
     return resolvedCode;
   }
 
-  const getStatusConfig = (status: string) => {
+  const getStatusConfig = (booking: Booking) => {
+    const status = booking.status;
     switch (status) {
       case "active":
+        // Check if final agreement exists
+        const hasFinalAgreement = booking.documents?.some(d => d.type === "final_agreement");
+        if (!hasFinalAgreement) {
+          return {
+            bg: "bg-yellow-100",
+            text: "text-yellow-700",
+            icon: Clock,
+            label: "Pending",
+          };
+        }
         return {
           bg: "bg-green-100",
           text: "text-green-700",
@@ -725,7 +752,7 @@ const MyBookings: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBookings.map((booking) => {
-              const statusConfig = getStatusConfig(booking.status);
+              const statusConfig = getStatusConfig(booking);
               const daysRemaining = calculateDaysRemaining(
                 booking.endDate || "",
               );
@@ -763,7 +790,10 @@ const MyBookings: React.FC = () => {
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConfig.bg} ${statusConfig.text}`}
                     >
-                      <statusConfig.icon className="w-3 h-3" />
+                      {(() => {
+                        const Icon = statusConfig.icon;
+                        return <Icon className="w-3 h-3" />;
+                      })()}
                       {statusConfig.label}
                     </span>
                   </div>
@@ -789,11 +819,11 @@ const MyBookings: React.FC = () => {
                     </div>
 
                     {/* Auto-renewal Status */}
-                    {booking.autoRenew && (
+                    {(booking.status === "active" || booking.status === "pending_payment" || booking.autoRenew) && (
                       <div className="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-green-50/50 border border-green-100 rounded-xl w-fit">
                         <div className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
                         <span className="text-[10px] font-bold text-green-700 uppercase tracking-tight">
-                          Auto-renewal on {formatDate(booking.endDate || "")}
+                          Renewal on {formatDate(booking.endDate || "")}
                         </span>
                       </div>
                     )}
@@ -848,25 +878,7 @@ const MyBookings: React.FC = () => {
                                 <Download className="w-4 h-4" /> Documents
                               </button>
                             )}
-                          {booking.status === "active" && (
-                            <button
-                              onClick={() =>
-                                handleToggleAutoRenew(
-                                  booking._id,
-                                  booking.autoRenew,
-                                )
-                              }
-                              disabled={togglingAutoRenew === booking._id}
-                              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
-                            >
-                              <RefreshCw
-                                className={`w-4 h-4 ${togglingAutoRenew === booking._id ? "animate-spin" : ""}`}
-                              />
-                              {booking.autoRenew
-                                ? "Disable Auto-Renew"
-                                : "Enable Auto-Renew"}
-                            </button>
-                          )}
+
                           <button
                             onClick={() => setQueryModalBooking(booking)}
                             className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
@@ -900,184 +912,14 @@ const MyBookings: React.FC = () => {
 
         {/* Booking Detail Modal */}
         {selectedBooking && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-              <div className="relative">
-                <img
-                  src={
-                    selectedBooking.spaceSnapshot?.images?.[0] ||
-                    selectedBooking.spaceSnapshot?.image ||
-                    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"
-                  }
-                  alt={getWorkspaceDisplayName(selectedBooking)}
-                  className="w-full h-48 object-cover"
-                />
-                <button
-                  onClick={() => setSelectedBooking(null)}
-                  className="absolute top-4 right-4 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-                <div className="absolute bottom-4 left-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${selectedBooking.type === "VirtualOffice" ||
-                      selectedBooking.type === "virtual_office"
-                      ? "bg-gray-100 text-gray-700"
-                      : selectedBooking.type === "MeetingRoom" ||
-                        selectedBooking.type === "meeting_room"
-                        ? "bg-purple-100 text-purple-700"
-                        : "bg-blue-500 text-white"
-                      }`}
-                  >
-                    {selectedBooking.type === "VirtualOffice" ||
-                      selectedBooking.type === "virtual_office"
-                      ? "Virtual Office"
-                      : selectedBooking.type === "MeetingRoom" ||
-                        selectedBooking.type === "meeting_room"
-                        ? "On Demand"
-                        : "Coworking"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">
-                      {getWorkspaceDisplayName(selectedBooking)}
-                    </h2>
-                    <p className="text-gray-500 flex items-center gap-1 mt-1">
-                      <MapPin className="w-4 h-4 text-[#35503F]" />{" "}
-                      {selectedBooking.spaceSnapshot?.address}
-                    </p>
-                  </div>
-                  <span
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${getStatusConfig(selectedBooking.status).bg
-                      } ${getStatusConfig(selectedBooking.status).text}`}
-                  >
-                    {getStatusConfig(selectedBooking.status).label}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500">Booking ID</p>
-                    <p className="text-sm font-semibold">
-                      {selectedBooking.bookingNumber}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500">Plan</p>
-                    <p className="text-sm font-semibold">
-                      {selectedBooking.plan.name}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500">Start Date</p>
-                    <p className="text-sm font-semibold">
-                      {formatDate(selectedBooking.startDate || "")}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500">End Date</p>
-                    <p className="text-sm font-semibold">
-                      {formatDate(selectedBooking.endDate || "")}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500">Amount</p>
-                    <p className="text-sm font-semibold">
-                      {formatCurrency(selectedBooking.plan.price)}/
-                      {selectedBooking.plan.tenure}{" "}
-                      {selectedBooking.plan.tenureUnit}
-                    </p>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500">City</p>
-                    <p className="text-sm font-semibold">
-                      {selectedBooking.spaceSnapshot?.city}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Documents */}
-                {selectedBooking.documents &&
-                  selectedBooking.documents.length > 0 && (
-                    <div className="mb-6">
-                      <h3 className="font-semibold text-gray-900 mb-3">
-                        Documents
-                      </h3>
-                      <div className="space-y-2">
-                        {selectedBooking.documents.map((doc, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                          >
-                            <div className="flex items-center gap-3">
-                              <FileText className="w-5 h-5 text-gray-400" />
-                              <span className="text-sm font-medium">
-                                {doc.name}
-                              </span>
-                            </div>
-                            <a
-                              href={doc.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-yellow-600 hover:text-yellow-700 font-medium text-sm"
-                            >
-                              Download
-                            </a>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                {/* Auto Renew Toggle */}
-                {selectedBooking.status === "active" && (
-                  <div className="mb-6 p-4 bg-gray-50 rounded-lg flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-gray-900">Auto Renew</p>
-                      <p className="text-sm text-gray-500">
-                        Automatically renew before expiry
-                      </p>
-                    </div>
-                    <button
-                      onClick={() =>
-                        handleToggleAutoRenew(
-                          selectedBooking._id,
-                          selectedBooking.autoRenew,
-                        )
-                      }
-                      disabled={togglingAutoRenew === selectedBooking._id}
-                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedBooking.autoRenew
-                        ? "bg-green-500 text-white"
-                        : "bg-gray-200 text-gray-600"
-                        }`}
-                    >
-                      {togglingAutoRenew === selectedBooking._id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : selectedBooking.autoRenew ? (
-                        "Enabled"
-                      ) : (
-                        "Disabled"
-                      )}
-                    </button>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setSelectedBooking(null)}
-                    className="flex-1 border border-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <BookingDetailsModal
+            booking={selectedBooking}
+            onClose={() => setSelectedBooking(null)}
+            getWorkspaceDisplayName={getWorkspaceDisplayName}
+            getStatusConfig={getStatusConfig}
+            formatCurrency={formatCurrency}
+            formatDate={formatDate}
+          />
         )}
 
         {/* Raise Query Modal */}

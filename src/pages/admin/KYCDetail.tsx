@@ -572,8 +572,8 @@ export default function KYCDetail() {
             )}
 
             {/* Overall Actions */}
-            {kycData.overallStatus !== "rejected" &&
-              kycData.overallStatus !== "approved" && (
+            {(kycData.overallStatus !== "rejected" && kycData.overallStatus !== "approved") || 
+              kycData.documents?.some(doc => doc.status === "pending") ? (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                   <h3 className="font-bold text-gray-900 mb-4">
                     Final Decision
@@ -619,7 +619,7 @@ export default function KYCDetail() {
                       )}
                   </div>
                 </div>
-              )}
+              ) : null}
           </div>
 
           {/* Right Column: Documents */}

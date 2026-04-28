@@ -172,14 +172,14 @@ const MeetingRoomSpaceComponent = () => {
       // But based on the merged code, it seems simulation/test was intended for this component.
       await new Promise((r) => setTimeout(r, 1500));
 
-      await verifyPayment({
+      const result = await verifyPayment({
         razorpay_order_id: order.orderId,
         razorpay_payment_id: `pay_test_${Date.now()}`,
         razorpay_signature: "test_signature_dev",
         devMode: true,
       });
 
-      hotToast.success("Booking Successful! Credits Earned! 🎉");
+      navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(`${hours} Hour Meeting Room Booking`)}&amount=${totalPrice}`);
       // navigate('/bookings'); // Optional: redirect to bookings
     } catch (error: any) {
       console.error(error);

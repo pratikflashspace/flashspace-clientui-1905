@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { CheckCircle, Download, ArrowRight, Home, Calendar, Building2 } from 'lucide-react';
+import { CheckCircle, Download, ArrowRight, Home, Calendar, Building2, Clock } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ interface PaymentDetails {
   spaceName: string;
   planName: string;
   tenure: number;
+  bookingId?: string;
 }
 
 const PaymentSuccessPage = () => {
@@ -24,6 +25,7 @@ const PaymentSuccessPage = () => {
 
   const [loading, setLoading] = useState(true);
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -35,16 +37,42 @@ const PaymentSuccessPage = () => {
     }
   }, [orderId]);
 
-  const fetchPaymentDetails = async () => {
+  const fetchPaymentDetails = async (retryCount = 0) => {
     try {
       const data = await getPaymentStatus(orderId!);
       setPaymentDetails(data);
+      
+      // If bookingId is missing, retry after 1 second (up to 5 times)
+      if (!data.bookingId && retryCount < 5) {
+        setTimeout(() => fetchPaymentDetails(retryCount + 1), 1000);
+      } else {
+        setLoading(false);
+      }
     } catch (error) {
       console.error("Error fetching payment details:", error);
-    } finally {
-      setLoading(false);
+      if (retryCount < 5) {
+        setTimeout(() => fetchPaymentDetails(retryCount + 1), 1000);
+      } else {
+        setLoading(false);
+      }
     }
   };
+
+  useEffect(() => {
+    if (!loading && paymentDetails?.bookingId) {
+      const interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            navigate(`/dashboard/my-bookings?openBooking=${paymentDetails.bookingId}`);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [loading, paymentDetails, navigate]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
@@ -59,10 +87,16 @@ const PaymentSuccessPage = () => {
           </div>
 
           {/* Success Message */}
-          <h1 className="text-3xl font-bold text-foreground mb-3">Payment Successful! 🎉</h1>
-          <p className="text-muted-foreground mb-8">
-            Your booking has been confirmed. You will receive a confirmation email shortly.
+          <h1 className="text-3xl font-bold text-foreground mb-3">Payment Successful!</h1>
+          <p className="text-muted-foreground mb-4">
+            Your booking has been confirmed.
           </p>
+          {paymentDetails?.bookingId && (
+            <div className="flex items-center justify-center gap-2 text-primary font-medium mb-8 bg-primary/5 py-2 px-4 rounded-full w-fit mx-auto animate-pulse">
+              <Clock className="w-4 h-4" />
+              <p className="text-sm">Redirecting to My Bookings in {countdown} seconds...</p>
+            </div>
+          )}
 
           {/* Order Details Card */}
           <div className="bg-card border border-border rounded-xl p-6 mb-8 text-left shadow-sm">
@@ -125,7 +159,7 @@ const PaymentSuccessPage = () => {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              onClick={() => navigate('/dashboard/my-bookings')}
+              onClick={() => navigate(paymentDetails?.bookingId ? `/dashboard/my-bookings?openBooking=${paymentDetails.bookingId}` : '/dashboard/my-bookings')}
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3"
             >
               <Calendar className="w-4 h-4 mr-2" />
