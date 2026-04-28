@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const FeatureCTA = () => {
     return (
@@ -62,13 +63,15 @@ export const FeatureCTA = () => {
                             took a day.
                         </p>
 
-                        <Button
-                            variant="outline"
-                            className="group text-secondary border-secondary/40 hover:bg-transparent hover:text-background hover:border-secondary font-medium px-6 py-6 bg-transparent rounded-xl"
-                        >
-                            Learn more
-                            <ArrowUpRight className="w-4 h-4 ml-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                        </Button>
+                        <Link to="/services">
+                            <Button
+                                variant="outline"
+                                className="group text-secondary border-secondary/40 hover:bg-transparent hover:text-background hover:border-secondary font-medium px-6 py-6 bg-transparent rounded-xl"
+                            >
+                                Learn more
+                                <ArrowUpRight className="w-4 h-4 ml-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                            </Button>
+                        </Link>
                     </motion.div>
 
                     {/* Right - Comparison Stats */}

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import userDashboardService from "@/services/userDashboard.service";
 import { Invoice, Booking } from "@/types/services";
+import { generateInvoicePDF } from "@/utils/pdfGenerator";
+import toast from "react-hot-toast";
 import {
   CreditCard,
   Download,
@@ -17,6 +19,8 @@ import {
   Loader2,
   Filter,
   ArrowDown,
+  Eye,
+  X,
 } from "lucide-react";
 
 // Types
@@ -34,23 +38,41 @@ export default function Billing() {
   const [subscriptions, setSubscriptions] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [downloadingInvoiceId, setDownloadingInvoiceId] = useState<string | null>(null);
+  const [previewingInvoiceId, setPreviewingInvoiceId] = useState<string | null>(null);
+  const [previewDocument, setPreviewDocument] = useState<{ title: string; url: string } | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const [invoicesRes, bookingsRes] = await Promise.all([
+      const [invoicesResult, bookingsResult] = await Promise.allSettled([
         userDashboardService.getInvoices({
           status: statusFilter === "all" ? undefined : statusFilter,
         }),
         userDashboardService.getBookings({ status: "active" }),
       ]);
-      if (invoicesRes.success && invoicesRes.data) {
+
+      const invoicesRes =
+        invoicesResult.status === "fulfilled" ? invoicesResult.value : null;
+      const bookingsRes =
+        bookingsResult.status === "fulfilled" ? bookingsResult.value : null;
+
+      if (invoicesRes?.success && invoicesRes.data) {
         // invoicesRes.data is InvoicesResponse which contains { summary, invoices }
         setInvoices(invoicesRes.data.invoices || []);
+      } else {
+        setInvoices([]);
       }
-      if (bookingsRes.success && bookingsRes.data) {
+
+      if (bookingsRes?.success && bookingsRes.data) {
         setSubscriptions(bookingsRes.data);
+      } else {
+        setSubscriptions([]);
+      }
+
+      if (!invoicesRes?.success) {
+        setError("Failed to load invoices");
       }
     } catch (err) {
       setError("Failed to load billing data");
@@ -77,6 +99,37 @@ export default function Billing() {
       month: "short",
       year: "numeric",
     });
+  };
+
+  const handleDownloadPDF = async (invoice: Invoice) => {
+    try {
+      setDownloadingInvoiceId(invoice._id);
+      await generateInvoicePDF(invoice, "download");
+      toast.success("Invoice downloaded successfully");
+    } catch (error) {
+      console.error("Error generating invoice PDF:", error);
+      toast.error("Failed to generate invoice PDF");
+    } finally {
+      setDownloadingInvoiceId(null);
+    }
+  };
+
+  const handlePreviewPDF = async (invoice: Invoice) => {
+    try {
+      setPreviewingInvoiceId(invoice._id);
+      const blobUrl = await generateInvoicePDF(invoice, "preview");
+      if (blobUrl) {
+        setPreviewDocument({
+          title: `Invoice ${invoice.invoiceNumber || invoice._id}`,
+          url: blobUrl,
+        });
+      }
+    } catch (error) {
+      console.error("Error previewing invoice PDF:", error);
+      toast.error("Failed to preview invoice PDF");
+    } finally {
+      setPreviewingInvoiceId(null);
+    }
   };
 
   const getStatusConfig = (status: string) => {
@@ -358,15 +411,37 @@ export default function Billing() {
                             </span>
                           </td>
                           <td className="py-4 px-6 text-right">
-                            {invoice.status === "pending" ? (
-                              <button className="inline-flex items-center px-4 py-1.5 bg-[#35503F] text-[#FEF8C3] text-xs font-medium rounded-full hover:bg-[#35503F]/90 transition-colors">
-                                Pay Now
+                            <div className="flex items-center justify-end gap-3">
+                              <button
+                                onClick={() => handlePreviewPDF(invoice)}
+                                disabled={previewingInvoiceId === invoice._id || downloadingInvoiceId === invoice._id}
+                                className="text-gray-400 hover:text-[#35503F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Preview invoice"
+                              >
+                                {previewingInvoiceId === invoice._id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Eye className="w-4 h-4" />
+                                )}
                               </button>
-                            ) : (
-                              <button className="text-gray-400 hover:text-[#35503F] transition-colors">
-                                <Download className="w-4 h-4" />
+                              <button
+                                onClick={() => handleDownloadPDF(invoice)}
+                                disabled={downloadingInvoiceId === invoice._id || previewingInvoiceId === invoice._id}
+                                className="text-gray-400 hover:text-[#35503F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Download invoice"
+                              >
+                                {downloadingInvoiceId === invoice._id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Download className="w-4 h-4" />
+                                )}
                               </button>
-                            )}
+                              {invoice.status === "pending" && (
+                                <button className="inline-flex items-center px-4 py-1.5 bg-[#35503F] text-[#FEF8C3] text-xs font-medium rounded-full hover:bg-[#35503F]/90 transition-colors">
+                                  Pay Now
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
@@ -374,6 +449,29 @@ export default function Billing() {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {previewDocument && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                <h3 className="text-lg font-semibold text-gray-900">{previewDocument.title}</h3>
+                <button
+                  onClick={() => setPreviewDocument(null)}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 bg-gray-950 overflow-hidden p-2 sm:p-4">
+                <iframe
+                  src={previewDocument.url}
+                  className="w-full h-full rounded-xl border border-gray-800 shadow-sm"
+                  title="Invoice Preview"
+                />
+              </div>
             </div>
           </div>
         )}

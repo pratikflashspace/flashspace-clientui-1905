@@ -376,7 +376,15 @@ const BusinessSetup = () => {
                       <Button className="flex-1 btn-hero">
                         Get Started
                       </Button>
-                      <Button variant="outline" className="flex-1 text-primary border-primary hover:bg-primary/5">
+                      <Button
+                        variant="outline"
+                        className="flex-1 text-primary border-primary hover:bg-primary/5"
+                        onClick={() =>
+                          navigate(
+                            `/solutions/business-setup?city=${encodeURIComponent(selectedCity)}&service=${encodeURIComponent(service.name)}`,
+                          )
+                        }
+                      >
                         Learn More
                       </Button>
                     </div>

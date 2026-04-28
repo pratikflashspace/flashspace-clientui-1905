@@ -365,7 +365,12 @@ const CoworkingSpace = () => {
                     to intelligent forecasting for renewals, smart recommendation engines, and beyond. One platform. End-to-end
                     intelligence.
                   </p>
-                  <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="group border-primary/30 hover:bg-primary/5 font-semibold"
+                    onClick={() => navigate("/start-chatting")}
+                  >
                     Learn more
                     <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </Button>

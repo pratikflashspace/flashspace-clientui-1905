@@ -6,12 +6,14 @@ import { Loader2 } from 'lucide-react';
 interface GoogleLoginButtonProps {
   onSuccess?: () => void;
   onError?: () => void;
+  onTwoFactorRequired?: (email: string) => void;
   role?: string;
 }
 
 export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
   onSuccess,
   onError,
+  onTwoFactorRequired,
   role
 }) => {
   const { googleLogin, isLoading } = useAuth();
@@ -23,7 +25,19 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
         throw new Error('No credential received from Google');
       }
 
-      await googleLogin(credentialResponse.credential, role);
+      const response = await googleLogin(credentialResponse.credential, role);
+
+      if (response.success && response.data?.requiresTwoFactor) {
+        const email = response.data.email;
+        if (email) {
+          onTwoFactorRequired?.(email);
+        }
+        return;
+      }
+
+      if (!response.success || !response.data?.user) {
+        throw new Error(response.message || 'Google sign-in did not complete');
+      }
 
       toast({
         title: 'Success',

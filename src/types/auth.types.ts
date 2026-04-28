@@ -103,8 +103,10 @@ export interface AuthState {
 }
 
 export interface LoginResponse {
-  user: User;
-  tokens: AuthTokens;
+  user?: User;
+  tokens?: AuthTokens;
+  requiresTwoFactor?: boolean;
+  email?: string;
 }
 
 export interface SignupResponse {
@@ -115,4 +117,9 @@ export interface SignupResponse {
 export interface VerifyOTPResponse {
   user: User;
   tokens: AuthTokens;
+}
+
+export interface VerifyLoginOTPRequest {
+  email: string;
+  otp: string;
 }
