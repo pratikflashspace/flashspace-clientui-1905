@@ -246,9 +246,20 @@ export default function Dashboard() {
     });
   };
 
-  const getStatusConfig = (status: string) => {
+  const getStatusConfig = (booking: Booking) => {
+    const status = booking.status;
     switch (status) {
       case "active":
+        // Check if final agreement exists
+        const hasFinalAgreement = booking.documents?.some(d => d.type === "final_agreement");
+        if (!hasFinalAgreement) {
+          return {
+            bg: "bg-yellow-100",
+            text: "text-yellow-700",
+            icon: Clock,
+            label: "Pending",
+          };
+        }
         return {
           bg: "bg-green-100",
           text: "text-green-700",
@@ -460,25 +471,25 @@ export default function Dashboard() {
           ))}
         </div>
         {/* Upcoming Renewals Section */}
-        {Array.isArray(bookings) && bookings.filter((b) => b.autoRenew).length > 0 && (
+        {Array.isArray(bookings) && bookings.filter((b) => b.status === "active" || b.status === "pending_payment" || b.autoRenew).length > 0 && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-[#35503F] tracking-tight">
-                Upcoming <span className="italic">Auto Renewals</span>
+                Upcoming <span className="italic">Renewals</span>
               </h2>
         
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {bookings
-                .filter((b) => b.autoRenew)
+                .filter((b) => b.status === "active" || b.status === "pending_payment" || b.autoRenew)
                 .sort((a, b) => {
                   const dateA = new Date(a.endDate || 0).getTime();
                   const dateB = new Date(b.endDate || 0).getTime();
                   return dateA - dateB;
                 })
                 .map((booking) => {
-                  const statusConfig = getStatusConfig(booking.status);
+                  const statusConfig = getStatusConfig(booking);
 
                   return (
                     <div
@@ -542,7 +553,7 @@ export default function Dashboard() {
                         <div className="mt-4 flex items-center gap-2 px-3 py-2 bg-green-50/50 border border-green-100 rounded-xl w-fit">
                           <div className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
                           <span className="text-[10px] font-bold text-green-700 uppercase tracking-tight">
-                            Auto Renewal: ON — {formatDate(booking.endDate || "")}
+                            Renewal on: {formatDate(booking.endDate || "")}
                           </span>
                         </div>
                       </div>
@@ -563,51 +574,7 @@ export default function Dashboard() {
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          
 
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:border-[#35503F] hover:text-[#35503F] transition-all bg-white shadow-sm active:scale-95">
-                                <MoreVertical className="w-4 h-4" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-56 p-1 bg-white rounded-2xl shadow-xl border-gray-100"
-                              align="end"
-                            >
-                              {booking.status === "pending_kyc" && (
-                                <button
-                                  onClick={() => navigate('/dashboard/profile')}
-                                  className="w-full text-left px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-xl flex items-center gap-3 transition-colors"
-                                >
-                                  <ShieldCheck className="w-4 h-4 text-green-600" /> Verify KYC
-                                </button>
-                              )}
-                              {booking.documents &&
-                                booking.documents.length > 0 && (
-                                  <button className="w-full text-left px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-xl flex items-center gap-3 transition-colors">
-                                    <Download className="w-4 h-4 text-blue-600" /> Documents
-                                  </button>
-                                )}
-                              {booking.status === "active" && (
-                                <button
-                                  onClick={() =>
-                                    handleToggleAutoRenew(
-                                      booking._id,
-                                      booking.autoRenew || false,
-                                    )
-                                  }
-                                  disabled={togglingAutoRenew === booking._id}
-                                  className="w-full text-left px-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-xl flex items-center gap-3 transition-colors"
-                                >
-                                  <RefreshCw className={`w-4 h-4 text-[#35503F] ${togglingAutoRenew === booking._id ? "animate-spin" : ""}`} /> 
-                                  Turn Off Auto-renew
-                                </button>
-                              )}
-                            </PopoverContent>
-                          </Popover>
-                        </div>
                       </div>
                     </div>
                   );
