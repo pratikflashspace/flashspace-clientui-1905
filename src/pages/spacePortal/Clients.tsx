@@ -10,12 +10,17 @@ import type {
 } from "@/types/spacePortal/client";
 
 import {
+  Building2,
+  CalendarDays,
+  CheckCircle2,
   Download,
   Eye,
   Loader2,
   MessageSquare,
   RefreshCw,
+  Search,
   Send,
+  UserRoundCheck,
   X,
 } from "lucide-react";
 import { TableSkeleton } from "@/components/ui/skeleton-loaders";
@@ -90,6 +95,27 @@ const formatDate = (value?: string) => {
     month: "short",
     year: "numeric",
   });
+};
+
+const formatCleanLocation = (location?: string, city?: string) => {
+  const parts = String(location || city || "N/A")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const uniqueParts = Array.from(
+    new Map(parts.map((part) => [part.toLowerCase(), part])).values(),
+  );
+
+  const cleanCity = city?.trim();
+  const locationIncludesCity = cleanCity
+    ? uniqueParts.some((part) => normalize(part) === normalize(cleanCity))
+    : false;
+
+  return {
+    main: uniqueParts.join(", ") || "N/A",
+    sub: cleanCity && !locationIncludesCity ? cleanCity : "",
+  };
 };
 
 const uniqueOptions = (rows: Client[], getter: (row: Client) => string | undefined) =>
@@ -205,6 +231,42 @@ export default function Clients() {
   const safePage = Math.min(page, totalPages);
   const startIndex = (safePage - 1) * pageSize;
   const paginatedClients = filteredClients.slice(startIndex, startIndex + pageSize);
+  const metrics = useMemo(() => {
+    const active = filteredClients.filter((client) => client.status === "ACTIVE").length;
+    const expiring = filteredClients.filter(
+      (client) => client.status === "EXPIRING_SOON",
+    ).length;
+    const uniqueSpaces = new Set(
+      filteredClients.map((client) => client.space).filter(Boolean),
+    ).size;
+
+    return [
+      {
+        label: "Linked Bookings",
+        value: filteredClients.length,
+        helper: "Across your spaces",
+        icon: CalendarDays,
+      },
+      {
+        label: "Active Clients",
+        value: active,
+        helper: "Currently live",
+        icon: CheckCircle2,
+      },
+      {
+        label: "Expiring Soon",
+        value: expiring,
+        helper: "Needs attention",
+        icon: UserRoundCheck,
+      },
+      {
+        label: "Spaces Booked",
+        value: uniqueSpaces,
+        helper: "Unique locations",
+        icon: Building2,
+      },
+    ];
+  }, [filteredClients]);
 
   useEffect(() => {
     setPage(1);
@@ -297,17 +359,53 @@ export default function Clients() {
 
   return (
     <div className="flex-1 animate-in fade-in duration-500">
-      <div className="mb-6">
-        <h1 className="text-4xl">
+      <div className="mb-7">
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
           Client <span className="text-primary italic">Bookings</span>
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-sm font-medium text-muted-foreground">
           View every booking linked to your spaces.
         </p>
       </div>
 
-      <div className="rounded-xl border border-border bg-background p-3 shadow-sm">
-        <div className="grid gap-3 md:grid-cols-3 min-[1100px]:grid-cols-[minmax(220px,1.4fr)_repeat(4,minmax(120px,1fr))_auto_auto] min-[1100px]:items-end">
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {metrics.map((metric) => (
+          <div
+            key={metric.label}
+            className="rounded-2xl border border-[#DDE5DA] bg-white p-5 shadow-sm"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-[#677E73]">
+                  {metric.label}
+                </p>
+                <p className="mt-3 text-3xl font-extrabold text-[#1F2E26]">
+                  {metric.value}
+                </p>
+                <p className="mt-1 text-xs font-medium text-[#677E73]">
+                  {metric.helper}
+                </p>
+              </div>
+              <div className="rounded-xl bg-[#EAF6EF] p-3 text-[#35503F]">
+                <metric.icon className="h-5 w-5" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-2xl border border-[#DDE5DA] bg-white p-5 shadow-sm">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-extrabold text-[#1F2E26]">
+              Booking Directory
+            </h2>
+            <p className="mt-1 text-xs font-medium text-[#677E73]">
+              Filter by status, city, workspace, or exact space.
+            </p>
+          </div>
+        </div>
+        <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 xl:items-end">
           <FilterInput
             label="Search"
             placeholder="Name, email, phone, company, invoice"
@@ -347,13 +445,13 @@ export default function Clients() {
               ...spaceOptions.map((value) => ({ label: value, value })),
             ]}
           />
-          <Button onClick={applyFilters} className="h-9 rounded-lg px-5 font-bold">
+          <Button onClick={applyFilters} className="h-11 w-full rounded-xl px-6 font-bold">
             Apply
           </Button>
           <Button
             onClick={resetFilters}
             variant="ghost"
-            className="h-9 rounded-lg px-5 font-bold"
+            className="h-11 w-full rounded-xl px-6 font-bold"
           >
             Reset
           </Button>
@@ -389,25 +487,25 @@ export default function Clients() {
         </div>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-xl border border-border bg-background shadow-sm">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-[#DDE5DA] bg-white shadow-sm">
         <div className="overflow-x-auto">
           {loading ? (
             <TableSkeleton rows={10} cols={10} />
           ) : (
-            <table className="w-full min-w-[1320px] border-collapse text-left text-sm">
-              <thead className="bg-muted/40">
-                <tr className="border-b border-border text-foreground">
-                  <TableHead className="w-16 text-right">S.No.</TableHead>
-                  <TableHead>Invoice No.</TableHead>
-                  <TableHead>User Name</TableHead>
-                  <TableHead>Company Name</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Workspace</TableHead>
-                  <TableHead>Space</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>KYC</TableHead>
-                  <TableHead className="text-center">Action</TableHead>
+            <table className="w-full min-w-[1120px] table-fixed border-collapse text-left text-sm">
+              <thead className="bg-[#F8FAF7]">
+                <tr className="border-b border-[#DDE5DA] text-[#1F2E26]">
+                  <TableHead className="w-14 text-right">S.No.</TableHead>
+                  <TableHead className="w-28">Invoice No.</TableHead>
+                  <TableHead className="w-24">User Name</TableHead>
+                  <TableHead className="w-40">Company Name</TableHead>
+                  <TableHead className="w-56">Contact</TableHead>
+                  <TableHead className="w-32">Workspace</TableHead>
+                  <TableHead className="w-36">Space</TableHead>
+                  <TableHead className="w-36">Location</TableHead>
+                  <TableHead className="w-28 text-center">Status</TableHead>
+                  <TableHead className="w-28 text-center">KYC</TableHead>
+                  <TableHead className="w-40 text-center">Action</TableHead>
                 </tr>
               </thead>
               <tbody>
@@ -514,13 +612,18 @@ function FilterInput({
 }) {
   return (
     <div className="min-w-0">
-      <p className="mb-0.5 text-[11px] font-bold text-muted-foreground">{label}</p>
-      <Input
-        placeholder={placeholder}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="h-9 rounded-lg text-sm"
-      />
+      <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-[#677E73]">
+        {label}
+      </p>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#93A59B]" />
+        <Input
+          placeholder={placeholder}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="h-11 rounded-xl border-[#DDE5DA] bg-[#F8FAF7] pl-9 text-sm font-medium"
+        />
+      </div>
     </div>
   );
 }
@@ -538,11 +641,13 @@ function FilterSelect({
 }) {
   return (
     <div className="min-w-0">
-      <p className="mb-0.5 text-[11px] font-bold text-muted-foreground">{label}</p>
+      <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-[#677E73]">
+        {label}
+      </p>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm font-semibold text-foreground shadow-sm focus:border-primary focus:outline-none"
+        className="h-11 w-full rounded-xl border border-[#DDE5DA] bg-[#F8FAF7] px-3 text-sm font-semibold text-[#1F2E26] shadow-sm focus:border-primary focus:outline-none"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -561,7 +666,11 @@ function TableHead({
   children: ReactNode;
   className?: string;
 }) {
-  return <th className={`px-4 py-4 font-bold ${className}`}>{children}</th>;
+  return (
+    <th className={`px-4 py-4 text-[11px] font-extrabold uppercase tracking-widest ${className}`}>
+      {children}
+    </th>
+  );
 }
 
 function BookingRow({
@@ -577,72 +686,84 @@ function BookingRow({
   onMessage: () => void;
   onNavigate: () => void;
 }) {
+  const cleanLocation = formatCleanLocation(client.location, client.city);
+
   return (
-    <tr className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-      <td className="px-4 py-4 text-right font-semibold text-muted-foreground">
+    <tr className="border-b border-[#EEF1EC] align-top last:border-0 hover:bg-[#F8FAF7] transition-colors">
+      <td className="px-4 py-5 text-right font-semibold text-muted-foreground">
         {serial}.
       </td>
-      <td className="px-4 py-4">
+      <td className="px-4 py-5">
         <button
           onClick={onNavigate}
-          className="font-bold text-primary hover:underline"
+          className="max-w-full rounded-lg bg-[#F8FAF7] px-2.5 py-1 font-mono text-[11px] font-bold text-primary hover:underline"
         >
           {client.invoiceNumber || client.bookingNumber || client.id}
         </button>
       </td>
-      <td className="px-4 py-4 font-semibold text-foreground">
+      <td className="px-4 py-5 font-semibold text-foreground">
         {client.contactName}
       </td>
-      <td className="px-4 py-4 text-foreground">
-        <p className="max-w-[280px] truncate font-semibold">
+      <td className="px-4 py-5 text-foreground">
+        <p className="truncate font-semibold">
           {client.companyName}
         </p>
         <p className="text-xs text-muted-foreground">
           {formatDate(client.startDate)} - {formatDate(client.endDate)}
         </p>
       </td>
-      <td className="px-4 py-4">
-        <p className="font-semibold text-foreground">{client.email || "N/A"}</p>
+      <td className="px-4 py-5">
+        <p className="truncate font-semibold text-foreground">{client.email || "N/A"}</p>
         <p className="text-sm text-muted-foreground">{client.phone || "N/A"}</p>
       </td>
-      <td className="px-4 py-4 font-semibold text-foreground">
-        {client.workspace || "N/A"}
+      <td className="px-4 py-5">
+        <span className="inline-flex min-w-[92px] items-center justify-center rounded-full bg-[#EAF6EF] px-3 py-1.5 text-center text-xs font-bold leading-none text-[#35503F]">
+          {client.workspace || "N/A"}
+        </span>
       </td>
-      <td className="px-4 py-4 font-semibold text-foreground">
-        {client.space || "N/A"}
+      <td className="px-4 py-5">
+        <p className="line-clamp-2 max-w-[130px] font-bold leading-5 text-foreground">
+          {client.space || "N/A"}
+        </p>
       </td>
-      <td className="px-4 py-4 text-muted-foreground">
-        <p>{client.location || "N/A"}</p>
-        <p className="text-xs">{client.city || ""}</p>
+      <td className="px-4 py-5 text-muted-foreground">
+        <p className="line-clamp-2 max-w-[130px] text-sm font-medium leading-5">
+          {cleanLocation.main}
+        </p>
+        {cleanLocation.sub && (
+          <p className="mt-1 text-xs font-medium text-[#677E73]">
+            {cleanLocation.sub}
+          </p>
+        )}
       </td>
-      <td className="px-4 py-4">
+      <td className="px-4 py-5 text-center">
         <StatusPill status={client.status} />
-        <p className="mt-1 text-xs font-medium text-muted-foreground">
+        <p className="mt-2 text-xs font-medium text-muted-foreground">
           {client.subscriptionSubStatus || "N/A"}
         </p>
       </td>
-      <td className="px-4 py-4">
+      <td className="px-4 py-5 text-center">
         <KycPill status={client.kycStatus} />
-        <p className="mt-1 text-xs font-medium text-muted-foreground">
+        <p className="mt-2 text-xs font-medium text-muted-foreground">
           {client.kycType || "N/A"}
         </p>
       </td>
-      <td className="px-4 py-4">
+      <td className="px-4 py-5">
         <div className="flex items-center justify-center gap-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={onView}
-            className="h-9 rounded-lg font-bold text-primary"
+            className="h-9 rounded-full border border-[#DDE5DA] bg-white px-3 font-bold text-[#1F2E26] hover:bg-[#F8FAF7] hover:text-[#35503F]"
           >
             <Eye className="mr-1.5 h-4 w-4" />
-            View Details
+            Details
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={onMessage}
-            className="h-9 w-9 rounded-lg text-primary"
+            className="h-9 w-9 rounded-full border border-[#DDE5DA] bg-white text-[#35503F] hover:bg-[#F8FAF7]"
           >
             <MessageSquare className="h-4 w-4" />
           </Button>
@@ -672,7 +793,7 @@ function StatusPill({ status }: { status: ClientStatus }) {
   return (
     <Badge
       variant="outline"
-      className={`rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider ${config.className}`}
+      className={`inline-flex min-w-[86px] justify-center rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider ${config.className}`}
     >
       {config.label}
     </Badge>
@@ -694,7 +815,7 @@ function KycPill({ status }: { status: KycStatus }) {
   return (
     <Badge
       variant="outline"
-      className={`rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider ${config.className}`}
+      className={`inline-flex min-w-[92px] justify-center rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider ${config.className}`}
     >
       {config.label}
     </Badge>

@@ -249,26 +249,26 @@ const InvoicesAndPayments = () => {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full min-w-[980px] table-fixed text-left border-collapse">
                       <thead>
                         <tr className="border-b border-border bg-muted/30">
-                          <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                          <th className="w-[150px] px-5 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                             Invoice #
                           </th>
-                          <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                          <th className="w-[130px] px-5 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                             Date
                           </th>
-                          <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                          <th className="w-[140px] px-5 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                             Amount
                           </th>
-                          <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                          <th className="w-[120px] px-5 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                             Status
                           </th>
-                          <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                          <th className="px-5 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                             Payment Details
                           </th>
-                          <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase text-center">
-                            Files
+                          <th className="w-[150px] px-5 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-center">
+                            Documents
                           </th>
                         </tr>
                       </thead>
@@ -284,27 +284,27 @@ const InvoicesAndPayments = () => {
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
                               transition={{ delay: idx * 0.03 }}
-                              className="group hover:bg-muted/30 transition-colors"
+                              className="group align-top hover:bg-muted/20 transition-colors"
                             >
-                            <td className="px-6 py-4">
-                              <span className="font-bold text-foreground">
+                            <td className="px-5 py-5">
+                              <span className="inline-flex max-w-[120px] rounded-lg bg-[#F8FAF7] px-2.5 py-1 font-mono text-xs font-bold text-primary">
                                 {record.invoiceNumber}
                               </span>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-5 py-5">
                               <span className="text-sm font-medium text-foreground">
                                 {formatDate(record.date)}
                               </span>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-5 py-5">
                               <span className="font-bold text-foreground">
                                 {formatCurrency(record.amount)}
                               </span>
                             </td>
-                            <td className="px-6 py-4">
+                            <td className="px-5 py-5">
                               <Badge
                                 variant="secondary"
-                                className={`font-bold text-[10px] uppercase ${
+                                className={`inline-flex min-w-[76px] justify-center rounded-full px-3 py-1.5 font-bold text-[10px] uppercase ${
                                   status === "Paid"
                                     ? "bg-emerald-100 text-emerald-800 border-emerald-200" 
                                     : "bg-amber-100 text-amber-800 border-amber-200"
@@ -313,30 +313,34 @@ const InvoicesAndPayments = () => {
                                 {status}
                               </Badge>
                             </td>
-                            <td className="px-6 py-4 min-w-[260px]">
+                            <td className="px-5 py-5">
                               {status === "Paid" && settlementComplete ? (
-                                <div className="space-y-1 text-xs">
-                                  <p className="font-semibold text-foreground">
-                                    {details.paymentMethod || "-"} -{" "}
-                                    {formatCurrency(details.amountPaid || record.amount)}
-                                  </p>
-                                  <p className="text-muted-foreground">
-                                    Payment Date: {formatPaymentDate(details.paymentDate)}
-                                  </p>
-                                  <p className="font-mono text-[11px] text-foreground">
-                                    UTR: {details.utrNumber || "-"}
-                                  </p>
+                                <div className="inline-flex max-w-full flex-col gap-1 rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-2 text-xs">
+                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <span className="font-bold text-emerald-900">
+                                      {details.paymentMethod || "-"}
+                                    </span>
+                                    <span className="font-bold text-foreground">
+                                      {formatCurrency(details.amountPaid || record.amount)}
+                                    </span>
+                                  </div>
+                                  <span className="text-muted-foreground">
+                                    Paid on {formatPaymentDate(details.paymentDate)}
+                                  </span>
+                                  <span className="font-mono text-[11px] font-semibold text-foreground">
+                                    UTR {details.utrNumber || "-"}
+                                  </span>
                                 </div>
                               ) : (
-                                <span className="text-xs text-muted-foreground">
+                                <span className="inline-flex rounded-xl border border-border bg-muted/30 px-3 py-2 text-xs font-medium text-muted-foreground">
                                   {status === "Paid"
                                     ? "Payment details will appear once admin adds settlement proof"
                                     : "Not settled yet"}
                                 </span>
                               )}
                             </td>
-                            <td className="px-6 py-4">
-                              <div className="flex justify-center gap-2">
+                            <td className="px-5 py-5">
+                              <div className="flex items-center justify-center gap-2">
                                 <a 
                                   href={getUploadedFileUrl(record.fileUrl)}
                                   target="_blank" 
@@ -346,7 +350,7 @@ const InvoicesAndPayments = () => {
                                     variant="ghost"
                                     size="sm"
                                     title="View/Download Invoice"
-                                    className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary"
+                                    className="h-9 w-9 p-0 rounded-full border border-border bg-white hover:bg-primary/10 hover:text-primary"
                                   >
                                     <Eye className="w-4 h-4" />
                                   </Button>
@@ -361,7 +365,7 @@ const InvoicesAndPayments = () => {
                                       variant="ghost"
                                       size="sm"
                                       title="View payment proof"
-                                      className="h-8 px-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700"
+                                      className="h-9 rounded-full border border-emerald-100 bg-emerald-50 px-3 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
                                     >
                                       Proof
                                     </Button>
