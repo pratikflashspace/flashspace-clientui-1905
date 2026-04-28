@@ -74,6 +74,11 @@ export interface BookingData {
     fullName: string;
     email: string;
   };
+  partner?: string | {
+    _id?: string;
+    fullName?: string;
+    email?: string;
+  };
   spaceSnapshot?: {
     name?: string;
     city?: string;
@@ -691,6 +696,7 @@ class AdminService {
 
   async getAllBookings(params?: {
     status?: string;
+    partner?: string;
     type?: string;
     page?: number;
     limit?: number;
@@ -698,6 +704,17 @@ class AdminService {
     const response = await axiosInstance.get<
       ApiResponse<{ bookings: BookingData[]; pagination: any }>
     >("/api/admin/bookings", { params });
+    return response.data;
+  }
+
+  async updateBookingStatus(
+    bookingId: string,
+    status: BookingData["status"],
+  ): Promise<ApiResponse<BookingData>> {
+    const response = await axiosInstance.patch<ApiResponse<BookingData>>(
+      `/api/admin/bookings/${bookingId}/status`,
+      { status },
+    );
     return response.data;
   }
 

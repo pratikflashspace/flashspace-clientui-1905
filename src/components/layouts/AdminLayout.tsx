@@ -99,8 +99,8 @@ export default function AdminLayout() {
       ],
     },
     {
-      icon: LineChart,
-      label: "Sales Analytics",
+      icon: Briefcase,
+      label: "Booking Management",
       path: "/admin/sales-analytics",
       roles: [
         "admin",
