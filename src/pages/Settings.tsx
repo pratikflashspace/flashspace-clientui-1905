@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/auth.service";
@@ -37,6 +37,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { User } from "@/types/auth.types";
+
+const buildSettingsFromUser = (user?: User | null) => ({
+  email: user?.notifications?.email ?? true,
+  push: user?.notifications?.push ?? true,
+  promotional: user?.notifications?.promotional ?? false,
+  reminders: user?.notifications?.reminders ?? true,
+  loginAlerts: user?.notifications?.loginAlerts ?? true,
+  twoFactor: user?.isTwoFactorEnabled ?? false,
+  sessionManagement: user?.securityPreferences?.sessionManagement ?? true,
+  dataSharing: user?.securityPreferences?.dataSharing ?? false,
+  language: user?.preferences?.language ?? "en",
+  currency: user?.preferences?.currency ?? "inr",
+  defaultCity: user?.preferences?.defaultCity ?? "delhi",
+  timeZone: user?.preferences?.timeZone ?? "ist",
+  darkMode: user?.preferences?.darkMode ?? false,
+  compactView: user?.preferences?.compactView ?? false,
+});
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -51,28 +69,12 @@ export default function Settings() {
     confirmPassword: "",
   });
 
-  // Notifications & Prences State (initialized from user object if available)
-  const [settings, setSettings] = useState({
-    // Notifications
-    email: user?.notifications?.email ?? true,
-    push: user?.notifications?.push ?? true,
-    promotional: user?.notifications?.promotional ?? false,
-    reminders: user?.notifications?.reminders ?? true,
-    loginAlerts: user?.notifications?.loginAlerts ?? true,
+  // Notifications & Preferences State
+  const [settings, setSettings] = useState(() => buildSettingsFromUser(user));
 
-    // Security
-    twoFactor: user?.isTwoFactorEnabled ?? false,
-    sessionManagement: user?.securityPreferences?.sessionManagement ?? true,
-    dataSharing: user?.securityPreferences?.dataSharing ?? false,
-
-    // Preferences
-    language: user?.preferences?.language ?? "en",
-    currency: user?.preferences?.currency ?? "inr",
-    defaultCity: user?.preferences?.defaultCity ?? "delhi",
-    timeZone: user?.preferences?.timeZone ?? "ist",
-    darkMode: user?.preferences?.darkMode ?? false,
-    compactView: user?.preferences?.compactView ?? false,
-  });
+  useEffect(() => {
+    setSettings(buildSettingsFromUser(user));
+  }, [user]);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,6 +117,7 @@ export default function Settings() {
     key: keyof typeof settings,
     value: boolean | string,
   ) => {
+    const previousValue = settings[key];
     // Optimistic UI Update
     setSettings((prev) => ({ ...prev, [key]: value }));
 
@@ -145,6 +148,10 @@ export default function Settings() {
         updatePayload = {
           securityPreferences: { ...user?.securityPreferences, [key]: value },
         };
+      } else if (key === "twoFactor") {
+        updatePayload = {
+          isTwoFactorEnabled: value,
+        };
       }
 
       const response = await authService.updateProfile(updatePayload);
@@ -152,18 +159,23 @@ export default function Settings() {
       // Sync global user state so other components see it
       if (response.success && response.data) {
         updateUser(response.data);
+        setSettings(buildSettingsFromUser(response.data));
+        toast.success(
+          key === "twoFactor" && value === true
+            ? "Two-factor authentication enabled"
+            : key === "twoFactor" && value === false
+              ? "Two-factor authentication disabled"
+              : "Preferences updated securely",
+        );
+      } else {
+        setSettings((prev) => ({ ...prev, [key]: previousValue }));
+        toast.error(response.message || "Failed to save preference");
       }
-
-      toast.success("Preferences updated securely");
     } catch (error) {
       // Revert optimistic update on failure
-      setSettings((prev) => ({ ...prev, [key]: !value }));
+      setSettings((prev) => ({ ...prev, [key]: previousValue }));
       toast.error("Failed to save preference");
     }
-  };
-
-  const togglePreference = (key: keyof typeof settings) => {
-    updateSettingAPI(key, !settings[key]);
   };
 
   const handleSelectChange = (key: keyof typeof settings, value: string) => {
@@ -249,8 +261,11 @@ export default function Settings() {
                         item.stateKey as keyof typeof settings
                       ] as boolean
                     }
-                    onCheckedChange={() =>
-                      togglePreference(item.stateKey as keyof typeof settings)
+                    onCheckedChange={(checked) =>
+                      updateSettingAPI(
+                        item.stateKey as keyof typeof settings,
+                        checked,
+                      )
                     }
                   />
                 </div>
@@ -406,8 +421,11 @@ export default function Settings() {
                         item.stateKey as keyof typeof settings
                       ] as boolean
                     }
-                    onCheckedChange={() =>
-                      togglePreference(item.stateKey as keyof typeof settings)
+                    onCheckedChange={(checked) =>
+                      updateSettingAPI(
+                        item.stateKey as keyof typeof settings,
+                        checked,
+                      )
                     }
                   />
                 </div>
@@ -531,8 +549,11 @@ export default function Settings() {
                         item.stateKey as keyof typeof settings
                       ] as boolean
                     }
-                    onCheckedChange={() =>
-                      togglePreference(item.stateKey as keyof typeof settings)
+                    onCheckedChange={(checked) =>
+                      updateSettingAPI(
+                        item.stateKey as keyof typeof settings,
+                        checked,
+                      )
                     }
                   />
                 </div>

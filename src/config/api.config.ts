@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
   AUTH: {
     SIGNUP: "/api/auth/signup",
     LOGIN: "/api/auth/login",
+    VERIFY_LOGIN_OTP: "/api/auth/verify-login-otp",
     LOGOUT: "/api/auth/logout",
     LOGOUT_ALL: "/api/auth/logout-all",
     VERIFY_OTP: "/api/auth/verify-otp",

@@ -4,6 +4,7 @@ import {
   SignupRequest,
   LoginRequest,
   VerifyOTPRequest,
+  VerifyLoginOTPRequest,
   ResendOTPRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
@@ -48,6 +49,18 @@ class AuthService {
         success: false,
         message: error.response?.data?.message || error.message || 'Login failed',
       } as AuthResponse<LoginResponse>;
+    }
+  }
+
+  async verifyLoginOTP(data: VerifyLoginOTPRequest): Promise<AuthResponse<VerifyOTPResponse>> {
+    try {
+      const response = await axiosInstance.post(API_ENDPOINTS.AUTH.VERIFY_LOGIN_OTP, data);
+      return response.data as AuthResponse<VerifyOTPResponse>;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || 'Login OTP verification failed',
+      } as AuthResponse<VerifyOTPResponse>;
     }
   }
 

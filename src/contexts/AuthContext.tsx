@@ -1,17 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import toast from 'react-hot-toast';
-import { User, AuthState } from '@/types/auth.types';
+import { User, AuthState, AuthResponse, LoginResponse, VerifyOTPResponse } from '@/types/auth.types';
 import { authService } from '@/services/auth.service';
 
 interface AuthContextType extends AuthState {
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<AuthResponse<LoginResponse>>;
+  verifyLoginOTP: (email: string, otp: string) => Promise<AuthResponse<VerifyOTPResponse>>;
   signup: (data: any) => Promise<void>;
   logout: () => Promise<void>;
   verifyOTP: (email: string, otp: string) => Promise<void>;
   checkAuthStatus: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   updateUser: (user: User) => void;
-  googleLogin: (idToken: string, role?: string) => Promise<void>;
+  googleLogin: (idToken: string, role?: string) => Promise<AuthResponse<LoginResponse>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -66,11 +67,67 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<AuthResponse<LoginResponse>> => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       const response = await authService.login({ email, password });
+
+      if (response.success && response.data?.requiresTwoFactor) {
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: null,
+        }));
+        toast.success(response.message || 'OTP sent to your email');
+        return response;
+      }
+
+      if (response.success && response.data?.user) {
+        setState({
+          user: response.data.user,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+        });
+
+        toast.success('Logged in successfully');
+        return response;
+      } else {
+        const errorMsg = response.message || 'Login failed';
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: errorMsg,
+        }));
+
+        toast.error(errorMsg);
+        return response;
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage,
+      }));
+
+      toast.error(errorMessage);
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  };
+
+  const verifyLoginOTP = async (
+    email: string,
+    otp: string,
+  ): Promise<AuthResponse<VerifyOTPResponse>> => {
+    try {
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+      const response = await authService.verifyLoginOTP({ email, otp });
 
       if (response.success && response.data?.user) {
         setState({
@@ -82,24 +139,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         toast.success('Logged in successfully');
       } else {
-        const errorMsg = response.message || 'Login failed';
+        const errorMsg = response.message || 'OTP verification failed';
         setState((prev) => ({
           ...prev,
           isLoading: false,
           error: errorMsg,
         }));
-
         toast.error(errorMsg);
       }
+
+      return response;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+      const errorMessage =
+        error.response?.data?.message || error.message || 'OTP verification failed';
       setState((prev) => ({
         ...prev,
         isLoading: false,
         error: errorMessage,
       }));
-
       toast.error(errorMessage);
+      return {
+        success: false,
+        message: errorMessage,
+      };
     }
   };
 
@@ -227,11 +289,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }));
   };
 
-  const googleLogin = async (idToken: string, role?: string) => {
+  const googleLogin = async (
+    idToken: string,
+    role?: string,
+  ): Promise<AuthResponse<LoginResponse>> => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       const response = await authService.googleLogin(idToken, role);
+
+      if (response.success && response.data?.requiresTwoFactor) {
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: null,
+        }));
+        toast.success(response.message || 'OTP sent to your email');
+        return response;
+      }
 
       if (response.success && response.data?.user) {
         setState({
@@ -242,6 +317,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         });
 
         toast.success('Logged in successfully');
+        return response;
       } else {
         const errorMsg = response.message || 'Google login failed';
         setState((prev) => ({
@@ -251,6 +327,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }));
 
         toast.error(errorMsg);
+        return response;
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Google login failed';
@@ -261,6 +338,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }));
 
       toast.error(errorMessage);
+      return {
+        success: false,
+        message: errorMessage,
+      };
     }
   };
 
@@ -269,6 +350,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       value={{
         ...state,
         login,
+        verifyLoginOTP,
         signup,
         logout,
         verifyOTP,
