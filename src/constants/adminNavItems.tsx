@@ -20,6 +20,7 @@ import {
   ShieldCheck,
   Handshake,
   Briefcase,
+  Activity,
 } from "lucide-react";
 
 export interface NavItem {
@@ -38,6 +39,11 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     label: "Booking Management",
     href: "/admin/sales-analytics",
     icon: <Briefcase className="w-5 h-5" />,
+  },
+  {
+    label: "Track Progress",
+    href: "/admin/track-progress",
+    icon: <Activity className="w-5 h-5" />,
   },
   {
     label: "Lead Management",
