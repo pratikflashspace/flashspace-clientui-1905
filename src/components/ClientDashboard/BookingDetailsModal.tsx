@@ -28,6 +28,7 @@ export default function BookingDetailsModal({
   const [step, setStep] = useState(1);
   const [kycProfile, setKycProfile] = useState<any>(null);
   const [individualProfile, setIndividualProfile] = useState<any>(null);
+  const [businessProfiles, setBusinessProfiles] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
   const [loadingKyc, setLoadingKyc] = useState(true);
 
@@ -35,6 +36,7 @@ export default function BookingDetailsModal({
   const [isEditingKyc, setIsEditingKyc] = useState(false);
   const [selectedPartners, setSelectedPartners] = useState<string[]>([]);
   const [isPartnerDropdownOpen, setIsPartnerDropdownOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState<{ type: string; profileId: string } | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -51,12 +53,15 @@ export default function BookingDetailsModal({
             ? booking.kycProfile 
             : (booking.kycProfile as any)?._id || (booking as any).kycProfileId;
 
-          const activeProfile = profiles.find(p => p._id === linkedProfileId) || profiles.find(p => p.kycType === 'business') || profiles.find(p => p.kycType === 'individual' && !p.isPartner);
           const individualProf = profiles.find(p => p.kycType === 'individual' && !p.isPartner);
+          const bizProfs = profiles.filter(p => p.kycType === 'business');
           const partnerProfs = profiles.filter(p => p.isPartner);
+
+          const activeProfile = profiles.find(p => p._id === linkedProfileId) || bizProfs[0] || individualProf;
 
           setKycProfile(activeProfile);
           setIndividualProfile(individualProf);
+          setBusinessProfiles(bizProfs);
           setPartners(partnerProfs);
 
           if (partnerProfs.length > 0) {
@@ -118,11 +123,18 @@ export default function BookingDetailsModal({
         const res = await userDashboardService.getKYC();
         if (res.success && Array.isArray(res.data)) {
           const profiles = res.data;
-          const linkedProfileId = booking.kycProfileId || booking.kycProfile?._id || booking.kycProfile;
-          const activeProfile = profiles.find(p => p._id === linkedProfileId) || profiles.find(p => p.kycType === 'business') || profiles.find(p => p.kycType === 'individual' && !p.isPartner);
-          setKycProfile(activeProfile);
-          setIndividualProfile(profiles.find(p => p.kycType === 'individual' && !p.isPartner));
+          const individualProf = profiles.find(p => p.kycType === 'individual' && !p.isPartner);
+          const bizProfs = profiles.filter(p => p.kycType === 'business');
+          
+          setIndividualProfile(individualProf);
+          setBusinessProfiles(bizProfs);
           setPartners(profiles.filter(p => p.isPartner));
+          
+          // Re-sync active profile
+          if (kycProfile) {
+            const updated = profiles.find(p => p._id === kycProfile._id);
+            if (updated) setKycProfile(updated);
+          }
         }
       } else {
         toast.error(response.message || "Upload failed", { id: toastId });
@@ -247,22 +259,126 @@ export default function BookingDetailsModal({
           </p>
         </div>
 
-        {/* Personal Documents */}
-        <div>
-          <h3 className="font-bold text-gray-900 mb-3 border-b pb-2">Personal Documents</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {[
-              { label: "PAN Card", type: "pan_card" },
-              { label: "Aadhar Card", type: "aadhaar" },
-              { label: "Video KYC", type: "video_kyc" }
-            ].map((docType) => {
-              const doc = getDoc(docType.type, 'individual');
-              return (
-                <div key={docType.type} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-xl">
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-medium text-gray-700">{docType.label}</span>
-                  </div>
+        {/* Profile Selector Tabs */}
+        <div className="bg-gray-50 p-1.5 rounded-xl border border-gray-200 flex gap-2">
+          <button
+            onClick={() => {
+              if (individualProfile) setKycProfile(individualProfile);
+            }}
+            className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+              kycProfile?.kycType === 'individual' 
+                ? 'bg-[#35503F] text-[#FEF8C3] shadow-md' 
+                : 'text-gray-500 hover:bg-gray-100'
+            }`}
+          >
+            Individual Profile
+          </button>
+          <button
+            onClick={() => {
+              if (businessProfiles.length > 0) {
+                if (kycProfile?.kycType !== 'business') {
+                  setKycProfile(businessProfiles[0]);
+                }
+              } else {
+                toast.error("No business profile found.");
+              }
+            }}
+            className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+              kycProfile?.kycType === 'business' 
+                ? 'bg-[#35503F] text-[#FEF8C3] shadow-md' 
+                : 'text-gray-500 hover:bg-gray-100'
+            }`}
+          >
+            Business Profile
+          </button>
+        </div>
+
+        {kycProfile?.kycType === 'business' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+            {/* Business Selection Dropdown */}
+            {businessProfiles.length > 1 && (
+              <div className="relative">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Select Business Entity</p>
+                <button
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                  className="w-full flex items-center justify-between p-3.5 bg-white border border-[#35503F]/20 rounded-xl text-sm font-bold text-[#35503F] shadow-sm hover:border-[#35503F] transition-all"
+                >
+                  <span>{kycProfile.profileName || kycProfile.businessInfo?.companyName}</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isProfileDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setIsProfileDropdownOpen(false)} />
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-20 py-2 max-h-48 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+                      {businessProfiles.map(p => (
+                        <button
+                          key={p._id}
+                          onClick={() => {
+                            setKycProfile(p);
+                            setIsProfileDropdownOpen(false);
+                          }}
+                          className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-gray-50 transition-colors flex flex-col gap-0.5"
+                        >
+                          <span className={kycProfile?._id === p._id ? 'text-[#35503F]' : 'text-gray-700'}>
+                            {p.profileName || p.businessInfo?.companyName}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-medium">{p.businessInfo?.gstNumber || "No GST"}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            <div className="bg-[#35503F]/5 border border-[#35503F]/10 rounded-2xl p-4">
+              <h4 className="text-[10px] font-bold text-[#35503F] uppercase tracking-wider mb-2 opacity-70">Business Information</h4>
+              <div className="grid grid-cols-2 gap-y-3">
+                <div>
+                  <p className="text-[10px] text-gray-500 font-medium">Company Name</p>
+                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.companyName || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 font-medium">Company Type</p>
+                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.companyType || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 font-medium">GST Number</p>
+                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.gstNumber || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 font-medium">PAN Number</p>
+                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.panNumber || "N/A"}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-[10px] text-gray-500 font-medium">Registered Address</p>
+                  <p className="text-xs font-bold text-gray-900 line-clamp-2 leading-relaxed">
+                    {kycProfile.businessInfo?.registeredAddress || kycProfile.businessInfo?.address || "N/A"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Personal Documents - Only show for Individual Profile */}
+        {kycProfile?.kycType === 'individual' && (
+          <div>
+            <h3 className="font-bold text-gray-900 mb-3 border-b pb-2">Personal Documents</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { label: "PAN Card", type: "pan_card" },
+                { label: "Aadhar Card", type: "aadhaar" },
+                { label: "Video KYC", type: "video_kyc" }
+              ].map((docType) => {
+                const doc = getDoc(docType.type, 'individual');
+                return (
+                  <div key={docType.type} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-medium text-gray-700">{docType.label}</span>
+                    </div>
                     <div className="flex items-center gap-2">
                       {doc?.fileUrl ? (
                         <a 
@@ -285,14 +401,15 @@ export default function BookingDetailsModal({
                         </button>
                       )}
                     </div>
-                </div>
-              );
-            })}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {kycProfile?.kycType === 'business' && (
-          <>
+          <div className="space-y-6">
             {/* Partner Selection Dropdown */}
             <div className="relative">
               <h3 className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center justify-between">
@@ -331,10 +448,7 @@ export default function BookingDetailsModal({
 
                 {isPartnerDropdownOpen && (
                   <>
-                    <div 
-                      className="fixed inset-0 z-10" 
-                      onClick={() => setIsPartnerDropdownOpen(false)}
-                    />
+                    <div className="fixed inset-0 z-10" onClick={() => setIsPartnerDropdownOpen(false)} />
                     <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-20 py-2 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
                       {partners.length === 0 ? (
                         <div className="px-4 py-3 text-sm text-gray-500 italic">No partners available</div>
@@ -368,62 +482,60 @@ export default function BookingDetailsModal({
             {/* Partner Documents for Each Selected Partner */}
             <div className="space-y-6 mt-4">
               {selectedPartners.map(partnerId => {
-              const partner = partners.find(p => p._id === partnerId);
-              if (!partner) return null;
-              
-              const partnerName = partner.profileName || partner.personalInfo?.fullName || "Partner";
-              
-              return (
-                <div key={partnerId} className="animate-in fade-in slide-in-from-top-2 duration-300">
-                  <h3 className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#35503F]"></div>
-                    Documents: <span className="text-[#35503F]">{partnerName}</span>
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {[
-                      { label: "PAN Card", type: "pan_card" },
-                      { label: "Aadhar Card", type: "aadhaar" }
-                    ].map(docType => {
-                      const doc = getDoc(docType.type, 'partner', partnerId);
-                      return (
-                        <div key={docType.type} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-xl hover:bg-white transition-colors">
-                          <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-gray-400" />
-                            <span className="text-sm font-medium text-gray-700">{docType.label}</span>
+                const partner = partners.find(p => p._id === partnerId);
+                if (!partner) return null;
+                const partnerName = partner.profileName || partner.personalInfo?.fullName || "Partner";
+                return (
+                  <div key={partnerId} className="animate-in fade-in slide-in-from-top-2 duration-300">
+                    <h3 className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#35503F]"></div>
+                      Documents: <span className="text-[#35503F]">{partnerName}</span>
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {[
+                        { label: "PAN Card", type: "pan_card" },
+                        { label: "Aadhar Card", type: "aadhaar" }
+                      ].map(docType => {
+                        const doc = getDoc(docType.type, 'partner', partnerId);
+                        return (
+                          <div key={docType.type} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-xl hover:bg-white transition-colors">
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-gray-400" />
+                              <span className="text-sm font-medium text-gray-700">{docType.label}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {doc?.fileUrl ? (
+                                <a 
+                                  href={getUploadedFileUrl(doc.fileUrl)} 
+                                  target="_blank" 
+                                  rel="noreferrer" 
+                                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </a>
+                              ) : (
+                                <span className="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded-md">Missing</span>
+                              )}
+                              {isEditingKyc && (
+                                <button 
+                                  onClick={() => triggerUpload(docType.type, partnerId)}
+                                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-yellow-600 hover:bg-gray-50 transition-colors"
+                                >
+                                  <Upload className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {doc?.fileUrl ? (
-                              <a 
-                                href={getUploadedFileUrl(doc.fileUrl)} 
-                                target="_blank" 
-                                rel="noreferrer" 
-                                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </a>
-                            ) : (
-                              <span className="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded-md">Missing</span>
-                            )}
-                            {isEditingKyc && (
-                              <button 
-                                onClick={() => triggerUpload(docType.type, partnerId)}
-                                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-yellow-600 hover:bg-gray-50 transition-colors"
-                              >
-                                <Upload className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
             </div>
 
             {/* Business Documents */}
-            <div>
+            <div className="space-y-4">
               <h3 className="font-bold text-gray-900 mb-3 border-b pb-2">Verify Business Documents</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
@@ -466,7 +578,7 @@ export default function BookingDetailsModal({
                 })}
               </div>
             </div>
-          </>
+          </div>
         )}
 
         <div className="flex gap-3 pt-4 border-t border-gray-100">

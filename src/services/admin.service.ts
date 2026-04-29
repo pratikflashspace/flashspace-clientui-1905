@@ -707,6 +707,13 @@ class AdminService {
     return response.data;
   }
 
+  async getTrackProgressData(): Promise<ApiResponse<any[]>> {
+    const response = await axiosInstance.get<ApiResponse<any[]>>(
+      "/api/admin/track-progress"
+    );
+    return response.data;
+  }
+
   async updateBookingStatus(
     bookingId: string,
     status: BookingData["status"],

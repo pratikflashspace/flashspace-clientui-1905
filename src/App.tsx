@@ -98,6 +98,7 @@ import Leaderboard from "./pages/admin/Leaderboard";
 import AdminAffiliateManagement from "./pages/admin/AdminAffiliateManagement";
 import AdminPartnerInvoices from "./pages/admin/PartnerInvoices";
 import DocumentManagement from "./pages/admin/DocumentManagement";
+import TrackProgress from "./pages/admin/TrackProgress";
 
 // --- Space Partner Portal Pages ---
 import SpacePortalClients from "@/pages/spacePortal/Clients";
@@ -439,6 +440,7 @@ const App = () => (
                           path="affiliates"
                           element={<AdminAffiliateManagement />}
                         />
+                        <Route path="track-progress" element={<TrackProgress />} />
                         <Route path="partner-invoices" element={<AdminPartnerInvoices />} />
                         <Route
                           path="documents"
