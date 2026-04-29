@@ -332,6 +332,46 @@ class UserDashboardService {
     }
   }
 
+  async uploadBookingDocument(
+    bookingId: string,
+    documentType: string,
+    file: File,
+  ): Promise<ApiResponse<any>> {
+    try {
+      const formData = new FormData();
+      formData.append("documentType", documentType);
+      formData.append("name", file.name);
+      formData.append("file", file);
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        `/api/user/bookings/${bookingId}/documents`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to upload document",
+      };
+    }
+  }
+
+  async submitBookingRequest(bookingId: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.post<ApiResponse<any>>(
+        `/api/user/bookings/${bookingId}/submit-request`,
+      );
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to send booking request to partner",
+      };
+    }
+  }
+
   // ========== INVOICES ==========
 
   async getInvoices(params?: {

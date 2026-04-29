@@ -292,6 +292,12 @@ export default function SpacePortalLayout() {
         hideTopBar: true,
         pageBg: "#f3f4f3",
       },
+      "/spaceportal/booking-requests": {
+        title: makeTitle("Booking", "Requests"),
+        subtitle: "Review KYC, agreements, and final documents.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
       "/spaceportal/clients": {
         title: makeTitle("My", "Clients"),
         subtitle: "Manage all your client relationships",
