@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, MessageSquare, Loader2, RefreshCw, CheckCircle2, X, AlertCircle, User as UserIcon, Ticket, MessageCircle, History, Star, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { Send, MessageSquare, Loader2, RefreshCw, CheckCircle2, X, AlertCircle, User as UserIcon, Ticket, MessageCircle, History, Star, ChevronLeft, ChevronRight, ChevronDown, Building2 } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'react-router-dom';
@@ -680,6 +680,7 @@ export default function ChatSupport() {
                                         <thead>
                                             <tr className="border-b border-gray-50 bg-gray-50/50">
                                                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Ticket ID</th>
+                                                <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Space Name</th>
                                                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Subject</th>
                                                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Date / Raised On</th>
                                                 <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Category</th>
@@ -698,6 +699,17 @@ export default function ChatSupport() {
                                                     >
                                                         <td className="px-6 py-5">
                                                             <span className="text-xs font-mono font-bold text-gray-400">#{ticket.ticketNumber.slice(-8)}</span>
+                                                        </td>
+                                                        <td className="px-6 py-5">
+                                                            <div className="flex items-center gap-2">
+                                                                <Building2 className="w-4 h-4 text-gray-300" />
+                                                                <span className={cn(
+                                                                    "text-xs font-bold",
+                                                                    ticket.bookingId?.spaceSnapshot?.name ? "text-[#35503F]" : "text-gray-400 italic"
+                                                                )}>
+                                                                    {ticket.bookingId?.spaceSnapshot?.name || "No Particular Space"}
+                                                                </span>
+                                                            </div>
                                                         </td>
                                                         <td className="px-6 py-5">
                                                             <div className="flex flex-col">

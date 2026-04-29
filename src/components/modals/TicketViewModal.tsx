@@ -663,27 +663,6 @@ export const TicketViewModal = ({
                     }}>
                     <AlertCircle size={14} /> Escalate
                   </button>
-                  <button 
-                    onClick={() => handleCloseTicket(ticket._id)}
-                    style={{ 
-                      flex: 1, 
-                      padding: '12px', 
-                      borderRadius: '16px', 
-                      backgroundColor: '#fff', 
-                      color: '#ef4444', 
-                      border: '1px solid #ef4444', 
-                      fontWeight: 900, 
-                      fontSize: '11px', 
-                      textTransform: 'uppercase', 
-                      letterSpacing: '0.08em', 
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px'
-                    }}>
-                    <XCircle size={14} /> Close Permanently
-                  </button>
               </div>
             </div>
           ) : (

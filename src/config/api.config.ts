@@ -105,6 +105,8 @@ export const API_ENDPOINTS = {
     PARTNER_ACTIVE_REQUESTS: "/api/user/partner/active-requests",
     PARTNER_ANALYTICS: "/api/user/partner/analytics",
     PARTNER_SPACES: "/api/user/partner/spaces",
+    PARTNER_UPLOAD_BOOKING_DOCUMENT: (id: string) =>
+      `/api/user/partner/bookings/${id}/upload-document`,
   },
 
   // Admin endpoints

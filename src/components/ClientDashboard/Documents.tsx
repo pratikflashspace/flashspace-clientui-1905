@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Download, Clock, AlertCircle, CheckCircle2, Eye, X, Search, Filter } from "lucide-react";
 import userDashboardService from "@/services/userDashboard.service";
-import { Invoice, KYCData, KYCDocument } from "@/types/services";
+import { Invoice, KYCData, KYCDocument, Booking } from "@/types/services";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { generateInvoicePDF } from "@/utils/pdfGenerator";
@@ -21,11 +21,16 @@ export default function Documents() {
 
     const [currentInvoicePage, setCurrentInvoicePage] = useState(1);
     const [currentKycPage, setCurrentKycPage] = useState(1);
+    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [currentAgreementPage, setCurrentAgreementPage] = useState(1);
+    const [currentSupportingPage, setCurrentSupportingPage] = useState(1);
     const itemsPerPage = 10;
 
     useEffect(() => {
         setCurrentInvoicePage(1);
         setCurrentKycPage(1);
+        setCurrentAgreementPage(1);
+        setCurrentSupportingPage(1);
     }, [searchQuery, filterStatus]);
 
     const isPdf = (url: string) => {
@@ -69,6 +74,53 @@ export default function Documents() {
         currentKycPage * itemsPerPage
     );
 
+    const filteredAgreements = bookings.flatMap(booking => 
+        (booking.documents || [])
+            .filter(doc => doc.type === 'final_agreement' || doc.type === 'agreement')
+            .map(doc => ({
+                ...doc,
+                bookingNumber: booking.bookingNumber,
+                spaceName: booking.spaceSnapshot?.name || 'N/A'
+            }))
+    ).filter(doc => {
+        const matchesSearch = doc.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            doc.bookingNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            doc.spaceName?.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesSearch;
+    });
+
+    const totalAgreementPages = Math.ceil(filteredAgreements.length / itemsPerPage);
+    const paginatedAgreements = filteredAgreements.slice(
+        (currentAgreementPage - 1) * itemsPerPage,
+        currentAgreementPage * itemsPerPage
+    );
+
+    const filteredSupportingDocs = bookings.flatMap(booking => 
+        (booking.documents || [])
+            .filter(doc => 
+                doc.type !== 'final_agreement' && 
+                doc.type !== 'agreement' && 
+                doc.type !== 'draft_agreement' && 
+                doc.type !== 'signed_agreement'
+            )
+            .map(doc => ({
+                ...doc,
+                bookingNumber: booking.bookingNumber,
+                spaceName: booking.spaceSnapshot?.name || 'N/A'
+            }))
+    ).filter(doc => {
+        const matchesSearch = doc.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            doc.bookingNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            doc.spaceName?.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesSearch;
+    });
+
+    const totalSupportingPages = Math.ceil(filteredSupportingDocs.length / itemsPerPage);
+    const paginatedSupportingDocs = filteredSupportingDocs.slice(
+        (currentSupportingPage - 1) * itemsPerPage,
+        currentSupportingPage * itemsPerPage
+    );
+
     useEffect(() => {
         fetchData();
     }, []);
@@ -76,9 +128,10 @@ export default function Documents() {
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const [invoicesRes, kycRes] = await Promise.all([
+            const [invoicesRes, kycRes, bookingsRes] = await Promise.all([
                 userDashboardService.getInvoices(),
-                userDashboardService.getKYC()
+                userDashboardService.getKYC(),
+                userDashboardService.getBookings()
             ]);
 
             if (invoicesRes.success && invoicesRes.data) {
@@ -108,6 +161,9 @@ export default function Documents() {
                 });
 
                 setKycDocuments(allDocuments as KYCDocument[]);
+            }
+            if (bookingsRes.success && bookingsRes.data) {
+                setBookings(bookingsRes.data);
             }
         } catch (error) {
             console.error("Failed to fetch documents data", error);
@@ -269,17 +325,117 @@ export default function Documents() {
             >
               KYC Documents
             </TabsTrigger>
+            <TabsTrigger
+              value="supporting"
+              className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+            >
+              Supporting Documents
+            </TabsTrigger>
           </TabsList>
 
                 <TabsContent value="agreement" className="mt-0">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <FileText className="w-8 h-8 text-gray-400" />
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Service Agreements</h3>
-                        <p className="text-gray-500 max-w-md mx-auto">
-                            Your service agreements will appear here once your booking is confirmed and digitally signed.
-                        </p>
+                    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                        {isLoading ? (
+                            <div className="p-12 text-center">
+                                <div className="animate-spin w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+                                <p className="text-gray-500">Loading your agreements...</p>
+                            </div>
+                        ) : filteredAgreements.length === 0 ? (
+                            <div className="p-12 text-center">
+                                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <FileText className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Service Agreements</h3>
+                                <p className="text-gray-500 max-w-md mx-auto">
+                                    Your service agreements will appear here once your booking is confirmed and digitally signed.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-50/80 border-b border-gray-100">
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Booking No.</th>
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Space Name</th>
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Document Name</th>
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Date</th>
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {paginatedAgreements.map((doc, idx) => (
+                                            <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
+                                                <td className="px-6 py-4 font-bold text-[#35503F]">{doc.bookingNumber}</td>
+                                                <td className="px-6 py-4 text-sm font-medium text-gray-700">{doc.spaceName}</td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                                            <FileText className="w-4 h-4 text-blue-500" />
+                                                        </div>
+                                                        <span className="text-sm font-semibold text-gray-900 truncate max-w-[200px]">
+                                                            {doc.name}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-gray-500">
+                                                    {doc.generatedAt ? format(new Date(doc.generatedAt), "MMM dd, yyyy") : "N/A"}
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                if (doc.url) {
+                                                                    setPreviewDocument({
+                                                                        title: doc.name,
+                                                                        url: getUploadedFileUrl(doc.url),
+                                                                        type: isPdf(doc.url) ? 'pdf' : (isVideo(doc.url) ? 'video' : 'image')
+                                                                    });
+                                                                }
+                                                            }}
+                                                            className="p-2 text-gray-400 hover:text-primary transition-colors"
+                                                            title="Preview"
+                                                        >
+                                                            <Eye className="w-5 h-5" />
+                                                        </button>
+                                                        <a
+                                                            href={doc.url ? getUploadedFileUrl(doc.url) : "#"}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="p-2 text-gray-400 hover:text-primary transition-colors"
+                                                            title="Download"
+                                                            download
+                                                        >
+                                                            <Download className="w-5 h-5" />
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                        {totalAgreementPages > 1 && (
+                            <div className="flex justify-center items-center gap-4 py-4 px-6 border-t border-gray-100 bg-gray-50">
+                                <button
+                                    onClick={() => setCurrentAgreementPage((p) => Math.max(1, p - 1))}
+                                    disabled={currentAgreementPage === 1}
+                                    className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Previous
+                                </button>
+                                <span className="text-sm font-medium text-gray-600">
+                                    Page {currentAgreementPage} of {totalAgreementPages}
+                                </span>
+                                <button
+                                    onClick={() => setCurrentAgreementPage((p) => Math.min(totalAgreementPages, p + 1))}
+                                    disabled={currentAgreementPage === totalAgreementPages}
+                                    className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </TabsContent>
 
@@ -514,6 +670,114 @@ export default function Documents() {
                                 <button
                                     onClick={() => setCurrentKycPage((p) => Math.min(totalKycPages, p + 1))}
                                     disabled={currentKycPage === totalKycPages}
+                                    className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="supporting" className="mt-0">
+                    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                        {isLoading ? (
+                            <div className="p-12 text-center">
+                                <div className="animate-spin w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+                                <p className="text-gray-500">Loading supporting documents...</p>
+                            </div>
+                        ) : filteredSupportingDocs.length === 0 ? (
+                            <div className="p-12 text-center">
+                                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <FileText className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Supporting Documents</h3>
+                                <p className="text-gray-500 max-w-md mx-auto">
+                                    Additional documents like NOC or Utility Bills uploaded by your space partner will appear here.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-50/80 border-b border-gray-100">
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Space Name</th>
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Booking No.</th>
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Document Name</th>
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Type</th>
+                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {paginatedSupportingDocs.map((doc, idx) => (
+                                            <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
+                                                <td className="px-6 py-4 text-sm font-bold text-gray-900">{doc.spaceName}</td>
+                                                <td className="px-6 py-4 font-medium text-[#35503F]">{doc.bookingNumber}</td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                                                            <FileText className="w-4 h-4 text-amber-600" />
+                                                        </div>
+                                                        <span className="text-sm font-semibold text-gray-900 truncate max-w-[200px]">
+                                                            {doc.name}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest bg-gray-100 text-gray-600">
+                                                        {doc.type.replace(/_/g, ' ')}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                if (doc.url) {
+                                                                    setPreviewDocument({
+                                                                        title: doc.name,
+                                                                        url: getUploadedFileUrl(doc.url),
+                                                                        type: isPdf(doc.url) ? 'pdf' : (isVideo(doc.url) ? 'video' : 'image')
+                                                                    });
+                                                                }
+                                                            }}
+                                                            className="p-2 text-gray-400 hover:text-primary transition-colors"
+                                                            title="Preview"
+                                                        >
+                                                            <Eye className="w-5 h-5" />
+                                                        </button>
+                                                        <a
+                                                            href={doc.url ? getUploadedFileUrl(doc.url) : "#"}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="p-2 text-gray-400 hover:text-primary transition-colors"
+                                                            title="Download"
+                                                            download
+                                                        >
+                                                            <Download className="w-5 h-5" />
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                        {totalSupportingPages > 1 && (
+                            <div className="flex justify-center items-center gap-4 py-4 px-6 border-t border-gray-100 bg-gray-50">
+                                <button
+                                    onClick={() => setCurrentSupportingPage((p) => Math.max(1, p - 1))}
+                                    disabled={currentSupportingPage === 1}
+                                    className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Previous
+                                </button>
+                                <span className="text-sm font-medium text-gray-600">
+                                    Page {currentSupportingPage} of {totalSupportingPages}
+                                </span>
+                                <button
+                                    onClick={() => setCurrentSupportingPage((p) => Math.min(totalSupportingPages, p + 1))}
+                                    disabled={currentSupportingPage === totalSupportingPages}
                                     className="px-4 py-2 border border-gray-200 bg-white rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                 >
                                     Next
