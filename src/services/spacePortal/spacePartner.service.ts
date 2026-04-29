@@ -203,6 +203,78 @@ export const fetchPartnerActiveRequests = async () => {
   }
 };
 
+export const fetchPartnerBookingRequests = async () => {
+  try {
+    const response = await axiosInstance.get("/api/user/partner/booking-requests");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const reviewPartnerBookingKycDocument = async (
+  bookingId: string,
+  payload: {
+    profileModel: "kyc" | "business" | "partner";
+    profileId: string;
+    documentType?: string;
+    documentId?: string;
+    action: "approve" | "reject";
+    rejectionReason?: string;
+  },
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/user/partner/booking-requests/${bookingId}/kyc-documents/review`,
+      payload,
+    );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const uploadPartnerBookingDocument = async (
+  bookingId: string,
+  documentType: string,
+  file: File,
+  name?: string,
+) => {
+  try {
+    const formData = new FormData();
+    formData.append("documentType", documentType);
+    formData.append("name", name || file.name);
+    formData.append("file", file);
+    const response = await axiosInstance.post(
+      `/api/user/partner/booking-requests/${bookingId}/documents`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const reviewPartnerBookingDocument = async (
+  bookingId: string,
+  payload: {
+    documentType: string;
+    action: "approve" | "reject";
+    rejectionReason?: string;
+  },
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/api/user/partner/booking-requests/${bookingId}/documents/review`,
+      payload,
+    );
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
 /**
  * Fetch analytics data for the Space Portal dashboard.
  */

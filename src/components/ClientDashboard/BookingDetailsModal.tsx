@@ -74,19 +74,45 @@ export default function BookingDetailsModal({
   const handleNext = () => setStep(prev => prev + 1);
   const handlePrev = () => setStep(prev => prev - 1);
 
+  const handleFinish = async () => {
+    const bookingId = (booking as any)._id || booking.id || booking.bookingNumber;
+    const toastId = toast.loading("Sending booking request to space partner...");
+    const response = await userDashboardService.submitBookingRequest(bookingId);
+    if (response.success) {
+      toast.success("Booking request sent to space partner", { id: toastId });
+      onClose();
+    } else {
+      toast.error(response.message || "Failed to send request", { id: toastId });
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !uploadingDoc) return;
 
     const toastId = toast.loading(`Uploading ${uploadingDoc.type.replace('_', ' ')}...`);
     try {
-      const response = await userDashboardService.uploadKYCDocument(
-        uploadingDoc.type,
-        file,
-        uploadingDoc.profileId
-      );
+      const isBookingAgreement = uploadingDoc.type.includes("agreement");
+      const response = isBookingAgreement
+        ? await userDashboardService.uploadBookingDocument(
+            (booking as any)._id || booking.id || booking.bookingNumber,
+            uploadingDoc.type,
+            file,
+          )
+        : await userDashboardService.uploadKYCDocument(
+            uploadingDoc.type,
+            file,
+            uploadingDoc.profileId
+          );
       if (response.success) {
         toast.success("Document updated successfully", { id: toastId });
+        if (isBookingAgreement && response.data) {
+          const docs = [...(booking.documents || [])];
+          const existingIndex = docs.findIndex((doc: any) => doc.type === uploadingDoc.type);
+          if (existingIndex >= 0) docs[existingIndex] = response.data;
+          else docs.push(response.data);
+          (booking as any).documents = docs;
+        }
         // Refresh KYC data
         const res = await userDashboardService.getKYC();
         if (res.success && Array.isArray(res.data)) {
@@ -549,7 +575,7 @@ export default function BookingDetailsModal({
             Back
           </button>
           <button
-            onClick={onClose}
+            onClick={handleFinish}
             className="flex-1 py-3 rounded-xl font-bold bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90 transition-all flex items-center justify-center gap-2"
           >
             <CheckCircle className="w-4 h-4" /> Finish

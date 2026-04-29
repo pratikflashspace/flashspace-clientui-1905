@@ -108,6 +108,7 @@ import Calendar from "./pages/spacePortal/Calendar";
 import Spaces from "./pages/spacePortal/Spaces";
 import Tickets from "./pages/spacePortal/Tickets";
 import BookingAnalytics from "./pages/spacePortal/BookingAnalytics";
+import BookingRequests from "./pages/spacePortal/BookingRequests";
 import ClientEnquiries from "./pages/spacePortal/ClientEnquiries";
 import SpacePortalProfile from "./pages/spacePortal/Profile";
 import Notifications from "./pages/spacePortal/Notifications";
@@ -495,6 +496,7 @@ const App = () => (
                           element={<Invoices />}
                         />
                         <Route path="booking-calendar" element={<Calendar />} />
+                        <Route path="booking-requests" element={<BookingRequests />} />
                         <Route
                           path="active-requests"
                           element={<Navigate to="/spaceportal/dashboard" replace />}
