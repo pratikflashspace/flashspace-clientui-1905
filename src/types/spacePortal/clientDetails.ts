@@ -39,6 +39,7 @@ export type ClientBooking = {
 export type ClientDetails = Client & {
   email: string;
   phone: string;
+  bookingId?: string;
 
   kyc: ClientKyc;
   agreement: ClientAgreement;

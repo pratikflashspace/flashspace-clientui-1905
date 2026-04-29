@@ -10,10 +10,12 @@ import {
   ShieldCheck,
   Mail,
   Loader2,
+  Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import { userDashboardService } from "@/services/userDashboard.service";
 import { getUploadedFileUrl } from "@/utils/fileUrl";
+import { uploadBookingDocument } from "@/services/spacePortal/spacePartner.service";
 
 import {
   Dialog,
@@ -106,6 +108,42 @@ export default function ClientDetails() {
   };
 
   /**
+   * Handles final agreement upload
+   */
+  const handleAgreementUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file || !client?.bookingId) return;
+
+    try {
+      setLoading(true);
+      const response = await uploadBookingDocument(
+        client.bookingId,
+        "final_agreement",
+        file,
+      );
+      if (response.success) {
+        toast.success("Agreement uploaded successfully!");
+        // Refresh client data
+        const refreshRes = await userDashboardService.getPartnerClientDetails(
+          clientId!,
+        );
+        if (refreshRes.success && refreshRes.data) {
+          setClient(refreshRes.data);
+        }
+      } else {
+        toast.error(response.message || "Failed to upload agreement");
+      }
+    } catch (error) {
+      console.error("Agreement upload error:", error);
+      toast.error("An error occurred while uploading the agreement");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
    * If loading
    */
   if (loading) {
@@ -189,6 +227,22 @@ export default function ClientDetails() {
               <Download size={16} />
               Download Agreement
             </button>
+
+            <button
+              type="button"
+              onClick={() => document.getElementById("agreement-upload")?.click()}
+              className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <Upload size={16} />
+              Upload Final Agreement
+            </button>
+            <input
+              id="agreement-upload"
+              type="file"
+              className="hidden"
+              accept=".pdf,.doc,.docx"
+              onChange={handleAgreementUpload}
+            />
 
             <a
               href={`mailto:${client.email}?subject=Flashspace%20Partnership&body=Hi%20${encodeURIComponent(

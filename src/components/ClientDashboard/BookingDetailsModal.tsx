@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Booking } from "@/types/services";
 import { 
   X, MapPin, FileText, Loader2, Download, Upload, Eye, CheckCircle, 
-  AlertCircle, ChevronRight, Edit2, Check
+  AlertCircle, ChevronRight, Edit2, Check, ChevronDown
 } from "lucide-react";
 import userDashboardService from "@/services/userDashboard.service";
 import toast from "react-hot-toast";
@@ -33,7 +33,8 @@ export default function BookingDetailsModal({
 
   // KYC specific states
   const [isEditingKyc, setIsEditingKyc] = useState(false);
-  const [selectedPartner, setSelectedPartner] = useState<string>("");
+  const [selectedPartners, setSelectedPartners] = useState<string[]>([]);
+  const [isPartnerDropdownOpen, setIsPartnerDropdownOpen] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState<{ type: string; profileId: string } | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -59,7 +60,7 @@ export default function BookingDetailsModal({
           setPartners(partnerProfs);
 
           if (partnerProfs.length > 0) {
-            setSelectedPartner(partnerProfs[0]._id);
+            setSelectedPartners([partnerProfs[0]._id]);
           }
         }
       } catch (err) {
@@ -139,11 +140,19 @@ export default function BookingDetailsModal({
     setTimeout(() => fileInputRef.current?.click(), 0);
   };
 
+  const togglePartnerSelection = (partnerId: string) => {
+    setSelectedPartners(prev => 
+      prev.includes(partnerId) 
+        ? prev.filter(id => id !== partnerId)
+        : [...prev, partnerId]
+    );
+  };
+
   // Helper to get document
-  const getDoc = (type: string, profileType: 'main' | 'individual' | 'partner' = 'main') => {
+  const getDoc = (type: string, profileType: 'main' | 'individual' | 'partner' = 'main', partnerId?: string) => {
     let profile = kycProfile;
     if (profileType === 'individual') profile = individualProfile || kycProfile;
-    if (profileType === 'partner') profile = partners.find(p => p._id === selectedPartner);
+    if (profileType === 'partner') profile = partners.find(p => p._id === (partnerId || selectedPartners[0]));
 
     if (!profile?.documents) return null;
     // Normalize type and check
@@ -284,67 +293,134 @@ export default function BookingDetailsModal({
 
         {kycProfile?.kycType === 'business' && (
           <>
-            {/* Partner Selection */}
-            <div>
-              <h3 className="font-bold text-gray-900 mb-3 border-b pb-2">Select Your Partner/Director</h3>
-              <select 
-                className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
-                value={selectedPartner}
-                onChange={(e) => setSelectedPartner(e.target.value)}
-              >
-                <option value="">Select a partner</option>
-                {partners.map(p => (
-                  <option key={p._id} value={p._id}>
-                    {p.profileName || p.personalInfo?.fullName || "Partner"}
-                  </option>
-                ))}
-              </select>
+            {/* Partner Selection Dropdown */}
+            <div className="relative">
+              <h3 className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center justify-between">
+                <span>Select Partners/Directors</span>
+                {selectedPartners.length > 0 && (
+                  <button 
+                    onClick={() => setSelectedPartners([])}
+                    className="text-xs font-medium text-red-500 hover:text-red-600"
+                  >
+                    Clear All
+                  </button>
+                )}
+              </h3>
+              
+              <div className="relative">
+                <button
+                  onClick={() => setIsPartnerDropdownOpen(!isPartnerDropdownOpen)}
+                  className="w-full flex items-center justify-between p-3.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium hover:border-gray-300 transition-all focus:ring-2 focus:ring-[#35503F]/20"
+                >
+                  <div className="flex flex-wrap gap-1.5 items-center">
+                    {selectedPartners.length === 0 ? (
+                      <span className="text-gray-500">Choose partners...</span>
+                    ) : (
+                      selectedPartners.map(id => {
+                        const p = partners.find(part => part._id === id);
+                        return (
+                          <span key={id} className="bg-[#35503F] text-[#FEF8C3] px-2 py-0.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                            {p?.profileName || p?.personalInfo?.fullName || "Partner"}
+                          </span>
+                        );
+                      })
+                    )}
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isPartnerDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isPartnerDropdownOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-10" 
+                      onClick={() => setIsPartnerDropdownOpen(false)}
+                    />
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl z-20 py-2 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+                      {partners.length === 0 ? (
+                        <div className="px-4 py-3 text-sm text-gray-500 italic">No partners available</div>
+                      ) : (
+                        partners.map(p => {
+                          const isSelected = selectedPartners.includes(p._id);
+                          return (
+                            <button
+                              key={p._id}
+                              onClick={() => togglePartnerSelection(p._id)}
+                              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+                            >
+                              <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
+                                isSelected ? 'bg-[#35503F] border-[#35503F]' : 'bg-white border-gray-300'
+                              }`}>
+                                {isSelected && <Check className="w-3 h-3 text-white" />}
+                              </div>
+                              <span className={`text-sm font-semibold ${isSelected ? 'text-[#35503F]' : 'text-gray-700'}`}>
+                                {p.profileName || p.personalInfo?.fullName || "Partner"}
+                              </span>
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
-            {/* Partner Documents */}
-            {selectedPartner && (
-              <div>
-                <h3 className="font-bold text-gray-900 mb-3 border-b pb-2">Verify Partner Documents</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    { label: "PAN Card", type: "pan_card" },
-                    { label: "Aadhar Card", type: "aadhaar" }
-                  ].map(docType => {
-                    const doc = getDoc(docType.type, 'partner');
-                    return (
-                      <div key={docType.type} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-xl">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm font-medium text-gray-700">{docType.label}</span>
+            {/* Partner Documents for Each Selected Partner */}
+            <div className="space-y-6 mt-4">
+              {selectedPartners.map(partnerId => {
+              const partner = partners.find(p => p._id === partnerId);
+              if (!partner) return null;
+              
+              const partnerName = partner.profileName || partner.personalInfo?.fullName || "Partner";
+              
+              return (
+                <div key={partnerId} className="animate-in fade-in slide-in-from-top-2 duration-300">
+                  <h3 className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[#35503F]"></div>
+                    Documents: <span className="text-[#35503F]">{partnerName}</span>
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      { label: "PAN Card", type: "pan_card" },
+                      { label: "Aadhar Card", type: "aadhaar" }
+                    ].map(docType => {
+                      const doc = getDoc(docType.type, 'partner', partnerId);
+                      return (
+                        <div key={docType.type} className="flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-xl hover:bg-white transition-colors">
+                          <div className="flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-gray-400" />
+                            <span className="text-sm font-medium text-gray-700">{docType.label}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {doc?.fileUrl ? (
+                              <a 
+                                href={getUploadedFileUrl(doc.fileUrl)} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </a>
+                            ) : (
+                              <span className="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded-md">Missing</span>
+                            )}
+                            {isEditingKyc && (
+                              <button 
+                                onClick={() => triggerUpload(docType.type, partnerId)}
+                                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-yellow-600 hover:bg-gray-50 transition-colors"
+                              >
+                                <Upload className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {doc?.fileUrl ? (
-                            <a 
-                              href={getUploadedFileUrl(doc.fileUrl)} 
-                              target="_blank" 
-                              rel="noreferrer" 
-                              className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </a>
-                          ) : (
-                            <span className="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded-md">Missing</span>
-                          )}
-                          {isEditingKyc && (
-                            <button 
-                              onClick={() => triggerUpload(docType.type, selectedPartner)}
-                              className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-yellow-600 hover:bg-gray-50 transition-colors"
-                            >
-                              <Upload className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })}
+            </div>
 
             {/* Business Documents */}
             <div>

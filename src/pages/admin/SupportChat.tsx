@@ -173,11 +173,11 @@ export default function SupportChat() {
   const handleResolve = async () => {
     if (!activeTicketId) return;
     try {
-      await adminService.closeTicket(activeTicketId);
-      toast.success("Ticket closed");
+      await adminService.resolveTicket(activeTicketId);
+      toast.success("Ticket resolved");
     } catch (error) {
-      console.error("Failed to close", error);
-      toast.error("Failed to close ticket");
+      console.error("Failed to resolve", error);
+      toast.error("Failed to resolve ticket");
     }
   };
 

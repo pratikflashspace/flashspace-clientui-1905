@@ -1,5 +1,6 @@
 import axiosInstance from "@/lib/axios";
 import { handleApiError } from "@/services/api.service";
+import { API_ENDPOINTS } from "@/config/api.config";
 
 export interface SpacePartnerTeamMember {
   id: string;
@@ -799,6 +800,33 @@ export const uploadKycDoc = async (documentType: string, file: File) => {
 export const submitKycForReview = async () => {
   try {
     const response = await axiosInstance.post("/api/spacePartner/kyc/submit");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
+ * Upload a document for a specific booking (Partner only)
+ */
+export const uploadBookingDocument = async (
+  bookingId: string,
+  documentType: string,
+  file: File,
+) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("documentType", documentType);
+    const response = await axiosInstance.post(
+      API_ENDPOINTS.USER.PARTNER_UPLOAD_BOOKING_DOCUMENT(bookingId),
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
     return response.data;
   } catch (error) {
     return handleApiError(error);
