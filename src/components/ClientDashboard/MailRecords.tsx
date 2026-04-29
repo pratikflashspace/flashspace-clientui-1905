@@ -24,6 +24,7 @@ import { format } from "date-fns";
 import { API_CONFIG } from "@/config/api.config";
 import { toast } from "react-hot-toast";
 import { mailService } from "@/services/mailService";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 
 export default function MailRecords() {
   const [mails, setMails] = useState<MailRecord[]>([]);
@@ -162,15 +163,7 @@ export default function MailRecords() {
   };
 
   const resolveDocumentUrl = (documentUrl?: string) => {
-    if (!documentUrl) return "";
-    if (documentUrl.startsWith("http://") || documentUrl.startsWith("https://")) {
-      return documentUrl;
-    }
-    const baseUrl = API_CONFIG.BASE_URL.replace(/\/$/, "");
-    const normalizedPath = documentUrl.startsWith("/")
-      ? documentUrl
-      : `/${documentUrl}`;
-    return `${baseUrl}${normalizedPath}`;
+    return getUploadedFileUrl(documentUrl);
   };
 
   if (loading) {
