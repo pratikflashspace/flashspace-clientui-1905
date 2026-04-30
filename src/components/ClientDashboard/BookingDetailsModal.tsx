@@ -664,14 +664,25 @@ export default function BookingDetailsModal({
               <p className="text-xs text-gray-500 mt-0.5">Please review before signing</p>
             </div>
             {draftAgreement?.fileUrl ? (
-              <a 
-                href={getUploadedFileUrl(draftAgreement.fileUrl)} 
-                target="_blank" 
-                rel="noreferrer" 
-                className="p-2.5 rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
-              >
-                <Download className="w-4 h-4" />
-              </a>
+              <div className="flex gap-2">
+                <a 
+                  href={getUploadedFileUrl(draftAgreement.fileUrl)} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="p-2.5 rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
+                  title="View"
+                >
+                  <Eye className="w-4 h-4" />
+                </a>
+                <a 
+                  href={getUploadedFileUrl(draftAgreement.fileUrl)} 
+                  download
+                  className="p-2.5 rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
+                  title="Download"
+                >
+                  <Download className="w-4 h-4" />
+                </a>
+              </div>
             ) : (
               <span className="text-xs text-gray-400">Not Available</span>
             )}

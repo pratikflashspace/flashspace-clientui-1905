@@ -300,30 +300,26 @@ export default function BookingRequests() {
               <Eye size={16} />
             </a>
           )}
-          <button
-            onClick={() => handleReviewKyc(booking, doc, "approve", profileModel, profileId)}
-            title="Partner approve"
-            aria-label="Partner approve"
-            className={`grid h-9 w-9 place-items-center rounded-lg border transition ${
-              isPartnerApproved
-                ? "border-emerald-600 bg-emerald-600 text-white"
-                : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-            }`}
-          >
-            <CheckCircle2 size={16} />
-          </button>
-          <button
-            onClick={() => handleReviewKyc(booking, doc, "reject", profileModel, profileId)}
-            title="Partner reject"
-            aria-label="Partner reject"
-            className={`grid h-9 w-9 place-items-center rounded-lg border transition ${
-              isPartnerRejected
-                ? "border-rose-600 bg-rose-600 text-white"
-                : "border-rose-200 text-rose-700 hover:bg-rose-50"
-            }`}
-          >
-            <XCircle size={16} />
-          </button>
+          {partnerStatus === "pending" && (
+            <>
+              <button
+                onClick={() => handleReviewKyc(booking, doc, "approve", profileModel, profileId)}
+                title="Partner approve"
+                aria-label="Partner approve"
+                className="grid h-9 w-9 place-items-center rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition"
+              >
+                <CheckCircle2 size={16} />
+              </button>
+              <button
+                onClick={() => handleReviewKyc(booking, doc, "reject", profileModel, profileId)}
+                title="Partner reject"
+                aria-label="Partner reject"
+                className="grid h-9 w-9 place-items-center rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 transition"
+              >
+                <XCircle size={16} />
+              </button>
+            </>
+          )}
         </div>
       </div>
     );
@@ -694,10 +690,20 @@ function AgreementCard({
                 </div>
               )}
             </div>
-            {(onApprove || onReject) && (
+            {(onApprove || onReject) && (!doc.status || doc.status === "pending") && (
               <div className="mt-3 flex gap-2">
                 <button onClick={onApprove} className="min-h-10 flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-bold text-white">Approve</button>
                 <button onClick={onReject} className="min-h-10 flex-1 rounded-lg border border-rose-200 px-3 py-2 text-sm font-bold text-rose-700">Reject</button>
+              </div>
+            )}
+            {(onApprove || onReject) && doc.status && doc.status !== "pending" && (
+              <div className="mt-3 p-2 rounded-lg bg-gray-50 border border-gray-100 text-center">
+                <p className={`text-xs font-bold uppercase ${doc.status === 'approved' ? 'text-emerald-700' : 'text-rose-700'}`}>
+                  Decision: {doc.status}
+                </p>
+                {doc.rejectionReason && (
+                   <p className="mt-1 text-[10px] text-rose-600 italic">Reason: {doc.rejectionReason}</p>
+                )}
               </div>
             )}
           </>
