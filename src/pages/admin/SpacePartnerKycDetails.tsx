@@ -136,6 +136,12 @@ const applyDocStatusUpdate = (
   };
 };
 
+const extractUserId = (userId: any): string => {
+  if (!userId) return "";
+  if (typeof userId === "object") return userId._id || userId.id || String(userId);
+  return String(userId);
+};
+
 export default function SpacePartnerKycDetails() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -209,7 +215,8 @@ export default function SpacePartnerKycDetails() {
     action: KycDecisionStatus,
     rejectMessage?: string,
   ) => {
-    if (!request || !request.userId) {
+    const resolvedUserId = extractUserId(request?.userId);
+    if (!request || !resolvedUserId) {
       toast.error("User ID missing for this KYC request.");
       return;
     }
@@ -220,7 +227,7 @@ export default function SpacePartnerKycDetails() {
     setSubmitting(true);
     try {
       const updatedKyc = await reviewSpaceUserKycDocument(
-        request.userId,
+        resolvedUserId,
         type,
         action,
         rejectMessage,
@@ -302,7 +309,8 @@ export default function SpacePartnerKycDetails() {
       return;
     }
 
-    if (!request || !request.userId) {
+    const resolvedUserId = extractUserId(request?.userId);
+    if (!request || !resolvedUserId) {
       toast.error("User ID missing for this KYC request.");
       return;
     }
@@ -313,7 +321,7 @@ export default function SpacePartnerKycDetails() {
     setSubmitting(true);
     try {
       const updatedKyc = await reviewSpaceUserKycOverall(
-        request.userId,
+        resolvedUserId,
         action,
         rejectMessage,
       );

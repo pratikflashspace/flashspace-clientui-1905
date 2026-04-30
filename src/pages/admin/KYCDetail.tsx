@@ -38,6 +38,16 @@ export default function KYCDetail() {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [partnerKYCs, setPartnerKYCs] = useState<any[]>([]);
   const [loadingPartners, setLoadingPartners] = useState(false);
+  const [activeKycId, setActiveKycId] = useState<string | null>(null);
+
+  // Helper to safely extract string ID from populated or unpopulated user fields
+  const extractUserId = (user: any): string | undefined => {
+    if (!user) return undefined;
+    if (typeof user === "string") return user;
+    if (typeof user === "object" && user._id) return user._id.toString();
+    if (typeof user === "object" && user.id) return user.id.toString();
+    return undefined;
+  };
 
   useEffect(() => {
     if (id) {
@@ -120,14 +130,17 @@ export default function KYCDetail() {
         setKycData(response.data);
 
         // If this is a user KYC, also fetch their linked partner KYCs
-        if (type !== "partner" && response.data.user?._id) {
+        if (type !== "partner" && response.data.user) {
           try {
             setLoadingPartners(true);
-            const partnersRes = await adminService.getPartnerKYCList({
-              userId: response.data.user._id,
-            });
-            if (partnersRes.success && partnersRes.data) {
-              setPartnerKYCs(partnersRes.data);
+            const resolvedUserId = extractUserId(response.data.user);
+            if (resolvedUserId) {
+              const partnersRes = await adminService.getPartnerKYCList({
+                userId: resolvedUserId,
+              });
+              if (partnersRes.success && partnersRes.data) {
+                setPartnerKYCs(partnersRes.data);
+              }
             }
           } catch (err) {
             console.error("Error fetching partner KYCs:", err);
@@ -153,8 +166,16 @@ export default function KYCDetail() {
     reason?: string,
     targetKycId?: string,
   ) => {
-    const effectiveId = targetKycId || id;
-    if (!effectiveId) return;
+    // Priority: targetKycId -> kycData._id -> id from URL
+    const rawId = targetKycId || kycData?._id || id;
+    const effectiveId = extractUserId(rawId);
+
+    if (!effectiveId || effectiveId === "_") {
+      console.error("Invalid KYC ID for document action:", { effectiveId, rawId, targetKycId, id });
+      toast.error("Invalid KYC ID. Please refresh and try again.");
+      return;
+    }
+
     setProcessing(true);
     try {
       const response = await adminService.reviewKYCDocument(
@@ -230,6 +251,7 @@ export default function KYCDetail() {
           setShowRejectModal(false);
           setRejectionReason("");
           setSelectedDocId(null);
+          setActiveKycId(null);
         }
       } else {
         toast.error(response.message || `Failed to ${action} document`);
@@ -280,8 +302,9 @@ export default function KYCDetail() {
     setShowRejectModal(true);
   };
 
-  const openRejectModal = (docId: string) => {
+  const openRejectModal = (docId: string, kycId?: string) => {
     setSelectedDocId(docId);
+    setActiveKycId(kycId || null);
     setShowRejectModal(true);
   };
 
@@ -714,7 +737,7 @@ export default function KYCDetail() {
                                   onClick={() => {
                                     const docId = doc._id || doc.id;
                                     if (!docId) return;
-                                    handleDocumentAction(docId, "approve", undefined, selectedDoc?.kycId);
+                                    handleDocumentAction(docId, "approve", undefined, (doc as any).kycId);
                                   }}
                                   title="Approve"
                                   disabled={processing || !(doc._id || doc.id)}
@@ -729,7 +752,7 @@ export default function KYCDetail() {
                                   onClick={() => {
                                     const docId = doc._id || doc.id;
                                     if (!docId) return;
-                                    openRejectModal(docId);
+                                    openRejectModal(docId, (doc as any).kycId);
                                   }}
                                   title="Reject"
                                   disabled={processing || !(doc._id || doc.id)}
@@ -912,20 +935,42 @@ export default function KYCDetail() {
                                 </div>
                               </div>
                             </div>
-                            <button
-                              onClick={() => {
-                                // For partner documents, we need to pass the partner's KYC ID for reviews
-                                // but the renderPreview uses the document object.
-                                setSelectedDoc({
-                                  ...doc,
-                                  kycId: partner._id, // Attach partner KYC ID to handle review correctly if needed
-                                });
-                                window.scrollTo({ top: 0, behavior: "smooth" });
-                              }}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
+                             <div className="flex items-center gap-2">
+                               <button
+                                 onClick={() => {
+                                   handleDocumentAction(doc._id || doc.id, "approve", undefined, partner._id);
+                                 }}
+                                 disabled={processing || !(doc._id || doc.id)}
+                                 className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                 title="Approve"
+                               >
+                                 <CheckCircle2 className="w-4 h-4" />
+                               </button>
+                               <button
+                                 onClick={() => {
+                                   openRejectModal(doc._id || doc.id, partner._id);
+                                 }}
+                                 disabled={processing || !(doc._id || doc.id)}
+                                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                 title="Reject"
+                                >
+                                 <XCircle className="w-4 h-4" />
+                               </button>
+                               <button
+                                 onClick={() => {
+                                   setSelectedDoc({
+                                     ...doc,
+                                     kycId: partner._id,
+                                   });
+                                   setActiveKycId(partner._id);
+                                   window.scrollTo({ top: 0, behavior: "smooth" });
+                                 }}
+                                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                 title="View"
+                               >
+                                 <Eye className="w-4 h-4" />
+                               </button>
+                             </div>
                           </div>
                         ))}
                       </div>
@@ -1057,7 +1102,7 @@ export default function KYCDetail() {
                           selectedDocId,
                           "reject",
                           rejectionReason,
-                          selectedDoc?.kycId,
+                          activeKycId || selectedDoc?.kycId,
                         );
                       }
                     }
