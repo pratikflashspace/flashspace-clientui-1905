@@ -266,13 +266,33 @@ export default function BookingDetailsModal({
               if (individualProfile) setKycProfile(individualProfile);
             }}
             className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
-              kycProfile?.kycType === 'individual' 
+              kycProfile?.kycType === 'individual' && !kycProfile?.isPartner
                 ? 'bg-[#35503F] text-[#FEF8C3] shadow-md' 
                 : 'text-gray-500 hover:bg-gray-100'
             }`}
           >
             Individual Profile
           </button>
+          
+          <button
+            onClick={() => {
+              if (partners.length > 0) {
+                if (!kycProfile?.isPartner) {
+                  setKycProfile(partners[0]);
+                }
+              } else {
+                toast.error("No partner profiles found.");
+              }
+            }}
+            className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+              kycProfile?.isPartner
+                ? 'bg-[#35503F] text-[#FEF8C3] shadow-md' 
+                : 'text-gray-500 hover:bg-gray-100'
+            }`}
+          >
+            Partner Profile
+          </button>
+
           <button
             onClick={() => {
               if (businessProfiles.length > 0) {
@@ -293,78 +313,9 @@ export default function BookingDetailsModal({
           </button>
         </div>
 
-        {kycProfile?.kycType === 'business' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
-            {/* Business Selection Dropdown */}
-            {businessProfiles.length > 1 && (
-              <div className="relative">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Select Business Entity</p>
-                <button
-                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                  className="w-full flex items-center justify-between p-3.5 bg-white border border-[#35503F]/20 rounded-xl text-sm font-bold text-[#35503F] shadow-sm hover:border-[#35503F] transition-all"
-                >
-                  <span>{kycProfile.profileName || kycProfile.businessInfo?.companyName}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {isProfileDropdownOpen && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setIsProfileDropdownOpen(false)} />
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-20 py-2 max-h-48 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-                      {businessProfiles.map(p => (
-                        <button
-                          key={p._id}
-                          onClick={() => {
-                            setKycProfile(p);
-                            setIsProfileDropdownOpen(false);
-                          }}
-                          className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-gray-50 transition-colors flex flex-col gap-0.5"
-                        >
-                          <span className={kycProfile?._id === p._id ? 'text-[#35503F]' : 'text-gray-700'}>
-                            {p.profileName || p.businessInfo?.companyName}
-                          </span>
-                          <span className="text-[10px] text-gray-400 font-medium">{p.businessInfo?.gstNumber || "No GST"}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-
-            <div className="bg-[#35503F]/5 border border-[#35503F]/10 rounded-2xl p-4">
-              <h4 className="text-[10px] font-bold text-[#35503F] uppercase tracking-wider mb-2 opacity-70">Business Information</h4>
-              <div className="grid grid-cols-2 gap-y-3">
-                <div>
-                  <p className="text-[10px] text-gray-500 font-medium">Company Name</p>
-                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.companyName || "N/A"}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-gray-500 font-medium">Company Type</p>
-                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.companyType || "N/A"}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-gray-500 font-medium">GST Number</p>
-                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.gstNumber || "N/A"}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-gray-500 font-medium">PAN Number</p>
-                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.panNumber || "N/A"}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-[10px] text-gray-500 font-medium">Registered Address</p>
-                  <p className="text-xs font-bold text-gray-900 line-clamp-2 leading-relaxed">
-                    {kycProfile.businessInfo?.registeredAddress || kycProfile.businessInfo?.address || "N/A"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Personal Documents - Only show for Individual Profile */}
-        {kycProfile?.kycType === 'individual' && (
-          <div>
+        {/* Individual Profile Content */}
+        {kycProfile?.kycType === 'individual' && !kycProfile?.isPartner && (
+          <div className="animate-in fade-in slide-in-from-top-2 duration-300">
             <h3 className="font-bold text-gray-900 mb-3 border-b pb-2">Personal Documents</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
@@ -408,8 +359,9 @@ export default function BookingDetailsModal({
           </div>
         )}
 
-        {kycProfile?.kycType === 'business' && (
-          <div className="space-y-6">
+        {/* Partner Profile Content */}
+        {kycProfile?.isPartner && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
             {/* Partner Selection Dropdown */}
             <div className="relative">
               <h3 className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center justify-between">
@@ -458,7 +410,10 @@ export default function BookingDetailsModal({
                           return (
                             <button
                               key={p._id}
-                              onClick={() => togglePartnerSelection(p._id)}
+                              onClick={() => {
+                                togglePartnerSelection(p._id);
+                                if (!isSelected) setKycProfile(p);
+                              }}
                               className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
                             >
                               <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
@@ -532,6 +487,76 @@ export default function BookingDetailsModal({
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Business Profile Content */}
+        {kycProfile?.kycType === 'business' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+            {/* Business Selection Dropdown */}
+            {businessProfiles.length > 1 && (
+              <div className="relative">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 ml-1">Select Business Entity</p>
+                <button
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                  className="w-full flex items-center justify-between p-3.5 bg-white border border-[#35503F]/20 rounded-xl text-sm font-bold text-[#35503F] shadow-sm hover:border-[#35503F] transition-all"
+                >
+                  <span>{kycProfile.profileName || kycProfile.businessInfo?.companyName}</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isProfileDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setIsProfileDropdownOpen(false)} />
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-20 py-2 max-h-48 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+                      {businessProfiles.map(p => (
+                        <button
+                          key={p._id}
+                          onClick={() => {
+                            setKycProfile(p);
+                            setIsProfileDropdownOpen(false);
+                          }}
+                          className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-gray-50 transition-colors flex flex-col gap-0.5"
+                        >
+                          <span className={kycProfile?._id === p._id ? 'text-[#35503F]' : 'text-gray-700'}>
+                            {p.profileName || p.businessInfo?.companyName}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-medium">{p.businessInfo?.gstNumber || "No GST"}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            <div className="bg-[#35503F]/5 border border-[#35503F]/10 rounded-2xl p-4">
+              <h4 className="text-[10px] font-bold text-[#35503F] uppercase tracking-wider mb-2 opacity-70">Business Information</h4>
+              <div className="grid grid-cols-2 gap-y-3">
+                <div>
+                  <p className="text-[10px] text-gray-500 font-medium">Company Name</p>
+                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.companyName || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 font-medium">Company Type</p>
+                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.companyType || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 font-medium">GST Number</p>
+                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.gstNumber || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 font-medium">PAN Number</p>
+                  <p className="text-sm font-bold text-gray-900">{kycProfile.businessInfo?.panNumber || "N/A"}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-[10px] text-gray-500 font-medium">Registered Address</p>
+                  <p className="text-xs font-bold text-gray-900 line-clamp-2 leading-relaxed">
+                    {kycProfile.businessInfo?.registeredAddress || kycProfile.businessInfo?.address || "N/A"}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Business Documents */}
