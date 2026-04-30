@@ -87,13 +87,13 @@ export default function Tickets() {
     let avgTimeStr = "N/A";
     const resolvedTickets = tickets.filter(t => {
       const s = (t.status || "").toUpperCase();
-      return (s === "RESOLVED") && t.createdAt && t.updatedAt;
+      return (s === "RESOLVED") && t.createdAt && (t.resolvedAt || t.updatedAt);
     });
 
     if (resolvedTickets.length > 0) {
       const totalDiff = resolvedTickets.reduce((acc, t) => {
         const start = new Date(t.createdAt).getTime();
-        const end = new Date(t.updatedAt).getTime();
+        const end = new Date(t.resolvedAt || t.updatedAt).getTime();
         return acc + (end - start);
       }, 0);
       const avgMs = totalDiff / resolvedTickets.length;
