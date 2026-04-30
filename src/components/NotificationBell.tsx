@@ -7,13 +7,15 @@ import { useNavigate } from 'react-router-dom';
 
 export const NotificationBell: React.FC = () => {
     const navigate = useNavigate();
-    const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications, handleNavigate } = useNotifications();
+    const { notifications, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications, handleNavigate } = useNotifications();
     const [isOpen, setIsOpen] = useState(false);
     const [clearedIds, setClearedIds] = useState<Set<string>>(new Set());
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Filter out locally cleared notifications
-    const visibleNotifications = notifications.filter(n => !clearedIds.has(n._id));
+    const visibleNotifications = notifications.filter(
+        n => !n.archived && !clearedIds.has(n._id),
+    );
     const visibleUnreadCount = visibleNotifications.filter(n => !n.read).length;
 
     // Close on click outside
@@ -111,8 +113,8 @@ export const NotificationBell: React.FC = () => {
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            // Add to locally cleared IDs
                                             setClearedIds(prev => new Set(prev).add(n._id));
+                                            deleteNotification(n._id);
                                         }}
                                         className="absolute top-4 right-3 p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                                         title="Clear notification from view"

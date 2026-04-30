@@ -232,7 +232,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     }, [navigate]);
 
-    const unreadCount = notifications.filter(n => !n.read).length;
+    const unreadCount = notifications.filter(n => !n.read && !n.archived).length;
 
     // 1. Fetch History
     const fetchNotifications = useCallback(async () => {
@@ -256,11 +256,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             // console.log("Notification API Response:", data);
 
             if (data.success && Array.isArray(data.data)) {
-                const preferences = normalizeNotificationPreferences(user.notifications);
-                const filteredData = data.data.filter((notification: INotification) =>
-                    isNotificationEnabledByPreference(notification, preferences)
-                );
-                setNotifications(normalizeNotifications(filteredData));
+                setNotifications(normalizeNotifications(data.data));
             }
         } catch (err) {
             console.error("Failed to fetch notifications", err);
