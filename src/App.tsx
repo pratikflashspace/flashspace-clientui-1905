@@ -106,6 +106,7 @@ import SpacePortalClientDetails from "@/pages/spacePortal/ClientsDetails";
 import Dashboard from "./pages/spacePortal/Dashboard";
 import Invoices from "./pages/spacePortal/Invoices";
 import Calendar from "./pages/spacePortal/Calendar";
+import SpacePortalTrackProgress from "./pages/spacePortal/TrackProgress";
 import Spaces from "./pages/spacePortal/Spaces";
 import Tickets from "./pages/spacePortal/Tickets";
 import BookingAnalytics from "./pages/spacePortal/BookingAnalytics";
@@ -514,6 +515,10 @@ const App = () => (
                         <Route
                           path="kyc-verification"
                           element={<KycVerification />}
+                        />
+                        <Route
+                          path="track-progress"
+                          element={<SpacePortalTrackProgress />}
                         />
                         <Route path="space-management" element={<Spaces />} />
                         <Route

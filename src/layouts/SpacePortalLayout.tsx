@@ -171,6 +171,10 @@ export default function SpacePortalLayout() {
         showSearch: true,
         placeholder: "Search spaces by name, city, id...",
       },
+      "/spaceportal/track-progress": {
+        showSearch: true,
+        placeholder: "Search by ID, user, or space...",
+      },
     }),
     [],
   );
@@ -318,6 +322,12 @@ export default function SpacePortalLayout() {
       "/spaceportal/kyc-verification": {
         title: makeTitle("KYC", "Verification"),
         subtitle: "Manage your verification profiles for compliance",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
+      "/spaceportal/track-progress": {
+        title: makeTitle("Track", "Progress"),
+        subtitle: "Monitor the lifecycle progress of all your space bookings.",
         hideTopBar: true,
         pageBg: "#f3f4f3",
       },
