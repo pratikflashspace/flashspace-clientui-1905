@@ -5,6 +5,7 @@ import {
   ExternalLink,
   Info,
   Mail,
+  RotateCcw,
   Search,
   Trash2,
   UserCircle2,
@@ -16,6 +17,7 @@ import { useNotifications, type INotification } from "@/contexts/NotificationCon
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/auth.service";
 import { maskSpaceName } from "@/utils/masking";
+import { API_CONFIG } from "@/config/api.config";
 
 type NotificationPreferencesState = {
   email: boolean;
@@ -180,12 +182,16 @@ const NotificationItem = ({
   notification, 
   onDelete, 
   onMarkRead, 
-  workspaceCodeMap 
+  workspaceCodeMap,
+  deletedView = false,
+  onRestore,
 }: { 
   notification: INotification; 
   onDelete: (id: string) => void;
   onMarkRead: (id: string) => void;
   workspaceCodeMap: Record<string, string>;
+  deletedView?: boolean;
+  onRestore?: (id: string) => void;
 }) => {
   const navigate = useNavigate();
   const x = useMotionValue(0);
@@ -194,6 +200,7 @@ const NotificationItem = ({
 
   const handleDragEnd = (_: any, info: any) => {
     if (Math.abs(info.offset.x) > 150) {
+      if (deletedView) return;
       onDelete(notification._id);
     }
   };
@@ -210,17 +217,21 @@ const NotificationItem = ({
   return (
     <div className="relative overflow-hidden rounded-2xl mb-2.5">
       {/* Absolute Background Delete Indicator */}
-      <div className="absolute inset-0 bg-red-50 flex items-center justify-between px-8 text-red-500 font-bold text-sm uppercase tracking-widest">
+      <div className={`absolute inset-0 flex items-center justify-between px-8 font-bold text-sm uppercase tracking-widest ${
+        deletedView ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-500"
+      }`}>
         <div className="flex items-center gap-2">
-           <Trash2 className="w-5 h-5" /> Delete
+           {deletedView ? <RotateCcw className="w-5 h-5" /> : <Trash2 className="w-5 h-5" />}
+           {deletedView ? "Deleted" : "Delete"}
         </div>
         <div className="flex items-center gap-2">
-           Delete <Trash2 className="w-5 h-5" />
+           {deletedView ? "Deleted" : "Delete"}
+           {deletedView ? <RotateCcw className="w-5 h-5" /> : <Trash2 className="w-5 h-5" />}
         </div>
       </div>
 
       <motion.article
-        drag="x"
+        drag={deletedView ? false : "x"}
         dragConstraints={{ left: 0, right: 0 }}
         onDragEnd={handleDragEnd}
         style={{ x, opacity }}
@@ -268,14 +279,25 @@ const NotificationItem = ({
               </button>
             ) : null}
 
-            <button
-              type="button"
-              onClick={() => onDelete(notification._id)}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
-              title="Delete notification"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
+            {deletedView ? (
+              <button
+                type="button"
+                onClick={() => onRestore?.(notification._id)}
+                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                title="Restore notification"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onDelete(notification._id)}
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                title="Delete notification"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
       </motion.article>
@@ -296,6 +318,9 @@ const Notifications = () => {
   const { user, updateUser } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeView, setActiveView] = useState<"recent" | "deleted">("recent");
+  const [deletedNotifications, setDeletedNotifications] = useState<INotification[]>([]);
+  const [loadingDeleted, setLoadingDeleted] = useState(false);
   const [updatingPreferenceKey, setUpdatingPreferenceKey] =
     useState<keyof NotificationPreferencesState | null>(null);
   const [preferences, setPreferences] = useState<NotificationPreferencesState>(() =>
@@ -310,14 +335,56 @@ const Notifications = () => {
     setPreferences(buildPreferences(user?.notifications));
   }, [user?.notifications]);
 
+  const fetchDeletedNotifications = async () => {
+    setLoadingDeleted(true);
+    try {
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}/api/notifications?archived=only`,
+        { credentials: "include" },
+      );
+      const data = await response.json();
+      if (data.success && Array.isArray(data.data)) {
+        setDeletedNotifications(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch deleted notifications:", error);
+    } finally {
+      setLoadingDeleted(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeView === "deleted") {
+      fetchDeletedNotifications();
+    }
+  }, [activeView]);
+
+  const restoreNotification = async (id: string) => {
+    setDeletedNotifications((prev) =>
+      prev.filter((notification) => notification._id !== id),
+    );
+    try {
+      await fetch(`${API_CONFIG.BASE_URL}/api/notifications/${id}/archive`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+      await fetchNotifications();
+    } catch (error) {
+      console.error("Failed to restore notification:", error);
+      await fetchDeletedNotifications();
+    }
+  };
+
   const filteredNotifications = useMemo(() => {
-    if (!searchQuery.trim()) return notifications;
+    const source =
+      activeView === "deleted"
+        ? deletedNotifications
+        : notifications.filter((notification) => !notification.archived);
+
+    if (!searchQuery.trim()) return source;
 
     const query = searchQuery.toLowerCase();
-    return notifications.filter((notification) => {
-      // Don't show archived/deleted notifications in the main list
-      if (notification.archived) return false;
-
+    return source.filter((notification) => {
       const title = notification.title || "";
       const message = notification.message || "";
       return (
@@ -325,7 +392,7 @@ const Notifications = () => {
         message.toLowerCase().includes(query)
       );
     });
-  }, [notifications, searchQuery]);
+  }, [activeView, deletedNotifications, notifications, searchQuery]);
 
   const handleTogglePreference = async (key: keyof NotificationPreferencesState) => {
     const nextPreferences = {
@@ -396,7 +463,35 @@ const Notifications = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-[#35503F]">Recent Notifications</h2>
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="text-2xl font-bold text-[#35503F]">
+                  {activeView === "deleted" ? "Deleted Notifications" : "Recent Notifications"}
+                </h2>
+                <div className="inline-flex rounded-2xl border border-gray-200 bg-white p-1 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setActiveView("recent")}
+                    className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                      activeView === "recent"
+                        ? "bg-[#35503F] text-white"
+                        : "text-gray-500 hover:bg-gray-50"
+                    }`}
+                  >
+                    Recent
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveView("deleted")}
+                    className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                      activeView === "deleted"
+                        ? "bg-[#35503F] text-white"
+                        : "text-gray-500 hover:bg-gray-50"
+                    }`}
+                  >
+                    Deleted
+                  </button>
+                </div>
+              </div>
               <div className="text-sm font-bold text-gray-400 uppercase tracking-wider">
                 {filteredNotifications.length} total
               </div>
@@ -404,7 +499,17 @@ const Notifications = () => {
 
             <div className="mt-4">
               <AnimatePresence initial={false}>
-                {filteredNotifications.length === 0 ? (
+                {loadingDeleted && activeView === "deleted" ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="rounded-2xl border border-dashed border-[#d8e3df] bg-[#f7faf8] px-6 py-7 text-center"
+                  >
+                    <Bell className="mx-auto h-8 w-8 text-[#6a8288]" />
+                    <p className="mt-3 text-sm font-medium text-[#496065]">Loading deleted notifications...</p>
+                  </motion.div>
+                ) : filteredNotifications.length === 0 ? (
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -422,6 +527,8 @@ const Notifications = () => {
                       onDelete={deleteNotification}
                       onMarkRead={markAsRead}
                       workspaceCodeMap={workspaceCodeMap}
+                      deletedView={activeView === "deleted"}
+                      onRestore={restoreNotification}
                     />
                   ))
                 )}
