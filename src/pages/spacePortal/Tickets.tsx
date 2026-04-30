@@ -80,16 +80,20 @@ export default function Tickets() {
     }).length;
     const resolvedCount = tickets.filter(t => {
       const s = (t.status || "").toUpperCase();
-      return s === "RESOLVED" || s === "CLOSED";
+      return s === "RESOLVED";
     }).length;
 
-    // Dynamic Avg Response Time calculation (simplified: time from createdAt to closedAt/updatedAt for resolved tickets)
+    // Dynamic Avg Response Time calculation (simplified: time from createdAt to closedAt/updatedAt for resolved/closed tickets)
     let avgTimeStr = "N/A";
-    const resolvedTickets = tickets.filter(t => (t.status || "").toUpperCase() === "RESOLVED" && t.createdAt && t.updatedAt);
+    const resolvedTickets = tickets.filter(t => {
+      const s = (t.status || "").toUpperCase();
+      return (s === "RESOLVED") && t.createdAt && (t.resolvedAt || t.updatedAt);
+    });
+
     if (resolvedTickets.length > 0) {
       const totalDiff = resolvedTickets.reduce((acc, t) => {
         const start = new Date(t.createdAt).getTime();
-        const end = new Date(t.updatedAt).getTime();
+        const end = new Date(t.resolvedAt || t.updatedAt).getTime();
         return acc + (end - start);
       }, 0);
       const avgMs = totalDiff / resolvedTickets.length;
@@ -121,7 +125,7 @@ export default function Tickets() {
       const matchesTab = 
         activeTab === "inprogress" 
           ? (status === "OPEN" || status === "IN_PROGRESS" || status === "ESCALATED")
-          : (status === "RESOLVED" || status === "CLOSED");
+          : (status === "RESOLVED");
 
       return matchesQuery && matchesStatus && matchesCategory && matchesTab;
     });
@@ -237,7 +241,6 @@ export default function Tickets() {
               { label: "Open", value: "OPEN" },
               { label: "In Progress", value: "IN_PROGRESS" },
               { label: "Resolved", value: "RESOLVED" },
-              { label: "Closed", value: "CLOSED" },
             ]}
           />
         </div>
@@ -369,7 +372,6 @@ function StatusBadge({ status }: { status: string }) {
       open: "bg-blue-100 text-blue-700",
       in_progress: "bg-indigo-100 text-indigo-700",
       resolved: "bg-emerald-100 text-emerald-700",
-      closed: "bg-slate-100 text-slate-700",
     }[s] || "bg-slate-100 text-slate-700";
 
   return (

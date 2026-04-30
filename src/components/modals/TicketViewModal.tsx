@@ -58,7 +58,7 @@ export const TicketViewModal = ({
 
   if (!open) return null;
 
-  const isReadOnly = ["resolved", "closed"].includes(ticket?.status?.toLowerCase());
+  const isReadOnly = ticket?.status?.toLowerCase() === "resolved";
 
   const submitReply = () => {
     if (isReadOnly || !replyMessage.trim() || !ticket?._id) return;
@@ -72,7 +72,6 @@ export const TicketViewModal = ({
       case "in_progress": return "#f59e0b";
       case "resolved": return "#10b981";
       case "escalated": return "#ef4444";
-      case "closed": return "#6b7280";
       default: return "#6b7280";
     }
   };
@@ -380,7 +379,7 @@ export const TicketViewModal = ({
                 <Lock size={18} color="#d97706" />
                 <div>
                   <p style={{ margin: 0, fontSize: '13px', fontWeight: 800, color: '#92400e' }}>Locked</p>
-                  <p style={{ margin: 0, fontSize: '11px', color: '#b45309', fontWeight: 500 }}>This ticket is resolved/closed.</p>
+                  <p style={{ margin: 0, fontSize: '11px', color: '#b45309', fontWeight: 500 }}>This ticket is resolved.</p>
                 </div>
               </div>
             )}

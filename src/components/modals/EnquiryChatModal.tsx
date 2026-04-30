@@ -187,7 +187,7 @@ export const EnquiryChatModal = ({
                 <div className="flex items-center gap-2 text-xl font-bold">
                   <MessageSquare className="w-5 h-5 text-primary" />
                   Chat with {name}
-                  {(activeTicketStatus === "resolved" || activeTicketStatus === "closed") && (
+                  {activeTicketStatus === "resolved" && (
                     <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium ml-1">
                       Resolved
                     </span>
@@ -196,7 +196,7 @@ export const EnquiryChatModal = ({
                 <p className="text-sm text-muted-foreground">{company} • {interest}</p>
               </div>
               <div className="flex items-center gap-2">
-                {activeTicketId && activeTicketStatus !== "resolved" && activeTicketStatus !== "closed" && (
+                {activeTicketId && activeTicketStatus !== "resolved" && (
                   <Button
                     variant="outline"
                     size="sm"
@@ -309,11 +309,11 @@ export const EnquiryChatModal = ({
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={(activeTicketStatus === "resolved" || activeTicketStatus === "closed") ? "This inquiry has been resolved" : "Type your message..."}
-                  disabled={sending || activeTicketStatus === "resolved" || activeTicketStatus === "closed"}
+                  placeholder={activeTicketStatus === "resolved" ? "This inquiry has been resolved" : "Type your message..."}
+                  disabled={sending || activeTicketStatus === "resolved"}
                   className="w-full pl-4 pr-12 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 bg-muted/20 text-sm disabled:opacity-50"
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey && activeTicketStatus !== "resolved" && activeTicketStatus !== "closed") {
+                    if (e.key === "Enter" && !e.shiftKey && activeTicketStatus !== "resolved") {
                       e.preventDefault();
                       handleSendMessage();
                     }
@@ -322,7 +322,7 @@ export const EnquiryChatModal = ({
                 <Button 
                   type="submit"
                   size="icon" 
-                  disabled={sending || !inputValue.trim() || activeTicketStatus === "resolved" || activeTicketStatus === "closed"}
+                  disabled={sending || !inputValue.trim() || activeTicketStatus === "resolved"}
                   className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg"
                 >
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
