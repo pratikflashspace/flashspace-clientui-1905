@@ -125,8 +125,11 @@ export default function BookingRequests() {
     setLoading(true);
     try {
       const response = await fetchPartnerBookingRequests();
-      const rows = response.success ? response.data || [] : [];
+      const rows = response?.success ? response.data || [] : [];
       setRequests(rows);
+    } catch (err) {
+      console.error("Failed to load booking requests:", err);
+      setRequests([]);
     } finally {
       setLoading(false);
     }
