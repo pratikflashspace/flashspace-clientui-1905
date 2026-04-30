@@ -13,6 +13,7 @@ import {
   UserPlus,
   User,
   ShieldCheck,
+  Activity,
 } from "lucide-react";
 
 export const sidebarConfig = [
@@ -25,6 +26,11 @@ export const sidebarConfig = [
     label: "KYC Compliance",
     path: "/spaceportal/kyc-verification",
     icon: ShieldCheck,
+  },
+  {
+    label: "Track Progress",
+    path: "/spaceportal/track-progress",
+    icon: Activity,
   },
   {
     label: "Booking Analytics",

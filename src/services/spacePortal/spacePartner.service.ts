@@ -99,6 +99,18 @@ export const deletePartnerTeamMember = async (memberId: string) => {
 };
 
 /**
+ * Fetch track progress data for the current partner.
+ */
+export const getTrackProgressData = async () => {
+  try {
+    const response = await axiosInstance.get("/spacePartner/track-progress");
+    return response.data;
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+/**
  * Fetch all coworking spaces for the logged-in partner.
  * Uses cookies for authentication.
  */
