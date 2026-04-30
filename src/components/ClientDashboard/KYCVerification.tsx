@@ -517,6 +517,30 @@ export default function KYCVerification() {
           return false;
         }
       }
+  
+      // Intercept for Existing Partner Update
+      if (isPartnerMode && profileId && profileId !== "new") {
+        const partnerData = {
+          fullName: personalForm.fullName,
+          email: personalForm.email,
+          phone: personalForm.phone,
+          panNumber: personalForm.pan,
+          aadhaarNumber: personalForm.aadhaar,
+          dob: personalForm.dateOfBirth,
+        };
+        
+        const partnerResponse = await userDashboardService.updatePartner(profileId, partnerData);
+        if (partnerResponse.success) {
+          toast.success("Partner updated successfully");
+          setEditMode(false);
+          fetchKYC(true);
+          return true;
+        } else {
+          setError(partnerResponse.message || "Failed to update partner");
+          setSaving(false);
+          return false;
+        }
+      }
 
       // Existing Logic for standard KYC updates
       const response = await userDashboardService.updateBusinessInfo({

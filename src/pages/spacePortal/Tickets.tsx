@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Eye, Star } from "lucide-react";
+import { Eye, Star, MessageSquare, Clock, CheckCircle2, Zap, Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { TableSkeleton } from "@/components/ui/skeleton-loaders";
@@ -19,6 +20,8 @@ export default function Tickets() {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
+  const [activeTab, setActiveTab] = useState("inprogress");
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const { socket } = useSocket();
@@ -61,20 +64,68 @@ export default function Tickets() {
     };
   }, [socket]);
 
+  const categories = useMemo(() => {
+    const cats = new Set<string>();
+    tickets.forEach(t => {
+      if (t.category) cats.add(t.category);
+    });
+    return Array.from(cats);
+  }, [tickets]);
+
+  const stats = useMemo(() => {
+    const total = tickets.length;
+    const inProgress = tickets.filter(t => {
+      const s = (t.status || "").toUpperCase();
+      return s === "OPEN" || s === "IN_PROGRESS" || s === "ESCALATED";
+    }).length;
+    const resolvedCount = tickets.filter(t => {
+      const s = (t.status || "").toUpperCase();
+      return s === "RESOLVED" || s === "CLOSED";
+    }).length;
+
+    // Dynamic Avg Response Time calculation (simplified: time from createdAt to closedAt/updatedAt for resolved tickets)
+    let avgTimeStr = "N/A";
+    const resolvedTickets = tickets.filter(t => (t.status || "").toUpperCase() === "RESOLVED" && t.createdAt && t.updatedAt);
+    if (resolvedTickets.length > 0) {
+      const totalDiff = resolvedTickets.reduce((acc, t) => {
+        const start = new Date(t.createdAt).getTime();
+        const end = new Date(t.updatedAt).getTime();
+        return acc + (end - start);
+      }, 0);
+      const avgMs = totalDiff / resolvedTickets.length;
+      const mins = Math.floor(avgMs / 60000);
+      const hours = Math.floor(mins / 60);
+      if (hours > 0) avgTimeStr = `${hours}h ${mins % 60}m`;
+      else if (mins > 0) avgTimeStr = `${mins}m`;
+      else avgTimeStr = "< 1m";
+    }
+
+    return { total, inProgress, resolved: resolvedCount, avgTime: avgTimeStr };
+  }, [tickets]);
+
   const filteredTickets = useMemo(() => {
     return tickets.filter((t) => {
       const q = query.toLowerCase();
+      const status = (t.status || "").toUpperCase();
       const matchesQuery =
         t.subject.toLowerCase().includes(q) ||
         t.ticketNumber.toLowerCase().includes(q) ||
         (t.user?.fullName || "").toLowerCase().includes(q);
 
       const matchesStatus =
-        statusFilter === "ALL" ? true : t.status.toLowerCase() === statusFilter.toLowerCase();
+        statusFilter === "ALL" ? true : status === statusFilter.toUpperCase();
 
-      return matchesQuery && matchesStatus;
+      const matchesCategory =
+        categoryFilter === "ALL" ? true : t.category === categoryFilter;
+
+      const matchesTab = 
+        activeTab === "inprogress" 
+          ? (status === "OPEN" || status === "IN_PROGRESS" || status === "ESCALATED")
+          : (status === "RESOLVED" || status === "CLOSED");
+
+      return matchesQuery && matchesStatus && matchesCategory && matchesTab;
     });
-  }, [tickets, query, statusFilter]);
+  }, [tickets, query, statusFilter, categoryFilter, activeTab]);
 
   const handleViewDetails = (ticket: PartnerTicketData) => {
     setSelectedTicket({
@@ -113,22 +164,71 @@ export default function Tickets() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl">
-          Support <span className="text-primary italic">Tickets</span>
+        <h1 className="text-4xl font-bold text-[#164e4e]">
+          Tickets
         </h1>
         <p className="text-muted-foreground mt-2">
-          Review and resolve support requests from your clients
+          Manage and track client support tickets and enquiries
         </p>
       </div>
 
-      {/* Controls */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <SearchBar
-          value={query}
-          onChange={setQuery}
-          placeholder="Search by ID, subject, or client name..."
-        />
-        <div className="flex gap-3">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {[
+          { label: "Total Tickets", value: stats.total, icon: MessageSquare, color: "text-blue-600", bg: "bg-blue-50" },
+          { label: "In Progress", value: stats.inProgress, icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
+          { label: "Resolved", value: stats.resolved, icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
+          { label: "Avg Response Time", value: stats.avgTime, icon: Zap, color: "text-purple-600", bg: "bg-purple-50" },
+        ].map((stat, i) => (
+          <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center`}>
+              <stat.icon className={`w-6 h-6 ${stat.color}`} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+              <p className="text-sm text-slate-500 font-medium">{stat.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabs and Filters */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-2 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
+          <TabsList className="bg-slate-100/50 p-1 rounded-xl">
+            <TabsTrigger 
+              value="inprogress" 
+              className="px-6 py-2 rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-[#164e4e] data-[state=active]:shadow-sm"
+            >
+              In Progress
+            </TabsTrigger>
+            <TabsTrigger 
+              value="converted"
+              className="px-6 py-2 rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-[#164e4e] data-[state=active]:shadow-sm"
+            >
+              Converted
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        <div className="flex flex-1 w-full md:w-auto gap-3">
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            placeholder="Search by ID, subject, or client name..."
+            className="flex-1"
+          />
+          <SelectBox
+            value={categoryFilter}
+            onChange={setCategoryFilter}
+            options={[
+              { label: "All Categories", value: "ALL" },
+              ...categories.map(c => ({ 
+                label: c.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), 
+                value: c 
+              }))
+            ]}
+          />
           <SelectBox
             value={statusFilter}
             onChange={setStatusFilter}

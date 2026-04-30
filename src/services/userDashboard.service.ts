@@ -552,6 +552,23 @@ class UserDashboardService {
       };
     }
   }
+  
+  async updatePartner(partnerId: string, data: any): Promise<ApiResponse<any>> {
+    try {
+      const response = await axiosInstance.put<ApiResponse<any>>(
+        `/api/user/kyc/partner/${partnerId}`,
+        data,
+      );
+      return response.data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to update partner";
+      return {
+        success: false,
+        message: errorMessage,
+      };
+    }
+  }
 
   async getPartners(profileId: string): Promise<ApiResponse<any[]>> {
     try {

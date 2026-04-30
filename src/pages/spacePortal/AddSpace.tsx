@@ -1556,9 +1556,9 @@ export default function AddSpace() {
             </div>
             <Input
               type="number"
-              placeholder="e.g. 5000"
+              placeholder="0"
               className="pl-14 h-14 rounded-2xl border-2 hover:border-primary/30 focus:border-primary transition-all text-lg font-black"
-              value={coworkingData.pricePerMonth}
+              value={coworkingData.pricePerMonth || ""}
               onChange={(e: any) => {
                 setCoworkingData({
                   ...coworkingData,
@@ -1650,9 +1650,10 @@ export default function AddSpace() {
                                ? "text-destructive"
                                : "text-primary"
                            } bg-muted/30 rounded-lg px-3 focus:outline-none transition-colors border-none group-focus-within:bg-muted`}
-                           value={table.numberOfSeats || 1}
+                           value={table.numberOfSeats || ""}
+                           placeholder="0"
                            onChange={(e) => {
-                             const val = parseInt(e.target.value) || 1;
+                             const val = parseInt(e.target.value) || 0;
                              const newFloors = [...coworkingData.floors];
                              newFloors[fIdx].tables[tIdx].numberOfSeats = val;
                              setCoworkingData({
@@ -1735,8 +1736,9 @@ export default function AddSpace() {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-black">₹</span>
                   <Input
                     type="number"
+                    placeholder="0"
                     className={`pl-8 h-14 rounded-2xl font-black text-lg ${errors[plan.id] ? "border-destructive focus:ring-destructive" : "border-primary/30 focus:ring-primary"}`}
-                    value={(virtualData as any)[plan.field]}
+                    value={(virtualData as any)[plan.field] || ""}
                     onChange={(e) => {
                       setVirtualData({
                         ...virtualData,
