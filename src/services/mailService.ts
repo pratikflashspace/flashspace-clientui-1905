@@ -36,15 +36,15 @@ export const mailService = {
   create: async (data: CreateMailData, file?: File) => {
     const payload = file
       ? (() => {
-          const formData = new FormData();
-          formData.append("client", data.client);
-          formData.append("email", data.email);
-          formData.append("sender", data.sender);
-          formData.append("type", data.type);
-          formData.append("space", data.space);
-          formData.append("file", file);
-          return formData;
-        })()
+        const formData = new FormData();
+        formData.append("client", data.client);
+        formData.append("email", data.email);
+        formData.append("sender", data.sender);
+        formData.append("type", data.type);
+        formData.append("space", data.space);
+        formData.append("file", file);
+        return formData;
+      })()
       : data;
 
     const response = await axiosInstance.post<{
