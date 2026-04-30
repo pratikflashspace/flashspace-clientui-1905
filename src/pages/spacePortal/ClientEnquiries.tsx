@@ -148,13 +148,13 @@ const ClientEnquiries = () => {
         
         // Converted tab: Resolved/Closed tickets
         const resolved = allTickets.filter(
-          (t: any) => t.status === "resolved" || t.status === "closed"
+          (t: any) => t.status === "resolved"
         );
         setConvertedClients(resolved);
 
         // In Progress tab: Combine Leads + In-Progress Tickets
         const inProgressTickets = allTickets
-          .filter((t: any) => t.status !== "resolved" && t.status !== "closed")
+          .filter((t: any) => t.status !== "resolved")
           .map((t: any) => ({
             id: t._id,
             ticketNumber: t.ticketNumber,
