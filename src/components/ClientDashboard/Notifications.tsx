@@ -24,7 +24,6 @@ type NotificationPreferencesState = {
   reminders: boolean;
   push: boolean;
   loginAlerts: boolean;
-  promotional: boolean;
 };
 
 type NotificationVisualMeta = {
@@ -38,7 +37,6 @@ const DEFAULT_PREFERENCES: NotificationPreferencesState = {
   reminders: true,
   push: true,
   loginAlerts: true,
-  promotional: false,
 };
 
 const buildPreferences = (
@@ -48,7 +46,6 @@ const buildPreferences = (
   reminders: raw?.reminders ?? DEFAULT_PREFERENCES.reminders,
   push: raw?.push ?? DEFAULT_PREFERENCES.push,
   loginAlerts: raw?.loginAlerts ?? DEFAULT_PREFERENCES.loginAlerts,
-  promotional: raw?.promotional ?? DEFAULT_PREFERENCES.promotional,
 });
 
 const getNotificationVisualMeta = (notification: INotification): NotificationVisualMeta => {
@@ -141,11 +138,6 @@ const preferenceItems: Array<{
     key: "loginAlerts",
     label: "Visit Alerts",
     description: "Updates when partner logs new visit records",
-  },
-  {
-    key: "promotional",
-    label: "Marketing Updates",
-    description: "Offers and product announcements",
   },
 ];
 
@@ -327,6 +319,15 @@ const Notifications = () => {
     buildPreferences(user?.notifications)
   );
 
+  const handleMarkRead = async (id: string) => {
+    await markAsRead(id);
+    if (activeView === "deleted") {
+      setDeletedNotifications((prev) =>
+        prev.map((n) => (n._id === id ? { ...n, read: true } : n))
+      );
+    }
+  };
+
   useEffect(() => {
     fetchNotifications();
   }, [fetchNotifications]);
@@ -498,7 +499,7 @@ const Notifications = () => {
             </div>
 
             <div className="mt-4">
-              <AnimatePresence initial={false}>
+              <AnimatePresence initial={false} key={activeView}>
                 {loadingDeleted && activeView === "deleted" ? (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -525,7 +526,7 @@ const Notifications = () => {
                       key={notification._id}
                       notification={notification}
                       onDelete={deleteNotification}
-                      onMarkRead={markAsRead}
+                      onMarkRead={handleMarkRead}
                       workspaceCodeMap={workspaceCodeMap}
                       deletedView={activeView === "deleted"}
                       onRestore={restoreNotification}

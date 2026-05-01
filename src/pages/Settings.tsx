@@ -42,7 +42,6 @@ import { User } from "@/types/auth.types";
 const buildSettingsFromUser = (user?: User | null) => ({
   email: user?.notifications?.email ?? true,
   push: user?.notifications?.push ?? true,
-  promotional: user?.notifications?.promotional ?? false,
   reminders: user?.notifications?.reminders ?? true,
   loginAlerts: user?.notifications?.loginAlerts ?? true,
   twoFactor: user?.isTwoFactorEnabled ?? false,
@@ -126,7 +125,7 @@ export default function Settings() {
       let updatePayload = {};
 
       if (
-        ["email", "push", "promotional", "reminders", "loginAlerts"].includes(
+        ["email", "push", "reminders", "loginAlerts"].includes(
           key,
         )
       ) {
@@ -226,12 +225,6 @@ export default function Settings() {
                     <Smartphone className="w-4 h-4 text-muted-foreground" />
                   ),
                   stateKey: "push",
-                },
-                {
-                  label: "Promotional Offers",
-                  desc: "Receive deals and discounts on workspaces",
-                  icon: <Bell className="w-4 h-4 text-muted-foreground" />,
-                  stateKey: "promotional",
                 },
                 {
                   label: "Booking Reminders",

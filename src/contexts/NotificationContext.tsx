@@ -31,7 +31,6 @@ export interface INotification {
 type NotificationPreferenceKey =
     | "email"
     | "push"
-    | "promotional"
     | "reminders"
     | "loginAlerts";
 
@@ -40,7 +39,6 @@ type NotificationPreferencesState = Record<NotificationPreferenceKey, boolean>;
 const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferencesState = {
     email: true,
     push: true,
-    promotional: false,
     reminders: true,
     loginAlerts: true,
 };
@@ -50,10 +48,6 @@ const normalizeNotificationPreferences = (
 ): NotificationPreferencesState => ({
     email: typeof raw?.email === "boolean" ? raw.email : DEFAULT_NOTIFICATION_PREFERENCES.email,
     push: typeof raw?.push === "boolean" ? raw.push : DEFAULT_NOTIFICATION_PREFERENCES.push,
-    promotional:
-        typeof raw?.promotional === "boolean"
-            ? raw.promotional
-            : DEFAULT_NOTIFICATION_PREFERENCES.promotional,
     reminders:
         typeof raw?.reminders === "boolean"
             ? raw.reminders
@@ -71,7 +65,6 @@ const inferPreferenceKeyFromNotification = (
     if (
         explicitPreference === "email" ||
         explicitPreference === "push" ||
-        explicitPreference === "promotional" ||
         explicitPreference === "reminders" ||
         explicitPreference === "loginAlerts"
     ) {
@@ -111,14 +104,6 @@ const inferPreferenceKeyFromNotification = (
         return "loginAlerts";
     }
 
-    if (
-        combinedText.includes("marketing") ||
-        combinedText.includes("offer") ||
-        combinedText.includes("announcement") ||
-        combinedText.includes("promo")
-    ) {
-        return "promotional";
-    }
 
     return null;
 };
