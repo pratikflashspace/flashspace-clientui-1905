@@ -25,7 +25,11 @@ export default function BookingDetailsModal({
   formatCurrency,
   formatDate,
 }: BookingDetailsModalProps) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(
+    (booking.partnerRequestStatus === 'submitted' || 
+     booking.partnerRequestStatus === 'in_review' || 
+     booking.partnerRequestStatus === 'completed') ? 3 : 1
+  );
   const [kycProfile, setKycProfile] = useState<any>(null);
   const [individualProfile, setIndividualProfile] = useState<any>(null);
   const [businessProfiles, setBusinessProfiles] = useState<any[]>([]);
@@ -57,6 +61,7 @@ export default function BookingDetailsModal({
           const bizProfs = profiles.filter(p => p.kycType === 'business');
           const partnerProfs = profiles.filter(p => p.isPartner);
 
+          // Find the profile that matches the linked ID from the booking
           const activeProfile = profiles.find(p => p._id === linkedProfileId) || bizProfs[0] || individualProf;
 
           setKycProfile(activeProfile);
@@ -64,8 +69,11 @@ export default function BookingDetailsModal({
           setBusinessProfiles(bizProfs);
           setPartners(partnerProfs);
 
-          if (partnerProfs.length > 0) {
-            setSelectedPartners([partnerProfs[0]._id]);
+          // Initialize selected partners from the booking data if available
+          if (booking.selectedPartners && Array.isArray(booking.selectedPartners)) {
+            setSelectedPartners(booking.selectedPartners.map(id => typeof id === 'string' ? id : (id as any)._id));
+          } else if ((booking as any).selectedPartnerIds && Array.isArray((booking as any).selectedPartnerIds)) {
+            setSelectedPartners((booking as any).selectedPartnerIds);
           }
         }
       } catch (err) {
@@ -81,11 +89,13 @@ export default function BookingDetailsModal({
   const handlePrev = () => setStep(prev => prev - 1);
 
   const handleFinish = async () => {
+    const isUpdating = booking.partnerRequestStatus === 'submitted' || booking.partnerRequestStatus === 'in_review';
     const bookingId = (booking as any)._id || booking.id || booking.bookingNumber;
-    const toastId = toast.loading("Sending booking request to space partner...");
-    const response = await userDashboardService.submitBookingRequest(bookingId);
+    const toastId = toast.loading(isUpdating ? "Updating booking request..." : "Sending booking request to space partner...");
+    const profileId = kycProfile?._id || (kycProfile as any)?.id;
+    const response = await userDashboardService.submitBookingRequest(bookingId, selectedPartners, profileId);
     if (response.success) {
-      toast.success("Booking request sent to space partner", { id: toastId });
+      toast.success(isUpdating ? "Booking request updated" : "Booking request sent to space partner", { id: toastId });
       onClose();
     } else {
       toast.error(response.message || "Failed to send request", { id: toastId });
@@ -332,14 +342,26 @@ export default function BookingDetailsModal({
                     </div>
                     <div className="flex items-center gap-2">
                       {doc?.fileUrl ? (
-                        <a 
-                          href={getUploadedFileUrl(doc.fileUrl)} 
-                          target="_blank" 
-                          rel="noreferrer" 
-                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </a>
+                        <div className="flex items-center gap-2">
+                          {doc.partnerReviewStatus === 'rejected' && (
+                            <div className="group relative">
+                              <span className="text-[10px] text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded-md font-black cursor-help">REJECTED</span>
+                              <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-white text-[10px] rounded-lg shadow-xl z-50 animate-in fade-in zoom-in-95">
+                                <div className="font-bold mb-1 text-red-400">Rejection Reason:</div>
+                                {doc.partnerRejectionReason || "Please re-upload a clearer document."}
+                                <div className="absolute top-full right-4 border-8 border-transparent border-t-gray-900" />
+                              </div>
+                            </div>
+                          )}
+                          <a 
+                            href={getUploadedFileUrl(doc.fileUrl)} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </a>
+                        </div>
                       ) : (
                         <span className="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded-md">Missing</span>
                       )}
@@ -460,14 +482,26 @@ export default function BookingDetailsModal({
                             </div>
                             <div className="flex items-center gap-2">
                               {doc?.fileUrl ? (
-                                <a 
-                                  href={getUploadedFileUrl(doc.fileUrl)} 
-                                  target="_blank" 
-                                  rel="noreferrer" 
-                                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </a>
+                                <div className="flex items-center gap-2">
+                                  {doc.partnerReviewStatus === 'rejected' && (
+                                    <div className="group relative">
+                                      <span className="text-[10px] text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded-md font-black cursor-help">REJECTED</span>
+                                      <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-white text-[10px] rounded-lg shadow-xl z-50 animate-in fade-in zoom-in-95">
+                                        <div className="font-bold mb-1 text-red-400">Rejection Reason:</div>
+                                        {doc.partnerRejectionReason || "Please re-upload a clearer document."}
+                                        <div className="absolute top-full right-4 border-8 border-transparent border-t-gray-900" />
+                                      </div>
+                                    </div>
+                                  )}
+                                  <a 
+                                    href={getUploadedFileUrl(doc.fileUrl)} 
+                                    target="_blank" 
+                                    rel="noreferrer" 
+                                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </a>
+                                </div>
                               ) : (
                                 <span className="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded-md">Missing</span>
                               )}
@@ -578,14 +612,26 @@ export default function BookingDetailsModal({
                       </div>
                       <div className="flex items-center gap-2">
                         {doc?.fileUrl ? (
-                          <a 
-                            href={getUploadedFileUrl(doc.fileUrl)} 
-                            target="_blank" 
-                            rel="noreferrer" 
-                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </a>
+                          <div className="flex items-center gap-2">
+                            {doc.partnerReviewStatus === 'rejected' && (
+                              <div className="group relative">
+                                <span className="text-[10px] text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded-md font-black cursor-help">REJECTED</span>
+                                <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-white text-[10px] rounded-lg shadow-xl z-50 animate-in fade-in zoom-in-95">
+                                  <div className="font-bold mb-1 text-red-400">Rejection Reason:</div>
+                                  {doc.partnerRejectionReason || "Please re-upload a clearer document."}
+                                  <div className="absolute top-full right-4 border-8 border-transparent border-t-gray-900" />
+                                </div>
+                              </div>
+                            )}
+                            <a 
+                              href={getUploadedFileUrl(doc.fileUrl)} 
+                              target="_blank" 
+                              rel="noreferrer" 
+                              className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </a>
+                          </div>
                         ) : (
                           <span className="text-xs text-red-500 font-medium bg-red-50 px-2 py-1 rounded-md">Missing</span>
                         )}
@@ -635,7 +681,7 @@ export default function BookingDetailsModal({
             onClick={handleNext}
             className="flex-1 py-3 rounded-xl font-bold bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90 transition-all"
           >
-            Next Step
+            {booking.partnerRequestStatus === 'not_started' ? 'Next Step' : 'View Agreement'}
           </button>
         </div>
       </div>
@@ -698,8 +744,14 @@ export default function BookingDetailsModal({
               Submit the Signed Agreement
             </h3>
             {signedAgreement && (
-              <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${isApproved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                {isApproved ? 'Approved' : 'Pending Approval'}
+              <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                (isApproved || signedAgreement.status === 'approved' || signedAgreement.partnerReviewStatus === 'approved') ? 'bg-green-100 text-green-700' : 
+                (signedAgreement.status === 'rejected' || signedAgreement.partnerReviewStatus === 'rejected') ? 'bg-red-100 text-red-700' :
+                'bg-yellow-100 text-yellow-700'
+              }`}>
+                {(isApproved || signedAgreement.status === 'approved' || signedAgreement.partnerReviewStatus === 'approved') ? 'Approved' : 
+                 (signedAgreement.status === 'rejected' || signedAgreement.partnerReviewStatus === 'rejected') ? 'Rejected' : 
+                 'Pending Approval'}
               </span>
             )}
           </div>
@@ -802,7 +854,7 @@ export default function BookingDetailsModal({
             onClick={handleFinish}
             className="flex-1 py-3 rounded-xl font-bold bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90 transition-all flex items-center justify-center gap-2"
           >
-            <CheckCircle className="w-4 h-4" /> Finish
+            <CheckCircle className="w-4 h-4" /> {booking.partnerRequestStatus === 'not_started' ? 'Finish' : 'Update Request'}
           </button>
         </div>
       </div>

@@ -39,7 +39,19 @@ type Doc = {
 type BookingRequest = {
   bookingId: string;
   bookingNumber: string;
-  client: { name: string; email: string; phone?: string; companyName?: string };
+  client: { 
+    name: string; 
+    email: string; 
+    phone?: string; 
+    companyName?: string;
+    companyType?: string;
+    gstNumber?: string;
+    panNumber?: string;
+    cinNumber?: string;
+    registeredAddress?: string;
+    industry?: string;
+    businessNature?: string;
+  };
   space: { name: string; address?: string; city?: string; image?: string; type?: string };
   plan: { name: string; tenure: number; tenureUnit: string; price: number };
   status: string;
@@ -189,7 +201,13 @@ export default function BookingRequests() {
     profileModel: "kyc" | "business" | "partner" = "kyc",
     profileId = booking.kyc.profileId,
   ) => {
-    const rejectionReason = action === "reject" ? window.prompt("Rejection reason") || "Rejected by partner" : undefined;
+    let rejectionReason: string | undefined = undefined;
+    if (action === "reject") {
+      const reason = window.prompt("Rejection reason");
+      if (reason === null) return; // User cancelled prompt
+      rejectionReason = reason || "Rejected by partner";
+    }
+
     const toastId = toast.loading(`${action === "approve" ? "Approving" : "Rejecting"} document...`);
     const response = await reviewPartnerBookingKycDocument(booking.bookingId, {
       profileModel,
@@ -492,6 +510,8 @@ export default function BookingRequests() {
                   </div>
                 ))}
               </div>
+
+
               {detailStep === 1 && (
                 <div className="flex border-t border-[#2D3F33]/10 p-5 pt-4">
                   <button
@@ -519,14 +539,46 @@ export default function BookingRequests() {
                   </div>
                 </div>
 
-                {selected.kyc.businessDocuments.length > 0 && (
-                  <div>
-                    <p className="mb-2 text-sm font-bold text-[#2D3F33]">Business Documents</p>
+                {/* Business KYC Section */}
+                <div>
+                  <p className="mb-3 text-sm font-bold text-[#2D3F33] flex items-center gap-2">
+                    <FileText size={16} className="text-[#35503F]" />
+                    {selected.kyc.profileName && selected.kyc.kycType === 'business'
+                      ? `Business KYC — ${selected.kyc.profileName}`
+                      : `Business KYC — ${selected.client.companyName || 'N/A'}`}
+                  </p>
+
+                  {/* Business Info Card */}
+                  <div className="rounded-xl border border-[#2D3F33]/10 bg-[#fff9d8]/20 p-4 mb-3">
+                    <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+                      {[
+                        ["Company Name", selected.client.companyName],
+                        ["Company Type", selected.client.companyType],
+                        ["GST Number", selected.client.gstNumber],
+                        ["PAN Number", selected.client.panNumber],
+                        ["CIN Number", selected.client.cinNumber],
+                        ["Industry", selected.client.industry],
+                        ["Business Nature", selected.client.businessNature],
+                        ["Registered Address", selected.client.registeredAddress],
+                      ].filter(([, v]) => v && v !== "N/A").map(([label, value]) => (
+                        <div key={label} className={label === "Registered Address" ? "sm:col-span-2" : ""}>
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-[#607067]">{label}</p>
+                          <p className="mt-0.5 text-sm font-bold text-[#10251a]">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Business Documents */}
+                  <p className="mb-3 text-sm font-bold text-[#2D3F33] uppercase tracking-wider">Business KYC — {selected.client.companyName || "N/A"}</p>
+                  {selected.kyc.businessDocuments.length > 0 ? (
                     <div className="space-y-2">
                       {selected.kyc.businessDocuments.map((doc) => renderDocRow(selected, doc, "business", selected.kyc.profileId))}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <p className="rounded-lg bg-[#f7f8f6] p-4 text-sm text-[#607067]">No business documents uploaded.</p>
+                  )}
+                </div>
 
                 {selected.kyc.partnerDocuments.map((partner) => (
                   <div key={partner.id}>
