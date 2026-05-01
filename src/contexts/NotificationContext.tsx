@@ -123,11 +123,25 @@ const getCreatedAtTime = (value?: string): number => {
     return Number.isNaN(parsed) ? 0 : parsed;
 };
 
+const isPartnerPortalNotification = (notification: INotification): boolean => {
+    const metadata = notification.metadata || {};
+    const actionUrl = typeof metadata.actionUrl === "string" ? metadata.actionUrl : "";
+    const metadataType = typeof metadata.type === "string" ? metadata.type : "";
+    const title = (notification.title || "").toLowerCase();
+
+    return (
+        actionUrl.startsWith("/spaceportal/") ||
+        metadataType === "booking_request" ||
+        title.includes("booking request")
+    );
+};
+
 const normalizeNotifications = (items: INotification[]): INotification[] => {
     const deduped = new Map<string, INotification>();
 
     items.forEach((item) => {
         if (!item?._id) return;
+        if (isPartnerPortalNotification(item)) return;
         deduped.set(item._id, item);
     });
 
@@ -169,8 +183,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const title = (notification.title || "").toLowerCase();
         const actionUrl = typeof metadata.actionUrl === "string" ? metadata.actionUrl : "";
 
-        if (actionUrl.startsWith("/dashboard/")) {
+        if (actionUrl.startsWith("/dashboard/") || actionUrl.startsWith("/spaceportal/") || actionUrl.startsWith("/affiliate-portal/")) {
             navigate(actionUrl);
+            return;
+        }
+
+        if (metadata.type === "booking_request" || title.includes("booking request")) {
+            navigate("/spaceportal/booking-requests");
             return;
         }
 
@@ -306,6 +325,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 _id: newNotification?._id || `notification-${Date.now()}`,
             };
             const preferences = normalizeNotificationPreferences(user.notifications);
+
+            if (isPartnerPortalNotification(normalizedIncoming)) {
+                return;
+            }
 
             if (!isNotificationEnabledByPreference(normalizedIncoming, preferences)) {
                 return;

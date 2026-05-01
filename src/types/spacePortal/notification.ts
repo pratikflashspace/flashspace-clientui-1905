@@ -5,7 +5,9 @@ export type SpacePortalNotification = {
   description?: string;
   time?: string;
   read?: boolean;
+  archived?: boolean;
   href?: string;
+  metadata?: Record<string, unknown>;
   isNew?: boolean;
   createdAt?: string;
 };
