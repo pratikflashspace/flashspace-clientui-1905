@@ -34,7 +34,6 @@ export interface User {
   notifications?: {
     email: boolean;
     push: boolean;
-    promotional: boolean;
     reminders: boolean;
     loginAlerts: boolean;
   };
