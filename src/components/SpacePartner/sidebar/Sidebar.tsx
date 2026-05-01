@@ -3,6 +3,7 @@ import { X, ChevronLeft, ChevronRight, LogOut, LayoutDashboard, Home } from "luc
 import { sidebarConfig } from "./SidebarConfig";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSpacePortalNotifications } from "@/contexts/SpacePortalNotificationsContext";
 
 type SidebarItemProps = {
   icon: React.ReactNode;
@@ -10,9 +11,10 @@ type SidebarItemProps = {
   to: string;
   collapsed?: boolean;
   disabled?: boolean;
+  badgeCount?: number;
 };
 
-function SidebarItem({ icon, label, to, collapsed, disabled }: SidebarItemProps) {
+function SidebarItem({ icon, label, to, collapsed, disabled, badgeCount = 0 }: SidebarItemProps) {
   if (disabled) {
     return (
       <div
@@ -33,7 +35,7 @@ function SidebarItem({ icon, label, to, collapsed, disabled }: SidebarItemProps)
       title={label}
       aria-label={label}
       className={({ isActive }) =>
-        `flex w-full items-center rounded-xl text-left text-sm font-semibold transition ${isActive
+        `relative flex w-full items-center rounded-xl text-left text-sm font-semibold transition ${isActive
           ? "bg-[#2D3F33] text-[#FDE68A] shadow-sm"
           : "text-[#485753] dark:text-slate-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5"
         } ${collapsed ? "justify-center px-3 py-3" : "gap-3 px-4 py-3"}`
@@ -44,7 +46,25 @@ function SidebarItem({ icon, label, to, collapsed, disabled }: SidebarItemProps)
           <span className={`${isActive ? "text-[#FDE68A]" : "text-[#7a8682] dark:text-gray-400"}`}>
             {icon}
           </span>
-          {collapsed ? null : <span>{label}</span>}
+          {collapsed ? null : (
+            <>
+              <span className="min-w-0 flex-1 truncate">{label}</span>
+              {badgeCount > 0 ? (
+                <span
+                  className={`inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold ${
+                    isActive
+                      ? "bg-[#FDE68A] text-[#2D3F33]"
+                      : "bg-[#FDE68A] text-[#2D3F33]"
+                  }`}
+                >
+                  {badgeCount > 99 ? "99+" : badgeCount}
+                </span>
+              ) : null}
+            </>
+          )}
+          {collapsed && badgeCount > 0 ? (
+            <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#FDE68A] ring-2 ring-[#f3f4f3]" />
+          ) : null}
         </>
       )}
     </NavLink>
@@ -64,7 +84,12 @@ export default function Sidebar({
 }: SidebarProps) {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { notifications } = useSpacePortalNotifications();
   const menuRef = React.useRef<HTMLDivElement>(null);
+  const unreadCount = React.useMemo(
+    () => notifications.filter((item) => !item.read && !item.archived).length,
+    [notifications],
+  );
 
   React.useEffect(() => {
     const menuEl = menuRef.current;
@@ -162,6 +187,9 @@ export default function Sidebar({
             label={item.label}
             collapsed={isCollapsed}
             disabled={item.disabled}
+            badgeCount={
+              item.path === "/spaceportal/notifications" ? unreadCount : 0
+            }
           />
         ))}
       </div>

@@ -14,6 +14,7 @@ import {
   User,
   ShieldCheck,
   Activity,
+  Bell,
 } from "lucide-react";
 
 export const sidebarConfig = [
@@ -71,6 +72,11 @@ export const sidebarConfig = [
     label: "Tickets",
     path: "/spaceportal/tickets",
     icon: MessageSquareText,
+  },
+  {
+    label: "Notifications",
+    path: "/spaceportal/notifications",
+    icon: Bell,
   },
   {
     label: "Feedback & NPS",

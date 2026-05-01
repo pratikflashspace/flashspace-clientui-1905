@@ -31,12 +31,23 @@ import { SPACE_PORTAL_NOTIFICATIONS } from "@/data/spacePortal/notifications";
  */
 function mapNotification(raw: any): SpacePortalNotification {
   const id = raw._id?.toString() ?? raw.id ?? String(Date.now());
+  const metadata = raw.metadata && typeof raw.metadata === "object" ? raw.metadata : {};
+  const href =
+    typeof metadata.actionUrl === "string"
+      ? metadata.actionUrl
+      : typeof raw.href === "string"
+        ? raw.href
+        : undefined;
+
   return {
     _id: id,
     id,
     title: raw.title ?? "",
     description: raw.message ?? raw.description ?? undefined,
+    href,
+    metadata,
     read: raw.read ?? false,
+    archived: raw.archived ?? false,
     createdAt: raw.createdAt ?? undefined,
     time: raw.createdAt
       ? new Date(raw.createdAt).toLocaleString("en-IN", {
@@ -532,6 +543,34 @@ export default function SpacePortalLayout() {
     setActiveToast(null);
   };
 
+  const navigateToNotification = (notification: SpacePortalNotification) => {
+    const href =
+      notification.href ||
+      (typeof notification.metadata?.actionUrl === "string"
+        ? notification.metadata.actionUrl
+        : undefined);
+
+    if (href?.startsWith("/spaceportal/")) {
+      navigate(href);
+    } else if (href?.startsWith("/")) {
+      navigate(href);
+    } else if (
+      notification.metadata?.type === "booking_request" ||
+      notification.title.toLowerCase().includes("booking request")
+    ) {
+      navigate("/spaceportal/booking-requests");
+    } else {
+      navigate("/spaceportal/notifications");
+    }
+
+    setNotifications((prev) =>
+      prev.map((item) =>
+        item.id === notification.id ? { ...item, read: true } : item,
+      ),
+    );
+    setActiveToast(null);
+  };
+
   /**
    * Notification provider value ? all mutations are optimistic
    * (local state updates immediately; API call follows async).
@@ -543,13 +582,27 @@ export default function SpacePortalLayout() {
       notifications,
 
       markAllRead: () =>
-        setNotifications((prev) =>
-          prev.map((item) => ({ ...item, read: true })),
-        ),
+        {
+          setNotifications((prev) =>
+            prev.map((item) => ({ ...item, read: true })),
+          );
+          fetch(`${base}/api/notifications/read-all`, {
+            method: "PATCH",
+            credentials: "include",
+          }).catch((err) =>
+            console.error("[SpacePortal] markAllRead failed:", err),
+          );
+        },
 
       markRead: (id: string) => {
         setNotifications((prev) =>
           prev.map((item) => (item.id === id ? { ...item, read: true } : item)),
+        );
+        fetch(`${base}/api/notifications/${id}/read`, {
+          method: "PATCH",
+          credentials: "include",
+        }).catch((err) =>
+          console.error("[SpacePortal] markRead failed:", err),
         );
       },
       // Mark unread is local-only (no backend PATCH for unread)
@@ -563,8 +616,8 @@ export default function SpacePortalLayout() {
       deleteNotification: async (id: string) => {
         setNotifications((prev) => prev.filter((item) => item.id !== id));
         try {
-          await fetch(`${base}/api/notifications/${id}`, {
-            method: "DELETE",
+          await fetch(`${base}/api/notifications/${id}/archive`, {
+            method: "PATCH",
             credentials: "include",
           });
         } catch (err) {
@@ -602,8 +655,9 @@ export default function SpacePortalLayout() {
 
       addNotification: (notification: SpacePortalNotification) =>
         setNotifications((prev) => [notification, ...prev]),
+      navigateToNotification,
     };
-  }, [notifications]);
+  }, [notifications, navigate]);
 
   /**
    * Search provider value extracted (cleaner).
@@ -656,7 +710,18 @@ export default function SpacePortalLayout() {
           {/* Toast */}
           {activeToast ? (
             <div className="fixed left-1/2 top-4 z-50 w-[92%] max-w-md -translate-x-1/2">
-              <div className="animate-in slide-in-from-top-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-lg">
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => navigateToNotification(activeToast)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    navigateToNotification(activeToast);
+                  }
+                }}
+                className="animate-in slide-in-from-top-2 cursor-pointer rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-lg transition hover:border-slate-300"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-sm font-semibold text-slate-900">
@@ -672,7 +737,10 @@ export default function SpacePortalLayout() {
 
                   <button
                     type="button"
-                    onClick={dismissToast}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      dismissToast();
+                    }}
                     className="text-xs font-semibold text-slate-500 hover:text-slate-700"
                   >
                     Dismiss
@@ -747,13 +815,26 @@ function triggerBrowserNotifications(
 
   newItems.forEach((item) => {
     const permission = window.Notification.permission;
+    const openTarget = () => {
+      const href =
+        item.href ||
+        (typeof item.metadata?.actionUrl === "string"
+          ? item.metadata.actionUrl
+          : "/spaceportal/notifications");
+
+      window.focus();
+      if (href.startsWith("/")) {
+        window.location.assign(href);
+      }
+    };
 
     // If already granted, show instantly
     if (permission === "granted") {
-      new window.Notification(item.title, {
+      const browserNotification = new window.Notification(item.title, {
         body: item.description ?? "",
         tag: item.id,
       });
+      browserNotification.onclick = openTarget;
       return;
     }
 
@@ -763,10 +844,11 @@ function triggerBrowserNotifications(
 
       window.Notification.requestPermission().then((result) => {
         if (result === "granted") {
-          new window.Notification(item.title, {
+          const browserNotification = new window.Notification(item.title, {
             body: item.description ?? "",
             tag: item.id,
           });
+          browserNotification.onclick = openTarget;
         }
       });
     }
