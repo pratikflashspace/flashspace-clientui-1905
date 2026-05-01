@@ -356,10 +356,11 @@ class UserDashboardService {
     }
   }
 
-  async submitBookingRequest(bookingId: string): Promise<ApiResponse<any>> {
+  async submitBookingRequest(bookingId: string, selectedPartners?: string[], kycProfileId?: string): Promise<ApiResponse<any>> {
     try {
       const response = await axiosInstance.post<ApiResponse<any>>(
         `/api/user/bookings/${bookingId}/submit-request`,
+        { selectedPartners, kycProfileId }
       );
       return response.data;
     } catch (error: any) {
