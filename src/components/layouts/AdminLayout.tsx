@@ -167,12 +167,6 @@ export default function AdminLayout() {
       roles: ["admin", "super_admin", "affiliate_manager"],
     },
     {
-      icon: CreditCard,
-      label: "Payment Invoices",
-      path: "/admin/invoices",
-      roles: ["admin", "super_admin", "sales", "partner"],
-    },
-    {
       icon: FileCheck,
       label: "Invoices Management",
       path: "/admin/partner-invoices",
@@ -268,7 +262,7 @@ export default function AdminLayout() {
         </div>
 
         {/* Navigation */}
-        <div className="flex-1 min-h-0 w-full overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-300">
+        <div className="sidebar-scrollbar flex-1 min-h-0 w-full overflow-y-auto overscroll-y-contain">
           <nav className="px-4 space-y-2 pb-4">
             {navItems.map((item) => (
               <NavLink
@@ -378,7 +372,7 @@ export default function AdminLayout() {
             </div>
 
             {/* Nav Links */}
-            <div className="flex-1 min-h-0 w-full overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-300">
+            <div className="sidebar-scrollbar flex-1 min-h-0 w-full overflow-y-auto overscroll-y-contain">
               <nav className="px-4 py-6 space-y-2 pb-8">
                 {navItems.map((item) => (
                   <NavLink

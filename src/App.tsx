@@ -87,7 +87,6 @@ import TicketSystem from "./pages/admin/TicketSystem";
 import AdminNotifications from "./pages/admin/Notifications";
 import AdminPropertyDetails from "./pages/admin/PropertyDetailsAdmin";
 import PropertyManagement from "./pages/admin/PropertyManagement";
-import AdminInvoices from "./pages/admin/Invoices";
 import ReceivablePayable from "./pages/admin/ReceivablePayable";
 import BalanceSheet from "./pages/admin/BalanceSheet";
 
@@ -433,7 +432,10 @@ const App = () => (
                           path="notifications"
                           element={<AdminNotifications />}
                         />
-                        <Route path="invoices" element={<AdminInvoices />} />
+                        <Route
+                          path="invoices"
+                          element={<Navigate to="/admin/partner-invoices" replace />}
+                        />
                         <Route path="finance" element={<ReceivablePayable />} />
                         <Route path="balance" element={<BalanceSheet />} />
                         <Route path="leads" element={<LeadManagement />} />

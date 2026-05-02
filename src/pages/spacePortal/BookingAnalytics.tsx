@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBookingAnalytics, fetchAllPartnerSpaces } from "@/services/spacePortal/spacePartner.service";
 import { getPropertyBookingsForPartner } from "@/services/property.service";
+import { userDashboardService } from "@/services/userDashboard.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -79,7 +80,10 @@ type PartnerBooking = {
     phone?: string;
     phoneNumber?: string;
     company?: string;
-  };
+  } | string | null;
+  userId?: string;
+  clientUserId?: string;
+  clientCompanyName?: string;
   daysRemaining?: number;
 };
 
@@ -91,6 +95,16 @@ type SpaceRollup = PartnerSpace & {
   cancelledBookings: number;
   pendingBookings: number;
   latestBooking?: PartnerBooking | null;
+};
+
+type PartnerClientBookingRow = {
+  bookingId?: string;
+  bookingNumber?: string;
+  userId?: string;
+  companyName?: string;
+  contactName?: string;
+  email?: string;
+  phone?: string;
 };
 
 const formatCurrency = (value: number) =>
@@ -118,16 +132,24 @@ const toBookingAmount = (booking: PartnerBooking) =>
   Number(booking?.totalAmount ?? booking?.plan?.finalPrice ?? booking?.plan?.price ?? 0);
 
 const getClientId = (booking: PartnerBooking) =>
-  String(booking?.user?._id || booking?.user?.id || booking?.user || "").trim();
+  String(
+    booking?.clientUserId ||
+      booking?.userId ||
+      (typeof booking?.user === "object" ? booking?.user?._id || booking?.user?.id : booking?.user) ||
+      "",
+  ).trim();
 
 const getClientName = (booking: PartnerBooking) =>
-  booking?.user?.fullName ||
-  booking?.user?.company ||
-  booking?.user?.email ||
+  booking?.clientCompanyName ||
+  (typeof booking?.user === "object" && booking?.user
+    ? booking.user.fullName || booking.user.company || booking.user.email
+    : "") ||
   "Client";
 
 const getClientContact = (booking: PartnerBooking) =>
-  booking?.user?.email || booking?.user?.phone || booking?.user?.phoneNumber || "";
+  (typeof booking?.user === "object" && booking?.user
+    ? booking.user.email || booking.user.phone || booking.user.phoneNumber
+    : "") || "";
 
 const getBookingStatus = (booking: PartnerBooking) =>
   String(booking?.status || "unknown").toLowerCase();
@@ -175,6 +197,14 @@ export default function BookingAnalytics() {
   } = useQuery({
     queryKey: ["partner-booking-analytics"],
     queryFn: fetchBookingAnalytics,
+  });
+
+  const { data: partnerClientBookings } = useQuery({
+    queryKey: ["partner-client-bookings"],
+    queryFn: async () => {
+      const response = await userDashboardService.getPartnerClientBookings();
+      return response.success && Array.isArray(response.data) ? response.data : [];
+    },
   });
 
   const [spaces, setSpaces] = useState<PartnerSpace[]>([]);
@@ -234,6 +264,53 @@ export default function BookingAnalytics() {
 
   const analytics = analyticsData?.data;
 
+  const bookingClientLookup = useMemo(() => {
+    const rows = Array.isArray(partnerClientBookings)
+      ? (partnerClientBookings as PartnerClientBookingRow[])
+      : [];
+
+    return rows.reduce<Record<string, PartnerClientBookingRow>>((acc, row) => {
+      const keys = [row.bookingId, row.bookingNumber].map((value) => String(value || "").trim());
+      keys.filter(Boolean).forEach((key) => {
+        acc[key] = row;
+      });
+      return acc;
+    }, {});
+  }, [partnerClientBookings]);
+
+  const resolveClientId = (booking: PartnerBooking) => {
+    const directId = getClientId(booking);
+    if (directId) return directId;
+
+    const fallback =
+      bookingClientLookup[String(booking._id || "").trim()] ||
+      bookingClientLookup[String(booking.bookingNumber || "").trim()];
+
+    return String(fallback?.userId || "").trim();
+  };
+
+  const resolveClientName = (booking: PartnerBooking) => {
+    const directName = getClientName(booking);
+    if (directName !== "Client") return directName;
+
+    const fallback =
+      bookingClientLookup[String(booking._id || "").trim()] ||
+      bookingClientLookup[String(booking.bookingNumber || "").trim()];
+
+    return fallback?.companyName || fallback?.contactName || fallback?.email || directName;
+  };
+
+  const resolveClientContact = (booking: PartnerBooking) => {
+    const directContact = getClientContact(booking);
+    if (directContact) return directContact;
+
+    const fallback =
+      bookingClientLookup[String(booking._id || "").trim()] ||
+      bookingClientLookup[String(booking.bookingNumber || "").trim()];
+
+    return fallback?.email || fallback?.phone || "";
+  };
+
   const growth = useMemo(() => {
     if (!analytics?.summary?.revenueLastMonth) return 0;
     return (
@@ -250,7 +327,7 @@ export default function BookingAnalytics() {
       const activeClients = new Set(
         bookings
           .filter(isActiveBooking)
-          .map(getClientId)
+          .map(resolveClientId)
           .filter(Boolean),
       ).size;
 
@@ -274,7 +351,7 @@ export default function BookingAnalytics() {
         latestBooking: bookings[0] || null,
       };
     });
-  }, [spaces, spaceBookings]);
+  }, [spaces, spaceBookings, bookingClientLookup]);
 
   const selectedSpace = useMemo(() => {
     if (!propertyId) return null;
@@ -288,7 +365,7 @@ export default function BookingAnalytics() {
     const activeClients = new Set(
       selectedBookings
         .filter(isActiveBooking)
-        .map(getClientId)
+        .map(resolveClientId)
         .filter(Boolean),
     ).size;
     const cancelledBookings = selectedBookings.filter(isCancelledBooking).length;
@@ -303,7 +380,7 @@ export default function BookingAnalytics() {
       cancelledBookings,
       revenue,
     };
-  }, [selectedBookings]);
+  }, [selectedBookings, bookingClientLookup]);
 
   if (analyticsLoading || spacesLoading) {
     return (
@@ -457,9 +534,9 @@ export default function BookingAnalytics() {
                     </thead>
                     <tbody>
                       {selectedBookings.map((booking) => {
-                        const clientId = getClientId(booking);
-                        const clientName = getClientName(booking);
-                        const clientContact = getClientContact(booking);
+                        const clientId = resolveClientId(booking);
+                        const clientName = resolveClientName(booking);
+                        const clientContact = resolveClientContact(booking);
                         const amount = toBookingAmount(booking);
                         const status = getBookingStatus(booking);
 
@@ -504,17 +581,28 @@ export default function BookingAnalytics() {
                               {formatCurrency(amount)}
                             </td>
                             <td className="py-4 text-right">
-                              <button
-                                onClick={() =>
-                                  clientId &&
-                                  navigate(`/spaceportal/clients/${clientId}`)
+                              {(() => {
+                                const params = new URLSearchParams();
+                                if (booking.bookingNumber) {
+                                  params.set("bookingNumber", booking.bookingNumber);
                                 }
-                                disabled={!clientId}
+                                if (clientId) {
+                                  params.set("clientId", clientId);
+                                }
+                                const clientsRoute = params.toString()
+                                  ? `/spaceportal/clients?${params.toString()}`
+                                  : "/spaceportal/clients";
+
+                                return (
+                              <button
+                                onClick={() => navigate(clientsRoute)}
                                 className="inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 View Client
                                 <ExternalLink className="h-3.5 w-3.5" />
                               </button>
+                                );
+                              })()}
                             </td>
                           </tr>
                         );

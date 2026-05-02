@@ -111,7 +111,12 @@ export const DashboardLayout = ({
           </div>
 
           {/* Navigation */}
-          <ScrollArea ref={scrollAreaRef} className="flex-1 py-4 min-h-0" data-lenis-prevent>
+          <ScrollArea
+            ref={scrollAreaRef}
+            className="flex-1 min-h-0 py-4"
+            scrollbarClassName="text-[#35503F]/75 hover:text-[#35503F]"
+            data-lenis-prevent
+          >
             <nav className="px-3 space-y-1">
               {navItems.map((item) => (
                 <div key={item.href}>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast as hotToast } from "react-hot-toast";
 
 import type {
@@ -148,6 +148,7 @@ const normalizeClientRows = (rows: Client[]) =>
 
 export default function Clients() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -356,6 +357,21 @@ export default function Clients() {
     setSelectedClient(mappedClient);
     setViewModalOpen(true);
   };
+
+  useEffect(() => {
+    if (!clients.length) return;
+
+    const params = new URLSearchParams(location.search);
+    const bookingNumber = params.get("bookingNumber")?.trim();
+    const clientId = params.get("clientId")?.trim();
+    const searchValue = bookingNumber || clientId || "";
+
+    if (!searchValue) return;
+
+    setDraftFilters((prev) => ({ ...prev, search: searchValue }));
+    setAppliedFilters((prev) => ({ ...prev, search: searchValue }));
+    setPage(1);
+  }, [clients, location.search]);
 
   return (
     <div className="flex-1 animate-in fade-in duration-500">
@@ -581,6 +597,11 @@ export default function Clients() {
         onOpenChat={() => {
           setViewModalOpen(false);
           setChatModalOpen(true);
+        }}
+        onManageClient={() => {
+          if (!selectedClient?.userId) return;
+          setViewModalOpen(false);
+          navigate(`/spaceportal/clients/${selectedClient.userId}`);
         }}
       />
       <PartnerClientChatModal

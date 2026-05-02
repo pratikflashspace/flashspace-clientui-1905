@@ -12,18 +12,8 @@ import {
 } from "lucide-react";
 
 import { API_CONFIG } from "@/config/api.config";
-import { useAuth } from "@/contexts/AuthContext";
 import { useSpacePortalNotifications } from "@/contexts/SpacePortalNotificationsContext";
-import { authService } from "@/services/auth.service";
 import type { SpacePortalNotification } from "@/types/spacePortal/notification";
-
-type NotificationPreferencesState = {
-  email: boolean;
-  reminders: boolean;
-  push: boolean;
-  loginAlerts: boolean;
-  promotional: boolean;
-};
 
 type NotificationVisualMeta = {
   Icon: typeof Bell;
@@ -31,50 +21,6 @@ type NotificationVisualMeta = {
   cardClassName: string;
 };
 
-const DEFAULT_PREFERENCES: NotificationPreferencesState = {
-  email: true,
-  reminders: true,
-  push: true,
-  loginAlerts: true,
-  promotional: false,
-};
-
-const preferenceItems: Array<{
-  key: keyof NotificationPreferencesState;
-  label: string;
-  description: string;
-}> = [
-  {
-    key: "reminders",
-    label: "KYC Alerts",
-    description: "Updates for KYC pending, approval, or rejection",
-  },
-  {
-    key: "push",
-    label: "Mail Notifications",
-    description: "Updates when partner logs new mail records",
-  },
-  {
-    key: "loginAlerts",
-    label: "Visit Alerts",
-    description: "Updates when partner logs new visit records",
-  },
-  {
-    key: "promotional",
-    label: "Marketing Updates",
-    description: "Offers and product announcements",
-  },
-];
-
-const buildPreferences = (
-  raw?: Partial<NotificationPreferencesState>,
-): NotificationPreferencesState => ({
-  email: raw?.email ?? DEFAULT_PREFERENCES.email,
-  reminders: raw?.reminders ?? DEFAULT_PREFERENCES.reminders,
-  push: raw?.push ?? DEFAULT_PREFERENCES.push,
-  loginAlerts: raw?.loginAlerts ?? DEFAULT_PREFERENCES.loginAlerts,
-  promotional: raw?.promotional ?? DEFAULT_PREFERENCES.promotional,
-});
 
 const mapNotification = (raw: any): SpacePortalNotification => {
   const id = raw._id?.toString() ?? raw.id ?? String(Date.now());
@@ -198,23 +144,12 @@ export default function Notifications() {
     restoreNotification,
     navigateToNotification,
   } = useSpacePortalNotifications();
-  const { user, updateUser } = useAuth();
-
   const [searchQuery, setSearchQuery] = useState("");
   const [activeView, setActiveView] = useState<"recent" | "deleted">("recent");
   const [deletedNotifications, setDeletedNotifications] = useState<
     SpacePortalNotification[]
   >([]);
   const [loadingDeleted, setLoadingDeleted] = useState(false);
-  const [updatingPreferenceKey, setUpdatingPreferenceKey] =
-    useState<keyof NotificationPreferencesState | null>(null);
-  const [preferences, setPreferences] = useState<NotificationPreferencesState>(
-    () => buildPreferences(user?.notifications),
-  );
-
-  useEffect(() => {
-    setPreferences(buildPreferences(user?.notifications));
-  }, [user?.notifications]);
 
   const unreadCount = useMemo(
     () => notifications.filter((item) => !item.read && !item.archived).length,
@@ -289,40 +224,10 @@ export default function Notifications() {
     }
   };
 
-  const handleTogglePreference = async (
-    key: keyof NotificationPreferencesState,
-  ) => {
-    const nextPreferences = {
-      ...preferences,
-      [key]: !preferences[key],
-    };
-    const previousPreferences = preferences;
-
-    setPreferences(nextPreferences);
-    setUpdatingPreferenceKey(key);
-
-    try {
-      const response = await authService.updateProfile({
-        notifications: nextPreferences,
-      });
-
-      if (response.success && response.data) {
-        updateUser(response.data);
-      } else {
-        setPreferences(previousPreferences);
-      }
-    } catch (error) {
-      console.error("[SpacePortal] Failed to update preferences:", error);
-      setPreferences(previousPreferences);
-    } finally {
-      setUpdatingPreferenceKey(null);
-    }
-  };
-
   return (
     <div className="min-h-[calc(100vh-8rem)] bg-gray-50 px-0 py-2 sm:py-4">
       <div className="mx-auto max-w-7xl space-y-8">
-        <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[1fr_320px]">
+        <div className="grid grid-cols-1 items-start gap-8">
           <section className="space-y-8">
             <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
               <div className="space-y-1">
@@ -404,32 +309,6 @@ export default function Notifications() {
               )}
             </div>
           </section>
-
-          <aside className="rounded-3xl border border-[#d8e3df] bg-white p-6 shadow-sm">
-            <h3 className="text-xl font-semibold leading-none text-[#13282b]">
-              Notification Preferences
-            </h3>
-            <div className="mt-5 space-y-5">
-              {preferenceItems.map((item) => (
-                <div
-                  key={item.key}
-                  className="flex items-center justify-between gap-4"
-                >
-                  <div>
-                    <p className="font-bold text-[#13282b]">{item.label}</p>
-                    <p className="mt-0.5 text-sm leading-5 text-[#40575d]">
-                      {item.description}
-                    </p>
-                  </div>
-                  <ToggleButton
-                    checked={preferences[item.key]}
-                    disabled={updatingPreferenceKey === item.key}
-                    onClick={() => handleTogglePreference(item.key)}
-                  />
-                </div>
-              ))}
-            </div>
-          </aside>
         </div>
       </div>
     </div>
