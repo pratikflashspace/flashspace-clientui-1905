@@ -33,6 +33,8 @@ import { toast } from "sonner";
 import { StatsSkeleton, TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { motion, AnimatePresence } from "framer-motion";
 
+const ITEMS_PER_PAGE = 6;
+
 interface InvoiceStats {
   totalAmount: number;
   totalPaid: number;
@@ -127,6 +129,7 @@ const AdminPartnerInvoices = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<"All" | "Paid" | "Pending">("All");
+  const [currentPage, setCurrentPage] = useState(1);
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [selectedInvoice, setSelectedInvoice] =
     useState<PartnerInvoiceAdminRecord | null>(null);
@@ -167,6 +170,10 @@ const AdminPartnerInvoices = () => {
   useEffect(() => {
     fetchInvoices();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeTab]);
 
   useEffect(() => {
     if (!paymentProofFile) {
@@ -349,6 +356,23 @@ const AdminPartnerInvoices = () => {
     return matchesSearch && matchesTab;
   });
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredInvoices.length / ITEMS_PER_PAGE),
+  );
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedInvoices = filteredInvoices.slice(
+    (safePage - 1) * ITEMS_PER_PAGE,
+    safePage * ITEMS_PER_PAGE,
+  );
+  const visibleStart = filteredInvoices.length
+    ? (safePage - 1) * ITEMS_PER_PAGE + 1
+    : 0;
+  const visibleEnd = Math.min(
+    safePage * ITEMS_PER_PAGE,
+    filteredInvoices.length,
+  );
+
   return (
     <DashboardLayout
       portalName="FlashSpace Admin"
@@ -522,7 +546,7 @@ const AdminPartnerInvoices = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {filteredInvoices.map((record, idx) => {
+                      {paginatedInvoices.map((record, idx) => {
                         const status = normalizeInvoiceStatus(record.status);
                         const details = record.paymentDetails;
                         const settlementComplete = hasSettlementDetails(record);
@@ -680,6 +704,44 @@ const AdminPartnerInvoices = () => {
           </AnimatePresence>
         )}
       </div>
+
+      {!loading && filteredInvoices.length > 0 && (
+        <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-border bg-background px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs font-medium text-muted-foreground">
+            Showing{" "}
+            <span className="font-bold text-foreground">{visibleStart}</span>-
+            <span className="font-bold text-foreground">{visibleEnd}</span> of{" "}
+            <span className="font-bold text-foreground">{filteredInvoices.length}</span>{" "}
+            invoices
+          </p>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 rounded-lg px-4 text-xs font-semibold"
+              disabled={safePage <= 1}
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            >
+              Previous
+            </Button>
+            <div className="flex h-9 min-w-20 items-center justify-center rounded-lg border border-border bg-muted/20 px-3 text-xs font-bold text-foreground">
+              {safePage} / {totalPages}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 rounded-lg px-4 text-xs font-semibold"
+              disabled={safePage >= totalPages}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+              }
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
 
       {paymentModalOpen && (
         <div className="fixed inset-0 z-[1500] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">

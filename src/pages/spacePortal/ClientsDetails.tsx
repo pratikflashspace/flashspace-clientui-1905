@@ -185,23 +185,23 @@ export default function ClientDetails() {
       {/* Back Button */}
       <button
         onClick={() => navigate("/spaceportal/clients")}
-        className="flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+        className="flex w-fit items-center gap-2 rounded-xl border border-[#DDE5DA] bg-white px-4 py-2 text-sm font-semibold text-[#35503F] hover:bg-[#F8FAF7]"
       >
         <ArrowLeft size={16} />
         Back to Clients
       </button>
 
       {/* Header Card */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">
+            <h1 className="text-3xl font-bold text-[#10251A]">
               {client.companyName}
             </h1>
 
-            <p className="mt-2 text-slate-500">
+            <p className="mt-2 text-[#607067]">
               Client ID:{" "}
-              <span className="font-semibold text-slate-700">{client.id}</span>
+              <span className="font-semibold text-[#35503F]">{client.id}</span>
             </p>
 
             {/* Tags */}
@@ -222,7 +222,7 @@ export default function ClientDetails() {
               onClick={() =>
                 handleOpenLink(client.agreement.agreementUrl, "Agreement")
               }
-              className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="flex items-center justify-center gap-2 rounded-xl border border-[#DDE5DA] bg-white px-5 py-3 text-sm font-semibold text-[#35503F] hover:bg-[#F8FAF7]"
             >
               <Download size={16} />
               Download Agreement
@@ -231,7 +231,7 @@ export default function ClientDetails() {
             <button
               type="button"
               onClick={() => document.getElementById("agreement-upload")?.click()}
-              className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="flex items-center justify-center gap-2 rounded-xl border border-[#DDE5DA] bg-white px-5 py-3 text-sm font-semibold text-[#35503F] hover:bg-[#F8FAF7]"
             >
               <Upload size={16} />
               Upload Final Agreement
@@ -284,7 +284,7 @@ export default function ClientDetails() {
             <div className="mt-6 overflow-x-auto">
               <table className="w-full min-w-[900px] border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-slate-500">
+                  <tr className="border-b border-[#DDE5DA] text-[#607067]">
                     <th className="py-3">Booking ID</th>
                     <th>Date</th>
                     <th>Slot</th>
@@ -297,17 +297,17 @@ export default function ClientDetails() {
                   {client.bookings.map((b) => (
                     <tr
                       key={b.id}
-                      className="border-b border-slate-100 hover:bg-slate-50"
+                      className="border-b border-[#EEF4F0] hover:bg-[#F8FAF7]"
                     >
-                      <td className="py-3 font-semibold text-slate-900">
+                      <td className="py-3 font-semibold text-[#10251A]">
                         {b.id}
                       </td>
-                      <td className="text-slate-700">{b.date}</td>
-                      <td className="text-slate-600">{b.slot}</td>
+                      <td className="text-[#35503F]">{b.date}</td>
+                      <td className="text-[#607067]">{b.slot}</td>
                       <td>
                         <BookingStatusBadge status={b.status} />
                       </td>
-                      <td className="text-right font-semibold text-slate-900">
+                      <td className="text-right font-semibold text-[#10251A]">
                         ₹{b.amount}
                       </td>
                     </tr>
@@ -316,7 +316,7 @@ export default function ClientDetails() {
               </table>
 
               {client.bookings.length === 0 && (
-                <p className="mt-6 text-center text-slate-500">
+                <p className="mt-6 text-center text-[#607067]">
                   No bookings found.
                 </p>
               )}
@@ -331,7 +331,7 @@ export default function ClientDetails() {
             <div className="mt-6 overflow-x-auto">
               <table className="w-full min-w-[900px] border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-slate-500">
+                  <tr className="border-b border-[#DDE5DA] text-[#607067]">
                     <th className="py-3">Invoice #</th>
                     <th>Date</th>
                     <th>Status</th>
@@ -343,16 +343,16 @@ export default function ClientDetails() {
                   {client.invoices.map((inv) => (
                     <tr
                       key={inv.id}
-                      className="border-b border-slate-100 hover:bg-slate-50"
+                      className="border-b border-[#EEF4F0] hover:bg-[#F8FAF7]"
                     >
-                      <td className="py-3 font-semibold text-slate-900">
+                      <td className="py-3 font-semibold text-[#10251A]">
                         {inv.invoiceNumber}
                       </td>
-                      <td className="text-slate-600">{inv.createdAt}</td>
+                      <td className="text-[#607067]">{inv.createdAt}</td>
                       <td>
                         <InvoiceStatusBadge status={inv.status} />
                       </td>
-                      <td className="text-right font-semibold text-slate-900">
+                      <td className="text-right font-semibold text-[#10251A]">
                         ₹{inv.amount}
                       </td>
                     </tr>
@@ -361,7 +361,7 @@ export default function ClientDetails() {
               </table>
 
               {client.invoices.length === 0 && (
-                <p className="mt-6 text-center text-slate-500">
+                <p className="mt-6 text-center text-[#607067]">
                   No invoices found.
                 </p>
               )}
@@ -372,23 +372,23 @@ export default function ClientDetails() {
         {/* RIGHT SIDE */}
         <div className="flex flex-col gap-6">
           {/* KYC Card */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <ShieldCheck className="text-[#3FA69E]" size={20} />
-              <h2 className="text-lg font-bold text-slate-900">KYC Details</h2>
+              <h2 className="text-lg font-bold text-[#10251A]">KYC Details</h2>
             </div>
 
             <div className="mt-6 space-y-4 text-sm">
-              <p className="text-slate-600">
+              <p className="text-[#607067]">
                 Status:{" "}
-                <span className="font-semibold text-slate-900">
+                <span className="font-semibold text-[#10251A]">
                   {client.kyc.status}
                 </span>
               </p>
 
-              <p className="text-slate-600">
+              <p className="text-[#607067]">
                 Documents:{" "}
-                <span className="font-semibold text-slate-900">
+                <span className="font-semibold text-[#10251A]">
                   {client.kyc.documents.length} uploaded
                 </span>
               </p>
@@ -410,10 +410,10 @@ export default function ClientDetails() {
           </div>
 
           {/* Agreement Card */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <FileText className="text-[#3FA69E]" size={20} />
-              <h2 className="text-lg font-bold text-slate-900">
+              <h2 className="text-lg font-bold text-[#10251A]">
                 Agreement Details
               </h2>
             </div>
@@ -435,7 +435,7 @@ export default function ClientDetails() {
               onClick={() =>
                 handleOpenLink(client.agreement.agreementUrl, "Agreement")
               }
-              className="mt-6 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="mt-6 w-full rounded-xl border border-[#DDE5DA] bg-white px-4 py-3 text-sm font-semibold text-[#35503F] hover:bg-[#F8FAF7]"
             >
               Download PDF
             </button>
@@ -445,12 +445,12 @@ export default function ClientDetails() {
 
       {/* Uploaded Docs Dialog */}
       <Dialog open={isDocsOpen} onOpenChange={setIsDocsOpen}>
-        <DialogContent className="max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+        <DialogContent className="max-w-xl rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-xl">
           <DialogHeader>
-            <DialogTitle className="text-slate-900">
+            <DialogTitle className="text-[#10251A]">
               Uploaded Documents
             </DialogTitle>
-            <DialogDescription className="text-slate-500">
+            <DialogDescription className="text-[#607067]">
               Review the client KYC documents.
             </DialogDescription>
           </DialogHeader>
@@ -459,13 +459,13 @@ export default function ClientDetails() {
             {client.kyc.documents.map((doc) => (
               <div
                 key={doc.id}
-                className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 rounded-xl border border-[#DDE5DA] bg-[#F8FAF7] p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">
+                  <p className="text-sm font-semibold text-[#10251A]">
                     {doc.type}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-[#607067]">
                     Uploaded: {doc.uploadedAt}
                   </p>
                 </div>
@@ -480,7 +480,7 @@ export default function ClientDetails() {
                         `${doc.type} document`,
                       )
                     }
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                    className="rounded-lg border border-[#DDE5DA] bg-white px-3 py-1.5 text-xs font-semibold text-[#35503F] hover:bg-[#EEF4F0]"
                   >
                     View
                   </button>
@@ -503,14 +503,14 @@ export default function ClientDetails() {
 
       {/* Document Viewer Modal */}
       <Dialog open={viewerOpen} onOpenChange={setViewerOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-xl flex flex-col">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-xl flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-slate-900">
+            <DialogTitle className="text-[#10251A]">
               {viewingDoc?.label || "Document Preview"}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="mt-4 flex-1 flex items-center justify-center bg-slate-50 rounded-xl overflow-hidden min-h-[50vh]">
+          <div className="mt-4 flex-1 flex items-center justify-center rounded-xl bg-[#F8FAF7] overflow-hidden min-h-[50vh]">
             {viewingDoc?.url ? (
               viewingDoc.type.toLowerCase().includes("video") ? (
                 <video
@@ -529,7 +529,7 @@ export default function ClientDetails() {
                 />
               )
             ) : (
-              <p className="text-slate-500">No preview available</p>
+              <p className="text-[#607067]">No preview available</p>
             )}
           </div>
 
@@ -538,7 +538,7 @@ export default function ClientDetails() {
               onClick={() =>
                 handleOpenLink(viewingDoc?.url, viewingDoc?.label || "Document")
               }
-              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="flex items-center gap-2 rounded-xl border border-[#DDE5DA] bg-white px-5 py-2.5 text-sm font-semibold text-[#35503F] hover:bg-[#F8FAF7]"
             >
               <Download size={16} />
               Open in New Tab
@@ -570,9 +570,9 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-      <p className="mt-1 text-sm text-slate-500">{description}</p>
+    <div className="rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-sm">
+      <h2 className="text-lg font-bold text-[#10251A]">{title}</h2>
+      <p className="mt-1 text-sm text-[#607067]">{description}</p>
       {children}
     </div>
   );
@@ -584,8 +584,8 @@ function SectionCard({
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col">
-      <span className="text-xs font-semibold text-slate-500">{label}</span>
-      <span className="mt-1 text-sm font-semibold text-slate-900">
+      <span className="text-xs font-semibold text-[#607067]">{label}</span>
+      <span className="mt-1 text-sm font-semibold text-[#10251A]">
         {value || "-"}
       </span>
     </div>

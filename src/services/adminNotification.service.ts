@@ -17,16 +17,21 @@ export interface AdminNotification {
   title: string;
   message: string;
   read: boolean;
+  archived?: boolean;
   metadata?: any;
   createdAt: string;
 }
 
 export const AdminNotificationService = {
-  getAll: async (): Promise<AdminNotification[]> => {
+  getAll: async (
+    archived?: "only" | "all",
+  ): Promise<AdminNotification[]> => {
     const response = await axiosInstance.get<{
       success: boolean;
       data: AdminNotification[];
-    }>("/api/notifications/admin");
+    }>("/api/notifications/admin", {
+      params: archived ? { archived } : undefined,
+    });
     return response.data.data;
   },
 
@@ -43,6 +48,14 @@ export const AdminNotificationService = {
       success: boolean;
       data: AdminNotification;
     }>(`/api/notifications/${id}/read`);
+    return response.data.data;
+  },
+
+  toggleArchive: async (id: string): Promise<AdminNotification> => {
+    const response = await axiosInstance.patch<{
+      success: boolean;
+      data: AdminNotification;
+    }>(`/api/notifications/${id}/archive`);
     return response.data.data;
   },
 };

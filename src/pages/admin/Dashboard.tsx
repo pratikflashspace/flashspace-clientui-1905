@@ -109,12 +109,12 @@ const financeFeatures = [
     title: "Invoice Management",
     description:
       "View and approve/reject invoices from clients and space partners",
-    href: "/admin/invoices",
+    href: "/admin/partner-invoices",
   },
   {
     title: "Cleared Invoices",
     description: "Track all cleared invoices with payment details",
-    href: "/admin/invoices",
+    href: "/admin/partner-invoices",
   },
   {
     title: "Balance Sheet",

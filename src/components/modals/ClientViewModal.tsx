@@ -24,6 +24,7 @@ interface ClientViewModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onOpenChat: () => void;
+  onManageClient?: () => void;
 }
 
 export const ClientViewModal = ({
@@ -31,6 +32,7 @@ export const ClientViewModal = ({
   open,
   onOpenChange,
   onOpenChat,
+  onManageClient,
 }: ClientViewModalProps) => {
   if (!client) return null;
 
@@ -164,7 +166,9 @@ export const ClientViewModal = ({
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Message
               </Button>
-              <Button className="flex-1">Manage Client</Button>
+              <Button className="flex-1" onClick={onManageClient}>
+                Manage Client
+              </Button>
             </div>
           </div>
         </div>

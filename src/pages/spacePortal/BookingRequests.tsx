@@ -123,6 +123,32 @@ const partnerStatusLabel = (status?: string) => {
   return "Partner Pending";
 };
 
+const getEffectiveKycStatus = (request: BookingRequest) => {
+  const partnerDocs = [
+    ...(request.kyc.personalDocuments || []),
+    ...(request.kyc.businessDocuments || []),
+    ...((request.kyc.partnerDocuments || []).flatMap((partner) => partner.documents || [])),
+  ];
+
+  if (!partnerDocs.length) {
+    return String(request.kycStatus || "pending").toLowerCase();
+  }
+
+  const partnerStatuses = partnerDocs.map((doc) =>
+    String(doc.partnerReviewStatus || "pending").toLowerCase(),
+  );
+
+  if (partnerStatuses.some((status) => status === "rejected")) {
+    return "rejected";
+  }
+
+  if (partnerStatuses.every((status) => status === "approved")) {
+    return "approved";
+  }
+
+  return "pending";
+};
+
 export default function BookingRequests() {
   const [requests, setRequests] = useState<BookingRequest[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
@@ -153,6 +179,7 @@ export default function BookingRequests() {
 
   const filtered = useMemo(() => {
     return requests.filter((request) => {
+      const effectiveKycStatus = getEffectiveKycStatus(request);
       const haystack = [
         request.bookingNumber,
         request.client.name,
@@ -162,7 +189,10 @@ export default function BookingRequests() {
         request.plan.name,
       ].join(" ").toLowerCase();
       const matchesQuery = haystack.includes(query.toLowerCase());
-      const matchesStatus = status === "all" || request.status === status || request.kycStatus === status;
+      const matchesStatus =
+        status === "all" ||
+        request.status === status ||
+        effectiveKycStatus === status;
       return matchesQuery && matchesStatus;
     });
   }, [requests, query, status]);
@@ -188,7 +218,7 @@ export default function BookingRequests() {
   }, [selected]);
 
   const metrics = useMemo(() => {
-    const pendingKyc = requests.filter((request) => request.kycStatus !== "approved").length;
+    const pendingKyc = requests.filter((request) => getEffectiveKycStatus(request) !== "approved").length;
     const signedPending = requests.filter((request) => request.agreement.signedAgreement?.status === "pending").length;
     const finalReady = requests.filter((request) => request.agreement.finalAgreement).length;
     return { total: requests.length, pendingKyc, signedPending, finalReady };
@@ -401,6 +431,9 @@ export default function BookingRequests() {
               <p className="p-6 text-sm text-[#607067]">No booking requests found.</p>
             ) : (
               filtered.map((request) => (
+                (() => {
+                  const effectiveKycStatus = getEffectiveKycStatus(request);
+                  return (
                 <button
                   key={request.bookingId}
                   onClick={() => {
@@ -415,15 +448,20 @@ export default function BookingRequests() {
                       <p className="mt-1 text-sm font-semibold text-[#2D3F33]">{request.client.companyName || request.client.name}</p>
                       <p className="text-xs text-[#607067]">{request.space.name}</p>
                     </div>
-                    <span className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase ${statusClass(request.kycStatus)}`}>{request.kycStatus}</span>
+                    <span className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase ${statusClass(effectiveKycStatus)}`}>{effectiveKycStatus}</span>
                   </div>
                 </button>
+                  );
+                })()
               ))
             )}
           </div>
         </div>
 
         {selected && (
+          (() => {
+            const selectedKycStatus = getEffectiveKycStatus(selected);
+            return (
           <div
             className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
             onWheel={(event) => event.preventDefault()}
@@ -454,8 +492,8 @@ export default function BookingRequests() {
                         <MapPin size={14} /> {selected.space.address || selected.space.city || "Location"}
                       </p>
                     </div>
-                    <span className={`hidden rounded-full border px-3 py-1 text-sm font-bold uppercase shadow-sm sm:inline-flex ${statusClass(selected.kycStatus)}`}>
-                      {selected.kycStatus}
+                    <span className={`hidden rounded-full border px-3 py-1 text-sm font-bold uppercase shadow-sm sm:inline-flex ${statusClass(selectedKycStatus)}`}>
+                      {selectedKycStatus}
                     </span>
                   </div>
                 </div>
@@ -685,6 +723,8 @@ export default function BookingRequests() {
               </div>
             </div>
           </div>
+            );
+          })()
         )}
       </div>
     </div>
