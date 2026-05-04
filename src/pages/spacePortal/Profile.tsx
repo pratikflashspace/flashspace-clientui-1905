@@ -61,9 +61,9 @@ export default function Profile() {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const resp = await spacePartnerService.fetchMyKyc();
       if (resp.success && resp.data) {
         setKycData(resp.data);
@@ -175,7 +175,10 @@ export default function Profile() {
                   <>
                     <Button 
                       variant="ghost" 
-                      onClick={() => setIsEditingBusiness(false)}
+                      onClick={() => {
+                        setIsEditingBusiness(false);
+                        fetchData(false);
+                      }}
                       className="rounded-2xl font-bold flex items-center gap-2"
                     >
                       <X className="w-4 h-4" /> Cancel
@@ -305,7 +308,10 @@ export default function Profile() {
                   <>
                     <Button 
                       variant="ghost" 
-                      onClick={() => setIsEditingBank(false)}
+                      onClick={() => {
+                        setIsEditingBank(false);
+                        fetchData(false);
+                      }}
                       className="rounded-2xl font-bold flex items-center gap-2"
                     >
                       <X className="w-4 h-4" /> Cancel
