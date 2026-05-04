@@ -75,7 +75,7 @@ const Profile: React.FC = () => {
     panNumber: "",
     cinNumber: "",
     address: "",
-    businessNature: "",
+    industry: "",
   });
 
   const extractAddressFromKYC = (profile: KYCData | null | undefined) => {
@@ -174,7 +174,7 @@ const Profile: React.FC = () => {
               gstNumber: kyc.businessInfo?.gstNumber || prev.gstNumber || "",
               panNumber: kyc.businessInfo?.panNumber || prev.panNumber || "",
               cinNumber: kyc.businessInfo?.cinNumber || prev.cinNumber || "",
-              businessNature: kyc.businessInfo?.businessNature || prev.businessNature || "",
+              industry: kyc.businessInfo?.industry || kyc.businessInfo?.businessNature || prev.industry || "",
             }));
           }
         }
@@ -304,7 +304,8 @@ const Profile: React.FC = () => {
           registeredAddress: finalAddress,
           address: finalAddress,
           companyName: businessInfoForm.companyName,
-          companyType: businessInfoForm.companyType
+          companyType: businessInfoForm.companyType,
+          industry: businessInfoForm.industry
         }
       };
 
@@ -405,7 +406,7 @@ const Profile: React.FC = () => {
         gstNumber: kycData.businessInfo?.gstNumber || "",
         panNumber: kycData.businessInfo?.panNumber || "",
         cinNumber: kycData.businessInfo?.cinNumber || "",
-        businessNature: kycData.businessInfo?.businessNature || "",
+        industry: kycData.businessInfo?.industry || kycData.businessInfo?.businessNature || "",
       });
     }
   };
@@ -891,23 +892,23 @@ const Profile: React.FC = () => {
                         </div>
                         <div>
                           <label className="block text-sm text-gray-500 mb-1">
-                            Business Nature
+                            Industry
                           </label>
                           {isEditing ? (
                             <input
                               type="text"
-                              value={businessInfoForm.businessNature}
+                              value={businessInfoForm.industry}
                               onChange={(e) =>
                                 setBusinessInfoForm({
                                   ...businessInfoForm,
-                                  businessNature: e.target.value,
+                                  industry: e.target.value,
                                 })
                               }
                               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                             />
                           ) : (
                             <p className="text-gray-900">
-                              {kycData.businessInfo?.businessNature || "N/A"}
+                              {kycData.businessInfo?.industry || kycData.businessInfo?.businessNature || "N/A"}
                             </p>
                           )}
                         </div>

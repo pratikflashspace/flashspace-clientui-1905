@@ -121,6 +121,12 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
     }, []);
 
     useEffect(() => {
+        const handleOpenContact = () => setIsContactOpen(true);
+        window.addEventListener('open-contact-modal', handleOpenContact);
+        return () => window.removeEventListener('open-contact-modal', handleOpenContact);
+    }, []);
+
+    useEffect(() => {
         // Rule 2: Show every time the user is inactive for 60 seconds
         let inactivityTimer: NodeJS.Timeout;
 
