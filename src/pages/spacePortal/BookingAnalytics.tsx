@@ -707,30 +707,22 @@ export default function BookingAnalytics() {
           title="Total Bookings"
           value={analytics?.summary?.totalBookings || 0}
           icon={CalendarCheck}
-          trend="+8%"
-          isUp={true}
         />
         <AnalyticsStat
           title="Active Clients"
           value={analytics?.summary?.activeClients || 0}
           icon={Users}
-          trend="+5%"
-          isUp={true}
         />
         <AnalyticsStat
           title="Cancelled"
           value={analytics?.summary?.cancelledBookings || 0}
           icon={XCircle}
-          trend="-2%"
-          isUp={false}
           color="text-rose-600"
         />
         <AnalyticsStat
           title="Pending"
           value={analytics?.summary?.pendingRequests || 0}
           icon={Clock}
-          trend="+3%"
-          isUp={true}
           color="text-amber-600"
         />
       </div>
@@ -1032,12 +1024,6 @@ function AnalyticsStat({
       <div className="flex items-center justify-between mb-4">
         <div className="p-2 rounded-xl bg-muted/50">
           <Icon className={`w-5 h-5 ${color}`} />
-        </div>
-        <div
-          className={`flex items-center gap-0.5 text-xs font-black ${isUp ? "text-emerald-600" : "text-rose-600"}`}
-        >
-          {isUp ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-          {trend}
         </div>
       </div>
       <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">

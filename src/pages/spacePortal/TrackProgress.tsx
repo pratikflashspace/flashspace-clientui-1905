@@ -170,9 +170,7 @@ const TrackProgress = () => {
                 <th className="p-5 text-center text-[11px] font-extrabold uppercase tracking-widest">
                   KYC (Admin)
                 </th>
-                <th className="p-5 text-center text-[11px] font-extrabold uppercase tracking-widest">
-                  KYC (My Space)
-                </th>
+
                 <th className="p-5 text-center text-[11px] font-extrabold uppercase tracking-widest">
                   Draft Agreement
                 </th>
@@ -203,11 +201,7 @@ const TrackProgress = () => {
                         <StatusIndicator approved={item.userKycApprovedByAdmin} label="Admin" />
                       </div>
                     </td>
-                    <td className="p-5 text-center">
-                      <div className="flex justify-center">
-                        <StatusIndicator approved={item.userKycApprovedBySpace} label="Space" />
-                      </div>
-                    </td>
+
                     <td className="p-5 text-center">
                       <BooleanIndicator value={item.draftSubmitted} trueLabel="Sent" falseLabel="Pending" />
                     </td>
@@ -224,7 +218,7 @@ const TrackProgress = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={9} className="p-16 text-center">
+                  <td colSpan={8} className="p-16 text-center">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <p className="text-muted-foreground font-bold">No bookings found for the search criteria.</p>
                       <Button variant="link" onClick={() => setSearchQuery("")} className="text-primary p-0 h-auto font-bold">

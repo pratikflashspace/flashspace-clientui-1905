@@ -872,15 +872,10 @@ const MyBookings: React.FC = () => {
                               <ShieldCheck className="w-4 h-4" /> Verify KYC
                             </button>
                           )}
-                          {booking.documents &&
-                            booking.documents.length > 0 && (
-                              <button className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2">
-                                <Download className="w-4 h-4" /> Documents
-                              </button>
-                            )}
+
 
                           <button
-                            onClick={() => setQueryModalBooking(booking)}
+                            onClick={() => navigate('/dashboard/support', { state: { bookingId: booking._id, autoShowForm: true } })}
                             className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md flex items-center gap-2"
                           >
                             <MessageSquare className="w-4 h-4" /> Raise Query

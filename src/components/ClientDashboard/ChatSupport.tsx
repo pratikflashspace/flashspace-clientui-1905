@@ -124,6 +124,18 @@ export default function ChatSupport() {
 
     useEffect(() => {
         fetchTickets();
+        
+        // Handle incoming state from MyBookings "Raise Query"
+        if (location.state?.autoShowForm) {
+            setShowNewTicketForm(true);
+            if (location.state.bookingId) {
+                setNewTicketData(prev => ({
+                    ...prev,
+                    bookingId: location.state.bookingId,
+                    category: 'bookings'
+                }));
+            }
+        }
     }, [location.state]);
 
     useEffect(() => {

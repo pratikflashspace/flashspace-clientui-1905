@@ -48,11 +48,7 @@ export const sidebarConfig = [
     path: "/spaceportal/space-management",
     icon: Building2,
   },
-  {
-    label: "Booking Calendar",
-    path: "/spaceportal/booking-calendar",
-    icon: CalendarDays,
-  },
+
   {
     label: "Booking Requests",
     path: "/spaceportal/booking-requests",
