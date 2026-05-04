@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -95,6 +96,7 @@ export interface MapMarker {
   reviews?: number;
   address?: string;
   features?: string[];
+  link?: string;
 }
 
 interface MapLibreMapProps {
@@ -195,6 +197,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
+  const navigate = useNavigate();
   const markersRef = useRef<maplibregl.Marker[]>([]);
   const popupsRef = useRef<maplibregl.Popup[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -482,7 +485,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
                   ${markerData.price ? markerData.price.replace(/\/month.*/, '') : 'Ask for Price'}
                 </span>
               </div>
-              <button style="
+              <button class="view-details-btn" style="
                 background: #35503F; color: white; border: none;
                 padding: 8px 16px; border-radius: 10px;
                 font-size: 12px; font-weight: 600; cursor: pointer;
@@ -544,7 +547,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
               if (viewDetailsBtn) {
                 viewDetailsBtn.addEventListener('click', (e) => {
                   e.stopPropagation();
-                  window.location.href = `/space/${markerData.id}`;
+                  navigate(markerData.link || `/space/${markerData.id}`);
                 });
               }
 
