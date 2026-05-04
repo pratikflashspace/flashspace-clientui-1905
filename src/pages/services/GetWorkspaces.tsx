@@ -595,9 +595,17 @@ const GetWorkspaces = () => {
     const searchStr = `?city=${encodeURIComponent(currentCity)}`;
 
     if (value === "coworking")
-      navigate(`/services/coworking-space${searchStr}`);
-    else if (value === "on-demand") navigate(`/services/on-demand${searchStr}`);
-    else navigate(`/services/virtual-office${searchStr}`);
+      navigate(`/services/coworking-space${searchStr}`, { replace: true });
+    else if (value === "on-demand") navigate(`/services/on-demand${searchStr}`, { replace: true });
+    else navigate(`/services/virtual-office${searchStr}`, { replace: true });
+  };
+
+  const handleCityChange = (city: string) => {
+    const params = new URLSearchParams(location.search);
+    params.set("city", city);
+    // Use replace to avoid cluttering history with filter changes
+    navigate({ search: params.toString() }, { replace: true });
+    // activeCity state will be updated by the useEffect listening to location.search
   };
   const [searchLocation, setSearchLocation] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -912,7 +920,7 @@ const GetWorkspaces = () => {
               activeCity={activeCity}
               cities={availableCities}
               loading={citiesLoading}
-              onSelect={(city) => setActiveCity(city)}
+              onSelect={handleCityChange}
             />
 
             {/* Search Location */}
@@ -1106,15 +1114,22 @@ const GetWorkspaces = () => {
                 lat: sortedWorkspaces[0]?.lat || workspaces[0]?.lat || 28.6139,
                 lng: sortedWorkspaces[0]?.lng || workspaces[0]?.lng || 77.209,
               }), [sortedWorkspaces, workspaces])}
-              markers={useMemo(() => sortedWorkspaces.map((ws) => ({
-                id: ws.id,
-                position: { lat: ws.lat, lng: ws.lng },
-                title: ws.spaceId || ws.name,
-                image: ws.images?.[0] || ws.image,
-                price: ws.plans?.[0]?.price,
-                rating: ws.rating,
-                address: ws.address,
-              })), [sortedWorkspaces])}
+              markers={useMemo(() => sortedWorkspaces.map((ws) => {
+                let link = `/space/${ws.id}`;
+                if (workspaceType === "coworking") link = `/coworking-space/${ws.id}`;
+                else if (workspaceType === "on-demand") link = `/meeting-room/${ws.id}`;
+
+                return {
+                  id: ws.id,
+                  position: { lat: ws.lat, lng: ws.lng },
+                  title: ws.spaceId || ws.name,
+                  image: ws.images?.[0] || ws.image,
+                  price: ws.plans?.[0]?.price,
+                  rating: ws.rating,
+                  address: ws.address,
+                  link: link,
+                };
+              }), [sortedWorkspaces, workspaceType])}
               height="100%"
               mapStyle="retro"
             />
