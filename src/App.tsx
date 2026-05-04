@@ -92,7 +92,6 @@ import BalanceSheet from "./pages/admin/BalanceSheet";
 
 import RevenueDashboard from "./pages/admin/RevenueDashboard";
 
-import SupportChat from "./pages/admin/SupportChat";
 import Leaderboard from "./pages/admin/Leaderboard";
 import AdminAffiliateManagement from "./pages/admin/AdminAffiliateManagement";
 import AdminPartnerInvoices from "./pages/admin/PartnerInvoices";
@@ -425,7 +424,7 @@ const App = () => (
                           element={<SalesAnalytics />}
                         />
                         <Route path="leaderboard" element={<Leaderboard />} />
-                        <Route path="support" element={<SupportChat />} />
+                        <Route path="support" element={<Navigate to="/admin" replace />} />
                         <Route path="revenue" element={<RevenueDashboard />} />
                         <Route path="tickets" element={<TicketSystem />} />
                         <Route
