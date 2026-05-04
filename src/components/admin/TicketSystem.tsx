@@ -8,6 +8,7 @@ import {
   CheckCircle,
   Eye,
   RefreshCw,
+  Building2,
 } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
@@ -458,21 +459,37 @@ export default function TicketSystem() {
                 <td className="p-4">{getPriorityBadge("medium")}</td>
                 <td className="p-4">
                   <div className="flex items-center gap-2">
-                    <Avatar className="w-6 h-6">
-                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                        {ticket.assignee?.fullName
-                          ? ticket.assignee.fullName.substring(0, 2).toUpperCase()
-                          : "UA"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm text-muted-foreground">
-                        {ticket.assignee?.fullName || "Unassigned"}
-                      </span>
-                      {ticket.assignee?.role && (
-                        <span className="text-xs text-muted-foreground/70">{ticket.assignee.role}</span>
-                      )}
-                    </div>
+                    {ticket.bookingId ? (
+                      <>
+                        <div className="w-6 h-6 rounded-lg bg-green-100 flex items-center justify-center text-green-700">
+                          <Building2 className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold text-foreground">
+                            {ticket.bookingId.spaceSnapshot?.name || "Linked Space"}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground uppercase tracking-tight">
+                            Space Assignee
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Avatar className="w-6 h-6">
+                          <AvatarFallback className="text-[10px] bg-blue-100 text-blue-700 font-bold">
+                            AD
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold text-foreground">
+                            Admin
+                          </span>
+                          <span className="text-[10px] text-muted-foreground uppercase tracking-tight">
+                            Direct Support
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </td>
                 <td className="p-4 text-sm text-muted-foreground">
@@ -534,22 +551,33 @@ export default function TicketSystem() {
 
             <div className="flex items-center justify-between pt-1">
               <div className="flex items-center gap-2">
-                <Avatar className="w-6 h-6 border border-border">
-                  <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
-                    {ticket.assignee?.fullName
-                      ? ticket.assignee.fullName.substring(0, 2).toUpperCase()
-                      : "UA"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                  <p className="text-[10px] text-muted-foreground leading-none">Assignee</p>
-                  <span className="text-xs font-medium text-foreground">
-                    {ticket.assignee?.fullName || "Unassigned"}
-                  </span>
-                  {ticket.assignee?.role && (
-                    <span className="text-[10px] text-muted-foreground/70">{ticket.assignee.role}</span>
-                  )}
-                </div>
+                {ticket.bookingId ? (
+                  <>
+                    <div className="w-6 h-6 rounded-lg bg-green-100 flex items-center justify-center text-green-700 border border-green-200">
+                      <Building2 className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="text-[10px] text-muted-foreground leading-none">Assignee</p>
+                      <span className="text-xs font-bold text-foreground">
+                        {ticket.bookingId.spaceSnapshot?.name || "Linked Space"}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Avatar className="w-6 h-6 border border-blue-100">
+                      <AvatarFallback className="text-[10px] bg-blue-100 text-blue-700 font-bold">
+                        AD
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <p className="text-[10px] text-muted-foreground leading-none">Assignee</p>
+                      <span className="text-xs font-bold text-foreground">
+                        Admin
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
               <div className="text-right">
                 <p className="text-[10px] text-muted-foreground leading-none">Created</p>

@@ -208,6 +208,26 @@ export default function Documents() {
         }
     };
 
+    const handleDownload = async (url: string, fileName: string) => {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+            toast.success("Download started");
+        } catch (error) {
+            console.error("Download failed:", error);
+            // Fallback to opening in new tab
+            window.open(url, '_blank');
+        }
+    };
+
     const getStatusBadge = (status: string) => {
         const lowerStatus = status.toLowerCase();
         switch (lowerStatus) {
@@ -397,16 +417,17 @@ export default function Documents() {
                                                         >
                                                             <Eye className="w-5 h-5" />
                                                         </button>
-                                                        <a
-                                                            href={doc.url ? getUploadedFileUrl(doc.url) : "#"}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
+                                                        <button
+                                                            onClick={() => {
+                                                                if (doc.url) {
+                                                                    handleDownload(getUploadedFileUrl(doc.url), doc.name);
+                                                                }
+                                                            }}
                                                             className="p-2 text-gray-400 hover:text-primary transition-colors"
                                                             title="Download"
-                                                            download
                                                         >
                                                             <Download className="w-5 h-5" />
-                                                        </a>
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -623,28 +644,35 @@ export default function Documents() {
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     {doc.fileUrl ? (
-                                                        <button
-                                                            onClick={() => {
-                                                                let normalizedUrl = doc.fileUrl!.replace(/\\/g, '/');
-                                                                let fullUrl = getUploadedFileUrl(normalizedUrl);
-                                                                const docType = isPdf(normalizedUrl) ? 'pdf' : isVideo(normalizedUrl) ? 'video' : 'image';
-                                                                console.log(`[Document Preview] Details:
-- Name: ${doc.name}
-- Original Path: ${normalizedUrl}
-- Final Viewer URL: ${fullUrl}
-- Deduced Type: ${docType} (Is Video? ${docType === 'video'})`);
-
-                                                                setPreviewDocument({
-                                                                    title: doc.name,
-                                                                    url: fullUrl,
-                                                                    type: docType
-                                                                });
-                                                            }}
-                                                            className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
-                                                        >
-                                                            <Eye className="w-4 h-4 text-gray-600" />
-                                                            <span className="text-gray-700">View</span>
-                                                        </button>
+                                                        <div className="flex justify-end gap-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    let normalizedUrl = doc.fileUrl!.replace(/\\/g, '/');
+                                                                    let fullUrl = getUploadedFileUrl(normalizedUrl);
+                                                                    const docType = isPdf(normalizedUrl) ? 'pdf' : isVideo(normalizedUrl) ? 'video' : 'image';
+                                                                    setPreviewDocument({
+                                                                        title: doc.name,
+                                                                        url: fullUrl,
+                                                                        type: docType
+                                                                    });
+                                                                }}
+                                                                className="p-2 text-gray-400 hover:text-primary transition-colors"
+                                                                title="Preview"
+                                                            >
+                                                                <Eye className="w-5 h-5" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (doc.fileUrl) {
+                                                                        handleDownload(getUploadedFileUrl(doc.fileUrl), doc.name);
+                                                                    }
+                                                                }}
+                                                                className="p-2 text-gray-400 hover:text-primary transition-colors"
+                                                                title="Download"
+                                                            >
+                                                                <Download className="w-5 h-5" />
+                                                            </button>
+                                                        </div>
                                                     ) : (
                                                         <span className="text-xs text-gray-400">Processing...</span>
                                                     )}
@@ -704,7 +732,6 @@ export default function Documents() {
                                             <th className="px-6 py-4 text-sm font-semibold text-gray-600">Space Name</th>
                                             <th className="px-6 py-4 text-sm font-semibold text-gray-600">Booking No.</th>
                                             <th className="px-6 py-4 text-sm font-semibold text-gray-600">Document Name</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Type</th>
                                             <th className="px-6 py-4 text-sm font-semibold text-gray-600 text-right">Action</th>
                                         </tr>
                                     </thead>
@@ -718,15 +745,10 @@ export default function Documents() {
                                                         <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
                                                             <FileText className="w-4 h-4 text-amber-600" />
                                                         </div>
-                                                        <span className="text-sm font-semibold text-gray-900 truncate max-w-[200px]">
-                                                            {doc.name}
+                                                        <span className="text-sm font-semibold text-gray-900 truncate max-w-[300px]">
+                                                            {doc.name || "Supporting Document"}
                                                         </span>
                                                     </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest bg-gray-100 text-gray-600">
-                                                        {doc.type.replace(/_/g, ' ')}
-                                                    </span>
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <div className="flex justify-end gap-2">
@@ -745,16 +767,17 @@ export default function Documents() {
                                                         >
                                                             <Eye className="w-5 h-5" />
                                                         </button>
-                                                        <a
-                                                            href={doc.url ? getUploadedFileUrl(doc.url) : "#"}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
+                                                        <button
+                                                            onClick={() => {
+                                                                if (doc.url) {
+                                                                    handleDownload(getUploadedFileUrl(doc.url), doc.name);
+                                                                }
+                                                            }}
                                                             className="p-2 text-gray-400 hover:text-primary transition-colors"
                                                             title="Download"
-                                                            download
                                                         >
                                                             <Download className="w-5 h-5" />
-                                                        </a>
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
