@@ -487,7 +487,7 @@ const Profile: React.FC = () => {
                   Manage your personal information and company details
                 </p>
               </div>
-              {!isEditing ? (
+              {activeTab !== "company" && (!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
                   className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
@@ -511,7 +511,7 @@ const Profile: React.FC = () => {
                     <X className="w-4 h-4" /> Cancel
                   </button>
                 </div>
-              )}
+              ))}
             </div>
 
             {/* Profile Info Card */}
@@ -576,7 +576,10 @@ const Profile: React.FC = () => {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                  onClick={() => {
+                    setActiveTab(tab.id as typeof activeTab);
+                    setIsEditing(false);
+                  }}
                   className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                     activeTab === tab.id
                       ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
