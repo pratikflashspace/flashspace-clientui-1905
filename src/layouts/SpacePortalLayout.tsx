@@ -550,15 +550,86 @@ export default function SpacePortalLayout() {
         ? notification.metadata.actionUrl
         : undefined);
 
+    const title = (notification.title || "").toLowerCase();
+    const message = (notification.description || "").toLowerCase();
+    const metadata = notification.metadata || {};
+
     if (href?.startsWith("/spaceportal/")) {
       navigate(href);
     } else if (href?.startsWith("/")) {
       navigate(href);
     } else if (
-      notification.metadata?.type === "booking_request" ||
-      notification.title.toLowerCase().includes("booking request")
+      metadata.ticketId ||
+      metadata.type === "TICKET_UPDATE" ||
+      title.includes("ticket") ||
+      message.includes("ticket")
+    ) {
+      navigate("/spaceportal/tickets");
+    } else if (
+      metadata.meetingId ||
+      metadata.type === "MEETING_BOOKED" ||
+      title.includes("meeting") ||
+      message.includes("meeting")
+    ) {
+      navigate("/spaceportal/booking-calendar");
+    } else if (
+      metadata.type === "booking_request" ||
+      title.includes("booking request") ||
+      message.includes("booking request")
     ) {
       navigate("/spaceportal/booking-requests");
+    } else if (
+      metadata.invoiceId ||
+      metadata.invoiceNumber ||
+      metadata.type === "invoice_generated" ||
+      metadata.type === "invoice_paid" ||
+      title.includes("invoice") ||
+      message.includes("invoice")
+    ) {
+      navigate("/spaceportal/invoices-payments");
+    } else if (
+      metadata.clientId ||
+      title.includes("client") ||
+      message.includes("client")
+    ) {
+      if (metadata.clientId) {
+        navigate(`/spaceportal/clients/${metadata.clientId}`);
+      } else {
+        navigate("/spaceportal/clients");
+      }
+    } else if (
+      metadata.propertyId ||
+      metadata.spaceId ||
+      title.includes("space") ||
+      message.includes("space")
+    ) {
+      const id = metadata.propertyId || metadata.spaceId;
+      if (id) {
+        navigate(`/spaceportal/space-management/${id}`);
+      } else {
+        navigate("/spaceportal/space-management");
+      }
+    } else if (
+      metadata.visitId ||
+      metadata.visitorId ||
+      title.includes("visit") ||
+      message.includes("visit") ||
+      title.includes("visitor") ||
+      message.includes("visitor") ||
+      title.includes("mail") ||
+      message.includes("mail") ||
+      title.includes("parcel") ||
+      message.includes("parcel")
+    ) {
+      navigate("/spaceportal/mail-visits");
+    } else if (
+      metadata.kycId ||
+      title.includes("kyc") ||
+      message.includes("kyc") ||
+      title.includes("verification") ||
+      message.includes("verification")
+    ) {
+      navigate("/spaceportal/kyc-verification");
     } else {
       navigate("/spaceportal/notifications");
     }

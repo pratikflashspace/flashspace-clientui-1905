@@ -250,6 +250,12 @@ const Profile: React.FC = () => {
         profileUpdateResponse = await authService.updateProfile({
           fullName: profileData.fullName,
           phoneNumber: profileData.phone,
+          alternatePhone: profileData.alternatePhone,
+          address: profileData.registeredAddress,
+          city: profileData.city,
+          state: profileData.state,
+          country: profileData.country,
+          pincode: profileData.pincode,
         });
 
         if (profileUpdateResponse.success && profileUpdateResponse.data) {
