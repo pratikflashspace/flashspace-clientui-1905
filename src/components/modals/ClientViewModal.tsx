@@ -15,15 +15,12 @@ import {
   CreditCard,
   CalendarDays,
   Key,
-  MoreVertical,
-  MessageSquare,
 } from "lucide-react";
 
 interface ClientViewModalProps {
   client: any;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onOpenChat: () => void;
   onManageClient?: () => void;
 }
 
@@ -31,7 +28,6 @@ export const ClientViewModal = ({
   client,
   open,
   onOpenChange,
-  onOpenChat,
   onManageClient,
 }: ClientViewModalProps) => {
   if (!client) return null;
@@ -161,12 +157,8 @@ export const ClientViewModal = ({
               </div>
             </div>
 
-            <div className="pt-6 flex gap-3">
-              <Button variant="outline" className="flex-1" onClick={onOpenChat}>
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Message
-              </Button>
-              <Button className="flex-1" onClick={onManageClient}>
+            <div className="pt-6 flex justify-end">
+              <Button className="min-w-44" onClick={onManageClient}>
                 Manage Client
               </Button>
             </div>

@@ -28,8 +28,11 @@ type Doc = {
   id: string;
   type: string;
   name: string;
+  profileModel?: "kyc" | "business" | "partner";
+  profileId?: string;
   status?: string;
   partnerReviewStatus?: string;
+  partnerReviewSource?: "booking" | "none";
   fileUrl?: string;
   rejectionReason?: string;
   partnerRejectionReason?: string;
@@ -135,7 +138,11 @@ const getEffectiveKycStatus = (request: BookingRequest) => {
   }
 
   const partnerStatuses = partnerDocs.map((doc) =>
-    String(doc.partnerReviewStatus || "pending").toLowerCase(),
+    String(
+      doc.partnerReviewSource === "booking"
+        ? doc.partnerReviewStatus || "pending"
+        : "pending",
+    ).toLowerCase(),
   );
 
   if (partnerStatuses.some((status) => status === "rejected")) {
@@ -258,6 +265,7 @@ export default function BookingRequests() {
                 ? {
                     ...item,
                     partnerReviewStatus: action === "approve" ? "approved" : "rejected",
+                    partnerReviewSource: "booking",
                     partnerRejectionReason: action === "reject" ? rejectionReason : undefined,
                   }
                 : item,
@@ -319,7 +327,12 @@ export default function BookingRequests() {
     profileModel: "kyc" | "business" | "partner" = "kyc",
     profileId = booking.kyc.profileId,
   ) => {
-    const partnerStatus = doc.partnerReviewStatus || "pending";
+    const reviewProfileModel = doc.profileModel || profileModel;
+    const reviewProfileId = doc.profileId || profileId;
+    const partnerStatus =
+      doc.partnerReviewSource === "booking"
+        ? doc.partnerReviewStatus || "pending"
+        : "pending";
     const isPartnerApproved = partnerStatus === "approved";
     const isPartnerRejected = partnerStatus === "rejected";
 
@@ -351,7 +364,7 @@ export default function BookingRequests() {
           {partnerStatus === "pending" && (
             <>
               <button
-                onClick={() => handleReviewKyc(booking, doc, "approve", profileModel, profileId)}
+                onClick={() => handleReviewKyc(booking, doc, "approve", reviewProfileModel, reviewProfileId)}
                 title="Partner approve"
                 aria-label="Partner approve"
                 className="grid h-9 w-9 place-items-center rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition"
@@ -359,7 +372,7 @@ export default function BookingRequests() {
                 <CheckCircle2 size={16} />
               </button>
               <button
-                onClick={() => handleReviewKyc(booking, doc, "reject", profileModel, profileId)}
+                onClick={() => handleReviewKyc(booking, doc, "reject", reviewProfileModel, reviewProfileId)}
                 title="Partner reject"
                 aria-label="Partner reject"
                 className="grid h-9 w-9 place-items-center rounded-lg border border-rose-200 text-rose-700 hover:bg-rose-50 transition"

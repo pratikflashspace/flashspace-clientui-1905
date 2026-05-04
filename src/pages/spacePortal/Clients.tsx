@@ -1,12 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast as hotToast } from "react-hot-toast";
 
 import type {
   Client,
-  ClientStatus,
-  KycStatus,
 } from "@/types/spacePortal/client";
 
 import {
@@ -504,49 +501,42 @@ export default function Clients() {
       </div>
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-[#DDE5DA] bg-white shadow-sm">
-        <div className="overflow-x-auto">
+        <div className="flex items-center justify-between border-b border-[#EEF1EC] bg-white px-5 py-4">
+          <div>
+            <p className="text-sm font-extrabold text-[#1F2E26]">
+              Client Bookings
+            </p>
+            <p className="mt-0.5 text-xs font-medium text-[#677E73]">
+              {filteredClients.length} booking records in this view
+            </p>
+          </div>
+        </div>
+        <div>
           {loading ? (
-            <TableSkeleton rows={10} cols={10} />
+            <div className="p-4">
+              <TableSkeleton rows={6} cols={4} />
+            </div>
+          ) : paginatedClients.length > 0 ? (
+            <div className="divide-y divide-[#EEF1EC]">
+              {paginatedClients.map((client, index) => (
+                <BookingRow
+                  key={client.bookingId || client.id}
+                  client={client}
+                  serial={startIndex + index + 1}
+                  onView={() => handleViewClient(client)}
+                  onMessage={() => setMessageTarget(client)}
+                  onNavigate={() =>
+                    navigate(`/spaceportal/clients/${client.userId}`)
+                  }
+                />
+              ))}
+            </div>
           ) : (
-            <table className="w-full min-w-[1120px] table-fixed border-collapse text-left text-sm">
-              <thead className="bg-[#F8FAF7]">
-                <tr className="border-b border-[#DDE5DA] text-[#1F2E26]">
-                  <TableHead className="w-14 text-right">S.No.</TableHead>
-                  <TableHead className="w-28">Invoice No.</TableHead>
-                  <TableHead className="w-24">User Name</TableHead>
-                  <TableHead className="w-40">Company Name</TableHead>
-                  <TableHead className="w-56">Contact</TableHead>
-                  <TableHead className="w-32">Workspace</TableHead>
-                  <TableHead className="w-36">Space</TableHead>
-                  <TableHead className="w-36">Location</TableHead>
-                  <TableHead className="w-28 text-center">Status</TableHead>
-                  <TableHead className="w-28 text-center">KYC</TableHead>
-                  <TableHead className="w-40 text-center">Action</TableHead>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedClients.length > 0 ? (
-                  paginatedClients.map((client, index) => (
-                    <BookingRow
-                      key={client.bookingId || client.id}
-                      client={client}
-                      serial={startIndex + index + 1}
-                      onView={() => handleViewClient(client)}
-                      onMessage={() => setMessageTarget(client)}
-                      onNavigate={() =>
-                        navigate(`/spaceportal/clients/${client.userId}`)
-                      }
-                    />
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={11} className="p-12 text-center text-slate-500">
-                      No bookings found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+            <div className="p-12 text-center">
+              <p className="text-sm font-semibold text-[#677E73]">
+                No bookings found.
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -594,10 +584,6 @@ export default function Clients() {
         client={selectedClient}
         open={viewModalOpen}
         onOpenChange={setViewModalOpen}
-        onOpenChat={() => {
-          setViewModalOpen(false);
-          setChatModalOpen(true);
-        }}
         onManageClient={() => {
           if (!selectedClient?.userId) return;
           setViewModalOpen(false);
@@ -680,20 +666,6 @@ function FilterSelect({
   );
 }
 
-function TableHead({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <th className={`px-4 py-4 text-[11px] font-extrabold uppercase tracking-widest ${className}`}>
-      {children}
-    </th>
-  );
-}
-
 function BookingRow({
   client,
   serial,
@@ -710,136 +682,106 @@ function BookingRow({
   const cleanLocation = formatCleanLocation(client.location, client.city);
 
   return (
-    <tr className="border-b border-[#EEF1EC] align-top last:border-0 hover:bg-[#F8FAF7] transition-colors">
-      <td className="px-4 py-5 text-right font-semibold text-muted-foreground">
-        {serial}.
-      </td>
-      <td className="px-4 py-5">
-        <button
-          onClick={onNavigate}
-          className="max-w-full rounded-lg bg-[#F8FAF7] px-2.5 py-1 font-mono text-[11px] font-bold text-primary hover:underline"
-        >
-          {client.invoiceNumber || client.bookingNumber || client.id}
-        </button>
-      </td>
-      <td className="px-4 py-5 font-semibold text-foreground">
-        {client.contactName}
-      </td>
-      <td className="px-4 py-5 text-foreground">
-        <p className="truncate font-semibold">
-          {client.companyName}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {formatDate(client.startDate)} - {formatDate(client.endDate)}
-        </p>
-      </td>
-      <td className="px-4 py-5">
-        <p className="truncate font-semibold text-foreground">{client.email || "N/A"}</p>
-        <p className="text-sm text-muted-foreground">{client.phone || "N/A"}</p>
-      </td>
-      <td className="px-4 py-5">
-        <span className="inline-flex min-w-[92px] items-center justify-center rounded-full bg-[#EAF6EF] px-3 py-1.5 text-center text-xs font-bold leading-none text-[#35503F]">
-          {client.workspace || "N/A"}
-        </span>
-      </td>
-      <td className="px-4 py-5">
-        <p className="line-clamp-2 max-w-[130px] font-bold leading-5 text-foreground">
-          {client.space || "N/A"}
-        </p>
-      </td>
-      <td className="px-4 py-5 text-muted-foreground">
-        <p className="line-clamp-2 max-w-[130px] text-sm font-medium leading-5">
-          {cleanLocation.main}
-        </p>
-        {cleanLocation.sub && (
-          <p className="mt-1 text-xs font-medium text-[#677E73]">
-            {cleanLocation.sub}
+    <article className="group bg-white px-5 py-4 transition-colors hover:bg-[#F8FAF7]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(210px,1.15fr)_minmax(210px,1fr)_minmax(240px,1.2fr)_minmax(200px,auto)] xl:items-center">
+        <div className="min-w-0">
+          <div className="flex items-center gap-3">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#EAF6EF] text-[11px] font-extrabold text-[#35503F]">
+              {serial}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-[15px] font-extrabold leading-5 text-[#1F2E26]">
+                {client.companyName || client.contactName || "N/A"}
+              </p>
+              <p className="truncate text-[11px] font-semibold text-[#677E73]">
+                {client.contactName || "No contact name"}
+              </p>
+            </div>
+          </div>
+          <div className="mt-2.5">
+            <p className="mb-1 text-[9px] font-extrabold uppercase tracking-widest text-[#8A9A91]">
+              Invoice
+            </p>
+            <button
+              onClick={onNavigate}
+              className="max-w-full truncate rounded-full border border-[#DDE5DA] bg-white px-3 py-1.5 font-mono text-[10px] font-bold text-primary transition hover:border-primary/30 hover:bg-primary/10"
+              title={client.invoiceNumber || client.bookingNumber || client.id}
+            >
+              {client.invoiceNumber || client.bookingNumber || client.id}
+            </button>
+          </div>
+        </div>
+
+        <div className="min-w-0">
+          <p className="mb-1 text-[9px] font-extrabold uppercase tracking-widest text-[#8A9A91]">
+            Contact
           </p>
-        )}
-      </td>
-      <td className="px-4 py-5 text-center">
-        <StatusPill status={client.status} />
-        <p className="mt-2 text-xs font-medium text-muted-foreground">
-          {client.subscriptionSubStatus || "N/A"}
-        </p>
-      </td>
-      <td className="px-4 py-5 text-center">
-        <KycPill status={client.kycStatus} />
-        <p className="mt-2 text-xs font-medium text-muted-foreground">
-          {client.kycType || "N/A"}
-        </p>
-      </td>
-      <td className="px-4 py-5">
-        <div className="flex items-center justify-center gap-2">
-          <Button
+          <p className="truncate text-[14px] font-bold text-[#1F2E26]">
+            {client.email || "N/A"}
+          </p>
+          <p className="mt-0.5 text-[11px] font-medium text-[#677E73]">
+            {client.phone && client.phone !== "N/A" ? client.phone : "No phone"}
+          </p>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-[96px_minmax(120px,1fr)_minmax(100px,0.8fr)]">
+          <div>
+            <p className="mb-1 text-[9px] font-extrabold uppercase tracking-widest text-[#8A9A91]">
+              Workspace
+            </p>
+            <span className="inline-flex max-w-full items-center justify-center rounded-full bg-[#EAF6EF] px-2.5 py-1 text-center text-[10px] font-bold leading-tight text-[#35503F]">
+              {client.workspace || "N/A"}
+            </span>
+          </div>
+          <div className="min-w-0">
+            <p className="mb-1 text-[9px] font-extrabold uppercase tracking-widest text-[#8A9A91]">
+              Space
+            </p>
+            <p className="line-clamp-2 text-[15px] font-extrabold leading-5 text-[#1F2E26]">
+              {client.space || "N/A"}
+            </p>
+            <p className="mt-0.5 text-[11px] font-medium text-[#677E73]">
+              {formatDate(client.startDate)} - {formatDate(client.endDate)}
+            </p>
+          </div>
+          <div className="min-w-0">
+            <p className="mb-1 text-[9px] font-extrabold uppercase tracking-widest text-[#8A9A91]">
+              Location
+            </p>
+            <p className="line-clamp-2 text-[13px] font-bold leading-5 text-[#50665A]">
+              {cleanLocation.main}
+            </p>
+            {cleanLocation.sub && (
+              <p className="mt-0.5 text-[11px] font-medium text-[#677E73]">
+                {cleanLocation.sub}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5 xl:justify-end">
+          <div className="flex items-center gap-2">
+            <Button
             variant="ghost"
             size="sm"
             onClick={onView}
-            className="h-9 rounded-full border border-[#DDE5DA] bg-white px-3 font-bold text-[#1F2E26] hover:bg-[#F8FAF7] hover:text-[#35503F]"
-          >
-            <Eye className="mr-1.5 h-4 w-4" />
-            Details
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onMessage}
-            className="h-9 w-9 rounded-full border border-[#DDE5DA] bg-white text-[#35503F] hover:bg-[#F8FAF7]"
-          >
-            <MessageSquare className="h-4 w-4" />
-          </Button>
+              className="h-8 rounded-full border border-[#C9D8CF] bg-white px-3 text-xs font-extrabold text-[#1F2E26] shadow-sm transition hover:border-primary/40 hover:bg-primary/10 hover:text-[#35503F]"
+            >
+              <Eye className="mr-1.5 h-3.5 w-3.5" />
+              View
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onMessage}
+              className="h-8 w-8 rounded-full border border-[#C9D8CF] bg-white text-[#35503F] shadow-sm transition hover:border-primary/40 hover:bg-primary/10"
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </div>
-      </td>
-    </tr>
-  );
-}
-
-function StatusPill({ status }: { status: ClientStatus }) {
-  const config =
-    status === "ACTIVE"
-      ? {
-          label: "Active",
-          className: "bg-emerald-50 text-emerald-700 border-emerald-100",
-        }
-      : status === "EXPIRING_SOON"
-        ? {
-            label: "Expiring Soon",
-            className: "bg-amber-50 text-amber-700 border-amber-100",
-          }
-        : {
-            label: "Inactive",
-            className: "bg-rose-50 text-rose-700 border-rose-100",
-          };
-
-  return (
-    <Badge
-      variant="outline"
-      className={`inline-flex min-w-[86px] justify-center rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider ${config.className}`}
-    >
-      {config.label}
-    </Badge>
-  );
-}
-
-function KycPill({ status }: { status: KycStatus }) {
-  const config =
-    status === "VERIFIED"
-      ? {
-          label: "Verified",
-          className: "bg-emerald-50 text-emerald-700 border-emerald-100",
-        }
-      : {
-          label: "Pending",
-          className: "bg-amber-50 text-amber-700 border-amber-100",
-        };
-
-  return (
-    <Badge
-      variant="outline"
-      className={`inline-flex min-w-[92px] justify-center rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider ${config.className}`}
-    >
-      {config.label}
-    </Badge>
+      </div>
+    </article>
   );
 }
 

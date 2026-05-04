@@ -8,7 +8,6 @@ import {
   Download,
   FileText,
   ShieldCheck,
-  Mail,
   Loader2,
   Upload,
 } from "lucide-react";
@@ -149,7 +148,7 @@ export default function ClientDetails() {
   if (loading) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-[#3FA69E]" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
         <p className="mt-4 text-slate-500 font-medium">
           Loading client details...
         </p>
@@ -172,7 +171,7 @@ export default function ClientDetails() {
 
         <button
           onClick={() => navigate("/spaceportal/clients")}
-          className="w-fit rounded-xl bg-[#3FA69E] px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
+          className="w-fit rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
         >
           Go Back to Clients
         </button>
@@ -206,7 +205,7 @@ export default function ClientDetails() {
 
             {/* Tags */}
             <div className="mt-4 flex flex-wrap gap-3">
-              <span className="rounded-full bg-emerald-50 px-4 py-1 text-xs font-semibold text-[#3FA69E]">
+              <span className="rounded-full bg-primary/5 px-4 py-1 text-xs font-semibold text-primary">
                 Plan: {client.plan}
               </span>
 
@@ -244,15 +243,6 @@ export default function ClientDetails() {
               onChange={handleAgreementUpload}
             />
 
-            <a
-              href={`mailto:${client.email}?subject=Flashspace%20Partnership&body=Hi%20${encodeURIComponent(
-                client.contactName,
-              )},%0A%0A`}
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#3FA69E] px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
-            >
-              <Mail size={16} />
-              Message Client
-            </a>
           </div>
         </div>
       </div>
@@ -374,7 +364,7 @@ export default function ClientDetails() {
           {/* KYC Card */}
           <div className="rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-sm">
             <div className="flex items-center gap-3">
-              <ShieldCheck className="text-[#3FA69E]" size={20} />
+              <ShieldCheck className="text-primary" size={20} />
               <h2 className="text-lg font-bold text-[#10251A]">KYC Details</h2>
             </div>
 
@@ -403,7 +393,7 @@ export default function ClientDetails() {
                 }
                 setIsDocsOpen(true);
               }}
-              className="mt-6 w-full rounded-xl bg-[#3FA69E] px-4 py-3 text-sm font-semibold text-white hover:opacity-90"
+              className="mt-6 w-full rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
             >
               View Uploaded Docs
             </button>
@@ -412,7 +402,7 @@ export default function ClientDetails() {
           {/* Agreement Card */}
           <div className="rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-sm">
             <div className="flex items-center gap-3">
-              <FileText className="text-[#3FA69E]" size={20} />
+              <FileText className="text-primary" size={20} />
               <h2 className="text-lg font-bold text-[#10251A]">
                 Agreement Details
               </h2>
@@ -490,7 +480,7 @@ export default function ClientDetails() {
                     onClick={() =>
                       handleOpenLink(doc.fileUrl, `${doc.type} document`)
                     }
-                    className="rounded-lg bg-[#3FA69E] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+                    className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
                   >
                     Download
                   </button>
@@ -545,7 +535,7 @@ export default function ClientDetails() {
             </button>
             <button
               onClick={() => setViewerOpen(false)}
-              className="rounded-xl bg-[#3FA69E] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+              className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
             >
               Close
             </button>
