@@ -6,7 +6,6 @@ import {
   BookOpen,
   Trophy,
   Target,
-  Headphones,
   Calculator,
   FileText,
   Wallet,
@@ -64,11 +63,6 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     label: "Partners",
     href: "/admin/partners",
     icon: <Handshake className="w-5 h-5" />,
-  },
-  {
-    label: "Support Chats",
-    href: "/admin/support",
-    icon: <Headphones className="w-5 h-5" />,
   },
   {
     label: "Learning Hub",

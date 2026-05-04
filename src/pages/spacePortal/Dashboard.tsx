@@ -142,9 +142,6 @@ export default function Dashboard() {
     totalClients: 0,
     monthlyRevenue: "₹0",
     pendingBookings: 0,
-    revenueChange: 0,
-    clientsChange: 0,
-    spacesChange: 0,
   });
 
   useEffect(() => {
@@ -176,9 +173,6 @@ export default function Dashboard() {
           totalClients: clients.length || 0,
           monthlyRevenue: formattedRevenue,
           pendingBookings: requests.length || 0,
-          revenueChange: 15, // Example trend
-          clientsChange: 8,
-          spacesChange: 12,
         });
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
@@ -225,19 +219,16 @@ export default function Dashboard() {
         <StatsCard
           title="Active Spaces"
           value={metrics.activeSpaces.toString()}
-          change={metrics.spacesChange}
           icon={Building2}
         />
         <StatsCard
           title="Total Clients"
           value={metrics.totalClients.toString()}
-          change={metrics.clientsChange}
           icon={Users}
         />
         <StatsCard
           title="Monthly Revenue"
           value={metrics.monthlyRevenue}
-          change={metrics.revenueChange}
           icon={TrendingUp}
         />
         <StatsCard

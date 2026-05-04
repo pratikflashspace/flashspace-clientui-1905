@@ -106,25 +106,21 @@ const RevenueDashboard = () => {
         <StatsCard
           title="Total Revenue (MTD)"
           value={loading ? "—" : formatRupees(metrics.mtdRevenue)}
-          change={0}
           icon={TrendingUp}
         />
         <StatsCard
           title="Revenue (YTD)"
           value={loading ? "—" : formatRupees(metrics.ytdRevenue)}
-          change={0}
           icon={Wallet}
         />
         <StatsCard
           title="Avg Revenue/Client"
           value={loading ? "—" : formatRupees(metrics.avgRevenuePerClient)}
-          change={0}
           icon={Users}
         />
         <StatsCard
           title="Total Revenue (All Time)"
           value={loading ? "—" : formatRupees(metrics.totalRevenue)}
-          change={0}
           icon={Building2}
         />
       </div>

@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 interface StatsCardProps {
   title: string;
   value: string | number;
-  change?: number;
   icon?: LucideIcon;
   className?: string;
 }
@@ -13,12 +12,9 @@ interface StatsCardProps {
 export const StatsCard = ({
   title,
   value,
-  change,
   icon: Icon,
   className,
 }: StatsCardProps) => {
-  const isPositive = change && change > 0;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -41,23 +37,6 @@ export const StatsCard = ({
       <div className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
         {value}
       </div>
-      {change !== undefined && (
-        <div
-          className={cn(
-            "flex items-center gap-1 mt-2 text-sm font-medium",
-            isPositive
-              ? "text-status-success text-emerald-500"
-              : "text-status-danger text-red-500",
-          )}
-        >
-          {isPositive ? (
-            <TrendingUp className="w-4 h-4" />
-          ) : (
-            <TrendingDown className="w-4 h-4" />
-          )}
-          <span>{Math.abs(change)}% from last month</span>
-        </div>
-      )}
     </motion.div>
   );
 };

@@ -6,7 +6,6 @@ import {
   TrendingUp,
   Ticket,
   BarChart3,
-  Headphones,
   Bell,
   Wallet,
   BookOpen,
@@ -46,12 +45,6 @@ const salesFeatures = [
     href: "/admin/coupons",
   },
   {
-    title: "WhatsApp Access",
-    description:
-      "Tap into client chats coming into the website via WhatsApp API",
-    href: "/admin/support",
-  },
-  {
     title: "Booking Dashboard",
     description:
       "View total bookings by categories, packages, and sales amounts",
@@ -70,11 +63,6 @@ const supportFeatures = [
     description:
       "Auto-assign tickets with due dates, follow-ups, and escalation alerts",
     href: "/admin/tickets",
-  },
-  {
-    title: "Chat Takeover",
-    description: "Take over support chats and view all active and past tickets",
-    href: "/admin/support",
   },
   {
     title: "Client Portal",
@@ -272,13 +260,11 @@ export default function AdminDashboard() {
         <StatsCard
           title="Total Bookings"
           value={stats?.totalBookings?.toLocaleString() || "0"}
-          change={0}
           icon={BarChart3}
         />
         <StatsCard
           title="Active Clients"
           value={stats?.totalUsers?.toLocaleString() || "0"}
-          change={0}
           icon={Users}
         />
         <StatsCard
@@ -288,13 +274,11 @@ export default function AdminDashboard() {
               ? `₹${stats.totalRevenue.toLocaleString()}`
               : "₹0"
           }
-          change={0}
           icon={TrendingUp}
         />
         <StatsCard
           title="Open Tickets"
           value={stats?.openTickets?.toLocaleString() || "0"}
-          change={0}
           icon={Ticket}
         />
       </div>
@@ -327,7 +311,7 @@ export default function AdminDashboard() {
       <FeatureSection
         title="Support Operations"
         description="Manage tickets and client support"
-        icon={<Headphones className="w-6 h-6 text-primary" />}
+        icon={<Ticket className="w-6 h-6 text-primary" />}
         features={supportFeatures}
       />
 

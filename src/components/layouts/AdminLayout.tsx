@@ -23,7 +23,6 @@ import {
   Target,
   Ticket,
   Tag,
-  Headphones,
   Trophy,
   Network,
   AlertTriangle,
@@ -115,12 +114,6 @@ export default function AdminLayout() {
       label: "Lead Management",
       path: "/admin/leads",
       roles: ["admin", "super_admin", "sales"],
-    },
-    {
-      icon: Headphones,
-      label: "Support Chats",
-      path: "/admin/support",
-      roles: ["admin", "super_admin", "support"],
     },
     {
       icon: Bell,

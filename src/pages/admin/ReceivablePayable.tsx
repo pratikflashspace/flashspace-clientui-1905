@@ -171,25 +171,21 @@ const ReceivablePayable = () => {
         <StatsCard
           title="Total Receivable"
           value={loading ? "—" : formatINR(metrics.totalReceivable)}
-          change={0}
           icon={ArrowDownRight}
         />
         <StatsCard
           title="Overdue Amount"
           value={loading ? "—" : formatINR(metrics.overdueReceivable)}
-          change={0}
           icon={TrendingUp}
         />
         <StatsCard
           title="Total Payable"
           value={loading ? "—" : formatINR(metrics.totalPayable)}
-          change={0}
           icon={ArrowUpRight}
         />
         <StatsCard
           title="Due This Week"
           value={loading ? "—" : formatINR(metrics.dueThisWeek)}
-          change={0}
           icon={Calculator}
         />
       </div>
