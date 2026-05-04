@@ -36,7 +36,7 @@ export const ClientViewModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl p-0 overflow-hidden bg-background border-0 shadow-2xl rounded-2xl">
         {/* Header */}
-        <div className="bg-muted/30 p-6 border-b border-border flex items-start justify-between">
+        <div className="bg-muted/30 p-6 pr-14 border-b border-border flex items-start justify-between">
           <div className="flex gap-4">
             <Avatar className="w-16 h-16 border-2 border-background shadow-sm">
               <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">
@@ -106,22 +106,12 @@ export const ClientViewModal = ({
                 <CreditCard className="w-4 h-4 text-muted-foreground" />
                 Engagement
               </h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-muted/30 p-3 rounded-xl border border-border/50">
-                  <div className="text-xs text-muted-foreground mb-1">
-                    Health Score
-                  </div>
-                  <div className="text-xl font-bold text-foreground">
-                    {client.healthScore}/100
-                  </div>
+              <div className="bg-muted/30 p-3 rounded-xl border border-border/50">
+                <div className="text-xs text-muted-foreground mb-1">
+                  Total Revenue
                 </div>
-                <div className="bg-muted/30 p-3 rounded-xl border border-border/50">
-                  <div className="text-xs text-muted-foreground mb-1">
-                    Total Revenue
-                  </div>
-                  <div className="text-xl font-bold text-primary">
-                    {client.revenue}
-                  </div>
+                <div className="text-xl font-bold text-primary">
+                  {client.revenue}
                 </div>
               </div>
             </div>

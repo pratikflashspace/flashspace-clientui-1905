@@ -479,12 +479,7 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold text-[#35503F] tracking-tight">
                 Manage <span className="italic">Bookings</span>
               </h2>
-              <button 
-                onClick={() => navigate("/dashboard/bookings")}
-                className="text-sm font-bold text-[#35503F] hover:underline flex items-center gap-1"
-              >
-                View all <ArrowRight className="w-4 h-4" />
-              </button>
+
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
