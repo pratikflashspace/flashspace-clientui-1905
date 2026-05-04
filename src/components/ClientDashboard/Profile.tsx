@@ -378,6 +378,38 @@ const Profile: React.FC = () => {
     setProfileData({ ...profileData, [field]: value });
   };
 
+  const handleCancel = () => {
+    setIsEditing(false);
+    if (user) {
+      setProfileData({
+        fullName: user.fullName || "",
+        email: user.email || "",
+        phone: user.phoneNumber || (user as any).phone || "",
+        alternatePhone: (user as any).alternatePhone || "",
+        city: (user as any).city || "",
+        state: (user as any).state || "",
+        country: (user as any).country || "IN",
+        pincode: (user as any).pincode || "",
+        registeredAddress:
+          (user as any).address || (user as any).registeredAddress || "",
+      });
+    }
+
+    if (kycData) {
+      const fetchedAddress = extractAddressFromKYC(kycData);
+      setBusinessInfoForm({
+        companyName: kycData.businessInfo?.companyName || "",
+        companyType: kycData.businessInfo?.companyType || "",
+        address:
+          kycData.businessInfo?.registeredAddress || fetchedAddress || "",
+        gstNumber: kycData.businessInfo?.gstNumber || "",
+        panNumber: kycData.businessInfo?.panNumber || "",
+        cinNumber: kycData.businessInfo?.cinNumber || "",
+        businessNature: kycData.businessInfo?.businessNature || "",
+      });
+    }
+  };
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-IN", {
       day: "numeric",
@@ -472,7 +504,7 @@ const Profile: React.FC = () => {
                     Save Changes
                   </button>
                   <button
-                    onClick={() => setIsEditing(false)}
+                    onClick={handleCancel}
                     className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 px-8 py-3.5 rounded-2xl font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95 text-center"
                   >
                     <X className="w-4 h-4" /> Cancel
