@@ -13,7 +13,7 @@ import {
   CoworkingSpaceItem,
   MeetingRoomItem,
 } from "@/types/services";
-import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
+
 import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 import { getShortAddress } from "@/utils/address";
 
@@ -82,7 +82,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFavorite, setIsFavorite] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
-    const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
+
 
     // Priority: item.images -> item.image -> single placeholder
     const images = useMemo(() => {
@@ -381,7 +381,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setIsMeetingModalOpen(true);
+                window.dispatchEvent(new CustomEvent('open-contact-modal'));
               }}
               className="flex-1 flex items-center justify-center gap-1.5 border border-border text-sm font-normal text-foreground py-2.5 px-2 rounded-xl hover:bg-muted/50 transition-all active:scale-[0.98]"
             >
@@ -392,11 +392,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
         </div>
 
         {/* Meeting Booking Modal */}
-        <MeetingBookingModal
-          isOpen={isMeetingModalOpen}
-          onClose={() => setIsMeetingModalOpen(false)}
-          item={item}
-        />
+
       </div>
     );
   },

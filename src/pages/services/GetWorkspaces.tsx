@@ -34,7 +34,7 @@ import {
 } from "@/services/virtualOffice.service";
 import { getCoworkingSpacesByCity } from "@/services/coworkingSpace.service";
 import { getMeetingRoomsByCity } from "@/services/meetingRoom.service";
-import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
+
 import { ListingItem } from "@/components/services/ListingCardModern";
 import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 import { getShortAddress } from "@/utils/address";
@@ -201,7 +201,7 @@ const WorkspaceCard = ({
   const [liked, setLiked] = useState(false);
   const [carted, setCarted] = useState(false);
   const [imgIndex, setImgIndex] = useState(0);
-  const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
+
   const navigate = useNavigate();
   const handleNavigate = () => {
     if (type === "virtual-office") navigate(`/space/${ws.id}`);
@@ -379,7 +379,7 @@ const WorkspaceCard = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setIsMeetingModalOpen(true);
+                window.dispatchEvent(new CustomEvent('open-contact-modal'));
               }}
               className="py-2 px-4 text-xs font-medium rounded-lg border border-border text-foreground hover:bg-muted transition-all duration-200 flex items-center gap-1 whitespace-nowrap flex-1"
             >
@@ -387,11 +387,7 @@ const WorkspaceCard = ({
             </button>
           </div>
         </div>
-        <MeetingBookingModal
-          isOpen={isMeetingModalOpen}
-          onClose={() => setIsMeetingModalOpen(false)}
-          item={bookingItem}
-        />
+
       </div>
     );
   }
@@ -532,7 +528,7 @@ const WorkspaceCard = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setIsMeetingModalOpen(true);
+              setIsContactModalOpen(true);
             }}
             className="flex-1 py-2.5 text-xs font-medium rounded-lg border border-border text-foreground hover:bg-muted transition-all duration-200 flex items-center justify-center gap-1.5"
           >
@@ -540,11 +536,7 @@ const WorkspaceCard = ({
           </button>
         </div>
       </div>
-      <MeetingBookingModal
-        isOpen={isMeetingModalOpen}
-        onClose={() => setIsMeetingModalOpen(false)}
-        item={bookingItem}
-      />
+
     </div>
   );
 };

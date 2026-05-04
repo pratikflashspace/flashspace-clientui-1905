@@ -75,7 +75,7 @@ const Profile: React.FC = () => {
     panNumber: "",
     cinNumber: "",
     address: "",
-    businessNature: "",
+    industry: "",
   });
 
   const extractAddressFromKYC = (profile: KYCData | null | undefined) => {
@@ -174,7 +174,7 @@ const Profile: React.FC = () => {
               gstNumber: kyc.businessInfo?.gstNumber || prev.gstNumber || "",
               panNumber: kyc.businessInfo?.panNumber || prev.panNumber || "",
               cinNumber: kyc.businessInfo?.cinNumber || prev.cinNumber || "",
-              businessNature: kyc.businessInfo?.businessNature || prev.businessNature || "",
+              industry: kyc.businessInfo?.industry || kyc.businessInfo?.businessNature || prev.industry || "",
             }));
           }
         }
@@ -304,7 +304,8 @@ const Profile: React.FC = () => {
           registeredAddress: finalAddress,
           address: finalAddress,
           companyName: businessInfoForm.companyName,
-          companyType: businessInfoForm.companyType
+          companyType: businessInfoForm.companyType,
+          industry: businessInfoForm.industry
         }
       };
 
@@ -405,7 +406,7 @@ const Profile: React.FC = () => {
         gstNumber: kycData.businessInfo?.gstNumber || "",
         panNumber: kycData.businessInfo?.panNumber || "",
         cinNumber: kycData.businessInfo?.cinNumber || "",
-        businessNature: kycData.businessInfo?.businessNature || "",
+        industry: kycData.businessInfo?.industry || kycData.businessInfo?.businessNature || "",
       });
     }
   };
@@ -486,7 +487,7 @@ const Profile: React.FC = () => {
                   Manage your personal information and company details
                 </p>
               </div>
-              {!isEditing ? (
+              {activeTab !== "company" && (!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
                   className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
@@ -510,7 +511,7 @@ const Profile: React.FC = () => {
                     <X className="w-4 h-4" /> Cancel
                   </button>
                 </div>
-              )}
+              ))}
             </div>
 
             {/* Profile Info Card */}
@@ -575,7 +576,10 @@ const Profile: React.FC = () => {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                  onClick={() => {
+                    setActiveTab(tab.id as typeof activeTab);
+                    setIsEditing(false);
+                  }}
                   className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                     activeTab === tab.id
                       ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
@@ -891,23 +895,23 @@ const Profile: React.FC = () => {
                         </div>
                         <div>
                           <label className="block text-sm text-gray-500 mb-1">
-                            Business Nature
+                            Industry
                           </label>
                           {isEditing ? (
                             <input
                               type="text"
-                              value={businessInfoForm.businessNature}
+                              value={businessInfoForm.industry}
                               onChange={(e) =>
                                 setBusinessInfoForm({
                                   ...businessInfoForm,
-                                  businessNature: e.target.value,
+                                  industry: e.target.value,
                                 })
                               }
                               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                             />
                           ) : (
                             <p className="text-gray-900">
-                              {kycData.businessInfo?.businessNature || "N/A"}
+                              {kycData.businessInfo?.industry || kycData.businessInfo?.businessNature || "N/A"}
                             </p>
                           )}
                         </div>

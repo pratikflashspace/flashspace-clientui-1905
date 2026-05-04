@@ -608,8 +608,7 @@ export default function BookingRequests() {
                         ["GST Number", selected.client.gstNumber],
                         ["PAN Number", selected.client.panNumber],
                         ["CIN Number", selected.client.cinNumber],
-                        ["Industry", selected.client.industry],
-                        ["Business Nature", selected.client.businessNature],
+                        ["Industry", selected.client.industry || selected.client.businessNature],
                         ["Registered Address", selected.client.registeredAddress],
                       ].filter(([, v]) => v && v !== "N/A").map(([label, value]) => (
                         <div key={label} className={label === "Registered Address" ? "sm:col-span-2" : ""}>

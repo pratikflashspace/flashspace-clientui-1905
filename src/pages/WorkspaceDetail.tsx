@@ -35,7 +35,7 @@ import { getMeetingRoomById } from "@/services/meetingRoom.service";
 import { getVirtualOfficePricing } from "@/utils/priceUtils";
 import { createPaymentOrder, verifyPayment } from "@/services/payment.service";
 import { useAuth } from "@/contexts/AuthContext";
-import MeetingBookingModal from "@/components/ui/MeetingBookingModal";
+
 
 type WorkspaceType = "virtual-office" | "coworking" | "on-demand";
 
@@ -68,7 +68,7 @@ const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isMeetingModalOpen, setIsMeetingModalOpen] = useState(false);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -229,7 +229,7 @@ const getPhotos = () => {
         </p>
 
         <button
-          onClick={() => setIsMeetingModalOpen(true)}
+          onClick={() => window.dispatchEvent(new CustomEvent('open-contact-modal'))}
           className="w-full mt-3 py-3 rounded-[10px] border border-border text-foreground text-sm font-medium flex items-center justify-center gap-2 hover:bg-muted/60 hover:border-border active:bg-muted transition-colors"
         >
           <Phone className="w-4 h-4" /> Contact Sales
@@ -817,21 +817,6 @@ const getPhotos = () => {
           </div>
         </div>
       </div>
-      <MeetingBookingModal
-        isOpen={isMeetingModalOpen}
-        onClose={() => setIsMeetingModalOpen(false)}
-        item={{
-          ...data,
-          _id: data._id || id,
-          name: data.name,
-          address: address,
-          area: data.area || data.city || "",
-          price: data.price || "N/A",
-          rating: data.rating || data.avgRating || 0,
-          reviews: data.reviews || data.totalReviews || 0,
-          features: data.features || data.amenities || [],
-        } as any}
-      />
       <Footer />
     </div>
   );
