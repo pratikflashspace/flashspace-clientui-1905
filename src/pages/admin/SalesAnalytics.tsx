@@ -434,152 +434,136 @@ export default function BookingManagement() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[1180px]">
-            <thead>
-              <tr className="border-b border-border bg-muted/10">
-                <th className="w-[180px] px-5 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Booking
-                </th>
-                <th className="w-[270px] px-5 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Client
-                </th>
-                <th className="w-[260px] px-5 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Space / Partner
-                </th>
-                <th className="w-[210px] px-5 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Plan
-                </th>
-                <th className="w-[130px] px-5 py-4 text-right text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Amount
-                </th>
-                <th className="w-[130px] px-5 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Status
-                </th>
-                <th className="w-[180px] px-5 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Update Status
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {paginatedBookings.map((booking) => (
-                <tr key={booking._id} className="align-top hover:bg-[#F8FAF7] transition-colors">
-                  <td className="px-5 py-5">
-                    <p className="inline-flex max-w-[150px] rounded-lg bg-[#F8FAF7] px-2.5 py-1 font-mono text-[11px] font-bold text-[#35503F]">
-                      {booking.bookingNumber || booking._id.slice(-8).toUpperCase()}
-                    </p>
-                    <p className="mt-2 text-[11px] leading-4 font-medium text-muted-foreground">
-                      {booking.createdAt
-                        ? format(new Date(booking.createdAt), "dd MMM yyyy, hh:mm aa")
-                        : "No date"}
-                    </p>
-                  </td>
-                  <td className="px-5 py-5">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#DDE5DA] bg-[#F8FAF7] text-xs font-bold text-[#35503F]">
-                        {booking.user?.fullName ? getInitial(booking.user.fullName) : <Users className="h-4 w-4" />}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-foreground">
-                          {booking.user?.fullName || "Guest User"}
-                        </p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {booking.user?.email || "No email"}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-5">
-                    <p className="line-clamp-2 text-sm font-bold leading-5 text-foreground">
-                      {booking.spaceSnapshot?.name || "Unknown Space"}
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                        {booking.spaceSnapshot?.city || "No city"}
-                      </span>
-                      <span className="rounded-md bg-[#EAF6EF] px-2 py-0.5 text-[11px] font-semibold text-[#35503F]">
-                        {getPartnerName(booking)}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-5">
-                    <p className="line-clamp-2 text-sm font-bold leading-5 text-foreground">
-                      {booking.plan?.name || "Custom Plan"}
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                        {formatBookingType(booking.type)}
-                      </span>
-                      <span className="rounded-md bg-[#FEF8C3] px-2 py-0.5 text-[11px] font-semibold text-[#1F2E26]">
-                        {booking.plan?.tenure || "-"} {booking.plan?.tenureUnit || ""}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-5 text-right text-sm font-bold text-foreground">
-                    {formatCurrency(getBookingAmount(booking))}
-                  </td>
-                  <td className="px-5 py-5">
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "capitalize font-semibold",
-                        statusBadgeClass[booking.status] || "bg-muted text-muted-foreground",
-                      )}
-                    >
-                      {formatStatus(booking.status)}
-                    </Badge>
-                  </td>
-                  <td className="px-5 py-5">
-                    <div className="flex items-center gap-2">
-                      <Select
-                        value={booking.status}
-                        onValueChange={(value) =>
-                          updateStatus(booking._id, value as BookingData["status"])
-                        }
-                        disabled={updatingBookingId === booking._id}
-                      >
-                        <SelectTrigger className="h-9 w-40 rounded-xl border-[#DDE5DA] bg-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-[#DDE5DA]">
-                          {STATUS_OPTIONS.map((status) => (
-                            <SelectItem
-                              key={status.value}
-                              value={status.value}
-                              className="rounded-lg data-[state=checked]:bg-[#FEF8C3]"
-                            >
-                              {status.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {updatingBookingId === booking._id && (
-                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+        <div>
+          <div className="hidden grid-cols-[minmax(118px,0.8fr)_minmax(260px,1.55fr)_minmax(220px,1.25fr)_minmax(145px,0.8fr)_minmax(86px,0.55fr)_minmax(76px,0.45fr)_minmax(118px,0.62fr)] gap-4 border-b border-border bg-muted/10 px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground xl:grid">
+            <span>Booking</span>
+            <span>Client</span>
+            <span>Space / Partner</span>
+            <span>Plan</span>
+            <span className="text-right">Amount</span>
+            <span>Status</span>
+            <span>Update</span>
+          </div>
 
-              {filteredBookings.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="py-20 text-center">
-                    <div className="mx-auto flex max-w-sm flex-col items-center gap-3 text-muted-foreground">
-                      {searchQuery || statusFilter !== "all" || partnerFilter !== "all" ? (
-                        <SlidersHorizontal className="h-8 w-8" />
-                      ) : (
-                        <XCircle className="h-8 w-8" />
-                      )}
-                      <p className="text-sm font-semibold">No bookings found</p>
-                      <p className="text-xs">
-                        Try changing the status, partner, or search filter.
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <div className="divide-y divide-border">
+            {paginatedBookings.map((booking) => (
+              <article
+                key={booking._id}
+                className="grid gap-4 px-5 py-5 transition-colors hover:bg-[#F8FAF7] xl:grid-cols-[minmax(118px,0.8fr)_minmax(260px,1.55fr)_minmax(220px,1.25fr)_minmax(145px,0.8fr)_minmax(86px,0.55fr)_minmax(76px,0.45fr)_minmax(118px,0.62fr)] xl:items-center"
+              >
+                <div className="min-w-0">
+                  <p className="inline-flex max-w-full truncate rounded-lg bg-[#F8FAF7] px-2 py-1 font-mono text-[9px] font-bold text-[#35503F]">
+                    {booking.bookingNumber || booking._id.slice(-8).toUpperCase()}
+                  </p>
+                  <p className="mt-1.5 truncate text-[10px] font-medium leading-4 text-muted-foreground">
+                    {booking.createdAt
+                      ? format(new Date(booking.createdAt), "dd MMM yyyy, hh:mm aa")
+                      : "No date"}
+                  </p>
+                </div>
+
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#DDE5DA] bg-[#F8FAF7] text-xs font-bold text-[#35503F]">
+                    {booking.user?.fullName ? getInitial(booking.user.fullName) : <Users className="h-4 w-4" />}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-foreground">
+                      {booking.user?.fullName || "Guest User"}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground" title={booking.user?.email || "No email"}>
+                      {booking.user?.email || "No email"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="min-w-0">
+                  <p className="line-clamp-2 text-sm font-bold leading-5 text-foreground">
+                    {booking.spaceSnapshot?.name || "Unknown Space"}
+                  </p>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                      {booking.spaceSnapshot?.city || "No city"}
+                    </span>
+                    <span className="max-w-[150px] truncate rounded-md bg-[#EAF6EF] px-2 py-0.5 text-[10px] font-semibold text-[#35503F]">
+                      {getPartnerName(booking)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="min-w-0">
+                  <p className="line-clamp-2 text-sm font-bold leading-5 text-foreground">
+                    {booking.plan?.name || "Custom Plan"}
+                  </p>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                      {formatBookingType(booking.type)}
+                    </span>
+                    <span className="rounded-md bg-[#FEF8C3] px-2 py-0.5 text-[10px] font-semibold text-[#1F2E26]">
+                      {booking.plan?.tenure || "-"} {booking.plan?.tenureUnit || ""}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="truncate text-sm font-bold text-foreground xl:text-right">
+                  {formatCurrency(getBookingAmount(booking))}
+                </p>
+
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "w-fit max-w-full truncate capitalize font-semibold",
+                    statusBadgeClass[booking.status] || "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {formatStatus(booking.status)}
+                </Badge>
+
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={booking.status}
+                    onValueChange={(value) =>
+                      updateStatus(booking._id, value as BookingData["status"])
+                    }
+                    disabled={updatingBookingId === booking._id}
+                  >
+                    <SelectTrigger className="h-9 w-28 rounded-xl border-[#DDE5DA] bg-white text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-[#DDE5DA]">
+                      {STATUS_OPTIONS.map((status) => (
+                        <SelectItem
+                          key={status.value}
+                          value={status.value}
+                          className="rounded-lg data-[state=checked]:bg-[#FEF8C3]"
+                        >
+                          {status.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {updatingBookingId === booking._id && (
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  )}
+                </div>
+              </article>
+            ))}
+
+            {filteredBookings.length === 0 && (
+              <div className="py-20 text-center">
+                <div className="mx-auto flex max-w-sm flex-col items-center gap-3 text-muted-foreground">
+                  {searchQuery || statusFilter !== "all" || partnerFilter !== "all" ? (
+                    <SlidersHorizontal className="h-8 w-8" />
+                  ) : (
+                    <XCircle className="h-8 w-8" />
+                  )}
+                  <p className="text-sm font-semibold">No bookings found</p>
+                  <p className="text-xs">
+                    Try changing the status, partner, or search filter.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {filteredBookings.length > 0 && (

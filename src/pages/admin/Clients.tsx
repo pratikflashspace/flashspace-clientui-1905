@@ -164,94 +164,74 @@ const ClientManagement = () => {
         All Clients ({visibleClients.length})
       </p>
 
-      <div className="hidden md:block bg-background border border-border rounded-xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-muted/50 border-b border-border">
-              <tr>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Client
-                </th>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Email
-                </th>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Phone
-                </th>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Bookings
-                </th>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Revenue
-                </th>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Last Booking
-                </th>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Status
-                </th>
-                <th className="text-right p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {visibleClients.length > 0 ? (
-                visibleClients.map((client) => (
-                  <tr
-                    key={client.id}
-                    onClick={() => navigate(`/admin/clients/${client.id}`)}
-                    className="hover:bg-muted/30 transition-colors cursor-pointer"
-                  >
-                    <td className="p-4">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm">
-                          <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-                            {client.initials || "CL"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <p className="font-semibold text-foreground whitespace-nowrap">{client.name}</p>
-                      </div>
-                    </td>
-                    <td className="p-4 text-sm text-muted-foreground">{client.email}</td>
-                    <td className="p-4 text-sm text-muted-foreground">{client.phone}</td>
-                    <td className="p-4 text-sm font-semibold text-foreground">
-                      {client.bookingCount}
-                    </td>
-                    <td className="p-4 text-sm font-semibold text-foreground">
-                      {formatCurrency(client.totalRevenue)}
-                    </td>
-                    <td className="p-4 text-sm text-muted-foreground">
-                      {formatDate(client.lastBookingDate)}
-                    </td>
-                    <td className="p-4">{renderStatusBadge(client.statusLabel)}</td>
-                    <td className="p-4 text-right">
-                      <Button
-                        variant="ghost"
-                        className="text-primary"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          navigate(`/admin/clients/${client.id}`);
-                        }}
-                      >
-                        <Eye className="w-4 h-4 mr-1" />
-                        View Bookings
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={8}
-                    className="p-12 text-center text-muted-foreground font-medium"
-                  >
-                    No clients found for the selected filters.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      <div className="hidden md:block overflow-hidden rounded-xl border border-border bg-background shadow-sm">
+        <div className="grid grid-cols-[minmax(230px,1.25fr)_minmax(220px,1.1fr)_92px_120px_112px_92px_112px] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+          <span>Client</span>
+          <span>Contact</span>
+          <span>Bookings</span>
+          <span>Revenue</span>
+          <span>Last Booking</span>
+          <span>Status</span>
+          <span className="text-right">Action</span>
+        </div>
+
+        <div className="divide-y divide-border">
+          {visibleClients.length > 0 ? (
+            visibleClients.map((client) => (
+              <button
+                key={client.id}
+                type="button"
+                onClick={() => navigate(`/admin/clients/${client.id}`)}
+                className="group grid w-full grid-cols-[minmax(230px,1.25fr)_minmax(220px,1.1fr)_92px_120px_112px_92px_112px] items-center gap-4 px-4 py-4 text-left transition-colors hover:bg-muted/30"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <Avatar className="h-9 w-9 shrink-0 ring-2 ring-background shadow-sm">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                      {client.initials || "CL"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-extrabold text-foreground">
+                      {client.name}
+                    </p>
+                    <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">
+                      ID: {client.id.slice(-6)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-foreground">
+                    {client.email}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {client.phone || "-"}
+                  </p>
+                </div>
+
+                <p className="text-sm font-extrabold text-foreground">
+                  {client.bookingCount}
+                </p>
+                <p className="truncate text-sm font-extrabold text-foreground">
+                  {formatCurrency(client.totalRevenue)}
+                </p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  {formatDate(client.lastBookingDate)}
+                </p>
+                <div>{renderStatusBadge(client.statusLabel)}</div>
+                <div className="flex justify-end">
+                  <span className="inline-flex h-9 items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 text-xs font-extrabold text-primary transition-colors group-hover:bg-primary/10">
+                    <Eye className="h-3.5 w-3.5" />
+                    View
+                  </span>
+                </div>
+              </button>
+            ))
+          ) : (
+            <div className="p-12 text-center font-medium text-muted-foreground">
+              No clients found for the selected filters.
+            </div>
+          )}
         </div>
       </div>
 

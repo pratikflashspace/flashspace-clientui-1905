@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { toast as hotToast } from "react-hot-toast";
 
-import type {
-  Client,
-} from "@/types/spacePortal/client";
+import type { Client } from "@/types/spacePortal/client";
 
 import {
   Building2,
@@ -12,23 +9,16 @@ import {
   CheckCircle2,
   Download,
   Eye,
-  Loader2,
-  MessageSquare,
   RefreshCw,
   Search,
-  Send,
   UserRoundCheck,
-  X,
 } from "lucide-react";
 import { TableSkeleton } from "@/components/ui/skeleton-loaders";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ClientViewModal as PartnerClientViewModal } from "@/components/modals/ClientViewModal";
-import { ClientChatModal as PartnerClientChatModal } from "@/components/modals/ClientChatModal";
 import { toast } from "@/hooks/use-toast";
 import { userDashboardService } from "@/services/userDashboard.service";
-import partnerTicketService from "@/services/spacePortal/partnerTicket.service";
 
 type BookingFilters = {
   search: string;
@@ -36,14 +26,6 @@ type BookingFilters = {
   workspace: string;
   city: string;
   space: string;
-};
-
-type ApiErrorLike = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
 };
 
 type SelectedClient = Omit<Client, "status"> & {
@@ -151,8 +133,6 @@ export default function Clients() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedClient, setSelectedClient] = useState<SelectedClient | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [chatModalOpen, setChatModalOpen] = useState(false);
-  const [messageTarget, setMessageTarget] = useState<Client | null>(null);
   const [draftFilters, setDraftFilters] = useState<BookingFilters>(emptyFilters);
   const [appliedFilters, setAppliedFilters] =
     useState<BookingFilters>(emptyFilters);
@@ -524,7 +504,6 @@ export default function Clients() {
                   client={client}
                   serial={startIndex + index + 1}
                   onView={() => handleViewClient(client)}
-                  onMessage={() => setMessageTarget(client)}
                   onNavigate={() =>
                     navigate(`/spaceportal/clients/${client.userId}`)
                   }
@@ -590,18 +569,6 @@ export default function Clients() {
           navigate(`/spaceportal/clients/${selectedClient.userId}`);
         }}
       />
-      <PartnerClientChatModal
-        client={selectedClient}
-        open={chatModalOpen}
-        onOpenChange={setChatModalOpen}
-      />
-
-      {messageTarget && (
-        <SendMessageModal
-          client={messageTarget}
-          onClose={() => setMessageTarget(null)}
-        />
-      )}
     </div>
   );
 }
@@ -670,13 +637,11 @@ function BookingRow({
   client,
   serial,
   onView,
-  onMessage,
   onNavigate,
 }: {
   client: Client;
   serial: number;
   onView: () => void;
-  onMessage: () => void;
   onNavigate: () => void;
 }) {
   const cleanLocation = formatCleanLocation(client.location, client.city);
@@ -760,142 +725,17 @@ function BookingRow({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 xl:justify-end">
-          <div className="flex items-center gap-2">
-            <Button
+          <Button
             variant="ghost"
             size="sm"
             onClick={onView}
-              className="h-8 rounded-full border border-[#C9D8CF] bg-white px-3 text-xs font-extrabold text-[#1F2E26] shadow-sm transition hover:border-primary/40 hover:bg-primary/10 hover:text-[#35503F]"
-            >
-              <Eye className="mr-1.5 h-3.5 w-3.5" />
-              View
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onMessage}
-              className="h-8 w-8 rounded-full border border-[#C9D8CF] bg-white text-[#35503F] shadow-sm transition hover:border-primary/40 hover:bg-primary/10"
-            >
-              <MessageSquare className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+            className="h-8 rounded-full border border-[#C9D8CF] bg-white px-3 text-xs font-extrabold text-[#1F2E26] shadow-sm transition hover:border-primary/40 hover:bg-primary/10 hover:text-[#35503F]"
+          >
+            <Eye className="mr-1.5 h-3.5 w-3.5" />
+            View
+          </Button>
         </div>
       </div>
     </article>
-  );
-}
-
-function SendMessageModal({
-  client,
-  onClose,
-}: {
-  client: Client;
-  onClose: () => void;
-}) {
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
-  const [sending, setSending] = useState(false);
-
-  const initials = client.companyName
-    .split(" ")
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase();
-
-  const handleSend = async () => {
-    if (!subject.trim() || !message.trim()) {
-      hotToast.error("Please fill in both fields.");
-      return;
-    }
-    if (!client.bookingId) {
-      hotToast.error("Cannot identify booking for this client.");
-      return;
-    }
-    setSending(true);
-    try {
-      const res = await partnerTicketService.createTicketForClient({
-        clientUserId: client.userId,
-        bookingId: client.bookingId,
-        subject: subject.trim(),
-        message: message.trim(),
-      });
-
-      if (res.success) {
-        hotToast.success(
-          "Message sent! The client will see it in their support section.",
-        );
-        onClose();
-      } else {
-        hotToast.error(res.message || "Failed to send message.");
-      }
-    } catch (err: unknown) {
-      const error = err as ApiErrorLike;
-      hotToast.error(error.response?.data?.message || "Something went wrong.");
-    } finally {
-      setSending(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg rounded-3xl bg-white shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-sm font-bold text-teal-700">
-              {initials}
-            </div>
-            <div>
-              <h2 className="font-bold text-gray-900">Send Message</h2>
-              <p className="text-xs text-gray-400">To: {client.contactName}</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="rounded-full p-2 hover:bg-gray-100">
-            <X size={18} className="text-gray-400" />
-          </button>
-        </div>
-        <div className="p-6 space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase">
-              Subject
-            </label>
-            <input
-              type="text"
-              value={subject}
-              onChange={(event) => setSubject(event.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:border-teal-400 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase">
-              Message
-            </label>
-            <textarea
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              rows={5}
-              className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm focus:border-teal-400 focus:outline-none"
-            />
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-3 border-t border-gray-100 px-6 py-4">
-          <Button variant="ghost" onClick={onClose} disabled={sending}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSend}
-            disabled={sending || !subject.trim() || !message.trim()}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
-          >
-            {sending ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <Send size={16} className="mr-2" />
-            )}
-            {sending ? "Sending..." : "Send Message"}
-          </Button>
-        </div>
-      </div>
-    </div>
   );
 }
