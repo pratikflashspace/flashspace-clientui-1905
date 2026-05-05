@@ -14,7 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import partnerTicketService, {
   PartnerTicketData,
@@ -185,6 +185,43 @@ export default function TicketsAndTasks() {
     }
   };
 
+  const stats = useMemo(() => {
+    const open = tickets.filter((t) => (t.status || "").toLowerCase() === "open").length;
+    const inProgress = tickets.filter((t) =>
+      ["in_progress", "escalated"].includes((t.status || "").toLowerCase())
+    ).length;
+    const pendingTasks = tasks.length;
+
+    // Dynamic Avg Response Time calculation (time from createdAt to first staff message)
+    let avgTimeStr = "N/A";
+    const ticketsWithReplies = tickets.filter(t => {
+      return t.messages && t.messages.some(m => m.sender !== 'user');
+    });
+
+    if (ticketsWithReplies.length > 0) {
+      const totalDiff = ticketsWithReplies.reduce((acc, t) => {
+        const staffMessages = t.messages.filter(m => m.sender !== 'user');
+        const firstStaffMessage = staffMessages.sort((a, b) => 
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        )[0];
+        
+        const start = new Date(t.createdAt).getTime();
+        const end = new Date(firstStaffMessage.createdAt).getTime();
+        return acc + (end - start);
+      }, 0);
+      
+      const avgMs = totalDiff / ticketsWithReplies.length;
+      const mins = Math.floor(avgMs / 60000);
+      const hours = Math.floor(mins / 60);
+      
+      if (hours > 0) avgTimeStr = `${hours}h ${mins % 60}m`;
+      else if (mins > 0) avgTimeStr = `${mins}m`;
+      else avgTimeStr = "< 1m";
+    }
+
+    return { open, inProgress, pendingTasks, avgResponse: avgTimeStr };
+  }, [tickets, tasks]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -223,10 +260,7 @@ export default function TicketsAndTasks() {
       <div className="grid gap-5 sm:grid-cols-4 mb-10">
         <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
           <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
-            {
-              tickets.filter((t) => (t.status || "").toLowerCase() === "open")
-                .length
-            }
+            {stats.open}
           </p>
           <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
             Open Tickets
@@ -234,13 +268,7 @@ export default function TicketsAndTasks() {
         </div>
         <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
           <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
-            {
-              tickets.filter((t) =>
-                ["in_progress", "escalated"].includes(
-                  (t.status || "").toLowerCase(),
-                ),
-              ).length
-            }
+            {stats.inProgress}
           </p>
           <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
             In Progress
@@ -248,7 +276,7 @@ export default function TicketsAndTasks() {
         </div>
         <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
           <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
-            {tasks.length}
+            {stats.pendingTasks}
           </p>
           <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
             Pending Tasks
@@ -256,7 +284,7 @@ export default function TicketsAndTasks() {
         </div>
         <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
           <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
-            4.2 hrs
+            {stats.avgResponse}
           </p>
           <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
             Avg Response
@@ -369,6 +397,9 @@ export default function TicketsAndTasks() {
                         <td className="p-5">
                           <div className="flex items-center gap-2">
                             <Avatar className="w-8 h-8 border border-[#2D3F33]/10">
+                              {ticket.assignee?.profilePicture && (
+                                <AvatarImage src={ticket.assignee.profilePicture} alt={ticket.assignee.fullName} className="object-cover" />
+                              )}
                               <AvatarFallback className="text-[10px] bg-[#2D3F33]/10 text-[#2D3F33] dark:text-[#FDE68A] font-bold uppercase">
                                 {ticket.assignee?.fullName
                                   ?.split(" ")
@@ -436,6 +467,9 @@ export default function TicketsAndTasks() {
               <div className="p-4 border-b border-[#2D3F33]/5 dark:border-white/10 bg-gray-50/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar>
+                    {activeTicket.user?.profilePicture && (
+                      <AvatarImage src={activeTicket.user.profilePicture} alt={activeTicket.user.fullName} className="object-cover" />
+                    )}
                     <AvatarFallback className="bg-[#2D3F33]/10 text-[#2D3F33]">
                       {activeTicket.user?.fullName
                         ?.substring(0, 2)

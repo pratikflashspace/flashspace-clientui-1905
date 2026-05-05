@@ -4,6 +4,8 @@ import { useSocket } from "@/contexts/SocketContext";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import userDashboardService from "@/services/userDashboard.service";
+import { TicketStatus } from "@/types/services";
 import {
   MessageCircle,
   Phone,
@@ -86,8 +88,9 @@ const contactOptions = [
     title: "Live Chat",
     description: "Instant Response",
     value: "Start Chat",
-    action: "#chat",
+    action: "/start-chatting",
     color: "bg-purple-100 text-purple-600",
+    isInternal: true,
   },
 ];
 
@@ -115,7 +118,7 @@ export default function Support() {
       const response = await userDashboardService.createTicket({
         subject: `Contact Request: ${contactFormData.subject || "General Inquiry"}`,
         category: "leads" as any,
-        description: `Name: ${contactFormData.name}\nEmail: ${contactFormData.email}\nPhone: ${contactFormData.phone}\n\nMessage:\n${contactFormData.message}`,
+        description: `CONTACT DETAILS\nName: ${contactFormData.name}\nEmail: ${contactFormData.email}\nPhone: ${contactFormData.phone}\n\n--- MESSAGE ---\n${contactFormData.message}`,
       });
 
       if (response.success && response.data) {
@@ -190,24 +193,41 @@ export default function Support() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {contactOptions.map((option, idx) => (
-            <a
-              key={idx}
-              href={option.action}
-              className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md group relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#35503F]/5 rounded-bl-full -mr-12 -mt-12 transition-transform group-hover:scale-110" />
-              <div className={`w-14 h-14 rounded-2xl ${option.color} flex items-center justify-center mb-6`}>
-                <option.icon className="w-7 h-7" />
-              </div>
-              <h3 className="text-xl font-bold text-[#35503F] mb-1">{option.title}</h3>
-              <p className="text-sm text-gray-500 font-medium mb-4">{option.description}</p>
-              <div className="flex items-center gap-2 text-[#35503F] font-extrabold group-hover:gap-3 transition-all">
-                {option.value}
-                <ExternalLink className="w-4 h-4" />
-              </div>
-            </a>
-          ))}
+          {contactOptions.map((option, idx) => {
+            const isInternal = (option as any).isInternal;
+            const Content = (
+              <>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[#35503F]/5 rounded-bl-full -mr-12 -mt-12 transition-transform group-hover:scale-110" />
+                <div className={`w-14 h-14 rounded-2xl ${option.color} flex items-center justify-center mb-6`}>
+                  <option.icon className="w-7 h-7" />
+                </div>
+                <h3 className="text-xl font-bold text-[#35503F] mb-1">{option.title}</h3>
+                <p className="text-sm text-gray-500 font-medium mb-4">{option.description}</p>
+                <div className="flex items-center gap-2 text-[#35503F] font-extrabold group-hover:gap-3 transition-all">
+                  {option.value}
+                  <ExternalLink className="w-4 h-4" />
+                </div>
+              </>
+            );
+
+            return isInternal ? (
+              <button
+                key={idx}
+                onClick={() => navigate(option.action)}
+                className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md group relative overflow-hidden text-left"
+              >
+                {Content}
+              </button>
+            ) : (
+              <a
+                key={idx}
+                href={option.action}
+                className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md group relative overflow-hidden"
+              >
+                {Content}
+              </a>
+            );
+          })}
         </div>
 
         <div className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 w-fit max-w-full overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">

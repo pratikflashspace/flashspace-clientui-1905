@@ -6,7 +6,7 @@ import {
   AdminPartnerListItem,
   adminService,
 } from "@/services/admin.service";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -210,6 +210,9 @@ const PartnersManagement = () => {
                     <td className="p-4">
                       <div className="flex min-w-0 items-center gap-3">
                         <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm">
+                          {partner.profilePicture && (
+                            <AvatarImage src={partner.profilePicture} alt={partner.name} className="object-cover" />
+                          )}
                           <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
                             {partner.name?.split(" ").map(n => n[0]).join("").toUpperCase() || "PA"}
                           </AvatarFallback>

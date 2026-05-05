@@ -63,6 +63,7 @@ export interface UserData {
   isEmailVerified?: boolean;
   createdAt: string;
   updatedAt: string;
+  profilePicture?: string;
 }
 
 export interface BookingData {
@@ -73,6 +74,7 @@ export interface BookingData {
   user?: {
     fullName: string;
     email: string;
+    profilePicture?: string;
   };
   partner?: string | {
     _id?: string;
@@ -113,6 +115,7 @@ export interface AdminClientListItem {
   lastBookingDate: string | null;
   statusLabel: "Active" | "At Risk" | "Churned";
   initials: string;
+  profilePicture?: string;
 }
 
 export interface AdminClientListResponse {
@@ -157,6 +160,7 @@ export interface AdminClientDetailResponse {
     firstBookingDate: string | null;
     lastBookingDate: string | null;
     statusLabel: "Active" | "At Risk" | "Churned";
+    profilePicture?: string;
   };
   bookings: AdminClientBookingItem[];
 }
@@ -170,6 +174,7 @@ export interface AdminPartnerListItem {
   spaces: Array<{ name: string; type: string; location?: string }>;
   kycVerified: boolean;
   createdAt: string;
+  profilePicture?: string;
 }
 
 export interface AdminPartnerListResponse {
@@ -188,6 +193,7 @@ export interface KYCData {
     fullName: string;
     email: string;
     phoneNumber?: string;
+    profilePicture?: string;
   };
   partnerInfo?: {
     fullName?: string;
@@ -249,6 +255,12 @@ export interface PartnerKYCData {
     aadhaarNumber: string;
     verified: boolean;
   };
+  user?: {
+    _id: string;
+    fullName: string;
+    email: string;
+    profilePicture?: string;
+  };
   overallStatus: "pending" | "approved" | "rejected" | string;
   progress?: number;
   isDeleted?: boolean;
@@ -276,6 +288,7 @@ export interface AdminTicketData {
     fullName: string;
     email: string;
     phoneNumber?: string;
+    profilePicture?: string;
   };
   category: string;
   priority: "low" | "medium" | "high";
@@ -284,6 +297,7 @@ export interface AdminTicketData {
     _id: string;
     fullName: string;
     email: string;
+    profilePicture?: string;
   };
   bookingId?: {
     _id: string;

@@ -6,11 +6,13 @@ import { Input } from "@/components/ui/input";
 import { TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { toast } from "@/hooks/use-toast";
 import { CheckCircle2, Clock, Loader2, RotateCcw, Search } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TrackProgressData {
   id: string;
   bookingId: string;
   userName: string;
+  profilePicture?: string;
   spaceBooked: string;
   userKycApprovedByAdmin: boolean;
   userKycApprovedBySpace: boolean;
@@ -194,7 +196,19 @@ const TrackProgress = () => {
                         {item.bookingId}
                       </span>
                     </td>
-                    <td className="p-5 font-bold text-[#1F2E26]">{item.userName}</td>
+                    <td className="p-5">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8 ring-2 ring-background shadow-sm">
+                          {item.profilePicture && (
+                            <AvatarImage src={item.profilePicture} alt={item.userName} className="object-cover" />
+                          )}
+                          <AvatarFallback className="bg-primary/10 text-primary font-bold text-[10px]">
+                            {item.userName?.split(" ").map(n => n[0]).join("").toUpperCase() || "CL"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="font-bold text-[#1F2E26]">{item.userName}</span>
+                      </div>
+                    </td>
                     <td className="p-5 text-xs font-bold text-[#677E73]">{item.spaceBooked}</td>
                     <td className="p-5 text-center">
                       <div className="flex justify-center">

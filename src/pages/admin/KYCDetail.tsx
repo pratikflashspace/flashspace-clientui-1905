@@ -22,6 +22,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { KYCDetailSkeleton } from "@/components/ui/skeleton-loaders";
 import { getUploadedFileUrl } from "@/utils/fileUrl";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function KYCDetail() {
   const { id } = useParams<{ id: string }>();
@@ -434,9 +435,14 @@ export default function KYCDetail() {
             {/* User Profile Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
-                  {displayInitial}
-                </div>
+                <Avatar className="w-12 h-12 rounded-full ring-2 ring-background shadow-md border border-border">
+                  {kycData.user?.profilePicture && (
+                    <AvatarImage src={getUploadedFileUrl(kycData.user.profilePicture)} alt={normalizedDisplayName} className="object-cover" />
+                  )}
+                  <AvatarFallback className="bg-blue-100 text-blue-600 font-bold text-lg">
+                    {displayInitial}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex-1 overflow-hidden">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
                     {type === "property"

@@ -16,6 +16,7 @@ import {
   XCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   fetchPartnerBookingRequests,
   reviewPartnerBookingDocument,
@@ -43,9 +44,9 @@ type BookingRequest = {
   bookingId: string;
   bookingNumber: string;
   client: { 
-    name: string; 
     email: string; 
     phone?: string; 
+    profilePicture?: string;
     companyName?: string;
     companyType?: string;
     gstNumber?: string;
@@ -77,6 +78,7 @@ type BookingRequest = {
     supportingDocuments: Doc[];
     documents: Doc[];
   };
+  clientUserId?: string; // Adding for completeness if needed
 };
 
 const DOC_LABELS: Record<string, string> = {
@@ -456,10 +458,20 @@ export default function BookingRequests() {
                   className={`block w-full border-b px-4 py-4 text-left transition hover:bg-[#f7f8f6] ${selected?.bookingId === request.bookingId ? "bg-[#fff9d8]" : ""}`}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-black text-[#10251a]">{request.bookingNumber}</p>
-                      <p className="mt-1 text-sm font-semibold text-[#2D3F33]">{request.client.companyName || request.client.name}</p>
-                      <p className="text-xs text-[#607067]">{request.space.name}</p>
+                    <div className="flex items-start gap-3 min-w-0">
+                      <Avatar className="h-10 w-10 shrink-0 border border-[#2D3F33]/10">
+                        {request.client.profilePicture && (
+                          <AvatarImage src={request.client.profilePicture} alt={request.client.name} className="object-cover" />
+                        )}
+                        <AvatarFallback className="bg-[#2D3F33]/10 text-[#2D3F33] text-xs font-bold uppercase">
+                          {request.client.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "CL"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="font-black text-[#10251a] truncate">{request.bookingNumber}</p>
+                        <p className="mt-1 text-sm font-semibold text-[#2D3F33] truncate">{request.client.companyName || request.client.name}</p>
+                        <p className="text-xs text-[#607067] truncate">{request.space.name}</p>
+                      </div>
                     </div>
                     <span className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase ${statusClass(effectiveKycStatus)}`}>{effectiveKycStatus}</span>
                   </div>

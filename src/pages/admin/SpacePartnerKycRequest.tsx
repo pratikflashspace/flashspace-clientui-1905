@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getUploadedFileUrl } from "@/utils/fileUrl";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   getAllSpacePartnerKyc,
   SpaceUserKycResponse,
@@ -198,9 +199,14 @@ export default function SpacePartnerKycRequest({
           <div className="p-6 border-b border-border bg-gradient-to-r from-gray-50 to-white">
             <div className="flex items-center justify-between mb-4 gap-3">
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#35503f] flex items-center justify-center text-white font-bold text-lg">
-                  {kyc.fullName?.charAt(0) || "P"}
-                </div>
+                <Avatar className="flex-shrink-0 w-12 h-12 ring-2 ring-background shadow-md border border-border">
+                  {kyc.profilePicture && (
+                    <AvatarImage src={getUploadedFileUrl(kyc.profilePicture)} alt={kyc.fullName} className="object-cover" />
+                  )}
+                  <AvatarFallback className="bg-[#35503f] text-white font-bold text-lg">
+                    {kyc.fullName?.charAt(0) || "P"}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="min-w-0">
                   <h3 className="font-bold text-foreground truncate">
                     {kyc.fullName}

@@ -434,11 +434,7 @@ const Profile: React.FC = () => {
           </span>
         );
       default:
-        return (
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-600">
-            <FileText className="w-4 h-4" /> Not Submitted
-          </span>
-        );
+        return null;
     }
   };
 
@@ -516,9 +512,46 @@ const Profile: React.FC = () => {
 
             {/* Profile Info Card */}
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="bg-[#35503F]/5 h-32 relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#35503F]/10 to-transparent" />
-              </div>
+            {/* Cover Image */}
+            <div className="h-48 relative group/cover">
+              {user?.coverImage ? (
+                <img 
+                  src={user.coverImage.startsWith('http') ? user.coverImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.coverImage}`} 
+                  alt="Cover" 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-r from-[#35503F]/20 to-[#35503F]/5" />
+              )}
+              
+              <label className="absolute bottom-4 right-4 w-12 h-12 bg-white border border-gray-100 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all shadow-lg text-[#35503F] z-20 group-hover/cover:scale-105">
+                <Camera className="w-6 h-6" />
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      toast.loading("Uploading cover image...");
+                      const res = await authService.uploadCoverImage(file);
+                      if (res.success && res.data) {
+                        updateUser({ ...user!, coverImage: res.data.coverImage });
+                        toast.dismiss();
+                        toast.success("Cover image updated");
+                      } else {
+                        toast.dismiss();
+                        toast.error(res.message || "Upload failed");
+                      }
+                    } catch (err) {
+                      toast.dismiss();
+                      toast.error("Upload failed");
+                    }
+                  }} 
+                />
+              </label>
+            </div>
               <div className="px-8 pb-8">
                 <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-16 relative z-10">
                   {/* Profile Image */}
@@ -564,7 +597,7 @@ const Profile: React.FC = () => {
                     </p>
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 flex items-center gap-2">
                        <ShieldCheck className="w-3 h-3 text-[#35503F]" />
-                       Client ID: {user?._id?.slice(-8).toUpperCase() || "N/A"}
+                       Client ID: {(user?._id || user?.id)?.slice(-8).toUpperCase() || "N/A"}
                     </p>
                   </div>
                 </div>

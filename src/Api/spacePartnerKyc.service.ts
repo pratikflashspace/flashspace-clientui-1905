@@ -78,6 +78,7 @@ export type SpaceUserKycResponse = {
   fullName: string;
   email: string;
   phoneNumber: string;
+  profilePicture?: string;
   dateOfBirth: string;
   aadhaarNumber: string;
   panNumber: string;

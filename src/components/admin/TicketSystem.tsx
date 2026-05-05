@@ -14,7 +14,7 @@ import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TicketViewModal } from "@/components/modals/TicketViewModal";
 import { CreateTicketModal } from "@/components/modals/CreateTicketModal";
@@ -448,8 +448,20 @@ export default function TicketSystem() {
                     </p>
                   </div>
                 </td>
-                <td className="p-4 text-sm text-muted-foreground">
-                  {ticket.user?.fullName || "Unknown"}
+                <td className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-8 w-8 ring-2 ring-background shadow-sm">
+                      {ticket.user?.profilePicture && (
+                        <AvatarImage src={ticket.user.profilePicture} alt={ticket.user.fullName} className="object-cover" />
+                      )}
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold text-[10px]">
+                        {ticket.user?.fullName?.split(" ").map(n => n[0]).join("").toUpperCase() || "CL"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-foreground">
+                      {ticket.user?.fullName || "Unknown"}
+                    </span>
+                  </div>
                 </td>
                 <td className="p-4">
                   <Badge variant="outline">
@@ -476,8 +488,11 @@ export default function TicketSystem() {
                     ) : (
                       <>
                         <Avatar className="w-6 h-6">
+                          {ticket.assignee?.profilePicture && (
+                            <AvatarImage src={ticket.assignee.profilePicture} alt={ticket.assignee.fullName} />
+                          )}
                           <AvatarFallback className="text-[10px] bg-blue-100 text-blue-700 font-bold">
-                            AD
+                            {ticket.assignee?.fullName?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "AD"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
@@ -535,9 +550,19 @@ export default function TicketSystem() {
             <div className="grid grid-cols-2 gap-4 py-2 border-y border-border/50">
               <div>
                 <p className="text-[10px] text-muted-foreground uppercase font-medium">Client</p>
-                <p className="text-sm font-medium text-foreground truncate">
-                  {ticket.user?.fullName || "Unknown"}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <Avatar className="h-5 w-5">
+                    {ticket.user?.profilePicture && (
+                      <AvatarImage src={ticket.user.profilePicture} alt={ticket.user.fullName} />
+                    )}
+                    <AvatarFallback className="text-[8px] bg-primary/10 text-primary font-bold">
+                      {ticket.user?.fullName?.split(" ").map(n => n[0]).join("").toUpperCase() || "CL"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {ticket.user?.fullName || "Unknown"}
+                  </p>
+                </div>
               </div>
               <div>
                 <p className="text-[10px] text-muted-foreground uppercase font-medium">Category</p>
@@ -566,8 +591,11 @@ export default function TicketSystem() {
                 ) : (
                   <>
                     <Avatar className="w-6 h-6 border border-blue-100">
+                      {ticket.assignee?.profilePicture && (
+                        <AvatarImage src={ticket.assignee.profilePicture} alt={ticket.assignee.fullName} />
+                      )}
                       <AvatarFallback className="text-[10px] bg-blue-100 text-blue-700 font-bold">
-                        AD
+                        {ticket.assignee?.fullName?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "AD"}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">

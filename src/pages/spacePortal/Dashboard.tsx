@@ -33,6 +33,18 @@ const spaceManagementFeatures = [
       "Add spaces in different locations with photos, videos, and virtual tours",
     href: "#add-space",
   },
+  {
+    title: "Booking Calendar",
+    description:
+      "Check booking requests for on-demand options and manage availability",
+    href: "/spaceportal/booking-calendar",
+  },
+  {
+    title: "Real-time Notifications",
+    description:
+      "Get notified on each booking stage completion for your clients",
+    href: "/spaceportal/booking-calendar",
+  },
 ];
 
 const clientManagementFeatures = [
