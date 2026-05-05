@@ -83,22 +83,28 @@ export default function Tickets() {
       return s === "RESOLVED";
     }).length;
 
-    // Dynamic Avg Response Time calculation (simplified: time from createdAt to closedAt/updatedAt for resolved/closed tickets)
+    // Dynamic Avg Response Time calculation (time from createdAt to first staff message)
     let avgTimeStr = "N/A";
-    const resolvedTickets = tickets.filter(t => {
-      const s = (t.status || "").toUpperCase();
-      return (s === "RESOLVED") && t.createdAt && (t.resolvedAt || t.updatedAt);
+    const ticketsWithReplies = tickets.filter(t => {
+      return t.messages && t.messages.some(m => m.sender !== 'user');
     });
 
-    if (resolvedTickets.length > 0) {
-      const totalDiff = resolvedTickets.reduce((acc, t) => {
+    if (ticketsWithReplies.length > 0) {
+      const totalDiff = ticketsWithReplies.reduce((acc, t) => {
+        const staffMessages = t.messages.filter(m => m.sender !== 'user');
+        const firstStaffMessage = staffMessages.sort((a, b) => 
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        )[0];
+        
         const start = new Date(t.createdAt).getTime();
-        const end = new Date(t.resolvedAt || t.updatedAt).getTime();
+        const end = new Date(firstStaffMessage.createdAt).getTime();
         return acc + (end - start);
       }, 0);
-      const avgMs = totalDiff / resolvedTickets.length;
+      
+      const avgMs = totalDiff / ticketsWithReplies.length;
       const mins = Math.floor(avgMs / 60000);
       const hours = Math.floor(mins / 60);
+      
       if (hours > 0) avgTimeStr = `${hours}h ${mins % 60}m`;
       else if (mins > 0) avgTimeStr = `${mins}m`;
       else avgTimeStr = "< 1m";

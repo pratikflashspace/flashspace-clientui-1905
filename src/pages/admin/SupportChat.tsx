@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { adminService, AdminTicketData } from "@/services/admin.service";
 import { useAuth } from "@/contexts/AuthContext";
@@ -396,6 +396,9 @@ export default function SupportChat() {
                     <div className="flex justify-between items-start mb-1">
                       <div className="flex items-center gap-3 min-w-0">
                         <Avatar className="h-9 w-9 ring-2 ring-background shrink-0">
+                          {ticket.user?.profilePicture && (
+                            <AvatarImage src={ticket.user.profilePicture} alt={ticket.user.fullName} className="object-cover" />
+                          )}
                           <AvatarFallback className="text-[10px] font-black bg-gray-100 text-gray-600">
                             {ticket.user?.fullName
                               ?.substring(0, 2)
@@ -458,6 +461,9 @@ export default function SupportChat() {
                     <ArrowLeft className="w-5 h-5" />
                   </button>
                   <Avatar className="h-10 w-10 ring-2 ring-gray-100">
+                    {activeTicket.user?.profilePicture && (
+                      <AvatarImage src={activeTicket.user.profilePicture} alt={activeTicket.user.fullName} className="object-cover" />
+                    )}
                     <AvatarFallback className="bg-primary/10 text-primary font-bold">
                       {activeTicket.user?.fullName
                         ?.substring(0, 2)

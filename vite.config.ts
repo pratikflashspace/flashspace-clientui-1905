@@ -32,16 +32,32 @@ export default defineConfig({
   },
   build: {
     target: "es2020",
+    chunkSizeWarningLimit: 10000,
     commonjsOptions: {
       include: [/maplibre-gl/, /node_modules/],
       transformMixedEsModules: true,
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          "vendor-react": ["react", "react-dom", "react-router-dom"],
-          "vendor-ui": ["lucide-react", "gsap"],
-          "vendor-heavy": ["maplibre-gl", "jspdf", "recharts"],
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            // 1. Heavy Data/3D
+            if (id.includes("country-state-city")) return "vendor-geo-data";
+            if (id.includes("three")) return "vendor-3d";
+            
+            // 2. Heavy UI Components
+            if (id.includes("maplibre-gl") || id.includes("recharts") || id.includes("gsap") || id.includes("sheryjs")) {
+              return "vendor-heavy-ui";
+            }
+            
+            // 3. Icons (Keep separate as they are numerous)
+            if (id.includes("lucide-react") || id.includes("react-icons") || id.includes("@tabler/icons-react")) {
+              return "vendor-icons";
+            }
+
+            // 4. Everything else (Core & Libs combined to prevent circular deps)
+            return "vendor-core";
+          }
         },
       },
     },

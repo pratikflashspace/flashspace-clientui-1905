@@ -1,7 +1,8 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import BusinessKYCCard from "../../components/AdminDashboard/BusinessKYCCard";
 
 import SpacePartnerKycRequest from "./SpacePartnerKycRequest";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { adminService } from "@/services/admin.service";
 import {
   Search,
@@ -62,6 +63,7 @@ interface KYCRequest {
     fullName: string;
     email: string;
     phoneNumber?: string;
+    profilePicture?: string;
   } | null;
   personalInfo?: {
     fullName?: string;
@@ -735,9 +737,14 @@ export default function KYCRequests() {
                     >
                       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                            <User className="w-5 h-5 text-orange-600" />
-                          </div>
+                          <Avatar className="w-10 h-10 ring-2 ring-background shadow-sm shrink-0 border border-border">
+                            {partner.user?.profilePicture && (
+                              <AvatarImage src={getUploadedFileUrl(partner.user.profilePicture)} alt={partner.fullName} className="object-cover" />
+                            )}
+                            <AvatarFallback className="bg-orange-100 text-orange-600 font-bold">
+                              {partner.fullName.charAt(0) || "P"}
+                            </AvatarFallback>
+                          </Avatar>
                           <div className="min-w-0">
                             <h4 className="font-bold text-foreground truncate">
                               {partner.fullName}
@@ -947,9 +954,14 @@ export default function KYCRequests() {
                         <div className="p-6 border-b border-border bg-gradient-to-r from-gray-50 to-white">
                           <div className="flex items-center justify-between mb-4 gap-3">
                             <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#35503f] to-[#4a6b54] flex items-center justify-center text-white font-bold text-lg shadow-md flex-shrink-0">
-                                {getRequestUserName(request).charAt(0) || "U"}
-                              </div>
+                              <Avatar className="w-12 h-12 ring-2 ring-background shadow-md group-hover:scale-105 transition-transform shrink-0 border border-border">
+                                {request.user?.profilePicture && (
+                                  <AvatarImage src={getUploadedFileUrl(request.user.profilePicture)} alt={getRequestUserName(request)} className="object-cover" />
+                                )}
+                                <AvatarFallback className="bg-gradient-to-br from-[#35503f] to-[#4a6b54] text-white font-bold text-lg">
+                                  {getRequestUserName(request).charAt(0) || "U"}
+                                </AvatarFallback>
+                              </Avatar>
                               <div className="min-w-0 flex-1">
                                 <h3 className="font-bold text-foreground truncate">
                                   {getRequestUserName(request)}

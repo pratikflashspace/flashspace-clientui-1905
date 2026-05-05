@@ -125,9 +125,14 @@ export const TicketViewModal = ({
                   justifyContent: 'center', 
                   fontSize: '20px',
                   fontWeight: 900,
-                  boxShadow: '0 8px 16px rgba(53, 80, 63, 0.2)'
+                  boxShadow: '0 8px 16px rgba(53, 80, 63, 0.2)',
+                  overflow: 'hidden'
                 }}>
-                  {ticket?.user?.fullName?.substring(0, 1).toUpperCase()}
+                  {ticket?.user?.profilePicture ? (
+                    <img src={ticket.user.profilePicture} alt={ticket.user.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    ticket?.user?.fullName?.substring(0, 1).toUpperCase()
+                  )}
                 </div>
                 <div>
                   <h2 style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '-0.02em', margin: 0 }}>{ticket?.user?.fullName}</h2>
@@ -277,8 +282,12 @@ export const TicketViewModal = ({
                               onMouseOut={(e) => (e.currentTarget.style.backgroundColor = selectedAssignee === staffId ? '#f8fafc' : 'transparent')}
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <div style={{ width: '32px', height: '32px', borderRadius: '10px', backgroundColor: '#35503f', color: '#fff', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                                  {s.fullName?.charAt(0).toUpperCase()}
+                                <div style={{ width: '32px', height: '32px', borderRadius: '10px', backgroundColor: '#35503f', color: '#fff', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', overflow: 'hidden' }}>
+                                  {s.profilePicture ? (
+                                    <img src={s.profilePicture} alt={s.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  ) : (
+                                    s.fullName?.charAt(0).toUpperCase()
+                                  )}
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                   <span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>{s.fullName}</span>
@@ -466,11 +475,15 @@ export const TicketViewModal = ({
                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)',
                  textAlign: 'left'
                }}>
-                 <p style={{ margin: 0, fontSize: '14px', color: '#1e293b', lineHeight: 1.6, fontWeight: 500 }}>{ticket?.description}</p>
+                 <p style={{ margin: 0, fontSize: '14px', color: '#1e293b', lineHeight: 1.6, fontWeight: 500, whiteSpace: 'pre-wrap' }}>{ticket?.description}</p>
                  <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
-                    <div style={{ width: '24px', height: '24px', borderRadius: '8px', backgroundColor: '#35503f', color: '#fff', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                      {ticket?.user?.fullName?.charAt(0)}
-                    </div>
+                     <div style={{ width: '24px', height: '24px', borderRadius: '8px', backgroundColor: '#35503f', color: '#fff', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', overflow: 'hidden' }}>
+                       {ticket?.user?.profilePicture ? (
+                         <img src={ticket.user.profilePicture} alt={ticket.user.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                       ) : (
+                         ticket?.user?.fullName?.charAt(0)
+                       )}
+                     </div>
                     <span style={{ fontSize: '12px', fontWeight: 700, color: '#475569' }}>{ticket?.user?.fullName}</span>
                     <span style={{ fontSize: '11px', color: '#94a3b8' }}>• {format(new Date(ticket?.createdAt), "MMM d, h:mm a")}</span>
                  </div>
@@ -541,7 +554,8 @@ export const TicketViewModal = ({
                      border: bubbleStyle.border,
                      fontSize: '14px',
                      fontWeight: 500,
-                     lineHeight: 1.5
+                     lineHeight: 1.5,
+                     whiteSpace: 'pre-wrap'
                    }}>
                      {msg.message}
                    </div>

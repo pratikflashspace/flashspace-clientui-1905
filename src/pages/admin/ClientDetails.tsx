@@ -6,8 +6,10 @@ import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { adminService } from "@/services/admin.service";
 import type { AdminClientBookingItem } from "@/services/admin.service";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat("en-IN", {
@@ -222,8 +224,17 @@ const ClientDetails = () => {
 
         <section className="rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-sm">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-            <div className="min-w-0">
-              <h1 className="break-words text-3xl font-bold text-[#10251A]">{client.name}</h1>
+            <div className="flex flex-col gap-6 md:flex-row md:items-center">
+              <Avatar className="h-20 w-20 shrink-0 ring-4 ring-background shadow-lg md:h-24 md:w-24">
+                {client.profilePicture && (
+                  <AvatarImage src={getUploadedFileUrl(client.profilePicture)} alt={client.name} className="object-cover" />
+                )}
+                <AvatarFallback className="bg-primary/10 text-2xl font-black text-primary">
+                  {client.name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "CL"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <h1 className="break-words text-3xl font-bold text-[#10251A]">{client.name}</h1>
 
               <p className="mt-2 text-[#607067]">
                 Client ID:{" "}
@@ -238,6 +249,7 @@ const ClientDetails = () => {
                   Bookings: {client.totalBookings}
                 </span>
                 {getClientStatusBadge(client.statusLabel)}
+              </div>
               </div>
             </div>
 

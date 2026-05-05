@@ -18,6 +18,7 @@ export interface User {
   isEmailVerified: boolean;
   kycVerified?: boolean;
   profilePicture?: string;
+  coverImage?: string;
   authProvider?: "local" | "google";
   isTwoFactorEnabled?: boolean;
   lastLogin?: string;

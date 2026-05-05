@@ -6,12 +6,13 @@ import {
   AdminClientListItem,
   adminService,
 } from "@/services/admin.service";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { toast } from "@/hooks/use-toast";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 import { Eye, Loader2, RotateCcw, Search } from "lucide-react";
 
 const formatCurrency = (amount: number) =>
@@ -186,6 +187,9 @@ const ClientManagement = () => {
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <Avatar className="h-9 w-9 shrink-0 ring-2 ring-background shadow-sm">
+                    {client.profilePicture && (
+                      <AvatarImage src={getUploadedFileUrl(client.profilePicture)} alt={client.name} className="object-cover" />
+                    )}
                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                       {client.initials || "CL"}
                     </AvatarFallback>
@@ -243,12 +247,21 @@ const ClientManagement = () => {
               className="bg-white border border-border rounded-2xl p-5 shadow-sm space-y-4"
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-bold text-foreground whitespace-nowrap">
-                    {client.name}
-                  </p>
-                  <p className="text-sm text-muted-foreground break-all">{client.email}</p>
-                  <p className="text-sm text-muted-foreground">{client.phone}</p>
+                <div className="flex items-center gap-3 min-w-0">
+                  <Avatar className="h-10 w-10 shrink-0 ring-2 ring-background shadow-sm">
+                    {client.profilePicture && (
+                      <AvatarImage src={getUploadedFileUrl(client.profilePicture)} alt={client.name} className="object-cover" />
+                    )}
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                      {client.initials || "CL"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="font-bold text-foreground whitespace-nowrap truncate max-w-[120px]">
+                      {client.name}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground break-all truncate max-w-[140px]">{client.email}</p>
+                  </div>
                 </div>
                 {renderStatusBadge(client.statusLabel)}
               </div>

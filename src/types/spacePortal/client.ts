@@ -36,4 +36,5 @@ export type Client = {
 
   dealValue?: number;
   createdAt?: string;
+  profilePicture?: string;
 };

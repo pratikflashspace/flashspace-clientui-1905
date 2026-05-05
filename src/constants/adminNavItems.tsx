@@ -65,34 +65,9 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     icon: <Handshake className="w-5 h-5" />,
   },
   {
-    label: "Learning Hub",
-    href: "/admin/learning-hub",
-    icon: <BookOpen className="w-5 h-5" />,
-  },
-  {
-    label: "Leaderboard",
-    href: "/admin/leaderboard",
-    icon: <Trophy className="w-5 h-5" />,
-  },
-  {
-    label: "Revenue Dashboard",
-    href: "/admin/revenue",
-    icon: <Wallet className="w-5 h-5" />,
-  },
-  {
     label: "Partner Invoices",
     href: "/admin/partner-invoices",
     icon: <Receipt className="w-5 h-5" />,
-  },
-  {
-    label: "Receivable/Payable",
-    href: "/admin/finance",
-    icon: <Calculator className="w-5 h-5" />,
-  },
-  {
-    label: "Balance Sheet",
-    href: "/admin/balance",
-    icon: <FileText className="w-5 h-5" />,
   },
   {
     label: "Notifications",

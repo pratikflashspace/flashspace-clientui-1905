@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { adminService, BookingData, UserData } from "@/services/admin.service";
@@ -463,9 +464,14 @@ export default function BookingManagement() {
                 </div>
 
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#DDE5DA] bg-[#F8FAF7] text-xs font-bold text-[#35503F]">
-                    {booking.user?.fullName ? getInitial(booking.user.fullName) : <Users className="h-4 w-4" />}
-                  </div>
+                  <Avatar className="h-9 w-9 border border-[#DDE5DA] shadow-sm">
+                    {booking.user?.profilePicture && (
+                      <AvatarImage src={booking.user.profilePicture} alt={booking.user.fullName} className="object-cover" />
+                    )}
+                    <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">
+                      {booking.user?.fullName ? getInitial(booking.user.fullName) : <Users className="h-4 w-4" />}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold text-foreground">
                       {booking.user?.fullName || "Guest User"}

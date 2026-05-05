@@ -18,6 +18,8 @@ import {
   Lock,
   ChevronDown,
 } from "lucide-react";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { toast } from "sonner";
 import {
@@ -49,6 +51,7 @@ interface User {
     | "super_admin";
   isEmailVerified?: boolean;
   createdAt: string;
+  profilePicture?: string;
 }
 
 export default function UserManagement() {
@@ -457,14 +460,14 @@ export default function UserManagement() {
                           >
                             <td className="px-6 py-5">
                               <div className="flex items-center gap-4">
-                                <div className={`relative w-11 h-11 rounded-2xl bg-gradient-to-br ${getRandomGradient(user.fullName)} flex items-center justify-center text-white font-black text-xs shadow-lg group-hover:scale-110 transition-transform`}>
-                                  {getInitials(user.fullName)}
-                                  {user.isEmailVerified && (
-                                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                                      <UserCheck className="w-2 h-2 text-white" />
-                                    </div>
+                                <Avatar className="h-11 w-11 ring-2 ring-background shadow-lg group-hover:scale-110 transition-transform rounded-2xl overflow-hidden">
+                                  {user.profilePicture && (
+                                    <AvatarImage src={getUploadedFileUrl(user.profilePicture)} alt={user.fullName} className="object-cover" />
                                   )}
-                                </div>
+                                  <AvatarFallback className={`bg-gradient-to-br ${getRandomGradient(user.fullName)} text-white font-black text-xs`}>
+                                    {getInitials(user.fullName)}
+                                  </AvatarFallback>
+                                </Avatar>
                                 <div className="min-w-0">
                                   <p className="font-extrabold text-foreground truncate max-w-[200px] leading-tight mb-0.5">{user.fullName}</p>
                                   <p className="text-[11px] text-muted-foreground font-bold truncate max-w-[200px]">{user.email}</p>
@@ -560,9 +563,14 @@ export default function UserManagement() {
                       <div key={user.id} className="bg-white border border-gray-100 rounded-[24px] p-5 shadow-sm hover:shadow-md transition-all space-y-4">
                         <div className="flex justify-between items-start">
                           <div className="flex items-center gap-3">
-                            <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${getRandomGradient(user.fullName)} flex items-center justify-center text-white font-black shadow-lg`}>
-                              {getInitials(user.fullName)}
-                            </div>
+                            <Avatar className="h-12 w-12 ring-2 ring-background shadow-lg rounded-2xl overflow-hidden">
+                              {user.profilePicture && (
+                                <AvatarImage src={getUploadedFileUrl(user.profilePicture)} alt={user.fullName} className="object-cover" />
+                              )}
+                              <AvatarFallback className={`bg-gradient-to-br ${getRandomGradient(user.fullName)} text-white font-black text-xs`}>
+                                {getInitials(user.fullName)}
+                              </AvatarFallback>
+                            </Avatar>
                             <div className="min-w-0">
                               <h3 className="font-black text-foreground truncate max-w-[140px] leading-tight">{user.fullName}</h3>
                               <p className="text-[11px] text-muted-foreground font-bold truncate max-w-[140px]">{user.email}</p>

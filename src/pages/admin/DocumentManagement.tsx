@@ -18,6 +18,7 @@ import {
   LayoutGrid,
   List,
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { adminService } from "@/services/admin.service";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,6 +38,7 @@ interface Document {
   status: "pending" | "approved" | "rejected" | string;
   uploadedAt: string;
   category: "User" | "Partner" | "Business";
+  ownerProfilePicture?: string;
   originalKycId: string;
 }
 
@@ -44,6 +46,7 @@ interface UserGroup {
   id: string;
   name: string;
   email: string;
+  profilePicture?: string;
   personalDocs: Document[];
   partnerDocs: Document[];
   businessDocs: Document[];
@@ -93,10 +96,15 @@ const DocumentManagement = () => {
           id: key,
           name: doc.ownerName,
           email: doc.ownerEmail,
+          profilePicture: doc.ownerProfilePicture,
           personalDocs: [],
           partnerDocs: [],
           businessDocs: []
         };
+      }
+      
+      if (!groups[key].profilePicture && doc.ownerProfilePicture) {
+        groups[key].profilePicture = doc.ownerProfilePicture;
       }
       
       if (doc.category === "User") groups[key].personalDocs.push(doc);
@@ -238,9 +246,14 @@ const DocumentManagement = () => {
                 className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-gray-50/50 transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#35503F]/10 flex items-center justify-center text-[#35503F] font-bold text-xl">
-                    {group.name.charAt(0)}
-                  </div>
+                  <Avatar className="w-12 h-12 rounded-2xl ring-2 ring-background shadow-md group-hover:scale-105 transition-transform shrink-0 border border-border">
+                    {group.profilePicture && (
+                      <AvatarImage src={getUploadedFileUrl(group.profilePicture)} alt={group.name} className="object-cover" />
+                    )}
+                    <AvatarFallback className="bg-[#35503F]/10 text-[#35503F] font-bold text-xl">
+                      {group.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
                     <h3 className="text-lg font-extrabold text-[#35503F]">{group.name}</h3>
                     <p className="text-sm text-gray-400 font-medium">{group.email}</p>

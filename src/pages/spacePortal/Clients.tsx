@@ -13,6 +13,7 @@ import {
   Search,
   UserRoundCheck,
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -651,9 +652,14 @@ function BookingRow({
       <div className="grid gap-4 xl:grid-cols-[minmax(210px,1.15fr)_minmax(210px,1fr)_minmax(240px,1.2fr)_minmax(200px,auto)] xl:items-center">
         <div className="min-w-0">
           <div className="flex items-center gap-3">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#EAF6EF] text-[11px] font-extrabold text-[#35503F]">
-              {serial}
-            </span>
+            <Avatar className="h-9 w-9 shrink-0 ring-2 ring-background shadow-sm">
+              {client.profilePicture && (
+                <AvatarImage src={client.profilePicture} alt={client.contactName} className="object-cover" />
+              )}
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold uppercase">
+                {client.contactName?.split(" ").map(n => n[0]).join("").slice(0, 2) || "CL"}
+              </AvatarFallback>
+            </Avatar>
             <div className="min-w-0">
               <p className="truncate text-[15px] font-extrabold leading-5 text-[#1F2E26]">
                 {client.companyName || client.contactName || "N/A"}

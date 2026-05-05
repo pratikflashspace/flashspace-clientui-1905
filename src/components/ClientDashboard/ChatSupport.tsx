@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Send, MessageSquare, Loader2, RefreshCw, CheckCircle2, X, AlertCircle, User as UserIcon, Ticket, MessageCircle, History, Star, ChevronLeft, ChevronRight, ChevronDown, Building2 } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -82,7 +82,10 @@ export default function ChatSupport() {
         ((t.status === 'resolved' || t.status === 'closed') && !t.feedbackSubmittedAt)
     );
 
-    const activeTicket = tickets.find(t => t._id === activeTicketId);
+    const activeTicket = useMemo(() => {
+        if (!activeTicketId) return null;
+        return tickets.find(t => t._id === activeTicketId || t.id === activeTicketId);
+    }, [tickets, activeTicketId]);
 
     const fetchTickets = async (page = 1) => {
         try {
@@ -103,15 +106,24 @@ export default function ChatSupport() {
                 if (location.state?.ticketId) {
                     setActiveTicketId(location.state.ticketId);
                     setActiveTab('open');
-                } else if (!activeTicketId && sorted.length > 0) {
-                    // Only auto-select latest open if NO ticket is currently selected
-                    const latestOpen = sorted.find((t: Ticket) => 
-                        t.status === 'open' || 
-                        t.status === 'in_progress' || 
-                        ((t.status === 'resolved' || t.status === 'closed') && !t.feedbackSubmittedAt)
-                    );
-                    if (latestOpen) {
-                        setActiveTicketId(latestOpen._id);
+                } else if (sorted.length > 0) {
+                    // Try to find the best ticket to show:
+                    // 1. Current activeTicketId if it still exists in sorted
+                    // 2. Latest open/pending action ticket
+                    // 3. Just the first ticket
+                    const currentStillExists = activeTicketId && sorted.find((t: Ticket) => t._id === activeTicketId || t.id === activeTicketId);
+                    
+                    if (!currentStillExists) {
+                        const latestOpen = sorted.find((t: Ticket) => 
+                            t.status === 'open' || 
+                            t.status === 'in_progress' || 
+                            ((t.status === 'resolved' || t.status === 'closed') && !t.feedbackSubmittedAt)
+                        );
+                        if (latestOpen) {
+                            setActiveTicketId(latestOpen._id || latestOpen.id);
+                        } else if (sorted[0]) {
+                            setActiveTicketId(sorted[0]._id || sorted[0].id);
+                        }
                     }
                 }
             }
@@ -258,12 +270,13 @@ export default function ChatSupport() {
     };
 
     const handleSubmitFeedback = async () => {
-        // Find the ticket ID to use - prioritize activeTicketId
-        const ticketIdToRate = activeTicketId || activeTicket?._id;
+        // Find the ticket ID to use - prioritize activeTicketId, fallback to activeTicket property
+        const ticketIdToRate = activeTicketId || (activeTicket as any)?._id || (activeTicket as any)?.id;
+        console.log('Submitting feedback for ticket:', { ticketIdToRate, activeTicketId, activeTicketFromState: (activeTicket as any)?._id });
 
         if (!ticketIdToRate) {
-            toast.error('Technical error: No ticket selected.');
-            console.error('Feedback failed: activeTicketId is null', { activeTicketId, activeTicketIdFromObject: activeTicket?._id });
+            toast.error('Technical error: No ticket selected for feedback.');
+            console.error('Feedback failed: No valid ticket ID found', { activeTicketId, activeTicketIdFromObject: (activeTicket as any)?._id || (activeTicket as any)?.id });
             return;
         }
 
@@ -660,7 +673,15 @@ export default function ChatSupport() {
                                     <button 
                                         onClick={() => {
                                             if (hasPendingAction) {
-                                                toast.error("Please complete your pending actions first!", { icon: '🚫' });
+                                                const pendingTicket = tickets.find(t => 
+                                                    t.status === 'open' || 
+                                                    t.status === 'in_progress' || 
+                                                    ((t.status === 'resolved' || t.status === 'closed') && !t.feedbackSubmittedAt)
+                                                );
+                                                if (pendingTicket) {
+                                                    setActiveTicketId(pendingTicket._id || pendingTicket.id);
+                                                    setActiveTab('open');
+                                                }
                                             } else {
                                                 setShowNewTicketForm(true);
                                             }
@@ -668,11 +689,11 @@ export default function ChatSupport() {
                                         className={cn(
                                             "px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl active:scale-95",
                                             hasPendingAction 
-                                                ? "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200" 
+                                                ? "bg-[#FEF8C3] text-[#35503F] border border-[#35503F]/10 hover:shadow-md" 
                                                 : "bg-[#35503F] text-[#FEF8C3] hover:bg-black shadow-[#35503F]/10 ring-4 ring-[#35503F]/10"
                                         )}
                                     >
-                                        {hasPendingAction ? "Feedback Pending" : "Raise New Ticket"}
+                                        {hasPendingAction ? "Resolve Pending Action" : "Raise New Ticket"}
                                     </button>
                                 </div>
                             </div>

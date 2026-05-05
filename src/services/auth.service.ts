@@ -259,6 +259,29 @@ class AuthService {
   }
 
   /**
+   * Upload cover image
+   */
+  async uploadCoverImage(file: File): Promise<AuthResponse<{ coverImage: string }>> {
+    try {
+      const formData = new FormData();
+      formData.append('coverImage', file);
+
+      const response = await axiosInstance.post('/user/upload-cover', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true
+      });
+      return response.data as AuthResponse<{ coverImage: string }>;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || 'Failed to upload cover image',
+      } as AuthResponse<{ coverImage: string }>;
+    }
+  }
+
+  /**
    * Refresh access token
    */
   async refreshToken(): Promise<AuthResponse<{ accessToken: string; refreshToken: string }>> {
