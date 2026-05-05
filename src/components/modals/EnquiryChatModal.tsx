@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Send, Loader2, X, CheckCircle } from "lucide-react";
+import { MessageSquare, Send, Loader2, X, CheckCircle, FileText, Paperclip } from "lucide-react";
 import partnerTicketService, { PartnerTicketMessage } from "@/services/spacePortal/partnerTicket.service";
 import { toast } from "@/hooks/use-toast";
 import { useSocket } from "@/contexts/SocketContext";
@@ -29,7 +29,9 @@ export const EnquiryChatModal = ({
   const [inputValue, setInputValue] = useState("");
   const [activeTicketId, setActiveTicketId] = useState<string | null>(null);
   const [activeTicketStatus, setActiveTicketStatus] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { socket } = useSocket();
 
   useEffect(() => {
@@ -124,31 +126,48 @@ export const EnquiryChatModal = ({
   };
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim() || !enquiry) return;
+    if (!inputValue.trim() && selectedFiles.length === 0) return;
     
     setSending(true);
     try {
+      const formData = new FormData();
+      formData.append("message", inputValue.trim());
+      selectedFiles.forEach(file => formData.append("attachments", file));
+
       if (activeTicketId) {
         // Reply to existing ticket
-        const res = await partnerTicketService.replyToTicket(activeTicketId, inputValue);
+        const res = await partnerTicketService.replyToTicket(activeTicketId, formData);
         if (res.success) {
-          // Message will be added via socket or we can add it manually if socket fails
           setInputValue("");
-          // If socket is not active, refresh manually
+          setSelectedFiles([]);
           if (!socket) loadMessages();
         }
       } else {
         // Create new ticket for this lead
+        // Ensure we have a valid bookingId from the enquiry
+        const bookingId = enquiry.bookingId?._id || enquiry.bookingId?.id || (enquiry.category === "Booking" ? enquiry.id : null);
+        
+        if (!bookingId && !enquiry.user?.id) {
+          toast({
+            title: "Error",
+            description: "Cannot initiate chat: Missing client or booking information.",
+            variant: "destructive",
+          });
+          setSending(false);
+          return;
+        }
+
         const res = await partnerTicketService.createTicketForClient({
-          clientUserId: enquiry.user?.id,
-          bookingId: enquiry.id, // Pass meeting/visit ID here for tracking
+          clientUserId: enquiry.user?.id || enquiry.user?._id,
+          bookingId: bookingId,
           subject: `Inquiry: ${enquiry.space || "General"}`,
-          message: inputValue
+          message: inputValue.trim()
         });
         if (res.success) {
           setActiveTicketId(res.data._id);
           setMessages(res.data.messages || []);
           setInputValue("");
+          setSelectedFiles([]);
           toast({
             title: "Chat Initiated",
             description: "Message sent to lead.",
@@ -276,7 +295,37 @@ export const EnquiryChatModal = ({
                             ? "bg-white text-slate-800 border border-slate-200 rounded-tl-none shadow-sm"
                             : "bg-slate-100 text-slate-700 border border-slate-200 rounded-tl-none italic"
                       }`}>
-                        {msg.message}
+                        <p>{msg.message}</p>
+                        
+                        {msg.attachments && msg.attachments.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {msg.attachments.map((url: string, i: number) => {
+                              const isImg = url.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+                              const fullUrl = url.startsWith('http') ? url : `${import.meta.env.VITE_API_URL || ''}${url}`;
+                              return (
+                                <a 
+                                  key={i} 
+                                  href={fullUrl} 
+                                  target="_blank" 
+                                  rel="noreferrer" 
+                                  className="block group/attach relative"
+                                >
+                                  {isImg ? (
+                                    <img 
+                                      src={fullUrl} 
+                                      alt="attachment" 
+                                      className="w-24 h-24 object-cover rounded-lg border border-black/5 hover:opacity-90 transition-opacity shadow-sm" 
+                                    />
+                                  ) : (
+                                    <div className="flex items-center gap-2 bg-slate-100/50 hover:bg-slate-100 p-2 rounded-lg text-[10px] font-bold border border-slate-200 transition-colors">
+                                      <span className="text-primary">📎</span> Doc {i+1}
+                                    </div>
+                                  )}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -297,36 +346,65 @@ export const EnquiryChatModal = ({
             </div>
 
             {/* Input Area */}
-            <div className="p-6 border-t bg-white shrink-0">
+            <div className="p-6 border-t bg-white shrink-0 space-y-3">
+              {selectedFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {selectedFiles.map((file, i) => (
+                    <div key={i} className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-lg text-[10px] font-bold border border-slate-200 group">
+                      <span className="max-w-[100px] truncate">{file.name}</span>
+                      <X 
+                        className="w-3 h-3 cursor-pointer text-muted-foreground hover:text-red-500" 
+                        onClick={() => setSelectedFiles(prev => prev.filter((_, idx) => idx !== i))}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
               <form 
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSendMessage();
                 }}
-                className="relative"
+                className="relative flex items-center gap-2"
               >
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={activeTicketStatus === "resolved" ? "This inquiry has been resolved" : "Type your message..."}
-                  disabled={sending || activeTicketStatus === "resolved"}
-                  className="w-full pl-4 pr-12 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 bg-muted/20 text-sm disabled:opacity-50"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey && activeTicketStatus !== "resolved") {
-                      e.preventDefault();
-                      handleSendMessage();
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      const files = Array.from(e.target.files);
+                      setSelectedFiles(prev => [...prev, ...files].slice(0, 5));
                     }
-                  }}
+                  }} 
+                  multiple 
+                  hidden 
+                  accept="image/*,.pdf" 
                 />
-                <Button 
-                  type="submit"
-                  size="icon" 
-                  disabled={sending || !inputValue.trim() || activeTicketStatus === "resolved"}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg"
+                <button 
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-2 text-muted-foreground hover:text-primary transition-colors bg-slate-50 rounded-xl border border-border"
                 >
-                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                </Button>
+                  <Paperclip className="w-5 h-5" />
+                </button>
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder={activeTicketStatus === "resolved" ? "This inquiry has been resolved" : "Type your message..."}
+                    disabled={sending || activeTicketStatus === "resolved"}
+                    className="w-full pl-4 pr-12 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 bg-muted/20 text-sm disabled:opacity-50"
+                  />
+                  <Button 
+                    type="submit"
+                    size="icon" 
+                    disabled={sending || (!inputValue.trim() && selectedFiles.length === 0) || activeTicketStatus === "resolved"}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg w-8 h-8"
+                  >
+                    {sending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+                  </Button>
+                </div>
               </form>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { Eye, Star, MessageSquare, Clock, CheckCircle2, Zap, Filter } from "luci
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { toast } from "sonner";
@@ -19,12 +19,17 @@ export default function Tickets() {
   const [tickets, setTickets] = useState<PartnerTicketData[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [activeTab, setActiveTab] = useState("inprogress");
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
   const [chatOpen, setChatOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const { socket } = useSocket();
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, categoryFilter, query]);
 
   const fetchTickets = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -83,36 +88,44 @@ export default function Tickets() {
       return s === "RESOLVED";
     }).length;
 
-    // Dynamic Avg Response Time calculation (time from createdAt to first staff message)
+    // Dynamic Avg Response Time calculation
     let avgTimeStr = "N/A";
-    const ticketsWithReplies = tickets.filter(t => {
-      return t.messages && t.messages.some(m => m.sender !== 'user');
+    const ticketsForStats = tickets.filter(t => {
+      const hasReply = t.messages && t.messages.some(m => m.sender !== 'user');
+      const isResolved = (t.status || "").toUpperCase() === "RESOLVED" || t.resolvedAt;
+      return hasReply || isResolved;
     });
 
-    if (ticketsWithReplies.length > 0) {
-      const totalDiff = ticketsWithReplies.reduce((acc, t) => {
-        const staffMessages = t.messages.filter(m => m.sender !== 'user');
-        const firstStaffMessage = staffMessages.sort((a, b) => 
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        )[0];
-        
-        const start = new Date(t.createdAt).getTime();
-        const end = new Date(firstStaffMessage.createdAt).getTime();
-        return acc + (end - start);
+    if (ticketsForStats.length > 0) {
+      const totalDiff = ticketsForStats.reduce((acc, t) => {
+        let responseTime = 0;
+        const staffMessages = (t.messages || []).filter(m => m.sender !== 'user');
+
+        if (staffMessages.length > 0) {
+          const firstStaffMessage = staffMessages.sort((a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          )[0];
+          responseTime = new Date(firstStaffMessage.createdAt).getTime() - new Date(t.createdAt).getTime();
+        } else if (t.resolvedAt) {
+          responseTime = new Date(t.resolvedAt).getTime() - new Date(t.createdAt).getTime();
+        }
+
+        return acc + Math.max(0, responseTime);
       }, 0);
-      
-      const avgMs = totalDiff / ticketsWithReplies.length;
+
+      const avgMs = totalDiff / ticketsForStats.length;
       const mins = Math.floor(avgMs / 60000);
       const hours = Math.floor(mins / 60);
-      
-      if (hours > 0) avgTimeStr = `${hours}h ${mins % 60}m`;
+      const days = Math.floor(hours / 24);
+
+      if (days > 0) avgTimeStr = `${days}d ${hours % 24}h`;
+      else if (hours > 0) avgTimeStr = `${hours}h ${mins % 60}m`;
       else if (mins > 0) avgTimeStr = `${mins}m`;
       else avgTimeStr = "< 1m";
     }
 
     return { total, inProgress, resolved: resolvedCount, avgTime: avgTimeStr };
   }, [tickets]);
-
   const filteredTickets = useMemo(() => {
     return tickets.filter((t) => {
       const q = query.toLowerCase();
@@ -122,20 +135,24 @@ export default function Tickets() {
         t.ticketNumber.toLowerCase().includes(q) ||
         (t.user?.fullName || "").toLowerCase().includes(q);
 
-      const matchesStatus =
-        statusFilter === "ALL" ? true : status === statusFilter.toUpperCase();
-
       const matchesCategory =
         categoryFilter === "ALL" ? true : t.category === categoryFilter;
 
-      const matchesTab = 
-        activeTab === "inprogress" 
+      const matchesTab =
+        activeTab === "inprogress"
           ? (status === "OPEN" || status === "IN_PROGRESS" || status === "ESCALATED")
           : (status === "RESOLVED");
 
-      return matchesQuery && matchesStatus && matchesCategory && matchesTab;
+      return matchesQuery && matchesCategory && matchesTab;
     });
-  }, [tickets, query, statusFilter, categoryFilter, activeTab]);
+  }, [tickets, query, categoryFilter, activeTab]);
+
+  const paginatedTickets = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredTickets.slice(start, start + itemsPerPage);
+  }, [filteredTickets, currentPage]);
+
+  const totalPages = Math.ceil(filteredTickets.length / itemsPerPage);
 
   const handleViewDetails = (ticket: PartnerTicketData) => {
     setSelectedTicket({
@@ -206,13 +223,13 @@ export default function Tickets() {
       <div className="bg-white border border-slate-200 rounded-2xl p-2 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
           <TabsList className="bg-slate-100/50 p-1 rounded-xl">
-            <TabsTrigger 
-              value="inprogress" 
+            <TabsTrigger
+              value="inprogress"
               className="px-6 py-2 rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-[#164e4e] data-[state=active]:shadow-sm"
             >
               In Progress
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="converted"
               className="px-6 py-2 rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-[#164e4e] data-[state=active]:shadow-sm"
             >
@@ -233,20 +250,10 @@ export default function Tickets() {
             onChange={setCategoryFilter}
             options={[
               { label: "All Categories", value: "ALL" },
-              ...categories.map(c => ({ 
-                label: c.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), 
-                value: c 
+              ...categories.map(c => ({
+                label: c.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                value: c
               }))
-            ]}
-          />
-          <SelectBox
-            value={statusFilter}
-            onChange={setStatusFilter}
-            options={[
-              { label: "All Status", value: "ALL" },
-              { label: "Open", value: "OPEN" },
-              { label: "In Progress", value: "IN_PROGRESS" },
-              { label: "Resolved", value: "RESOLVED" },
             ]}
           />
         </div>
@@ -265,6 +272,9 @@ export default function Tickets() {
                   Client
                 </th>
                 <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                  Category
+                </th>
+                <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
                   Date
                 </th>
                 <th className="text-left p-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
@@ -279,17 +289,17 @@ export default function Tickets() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {filteredTickets.length === 0 ? (
+              {paginatedTickets.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="p-12 text-center text-muted-foreground italic"
                   >
                     No support tickets found
                   </td>
                 </tr>
               ) : (
-                filteredTickets.map((ticket) => (
+                paginatedTickets.map((ticket) => (
                   <tr
                     key={ticket._id}
                     className="hover:bg-muted/30 transition-colors"
@@ -306,15 +316,28 @@ export default function Tickets() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
-                        <Avatar className="h-7 w-7 border border-border">
-                          <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
-                            {ticket.user?.fullName?.[0] || "U"}
-                          </AvatarFallback>
-                        </Avatar>
+                        <div className="h-9 w-9 rounded-lg border border-border overflow-hidden flex-shrink-0 bg-slate-50">
+                          {ticket.user?.profilePicture ? (
+                            <img 
+                              src={ticket.user.profilePicture.startsWith('http') ? ticket.user.profilePicture : `${import.meta.env.VITE_API_URL || ''}${ticket.user.profilePicture}`} 
+                              alt={ticket.user?.fullName}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xs bg-primary/10 text-primary font-bold">
+                              {ticket.user?.fullName?.[0] || "U"}
+                            </div>
+                          )}
+                        </div>
                         <span className="text-sm font-medium text-foreground">
                           {ticket.user?.fullName}
                         </span>
                       </div>
+                    </td>
+                    <td className="p-4">
+                      <Badge variant="secondary" className="text-[10px] uppercase tracking-wider font-bold bg-slate-100 text-slate-600 border-none rounded-lg px-2 py-1 whitespace-nowrap">
+                        {ticket.category?.replace('_', ' ') || 'Other'}
+                      </Badge>
                     </td>
                     <td className="p-4 text-xs font-medium text-muted-foreground whitespace-nowrap">
                       {format(new Date(ticket.createdAt), "MMM d, yyyy")}
@@ -328,11 +351,10 @@ export default function Tickets() {
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star
                               key={i}
-                              className={`w-3 h-3 ${
-                                i < Number(ticket.rating)
+                              className={`w-3 h-3 ${i < Number(ticket.rating)
                                   ? "fill-yellow-400 text-yellow-400"
                                   : "text-muted/30"
-                              }`}
+                                }`}
                             />
                           ))}
                         </div>
@@ -358,6 +380,53 @@ export default function Tickets() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/20">
+            <div className="text-xs text-muted-foreground font-medium">
+              Showing <span className="text-foreground">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
+              <span className="text-foreground">
+                {Math.min(currentPage * itemsPerPage, filteredTickets.length)}
+              </span>{" "}
+              of <span className="text-foreground">{filteredTickets.length}</span> tickets
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="h-8 text-xs font-bold rounded-lg"
+              >
+                Previous
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <Button
+                    key={i + 1}
+                    variant={currentPage === i + 1 ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`h-8 w-8 p-0 text-xs font-bold rounded-lg ${currentPage === i + 1 ? "bg-[#164e4e] hover:bg-[#164e4e]/90" : ""
+                      }`}
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="h-8 text-xs font-bold rounded-lg"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <EnquiryChatModal

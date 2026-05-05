@@ -305,11 +305,12 @@ class AffiliatePortalService {
         }
     }
 
-    async replyToSupportTicket(id: string, message: string): Promise<ApiResponse<any>> {
+    async replyToSupportTicket(id: string, data: FormData | { message: string }): Promise<ApiResponse<any>> {
         try {
             const response = await axiosInstance.post<ApiResponse<any>>(
                 `/api/tickets/${id}/reply`,
-                { message }
+                data,
+                data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined
             );
             return response.data;
         } catch (error: any) {

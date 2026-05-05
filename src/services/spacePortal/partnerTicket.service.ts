@@ -23,6 +23,7 @@ export interface PartnerTicketData {
         fullName: string;
         email: string;
         phoneNumber?: string;
+        profilePicture?: string;
     };
     bookingId?: {
         _id: string;
@@ -86,10 +87,10 @@ class PartnerTicketService {
         );
     }
 
-    async replyToTicket(ticketId: string, message: string): Promise<ApiResponse<PartnerTicketData>> {
-        const response = await axiosInstance.post<ApiResponse<PartnerTicketData>>(`/api/tickets/partner/${ticketId}/reply`, {
-            message
-        });
+    async replyToTicket(ticketId: string, data: FormData | { message: string }): Promise<ApiResponse<PartnerTicketData>> {
+        const response = await axiosInstance.post<ApiResponse<PartnerTicketData>>(`/api/tickets/partner/${ticketId}/reply`, 
+            data
+        );
         return response.data;
     }
 

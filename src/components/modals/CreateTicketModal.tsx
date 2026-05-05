@@ -38,7 +38,6 @@ export function CreateTicketModal({
     subject: "",
     category: "",
     description: "",
-    priority: "medium",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,7 +74,6 @@ export function CreateTicketModal({
           subject: "",
           category: "",
           description: "",
-          priority: "medium",
         });
       } else {
         toast({
@@ -120,47 +118,26 @@ export function CreateTicketModal({
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, category: value })
-                }
-              >
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="virtual_office">Virtual Office</SelectItem>
-                  <SelectItem value="coworking">Coworking</SelectItem>
-                  <SelectItem value="billing">Billing & Payments</SelectItem>
-                  <SelectItem value="kyc">KYC & Documents</SelectItem>
-                  <SelectItem value="technical">Technical Issue</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
-              <Select
-                value={formData.priority}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, priority: value })
-                }
-              >
-                <SelectTrigger id="priority">
-                  <SelectValue placeholder="Select priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Select
+              value={formData.category}
+              onValueChange={(value) =>
+                setFormData({ ...formData, category: value })
+              }
+            >
+              <SelectTrigger id="category">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="virtual_office">Virtual Office</SelectItem>
+                <SelectItem value="coworking">Coworking</SelectItem>
+                <SelectItem value="billing">Billing & Payments</SelectItem>
+                <SelectItem value="kyc">KYC & Documents</SelectItem>
+                <SelectItem value="technical">Technical Issue</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

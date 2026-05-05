@@ -14,21 +14,32 @@ import {
   ArrowUpRight,
   Lock,
   Search,
-  Star
+  Star,
+  Paperclip,
+  FileText,
+  Loader2
 } from "lucide-react";
+import { useSocket } from "@/contexts/SocketContext";
+import { useAuth } from "@/contexts/AuthContext";
 
-export const TicketViewModal = ({
-  ticket,
-  open,
-  onOpenChange,
-  staffMembers,
+export const TicketViewModal = ({ 
+  open, 
+  onOpenChange, 
+  ticket, 
   handleAssignTicket,
   handleResolveTicket,
-  handleEscalateTicket,
   handleCloseTicket,
   handleReply,
+  staffMembers,
+  typingUser
 }: any) => {
+  const { socket } = useSocket();
+  const { user } = useAuth();
   const [replyMessage, setReplyMessage] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [sending, setSending] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [selectedAssignee, setSelectedAssignee] = useState(ticket?.assignee?._id || ticket?.assignee?.id || ticket?.assignee || "");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,10 +71,55 @@ export const TicketViewModal = ({
 
   const isReadOnly = ticket?.status?.toLowerCase() === "resolved";
 
-  const submitReply = () => {
-    if (isReadOnly || !replyMessage.trim() || !ticket?._id) return;
-    handleReply(ticket._id, replyMessage);
-    setReplyMessage("");
+  const submitReply = async () => {
+    if (isReadOnly || (!replyMessage.trim() && selectedFiles.length === 0) || !ticket?._id || sending) return;
+    
+    setSending(true);
+    try {
+      const formData = new FormData();
+      formData.append('message', replyMessage.trim());
+      selectedFiles.forEach(file => {
+        formData.append('attachments', file);
+      });
+
+      await handleReply(ticket._id, formData);
+      setReplyMessage("");
+      setSelectedFiles([]);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setReplyMessage(e.target.value);
+    
+    if (!socket || !ticket?._id) return;
+
+    // Emit typing event
+    socket.emit('typing', { ticketId: ticket._id, user: user?.fullName || 'Admin' });
+
+    // Clear previous timeout
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+    // Set timeout to stop typing
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit('stop_typing', { ticketId: ticket._id });
+    }, 3000);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      if (selectedFiles.length + files.length > 5) {
+        alert('Maximum 5 files allowed');
+        return;
+      }
+      setSelectedFiles(prev => [...prev, ...files]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const getStatusColor = (status: string) => {
@@ -71,7 +127,7 @@ export const TicketViewModal = ({
       case "open": return "#3b82f6";
       case "in_progress": return "#f59e0b";
       case "resolved": return "#10b981";
-      case "escalated": return "#ef4444";
+
       default: return "#6b7280";
     }
   };
@@ -557,7 +613,52 @@ export const TicketViewModal = ({
                      lineHeight: 1.5,
                      whiteSpace: 'pre-wrap'
                    }}>
-                     {msg.message}
+                    <div>
+                      {msg.message}
+                      {msg.attachments && msg.attachments.length > 0 && (
+                        <div style={{ marginTop: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                          {msg.attachments.map((url: string, idx: number) => {
+                            const isImage = url.match(/\.(jpg|jpeg|png|gif)$/i);
+                            return (
+                              <a 
+                                key={idx} 
+                                href={`${import.meta.env.VITE_API_URL || ''}${url}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                style={{ display: 'block' }}
+                              >
+                                {isImage ? (
+                                  <img 
+                                    src={`${import.meta.env.VITE_API_URL || ''}${url}`} 
+                                    alt="attachment" 
+                                    style={{ 
+                                      width: '100px', 
+                                      height: '100px', 
+                                      objectFit: 'cover', 
+                                      borderRadius: '12px', 
+                                      border: '1px solid rgba(255,255,255,0.1)' 
+                                    }}
+                                  />
+                                ) : (
+                                  <div style={{ 
+                                    display: 'flex', 
+                                    itemsCenter: 'center', 
+                                    gap: '8px', 
+                                    backgroundColor: isAdmin ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)', 
+                                    padding: '8px 12px', 
+                                    borderRadius: '12px',
+                                    fontSize: '11px',
+                                    fontWeight: 700
+                                  }}>
+                                    <FileText size={14} /> Attachment {idx + 1}
+                                  </div>
+                                )}
+                              </a>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                    </div>
                    <div style={{ 
                      fontSize: '10px', 
@@ -573,19 +674,75 @@ export const TicketViewModal = ({
                 </div>
               );
             })}
+
+             {typingUser && (
+               <div style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.6 }}>
+                 <div style={{ display: 'flex', gap: '3px' }}>
+                   <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#64748b', animation: 'bounce 1s infinite' }} />
+                   <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#64748b', animation: 'bounce 1s infinite 0.2s' }} />
+                   <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#64748b', animation: 'bounce 1s infinite 0.4s' }} />
+                 </div>
+                 <span style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{typingUser} is typing...</span>
+               </div>
+             )}
           </div>
 
           {/* Action Bar */}
           {!isReadOnly ? (
             <div style={{ padding: '30px 40px', borderTop: '1px solid #f1f5f9', background: '#fff' }}>
+              {selectedFiles.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+                  {selectedFiles.map((file, i) => (
+                    <div key={i} style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '8px', 
+                      backgroundColor: '#f1f5f9', 
+                      padding: '6px 12px', 
+                      borderRadius: '12px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: '#475569',
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <span style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</span>
+                      <X size={12} style={{ cursor: 'pointer', color: '#94a3b8' }} onClick={() => removeFile(i)} />
+                    </div>
+                  ))}
+                </div>
+              )}
               <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                  <div style={{ flex: 1, position: 'relative' }}>
+                   <input 
+                     type="file" 
+                     ref={fileInputRef} 
+                     onChange={handleFileSelect} 
+                     multiple 
+                     style={{ display: 'none' }} 
+                     accept="image/*,.pdf"
+                   />
+                   <button 
+                     onClick={() => fileInputRef.current?.click()}
+                     style={{ 
+                       position: 'absolute',
+                       left: '12px',
+                       top: '50%',
+                       transform: 'translateY(-50%)',
+                       background: 'transparent',
+                       border: 'none',
+                       color: '#94a3b8',
+                       cursor: 'pointer',
+                       zIndex: 5
+                     }}
+                   >
+                     <Paperclip size={20} />
+                   </button>
                    <textarea 
                      style={{ 
                        width: '100%', 
                        minHeight: '60px', 
                        maxHeight: '150px', 
-                       padding: '18px 60px 18px 24px', 
+                       padding: '18px 60px 18px 48px', 
                        borderRadius: '24px', 
                        border: '1px solid #e2e8f0', 
                        backgroundColor: '#f8fafc',
@@ -597,7 +754,7 @@ export const TicketViewModal = ({
                      }}
                      placeholder="Write your response here..."
                      value={replyMessage}
-                     onChange={(e) => setReplyMessage(e.target.value)}
+                     onChange={handleInputChange}
                      onKeyDown={(e) => {
                        if (e.key === 'Enter' && !e.shiftKey) {
                          e.preventDefault();
@@ -607,7 +764,7 @@ export const TicketViewModal = ({
                    />
                    <button 
                      onClick={submitReply}
-                     disabled={!replyMessage.trim()}
+                     disabled={(!replyMessage.trim() && selectedFiles.length === 0) || sending}
                      style={{ 
                        position: 'absolute',
                        right: '10px',
@@ -623,12 +780,12 @@ export const TicketViewModal = ({
                        alignItems: 'center', 
                        justifyContent: 'center',
                        cursor: 'pointer',
-                       opacity: replyMessage.trim() ? 1 : 0.4,
+                       opacity: (replyMessage.trim() || selectedFiles.length > 0) && !sending ? 1 : 0.4,
                        transition: 'all 0.2s ease',
-                       boxShadow: replyMessage.trim() ? '0 8px 16px rgba(53, 80, 63, 0.2)' : 'none'
+                       boxShadow: (replyMessage.trim() || selectedFiles.length > 0) ? '0 8px 16px rgba(53, 80, 63, 0.2)' : 'none'
                      }}
                    >
-                     <Send size={18} />
+                     {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                    </button>
                  </div>
               </div>
@@ -655,27 +812,7 @@ export const TicketViewModal = ({
                     }}>
                     <CheckCircle2 size={14} /> Mark Resolved
                   </button>
-                  <button 
-                    onClick={() => handleEscalateTicket(ticket._id)}
-                    style={{ 
-                      flex: 1, 
-                      padding: '12px', 
-                      borderRadius: '16px', 
-                      backgroundColor: '#fff', 
-                      color: '#f59e0b', 
-                      border: '1px solid #f59e0b', 
-                      fontWeight: 900, 
-                      fontSize: '11px', 
-                      textTransform: 'uppercase', 
-                      letterSpacing: '0.08em', 
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px'
-                    }}>
-                    <AlertCircle size={14} /> Escalate
-                  </button>
+
               </div>
             </div>
           ) : (

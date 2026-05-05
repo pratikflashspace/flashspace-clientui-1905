@@ -41,6 +41,7 @@ export default function TicketSystem() {
   );
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [typingUser, setTypingUser] = useState<string | null>(null);
 
 
   // Original states
@@ -50,7 +51,6 @@ export default function TicketSystem() {
   const [stats, setStats] = useState<TicketStats>({
     open: 0,
     in_progress: 0,
-    escalated: 0,
     resolved: 0,
     closed: 0,
     avgResolution: "4.2 hrs",
@@ -161,12 +161,28 @@ export default function TicketSystem() {
       }
     };
 
+    const handleTyping = (data: { ticketId: string; user: string }) => {
+      if (selectedTicket && data.ticketId === selectedTicket._id) {
+        setTypingUser(data.user);
+      }
+    };
+
+    const handleStopTyping = (data: { ticketId: string }) => {
+      if (selectedTicket && data.ticketId === selectedTicket._id) {
+        setTypingUser(null);
+      }
+    };
+
     socket.on("new_message", handleNewMessage);
     socket.on("ticket_updated", handleTicketUpdated);
+    socket.on("typing", handleTyping);
+    socket.on("stop_typing", handleStopTyping);
 
     return () => {
       socket.off("new_message", handleNewMessage);
       socket.off("ticket_updated", handleTicketUpdated);
+      socket.off("typing", handleTyping);
+      socket.off("stop_typing", handleStopTyping);
     };
   }, [socket, selectedTicket?._id]);
 
@@ -273,25 +289,7 @@ export default function TicketSystem() {
     }
   };
 
-  const handleEscalateTicket = async (ticketId: string) => {
-    try {
-      const response = await adminService.escalateTicket(ticketId);
-      if (response.success) {
-        toast({ title: "Success", description: "Ticket escalated!" });
-        fetchTickets();
-        if (selectedTicket?._id === ticketId) {
-          setSelectedTicket(response.data || null);
-        }
-      }
-    } catch (err: unknown) {
-      console.error("Failed to escalate ticket", err);
-      toast({
-        title: "Error",
-        description: "Failed to escalate ticket",
-        variant: "destructive",
-      });
-    }
-  };
+
 
   const handleCloseTicket = async (ticketId: string) => {
     try {
@@ -315,13 +313,14 @@ export default function TicketSystem() {
     }
   };
 
-  const handleReply = async (ticketId: string, message: string) => {
+  const handleReply = async (ticketId: string, data: any) => {
     try {
-      const response = await adminService.replyToTicket(ticketId, message);
+      const response = await adminService.replyToTicket(ticketId, data);
       if (response.success) {
         toast({ title: "Success", description: "Reply sent!" });
         setSelectedTicket(response.data || null);
         fetchTickets();
+        if (socket) socket.emit("stop_typing", { ticketId });
       }
     } catch (err: unknown) {
       console.error("Failed to send reply", err);
@@ -333,22 +332,7 @@ export default function TicketSystem() {
     }
   };
 
-  const getPriorityBadge = (priority: string = "medium") => {
-    switch (priority.toLowerCase()) {
-      case "high":
-        return <Badge variant="destructive">High</Badge>;
-      case "medium":
-        return (
-          <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">
-            Medium
-          </Badge>
-        );
-      case "low":
-        return <Badge variant="secondary">Low</Badge>;
-      default:
-        return <Badge variant="outline">{priority}</Badge>;
-    }
-  };
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -366,13 +350,7 @@ export default function TicketSystem() {
             In Progress
           </Badge>
         );
-      case "escalated":
-        return (
-          <Badge variant="destructive">
-            <AlertCircle className="w-3 h-3 mr-1" />
-            Escalated
-          </Badge>
-        );
+
       case "resolved":
         return (
           <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
@@ -415,9 +393,7 @@ export default function TicketSystem() {
               <th className="text-left p-4 text-sm font-semibold text-foreground">
                 Category
               </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Priority
-              </th>
+
               <th className="text-left p-4 text-sm font-semibold text-foreground">
                 Assignee
               </th>
@@ -468,7 +444,7 @@ export default function TicketSystem() {
                     {formatCategory(ticket.category)}
                   </Badge>
                 </td>
-                <td className="p-4">{getPriorityBadge("medium")}</td>
+
                 <td className="p-4">
                   <div className="flex items-center gap-2">
                     {ticket.bookingId ? (
@@ -673,7 +649,7 @@ export default function TicketSystem() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 mb-8">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
           <p className="text-2xl font-extrabold text-foreground">
             {stats.open}
@@ -686,12 +662,7 @@ export default function TicketSystem() {
           </p>
           <p className="text-sm text-muted-foreground">In Progress</p>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-red-200 transition-colors">
-          <p className="text-2xl font-extrabold text-red-600">
-            {stats.escalated}
-          </p>
-          <p className="text-sm text-muted-foreground">Escalated</p>
-        </div>
+
         <div className="bg-background border border-border rounded-xl p-5 hover:border-green-200 transition-colors">
           <p className="text-2xl font-extrabold text-green-600">
             {stats.resolvedThisMonth}
@@ -731,9 +702,7 @@ export default function TicketSystem() {
             <TabsTrigger value="in_progress" className="px-4 py-2 text-sm text-nowrap">
               In Progress ({stats.in_progress})
             </TabsTrigger>
-            <TabsTrigger value="escalated" className="px-4 py-2 text-sm">
-              Escalated ({stats.escalated})
-            </TabsTrigger>
+
             <TabsTrigger value="resolved" className="px-4 py-2 text-sm">Resolved</TabsTrigger>
           </TabsList>
         </div>
@@ -742,7 +711,7 @@ export default function TicketSystem() {
         <TabsContent value="all">{renderTicketList()}</TabsContent>
         <TabsContent value="open">{renderTicketList()}</TabsContent>
         <TabsContent value="in_progress">{renderTicketList()}</TabsContent>
-        <TabsContent value="escalated">{renderTicketList()}</TabsContent>
+
         <TabsContent value="resolved">{renderTicketList()}</TabsContent>
       </Tabs>
 
@@ -752,10 +721,10 @@ export default function TicketSystem() {
         onOpenChange={setModalOpen}
         handleAssignTicket={handleAssignTicket}
         handleResolveTicket={handleResolveTicket}
-        handleEscalateTicket={handleEscalateTicket}
         handleCloseTicket={handleCloseTicket}
         handleReply={handleReply}
         staffMembers={staffMembers}
+        typingUser={typingUser}
       />
 
       <CreateTicketModal

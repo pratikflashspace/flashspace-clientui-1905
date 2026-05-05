@@ -513,11 +513,10 @@ export interface InvoicesResponse {
 
 // ============ TICKET TYPES ============
 
-export type TicketPriority = "low" | "medium" | "high" | "urgent";
+
 export type TicketStatus =
   | "open"
   | "in_progress"
-  | "escalated"
   | "resolved"
   | "closed"
   | "waiting_customer";
@@ -536,7 +535,7 @@ export interface SupportTicket {
   subject: string;
   description: string;
   category: string;
-  priority: TicketPriority;
+
   status: TicketStatus;
   user?: {
     _id: string;
@@ -661,8 +660,8 @@ export interface AdminTicketData {
     phoneNumber?: string;
   };
   category: string;
-  priority: "low" | "medium" | "high";
-  status: "open" | "in_progress" | "escalated" | "resolved" | "closed";
+
+  status: "open" | "in_progress" | "resolved" | "closed";
   assignee?: {
     _id: string;
     fullName: string;
@@ -681,7 +680,7 @@ export interface AdminTicketData {
 export interface TicketStats {
   open: number;
   in_progress: number;
-  escalated: number;
+
   resolved: number;
   closed: number;
   avgResolution?: string;
