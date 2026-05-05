@@ -15,7 +15,7 @@ export interface PartnerTicketData {
     subject: string;
     description: string;
     category: string;
-    priority: string;
+
     status: string;
     messages: PartnerTicketMessage[];
     user: {

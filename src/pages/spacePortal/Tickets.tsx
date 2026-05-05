@@ -140,7 +140,7 @@ export default function Tickets() {
 
       const matchesTab =
         activeTab === "inprogress"
-          ? (status === "OPEN" || status === "IN_PROGRESS" || status === "ESCALATED")
+          ? (status === "OPEN" || status === "IN_PROGRESS")
           : (status === "RESOLVED");
 
       return matchesQuery && matchesCategory && matchesTab;

@@ -44,7 +44,6 @@ const getStatusBadge = (status: string) => {
         </Badge>
       );
     case "in_progress":
-    case "escalated":
       return (
         <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200">
           <Clock className="w-3 h-3 mr-1" />
@@ -379,7 +378,6 @@ export default function TicketsAndTasks() {
           <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
             Avg Response
           </p>
-        </div>
         </div>
       </div>
 
