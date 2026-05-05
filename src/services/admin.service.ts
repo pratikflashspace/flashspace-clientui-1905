@@ -291,8 +291,8 @@ export interface AdminTicketData {
     profilePicture?: string;
   };
   category: string;
-  priority: "low" | "medium" | "high";
-  status: "open" | "in_progress" | "escalated" | "resolved" | "closed";
+
+  status: "open" | "in_progress" | "resolved" | "closed";
   assignee?: {
     _id: string;
     fullName: string;
@@ -315,6 +315,7 @@ export interface AdminTicketData {
   messages: Array<{
     sender: "user" | "support" | "admin" | "partner" | "affiliate";
     message: string;
+    attachments?: string[];
     createdAt: string;
   }>;
   unreadCount?: number;
@@ -326,7 +327,6 @@ export interface AdminTicketData {
 export interface TicketStats {
   open: number;
   in_progress: number;
-  escalated: number;
   resolved: number;
   closed: number;
   avgResolution?: string;
@@ -795,7 +795,7 @@ class AdminService {
           data: {
             open: statsMap.open || 0,
             in_progress: statsMap.in_progress || 0,
-            escalated: statsMap.escalated || 0,
+
             resolved: statsMap.resolved || 0,
             closed: statsMap.closed || 0,
             avgResolution: "4.2 hrs",
@@ -857,14 +857,7 @@ class AdminService {
     return response.data;
   }
 
-  async escalateTicket(
-    ticketId: string,
-  ): Promise<ApiResponse<AdminTicketData>> {
-    const response = await axiosInstance.post<ApiResponse<AdminTicketData>>(
-      `/api/tickets/admin/${ticketId}/escalate`,
-    );
-    return response.data;
-  }
+
 
   async closeTicket(ticketId: string): Promise<ApiResponse<AdminTicketData>> {
     const response = await axiosInstance.post<ApiResponse<AdminTicketData>>(
@@ -875,15 +868,12 @@ class AdminService {
 
   async replyToTicket(
     ticketId: string,
-    message: string,
-    attachments?: string[],
+    data: FormData | { message: string; attachments?: string[] },
   ): Promise<ApiResponse<AdminTicketData>> {
     const response = await axiosInstance.post<ApiResponse<AdminTicketData>>(
       `/api/tickets/admin/${ticketId}/reply`,
-      {
-        message,
-        attachments,
-      },
+      data,
+      data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined
     );
     return response.data;
   }

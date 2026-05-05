@@ -10,6 +10,9 @@ import {
   Send,
   Headphones,
   Star,
+  Paperclip,
+  X,
+  FileText,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +25,7 @@ import partnerTicketService, {
 import { fetchPartnerActiveRequests } from "@/services/spacePortal/spacePartner.service";
 import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
+import { useSocket } from "@/contexts/SocketContext";
 import { useMemo } from "react";
 import SearchBar from "@/components/ui/SpacePartner/SearchBar";
 import SelectBox from "@/components/ui/SpacePartner/SelectionBox";
@@ -40,7 +44,6 @@ const getStatusBadge = (status: string) => {
         </Badge>
       );
     case "in_progress":
-    case "escalated":
       return (
         <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200">
           <Clock className="w-3 h-3 mr-1" />
@@ -70,10 +73,21 @@ export default function TicketsAndTasks() {
   const [activeTicket, setActiveTicket] = useState<PartnerTicketData | null>(
     null,
   );
-  const [messageInput, setMessageInput] = useState("");
   const [query, setQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [messageInput, setMessageInput] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryFilter, query]);
+  const [typingUser, setTypingUser] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { socket } = useSocket();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -114,6 +128,45 @@ export default function TicketsAndTasks() {
     loadData();
   }, []);
 
+  // Socket listeners
+  useEffect(() => {
+    if (!socket || !activeTicket) return;
+
+    socket.emit("join_ticket", activeTicket._id);
+
+    const onNewMessage = (data: { ticketId: string; message: any }) => {
+      if (data.ticketId === activeTicket._id) {
+        setActiveTicket((prev) => {
+          if (!prev) return null;
+          const exists = prev.messages.some(m => 
+            new Date(m.createdAt).getTime() === new Date(data.message.createdAt).getTime() &&
+            m.message === data.message.message
+          );
+          if (exists) return prev;
+          return { ...prev, messages: [...prev.messages, data.message] };
+        });
+      }
+    };
+
+    const onTyping = (data: { ticketId: string; user: string }) => {
+      if (data.ticketId === activeTicket._id) setTypingUser(data.user);
+    };
+
+    const onStopTyping = (data: { ticketId: string }) => {
+      if (data.ticketId === activeTicket._id) setTypingUser(null);
+    };
+
+    socket.on("new_message", onNewMessage);
+    socket.on("typing", onTyping);
+    socket.on("stop_typing", onStopTyping);
+
+    return () => {
+      socket.off("new_message", onNewMessage);
+      socket.off("typing", onTyping);
+      socket.off("stop_typing", onStopTyping);
+    };
+  }, [socket, activeTicket?._id]);
+
   const filteredTickets = useMemo(() => {
     return tickets.filter((t) => {
       const q = query.toLowerCase();
@@ -122,12 +175,19 @@ export default function TicketsAndTasks() {
         t.ticketNumber.toLowerCase().includes(q) ||
         (t.user?.fullName || "").toLowerCase().includes(q);
 
-      const matchesStatus =
-        statusFilter === "ALL" ? true : t.status.toLowerCase() === statusFilter.toLowerCase();
+      const matchesCategory =
+        categoryFilter === "ALL" ? true : t.category?.toLowerCase() === categoryFilter.toLowerCase();
 
-      return matchesQuery && matchesStatus;
+      return matchesQuery && matchesCategory;
     });
-  }, [tickets, query, statusFilter]);
+  }, [tickets, query, categoryFilter]);
+
+  const paginatedTickets = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredTickets.slice(start, start + itemsPerPage);
+  }, [filteredTickets, currentPage]);
+
+  const totalPages = Math.ceil(filteredTickets.length / itemsPerPage);
 
 
 
@@ -150,30 +210,23 @@ export default function TicketsAndTasks() {
   };
 
   const handleSendMessage = async () => {
-    if (!activeTicket || !messageInput.trim()) return;
+    if (!activeTicket || (!messageInput.trim() && selectedFiles.length === 0)) return;
     try {
+      const formData = new FormData();
+      formData.append("message", messageInput.trim());
+      selectedFiles.forEach(file => formData.append("attachments", file));
+
       const res = await partnerTicketService.replyToTicket(
         activeTicket._id,
-        messageInput.trim(),
+        formData,
       );
       if (res.success) {
-        // Optimistically add the new message to the local active ticket
-        const newMessage = {
-          _id: Date.now().toString(), // temporary id
-          sender: "partner" as const,
-          message: messageInput.trim(),
-          createdAt: new Date().toISOString(),
-        };
-        setActiveTicket((prev) =>
-          prev
-            ? {
-                ...prev,
-                messages: [...prev.messages, newMessage],
-              }
-            : null,
-        );
+        // Clear inputs
         setMessageInput("");
-        // Refresh the ticket list in the background (optional)
+        setSelectedFiles([]);
+        if (socket) socket.emit("stop_typing", { ticketId: activeTicket._id });
+        
+        // Refresh ticket to get official message state
         loadData();
       }
     } catch (err) {
@@ -185,6 +238,33 @@ export default function TicketsAndTasks() {
     }
   };
 
+  const handleInputChange = (val: string) => {
+    setMessageInput(val);
+    if (!socket || !activeTicket) return;
+
+    socket.emit("typing", { ticketId: activeTicket._id, user: user?.fullName || "Partner" });
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit("stop_typing", { ticketId: activeTicket._id });
+    }, 3000);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      if (selectedFiles.length + files.length > 5) {
+        toast({ title: "Max 5 files allowed", variant: "destructive" });
+        return;
+      }
+      setSelectedFiles(prev => [...prev, ...files]);
+    }
+  };
+
+  const removeFile = (idx: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== idx));
+  };
+
   const stats = useMemo(() => {
     const open = tickets.filter((t) => (t.status || "").toLowerCase() === "open").length;
     const inProgress = tickets.filter((t) =>
@@ -192,29 +272,38 @@ export default function TicketsAndTasks() {
     ).length;
     const pendingTasks = tasks.length;
 
-    // Dynamic Avg Response Time calculation (time from createdAt to first staff message)
+    // Dynamic Avg Response Time calculation
     let avgTimeStr = "N/A";
-    const ticketsWithReplies = tickets.filter(t => {
-      return t.messages && t.messages.some(m => m.sender !== 'user');
+    const ticketsForStats = tickets.filter(t => {
+      const hasReply = t.messages && t.messages.some(m => m.sender !== 'user');
+      const isResolved = (t.status || "").toLowerCase() === "resolved" || t.resolvedAt;
+      return hasReply || isResolved;
     });
 
-    if (ticketsWithReplies.length > 0) {
-      const totalDiff = ticketsWithReplies.reduce((acc, t) => {
-        const staffMessages = t.messages.filter(m => m.sender !== 'user');
-        const firstStaffMessage = staffMessages.sort((a, b) => 
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        )[0];
+    if (ticketsForStats.length > 0) {
+      const totalDiff = ticketsForStats.reduce((acc, t) => {
+        let responseTime = 0;
+        const staffMessages = (t.messages || []).filter(m => m.sender !== 'user');
         
-        const start = new Date(t.createdAt).getTime();
-        const end = new Date(firstStaffMessage.createdAt).getTime();
-        return acc + (end - start);
+        if (staffMessages.length > 0) {
+          const firstStaffMessage = staffMessages.sort((a, b) => 
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          )[0];
+          responseTime = new Date(firstStaffMessage.createdAt).getTime() - new Date(t.createdAt).getTime();
+        } else if (t.resolvedAt) {
+          responseTime = new Date(t.resolvedAt).getTime() - new Date(t.createdAt).getTime();
+        }
+        
+        return acc + Math.max(0, responseTime);
       }, 0);
       
-      const avgMs = totalDiff / ticketsWithReplies.length;
+      const avgMs = totalDiff / ticketsForStats.length;
       const mins = Math.floor(avgMs / 60000);
       const hours = Math.floor(mins / 60);
+      const days = Math.floor(hours / 24);
       
-      if (hours > 0) avgTimeStr = `${hours}h ${mins % 60}m`;
+      if (days > 0) avgTimeStr = `${days}d ${hours % 24}h`;
+      else if (hours > 0) avgTimeStr = `${hours}h ${mins % 60}m`;
       else if (mins > 0) avgTimeStr = `${mins}m`;
       else avgTimeStr = "< 1m";
     }
@@ -322,15 +411,20 @@ export default function TicketsAndTasks() {
             />
             <div className="flex gap-3">
               <SelectBox
-                value={statusFilter}
-                onChange={setStatusFilter}
+                value={categoryFilter}
+                onChange={setCategoryFilter}
                 options={[
-                  { label: "All Status", value: "ALL" },
-                  { label: "Open", value: "OPEN" },
-                  { label: "Pending", value: "PENDING" },
-                  { label: "In Progress", value: "IN_PROGRESS" },
-                  { label: "Resolved", value: "RESOLVED" },
-                  { label: "Closed", value: "CLOSED" },
+                  { label: "All Categories", value: "ALL" },
+                  { label: "Virtual Office", value: "virtual_office" },
+                  { label: "Coworking", value: "coworking" },
+                  { label: "Billing", value: "billing" },
+                  { label: "KYC", value: "kyc" },
+                  { label: "Technical", value: "technical" },
+                  { label: "Mail Services", value: "mail_services" },
+                  { label: "Bookings", value: "bookings" },
+                  { label: "Compliance", value: "compliance" },
+                  { label: "Leads", value: "leads" },
+                  { label: "Other", value: "other" },
                 ]}
               />
             </div>
@@ -347,6 +441,9 @@ export default function TicketsAndTasks() {
                     </th>
                     <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
                       Client
+                    </th>
+                    <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
+                      Category
                     </th>
                     <th className="text-left p-5 text-xs font-bold text-[#164e4e]/60 dark:text-gray-400 uppercase tracking-widest">
                       Assignee
@@ -366,17 +463,17 @@ export default function TicketsAndTasks() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#2D3F33]/5 dark:divide-white/10">
-                  {filteredTickets.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={7}
-                        className="p-12 text-center text-[#164e4e]/50 dark:text-gray-500 italic"
-                      >
-                        No support tickets found
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredTickets.map((ticket) => (
+                  {paginatedTickets.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="p-12 text-center text-[#164e4e]/40 italic"
+                  >
+                    No support tickets found
+                  </td>
+                </tr>
+              ) : (
+                paginatedTickets.map((ticket) => (
                       <tr
                         key={ticket._id}
                         className="hover:bg-[#fcfcfc] dark:hover:bg-white/5 transition-colors"
@@ -391,8 +488,30 @@ export default function TicketsAndTasks() {
                             </p>
                           </div>
                         </td>
-                        <td className="p-5 text-sm text-[#164e4e]/80 dark:text-gray-300 font-medium">
-                          {ticket.user?.fullName}
+                        <td className="p-5">
+                          <div className="flex items-center gap-2">
+                            <div className="h-9 w-9 rounded-lg border border-[#164e4e]/10 overflow-hidden flex-shrink-0 bg-slate-50">
+                              {ticket.user?.profilePicture ? (
+                                <img 
+                                  src={ticket.user.profilePicture.startsWith('http') ? ticket.user.profilePicture : `${import.meta.env.VITE_API_URL || ''}${ticket.user.profilePicture}`} 
+                                  alt={ticket.user?.fullName}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-xs bg-[#164e4e]/5 text-[#164e4e] font-bold">
+                                  {ticket.user?.fullName?.[0] || "U"}
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-sm text-[#164e4e]/80 dark:text-gray-300 font-medium">
+                              {ticket.user?.fullName}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="p-5">
+                          <Badge variant="secondary" className="text-[10px] uppercase tracking-wider font-bold bg-[#2D3F33]/5 text-[#2D3F33]/70 border-none rounded-lg px-2 py-1">
+                            {ticket.category?.replace('_', ' ') || 'Other'}
+                          </Badge>
                         </td>
                         <td className="p-5">
                           <div className="flex items-center gap-2">
@@ -458,6 +577,56 @@ export default function TicketsAndTasks() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t border-[#2D3F33]/5 bg-[#2D3F33]/[0.02]">
+                <div className="text-xs text-[#164e4e]/60 font-medium">
+                  Showing <span className="text-[#164e4e]">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
+                  <span className="text-[#164e4e]">
+                    {Math.min(currentPage * itemsPerPage, filteredTickets.length)}
+                  </span>{" "}
+                  of <span className="text-[#164e4e]">{filteredTickets.length}</span> tickets
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="h-8 text-xs font-bold rounded-lg border-[#2D3F33]/10 hover:bg-[#2D3F33]/5"
+                  >
+                    Previous
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }).map((_, i) => (
+                      <Button
+                        key={i + 1}
+                        variant={currentPage === i + 1 ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`h-8 w-8 p-0 text-xs font-bold rounded-lg ${
+                          currentPage === i + 1 
+                            ? "bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90" 
+                            : "text-[#164e4e]/60 hover:bg-[#2D3F33]/5"
+                        }`}
+                      >
+                        {i + 1}
+                      </Button>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="h-8 text-xs font-bold rounded-lg border-[#2D3F33]/10 hover:bg-[#2D3F33]/5"
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Chat Panel (only shown when a ticket is selected) */}
@@ -637,6 +806,26 @@ export default function TicketsAndTasks() {
                           <p className="text-sm leading-relaxed whitespace-pre-wrap">
                             {msg.message}
                           </p>
+                          
+                          {/* Attachments rendering */}
+                          {msg.attachments && msg.attachments.length > 0 && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {msg.attachments.map((url: string, i: number) => {
+                                const isImg = url.match(/\.(jpg|jpeg|png|gif)$/i);
+                                return (
+                                  <a key={i} href={url.startsWith('http') ? url : `${import.meta.env.VITE_API_URL || ''}${url}`} target="_blank" rel="noreferrer" className="block">
+                                    {isImg ? (
+                                      <img src={url.startsWith('http') ? url : `${import.meta.env.VITE_API_URL || ''}${url}`} alt="attachment" className="w-20 h-20 object-cover rounded-lg border border-white/20" />
+                                    ) : (
+                                      <div className="flex items-center gap-2 bg-black/10 p-2 rounded-lg text-[10px] font-bold">
+                                        <FileText className="w-3 h-3" /> Doc {i+1}
+                                      </div>
+                                    )}
+                                  </a>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                         <span
                           className={`text-[10px] text-gray-400 block px-1 ${isRightSide ? "text-right" : ""}`}
@@ -647,27 +836,55 @@ export default function TicketsAndTasks() {
                     </div>
                   );
                 })}
+                
+                {typingUser && (
+                  <div className="flex items-center gap-2 opacity-50 mt-2">
+                    <div className="flex gap-1">
+                      <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
+                      <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-75" />
+                      <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-150" />
+                    </div>
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{typingUser} is typing...</span>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
 
               {/* Messages Input Area */}
               {activeTicket.status !== "resolved" &&
               activeTicket.status !== "closed" ? (
-                <div className="p-6 bg-white border-t border-gray-100">
-                  <div className="flex items-center gap-4 bg-gray-50 p-2 pr-2 rounded-2xl border border-gray-200 focus-within:ring-2 focus-within:ring-[#2D3F33]/10 transition-all">
+                <div className="p-6 bg-white border-t border-gray-100 space-y-4">
+                  {selectedFiles.length > 0 && (
+                    <div className="flex flex-wrap gap-2 px-2">
+                      {selectedFiles.map((file, i) => (
+                        <div key={i} className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-[10px] font-bold text-gray-600 border border-gray-200">
+                          <span className="max-w-[120px] truncate">{file.name}</span>
+                          <X className="w-3 h-3 cursor-pointer hover:text-red-500" onClick={() => removeFile(i)} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-4 bg-gray-50 p-2 pr-2 rounded-2xl border border-gray-200 focus-within:ring-2 focus-within:ring-[#2D3F33]/10 transition-all relative">
+                    <input type="file" ref={fileInputRef} onChange={handleFileSelect} multiple hidden accept="image/*,.pdf" />
+                    <button 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="p-2 text-gray-400 hover:text-[#2D3F33] transition-colors"
+                    >
+                      <Paperclip className="w-5 h-5" />
+                    </button>
                     <input
                       type="text"
                       value={messageInput}
-                      onChange={(e) => setMessageInput(e.target.value)}
+                      onChange={(e) => handleInputChange(e.target.value)}
                       onKeyDown={(e) =>
                         e.key === "Enter" && handleSendMessage()
                       }
                       placeholder="Type your reply..."
-                      className="flex-1 bg-transparent border-none focus:outline-none px-4 text-sm text-gray-700 placeholder:text-gray-400"
+                      className="flex-1 bg-transparent border-none focus:outline-none px-2 text-sm text-gray-700 placeholder:text-gray-400"
                     />
                     <Button
                       onClick={handleSendMessage}
-                      disabled={!messageInput.trim()}
+                      disabled={(!messageInput.trim() && selectedFiles.length === 0)}
                       className="bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90 rounded-xl"
                     >
                       <Send className="w-4 h-4" />

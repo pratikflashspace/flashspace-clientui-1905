@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Send, MessageSquare, Loader2, RefreshCw, CheckCircle2, X, AlertCircle, User as UserIcon, Ticket, MessageCircle, History, Star, ChevronLeft, ChevronRight, ChevronDown, Building2 } from 'lucide-react';
+import { Send, MessageSquare, Loader2, RefreshCw, CheckCircle2, X, AlertCircle, User as UserIcon, Ticket, MessageCircle, History, Star, ChevronLeft, ChevronRight, ChevronDown, Building2, Paperclip, FileText } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation } from 'react-router-dom';
@@ -64,16 +64,21 @@ export default function ChatSupport() {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [isTyping, setIsTyping] = useState(false);
+    const [typingUser, setTypingUser] = useState<string | null>(null);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [messageInput, setMessageInput] = useState('');
     const [sending, setSending] = useState(false);
-    const [userRating, setUserRating] = useState<number>(0);
-    const [remarksInput, setRemarksInput] = useState('');
-    const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
     const [showNewTicketForm, setShowNewTicketForm] = useState(false);
     const [newTicketData, setNewTicketData] = useState({ subject: '', category: '', description: '', bookingId: '' });
     const [userBookings, setUserBookings] = useState<any[]>([]);
     const [loadingBookings, setLoadingBookings] = useState(false);
     const [creatingTicket, setCreatingTicket] = useState(false);
+    const [userRating, setUserRating] = useState(0);
+    const [remarksInput, setRemarksInput] = useState('');
+    const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     const hasPendingAction = tickets.some(t => 
@@ -183,12 +188,28 @@ export default function ChatSupport() {
             setTickets(prev => prev.map(t => t._id === data.ticketId ? data.ticket : t));
         };
 
+        const handleTyping = (data: { ticketId: string; user: string }) => {
+            if (data.ticketId === activeTicketId) {
+                setTypingUser(data.user);
+            }
+        };
+
+        const handleStopTyping = (data: { ticketId: string }) => {
+            if (data.ticketId === activeTicketId) {
+                setTypingUser(null);
+            }
+        };
+
         socket.on('new_message', handleNewMessage);
         socket.on('ticket_updated', handleTicketUpdated);
+        socket.on('typing', handleTyping);
+        socket.on('stop_typing', handleStopTyping);
 
         return () => {
             socket.off('new_message', handleNewMessage);
             socket.off('ticket_updated', handleTicketUpdated);
+            socket.off('typing', handleTyping);
+            socket.off('stop_typing', handleStopTyping);
         };
     }, [socket, activeTicketId]);
 
@@ -213,20 +234,61 @@ export default function ChatSupport() {
     }, [showNewTicketForm, newTicketData.category]);
 
     const handleSendReply = async () => {
-        if (!activeTicketId || !messageInput.trim()) return;
+        if (!activeTicketId || (!messageInput.trim() && selectedFiles.length === 0)) return;
         setSending(true);
         try {
-            const res = await axiosInstance.post(`/api/tickets/${activeTicketId}/reply`, {
-                message: messageInput.trim(),
+            const formData = new FormData();
+            formData.append('message', messageInput.trim());
+            selectedFiles.forEach(file => {
+                formData.append('attachments', file);
             });
+
+            const res = await axiosInstance.post(`/api/tickets/${activeTicketId}/reply`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
             if (res.data.success) {
                 setMessageInput('');
+                setSelectedFiles([]);
+                if (socket) socket.emit('stop_typing', { ticketId: activeTicketId });
             }
         } catch (e) {
             toast.error('Failed to send message');
         } finally {
             setSending(false);
         }
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setMessageInput(e.target.value);
+        
+        if (!socket || !activeTicketId) return;
+
+        // Emit typing event
+        socket.emit('typing', { ticketId: activeTicketId, user: user?.fullName || 'Client' });
+
+        // Clear previous timeout
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+        // Set timeout to stop typing
+        typingTimeoutRef.current = setTimeout(() => {
+            socket.emit('stop_typing', { ticketId: activeTicketId });
+        }, 3000);
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+            if (selectedFiles.length + files.length > 5) {
+                toast.error('Maximum 5 files allowed');
+                return;
+            }
+            setSelectedFiles(prev => [...prev, ...files]);
+        }
+    };
+
+    const removeFile = (index: number) => {
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleCreateTicket = async (e: React.FormEvent) => {
@@ -553,10 +615,50 @@ export default function ChatSupport() {
                                                         </span>
                                                     </div>
                                                     <p className="leading-relaxed whitespace-pre-wrap text-[13px] md:text-sm">{msg.message}</p>
+                                                    {msg.attachments && msg.attachments.length > 0 && (
+                                                        <div className="mt-3 flex flex-wrap gap-2">
+                                                            {msg.attachments.map((url, i) => {
+                                                                const isImage = url.match(/\.(jpg|jpeg|png|gif)$/i);
+                                                                return (
+                                                                    <a 
+                                                                        key={i} 
+                                                                        href={`${import.meta.env.VITE_API_URL || ''}${url}`} 
+                                                                        target="_blank" 
+                                                                        rel="noopener noreferrer"
+                                                                        className="block group/file"
+                                                                    >
+                                                                        {isImage ? (
+                                                                            <img 
+                                                                                src={`${import.meta.env.VITE_API_URL || ''}${url}`} 
+                                                                                alt="attachment" 
+                                                                                className="w-32 h-32 object-cover rounded-xl border border-white/20 hover:scale-105 transition-transform"
+                                                                            />
+                                                                        ) : (
+                                                                            <div className="flex items-center gap-2 bg-black/10 px-3 py-2 rounded-xl border border-white/10 hover:bg-black/20 transition-colors">
+                                                                                <FileText className="w-4 h-4" />
+                                                                                <span className="text-[10px] font-bold truncate max-w-[100px]">Attachment {i + 1}</span>
+                                                                            </div>
+                                                                        )}
+                                                                    </a>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         );
                                     })}
+
+                                    {typingUser && (
+                                        <div className="flex items-center gap-2 animate-pulse">
+                                            <div className="flex gap-1">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce" />
+                                                <div className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce [animation-delay:0.2s]" />
+                                                <div className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce [animation-delay:0.4s]" />
+                                            </div>
+                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{typingUser} is typing...</span>
+                                        </div>
+                                    )}
 
                                     {/* Feedback Section - Mini Style */}
                                     {(activeTicket.status === 'closed' || activeTicket.status === 'resolved') && (
@@ -628,17 +730,43 @@ export default function ChatSupport() {
                                 {/* Input Area */}
                                 {activeTicket.status !== 'closed' && activeTicket.status !== 'resolved' ? (
                                     <div className="p-6 bg-white border-t border-gray-100 relative z-10 shrink-0">
-                                        <div className="flex items-center gap-3 bg-gray-50/80 rounded-2xl border border-gray-200 p-2 pl-5 focus-within:ring-4 focus-within:ring-[#35503F]/5 focus-within:border-[#35503F]/20 focus-within:bg-white transition-all">
+                                        {selectedFiles.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mb-3">
+                                                {selectedFiles.map((file, i) => (
+                                                    <div key={i} className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-xl border border-gray-200">
+                                                        <span className="text-[10px] font-bold text-gray-600 truncate max-w-[150px]">{file.name}</span>
+                                                        <button onClick={() => removeFile(i)} className="p-0.5 hover:bg-gray-200 rounded-full">
+                                                            <X className="w-3 h-3 text-gray-400" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div className="flex items-center gap-3 bg-gray-50/80 rounded-2xl border border-gray-200 p-2 pl-4 focus-within:ring-4 focus-within:ring-[#35503F]/5 focus-within:border-[#35503F]/20 focus-within:bg-white transition-all">
+                                            <input 
+                                                type="file" 
+                                                ref={fileInputRef} 
+                                                onChange={handleFileSelect} 
+                                                multiple 
+                                                className="hidden" 
+                                                accept="image/*,.pdf"
+                                            />
+                                            <button 
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="p-2 hover:bg-gray-200 rounded-xl transition-colors text-gray-400 hover:text-[#35503F]"
+                                            >
+                                                <Paperclip className="w-5 h-5" />
+                                            </button>
                                             <input 
                                                 type="text" value={messageInput}
-                                                onChange={(e) => setMessageInput(e.target.value)}
+                                                onChange={handleInputChange}
                                                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendReply()}
                                                 placeholder="Type your message here..."
                                                 className="flex-1 bg-transparent border-none focus:outline-none text-sm font-semibold text-gray-700 placeholder:text-gray-400"
                                             />
                                             <button
                                                 onClick={handleSendReply}
-                                                disabled={!messageInput.trim() || sending}
+                                                disabled={(!messageInput.trim() && selectedFiles.length === 0) || sending}
                                                 className="w-11 h-11 rounded-xl bg-[#35503F] text-[#FEF8C3] flex items-center justify-center shadow-lg shadow-[#35503F]/20 hover:scale-105 active:scale-95 disabled:opacity-30 disabled:scale-100 transition-all"
                                             >
                                                 {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}

@@ -194,7 +194,7 @@ export default function SupportChat() {
     const score = (status: string) => {
       if (status === "open") return 3;
       if (status === "in_progress") return 2;
-      if (status === "escalated") return 2;
+
       return 0;
     };
     const scoreDiff = score(b.status) - score(a.status);
@@ -206,8 +206,7 @@ export default function SupportChat() {
     switch (status) {
       case "open":
       case "in_progress":
-      case "escalated":
-        return "destructive";
+
       case "active":
         return "default";
       case "resolved":
@@ -227,8 +226,7 @@ export default function SupportChat() {
       case "resolved":
       case "closed":
         return "bg-green-50 text-green-600 border-green-200";
-      case "escalated":
-        return "bg-orange-50 text-orange-600 border-orange-200";
+
       default:
         return "bg-gray-50 text-gray-600 border-gray-200";
     }

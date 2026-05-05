@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Search, Send, MessageSquare, Loader2, Zap, Users, AlertCircle,
-    CheckCircle, RefreshCw, X,
+    CheckCircle, RefreshCw, X, Paperclip, FileText,
 } from 'lucide-react';
 import { useSocket } from '@/contexts/SocketContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -76,6 +76,10 @@ export default function AffiliateClientChat() {
     const [messageInput, setMessageInput] = useState('');
     const [sending, setSending] = useState(false);
     const [tappingIn, setTappingIn] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [typingUser, setTypingUser] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     const activeTicket = tickets.find(t => t._id === activeTicketId);
@@ -157,16 +161,28 @@ export default function AffiliateClientChat() {
             fetchTickets();
         };
 
+        const onTyping = (data: { ticketId: string; user: string }) => {
+            if (data.ticketId === activeTicketId) setTypingUser(data.user);
+        };
+
+        const onStopTyping = (data: { ticketId: string }) => {
+            if (data.ticketId === activeTicketId) setTypingUser(null);
+        };
+
         socket.on('new_message', onNewMessage);
         socket.on('tap_in', onTapIn);
         socket.on('ticket_updated', onTicketUpdated);
         socket.on('affiliate_new_ticket', onAffiliateNewTicket);
+        socket.on('typing', onTyping);
+        socket.on('stop_typing', onStopTyping);
 
         return () => {
             socket.off('new_message', onNewMessage);
             socket.off('tap_in', onTapIn);
             socket.off('ticket_updated', onTicketUpdated);
             socket.off('affiliate_new_ticket', onAffiliateNewTicket);
+            socket.off('typing', onTyping);
+            socket.off('stop_typing', onStopTyping);
         };
     }, [socket, activeTicketId]);
 
@@ -189,18 +205,53 @@ export default function AffiliateClientChat() {
     };
 
     const handleSendReply = async () => {
-        if (!activeTicketId || !messageInput.trim()) return;
+        if (!activeTicketId || (!messageInput.trim() && selectedFiles.length === 0)) return;
         setSending(true);
         try {
-            const res = await axiosInstance.post(`/api/tickets/affiliate/${activeTicketId}/reply`, { message: messageInput.trim() });
+            const formData = new FormData();
+            formData.append('message', messageInput.trim());
+            selectedFiles.forEach(file => formData.append('attachments', file));
+
+            const res = await axiosInstance.post(`/api/tickets/affiliate/${activeTicketId}/reply`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             if (res.data.success) {
                 setMessageInput('');
+                setSelectedFiles([]);
+                if (socket) socket.emit('stop_typing', { ticketId: activeTicketId });
             }
         } catch (e: any) {
             toast.error(e.response?.data?.message || 'Failed to send message');
         } finally {
             setSending(false);
         }
+    };
+
+    const handleInputChange = (val: string) => {
+        setMessageInput(val);
+        if (!socket || !activeTicketId) return;
+
+        socket.emit('typing', { ticketId: activeTicketId, user: user?.fullName || 'Affiliate' });
+
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(() => {
+            socket.emit('stop_typing', { ticketId: activeTicketId });
+        }, 3000);
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+            if (selectedFiles.length + files.length > 5) {
+                toast.error('Max 5 files allowed');
+                return;
+            }
+            setSelectedFiles(prev => [...prev, ...files]);
+        }
+    };
+
+    const removeFile = (idx: number) => {
+        setSelectedFiles(prev => prev.filter((_, i) => i !== idx));
     };
 
     // ─── Loading ─────────────────────────────────────────────────────────────
@@ -435,6 +486,25 @@ export default function AffiliateClientChat() {
                                                 </div>
 
                                                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</p>
+                                                 
+                                                 {msg.attachments && msg.attachments.length > 0 && (
+                                                    <div className="mt-3 flex flex-wrap gap-2">
+                                                        {msg.attachments.map((url, i) => {
+                                                            const isImg = url.match(/\.(jpg|jpeg|png|gif)$/i);
+                                                            return (
+                                                                <a key={i} href={`${import.meta.env.VITE_API_URL || ''}${url}`} target="_blank" rel="noreferrer" className="block">
+                                                                    {isImg ? (
+                                                                        <img src={`${import.meta.env.VITE_API_URL || ''}${url}`} alt="attachment" className="w-20 h-20 object-cover rounded-lg border border-white/20" />
+                                                                    ) : (
+                                                                        <div className="flex items-center gap-2 bg-black/10 p-2 rounded-lg text-[10px] font-bold">
+                                                                            <FileText className="w-3 h-3" /> File {i+1}
+                                                                        </div>
+                                                                    )}
+                                                                </a>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                 )}
                                             </div>
                                             <span className={`text-[10px] text-gray-400 block px-1 ${isRightSide ? 'text-right' : ''}`}>
                                                 {format(new Date(msg.createdAt), 'h:mm a')}
@@ -443,6 +513,17 @@ export default function AffiliateClientChat() {
                                     </div>
                                 );
                             })}
+
+                             {typingUser && (
+                                <div className="flex items-center gap-2 opacity-50 mt-2">
+                                    <div className="flex gap-1">
+                                        <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" />
+                                        <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce delay-75" />
+                                        <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce delay-150" />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{typingUser} is typing...</span>
+                                </div>
+                             )}
                         </div>
 
                         {/* Input */}
