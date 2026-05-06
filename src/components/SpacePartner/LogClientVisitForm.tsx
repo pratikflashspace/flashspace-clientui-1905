@@ -41,7 +41,7 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
 
   // Real email autocomplete
   const [showEmailDropdown, setShowEmailDropdown] = useState(false);
-  const [emailOptions, setEmailOptions] = useState<string[]>([]);
+  const [emailOptions, setEmailOptions] = useState<{ email: string; name: string }[]>([]);
   const [spaceOptions, setSpaceOptions] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
@@ -51,17 +51,16 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
         const response: any = await fetchPartnerDashboard();
         if (response?.data?.clients) {
           const clients = response.data.clients;
-          const emails = Array.from(
-            new Set(
-              clients
-                .map((c: any) => c.email)
-                .filter(
-                  (email: any) =>
-                    email && email !== "N/A" && email.trim() !== "",
-                ),
-            ),
-          ) as string[];
-          setEmailOptions(emails);
+          const options = clients
+            .filter((c: any) => c.email && c.email !== "N/A" && c.email.trim() !== "")
+            .map((c: any) => ({
+              email: c.email.trim().toLowerCase(),
+              name: c.contactName || c.companyName || c.email.split("@")[0]
+            }));
+          
+          // Deduplicate by email
+          const uniqueOptions = Array.from(new Map(options.map((item: any) => [item.email, item])).values()) as { email: string; name: string }[];
+          setEmailOptions(uniqueOptions);
         }
 
         // Load partner spaces
@@ -87,8 +86,9 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
   }, []);
 
   const matchedEmails = emailOptions
-    .filter((email) =>
-      email.toLowerCase().includes(formData.clientEmail.toLowerCase()),
+    .filter((opt) =>
+      opt.email.toLowerCase().includes(formData.clientEmail.toLowerCase()) ||
+      opt.name.toLowerCase().includes(formData.clientEmail.toLowerCase())
     )
     .slice(0, 7);
 
@@ -120,9 +120,10 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
     setLoading(true);
 
     try {
-      // Create backend payload matching CreateVisitData interface
+      const selectedClient = emailOptions.find(opt => opt.email.toLowerCase() === formData.clientEmail.toLowerCase());
+      
       const payload = {
-        client: formData.clientEmail.split("@")[0] || "Unknown Client",
+        client: selectedClient?.name || formData.clientEmail.split("@")[0] || "Client",
         email: formData.clientEmail,
         visitor: formData.visitor,
         purpose: formData.purpose,
@@ -203,23 +204,22 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
           {showEmailDropdown && formData.clientEmail.length > 0 && (
             <ul className="absolute z-10 w-full mt-1 bg-background border border-border rounded-xl shadow-lg max-h-48 overflow-y-auto">
               {matchedEmails.length > 0 ? (
-                matchedEmails.map((email) => (
+                matchedEmails.map((opt) => (
                   <li
-                    key={email}
+                    key={opt.email}
                     className="px-4 py-2.5 hover:bg-muted cursor-pointer text-sm transition-colors border-b border-border/30 last:border-0 flex flex-col"
                     onMouseDown={() => {
                       setFormData((prev) => ({
                         ...prev,
-                        clientEmail: email,
-                        visitor: email.split("@")[0],
+                        clientEmail: opt.email,
                       }));
                       setShowEmailDropdown(false);
                     }}
                   >
-                    <span className="font-medium text-foreground">
-                      {email.split("@")[0]}
+                    <span className="font-bold text-foreground">
+                      {opt.name}
                     </span>
-                    <span className="text-xs text-muted-foreground">{email}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{opt.email}</span>
                   </li>
                 ))
               ) : (

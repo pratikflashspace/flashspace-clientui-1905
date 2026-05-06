@@ -25,11 +25,18 @@ export interface CreateVisitData {
 }
 
 export const visitService = {
-  getAll: async () => {
+  getAll: async (page = 1, limit = 10, search = "") => {
     const response = await axiosInstance.get<{
       success: boolean;
       data: VisitRecord[];
-    }>(API_URL);
+      pagination: {
+        total: number;
+        pending: number;
+        page: number;
+        limit: number;
+        pages: number;
+      };
+    }>(`${API_URL}?page=${page}&limit=${limit}&search=${search}`);
     return response.data;
   },
 

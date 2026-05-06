@@ -36,7 +36,7 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
 
   // Real email autocomplete
   const [showEmailDropdown, setShowEmailDropdown] = useState(false);
-  const [emailOptions, setEmailOptions] = useState<string[]>([]);
+  const [emailOptions, setEmailOptions] = useState<{ email: string; name: string }[]>([]);
   const [spaceOptions, setSpaceOptions] = useState<{ id: string; name: string }[]>([]);
 
   React.useEffect(() => {
@@ -46,17 +46,16 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
         const response: any = await fetchPartnerDashboard();
         if (response?.data?.clients) {
           const clients = response.data.clients;
-          const emails = Array.from(
-            new Set(
-              clients
-                .map((c: any) => c.email)
-                .filter(
-                  (email: any) =>
-                    email && email !== "N/A" && email.trim() !== "",
-                ),
-            ),
-          ) as string[];
-          setEmailOptions(emails);
+          const options = clients
+            .filter((c: any) => c.email && c.email !== "N/A" && c.email.trim() !== "")
+            .map((c: any) => ({
+              email: c.email.trim().toLowerCase(),
+              name: c.contactName || c.companyName || c.email.split("@")[0]
+            }));
+          
+          // Deduplicate by email
+          const uniqueOptions = Array.from(new Map(options.map((item: any) => [item.email, item])).values()) as { email: string; name: string }[];
+          setEmailOptions(uniqueOptions);
         }
 
         // Load partner spaces
@@ -83,8 +82,9 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
   }, []);
 
   const matchedEmails = emailOptions
-    .filter((email) =>
-      email.toLowerCase().includes(formData.clientEmail.toLowerCase()),
+    .filter((opt) =>
+      opt.email.toLowerCase().includes(formData.clientEmail.toLowerCase()) ||
+      opt.name.toLowerCase().includes(formData.clientEmail.toLowerCase())
     )
     .slice(0, 7);
 
@@ -151,15 +151,14 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
       // Create backend payload matching the existing CreateMailData interface
       // Note: We are mocking client name as we only have clientEmail in this specific UI
       // In a real scenario, the backend might look up the client name by email.
+      const selectedClient = emailOptions.find(opt => opt.email.toLowerCase() === formData.clientEmail.toLowerCase());
+      
       const payload = {
-        client: formData.clientEmail.split("@")[0] || "Unknown Client", // Placeholder
+        client: selectedClient?.name || formData.clientEmail.split("@")[0] || "Client",
         email: formData.clientEmail,
         sender: formData.sender,
         type: formData.type,
         space: formData.space,
-        // The backend schema currently doesn't formally accept trackingNumber, notifyClient, or photoUrl
-        // We will pass them anyway, and the backend might simply ignore them if 'strict' is true.
-        // If we updated the backend, these would be saved.
       };
 
       await mailService.create(payload, selectedFile || undefined);
@@ -238,19 +237,20 @@ const LogIncomingMailForm: React.FC<LogIncomingMailFormProps> = ({
           {showEmailDropdown && formData.clientEmail.length > 0 && (
             <ul className="absolute z-10 w-[calc(100%-3rem)] mt-1 bg-background border border-border rounded-xl shadow-lg max-h-48 overflow-y-auto">
               {matchedEmails.length > 0 ? (
-                matchedEmails.map((email) => (
+                matchedEmails.map((opt) => (
                   <li
-                    key={email}
-                    className="px-4 py-2.5 hover:bg-muted cursor-pointer text-sm text-foreground transition-colors"
+                    key={opt.email}
+                    className="px-4 py-2.5 hover:bg-muted cursor-pointer text-sm text-foreground transition-colors border-b border-border last:border-0"
                     onMouseDown={() => {
                       setFormData((prev) => ({
                         ...prev,
-                        clientEmail: email,
+                        clientEmail: opt.email,
                       }));
                       setShowEmailDropdown(false);
                     }}
                   >
-                    {email}
+                    <div className="font-bold">{opt.name}</div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wider">{opt.email}</div>
                   </li>
                 ))
               ) : (

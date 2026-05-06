@@ -650,13 +650,17 @@ export default function ChatSupport() {
                                     })}
 
                                     {typingUser && (
-                                        <div className="flex items-center gap-2 animate-pulse">
-                                            <div className="flex gap-1">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce" />
-                                                <div className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce [animation-delay:0.2s]" />
-                                                <div className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce [animation-delay:0.4s]" />
+                                        <div className="flex flex-col items-start gap-1 mt-2 animate-in fade-in slide-in-from-left-2 duration-300">
+                                            <div className="bg-white border border-[#35503F]/10 px-4 py-2.5 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-2">
+                                                <div className="flex gap-1">
+                                                    <div className="w-1.5 h-1.5 bg-[#35503F] rounded-full" style={{ animation: 'typing-bounce 1s infinite' }} />
+                                                    <div className="w-1.5 h-1.5 bg-[#35503F] rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.2s' }} />
+                                                    <div className="w-1.5 h-1.5 bg-[#35503F] rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.4s' }} />
+                                                </div>
+                                                <span className="text-[10px] font-black text-[#35503F]/60 uppercase tracking-widest">
+                                                    {typingUser} is typing...
+                                                </span>
                                             </div>
-                                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{typingUser} is typing...</span>
                                         </div>
                                     )}
 

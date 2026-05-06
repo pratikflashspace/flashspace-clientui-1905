@@ -299,6 +299,11 @@ export default function SpacePartnerKycDetails() {
         toast.success(
           `Property KYC ${action === "approved" ? "approved" : "rejected"} successfully`,
         );
+        if (action === "approved") {
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
         setOverallAction(null);
         setOverallRejectReason("");
       } catch (e: any) {
@@ -338,6 +343,11 @@ export default function SpacePartnerKycDetails() {
       toast.success(
         `KYC ${action === "approved" ? "approved" : "rejected"} successfully`,
       );
+      if (action === "approved") {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
       setOverallAction(null);
       setOverallRejectReason("");
     } catch (e: any) {

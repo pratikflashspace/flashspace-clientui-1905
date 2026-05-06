@@ -305,15 +305,7 @@ export default function Billing() {
               Manage your invoices, active subscriptions, and payment history
             </p>
           </div>
-          {activeTab !== "payments" && (
-            <button
-              onClick={handleDownload}
-              className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
-            >
-              <Download className="w-4 h-4" />
-              {activeTab === "invoices" ? "Download Invoices" : "Download Subscriptions"}
-            </button>
-          )}
+          {/* Removed Download Buttons as requested */}
         </div>
 
         {/* Stats Cards Section */}

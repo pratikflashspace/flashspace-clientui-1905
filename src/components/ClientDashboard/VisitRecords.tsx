@@ -184,13 +184,12 @@ export default function VisitRecords() {
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Office</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Duration</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filteredVisits.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-20 text-center">
+                    <td colSpan={6} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
                           <Clock className="w-8 h-8 text-gray-300" />
@@ -206,7 +205,7 @@ export default function VisitRecords() {
                   filteredVisits.map((visit) => (
                     <tr key={visit._id} className="hover:bg-gray-50/30 transition-colors group">
                       <td className="px-6 py-4">
-                        <span className="text-sm font-bold text-gray-900">{visit.visitId}</span>
+                        <span className="text-sm font-bold text-gray-900">#{visit._id.slice(-6).toUpperCase()}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -235,41 +234,6 @@ export default function VisitRecords() {
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-sm text-gray-500 font-medium">15 mins</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all ${
-                            visit.status === "Completed"
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                              : visit.status === "Forwarded"
-                              ? "bg-blue-50 text-blue-700 border-blue-100"
-                              : "bg-amber-50 text-amber-700 border-amber-100"
-                          }`}>
-                            {visit.status === "Completed" ? (
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                            ) : visit.status === "Forwarded" ? (
-                              <ShieldCheck className="w-3.5 h-3.5" />
-                            ) : (
-                              <Clock className="w-3.5 h-3.5" />
-                            )}
-                            {visit.status}
-                          </span>
-
-                          {visit.status === "Pending" && (
-                            <button
-                              onClick={() => handleVerify(visit._id)}
-                              disabled={verifyingId === visit._id}
-                              className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#35503F] text-[#FEF8C3] rounded-xl text-xs font-bold shadow-sm hover:bg-[#35503F]/90 transition-all active:scale-95 disabled:opacity-50"
-                            >
-                              {verifyingId === visit._id ? (
-                                <Loader className="w-3 h-3 animate-spin" />
-                              ) : (
-                                <ShieldCheck className="w-3.5 h-3.5" />
-                              )}
-                              Request Forward
-                            </button>
-                          )}
-                        </div>
                       </td>
                     </tr>
                   ))

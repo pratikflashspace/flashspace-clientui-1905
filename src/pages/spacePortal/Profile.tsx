@@ -284,13 +284,6 @@ export default function Profile() {
                 url={kycData?.bankDetailsProofUrl}
                 onUpload={(file) => handleFileUpload("bank_details_proof", file)}
               />
-              <DocumentRow 
-                title="Address Proof" 
-                status={kycData?.addressProofStatus} 
-                date={kycData?.addressProofUrl ? "Uploaded" : "Not Uploaded"}
-                url={kycData?.addressProofUrl}
-                onUpload={(file) => handleFileUpload("address_proof", file)}
-              />
             </CardContent>
           </Card>
         </TabsContent>

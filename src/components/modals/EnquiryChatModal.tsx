@@ -10,6 +10,7 @@ import { MessageSquare, Send, Loader2, X, CheckCircle, FileText, Paperclip } fro
 import partnerTicketService, { PartnerTicketMessage } from "@/services/spacePortal/partnerTicket.service";
 import { toast } from "@/hooks/use-toast";
 import { useSocket } from "@/contexts/SocketContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 
 interface EnquiryChatModalProps {
@@ -30,9 +31,12 @@ export const EnquiryChatModal = ({
   const [activeTicketId, setActiveTicketId] = useState<string | null>(null);
   const [activeTicketStatus, setActiveTicketStatus] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [typingUser, setTypingUser] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { socket } = useSocket();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (open && enquiry) {
@@ -69,11 +73,27 @@ export const EnquiryChatModal = ({
       }
     };
 
+    const onTyping = (data: { ticketId: string; user: string }) => {
+      if (data.ticketId === activeTicketId) {
+        setTypingUser(data.user);
+      }
+    };
+
+    const onStopTyping = (data: { ticketId: string }) => {
+      if (data.ticketId === activeTicketId) {
+        setTypingUser(null);
+      }
+    };
+
     socket.emit("join_ticket", activeTicketId);
     socket.on("new_message", handleNewMessage);
+    socket.on("typing", onTyping);
+    socket.on("stop_typing", onStopTyping);
 
     return () => {
       socket.off("new_message", handleNewMessage);
+      socket.off("typing", onTyping);
+      socket.off("stop_typing", onStopTyping);
       socket.emit("leave_ticket", activeTicketId);
     };
   }, [socket, activeTicketId]);
@@ -184,6 +204,21 @@ export const EnquiryChatModal = ({
     } finally {
       setSending(false);
     }
+  };
+
+  const handleInputChange = (val: string) => {
+    setInputValue(val);
+    if (!socket || !activeTicketId) return;
+
+    socket.emit("typing", { 
+      ticketId: activeTicketId, 
+      user: user?.fullName || "Partner" 
+    });
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit("stop_typing", { ticketId: activeTicketId });
+    }, 3000);
   };
 
   if (!enquiry) return null;
@@ -343,6 +378,21 @@ export const EnquiryChatModal = ({
                   </div>
                 </div>
               )}
+
+              {typingUser && (
+                <div className="flex flex-col items-start gap-1 mt-2 animate-in fade-in slide-in-from-left-2 duration-300">
+                  <div className="bg-white border border-primary/10 px-4 py-2.5 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-2">
+                    <div className="flex gap-1">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full" style={{ animation: 'typing-bounce 1s infinite' }} />
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.2s' }} />
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.4s' }} />
+                    </div>
+                    <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest">
+                      {typingUser} is typing...
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Input Area */}
@@ -391,7 +441,7 @@ export const EnquiryChatModal = ({
                   <input
                     type="text"
                     value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
+                    onChange={(e) => handleInputChange(e.target.value)}
                     placeholder={activeTicketStatus === "resolved" ? "This inquiry has been resolved" : "Type your message..."}
                     disabled={sending || activeTicketStatus === "resolved"}
                     className="w-full pl-4 pr-12 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 bg-muted/20 text-sm disabled:opacity-50"

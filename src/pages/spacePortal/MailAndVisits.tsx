@@ -13,6 +13,11 @@ import {
   MoreVertical,
   History,
   Filter,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Send,
+  Search,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -29,6 +34,7 @@ import LogVisitModal from "@/components/SpacePartner/LogVisitModal";
 import { mailService, MailRecord } from "@/services/mailService";
 import { visitService, VisitRecord } from "@/services/visitService";
 import { format } from "date-fns";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 
 const MailAndVisits = () => {
   const [searchParams] = useSearchParams();
@@ -36,20 +42,21 @@ const MailAndVisits = () => {
   const [activeTab, setActiveTab] = useState<"mail" | "visits">(initialTab);
   const [mailRecords, setMailRecords] = useState<MailRecord[]>([]);
   const [visitRecords, setVisitRecords] = useState<VisitRecord[]>([]);
+  const [mailPagination, setMailPagination] = useState({ page: 1, pages: 1, total: 0, pending: 0, collected: 0 });
+  const [visitPagination, setVisitPagination] = useState({ page: 1, pages: 1, total: 0, pending: 0 });
   const [loading, setLoading] = useState(true);
   const [isLogMailModalOpen, setIsLogMailModalOpen] = useState(false);
   const [isLogVisitModalOpen, setIsLogVisitModalOpen] = useState(false);
+  const [mailSearch, setMailSearch] = useState("");
+  const [visitSearch, setVisitSearch] = useState("");
+  const [mailStatusFilter, setMailStatusFilter] = useState("all");
 
-  const fetchMails = async () => {
+  const fetchMails = async (page = 1) => {
     try {
-      const response = await mailService.getAll();
+      const response = await mailService.getAll(page, 10, mailSearch, mailStatusFilter);
       if (response.success) {
-        const sortedData = response.data.sort((a, b) => {
-          return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-        });
-        setMailRecords(sortedData);
+        setMailRecords(response.data);
+        setMailPagination(response.pagination);
       }
     } catch (error) {
       console.error("Failed to fetch mails", error);
@@ -57,16 +64,12 @@ const MailAndVisits = () => {
     }
   };
 
-  const fetchVisits = async () => {
+  const fetchVisits = async (page = 1) => {
     try {
-      const response = await visitService.getAll();
+      const response = await visitService.getAll(page, 10, visitSearch);
       if (response.success) {
-        const sortedData = response.data.sort((a, b) => {
-          return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-        });
-        setVisitRecords(sortedData);
+        setVisitRecords(response.data);
+        setVisitPagination(response.pagination);
       }
     } catch (error) {
       console.error("Failed to fetch visits", error);
@@ -82,36 +85,39 @@ const MailAndVisits = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [mailStatusFilter]);
+
+  const handleMailSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchMails(1);
+  };
+
+  const handleVisitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchVisits(1);
+  };
 
   const stats = [
     {
+      icon: CheckCircle2,
+      value: mailPagination.collected,
+      label: "Total Mail Collected",
+      color: "text-emerald-600",
+      bg: "bg-emerald-50",
+    },
+    {
       icon: Package,
-      value: mailRecords.filter((m) => m.status === "Pending Action").length,
+      value: mailPagination.pending,
       label: "Pending Mail",
       color: "text-rose-600",
       bg: "bg-rose-50",
     },
     {
-      icon: History,
-      value: visitRecords.filter((v) => v.status === "Pending").length,
-      label: "Pending Visits",
-      color: "text-amber-600",
-      bg: "bg-amber-50",
-    },
-    {
       icon: User,
-      value: visitRecords.length,
+      value: visitPagination.total,
       label: "Total Visits",
       color: "text-primary",
       bg: "bg-primary/5",
-    },
-    {
-      icon: CheckCircle2,
-      value: mailRecords.filter((m) => m.status === "Collected").length,
-      label: "Collected Total",
-      color: "text-emerald-600",
-      bg: "bg-emerald-50",
     },
   ];
 
@@ -126,6 +132,7 @@ const MailAndVisits = () => {
               : record,
           ),
         );
+        fetchMails(mailPagination.page);
         toast.success(`Mail status updated to ${nextStatus}`);
       }
     } catch (error) {
@@ -144,6 +151,7 @@ const MailAndVisits = () => {
               : record,
           ),
         );
+        fetchVisits(visitPagination.page);
         toast.success(`Visit status updated to ${nextStatus}`);
       }
     } catch (error) {
@@ -197,7 +205,7 @@ const MailAndVisits = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
         {stats.map((stat, index) => (
           <div
             key={index}
@@ -237,13 +245,38 @@ const MailAndVisits = () => {
             </TabsTrigger>
           </TabsList>
 
-          <Button
-            variant="outline"
-            className="rounded-xl font-bold border-border bg-background hover:bg-muted text-foreground"
-          >
-            <Filter className="w-4 h-4 mr-2" />
-            Filter
-          </Button>
+          <div className="flex items-center gap-4">
+            <form onSubmit={activeTab === "mail" ? handleMailSearch : handleVisitSearch} className="relative w-64 md:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder={activeTab === "mail" ? "Search client or sender..." : "Search visitor or purpose..."}
+                value={activeTab === "mail" ? mailSearch : visitSearch}
+                onChange={(e) => activeTab === "mail" ? setMailSearch(e.target.value) : setVisitSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              />
+            </form>
+
+            {activeTab === "mail" && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="rounded-xl font-bold border-border bg-background hover:bg-muted text-foreground"
+                  >
+                    <Filter className="w-4 h-4 mr-2" />
+                    {mailStatusFilter === "all" ? "All Status" : mailStatusFilter}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background rounded-xl border-border">
+                  <DropdownMenuItem onClick={() => setMailStatusFilter("all")}>All Status</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setMailStatusFilter("Pending Action")}>Pending Action</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setMailStatusFilter("Forwarded")}>Forwarded</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setMailStatusFilter("Collected")}>Collected</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
 
         <TabsContent
@@ -271,6 +304,12 @@ const MailAndVisits = () => {
                       Received
                     </th>
                     <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                      Client's Decision
+                    </th>
+                    <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                      User Collected
+                    </th>
+                    <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
                       Status
                     </th>
                     <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider text-right pr-6">
@@ -282,7 +321,7 @@ const MailAndVisits = () => {
                   {mailRecords.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={7}
+                        colSpan={9}
                         className="p-12 text-center text-muted-foreground italic"
                       >
                         No mail records found
@@ -292,7 +331,7 @@ const MailAndVisits = () => {
                     mailRecords.map((record) => (
                       <tr
                         key={record._id}
-                        className="hover:bg-muted/30 transition-colors"
+                        className="hover:bg-primary/[0.04] transition-all duration-200 group border-b border-border/50"
                       >
                         <td className="px-6 py-5">
                           <span className="text-[10px] text-primary font-bold opacity-70">
@@ -317,23 +356,60 @@ const MailAndVisits = () => {
                           {format(new Date(record.createdAt), "MMM d, yyyy")}
                         </td>
                         <td className="px-6 py-5">
+                          {record.clientDecision === "Forward Requested" ? (
+                            <Badge className="bg-blue-50 text-blue-600 border border-blue-100 flex items-center gap-1.5 w-fit font-extrabold text-[10px] uppercase px-2 py-1 rounded-full shadow-sm hover:bg-blue-50 transition-none">
+                              <Send className="w-3 h-3" />
+                              Requested Forward
+                            </Badge>
+                          ) : (
+                            <div className="flex items-center gap-1.5 text-muted-foreground/50">
+                              <Clock className="w-3 h-3" />
+                              <span className="text-[10px] font-bold uppercase tracking-wider">No Request</span>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-5">
+                          {record.userCollectedStatus === "Collected" ? (
+                            <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center gap-1.5 w-fit font-extrabold text-[10px] uppercase px-2 py-1 rounded-full shadow-sm hover:bg-emerald-50 transition-none">
+                              <CheckCircle2 className="w-3 h-3" />
+                              Collected
+                            </Badge>
+                          ) : (
+                            <div className="flex items-center gap-1.5 text-muted-foreground/50">
+                              <Clock className="w-3 h-3" />
+                              <span className="text-[10px] font-bold uppercase tracking-wider">Pending</span>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-5">
                           <MailStatusBadge status={record.status} />
                         </td>
                         <td className="px-6 py-5 text-right pr-6">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                          <div className="flex items-center justify-end gap-2">
+                            {record.documentUrl && (
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary"
+                                onClick={() => window.open(getUploadedFileUrl(record.documentUrl), "_blank")}
                               >
-                                <MoreVertical className="h-4 w-4" />
+                                <Eye className="h-4 w-4" />
                               </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              className="bg-background rounded-xl border-border"
-                            >
+                            )}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary"
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="bg-background rounded-xl border-border"
+                              >
                               <DropdownMenuItem
                                 className="font-bold text-xs"
                                 onClick={() =>
@@ -360,6 +436,7 @@ const MailAndVisits = () => {
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
+                        </div>
                         </td>
                       </tr>
                     ))
@@ -367,6 +444,59 @@ const MailAndVisits = () => {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination for Mail */}
+            {mailPagination.total > 0 && (
+              <div className="px-6 py-4 border-t border-border flex flex-col sm:flex-row items-center justify-between bg-muted/20 gap-4">
+                <p className="text-xs text-muted-foreground font-medium">
+                  Showing {(mailPagination.page - 1) * 10 + 1} to{" "}
+                  {Math.min(mailPagination.page * 10, mailPagination.total)} of{" "}
+                  {mailPagination.total} results
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={mailPagination.page === 1}
+                    onClick={() => fetchMails(mailPagination.page - 1)}
+                    className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: mailPagination.pages }, (_, i) => i + 1)
+                      .filter(p => {
+                        const curr = mailPagination.page;
+                        return p === 1 || p === mailPagination.pages || (p >= curr - 1 && p <= curr + 1);
+                      })
+                      .map((p, i, arr) => (
+                        <React.Fragment key={p}>
+                          {i > 0 && arr[i - 1] !== p - 1 && <span className="text-muted-foreground px-1">...</span>}
+                          <Button
+                            variant={mailPagination.page === p ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => fetchMails(p)}
+                            className={`h-8 w-8 p-0 rounded-lg text-xs font-bold transition-all ${
+                              mailPagination.page === p ? "bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90" : "hover:bg-primary/10"
+                            }`}
+                          >
+                            {p}
+                          </Button>
+                        </React.Fragment>
+                      ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={mailPagination.page === mailPagination.pages}
+                    onClick={() => fetchMails(mailPagination.page + 1)}
+                    className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </TabsContent>
 
@@ -394,19 +524,13 @@ const MailAndVisits = () => {
                     <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
                       Date & Time
                     </th>
-                    <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider text-right pr-6">
-                      Actions
-                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {visitRecords.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={7}
+                        colSpan={5}
                         className="p-12 text-center text-muted-foreground italic"
                       >
                         No visit records found
@@ -416,7 +540,7 @@ const MailAndVisits = () => {
                     visitRecords.map((record) => (
                       <tr
                         key={record._id}
-                        className="hover:bg-muted/30 transition-colors"
+                        className="hover:bg-primary/[0.04] transition-all duration-200 group border-b border-border/50"
                       >
                         <td className="px-6 py-5">
                           <span className="text-[10px] text-primary font-bold opacity-70">
@@ -435,57 +559,65 @@ const MailAndVisits = () => {
                         <td className="px-6 py-5 text-xs font-bold text-muted-foreground">
                           {format(new Date(record.date), "MMM d, h:mm a")}
                         </td>
-                        <td className="px-6 py-5">
-                          <VisitStatusBadge status={record.status} />
-                        </td>
-                        <td className="px-6 py-5 text-right pr-6">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10 hover:text-primary"
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              className="bg-background rounded-xl border-border"
-                            >
-                              <DropdownMenuItem
-                                className="font-bold text-xs"
-                                onClick={() =>
-                                  handleVisitUpdate(record._id, "Pending")
-                                }
-                              >
-                                Mark as Pending
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="font-bold text-xs"
-                                onClick={() =>
-                                  handleVisitUpdate(record._id, "Forwarded")
-                                }
-                              >
-                                Mark as Forwarded
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="font-bold text-xs text-emerald-600"
-                                onClick={() =>
-                                  handleVisitUpdate(record._id, "Completed")
-                                }
-                              >
-                                Mark as Completed
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </td>
                       </tr>
                     ))
                   )}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination for Visits */}
+            {visitPagination.total > 0 && (
+              <div className="px-6 py-4 border-t border-border flex flex-col sm:flex-row items-center justify-between bg-muted/20 gap-4">
+                <p className="text-xs text-muted-foreground font-medium">
+                  Showing {(visitPagination.page - 1) * 10 + 1} to{" "}
+                  {Math.min(visitPagination.page * 10, visitPagination.total)} of{" "}
+                  {visitPagination.total} results
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={visitPagination.page === 1}
+                    onClick={() => fetchVisits(visitPagination.page - 1)}
+                    className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: visitPagination.pages }, (_, i) => i + 1)
+                      .filter(p => {
+                        const curr = visitPagination.page;
+                        return p === 1 || p === visitPagination.pages || (p >= curr - 1 && p <= curr + 1);
+                      })
+                      .map((p, i, arr) => (
+                        <React.Fragment key={p}>
+                          {i > 0 && arr[i - 1] !== p - 1 && <span className="text-muted-foreground px-1">...</span>}
+                          <Button
+                            variant={visitPagination.page === p ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => fetchVisits(p)}
+                            className={`h-8 w-8 p-0 rounded-lg text-xs font-bold transition-all ${
+                              visitPagination.page === p ? "bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90" : "hover:bg-primary/10"
+                            }`}
+                          >
+                            {p}
+                          </Button>
+                        </React.Fragment>
+                      ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={visitPagination.page === visitPagination.pages}
+                    onClick={() => fetchVisits(visitPagination.page + 1)}
+                    className="h-8 w-8 p-0 rounded-lg hover:bg-primary/10"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>
@@ -507,14 +639,14 @@ const MailAndVisits = () => {
 function MailStatusBadge({ status }: { status: string }) {
   const styles =
     {
-      "Pending Action": "bg-rose-100 text-rose-700",
-      Forwarded: "bg-amber-100 text-amber-700",
-      Collected: "bg-emerald-100 text-emerald-700",
-    }[status] || "bg-slate-100 text-slate-700";
+      "Pending Action": "bg-rose-50 text-rose-600 border-rose-100",
+      Forwarded: "bg-amber-50 text-amber-600 border-amber-100",
+      Collected: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    }[status] || "bg-slate-50 text-slate-600 border-slate-100";
 
   return (
     <Badge
-      className={`${styles} border-none font-extrabold text-[10px] uppercase px-2 py-0.5 rounded-full`}
+      className={`${styles} border font-extrabold text-[10px] uppercase px-2 py-1 rounded-full shadow-sm hover:bg-opacity-100`}
     >
       {status}
     </Badge>
@@ -524,14 +656,14 @@ function MailStatusBadge({ status }: { status: string }) {
 function VisitStatusBadge({ status }: { status: string }) {
   const styles =
     {
-      Pending: "bg-amber-100 text-amber-700",
-      Forwarded: "bg-blue-100 text-blue-700",
-      Completed: "bg-emerald-100 text-emerald-700",
-    }[status] || "bg-slate-100 text-slate-700";
+      Pending: "bg-amber-50 text-amber-600 border-amber-100",
+      Forwarded: "bg-blue-50 text-blue-600 border-blue-100",
+      Completed: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    }[status] || "bg-slate-50 text-slate-600 border-slate-100";
 
   return (
     <Badge
-      className={`${styles} border-none font-extrabold text-[10px] uppercase px-2 py-0.5 rounded-full`}
+      className={`${styles} border font-extrabold text-[10px] uppercase px-2 py-1 rounded-full shadow-sm hover:bg-opacity-100`}
     >
       {status}
     </Badge>
