@@ -341,7 +341,7 @@ export const TicketViewModal = ({
                               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <div style={{ width: '32px', height: '32px', borderRadius: '10px', backgroundColor: '#35503f', color: '#fff', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', overflow: 'hidden' }}>
                                   {s.profilePicture ? (
-                                    <img src={s.profilePicture} alt={s.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <img src={getUploadedFileUrl(s.profilePicture)} alt={s.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                   ) : (
                                     s.fullName?.charAt(0).toUpperCase()
                                   )}
@@ -536,7 +536,7 @@ export const TicketViewModal = ({
                  <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
                      <div style={{ width: '24px', height: '24px', borderRadius: '8px', backgroundColor: '#35503f', color: '#fff', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', overflow: 'hidden' }}>
                        {ticket?.user?.profilePicture ? (
-                         <img src={ticket.user.profilePicture} alt={ticket.user.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                         <img src={getUploadedFileUrl(ticket.user.profilePicture)} alt={ticket.user.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                        ) : (
                          ticket?.user?.fullName?.charAt(0)
                        )}

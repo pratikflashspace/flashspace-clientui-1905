@@ -128,6 +128,16 @@ export default function TicketSystem() {
     return () => clearTimeout(timer);
   }, [activeTab, searchTerm]);
 
+  // Add 30-second polling to keep data fresh
+  useEffect(() => {
+    const pollInterval = setInterval(() => {
+      fetchTickets(false); // Fetch without showing global loading overlay
+      fetchStats();
+    }, 30000);
+
+    return () => clearInterval(pollInterval);
+  }, [activeTab, searchTerm]);
+
   useEffect(() => {
     if (!socket || !selectedTicket) return;
 
