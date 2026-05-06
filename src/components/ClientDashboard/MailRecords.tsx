@@ -18,7 +18,8 @@ import {
   Package,
   Send,
   Inbox,
-  ArrowRight
+  ArrowRight,
+  Eye
 } from "lucide-react";
 import { format } from "date-fns";
 import { API_CONFIG } from "@/config/api.config";
@@ -85,12 +86,8 @@ export default function MailRecords() {
       const response = await mailService.updateStatus(id, "Forwarded");
       if (response.success) {
         toast.success("Forward request sent successfully!");
-        setMails(prev => prev.map(m => m._id === id ? { ...m, status: "Forwarded" } : m));
-        setStats(prev => ({
-          ...prev,
-          pending: Math.max(0, prev.pending - 1),
-          forwarded: prev.forwarded + 1
-        }));
+        // Update client decision locally
+        setMails(prev => prev.map(m => m._id === id ? { ...m, clientDecision: "Forward Requested" } : m));
       } else {
         toast.error(response.message || "Failed to send forward request");
       }
@@ -105,6 +102,20 @@ export default function MailRecords() {
     }
   };
 
+  const handleMarkAsCollected = async (id: string) => {
+    try {
+      const response = await mailService.updateStatus(id, "Collected");
+      if (response.success) {
+        toast.success("Marked as collected!");
+        setMails(prev => prev.map(m => m._id === id ? { ...m, userCollectedStatus: "Collected" } : m));
+      } else {
+        toast.error(response.message || "Failed to update status");
+      }
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
+  };
+
   const filteredMails = mails.filter((m) => {
     const matchSearch =
       searchQuery === "" ||
@@ -113,45 +124,42 @@ export default function MailRecords() {
       m.space.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchTab = 
-      activeTab === "forwarded" ? m.status === "Forwarded" :
-      activeTab === "collected" ? m.status === "Collected" :
-      m.status === "Pending Action";
+      activeTab === "collected" ? (m.status === "Collected" || m.userCollectedStatus === "Collected") :
+      activeTab === "forwarded" ? ((m.status === "Forwarded" || m.clientDecision === "Forward Requested") && m.userCollectedStatus !== "Collected" && m.status !== "Collected") :
+      (m.status === "Pending Action" && m.clientDecision !== "Forward Requested" && m.userCollectedStatus !== "Collected" && m.status !== "Collected");
     
     return matchSearch && matchTab;
   });
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Pending Action":
-      case "Pending Pickup":
-        return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-            <Clock className="w-3 h-3" />
-            Pending Pickup
-          </span>
-        );
-      case "Forwarded":
-        return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-            <Send className="w-3 h-3" />
-            Forwarded
-          </span>
-        );
-      case "Collected":
-        return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-            <CheckCircle2 className="w-3 h-3" />
-            Collected
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
-            <Mail className="w-3 h-3" />
-            {status}
-          </span>
-        );
+  const getStatusBadge = (mail: MailRecord) => {
+    const { status, clientDecision, userCollectedStatus } = mail;
+    
+    if (status === "Collected" || userCollectedStatus === "Collected") {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+          <CheckCircle2 className="w-3 h-3" />
+          {status === "Collected" ? "Collected" : "Marked as Received"}
+        </span>
+      );
     }
+
+    if (status === "Forwarded" || clientDecision === "Forward Requested") {
+      return (
+        <div className="flex flex-col gap-1">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 w-fit">
+            <Send className="w-3 h-3" />
+            Forward Requested
+          </span>
+        </div>
+      );
+    }
+
+    return (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 w-fit">
+        <Clock className="w-3 h-3" />
+        Pending
+      </span>
+    );
   };
 
   const formatDate = (dateStr: string) => {
@@ -315,36 +323,42 @@ export default function MailRecords() {
                         <span className="text-sm text-gray-500 font-medium">{formatDate(mail.received)}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(mail.status)}
+                        {getStatusBadge(mail)}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-3">
                           {mail.documentUrl && (
-                            <a
-                              href={resolveDocumentUrl(mail.documentUrl)}
-                              target="_blank"
-                              rel="noreferrer"
+                            <button
+                              onClick={() => window.open(resolveDocumentUrl(mail.documentUrl), "_blank")}
                               title="View Document"
                               className="p-2 text-gray-400 hover:text-[#35503F] hover:bg-gray-100 rounded-lg transition-all"
                             >
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
+                              <Eye className="w-4 h-4" />
+                            </button>
                           )}
                           {mail.status !== "Collected" && (
-                            <button 
-                              className={`inline-flex items-center px-4 py-2 border rounded-xl text-sm font-bold transition-all shadow-sm active:scale-95 ${
-                                mail.status === "Forwarded" 
-                                  ? "bg-blue-50 border-blue-100 text-blue-600 cursor-default"
-                                  : "bg-white border-gray-200 text-gray-900 hover:bg-gray-50 hover:border-gray-300"
-                              }`}
-                              onClick={() => mail.status !== "Forwarded" && handleForward(mail._id)}
-                              disabled={forwardingIds.has(mail._id) || mail.status === "Forwarded"}
-                            >
-                              {forwardingIds.has(mail._id) ? (
-                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                              ) : null}
-                              {mail.status === "Forwarded" ? "Request Forwarded" : "Request Forward"}
-                            </button>
+                            <div className="flex gap-2">
+                              {mail.clientDecision !== "Forward Requested" && mail.status === "Pending Action" && (
+                                <button 
+                                  className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-900 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95"
+                                  onClick={() => handleForward(mail._id)}
+                                  disabled={forwardingIds.has(mail._id)}
+                                >
+                                  {forwardingIds.has(mail._id) ? (
+                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                  ) : null}
+                                  Please Forward
+                                </button>
+                              )}
+                              {(mail.clientDecision === "Forward Requested" || mail.status === "Forwarded") && mail.userCollectedStatus !== "Collected" && (
+                                <button 
+                                  className="inline-flex items-center px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-xl text-sm font-bold hover:bg-[#35503F]/90 transition-all shadow-sm active:scale-95"
+                                  onClick={() => handleMarkAsCollected(mail._id)}
+                                >
+                                  Collected
+                                </button>
+                              )}
+                            </div>
                           )}
                         </div>
                       </td>

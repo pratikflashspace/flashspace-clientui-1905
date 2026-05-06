@@ -792,12 +792,6 @@ export default function KYCVerification() {
             description: "Company incorporation certificate",
             required: false,
           },
-          {
-            type: "address_proof",
-            name: "Address Proof",
-            description: "Utility bill or rent agreement",
-            required: true,
-          },
         ];
 
   // Check if all required documents are uploaded

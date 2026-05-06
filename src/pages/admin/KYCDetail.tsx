@@ -284,7 +284,9 @@ export default function KYCDetail() {
       }
       if (response.success) {
         toast.success("KYC approved successfully");
-        navigate(-1);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
         toast.error(response.message || "Failed to approve KYC");
       }

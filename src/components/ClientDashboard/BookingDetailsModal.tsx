@@ -600,8 +600,7 @@ export default function BookingDetailsModal({
                 {[
                   { label: "Certificate of Incorporation", type: "coi" },
                   { label: "Company PAN Card", type: "pan_card" },
-                  { label: "GST Certificate", type: "gst_certificate" },
-                  { label: "Other Documents", type: "address_proof" }
+                  { label: "GST Certificate", type: "gst_certificate" }
                 ].map((docType) => {
                   const doc = getDoc(docType.type, 'main');
                   return (

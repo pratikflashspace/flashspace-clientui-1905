@@ -28,6 +28,7 @@ import {
   TicketStats,
 } from "@/services/admin.service";
 import { useAuth } from "@/contexts/AuthContext";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 import { useSocket } from "@/contexts/SocketContext";
 import playNotificationSound from "@/utils/sound.util";
 
@@ -428,7 +429,7 @@ export default function TicketSystem() {
                   <div className="flex items-center gap-3">
                     <Avatar className="h-8 w-8 ring-2 ring-background shadow-sm">
                       {ticket.user?.profilePicture && (
-                        <AvatarImage src={ticket.user.profilePicture} alt={ticket.user.fullName} className="object-cover" />
+                        <AvatarImage src={getUploadedFileUrl(ticket.user.profilePicture)} alt={ticket.user.fullName} className="object-cover" />
                       )}
                       <AvatarFallback className="bg-primary/10 text-primary font-bold text-[10px]">
                         {ticket.user?.fullName?.split(" ").map(n => n[0]).join("").toUpperCase() || "CL"}
@@ -465,7 +466,7 @@ export default function TicketSystem() {
                       <>
                         <Avatar className="w-6 h-6">
                           {ticket.assignee?.profilePicture && (
-                            <AvatarImage src={ticket.assignee.profilePicture} alt={ticket.assignee.fullName} />
+                            <AvatarImage src={getUploadedFileUrl(ticket.assignee.profilePicture)} alt={ticket.assignee.fullName} />
                           )}
                           <AvatarFallback className="text-[10px] bg-blue-100 text-blue-700 font-bold">
                             {ticket.assignee?.fullName?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "AD"}
@@ -529,7 +530,7 @@ export default function TicketSystem() {
                 <div className="flex items-center gap-2 mt-1">
                   <Avatar className="h-5 w-5">
                     {ticket.user?.profilePicture && (
-                      <AvatarImage src={ticket.user.profilePicture} alt={ticket.user.fullName} />
+                      <AvatarImage src={getUploadedFileUrl(ticket.user.profilePicture)} alt={ticket.user.fullName} />
                     )}
                     <AvatarFallback className="text-[8px] bg-primary/10 text-primary font-bold">
                       {ticket.user?.fullName?.split(" ").map(n => n[0]).join("").toUpperCase() || "CL"}
@@ -568,7 +569,7 @@ export default function TicketSystem() {
                   <>
                     <Avatar className="w-6 h-6 border border-blue-100">
                       {ticket.assignee?.profilePicture && (
-                        <AvatarImage src={ticket.assignee.profilePicture} alt={ticket.assignee.fullName} />
+                        <AvatarImage src={getUploadedFileUrl(ticket.assignee.profilePicture)} alt={ticket.assignee.fullName} />
                       )}
                       <AvatarFallback className="text-[10px] bg-blue-100 text-blue-700 font-bold">
                         {ticket.assignee?.fullName?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "AD"}

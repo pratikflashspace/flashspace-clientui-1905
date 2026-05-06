@@ -12,6 +12,8 @@ export interface MailRecord {
   documentUrl?: string;
   received: string;
   status: "Pending Action" | "Forwarded" | "Collected";
+  clientDecision?: "None" | "Forward Requested";
+  userCollectedStatus?: "Pending" | "Collected";
   createdAt: string;
   updatedAt: string;
 }
@@ -25,11 +27,19 @@ export interface CreateMailData {
 }
 
 export const mailService = {
-  getAll: async () => {
+  getAll: async (page = 1, limit = 10, search = "", status = "all") => {
     const response = await axiosInstance.get<{
       success: boolean;
       data: MailRecord[];
-    }>(API_URL);
+      pagination: {
+        total: number;
+        pending: number;
+        collected: number;
+        page: number;
+        limit: number;
+        pages: number;
+      };
+    }>(`${API_URL}?page=${page}&limit=${limit}&search=${search}&status=${status}`);
     return response.data;
   },
 

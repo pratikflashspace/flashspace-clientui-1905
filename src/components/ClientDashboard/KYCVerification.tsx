@@ -635,6 +635,33 @@ export default function KYCVerification() {
       setLoading(false);
     }
   };
+  
+  const handleDeletePartner = async (partnerId: string, partnerName: string) => {
+    if (!confirm(`Are you sure you want to remove the partner "${partnerName || "this partner"}"? This action cannot be undone and will delete the record from the database.`)) return;
+
+    setLoading(true);
+    try {
+      const resp = await userDashboardService.removePartner(partnerId);
+      if (resp.success) {
+        toast.success("Partner removed successfully");
+        if (profileId === partnerId) {
+          setProfileId(null);
+          setSearchParams((params) => {
+            params.delete("profileId");
+            return params;
+          });
+        }
+        fetchKYC();
+      } else {
+        toast.error(resp.message || "Failed to remove partner");
+      }
+    } catch (err) {
+      console.error("Remove partner error:", err);
+      toast.error("An error occurred while removing the partner");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleUploadDocument = async (docType: string, file: File) => {
     if (!profileId || profileId === "new") {
@@ -941,12 +968,6 @@ export default function KYCVerification() {
           description: "Company incorporation certificate",
           required: false,
         },
-        {
-          type: "address_proof",
-          name: "Address Proof",
-          description: "Utility bill or rent agreement",
-          required: true,
-        },
       ];
 
   // Check if all required documents are uploaded
@@ -1186,19 +1207,31 @@ export default function KYCVerification() {
                           {partner.personalInfo?.fullName?.charAt(0) || "P"}
                         </div>
                         <div className="text-left">
-                          <h4 className="font-semibold text-gray-900">{partner.personalInfo?.fullName || "Partner"}</h4>
-                          <p className="text-xs text-gray-500">{partner.personalInfo?.email}</p>
+                          <h4 className="font-semibold text-gray-900 truncate max-w-[120px] sm:max-w-[180px]">{partner.personalInfo?.fullName || "Partner"}</h4>
+                          <p className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-[180px]">{partner.personalInfo?.email}</p>
                         </div>
                       </div>
-                      <button
-                        onClick={() => {
-                          setProfileId(partner._id || null);
-                          setSearchParams({ profileId: partner._id || "" });
-                        }}
-                        className="px-3 py-1.5 text-xs bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100"
-                      >
-                        Details
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setProfileId(partner._id || null);
+                            setSearchParams({ profileId: partner._id || "" });
+                          }}
+                          className="px-3 py-1.5 text-xs bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 font-bold"
+                        >
+                          Details
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePartner(partner._id!, partner.personalInfo?.fullName || "");
+                          }}
+                          className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="Delete Partner"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

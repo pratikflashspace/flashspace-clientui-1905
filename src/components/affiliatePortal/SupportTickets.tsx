@@ -332,13 +332,17 @@ const SupportTickets = () => {
                     })}
 
                     {typingUser && (
-                        <div className="flex items-center gap-2 opacity-60">
-                            <div className="flex gap-1">
-                                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" />
-                                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce delay-75" />
-                                <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce delay-150" />
+                        <div className="flex flex-col items-start gap-1 mt-2 animate-in fade-in slide-in-from-left-2 duration-300">
+                            <div className="bg-white border border-[#5bb09c]/10 px-4 py-2.5 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-2">
+                                <div className="flex gap-1">
+                                    <div className="w-1.5 h-1.5 bg-[#5bb09c] rounded-full" style={{ animation: 'typing-bounce 1s infinite' }} />
+                                    <div className="w-1.5 h-1.5 bg-[#5bb09c] rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.2s' }} />
+                                    <div className="w-1.5 h-1.5 bg-[#5bb09c] rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.4s' }} />
+                                </div>
+                                <span className="text-[10px] font-black text-[#5bb09c]/60 uppercase tracking-widest">
+                                    {typingUser} is typing...
+                                </span>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{typingUser} is typing...</span>
                         </div>
                     )}
                 </div>

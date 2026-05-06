@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useSocket } from "@/contexts/SocketContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 
 export const TicketViewModal = ({ 
   open, 
@@ -185,7 +186,7 @@ export const TicketViewModal = ({
                   overflow: 'hidden'
                 }}>
                   {ticket?.user?.profilePicture ? (
-                    <img src={ticket.user.profilePicture} alt={ticket.user.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={getUploadedFileUrl(ticket.user.profilePicture)} alt={ticket.user.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     ticket?.user?.fullName?.substring(0, 1).toUpperCase()
                   )}
@@ -676,13 +677,32 @@ export const TicketViewModal = ({
             })}
 
              {typingUser && (
-               <div style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.6 }}>
-                 <div style={{ display: 'flex', gap: '3px' }}>
-                   <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#64748b', animation: 'bounce 1s infinite' }} />
-                   <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#64748b', animation: 'bounce 1s infinite 0.2s' }} />
-                   <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#64748b', animation: 'bounce 1s infinite 0.4s' }} />
+               <div style={{ 
+                 alignSelf: 'flex-start', 
+                 display: 'flex', 
+                 flexDirection: 'column',
+                 gap: '4px',
+                 marginTop: '8px',
+                 animation: 'fadeIn 0.3s ease-out'
+               }}>
+                 <div style={{ 
+                   backgroundColor: '#fff', 
+                   padding: '10px 18px', 
+                   borderRadius: '18px', 
+                   borderTopLeftRadius: '4px',
+                   border: '1px solid #e2e8f0',
+                   boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+                   display: 'flex', 
+                   alignItems: 'center', 
+                   gap: '10px'
+                 }}>
+                   <div style={{ display: 'flex', gap: '4px' }}>
+                     <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#35503f', animation: 'typing-bounce 1s infinite' }} />
+                     <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#35503f', animation: 'typing-bounce 1s infinite 0.2s' }} />
+                     <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#35503f', animation: 'typing-bounce 1s infinite 0.4s' }} />
+                   </div>
+                   <span style={{ fontSize: '10px', fontWeight: 900, color: '#35503f', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{typingUser} is typing...</span>
                  </div>
-                 <span style={{ fontSize: '10px', fontWeight: 900, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{typingUser} is typing...</span>
                </div>
              )}
           </div>

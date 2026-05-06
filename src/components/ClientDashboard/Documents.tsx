@@ -98,9 +98,7 @@ export default function Documents() {
     const filteredSupportingDocs = bookings.flatMap(booking => 
         (booking.documents || [])
             .filter(doc => 
-                !['final_agreement', 'agreement', 'draft_agreement', 'signed_agreement', 
-                  'pan_card', 'aadhaar', 'video_kyc', 'coi', 'gst_certificate', 'address_proof'
-                ].includes(doc.type || '')
+                ['noc', 'utility_bill', 'electricity_bill', 'other_support'].includes(doc.type || '')
             )
             .map(doc => ({
                 ...doc,
