@@ -65,6 +65,13 @@ const DocumentManagement = () => {
 
   useEffect(() => {
     fetchDocuments();
+    
+    // Add 30-second polling to keep data fresh
+    const pollInterval = setInterval(() => {
+      fetchDocuments();
+    }, 30000);
+
+    return () => clearInterval(pollInterval);
   }, [statusFilter]);
 
   const fetchDocuments = async () => {

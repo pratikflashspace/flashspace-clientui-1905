@@ -207,6 +207,12 @@ export default function SpacePartnerKycDetails() {
   useEffect(() => {
     if (!id) return;
     fetchKyc();
+
+    const pollInterval = setInterval(() => {
+      fetchKyc();
+    }, 30000);
+
+    return () => clearInterval(pollInterval);
   }, [id, fetchKyc]);
 
   // Document Accept/Reject handlers

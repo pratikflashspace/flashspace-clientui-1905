@@ -146,24 +146,33 @@ export default function AdminDashboard() {
     }
   }, [socket]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [statsResponse] = await Promise.all([
-          adminService.getDashboardStats(),
-        ]);
+  const fetchData = async (silent = false) => {
+    if (!silent) setLoading(true);
+    try {
+      const [statsResponse] = await Promise.all([
+        adminService.getDashboardStats(),
+      ]);
 
-        if (statsResponse.success && statsResponse.data) {
-          setStats(statsResponse.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch admin data", error);
-      } finally {
-        setLoading(false);
+      if (statsResponse.success && statsResponse.data) {
+        setStats(statsResponse.data);
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch admin data", error);
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
+  }, []);
+
+  // Polling for real-time stats
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchData(true);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {

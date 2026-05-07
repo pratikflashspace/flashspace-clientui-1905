@@ -77,14 +77,22 @@ const MailAndVisits = () => {
     }
   };
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (silent = false) => {
+    if (!silent) setLoading(true);
     await Promise.all([fetchMails(), fetchVisits()]);
-    setLoading(false);
+    if (!silent) setLoading(false);
   };
 
   useEffect(() => {
     fetchData();
+  }, [mailStatusFilter]);
+
+  // Polling for real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchData(true);
+    }, 5000);
+    return () => clearInterval(interval);
   }, [mailStatusFilter]);
 
   const handleMailSearch = (e: React.FormEvent) => {
@@ -410,14 +418,7 @@ const MailAndVisits = () => {
                                 align="end"
                                 className="bg-background rounded-xl border-border"
                               >
-                              <DropdownMenuItem
-                                className="font-bold text-xs"
-                                onClick={() =>
-                                  handleUpdate(record._id, "Pending Action")
-                                }
-                              >
-                                Mark as Pending
-                              </DropdownMenuItem>
+
                               <DropdownMenuItem
                                 className="font-bold text-xs"
                                 onClick={() =>

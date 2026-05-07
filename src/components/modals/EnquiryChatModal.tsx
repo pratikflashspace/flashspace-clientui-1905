@@ -160,6 +160,13 @@ export const EnquiryChatModal = ({
         if (res.success) {
           setInputValue("");
           setSelectedFiles([]);
+
+          // Clear typing indicator immediately after sending
+          if (socket && activeTicketId) {
+            socket.emit("stop_typing", { ticketId: activeTicketId });
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+          }
+
           if (!socket) loadMessages();
         }
       } else {
@@ -188,6 +195,13 @@ export const EnquiryChatModal = ({
           setMessages(res.data.messages || []);
           setInputValue("");
           setSelectedFiles([]);
+
+          // Clear typing indicator
+          if (socket && res.data._id) {
+            socket.emit("stop_typing", { ticketId: res.data._id });
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+          }
+
           toast({
             title: "Chat Initiated",
             description: "Message sent to lead.",
@@ -218,12 +232,12 @@ export const EnquiryChatModal = ({
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
       socket.emit("stop_typing", { ticketId: activeTicketId });
-    }, 3000);
+    }, 1500); // Reduced from 3s to 1.5s for snappier feedback
   };
 
   if (!enquiry) return null;
   const name = enquiry.user?.name || "Client";
-  const company = enquiry.user?.company || "N/A";
+  const company = enquiry.user?.company && enquiry.user?.company !== "N/A" ? enquiry.user?.company : "";
   const interest = enquiry.space || enquiry.type || "Space";
 
   return (
@@ -247,7 +261,10 @@ export const EnquiryChatModal = ({
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">{company} • {interest}</p>
+                <p className="text-sm text-muted-foreground">
+                  {company ? `${company} • ` : ""}
+                  {interest}
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 {activeTicketId && activeTicketStatus !== "resolved" && (

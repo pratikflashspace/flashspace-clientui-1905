@@ -218,7 +218,10 @@ export default function AffiliateClientChat() {
             if (res.data.success) {
                 setMessageInput('');
                 setSelectedFiles([]);
-                if (socket) socket.emit('stop_typing', { ticketId: activeTicketId });
+                if (socket) {
+                    socket.emit('stop_typing', { ticketId: activeTicketId });
+                    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                }
             }
         } catch (e: any) {
             toast.error(e.response?.data?.message || 'Failed to send message');

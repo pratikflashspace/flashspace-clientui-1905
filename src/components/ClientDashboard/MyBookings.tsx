@@ -96,8 +96,8 @@ const MyBookings: React.FC = () => {
     null,
   );
 
-  const fetchBookings = async () => {
-    setLoading(true);
+  const fetchBookings = async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
     setError(null);
     try {
       const typeMap: Record<string, string> = {
@@ -147,17 +147,24 @@ const MyBookings: React.FC = () => {
           setTotalCount(response.data.length);
         }
       } else {
-        setError(response.message || "Failed to load bookings");
+        if (!isSilent) setError(response.message || "Failed to load bookings");
       }
     } catch (err) {
-      setError("Failed to load bookings");
+      if (!isSilent) setError("Failed to load bookings");
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchBookings();
+
+    // Set up polling every 5 seconds
+    const interval = setInterval(() => {
+      fetchBookings(true);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [activeTab, statusFilter]);
 
   useEffect(() => {
