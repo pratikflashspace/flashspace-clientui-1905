@@ -35,6 +35,7 @@ import { getMeetingRoomById } from "@/services/meetingRoom.service";
 import { getVirtualOfficePricing } from "@/utils/priceUtils";
 import { createPaymentOrder, verifyPayment } from "@/services/payment.service";
 import { useAuth } from "@/contexts/AuthContext";
+import { LeadCollectionModal } from "@/components/booking/LeadCollectionModal";
 
 
 type WorkspaceType = "virtual-office" | "coworking" | "on-demand";
@@ -68,6 +69,8 @@ const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [pendingBookingAction, setPendingBookingAction] = useState<(() => void) | null>(null);
 
 
   useEffect(() => {
@@ -166,9 +169,14 @@ const getPhotos = () => {
     const handleBookNow = () => {
       if (!data || !pricing) return;
       if (data.availability?.toLowerCase() === "unavailable") return;
-      navigate(
-        `/booking/${data._id}/complete?plan=${selectedPlan}&type=virtual_office`,
-      );
+      const executeBooking = () => {
+        navigate(
+          `/booking/${data._id}/complete?plan=${selectedPlan}&type=virtual_office`,
+        );
+      };
+
+      setPendingBookingAction(() => executeBooking);
+      setShowLeadModal(true);
     };
 
     return (
@@ -246,10 +254,15 @@ const getPhotos = () => {
     const handleBookNow = () => {
       if (!data) return;
       if (data.availability?.toLowerCase() === "unavailable") return;
-      const dateStr = selectedDate.toISOString();
-      navigate(
-        `/booking/${data._id}?desks=${deskCount}&date=${dateStr}&type=coworking&direct=true`,
-      );
+      const executeBooking = () => {
+        const dateStr = selectedDate.toISOString();
+        navigate(
+          `/booking/${data._id}?desks=${deskCount}&date=${dateStr}&type=coworking&direct=true`,
+        );
+      };
+
+      setPendingBookingAction(() => executeBooking);
+      setShowLeadModal(true);
     };
 
     return (
@@ -381,39 +394,15 @@ const getPhotos = () => {
         return;
       }
 
-      setIsProcessing(true);
-      try {
-        const order = await createPaymentOrder({
-          userId: user.id || (user as any)._id,
-          userEmail: user.email,
-          userName: user.fullName || "User",
-          userPhone: user.phoneNumber || "9876543210",
-          spaceId: data._id,
-          spaceName: data.name,
-          planName: `${hours} Hour Meeting Room Booking`,
-          planKey: "meeting_hourly",
-          tenure: 1,
-          yearlyPrice: totalPrice,
-          totalAmount: totalPrice,
-          discountPercent: 0,
-          discountAmount: 0,
-          paymentType: "meeting_room" as any,
-        });
+      const executeBooking = async () => {
+        navigate(
+          `/booking/${data._id}?hours=${hours}&price=${totalPrice}&type=on-demand&direct=true`,
+        );
+      };
 
-        await new Promise((r) => setTimeout(r, 1500));
-        const result = await verifyPayment({
-          razorpay_order_id: order.orderId,
-          razorpay_payment_id: `pay_test_${Date.now()}`,
-          razorpay_signature: "test_signature_dev",
-          devMode: true,
-        });
-
-        navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(data.name)}&planName=${encodeURIComponent(`${hours} Hour Meeting Room Booking`)}&amount=${totalPrice}`);
-      } catch (error: any) {
-        hotToast.error(error.message || "Booking failed");
-      } finally {
-        setIsProcessing(false);
-      }
+      setPendingBookingAction(() => executeBooking);
+      setShowLeadModal(true);
+      return;
     };
 
     return (
@@ -818,6 +807,18 @@ const getPhotos = () => {
         </div>
       </div>
       <Footer />
+      <LeadCollectionModal
+        isOpen={showLeadModal}
+        onClose={() => setShowLeadModal(false)}
+        onSuccess={() => {
+          setShowLeadModal(false);
+          if (pendingBookingAction) {
+            pendingBookingAction();
+          }
+        }}
+        spaceId={data?._id || ""}
+        spaceName={data?.name || data?.spaceId || "Selected Space"}
+      />
     </div>
   );
 };

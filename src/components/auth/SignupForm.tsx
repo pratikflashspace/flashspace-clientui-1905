@@ -62,8 +62,8 @@ export const SignupForm = ({
       if (onSuccess) {
         onSuccess();
       }
-       // Navigate to dashboard since user is now logged in
-      navigate('/dashboard');
+       // Navigate to home since user is now logged in
+      navigate('/');
     } catch (error) {
       console.error('Signup error:', error);
     }
@@ -177,7 +177,7 @@ export const SignupForm = ({
           </div>
         </div>
         <div className="mt-6">
-          <GoogleLoginButton onSuccess={() => navigate('/dashboard')} role={formData.role} />
+          <GoogleLoginButton onSuccess={() => navigate('/')} role={formData.role} />
         </div>
       </div>
     </form >

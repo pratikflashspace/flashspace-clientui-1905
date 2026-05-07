@@ -21,16 +21,14 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
         switch (user.role) {
           case 'super_admin':
           case 'admin':
-            navigate('/admin', { replace: true });
-            break;
           case 'partner':
-            navigate('/spaceportal', { replace: true });
+            navigate('/', { replace: true });
             break;
           case 'affiliate':
             navigate('/affiliate-portal', { replace: true });
             break;
           default:
-            navigate('/dashboard', { replace: true });
+            navigate('/', { replace: true });
         }
       }
     }
@@ -255,7 +253,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
 
           <div className="mt-6">
             <GoogleLoginButton
-              onSuccess={() => navigate('/dashboard')}
+              onSuccess={() => navigate('/')}
               onTwoFactorRequired={(email) => {
                 setFormData((prev) => ({ ...prev, email, password: '' }));
                 setTwoFactorRequired(true);

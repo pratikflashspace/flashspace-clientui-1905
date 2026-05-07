@@ -31,6 +31,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { getVirtualOfficeById } from "@/services/virtualOffice.service";
 import { getCoworkingSpaceById } from "@/services/coworkingSpace.service";
+import { getMeetingRoomById } from "@/services/meetingRoom.service";
 import { VirtualOfficeItem } from "@/types/services";
 import { getVirtualOfficePricing, parsePrice, PlanDetails } from "@/utils/priceUtils";
 import { BookingPageSkeleton } from "@/components/ui/skeleton-loaders";
@@ -230,6 +231,27 @@ const BookingPage = () => {
                 "High Speed WiFi",
                 "Unlimited Coffee",
                 "Office Supplies",
+              ],
+            });
+          }
+        } else if (type === "on-demand") {
+          const data = await getMeetingRoomById(id);
+          if (!data) {
+            setError("Meeting room not found");
+          } else {
+            setSpaceDetails(data as any);
+            const hours = parseInt(searchParams.get("hours") || "1");
+            const price = parseInt(searchParams.get("price") || "0");
+            setSelectedPlanDetails({
+              key: "on-demand",
+              name: `Meeting Room (${hours} Hour${hours > 1 ? "s" : ""})`,
+              monthlyPrice: price,
+              yearlyPrice: price, // Not used for on-demand
+              features: data.features || [
+                "High Speed WiFi",
+                "HD Display",
+                "Whiteboard",
+                "Coffee/Tea",
               ],
             });
           }
@@ -457,6 +479,7 @@ const BookingPage = () => {
 
   // ============ PRICING CALCULATIONS ============
   const isCoworking = searchParams.get("type") === "coworking";
+  const isOnDemand = searchParams.get("type") === "on-demand";
   const yearlyPrice = selectedPlanDetails?.yearlyPrice || 0;
 
   const tenureOptions = [
@@ -488,15 +511,25 @@ const BookingPage = () => {
 
   const selectedOption = tenureOptions.find((t) => t.years === selectedTenure)!;
   const basePrice =
-    isCoworking && fixedAmount !== null
+    (isCoworking || isOnDemand) && fixedAmount !== null
       ? fixedAmount
-      : selectedOption.totalPrice;
+      : (isOnDemand && selectedPlanDetails)
+        ? selectedPlanDetails.monthlyPrice
+        : selectedOption.totalPrice;
   const couponDiscountAmount = appliedCoupon
     ? Math.round((basePrice * appliedCoupon.discountValue) / 100)
     : 0;
   const taxableAmount = Math.max(basePrice - couponDiscountAmount, 0);
   const gstAmount = Math.round(taxableAmount * 0.18);
   const finalPayableAmount = taxableAmount + gstAmount;
+
+  const getPaymentType = () => {
+    const type = searchParams.get("type");
+    if (searchParams.get("holdId")) return "seat_booking";
+    if (type === "coworking") return "coworking_space";
+    if (type === "on-demand") return "meeting_room";
+    return "virtual_office";
+  };
 
   // Compute end date from start date + tenure
   const computedEndDate = (() => {
@@ -549,11 +582,7 @@ const BookingPage = () => {
           (appliedCoupon?.discountValue || 0),
         discountAmount:
           (isCoworking ? 0 : selectedOption.savings) + couponDiscountAmount,
-        paymentType: searchParams.get("holdId")
-          ? "seat_booking"
-          : isCoworking
-            ? "coworking_space"
-            : "virtual_office",
+        paymentType: getPaymentType() as any,
         startDate: new Date(selectedStartDate).toISOString(),
         holdId: searchParams.get("holdId") || undefined,
         // ── Affiliate attribution ──────────────────────────────────
@@ -711,11 +740,7 @@ const BookingPage = () => {
           (appliedCoupon?.discountValue || 0),
         discountAmount:
           (isCoworking ? 0 : selectedOption.savings) + couponDiscountAmount,
-        paymentType: searchParams.get("holdId")
-          ? "seat_booking"
-          : isCoworking
-            ? "coworking_space"
-            : "virtual_office",
+        paymentType: getPaymentType() as any,
         startDate: new Date(selectedStartDate).toISOString(),
         holdId: searchParams.get("holdId") || undefined,
         // ── Affiliate attribution ──────────────────────────────────
