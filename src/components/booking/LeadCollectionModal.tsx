@@ -62,16 +62,31 @@ export const LeadCollectionModal = ({
     setLoading(true);
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/leads/booking-lead`, {
+      const rawBase =
+        import.meta.env.VITE_API_URL ||
+        (import.meta.env.DEV ? 'http://localhost:5000' : window.location.origin);
+      const base = rawBase.replace(/\/$/, '');
+      const userName = user?.fullName || email.split('@')[0] || 'Booking Lead';
+
+      await axios.post(`${base}/api/leads`, {
+        name: userName,
         userId: user?.id || (user as any)?._id,
         email,
         phone,
-        spaceId,
-        spaceName,
+        businessType: 'Booking',
+        message: `Booking interest for ${spaceName}`,
+        source: 'Booking Flow',
+        page: window.location.href,
         utm: {
-            source: 'booking_flow',
-            timestamp: new Date().toISOString()
-        }
+          source: 'booking_flow',
+          spaceId,
+          spaceName,
+          timestamp: new Date().toISOString(),
+        },
+      }, {
+        headers: {
+          'x-api-key': import.meta.env.VITE_LEAD_API_KEY || 'flashspace123',
+        },
       });
 
       onSuccess();

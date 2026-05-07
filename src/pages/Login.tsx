@@ -1,10 +1,30 @@
 import { LoginForm } from "@/components/auth/LoginForm";
-import { Link, Navigate } from "react-router-dom";
+import { useCallback } from "react";
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
+import { isCheckoutReturnPath } from "@/utils/checkoutSession";
 
 const Login = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const stateRedirectTo = (location.state as { redirectTo?: string } | null)
+    ?.redirectTo;
+  const requestedRedirect =
+    stateRedirectTo ||
+    searchParams.get("redirectTo") ||
+    searchParams.get("redirect") ||
+    "/";
+  const redirectTo = isCheckoutReturnPath(requestedRedirect)
+    ? requestedRedirect
+    : "/";
+
+  const handleLoginSuccess = useCallback(() => {
+    navigate(redirectTo, { replace: true });
+  }, [navigate, redirectTo]);
 
   if (isLoading) {
     return (
@@ -15,7 +35,7 @@ const Login = () => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   return (
@@ -40,7 +60,7 @@ const Login = () => {
             </p>
           </div>
 
-          <LoginForm />
+          <LoginForm onSuccess={handleLoginSuccess} />
 
           <div className="mt-6 text-center">
             <p className="text-sm text-[#677E73]">

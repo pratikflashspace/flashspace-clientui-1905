@@ -1,9 +1,15 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
+import {
+  getDefaultLoginUrl,
+  getLoginRedirectUrl,
+  isCheckoutReturnPath,
+} from '@/utils/checkoutSession';
 
 export const ProtectedRoute = () => {
   const { isAuthenticated, isLoading, user } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -14,7 +20,19 @@ export const ProtectedRoute = () => {
   }
 
   if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace />;
+    const redirectTo = `${location.pathname}${location.search}${location.hash}`;
+    const shouldReturnAfterLogin = isCheckoutReturnPath(redirectTo);
+    return (
+      <Navigate
+        to={
+          shouldReturnAfterLogin
+            ? getLoginRedirectUrl(redirectTo)
+            : getDefaultLoginUrl()
+        }
+        state={shouldReturnAfterLogin ? { redirectTo } : undefined}
+        replace
+      />
+    );
   }
 
   return <Outlet />;

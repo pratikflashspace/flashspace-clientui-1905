@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
   Check,
   Shield,
-  ShieldAlert,
-  AlertTriangle,
   Clock,
   Star,
   Building2,
@@ -48,7 +46,12 @@ import {
 } from "@/services/payment.service";
 import { API_CONFIG, API_ENDPOINTS } from "@/config/api.config";
 import axiosInstance from "@/services/api.service";
-import userDashboardService from "@/services/userDashboard.service";
+import {
+  clearCheckoutState,
+  getLoginRedirectUrl,
+  persistCheckoutState,
+  readCheckoutState,
+} from "@/utils/checkoutSession";
 
 // ============ STEP DEFINITIONS ============
 const STEPS = [
@@ -62,9 +65,11 @@ const BookingPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const planKeyId = searchParams.get("plan") || "gst";
+  const checkoutReturnTo = `${location.pathname}${location.search}${location.hash}`;
 
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
 
   const isDirect = searchParams.get("direct") === "true";
@@ -93,10 +98,6 @@ const BookingPage = () => {
     company: "",
   });
 
-  // KYC STATE
-  const [kycStatus, setKycStatus] = useState<string | null>(null); // null = loading, 'approved', 'pending', 'in_progress', 'not_started', 'rejected'
-  const [kycLoading, setKycLoading] = useState(true);
-
   // COUPON STATE
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{
@@ -119,6 +120,46 @@ const BookingPage = () => {
     useState<ReturnType<typeof getVirtualOfficePricing>>(null);
   const [selectedPlanKey, setSelectedPlanKey] = useState(planKeyId);
 
+  const persistCurrentCheckout = () => {
+    persistCheckoutState(
+      {
+        page: "booking",
+        path: checkoutReturnTo,
+        currentStep,
+        selectedTenure,
+        selectedPlanKey,
+        userDetails,
+        couponCode,
+        appliedCoupon,
+        selectedStartDate,
+      },
+      checkoutReturnTo,
+    );
+  };
+
+  useEffect(() => {
+    const saved = readCheckoutState<{
+      page?: string;
+      path?: string;
+      currentStep?: number;
+      selectedTenure?: 1 | 2 | 3;
+      selectedPlanKey?: string;
+      userDetails?: typeof userDetails;
+      couponCode?: string;
+      appliedCoupon?: typeof appliedCoupon;
+      selectedStartDate?: string;
+    }>();
+
+    if (saved?.page !== "booking" || saved.path !== checkoutReturnTo) return;
+    if (typeof saved.currentStep === "number") setCurrentStep(saved.currentStep);
+    if (saved.selectedTenure) setSelectedTenure(saved.selectedTenure);
+    if (saved.selectedPlanKey) setSelectedPlanKey(saved.selectedPlanKey);
+    if (saved.userDetails) setUserDetails(saved.userDetails);
+    if (typeof saved.couponCode === "string") setCouponCode(saved.couponCode);
+    if (saved.appliedCoupon !== undefined) setAppliedCoupon(saved.appliedCoupon);
+    if (saved.selectedStartDate) setSelectedStartDate(saved.selectedStartDate);
+  }, [checkoutReturnTo]);
+
   // HOLD TIMER STATE (For Coworking Seats)
   const [holdTimeLeft, setHoldTimeLeft] = useState<number | null>(null);
   const [holdExpiresAt, setHoldExpiresAt] = useState<string | null>(null);
@@ -136,60 +177,6 @@ const BookingPage = () => {
       }));
     }
   }, [user]);
-
-  // ============ KYC STATUS CHECK ============
-  useEffect(() => {
-    const checkKycStatus = async () => {
-      if (!isAuthenticated || !user) {
-        setKycLoading(false);
-        setKycStatus(null);
-        return;
-      }
-
-      // Bypass KYC for admins
-      if (user.role === 'admin' || user.role === 'super_admin') {
-        setKycStatus('approved');
-        setKycLoading(false);
-        return;
-      }
-      try {
-        setKycLoading(true);
-        const response = await userDashboardService.getKYC();
-        if (response.success && response.data) {
-          const kycRecords = Array.isArray(response.data)
-            ? response.data
-            : [response.data];
-          // Check if any profile is approved
-          const approved = kycRecords.find(
-            (k: any) => k.overallStatus === "approved"
-          );
-          if (approved) {
-            setKycStatus("approved");
-          } else {
-            hotToast("KYC Verification Required", {
-              icon: "🛡️",
-              duration: 4000,
-            });
-            navigate("/dashboard/profile");
-            return;
-          }
-        } else {
-            hotToast("KYC Verification Required", {
-              icon: "🛡️",
-              duration: 4000,
-            });
-            navigate("/dashboard/profile");
-            return;
-        }
-      } catch (err) {
-        console.error("KYC check failed:", err);
-        setKycStatus("not_started");
-      } finally {
-        setKycLoading(false);
-      }
-    };
-    checkKycStatus();
-  }, [isAuthenticated, user]);
 
   // Scroll to top on step change
   useEffect(() => {
@@ -399,9 +386,10 @@ const BookingPage = () => {
         description: "Please login to apply coupons",
         variant: "destructive",
       });
-      navigate(
-        `/login?redirect=/booking/${id}?plan=${planKeyId}${isDirect ? "&direct=true" : ""}`,
-      );
+      persistCurrentCheckout();
+      navigate(getLoginRedirectUrl(checkoutReturnTo), {
+        state: { redirectTo: checkoutReturnTo },
+      });
       return;
     }
     setCouponLoading(true);
@@ -556,9 +544,10 @@ const BookingPage = () => {
         description: "Please login to continue with your booking",
         variant: "destructive",
       });
-      navigate(
-        `/login?redirect=/booking/${id}?plan=${planKeyId}${isDirect ? "&direct=true" : ""}`,
-      );
+      persistCurrentCheckout();
+      navigate(getLoginRedirectUrl(checkoutReturnTo), {
+        state: { redirectTo: checkoutReturnTo },
+      });
       return;
     }
     if (!spaceDetails || !selectedPlanDetails) return;
@@ -648,6 +637,7 @@ const BookingPage = () => {
               title: "Payment Successful! 🎉",
               description: "Your booking has been confirmed",
             });
+            clearCheckoutState();
             navigate(
               `/payment/success?orderId=${response.razorpay_order_id}&paymentId=${response.razorpay_payment_id}`,
             );
@@ -687,16 +677,6 @@ const BookingPage = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Payment initiation error:", error);
-      // Handle KYC-required error from backend
-      if (error?.response?.data?.kycRequired || error?.kycRequired) {
-        toast({
-          title: "KYC Required",
-          description: error?.response?.data?.message || error?.message || "Please complete your KYC verification before booking.",
-          variant: "destructive",
-        });
-        navigate("/dashboard/profile");
-        return;
-      }
       toast({
         title: "Error",
         description: error?.message || "Failed to initiate payment.",
@@ -714,9 +694,10 @@ const BookingPage = () => {
         description: "Please login to continue",
         variant: "destructive",
       });
-      navigate(
-        `/login?redirect=/booking/${id}?plan=${planKeyId}${isDirect ? "&direct=true" : ""}`,
-      );
+      persistCurrentCheckout();
+      navigate(getLoginRedirectUrl(checkoutReturnTo), {
+        state: { redirectTo: checkoutReturnTo },
+      });
       return;
     }
     if (!spaceDetails || !selectedPlanDetails) return;
@@ -786,22 +767,13 @@ const BookingPage = () => {
         title: "Payment Simulated! 🎉",
         description: "Mock booking has been created successfully",
       });
+      clearCheckoutState();
       navigate(
         `/payment/success?orderId=${orderData.orderId}&paymentId=${result.paymentId}`,
       );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Payment simulation error:", error);
-      // Handle KYC-required error from backend
-      if (error?.response?.data?.kycRequired || error?.kycRequired) {
-        toast({
-          title: "KYC Required",
-          description: error?.response?.data?.message || error?.message || "Please complete your KYC verification before booking.",
-          variant: "destructive",
-        });
-        navigate("/dashboard/profile");
-        return;
-      }
       toast({
         title: "Simulation Failed",
         description: error?.message || "Failed to simulate payment.",
@@ -813,7 +785,7 @@ const BookingPage = () => {
   };
 
   // ============ LOADING / ERROR STATES ============
-  if (loading || kycLoading) {
+  if (loading) {
     return (
       <div className="flex flex-col min-h-screen bg-background text-foreground">
         <Header />
@@ -1642,43 +1614,23 @@ const BookingPage = () => {
                 </div>
 
                 {/* Pay Button */}
-                {!user?.kycVerified && user?.role === "user" ? (
-                  <div className="bg-amber-50 border border-amber-200 rounded-3xl p-8 mb-8 text-center animate-in fade-in zoom-in duration-500">
-                    <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Shield className="w-8 h-8 text-amber-600" />
-                    </div>
-                    <h3 className="text-xl font-bold text-amber-900 mb-2">
-                      KYC Verification Required
-                    </h3>
-                    <p className="text-amber-800 text-sm mb-6 max-w-md mx-auto leading-relaxed">
-                      To ensure security and compliance, KYC verification is mandatory for booking this space. Your current KYC status is not yet approved.
-                    </p>
-                      <Button
-                        onClick={() => navigate("/dashboard/kyc")}
-                        className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-6 px-8 rounded-xl shadow-lg shadow-amber-200/50 transition-all hover:scale-[1.02] w-full"
-                      >
-                        Complete KYC Verification
-                      </Button>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={handleProceedToPayment}
-                    disabled={paymentLoading}
-                    className="w-full py-6 bg-gradient-to-r from-teal-600 to-emerald-500 text-white rounded-2xl font-bold text-lg hover:from-teal-700 hover:to-emerald-600 transition-all duration-300 shadow-lg shadow-teal-200/50 hover:shadow-xl disabled:opacity-70"
-                  >
-                    {paymentLoading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Processing...
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center gap-2">
-                        <Shield className="w-5 h-5" />
-                        Pay ₹{finalPayableAmount.toLocaleString()} Securely
-                      </span>
-                    )}
-                  </Button>
-                )}
+                <Button
+                  onClick={handleProceedToPayment}
+                  disabled={paymentLoading}
+                  className="w-full py-6 bg-gradient-to-r from-teal-600 to-emerald-500 text-white rounded-2xl font-bold text-lg hover:from-teal-700 hover:to-emerald-600 transition-all duration-300 shadow-lg shadow-teal-200/50 hover:shadow-xl disabled:opacity-70"
+                >
+                  {paymentLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Processing...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      <Shield className="w-5 h-5" />
+                      Pay ₹{finalPayableAmount.toLocaleString()} Securely
+                    </span>
+                  )}
+                </Button>
 
                 {/* Dev Mode Simulate Button */}
                 {isDevMode && (

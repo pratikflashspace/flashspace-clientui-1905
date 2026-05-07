@@ -253,7 +253,13 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
 
           <div className="mt-6">
             <GoogleLoginButton
-              onSuccess={() => navigate('/')}
+              onSuccess={() => {
+                if (onSuccess) {
+                  onSuccess();
+                } else {
+                  navigate('/');
+                }
+              }}
               onTwoFactorRequired={(email) => {
                 setFormData((prev) => ({ ...prev, email, password: '' }));
                 setTwoFactorRequired(true);
