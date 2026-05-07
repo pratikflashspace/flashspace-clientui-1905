@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
+import { isCheckoutReturnPath } from "@/utils/checkoutSession";
 
 const Login = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -16,10 +17,10 @@ const Login = () => {
     stateRedirectTo ||
     searchParams.get("redirectTo") ||
     searchParams.get("redirect") ||
-    "/dashboard";
-  const redirectTo = requestedRedirect.startsWith("/")
+    "/";
+  const redirectTo = isCheckoutReturnPath(requestedRedirect)
     ? requestedRedirect
-    : "/dashboard";
+    : "/";
 
   const handleLoginSuccess = useCallback(() => {
     navigate(redirectTo, { replace: true });

@@ -1,5 +1,13 @@
 const CHECKOUT_RETURN_KEY = "flashspace_checkout_return_to";
 const CHECKOUT_STATE_KEY = "flashspace_checkout_state";
+const DEFAULT_LOGIN_RETURN_TO = "/";
+
+const CHECKOUT_RETURN_PATHS = [
+  "/booking/",
+  "/space/",
+  "/coworking-space/",
+  "/meeting-room/",
+];
 
 const canUseSessionStorage = () =>
   typeof window !== "undefined" && Boolean(window.sessionStorage);
@@ -9,8 +17,26 @@ export const getCurrentCheckoutPath = () => {
   return `${window.location.pathname}${window.location.search}${window.location.hash}`;
 };
 
-export const getLoginRedirectUrl = (returnTo = getCurrentCheckoutPath()) =>
-  `/login?redirectTo=${encodeURIComponent(returnTo)}`;
+export const isSafeInternalPath = (path?: string | null) =>
+  Boolean(path?.startsWith("/") && !path.startsWith("//"));
+
+export const isCheckoutReturnPath = (path?: string | null) => {
+  if (!isSafeInternalPath(path)) return false;
+
+  return CHECKOUT_RETURN_PATHS.some((checkoutPath) =>
+    path!.startsWith(checkoutPath),
+  );
+};
+
+export const getLoginRedirectUrl = (returnTo = getCurrentCheckoutPath()) => {
+  const safeReturnTo = isSafeInternalPath(returnTo)
+    ? returnTo
+    : DEFAULT_LOGIN_RETURN_TO;
+
+  return `/login?redirectTo=${encodeURIComponent(safeReturnTo)}`;
+};
+
+export const getDefaultLoginUrl = () => "/login";
 
 export const persistCheckoutState = (
   state: Record<string, unknown>,

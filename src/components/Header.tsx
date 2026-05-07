@@ -27,7 +27,11 @@ import { LoginModal } from "@/components/auth/LoginModal";
 import { SignupModal } from "@/components/auth/SignupModal";
 import { PartnerChoiceModal } from "@/components/auth/PartnerChoiceModal";
 import { GetInTouchModal } from "@/components/modals/GetInTouchModal";
-import { getLoginRedirectUrl } from "@/utils/checkoutSession";
+import {
+    getDefaultLoginUrl,
+    getLoginRedirectUrl,
+    isCheckoutReturnPath,
+} from "@/utils/checkoutSession";
 
 interface HeaderProps {
     forceWhiteBackground?: boolean;
@@ -62,10 +66,19 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
     const loginRedirectTo = (() => {
         const params = new URLSearchParams(location.search);
         const requested = params.get("redirectTo") || params.get("redirect");
-        if (requested?.startsWith("/")) return requested;
-        if (location.pathname !== "/login" && location.pathname !== "/signup") return currentRoute;
-        return "/dashboard";
+        if (isCheckoutReturnPath(requested)) return requested;
+        if (
+            location.pathname !== "/login" &&
+            location.pathname !== "/signup" &&
+            isCheckoutReturnPath(currentRoute)
+        ) {
+            return currentRoute;
+        }
+        return "/";
     })();
+    const loginUrl = isCheckoutReturnPath(currentRoute)
+        ? getLoginRedirectUrl(currentRoute)
+        : getDefaultLoginUrl();
 
     const handleLoginSuccess = () => {
         setIsLoginOpen(false);
@@ -359,7 +372,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                                 </div>
                             ) : (
                                 <button
-                                    onClick={() => navigate(getLoginRedirectUrl(currentRoute))}
+                                    onClick={() => navigate(loginUrl)}
                                     className="hidden sm:inline-flex text-sm font-medium text-[#4B5E6B] dark:text-white hover:opacity-80 transition-all"
                                 >
                                     Sign in
@@ -372,7 +385,7 @@ const Header = ({ forceWhiteBackground = false, lightText = false, loginBlack = 
                 <SidebarMenu
                     isOpen={isMenuOpen}
                     onClose={() => setIsMenuOpen(false)}
-                    onOpenLogin={() => navigate(getLoginRedirectUrl(currentRoute))}
+                    onOpenLogin={() => navigate(loginUrl)}
                     onOpenContact={() => setIsContactOpen(true)}
                 />
             </header>
