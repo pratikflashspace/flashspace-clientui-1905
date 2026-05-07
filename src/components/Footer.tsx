@@ -20,7 +20,7 @@ const footerLinks = {
     { label: "Privacy Policy", href: "/about" },
   ],
   community: [
-    { label: "LinkedIn", href: "https://www.linkedin.com/company/flashspace" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/company/flash-space/" },
     { label: "Twitter", href: "https://twitter.com/flashspace" },
     { label: "Instagram", href: "https://instagram.com/flashspace" },
   ],

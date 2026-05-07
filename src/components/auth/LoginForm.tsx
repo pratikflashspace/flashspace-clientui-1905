@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { GoogleLoginButton } from './GoogleLoginButton';
+import { getDefaultDashboard } from '@/utils/roleRedirection';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -18,18 +19,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       if (onSuccess) {
         onSuccess();
       } else {
-        switch (user.role) {
-          case 'super_admin':
-          case 'admin':
-          case 'partner':
-            navigate('/', { replace: true });
-            break;
-          case 'affiliate':
-            navigate('/affiliate-portal', { replace: true });
-            break;
-          default:
-            navigate('/', { replace: true });
-        }
+        navigate(getDefaultDashboard(user.role), { replace: true });
       }
     }
   }, [isAuthenticated, isLoading, navigate, onSuccess, user]);
@@ -256,8 +246,6 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
               onSuccess={() => {
                 if (onSuccess) {
                   onSuccess();
-                } else {
-                  navigate('/');
                 }
               }}
               onTwoFactorRequired={(email) => {

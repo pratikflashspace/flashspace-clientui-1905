@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff, Loader2, User, Mail, Phone, Lock, ArrowRight, Building2 } from 'lucide-react';
 import { GoogleLoginButton } from './GoogleLoginButton';
+import { getDefaultDashboard } from '@/utils/roleRedirection';
 import { toast } from 'sonner';
 
 export const SignupForm = ({
@@ -58,12 +59,12 @@ export const SignupForm = ({
     if (!validateForm()) return;
 
     try {
-      await signup(formData);
+      const response = await signup(formData);
       if (onSuccess) {
         onSuccess();
       }
-       // Navigate to home since user is now logged in
-      navigate('/');
+      // Use role based redirection
+      navigate(getDefaultDashboard(formData.role), { replace: true });
     } catch (error) {
       console.error('Signup error:', error);
     }
@@ -177,7 +178,7 @@ export const SignupForm = ({
           </div>
         </div>
         <div className="mt-6">
-          <GoogleLoginButton onSuccess={() => navigate('/')} role={formData.role} />
+          <GoogleLoginButton onSuccess={() => navigate(getDefaultDashboard(formData.role), { replace: true })} role={formData.role} />
         </div>
       </div>
     </form >
