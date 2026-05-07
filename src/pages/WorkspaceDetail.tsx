@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 import MapLibreMap from "@/components/Map/MapLibreMap";
 import Header from "@/components/Header";
@@ -35,6 +35,12 @@ import { getMeetingRoomById } from "@/services/meetingRoom.service";
 import { getVirtualOfficePricing } from "@/utils/priceUtils";
 import { createPaymentOrder, verifyPayment } from "@/services/payment.service";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  clearCheckoutState,
+  getLoginRedirectUrl,
+  persistCheckoutState,
+  readCheckoutState,
+} from "@/utils/checkoutSession";
 
 
 type WorkspaceType = "virtual-office" | "coworking" | "on-demand";
@@ -53,7 +59,9 @@ const DEFAULT_PHOTOS = [
 const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+  const checkoutReturnTo = `${location.pathname}${location.search}${location.hash}`;
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -68,6 +76,37 @@ const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const persistCurrentCheckout = () => {
+    persistCheckoutState(
+      {
+        page: "workspace-detail",
+        path: checkoutReturnTo,
+        selectedPlan,
+        deskCount,
+        hours,
+        selectedDate: selectedDate.toISOString(),
+      },
+      checkoutReturnTo,
+    );
+  };
+
+  useEffect(() => {
+    const saved = readCheckoutState<{
+      page?: string;
+      path?: string;
+      selectedPlan?: string;
+      deskCount?: number;
+      hours?: number;
+      selectedDate?: string;
+    }>();
+
+    if (saved?.page !== "workspace-detail" || saved.path !== checkoutReturnTo) return;
+    if (saved.selectedPlan) setSelectedPlan(saved.selectedPlan);
+    if (typeof saved.deskCount === "number") setDeskCount(saved.deskCount);
+    if (typeof saved.hours === "number") setHours(saved.hours);
+    if (saved.selectedDate) setSelectedDate(new Date(saved.selectedDate));
+  }, [checkoutReturnTo]);
 
 
   useEffect(() => {
@@ -369,15 +408,10 @@ const getPhotos = () => {
     const handleBookNow = async () => {
       if (!user) {
         hotToast.error("Please login to book a meeting room");
-        navigate(`/login?redirect=${location.pathname}`);
-        return;
-      }
-
-      if (!user.kycVerified && user.role === "user") {
-        hotToast.error(
-          "Your KYC has not been approved yet. Please complete your KYC verification to book a space.",
-        );
-        navigate("/dashboard/kyc");
+        persistCurrentCheckout();
+        navigate(getLoginRedirectUrl(checkoutReturnTo), {
+          state: { redirectTo: checkoutReturnTo },
+        });
         return;
       }
 
@@ -408,6 +442,7 @@ const getPhotos = () => {
           devMode: true,
         });
 
+        clearCheckoutState();
         navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(data.name)}&planName=${encodeURIComponent(`${hours} Hour Meeting Room Booking`)}&amount=${totalPrice}`);
       } catch (error: any) {
         hotToast.error(error.message || "Booking failed");
@@ -504,35 +539,13 @@ const getPhotos = () => {
           </div>
         </div>
 
-        {user && !user.kycVerified && user.role === "user" ? (
-          <div className="bg-amber-50 border border-amber-100 rounded-[10px] p-4 mb-4">
-            <div className="flex items-start gap-3">
-              <ShieldCheck className="w-5 h-5 text-amber-600 mt-0.5" />
-              <div>
-                <p className="text-xs font-bold text-amber-900 mb-1">
-                  KYC Required
-                </p>
-                <p className="text-[11px] text-amber-800 leading-relaxed">
-                  Your KYC verification is mandatory before booking. Please complete it to continue.
-                </p>
-                <button
-                  onClick={() => navigate("/dashboard/kyc")}
-                  className="mt-2 text-[11px] font-bold text-amber-700 underline"
-                >
-                  Verify Now →
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={handleBookNow}
-            disabled={isProcessing}
-            className={`w-full font-bold py-3.5 rounded-[10px] transition-all duration-300 ${isProcessing ? "bg-muted text-muted-foreground cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
-          >
-            {isProcessing ? "Processing Payment..." : `Pay ₹${totalPrice}`}
-          </button>
-        )}
+        <button
+          onClick={handleBookNow}
+          disabled={isProcessing}
+          className={`w-full font-bold py-3.5 rounded-[10px] transition-all duration-300 ${isProcessing ? "bg-muted text-muted-foreground cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+        >
+          {isProcessing ? "Processing Payment..." : `Pay ₹${totalPrice}`}
+        </button>
         <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
           <ShieldCheck className="w-3.5 h-3.5" /> Secure Payment via Razorpay
         </div>
