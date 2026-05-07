@@ -9,7 +9,7 @@ import { VirtualOfficeItem } from '@/types/services';
 import { getVirtualOfficePricing } from '@/utils/priceUtils';
 import { SpaceDetailSkeleton } from '@/components/ui/skeleton-loaders';
 import ImageGalleryModal from '../ui/ImageGalleryModal';
-import { LeadCollectionModal } from '@/components/Booking/LeadCollectionModal';
+import { LeadCollectionModal } from '@/components/booking/LeadCollectionModal';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Default photos for spaces that don't have images

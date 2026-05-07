@@ -35,7 +35,7 @@ import { getMeetingRoomById } from "@/services/meetingRoom.service";
 import { getVirtualOfficePricing } from "@/utils/priceUtils";
 import { createPaymentOrder, verifyPayment } from "@/services/payment.service";
 import { useAuth } from "@/contexts/AuthContext";
-import { LeadCollectionModal } from "@/components/Booking/LeadCollectionModal";
+import { LeadCollectionModal } from "@/components/booking/LeadCollectionModal";
 
 
 type WorkspaceType = "virtual-office" | "coworking" | "on-demand";
