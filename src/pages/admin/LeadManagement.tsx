@@ -34,25 +34,36 @@ const LeadManagement = () => {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        const response = await axiosInstance.get("/api/leads");
-        const contacts = response?.data?.data || [];
-        processLeads(contacts);
-      } catch (error) {
-        console.error("Failed to fetch leads", error);
+  const fetchLeads = async (silent = false) => {
+    if (!silent) setLoading(true);
+    try {
+      const response = await axiosInstance.get("/api/leads");
+      const contacts = response?.data?.data || [];
+      processLeads(contacts);
+    } catch (error) {
+      console.error("Failed to fetch leads", error);
+      if (!silent) {
         toast({
           title: "Error",
           description: "Failed to load lead data.",
           variant: "destructive",
         });
-      } finally {
-        setLoading(false);
       }
-    };
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchLeads();
+  }, []);
+
+  // Polling for real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchLeads(true);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const processLeads = (contacts: any[]) => {

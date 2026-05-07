@@ -144,44 +144,52 @@ export default function Dashboard() {
     pendingBookings: 0,
   });
 
+  const loadDashboardData = async (silent = false) => {
+    if (!silent) setLoading(true);
+    try {
+      const [dashboardRes, spacesRes, requestsRes] = await Promise.all([
+        fetchPartnerDashboard(),
+        fetchAllPartnerSpaces(),
+        fetchPartnerActiveRequests(),
+      ]);
+
+      const clients: Client[] = dashboardRes?.data?.clients || [];
+      const spaces = spacesRes?.data || [];
+      const requests = requestsRes?.data || [];
+
+      // Calculate Revenue from deal values
+      const totalRevenue = clients.reduce(
+        (sum, c) => sum + (c.dealValue || 0),
+        0,
+      );
+      const formattedRevenue =
+        totalRevenue >= 100000
+          ? `₹${(totalRevenue / 100000).toFixed(1)}L`
+          : `₹${totalRevenue.toLocaleString()}`;
+
+      setMetrics({
+        activeSpaces: spaces.length || 0,
+        totalClients: clients.length || 0,
+        monthlyRevenue: formattedRevenue,
+        pendingBookings: requests.length || 0,
+      });
+    } catch (error) {
+      console.error("Failed to load dashboard data:", error);
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadDashboardData = async () => {
-      setLoading(true);
-      try {
-        const [dashboardRes, spacesRes, requestsRes] = await Promise.all([
-          fetchPartnerDashboard(),
-          fetchAllPartnerSpaces(),
-          fetchPartnerActiveRequests(),
-        ]);
-
-        const clients: Client[] = dashboardRes?.data?.clients || [];
-        const spaces = spacesRes?.data || [];
-        const requests = requestsRes?.data || [];
-
-        // Calculate Revenue from deal values
-        const totalRevenue = clients.reduce(
-          (sum, c) => sum + (c.dealValue || 0),
-          0,
-        );
-        const formattedRevenue =
-          totalRevenue >= 100000
-            ? `₹${(totalRevenue / 100000).toFixed(1)}L`
-            : `₹${totalRevenue.toLocaleString()}`;
-
-        setMetrics({
-          activeSpaces: spaces.length || 0,
-          totalClients: clients.length || 0,
-          monthlyRevenue: formattedRevenue,
-          pendingBookings: requests.length || 0,
-        });
-      } catch (error) {
-        console.error("Failed to load dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadDashboardData();
+  }, []);
+
+  // Polling for real-time stats
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadDashboardData(true);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {

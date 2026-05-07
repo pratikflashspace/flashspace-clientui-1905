@@ -62,9 +62,17 @@ export default function BookingDetailsModal({
           const partnerProfs = profiles.filter(p => p.isPartner);
 
           // Find the profile that matches the linked ID from the booking
-          const activeProfile = profiles.find(p => p._id === linkedProfileId) || bizProfs[0] || individualProf;
+          let activeProfile = profiles.find(p => p._id === linkedProfileId);
+          
+          // CRITICAL: If this is a business booking (VirtualOffice) and we don't have a specific business linked 
+          // (or it's linked to an individual profile), DEFAULT to the first business profile if available.
+          const isBusinessBooking = booking.type === "VirtualOffice" || booking.type === "virtual_office";
+          if (isBusinessBooking && (!activeProfile || activeProfile.kycType !== 'business') && bizProfs.length > 0) {
+            console.log("[BookingDetailsModal] Defaulting to first business profile instead of individual/none");
+            activeProfile = bizProfs[0];
+          }
 
-          setKycProfile(activeProfile);
+          setKycProfile(activeProfile || individualProf);
           setIndividualProfile(individualProf);
           setBusinessProfiles(bizProfs);
           setPartners(partnerProfs);
@@ -92,7 +100,10 @@ export default function BookingDetailsModal({
     const isUpdating = booking.partnerRequestStatus === 'submitted' || booking.partnerRequestStatus === 'in_review';
     const bookingId = (booking as any)._id || booking.id || booking.bookingNumber;
     const toastId = toast.loading(isUpdating ? "Updating booking request..." : "Sending booking request to space partner...");
+    
     const profileId = kycProfile?._id || (kycProfile as any)?.id;
+    console.log(`[BookingDetailsModal] Finishing with profileId: ${profileId}`, kycProfile);
+    
     const response = await userDashboardService.submitBookingRequest(bookingId, selectedPartners, profileId);
     if (response.success) {
       toast.success(isUpdating ? "Booking request updated" : "Booking request sent to space partner", { id: toastId });

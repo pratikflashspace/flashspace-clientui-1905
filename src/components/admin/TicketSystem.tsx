@@ -8,13 +8,12 @@ import {
   CheckCircle,
   Eye,
   RefreshCw,
-  Building2,
 } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TicketViewModal } from "@/components/modals/TicketViewModal";
 import { CreateTicketModal } from "@/components/modals/CreateTicketModal";
@@ -28,7 +27,6 @@ import {
   TicketStats,
 } from "@/services/admin.service";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUploadedFileUrl } from "@/utils/fileUrl";
 import { useSocket } from "@/contexts/SocketContext";
 import playNotificationSound from "@/utils/sound.util";
 
@@ -42,7 +40,6 @@ export default function TicketSystem() {
   );
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [typingUser, setTypingUser] = useState<string | null>(null);
 
 
   // Original states
@@ -52,6 +49,7 @@ export default function TicketSystem() {
   const [stats, setStats] = useState<TicketStats>({
     open: 0,
     in_progress: 0,
+    escalated: 0,
     resolved: 0,
     closed: 0,
     avgResolution: "4.2 hrs",
@@ -128,16 +126,6 @@ export default function TicketSystem() {
     return () => clearTimeout(timer);
   }, [activeTab, searchTerm]);
 
-  // Add 30-second polling to keep data fresh
-  useEffect(() => {
-    const pollInterval = setInterval(() => {
-      fetchTickets(false); // Fetch without showing global loading overlay
-      fetchStats();
-    }, 30000);
-
-    return () => clearInterval(pollInterval);
-  }, [activeTab, searchTerm]);
-
   useEffect(() => {
     if (!socket || !selectedTicket) return;
 
@@ -172,28 +160,12 @@ export default function TicketSystem() {
       }
     };
 
-    const handleTyping = (data: { ticketId: string; user: string }) => {
-      if (selectedTicket && data.ticketId === selectedTicket._id) {
-        setTypingUser(data.user);
-      }
-    };
-
-    const handleStopTyping = (data: { ticketId: string }) => {
-      if (selectedTicket && data.ticketId === selectedTicket._id) {
-        setTypingUser(null);
-      }
-    };
-
     socket.on("new_message", handleNewMessage);
     socket.on("ticket_updated", handleTicketUpdated);
-    socket.on("typing", handleTyping);
-    socket.on("stop_typing", handleStopTyping);
 
     return () => {
       socket.off("new_message", handleNewMessage);
       socket.off("ticket_updated", handleTicketUpdated);
-      socket.off("typing", handleTyping);
-      socket.off("stop_typing", handleStopTyping);
     };
   }, [socket, selectedTicket?._id]);
 
@@ -300,7 +272,25 @@ export default function TicketSystem() {
     }
   };
 
-
+  const handleEscalateTicket = async (ticketId: string) => {
+    try {
+      const response = await adminService.escalateTicket(ticketId);
+      if (response.success) {
+        toast({ title: "Success", description: "Ticket escalated!" });
+        fetchTickets();
+        if (selectedTicket?._id === ticketId) {
+          setSelectedTicket(response.data || null);
+        }
+      }
+    } catch (err: unknown) {
+      console.error("Failed to escalate ticket", err);
+      toast({
+        title: "Error",
+        description: "Failed to escalate ticket",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleCloseTicket = async (ticketId: string) => {
     try {
@@ -324,14 +314,13 @@ export default function TicketSystem() {
     }
   };
 
-  const handleReply = async (ticketId: string, data: any) => {
+  const handleReply = async (ticketId: string, message: string) => {
     try {
-      const response = await adminService.replyToTicket(ticketId, data);
+      const response = await adminService.replyToTicket(ticketId, message);
       if (response.success) {
         toast({ title: "Success", description: "Reply sent!" });
         setSelectedTicket(response.data || null);
         fetchTickets();
-        if (socket) socket.emit("stop_typing", { ticketId });
       }
     } catch (err: unknown) {
       console.error("Failed to send reply", err);
@@ -343,7 +332,22 @@ export default function TicketSystem() {
     }
   };
 
-
+  const getPriorityBadge = (priority: string = "medium") => {
+    switch (priority.toLowerCase()) {
+      case "high":
+        return <Badge variant="destructive">High</Badge>;
+      case "medium":
+        return (
+          <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">
+            Medium
+          </Badge>
+        );
+      case "low":
+        return <Badge variant="secondary">Low</Badge>;
+      default:
+        return <Badge variant="outline">{priority}</Badge>;
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -361,7 +365,13 @@ export default function TicketSystem() {
             In Progress
           </Badge>
         );
-
+      case "escalated":
+        return (
+          <Badge variant="destructive">
+            <AlertCircle className="w-3 h-3 mr-1" />
+            Escalated
+          </Badge>
+        );
       case "resolved":
         return (
           <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">
@@ -404,7 +414,9 @@ export default function TicketSystem() {
               <th className="text-left p-4 text-sm font-semibold text-foreground">
                 Category
               </th>
-
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Priority
+              </th>
               <th className="text-left p-4 text-sm font-semibold text-foreground">
                 Assignee
               </th>
@@ -435,63 +447,32 @@ export default function TicketSystem() {
                     </p>
                   </div>
                 </td>
-                <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8 ring-2 ring-background shadow-sm">
-                      {ticket.user?.profilePicture && (
-                        <AvatarImage src={getUploadedFileUrl(ticket.user.profilePicture)} alt={ticket.user.fullName} className="object-cover" />
-                      )}
-                      <AvatarFallback className="bg-primary/10 text-primary font-bold text-[10px]">
-                        {ticket.user?.fullName?.split(" ").map(n => n[0]).join("").toUpperCase() || "CL"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium text-foreground">
-                      {ticket.user?.fullName || "Unknown"}
-                    </span>
-                  </div>
+                <td className="p-4 text-sm text-muted-foreground">
+                  {ticket.user?.fullName || "Unknown"}
                 </td>
                 <td className="p-4">
                   <Badge variant="outline">
                     {formatCategory(ticket.category)}
                   </Badge>
                 </td>
-
+                <td className="p-4">{getPriorityBadge("medium")}</td>
                 <td className="p-4">
                   <div className="flex items-center gap-2">
-                    {ticket.bookingId ? (
-                      <>
-                        <div className="w-6 h-6 rounded-lg bg-green-100 flex items-center justify-center text-green-700">
-                          <Building2 className="w-3.5 h-3.5" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-foreground">
-                            {ticket.bookingId.spaceSnapshot?.name || "Linked Space"}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground uppercase tracking-tight">
-                            Space Assignee
-                          </span>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <Avatar className="w-6 h-6">
-                          {ticket.assignee?.profilePicture && (
-                            <AvatarImage src={getUploadedFileUrl(ticket.assignee.profilePicture)} alt={ticket.assignee.fullName} />
-                          )}
-                          <AvatarFallback className="text-[10px] bg-blue-100 text-blue-700 font-bold">
-                            {ticket.assignee?.fullName?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "AD"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-foreground">
-                            Admin
-                          </span>
-                          <span className="text-[10px] text-muted-foreground uppercase tracking-tight">
-                            Direct Support
-                          </span>
-                        </div>
-                      </>
-                    )}
+                    <Avatar className="w-6 h-6">
+                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                        {ticket.assignee?.fullName
+                          ? ticket.assignee.fullName.substring(0, 2).toUpperCase()
+                          : "UA"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-sm text-muted-foreground">
+                        {ticket.assignee?.fullName || "Unassigned"}
+                      </span>
+                      {ticket.assignee?.role && (
+                        <span className="text-xs text-muted-foreground/70">{ticket.assignee.role}</span>
+                      )}
+                    </div>
                   </div>
                 </td>
                 <td className="p-4 text-sm text-muted-foreground">
@@ -537,19 +518,9 @@ export default function TicketSystem() {
             <div className="grid grid-cols-2 gap-4 py-2 border-y border-border/50">
               <div>
                 <p className="text-[10px] text-muted-foreground uppercase font-medium">Client</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <Avatar className="h-5 w-5">
-                    {ticket.user?.profilePicture && (
-                      <AvatarImage src={getUploadedFileUrl(ticket.user.profilePicture)} alt={ticket.user.fullName} />
-                    )}
-                    <AvatarFallback className="text-[8px] bg-primary/10 text-primary font-bold">
-                      {ticket.user?.fullName?.split(" ").map(n => n[0]).join("").toUpperCase() || "CL"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {ticket.user?.fullName || "Unknown"}
-                  </p>
-                </div>
+                <p className="text-sm font-medium text-foreground truncate">
+                  {ticket.user?.fullName || "Unknown"}
+                </p>
               </div>
               <div>
                 <p className="text-[10px] text-muted-foreground uppercase font-medium">Category</p>
@@ -563,36 +534,22 @@ export default function TicketSystem() {
 
             <div className="flex items-center justify-between pt-1">
               <div className="flex items-center gap-2">
-                {ticket.bookingId ? (
-                  <>
-                    <div className="w-6 h-6 rounded-lg bg-green-100 flex items-center justify-center text-green-700 border border-green-200">
-                      <Building2 className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="flex flex-col">
-                      <p className="text-[10px] text-muted-foreground leading-none">Assignee</p>
-                      <span className="text-xs font-bold text-foreground">
-                        {ticket.bookingId.spaceSnapshot?.name || "Linked Space"}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <Avatar className="w-6 h-6 border border-blue-100">
-                      {ticket.assignee?.profilePicture && (
-                        <AvatarImage src={getUploadedFileUrl(ticket.assignee.profilePicture)} alt={ticket.assignee.fullName} />
-                      )}
-                      <AvatarFallback className="text-[10px] bg-blue-100 text-blue-700 font-bold">
-                        {ticket.assignee?.fullName?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "AD"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <p className="text-[10px] text-muted-foreground leading-none">Assignee</p>
-                      <span className="text-xs font-bold text-foreground">
-                        Admin
-                      </span>
-                    </div>
-                  </>
-                )}
+                <Avatar className="w-6 h-6 border border-border">
+                  <AvatarFallback className="text-[10px] bg-primary/10 text-primary font-bold">
+                    {ticket.assignee?.fullName
+                      ? ticket.assignee.fullName.substring(0, 2).toUpperCase()
+                      : "UA"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                  <p className="text-[10px] text-muted-foreground leading-none">Assignee</p>
+                  <span className="text-xs font-medium text-foreground">
+                    {ticket.assignee?.fullName || "Unassigned"}
+                  </span>
+                  {ticket.assignee?.role && (
+                    <span className="text-[10px] text-muted-foreground/70">{ticket.assignee.role}</span>
+                  )}
+                </div>
               </div>
               <div className="text-right">
                 <p className="text-[10px] text-muted-foreground leading-none">Created</p>
@@ -660,7 +617,7 @@ export default function TicketSystem() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 mb-8">
         <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
           <p className="text-2xl font-extrabold text-foreground">
             {stats.open}
@@ -673,7 +630,12 @@ export default function TicketSystem() {
           </p>
           <p className="text-sm text-muted-foreground">In Progress</p>
         </div>
-
+        <div className="bg-background border border-border rounded-xl p-5 hover:border-red-200 transition-colors">
+          <p className="text-2xl font-extrabold text-red-600">
+            {stats.escalated}
+          </p>
+          <p className="text-sm text-muted-foreground">Escalated</p>
+        </div>
         <div className="bg-background border border-border rounded-xl p-5 hover:border-green-200 transition-colors">
           <p className="text-2xl font-extrabold text-green-600">
             {stats.resolvedThisMonth}
@@ -713,7 +675,9 @@ export default function TicketSystem() {
             <TabsTrigger value="in_progress" className="px-4 py-2 text-sm text-nowrap">
               In Progress ({stats.in_progress})
             </TabsTrigger>
-
+            <TabsTrigger value="escalated" className="px-4 py-2 text-sm">
+              Escalated ({stats.escalated})
+            </TabsTrigger>
             <TabsTrigger value="resolved" className="px-4 py-2 text-sm">Resolved</TabsTrigger>
           </TabsList>
         </div>
@@ -722,7 +686,7 @@ export default function TicketSystem() {
         <TabsContent value="all">{renderTicketList()}</TabsContent>
         <TabsContent value="open">{renderTicketList()}</TabsContent>
         <TabsContent value="in_progress">{renderTicketList()}</TabsContent>
-
+        <TabsContent value="escalated">{renderTicketList()}</TabsContent>
         <TabsContent value="resolved">{renderTicketList()}</TabsContent>
       </Tabs>
 
@@ -732,10 +696,10 @@ export default function TicketSystem() {
         onOpenChange={setModalOpen}
         handleAssignTicket={handleAssignTicket}
         handleResolveTicket={handleResolveTicket}
+        handleEscalateTicket={handleEscalateTicket}
         handleCloseTicket={handleCloseTicket}
         handleReply={handleReply}
         staffMembers={staffMembers}
-        typingUser={typingUser}
       />
 
       <CreateTicketModal

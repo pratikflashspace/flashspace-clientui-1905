@@ -168,8 +168,8 @@ export default function BookingRequests() {
   const [uploadTarget, setUploadTarget] = useState<{ bookingId: string; type: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const loadRequests = async () => {
-    setLoading(true);
+  const loadRequests = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const response = await fetchPartnerBookingRequests();
       const rows = response?.success ? response.data || [] : [];
@@ -178,12 +178,20 @@ export default function BookingRequests() {
       console.error("Failed to load booking requests:", err);
       setRequests([]);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     loadRequests();
+  }, []);
+
+  // Polling for real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadRequests(true);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const filtered = useMemo(() => {

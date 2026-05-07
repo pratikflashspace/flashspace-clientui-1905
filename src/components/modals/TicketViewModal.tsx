@@ -86,6 +86,12 @@ export const TicketViewModal = ({
       await handleReply(ticket._id, formData);
       setReplyMessage("");
       setSelectedFiles([]);
+      
+      // Clear typing indicator immediately after sending
+      if (socket && ticket?._id) {
+        socket.emit('stop_typing', { ticketId: ticket._id });
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      }
     } finally {
       setSending(false);
     }

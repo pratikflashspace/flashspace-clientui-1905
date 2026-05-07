@@ -64,10 +64,29 @@ export default function Tickets() {
     };
 
     socket.on("partner_new_ticket", handleNewTicket);
+
+    const handleTicketUpdate = (data: any) => {
+      console.log("Ticket updated socket event received:", data);
+      fetchTickets(true); // Silent refresh
+    };
+
+    socket.on("ticket_updated", handleTicketUpdate);
+
     return () => {
       socket.off("partner_new_ticket", handleNewTicket);
+      socket.off("ticket_updated", handleTicketUpdate);
     };
-  }, [socket]);
+  }, [socket, fetchTickets]);
+
+  // Add polling for data synchronization
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Polling tickets for space partner...");
+      fetchTickets(true); // Silent refresh every 5 seconds
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [fetchTickets]);
 
   const categories = useMemo(() => {
     const cats = new Set<string>();

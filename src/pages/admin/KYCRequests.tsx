@@ -171,6 +171,15 @@ export default function KYCRequests() {
     fetchPartnerKYCRequests();
   }, []);
 
+  // Polling for real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchKYCRequests(true);
+      fetchPartnerKYCRequests(undefined, true);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Close modal on ESC key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -262,13 +271,11 @@ export default function KYCRequests() {
     showBusinessInfoModal,
   ]);
 
-  const fetchKYCRequests = async () => {
-    setLoading(true);
+  const fetchKYCRequests = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const response = await adminService.getPendingKYC(true);
-      // console.log("KYC Response:", response);
       if (response.success && response.data) {
-        // Deduplicate by _id
         const uniqueRequests = response.data.filter(
           (req: KYCRequest, index: number, self: KYCRequest[]) =>
             index === self.findIndex((r) => r._id === req._id),
@@ -277,31 +284,29 @@ export default function KYCRequests() {
       }
     } catch (error) {
       console.error("Failed to fetch KYC requests", error);
-      toast.error("Failed to fetch KYC requests");
+      if (!silent) toast.error("Failed to fetch KYC requests");
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
-  const fetchPartnerKYCRequests = async (userId?: string) => {
-    setLoadingPartnerRequests(true);
-    // console.log("Fetching partner requests for userId:", userId);
+  const fetchPartnerKYCRequests = async (userId?: string, silent = false) => {
+    if (!silent) setLoadingPartnerRequests(true);
     try {
       const params: any = { limit: 100 };
       const idToFetch = userId || selectedUserForPartners?.id;
       if (idToFetch) {
         params.userId = idToFetch;
       }
-      // console.log("API params:", params);
       const response = await adminService.getAllPartnerKYC(params);
       if (response.success && response.data) {
         setPartnerRequests(response.data.partners || []);
       }
     } catch (error) {
       console.error("Failed to fetch partner KYC requests", error);
-      toast.error("Failed to fetch partner KYC requests");
+      if (!silent) toast.error("Failed to fetch partner KYC requests");
     } finally {
-      setLoadingPartnerRequests(false);
+      if (!silent) setLoadingPartnerRequests(false);
     }
   };
 

@@ -67,8 +67,11 @@ const TrackProgress = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const fetchData = async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
+  const fetchData = async (isRefresh = false, silent = false) => {
+    if (!silent) {
+      if (isRefresh) setRefreshing(true);
+      else setLoading(true);
+    }
     try {
       const response = await adminService.getTrackProgressData();
       if (response.success && response.data) {
@@ -76,19 +79,31 @@ const TrackProgress = () => {
       }
     } catch (error) {
       console.error("Failed to fetch track progress data", error);
-      toast({
-        title: "Error",
-        description: "Could not load progress data. Please try again.",
-        variant: "destructive",
-      });
+      if (!silent) {
+        toast({
+          title: "Error",
+          description: "Could not load progress data. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (!silent) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   };
 
   useEffect(() => {
     void fetchData();
+  }, []);
+
+  // Polling for real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchData(false, true);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const filteredData = useMemo(() => {

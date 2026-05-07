@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Search, Plus, Eye, Loader2, ArrowLeft, CheckCircle2, Send, Headphones, Paperclip, X, FileText } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Search, Plus, Eye, Loader2, ArrowLeft, CheckCircle2, Send, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { affiliatePortalService } from "@/services/affiliatePortal.service";
@@ -26,11 +26,6 @@ const SupportTickets = () => {
 
     // Reply State
     const [replyMessage, setReplyMessage] = useState("");
-    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-    const [typingUser, setTypingUser] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const scrollRef = useRef<HTMLDivElement>(null);
 
     const fetchTickets = async () => {
         setLoading(true);
@@ -59,12 +54,6 @@ const SupportTickets = () => {
     useEffect(() => {
         fetchTickets();
     }, []);
-
-    useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        }
-    }, [selectedTicket?.messages]);
 
     // Socket listener for real-time ticket updates and messages
     useEffect(() => {
@@ -97,28 +86,12 @@ const SupportTickets = () => {
             }
         };
 
-        const handleTyping = (data: { ticketId: string; user: string }) => {
-            if (data.ticketId === selectedTicket._id) {
-                setTypingUser(data.user);
-            }
-        };
-
-        const handleStopTyping = (data: { ticketId: string }) => {
-            if (data.ticketId === selectedTicket._id) {
-                setTypingUser(null);
-            }
-        };
-
         socket.on('new_message', handleNewMessage);
         socket.on('ticket_updated', handleTicketUpdated);
-        socket.on('typing', handleTyping);
-        socket.on('stop_typing', handleStopTyping);
 
         return () => {
             socket.off('new_message', handleNewMessage);
             socket.off('ticket_updated', handleTicketUpdated);
-            socket.off('typing', handleTyping);
-            socket.off('stop_typing', handleStopTyping);
         };
     }, [socket, selectedTicket?._id]);
 
@@ -152,22 +125,14 @@ const SupportTickets = () => {
     };
 
     const handleReply = async () => {
-        if (!selectedTicket || (!replyMessage.trim() && selectedFiles.length === 0)) return;
+        if (!selectedTicket || !replyMessage.trim()) return;
         setSubmitting(true);
         try {
-            const formData = new FormData();
-            formData.append('message', replyMessage.trim());
-            selectedFiles.forEach(file => {
-                formData.append('attachments', file);
-            });
-
-            const response = await affiliatePortalService.replyToSupportTicket(selectedTicket._id, formData);
+            const response = await affiliatePortalService.replyToSupportTicket(selectedTicket._id, replyMessage);
             if (response.success && response.data) {
                 setSelectedTicket(response.data);
                 setReplyMessage("");
-                setSelectedFiles([]);
                 fetchTickets();
-                if (socket) socket.emit('stop_typing', { ticketId: selectedTicket._id });
             } else {
                 toast.error(response.message || "Failed to send reply");
             }
@@ -177,33 +142,6 @@ const SupportTickets = () => {
         } finally {
             setSubmitting(false);
         }
-    };
-
-    const handleInputChange = (val: string) => {
-        setReplyMessage(val);
-        if (!socket || !selectedTicket) return;
-
-        socket.emit('typing', { ticketId: selectedTicket._id, user: 'Affiliate' });
-
-        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-        typingTimeoutRef.current = setTimeout(() => {
-            socket.emit('stop_typing', { ticketId: selectedTicket._id });
-        }, 3000);
-    };
-
-    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const files = Array.from(e.target.files);
-            if (selectedFiles.length + files.length > 5) {
-                toast.error('Maximum 5 files allowed');
-                return;
-            }
-            setSelectedFiles(prev => [...prev, ...files]);
-        }
-    };
-
-    const removeFile = (index: number) => {
-        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     };
 
     const viewTicketDetails = async (ticketId: string) => {
@@ -278,10 +216,7 @@ const SupportTickets = () => {
                 </div>
 
                 {/* Messages Timeline */}
-                <div 
-                    ref={scrollRef}
-                    className="space-y-6 mb-8 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar scroll-smooth"
-                >
+                <div className="space-y-6 mb-8 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                     {selectedTicket.messages?.map((msg, idx) => {
                         const isUser = msg.sender === "user" || msg.sender === "affiliate";
                         return (
@@ -296,106 +231,29 @@ const SupportTickets = () => {
                                         </span>
                                     </div>
                                     <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{msg.message}</p>
-                                    
-                                    {/* Attachments rendering */}
-                                    {msg.attachments && msg.attachments.length > 0 && (
-                                        <div className="mt-3 flex flex-wrap gap-2">
-                                            {msg.attachments.map((url: string, i: number) => {
-                                                const isImage = url.match(/\.(jpg|jpeg|png|gif)$/i);
-                                                return (
-                                                    <a 
-                                                        key={i} 
-                                                        href={`${import.meta.env.VITE_API_URL || ''}${url}`} 
-                                                        target="_blank" 
-                                                        rel="noopener noreferrer"
-                                                        className="block group/attach"
-                                                    >
-                                                        {isImage ? (
-                                                            <img 
-                                                                src={`${import.meta.env.VITE_API_URL || ''}${url}`} 
-                                                                alt="attachment" 
-                                                                className="w-20 h-20 object-cover rounded-lg border border-gray-100 shadow-sm transition-transform group-hover/attach:scale-105" 
-                                                            />
-                                                        ) : (
-                                                            <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm p-2 rounded-lg border border-gray-100 text-[10px] font-bold">
-                                                                <FileText className="w-3 h-3 text-[#5bb09c]" /> Doc {i+1}
-                                                            </div>
-                                                        )}
-                                                    </a>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         );
                     })}
-
-                    {typingUser && (
-                        <div className="flex flex-col items-start gap-1 mt-2 animate-in fade-in slide-in-from-left-2 duration-300">
-                            <div className="bg-white border border-[#5bb09c]/10 px-4 py-2.5 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-2">
-                                <div className="flex gap-1">
-                                    <div className="w-1.5 h-1.5 bg-[#5bb09c] rounded-full" style={{ animation: 'typing-bounce 1s infinite' }} />
-                                    <div className="w-1.5 h-1.5 bg-[#5bb09c] rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.2s' }} />
-                                    <div className="w-1.5 h-1.5 bg-[#5bb09c] rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.4s' }} />
-                                </div>
-                                <span className="text-[10px] font-black text-[#5bb09c]/60 uppercase tracking-widest">
-                                    {typingUser} is typing...
-                                </span>
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 {/* Reply Interface */}
                 {selectedTicket.status !== "closed" && selectedTicket.status !== "resolved" && (
-                    <div className="space-y-4">
-                        {selectedFiles.length > 0 && (
-                            <div className="flex flex-wrap gap-2 px-2">
-                                {selectedFiles.map((file, i) => (
-                                    <div key={i} className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-[11px] font-bold text-gray-600 border border-gray-200">
-                                        <span className="max-w-[150px] truncate">{file.name}</span>
-                                        <X className="w-3 h-3 cursor-pointer text-gray-400 hover:text-red-500" onClick={() => removeFile(i)} />
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        <div className="bg-[#f9fafb] rounded-[1.5rem] p-2 ring-1 ring-black/5 flex items-end gap-2 focus-within:ring-2 focus-within:ring-[#2d5a4c]/20 focus-within:bg-white transition-all relative">
-                            <input 
-                                type="file" 
-                                ref={fileInputRef} 
-                                onChange={handleFileSelect} 
-                                multiple 
-                                hidden 
-                                accept="image/*,.pdf" 
-                            />
-                            <button 
-                                onClick={() => fileInputRef.current?.click()}
-                                className="p-3 text-gray-400 hover:text-[#2d5a4c] transition-colors"
-                            >
-                                <Paperclip className="w-5 h-5" />
-                            </button>
-                            <textarea
-                                value={replyMessage}
-                                onChange={(e) => handleInputChange(e.target.value)}
-                                placeholder="Type your reply here..."
-                                rows={1}
-                                className="flex-1 max-h-32 min-h-[44px] bg-transparent resize-none px-2 py-3 text-sm font-medium focus:outline-none placeholder:text-gray-400"
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleReply();
-                                    }
-                                }}
-                            />
-                            <button 
-                                onClick={handleReply}
-                                disabled={submitting || (!replyMessage.trim() && selectedFiles.length === 0)}
-                                className="h-11 w-11 bg-[#2d5a4c] text-white rounded-xl flex items-center justify-center shadow-lg shadow-[#2d5a4c]/20 disabled:opacity-50 transition-all hover:scale-105 active:scale-95"
-                            >
-                                {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-                            </button>
-                        </div>
+                    <div className="bg-[#f9fafb] rounded-[1.5rem] p-2 ring-1 ring-black/5 flex items-end gap-2 focus-within:ring-2 focus-within:ring-[#2d5a4c]/20 focus-within:bg-white transition-all">
+                        <textarea
+                            value={replyMessage}
+                            onChange={(e) => setReplyMessage(e.target.value)}
+                            placeholder="Type your reply here..."
+                            rows={1}
+                            className="flex-1 max-h-32 min-h-[44px] bg-transparent resize-none px-4 py-3 text-sm font-medium focus:outline-none placeholder:text-gray-400"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleReply();
+                                }
+                            }}
+                        />
+                        {/* ...other reply UI elements if any... */}
                     </div>
                 )}
             </div>

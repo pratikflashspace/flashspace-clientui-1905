@@ -250,7 +250,10 @@ export default function ChatSupport() {
             if (res.data.success) {
                 setMessageInput('');
                 setSelectedFiles([]);
-                if (socket) socket.emit('stop_typing', { ticketId: activeTicketId });
+                if (socket) {
+                    socket.emit('stop_typing', { ticketId: activeTicketId });
+                    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+                }
             }
         } catch (e) {
             toast.error('Failed to send message');

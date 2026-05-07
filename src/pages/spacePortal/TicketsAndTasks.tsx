@@ -99,8 +99,8 @@ export default function TicketsAndTasks() {
     }
   }, [activeTicket?.messages]);
 
-  const loadData = async () => {
-    setLoading(true);
+  const loadData = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const ticketRes = await partnerTicketService.getPartnerTickets(1, 100);
       if (ticketRes.success && ticketRes.data) {
@@ -114,13 +114,15 @@ export default function TicketsAndTasks() {
       }
     } catch (error) {
       console.error("Failed to fetch data", error);
-      toast({
-        title: "Error",
-        description: "Failed to load tickets and tasks",
-        variant: "destructive",
-      });
+      if (!silent) {
+        toast({
+          title: "Error",
+          description: "Failed to load tickets and tasks",
+          variant: "destructive",
+        });
+      }
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -128,7 +130,35 @@ export default function TicketsAndTasks() {
     loadData();
   }, []);
 
-  // Socket listeners
+  // Add polling for data synchronization
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Polling tickets and tasks for space partner...");
+      loadData(true); // Silent refresh every 5 seconds
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Socket listeners for list updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUpdate = () => {
+      console.log("Real-time update received via socket");
+      loadData(true);
+    };
+
+    socket.on("ticket_updated", handleUpdate);
+    socket.on("partner_new_ticket", handleUpdate);
+
+    return () => {
+      socket.off("ticket_updated", handleUpdate);
+      socket.off("partner_new_ticket", handleUpdate);
+    };
+  }, [socket]);
+
+  // Socket listeners for active chat
   useEffect(() => {
     if (!socket || !activeTicket) return;
 
@@ -224,7 +254,10 @@ export default function TicketsAndTasks() {
         // Clear inputs
         setMessageInput("");
         setSelectedFiles([]);
-        if (socket) socket.emit("stop_typing", { ticketId: activeTicket._id });
+        if (socket) {
+          socket.emit("stop_typing", { ticketId: activeTicket._id });
+          if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        }
         
         // Refresh ticket to get official message state
         loadData();
