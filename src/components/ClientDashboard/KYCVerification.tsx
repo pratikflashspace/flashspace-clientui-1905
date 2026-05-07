@@ -271,6 +271,7 @@ export default function KYCVerification() {
                 partners: [],
               },
               overallStatus: pData.status,
+              submittedAt: pData.submittedAt,
             };
             response = {
               success: true,
@@ -416,6 +417,7 @@ export default function KYCVerification() {
                     phone: p.phone,
                   },
                   overallStatus: p.status,
+                  submittedAt: p.submittedAt,
                 }));
                 setPartnerProfiles(mappedPartners);
               } else {
@@ -1065,6 +1067,8 @@ export default function KYCVerification() {
   const overallStatus = getOverallStatusConfig(
     kycData?.overallStatus || "not_started",
   );
+  const isKYCSubmittedForReview =
+    kycData?.overallStatus === "pending" && Boolean(kycData?.submittedAt);
   const completionPercentage = getCompletionPercentage();
 
   // New DASHBOARD VIEW Logic
@@ -2342,7 +2346,7 @@ export default function KYCVerification() {
                   {/* Show warning if not ready to submit */}
                   {!isReadyForSubmission() &&
                     kycData?.overallStatus !== "approved" &&
-                    kycData?.overallStatus !== "pending" && (
+                    !isKYCSubmittedForReview && (
                       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                         <p className="text-sm text-amber-800 font-medium flex items-start gap-2">
                           <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -2376,7 +2380,7 @@ export default function KYCVerification() {
                   {/* Show success when ready to submit */}
                   {isReadyForSubmission() &&
                     kycData?.overallStatus !== "approved" &&
-                    kycData?.overallStatus !== "pending" && (
+                    !isKYCSubmittedForReview && (
                       <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                         <p className="text-sm text-green-800 font-medium flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4" /> All
@@ -2405,7 +2409,7 @@ export default function KYCVerification() {
                         handleLinkBooking(profileId!);
                       } else if (
                         kycData?.overallStatus !== "approved" &&
-                        kycData?.overallStatus !== "pending"
+                        !isKYCSubmittedForReview
                       ) {
                         if (!isReadyForSubmission()) {
                           toast.error(
@@ -2445,17 +2449,17 @@ export default function KYCVerification() {
                       (!linkBookingId &&
                         kycData?.overallStatus === "approved") ||
                       (!linkBookingId &&
-                        kycData?.overallStatus === "pending") ||
+                        isKYCSubmittedForReview) ||
                       (!isConfirmed &&
                         kycData?.overallStatus !== "approved" &&
-                        kycData?.overallStatus !== "pending") ||
+                        !isKYCSubmittedForReview) ||
                       (!linkBookingId &&
                         !isReadyForSubmission() &&
                         kycData?.overallStatus !== "approved" &&
-                        kycData?.overallStatus !== "pending") ||
+                        !isKYCSubmittedForReview) ||
                       (!linkBookingId &&
                         kycData?.overallStatus !== "approved" &&
-                        kycData?.overallStatus !== "pending" &&
+                        !isKYCSubmittedForReview &&
                         !isConfirmed)
                     }
                     className="w-full py-3 bg-[#35503F] text-[#FEF8C3] rounded-xl font-semibold hover:bg-[#35503F]/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -2470,7 +2474,7 @@ export default function KYCVerification() {
                       "Use for Booking"
                     ) : kycData?.overallStatus === "approved" ? (
                       "Already Verified"
-                    ) : kycData?.overallStatus === "pending" ? (
+                    ) : isKYCSubmittedForReview ? (
                       "Under Review"
                     ) : (
                       "Submit for Verification"

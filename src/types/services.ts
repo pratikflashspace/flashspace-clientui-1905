@@ -465,6 +465,7 @@ export interface KYCData {
   isPartner?: boolean;
   partnerCount?: number;
   progress: number;
+  submittedAt?: string;
   personalInfo?: PersonalInfo;
   businessInfo?: BusinessInfo;
   documents?: KYCDocument[];
