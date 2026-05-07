@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, Wifi, Coffee, Printer, Monitor, Shield, Calendar, ChevronLeft, ChevronRight, ArrowLeft, Users, Clock } from 'lucide-react';
 import Header from "@/components/Header";
@@ -7,6 +7,8 @@ import { getCoworkingSpaceById } from '@/services/coworkingSpace.service';
 import { CoworkingSpaceItem } from '@/types/services';
 import { SpaceDetailSkeleton } from '@/components/ui/skeleton-loaders';
 import ImageGalleryModal from '../ui/ImageGalleryModal';
+import { LeadCollectionModal } from '@/components/Booking/LeadCollectionModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Default photos for spaces that don't have images
 const DEFAULT_PHOTOS = [
@@ -19,6 +21,7 @@ const DEFAULT_PHOTOS = [
 const CoworkingSpaceComponent = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   // State for API data
   const [spaceDetails, setSpaceDetails] = useState<CoworkingSpaceItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,6 +33,8 @@ const CoworkingSpaceComponent = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
+  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [pendingBookingAction, setPendingBookingAction] = useState<(() => void) | null>(null);
 
   // Fetch space details from API
   useEffect(() => {
@@ -104,11 +109,13 @@ const CoworkingSpaceComponent = () => {
     if (!spaceDetails) return;
     if (spaceDetails.availability?.toLowerCase() === 'unavailable') return;
 
-    // Navigate to booking page with params
-    // SpaceComponent sends ?plan=...
-    // Here we send deskCount and date
-    const dateStr = selectedDate.toISOString();
-    navigate(`/booking/${spaceDetails._id}?desks=${deskCount}&date=${dateStr}&type=coworking&direct=true`);
+    const executeBooking = () => {
+      const dateStr = selectedDate.toISOString();
+      navigate(`/booking/${spaceDetails._id}?desks=${deskCount}&date=${dateStr}&type=coworking&direct=true`);
+    };
+
+    setPendingBookingAction(() => executeBooking);
+    setShowLeadModal(true);
   };
 
   // Loading State - Show Skeleton
@@ -465,6 +472,18 @@ const CoworkingSpaceComponent = () => {
         onClose={() => setIsGalleryOpen(false)}
         images={photos}
         initialIndex={galleryInitialIndex}
+      />
+      <LeadCollectionModal
+        isOpen={showLeadModal}
+        onClose={() => setShowLeadModal(false)}
+        onSuccess={() => {
+          setShowLeadModal(false);
+          if (pendingBookingAction) {
+            pendingBookingAction();
+          }
+        }}
+        spaceId={spaceDetails._id}
+        spaceName={spaceDetails.name || "Selected Space"}
       />
     </div>
   );

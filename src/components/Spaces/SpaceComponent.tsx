@@ -9,6 +9,8 @@ import { VirtualOfficeItem } from '@/types/services';
 import { getVirtualOfficePricing } from '@/utils/priceUtils';
 import { SpaceDetailSkeleton } from '@/components/ui/skeleton-loaders';
 import ImageGalleryModal from '../ui/ImageGalleryModal';
+import { LeadCollectionModal } from '@/components/Booking/LeadCollectionModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Default photos for spaces that don't have images
 const DEFAULT_PHOTOS = [
@@ -21,6 +23,7 @@ const DEFAULT_PHOTOS = [
 const SpaceComponent = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   // State for API data
   const [spaceDetails, setSpaceDetails] = useState<VirtualOfficeItem | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -31,6 +34,8 @@ const SpaceComponent = () => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [pendingBookingAction, setPendingBookingAction] = useState<(() => void) | null>(null);
 
   // Handlers for Mobile Carousel
   const nextPhoto = (e: React.MouseEvent) => {
@@ -120,7 +125,13 @@ const SpaceComponent = () => {
   const handleBookNow = () => {
     if (!spaceDetails || !pricing) return;
     if (spaceDetails.availability?.toLowerCase() === 'unavailable') return;
-    navigate(`/booking/${spaceDetails._id}?plan=${selectedPlan}`);
+    
+    const executeBooking = () => {
+      navigate(`/booking/${spaceDetails._id}?plan=${selectedPlan}`);
+    };
+
+    setPendingBookingAction(() => executeBooking);
+    setShowLeadModal(true);
   };
 
   // Loading State - Show Skeleton
@@ -440,6 +451,18 @@ const SpaceComponent = () => {
       onClose={() => setIsGalleryOpen(false)}
       images={getPhotos()}
       initialIndex={galleryInitialIndex}
+    />
+    <LeadCollectionModal
+      isOpen={showLeadModal}
+      onClose={() => setShowLeadModal(false)}
+      onSuccess={() => {
+        setShowLeadModal(false);
+        if (pendingBookingAction) {
+          pendingBookingAction();
+        }
+      }}
+      spaceId={spaceDetails._id}
+      spaceName={spaceDetails.name || "Selected Space"}
     />
   </div>
   );

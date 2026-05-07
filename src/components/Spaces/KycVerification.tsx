@@ -1970,13 +1970,16 @@ export default function KYCVerification() {
                           <FileText className="w-5 h-5 text-primary" />
                           <span className="font-bold text-foreground">
                             Documents (
-                            {kycData?.documents?.filter(
-                              (d) =>
-                                d.type !== "video_kyc" &&
-                                (d.status === "approved" ||
-                                  d.status === "pending"),
-                            ).length || 0}
-                            /{requiredDocTypes.filter((d) => d.required).length}{" "}
+                            {(() => {
+                              const uploaded = kycData?.documents?.filter(
+                                (d) =>
+                                  d.type !== "video_kyc" &&
+                                  (d.status === "approved" ||
+                                    d.status === "pending"),
+                              ).length || 0;
+                              const required = requiredDocTypes.filter((d) => d.required).length;
+                              return `${uploaded}/${Math.max(uploaded, required)}`;
+                            })()}{" "}
                             uploaded)
                           </span>
                         </div>
