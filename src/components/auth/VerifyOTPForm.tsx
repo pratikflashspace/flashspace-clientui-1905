@@ -5,11 +5,12 @@ import { authService } from '@/services/auth.service';
 import { Button } from '@/components/ui/button';
 import { Loader2, Mail, ShieldCheck, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { getDefaultDashboard } from '@/utils/roleRedirection';
 
 export const VerifyOTPForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { verifyOTP, isLoading } = useAuth();
+  const { verifyOTP, isLoading, user } = useAuth();
   const { toast } = useToast();
   
   const [email, setEmail] = useState(searchParams.get('email') || '');
@@ -17,6 +18,12 @@ export const VerifyOTPForm = () => {
   const [error, setError] = useState('');
   const [resending, setResending] = useState(false);
   const [countdown, setCountdown] = useState(0);
+
+  useEffect(() => {
+    if (!isLoading && user && user.isEmailVerified) {
+       navigate(getDefaultDashboard(user.role), { replace: true });
+    }
+  }, [isLoading, user, navigate]);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -41,7 +48,7 @@ export const VerifyOTPForm = () => {
 
     try {
       await verifyOTP(email, otp);
-      navigate('/');
+      // user object will be updated in AuthContext by verifyOTP
     } catch (error) {
       console.error('OTP verification error:', error);
     }

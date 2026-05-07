@@ -4,9 +4,10 @@ import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { isCheckoutReturnPath } from "@/utils/checkoutSession";
+import { getDefaultDashboard } from "@/utils/roleRedirection";
 
 const Login = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -18,13 +19,20 @@ const Login = () => {
     searchParams.get("redirectTo") ||
     searchParams.get("redirect") ||
     "/";
+  
+  const isDefaultRedirect = requestedRedirect === "/";
+  
   const redirectTo = isCheckoutReturnPath(requestedRedirect)
     ? requestedRedirect
-    : "/";
+    : requestedRedirect;
 
   const handleLoginSuccess = useCallback(() => {
-    navigate(redirectTo, { replace: true });
-  }, [navigate, redirectTo]);
+    if (isDefaultRedirect && user) {
+      navigate(getDefaultDashboard(user.role), { replace: true });
+    } else {
+      navigate(redirectTo, { replace: true });
+    }
+  }, [navigate, redirectTo, isDefaultRedirect, user]);
 
   if (isLoading) {
     return (
@@ -34,8 +42,9 @@ const Login = () => {
     );
   }
 
-  if (isAuthenticated) {
-    return <Navigate to={redirectTo} replace />;
+  if (isAuthenticated && user) {
+    const finalDest = isDefaultRedirect ? getDefaultDashboard(user.role) : redirectTo;
+    return <Navigate to={finalDest} replace />;
   }
 
   return (

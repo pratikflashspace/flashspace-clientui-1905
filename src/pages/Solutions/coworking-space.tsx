@@ -150,7 +150,12 @@ const CoworkingSpace = () => {
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }} className="flex flex-wrap items-center justify-center gap-4 mt-8">
             <div ref={searchRef} className="relative">
               <div className="flex items-center h-12 rounded-xl border border-foreground/10 bg-white overflow-hidden shadow-lg" style={{ width: 400, maxWidth: "90vw" }}>
-                <Search className="w-4 h-4 ml-4 text-muted-foreground shrink-0" />
+                <button 
+                  onClick={() => navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`)}
+                  className="p-4 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
                 <input
                   type="text"
                   placeholder="Search coworking spaces in your city…"
@@ -159,16 +164,30 @@ const CoworkingSpace = () => {
                     setCityQuery(e.target.value);
                     setShowSuggestions(true);
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`);
+                      setShowSuggestions(false);
+                    }
+                  }}
                   onFocus={() => cityQuery.length > 0 && setShowSuggestions(true)}
-                  className="flex-1 h-full px-3 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none min-w-0"
+                  className="flex-1 h-full px-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none min-w-0"
                 />
-                <button className="p-2.5 text-muted-foreground hover:text-foreground transition-opacity"><Mic className="w-4 h-4" /></button>
-                <button className="p-2.5 mr-1 text-primary hover:text-primary/80 transition-opacity"><Send className="w-4 h-4" /></button>
               </div>
               {showSuggestions && filteredCities.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-foreground/10 rounded-xl shadow-lg z-50 overflow-hidden py-1">
                   {filteredCities.map((city) => (
-                    <button key={city} onClick={() => { setCityQuery(city); setShowSuggestions(false); }} className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-foreground/5 transition-colors">{city}</button>
+                    <button 
+                      key={city} 
+                      onClick={() => { 
+                        setCityQuery(city); 
+                        setShowSuggestions(false);
+                        navigate(`/services/coworking-space?city=${encodeURIComponent(city)}`);
+                      }} 
+                      className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-foreground/5 transition-colors"
+                    >
+                      {city}
+                    </button>
                   ))}
                 </div>
               )}
@@ -184,16 +203,6 @@ const CoworkingSpace = () => {
           </motion.div>
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 }} className="mt-20 w-full">
-          <p className="text-center text-base font-normal text-muted-foreground/70 mb-6 tracking-normal">Trusted by Growing Businesses</p>
-          <div className="relative overflow-hidden w-full">
-            <motion.div className="flex items-center gap-20" animate={{ x: ["0%", "-50%"] }} transition={{ duration: 22, repeat: Infinity, ease: "linear" }}>
-              {[...logos, ...logos].map((l, i) => (
-                <img key={i} src={l.src} alt={l.alt} className={`${l.className} w-auto object-contain opacity-50 select-none shrink-0`} />
-              ))}
-            </motion.div>
-          </div>
-        </motion.div>
       </section>
 
       <div className="lg:hidden sticky top-16 z-30 bg-white/90 backdrop-blur border-b border-border/40">
