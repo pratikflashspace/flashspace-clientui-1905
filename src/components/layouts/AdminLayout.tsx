@@ -154,12 +154,6 @@ export default function AdminLayout() {
       roles: ["admin", "super_admin", "sales", "support"],
     },
     {
-      icon: Network,
-      label: "Affiliate Management",
-      path: "/admin/affiliates",
-      roles: ["admin", "super_admin", "affiliate_manager"],
-    },
-    {
       icon: FileCheck,
       label: "Invoices Management",
       path: "/admin/partner-invoices",

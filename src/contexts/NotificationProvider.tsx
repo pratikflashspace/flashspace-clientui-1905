@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { useNavigate } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext'; // Assuming you have an AuthContext
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { maskSpaceName } from '@/utils/masking';
 import userDashboardService from '@/services/userDashboard.service';
 
@@ -165,17 +165,37 @@ interface NotificationContextType {
     archiveNotification: (id: string) => void;
     deleteAllNotifications: () => void;
     handleNavigate: (notification: INotification) => void;
+    requestPermission: () => Promise<void>;
+    notificationPermission: NotificationPermission;
     workspaceCodeMap: Record<string, string>;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    console.log("NotificationProvider rendering");
     const { user } = useAuth(); // Get current user
     const navigate = useNavigate();
     const [socket, setSocket] = useState<Socket | null>(null);
     const [notifications, setNotifications] = useState<INotification[]>([]);
     const [workspaceCodeMap, setWorkspaceCodeMap] = useState<Record<string, string>>({});
+    const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
+        typeof Notification !== 'undefined' ? Notification.permission : 'default'
+    );
+
+    const requestPermission = useCallback(async () => {
+        if (typeof Notification === 'undefined') return;
+        
+        try {
+            const permission = await Notification.requestPermission();
+            setNotificationPermission(permission);
+            if (permission === 'granted') {
+                toast.success('Browser notifications enabled!');
+            }
+        } catch (err) {
+            console.error('Failed to request notification permission', err);
+        }
+    }, []);
 
     const handleNavigate = useCallback((notification: INotification) => {
         const metadata = notification.metadata || {};
@@ -300,10 +320,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (user) {
             fetchNotifications();
             fetchWorkspaceCodes();
+            
+            // Auto request browser notification permission on visit
+            if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+                requestPermission();
+            }
         } else {
             setNotifications([]);
         }
-    }, [user, fetchNotifications]);
+    }, [user, fetchNotifications, requestPermission]);
 
     // 3. Socket Connection
     useEffect(() => {
@@ -335,21 +360,53 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             }
 
             // Show Toast
-            toast(
+            toast.custom(
                 (t) => (
                     <div 
-                        className="cursor-pointer"
+                        className="w-full max-w-sm bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-border/50 dark:border-white/10 p-4 flex items-start gap-4 transition-all duration-500 ease-out hover:scale-[1.02] active:scale-[0.98] cursor-pointer group"
                         onClick={() => {
                             handleNavigate(normalizedIncoming);
-                            toast.dismiss(t.id);
+                            toast.dismiss(t);
                         }}
                     >
-                        <strong>{normalizedIncoming.title}</strong>
-                        <p>{maskSpaceName(normalizedIncoming.message, normalizedIncoming.metadata, workspaceCodeMap)}</p>
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                            normalizedIncoming.type === 'SUCCESS' ? 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400' :
+                            normalizedIncoming.type === 'ERROR' ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400' :
+                            normalizedIncoming.type === 'WARNING' ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' :
+                            'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground'
+                        }`}>
+                            {normalizedIncoming.type === 'SUCCESS' ? (
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                            ) : normalizedIncoming.type === 'ERROR' ? (
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            ) : (
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                            )}
+                        </div>
+                        <div className="flex-grow min-w-0">
+                            <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
+                                {normalizedIncoming.title}
+                            </h4>
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+                                {maskSpaceName(normalizedIncoming.message, normalizedIncoming.metadata, workspaceCodeMap)}
+                            </p>
+                        </div>
+                        <div className="shrink-0 pt-0.5">
+                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        </div>
                     </div>
                 ),
-                { duration: 4000, position: 'top-right' }
+                { duration: 5000, position: 'top-right' }
             );
+
+            // Trigger Browser Notification if permission granted
+            if (Notification.permission === 'granted') {
+                const body = maskSpaceName(normalizedIncoming.message, normalizedIncoming.metadata, workspaceCodeMap);
+                new Notification(normalizedIncoming.title, {
+                    body: body,
+                    icon: '/favicon.ico', // You can use a specific notification icon here
+                });
+            }
 
             // Update State
             setNotifications(prev => mergeNotifications(prev, [normalizedIncoming]));
@@ -449,6 +506,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             archiveNotification,
             deleteAllNotifications,
             handleNavigate,
+            requestPermission,
+            notificationPermission,
             workspaceCodeMap
         }}>
             {children}
@@ -459,6 +518,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 export const useNotifications = () => {
     const context = useContext(NotificationContext);
     if (!context) {
+        console.error("useNotifications called outside of NotificationProvider!", {
+            context,
+            NotificationContext
+        });
         throw new Error("useNotifications must be used within a NotificationProvider");
     }
     return context;

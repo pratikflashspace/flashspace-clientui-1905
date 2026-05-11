@@ -16,7 +16,6 @@ import {
     openRazorpayCheckout,
     verifyPayment,
     reportPaymentFailure,
-    simulatePayment,
 } from '@/services/payment.service';
 import hotToast from 'react-hot-toast';
 import {
@@ -290,25 +289,7 @@ const CompleteBookingPage = () => {
         }
     };
 
-    // ─── STEP 2b: Simulate payment (dev/test) ─
-    const handleSimulatePayment = async () => {
-        if (!paymentOrder || !spaceDetails) return;
-        setPaymentLoading(true);
-        setShowPaymentModal(false);
-        try {
-            hotToast.loading('Simulating payment...', { id: 'sim' });
-            const result = await simulatePayment(paymentOrder.orderId);
-            hotToast.dismiss('sim');
-            if (appliedCoupon) await markCouponUsed(appliedCoupon.code).catch(() => { });
-            clearCheckoutState();
-            navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(planDisplayName)}&amount=${finalTotal}`);
-        } catch (err: any) {
-            hotToast.dismiss('sim');
-            hotToast.error(err?.message || 'Simulation failed.');
-        } finally {
-            setPaymentLoading(false);
-        }
-    };
+
 
     // ─── RENDER ───────────────────────────
     if (loading || authLoading) {
@@ -613,14 +594,7 @@ const CompleteBookingPage = () => {
                             Pay {formatCurrency(finalTotal)} with Razorpay
                         </button>
 
-                        {/* Simulate button */}
-                        <button
-                            onClick={handleSimulatePayment}
-                            disabled={paymentLoading}
-                            className="w-full mt-3 py-3.5 border-2 border-dashed border-border text-muted-foreground hover:border-primary/60 hover:text-foreground font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm"
-                        >
-                            🧪 Simulate Payment (Test Mode)
-                        </button>
+
 
                         <p className="text-center text-[10px] text-muted-foreground mt-4 flex items-center justify-center gap-1">
                             <Shield className="w-3 h-3" /> Secured by 256-bit SSL · PCI DSS Compliant

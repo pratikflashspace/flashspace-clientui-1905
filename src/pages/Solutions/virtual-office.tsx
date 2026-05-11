@@ -24,7 +24,7 @@ import Footer from "@/components/Footer";
 import { FeatureCTA } from "@/components/sections/FeatureCTA";
 import { Stats } from "@/components/sections/Stats";
 import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
-import { BlogSection } from "@/components/sections/BlogSection";
+
 import { CTA } from "@/components/sections/CTA";
 
 const featureVirtualOffice = "/hero-illustrated.jpg";
@@ -52,9 +52,9 @@ const voFeatures = [
 
 const aiCapabilities = [
   { id: "booking", label: "Smart Booking", icon: Zap, active: true },
-  { id: "compliance", label: "Compliance", icon: Shield, active: false },
-  { id: "access", label: "Access Control", icon: Sparkles, active: false },
-  { id: "analytics", label: "Analytics", icon: BarChart3, active: false },
+  { id: "compliance", label: "Compliance", icon: Shield, active: true },
+  { id: "access", label: "Access Control", icon: Sparkles, active: true },
+  { id: "analytics", label: "Analytics", icon: BarChart3, active: true },
 ];
 
 const VirtualOffice = () => {
@@ -439,8 +439,8 @@ const VirtualOffice = () => {
               <div className="flex flex-wrap gap-8 lg:gap-16 pt-8 border-t border-border/50">
                 {[
                   { value: "100+", label: "Cities covered" },
-                  { value: "₹999", label: "Starting price/month" },
-                  { value: "24hrs", label: "Activation time" },
+                  { value: "₹699", label: "Starting price/month" },
+                   { value: "2-3 days", label: "Activation time" },
                 ].map((stat) => (
                   <div key={stat.label}>
                     <div className="text-2xl lg:text-3xl font-bold text-foreground tracking-tight">{stat.value}</div>
@@ -491,10 +491,10 @@ const VirtualOffice = () => {
                   <h3 className="text-xl lg:text-2xl font-medium text-foreground mb-6 tracking-tight">Built to handle the most complex requirements.</h3>
                   <div className="flex flex-wrap gap-2">
                     {aiCapabilities.map((cap) => (
-                      <button key={cap.id} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all ${cap.active ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}>
+                      <div key={cap.id} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground shadow-sm cursor-default">
                         <cap.icon className="w-4 h-4" />
                         {cap.label}
-                      </button>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -663,7 +663,11 @@ const VirtualOffice = () => {
           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-20 pt-12 border-t border-border/50">
             <h3 className="text-2xl font-bold text-foreground mb-3 tracking-tight">Ready to get started?</h3>
             <p className="text-muted-foreground mb-6">Set up your virtual office in under 48 hours.</p>
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 rounded-xl">
+            <Button 
+              size="lg" 
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 rounded-xl"
+              onClick={() => navigate("/services/virtual-office")}
+            >
               Get Started Now
               <ArrowUpRight className="w-4 h-4 ml-1" />
             </Button>
@@ -674,7 +678,7 @@ const VirtualOffice = () => {
       <FeatureCTA />
       <Stats />
       <FounderTestimonial />
-      <BlogSection />
+
       <CTA />
       <Footer />
     </div >

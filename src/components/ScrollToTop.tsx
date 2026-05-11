@@ -22,7 +22,7 @@ export default function ScrollToTop() {
                 // For other pages, scroll the window
                 window.scrollTo({ top: 0, behavior: 'instant' });
             }
-        }, 0);
+        }, 100);
 
         return () => clearTimeout(timeoutId);
     }, [pathname]);

@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { useNotifications, NotificationType } from "@/contexts/NotificationContext";
+import { useNotifications, NotificationType } from "@/contexts/NotificationProvider";
 import { formatDistanceToNow } from 'date-fns';
 
 interface SidebarMenuProps {

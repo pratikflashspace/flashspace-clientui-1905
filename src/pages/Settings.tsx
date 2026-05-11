@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "../contexts/NotificationProvider";
 import { authService } from "@/services/auth.service";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -56,6 +57,7 @@ const buildSettingsFromUser = (user?: User | null) => ({
 });
 
 export default function Settings() {
+  const { requestPermission, notificationPermission } = useNotifications();
   const navigate = useNavigate();
   const { user, updateUser, logout } = useAuth();
 
@@ -181,13 +183,36 @@ export default function Settings() {
     updateSettingAPI(key, value);
   };
 
+  const handleDeleteAccount = async () => {
+    if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone and you will be logged out immediately.")) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await authService.deleteAccount();
+      if (response.success) {
+        toast.success("Account deleted successfully");
+        // Clear local storage/state and redirect
+        logout();
+        navigate("/");
+      } else {
+        toast.error(response.message || "Failed to delete account");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Header />
 
       <main className="flex-grow pt-24 pb-20">
         {/* Settings Header */}
-        <div className="sticky top-[88px] sm:top-24 z-30 bg-background/80 backdrop-blur-lg border-b border-border shadow-sm">
+        <div className="sticky top-[64px] z-30 bg-background/80 backdrop-blur-lg border-b border-border shadow-sm">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
@@ -377,11 +402,7 @@ export default function Settings() {
               <Separator />
 
               {[
-                {
-                  label: "Two-Factor Authentication",
-                  desc: "Add an extra layer of security to your account",
-                  stateKey: "twoFactor",
-                },
+
                 {
                   label: "Login Alerts",
                   desc: "Get notified when someone logs into your account",
@@ -392,11 +413,7 @@ export default function Settings() {
                   desc: "Automatically log out after 30 days of inactivity",
                   stateKey: "sessionManagement",
                 },
-                {
-                  label: "Data Sharing",
-                  desc: "Share anonymised usage data to improve services",
-                  stateKey: "dataSharing",
-                },
+
               ].map((item) => (
                 <div
                   key={item.label}
@@ -511,46 +528,6 @@ export default function Settings() {
                   </Select>
                 </div>
               </div>
-
-              <Separator />
-
-              {[
-                {
-                  label: "Dark Mode",
-                  desc: "Use dark theme across the app",
-                  stateKey: "darkMode",
-                },
-                {
-                  label: "Compact View",
-                  desc: "Show more content with less spacing",
-                  stateKey: "compactView",
-                },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="flex items-center justify-between"
-                >
-                  <div>
-                    <p className="font-medium text-sm text-foreground">
-                      {item.label}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{item.desc}</p>
-                  </div>
-                  <Switch
-                    checked={
-                      settings[
-                        item.stateKey as keyof typeof settings
-                      ] as boolean
-                    }
-                    onCheckedChange={(checked) =>
-                      updateSettingAPI(
-                        item.stateKey as keyof typeof settings,
-                        checked,
-                      )
-                    }
-                  />
-                </div>
-              ))}
             </CardContent>
           </Card>
 
@@ -567,7 +544,7 @@ export default function Settings() {
             </CardHeader>
             <CardContent className="space-y-3">
               {[
-                { label: "Help Centre", desc: "Browse FAQs and guides" },
+
                 {
                   label: "Contact Support",
                   desc: "Reach our team via chat or email",
@@ -607,8 +584,14 @@ export default function Settings() {
                     Permanently delete your account and all data.
                   </p>
                 </div>
-                <Button variant="destructive" size="sm" className="rounded-xl">
-                  Delete
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  className="rounded-xl"
+                  onClick={handleDeleteAccount}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Deleting..." : "Delete"}
                 </Button>
               </div>
             </CardContent>

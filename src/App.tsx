@@ -9,7 +9,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { SocketProvider } from "@/contexts/SocketContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
-import { NotificationProvider } from "@/contexts/NotificationContext";
+import { NotificationProvider } from "./contexts/NotificationProvider";
 import { ChatProvider } from "@/contexts/ChatContext";
 
 // --- Lazy Loaded Pages (Optimized Bundle) ---
@@ -41,7 +41,7 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Bookings = lazy(() => import("./pages/Bookings"));
 const Community = lazy(() => import("./pages/Community"));
-const Settings = lazy(() => import("./pages/Settings"));
+import Settings from "./pages/Settings";
 const CityListing = lazy(() => import("./pages/CityListing"));
 const AboutUs = lazy(() => import("./pages/AboutUs"));
 const HelpCenter = lazy(() => import("./pages/help/HelpCenter"));
@@ -144,21 +144,25 @@ const App = () => (
       <HotToaster
         position="top-center"
         toastOptions={{
-          duration: 2500,
+          duration: 3500,
           style: {
-            background: "#ffffff",
+            background: "rgba(255, 255, 255, 0.85)",
+            backdropFilter: "blur(20px) saturate(180%)",
             color: "#1f2937",
-            borderRadius: "16px",
-            padding: "20px 32px",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-            fontSize: "16px",
-            fontWeight: "500",
-            maxWidth: "400px",
+            borderRadius: "24px",
+            padding: "16px 28px",
+            boxShadow: "0 20px 40px -10px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.5)",
+            fontSize: "14px",
+            fontWeight: "600",
+            maxWidth: "480px",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
+            fontFamily: "'Inter Tight', sans-serif",
+            animation: "toast-enter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
           },
           success: {
             style: {
-              background: "#ffffff",
-              border: "1px solid #e5e7eb",
+              background: "rgba(236, 253, 245, 0.9)",
+              border: "1px solid rgba(16, 185, 129, 0.3)",
             },
             iconTheme: {
               primary: "#10b981",
@@ -167,8 +171,8 @@ const App = () => (
           },
           error: {
             style: {
-              background: "#ffffff",
-              border: "1px solid #fecaca",
+              background: "rgba(254, 242, 242, 0.8)",
+              border: "1px solid rgba(239, 68, 68, 0.2)",
             },
             iconTheme: {
               primary: "#ef4444",
@@ -180,8 +184,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <SocketProvider>
-            <DarkModeProvider>
-              <NotificationProvider>
+            <NotificationProvider>
                 <ChatProvider>
                   <ScrollToTop />
                   {/* <MouseFollower/> */}
@@ -579,8 +582,7 @@ const App = () => (
                     </Routes>
                   </Suspense>
                 </ChatProvider>
-              </NotificationProvider>
-            </DarkModeProvider>
+            </NotificationProvider>
           </SocketProvider>
         </AuthProvider>
       </BrowserRouter>

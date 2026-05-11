@@ -27,6 +27,7 @@ export const API_ENDPOINTS = {
     GET_PROFILE: "/api/auth/profile",
     GOOGLE: "/api/auth/google",
     GOOGLE_CALLBACK: "/api/auth/google/callback",
+    DELETE_ACCOUNT: "/api/auth/delete-account",
   },
 
   // Contact Form

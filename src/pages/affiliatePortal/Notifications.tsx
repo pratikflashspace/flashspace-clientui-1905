@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNotifications, NotificationType, INotification } from "@/contexts/NotificationContext";
+import { useNotifications, NotificationType, INotification } from "@/contexts/NotificationProvider";
 import {
     Bell,
     Search,
