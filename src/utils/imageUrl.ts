@@ -3,9 +3,9 @@ const getBaseUrl = () => {
     return import.meta.env.VITE_API_URL.replace(/\/api$/, "").replace(/\/$/, "");
   }
   
-  // In development, if no env is set, default to localhost:5000
+  // In development, if no env is set, default to localhost:5001
   if (import.meta.env.DEV) {
-    return "http://localhost:5000";
+    return "http://localhost:5001";
   }
   
   // In production, use the current origin
