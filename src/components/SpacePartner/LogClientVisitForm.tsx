@@ -8,6 +8,8 @@ import {
   Loader2,
   Briefcase,
   X,
+  Mail,
+  Phone,
 } from "lucide-react";
 import { toast } from "sonner";
 import { visitService } from "../../services/visitService";
@@ -34,6 +36,8 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
   const [formData, setFormData] = useState({
     clientEmail: "",
     visitor: "",
+    visitorEmail: "",
+    visitorNumber: "",
     purpose: "Coworking Day Pass",
     space: "",
     date: getLocalDatetimePattern(),
@@ -126,11 +130,14 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
         client: selectedClient?.name || formData.clientEmail.split("@")[0] || "Client",
         email: formData.clientEmail,
         visitor: formData.visitor,
+        visitorEmail: formData.visitorEmail,
+        visitorNumber: formData.visitorNumber,
         purpose: formData.purpose,
         space: formData.space,
         date: new Date(formData.date).toISOString(),
       };
 
+      console.log("Submitting visit payload:", payload);
       await visitService.create(payload as any);
       toast.success("Visit logged successfully!");
 
@@ -138,6 +145,8 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
       setFormData({
         clientEmail: "",
         visitor: "",
+        visitorEmail: "",
+        visitorNumber: "",
         purpose: "Coworking Day Pass",
         space: "",
         date: getLocalDatetimePattern(),
@@ -231,7 +240,7 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
           )}
         </div>
 
-        {/* Visitor Name + Purpose */}
+        {/* Visitor Info Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -247,6 +256,40 @@ const LogClientVisitForm: React.FC<LogClientVisitFormProps> = ({
                 onChange={handleChange}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-muted-foreground text-sm text-foreground"
                 required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Visitor Email
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="email"
+                name="visitorEmail"
+                placeholder="Email address"
+                value={formData.visitorEmail}
+                onChange={handleChange}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-muted-foreground text-sm text-foreground"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Visitor Number
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="tel"
+                name="visitorNumber"
+                placeholder="Contact number"
+                value={formData.visitorNumber}
+                onChange={handleChange}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-muted/20 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-muted-foreground text-sm text-foreground"
               />
             </div>
           </div>

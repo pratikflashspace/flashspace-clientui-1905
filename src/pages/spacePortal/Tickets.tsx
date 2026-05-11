@@ -252,7 +252,7 @@ export default function Tickets() {
               value="converted"
               className="px-6 py-2 rounded-lg font-bold data-[state=active]:bg-white data-[state=active]:text-[#164e4e] data-[state=active]:shadow-sm"
             >
-              Converted
+              Resolved
             </TabsTrigger>
           </TabsList>
         </Tabs>

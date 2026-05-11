@@ -13,6 +13,23 @@ export interface AdminDashboardStats {
   activeListings: number;
   totalRevenue: number;
   openTickets: number;
+  recentLeads: Array<{
+    id: string;
+    name: string;
+    email: string;
+    type: string;
+    time: string;
+  }>;
+  recentBookings: Array<{
+    id: string;
+    userName: string;
+    userEmail: string;
+    spaceName: string;
+    planName: string;
+    amount: number;
+    status: string;
+    time: string;
+  }>;
   recentActivity: Array<{
     id: string;
     type: string;
@@ -1137,6 +1154,18 @@ class AdminService {
     const response = await axiosInstance.get<ApiResponse<any[]>>(
       "/api/admin/documents",
       { params },
+    );
+    return response.data;
+  }
+  async uploadAdminInvoice(formData: FormData): Promise<ApiResponse<any>> {
+    const response = await axiosInstance.post<ApiResponse<any>>(
+      "/api/admin/invoices/upload",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
     );
     return response.data;
   }

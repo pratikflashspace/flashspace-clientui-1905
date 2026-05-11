@@ -13,6 +13,11 @@ import {
   Target,
   FileText,
   Receipt,
+  Mail,
+  User as UserIcon,
+  MapPin,
+  ArrowRight,
+  Loader2,
 } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { useSocket } from "@/contexts/SocketContext";
@@ -21,96 +26,9 @@ import {
   AdminNotification,
 } from "@/services/adminNotification.service";
 import { StatsCard } from "@/components/dashboard/StatsCard";
-import { FeatureSection } from "@/components/dashboard/FeatureSection";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { StatsSkeleton, FeatureSectionSkeleton } from "@/components/ui/skeleton-loaders";
-
-const salesFeatures = [
-  {
-    title: "Client Information Panel",
-    description:
-      "View all client information including their activity on FlashSpace ecosystem",
-    href: "/admin/clients",
-  },
-  {
-    title: "CRM Integration",
-    description:
-      "Manage leads with email and WhatsApp marketing workflows integrated",
-    href: "/admin/leads",
-  },
-  {
-    title: "Coupon Generator",
-    description:
-      "Create discount vouchers for payment portal to help close deals",
-    href: "/admin/coupons",
-  },
-  {
-    title: "Booking Dashboard",
-    description:
-      "View total bookings by categories, packages, and sales amounts",
-    href: "/admin/sales-analytics",
-  },
-  {
-    title: "Leaderboard",
-    description: "Track KPIs, targets, and achievements with team rankings",
-    href: "/admin/leaderboard",
-  },
-];
-
-const supportFeatures = [
-  {
-    title: "Ticket Management",
-    description:
-      "Auto-assign tickets with due dates, follow-ups, and escalation alerts",
-    href: "/admin/tickets",
-  },
-  {
-    title: "Client Portal",
-    description: "Detailed access to all client accounts and their history",
-    href: "/admin/clients",
-  },
-  {
-    title: "Learning Hub",
-    description:
-      "Training videos, articles, and documents for day-to-day tasks",
-    href: "/admin/learning-hub",
-  },
-  {
-    title: "Support Leaderboard",
-    description: "Track team performance and highlight best performers",
-    href: "/admin/leaderboard",
-  },
-];
-
-const financeFeatures = [
-  {
-    title: "Revenue Dashboard",
-    description: "Track payments received, receivable, payable, and more data",
-    href: "/admin/revenue",
-  },
-  {
-    title: "Receivable/Payable",
-    description: "Filter by space, city to get detailed payment information",
-    href: "/admin/finance",
-  },
-  {
-    title: "Invoice Management",
-    description:
-      "View and approve/reject invoices from clients and space partners",
-    href: "/admin/partner-invoices",
-  },
-  {
-    title: "Cleared Invoices",
-    description: "Track all cleared invoices with payment details",
-    href: "/admin/partner-invoices",
-  },
-  {
-    title: "Balance Sheet",
-    description:
-      "Overall, space-specific, region-specific, and date-range reports",
-    href: "/admin/balance",
-  },
-];
+import { Button } from "@/components/ui/button";
+import { StatsSkeleton } from "@/components/ui/skeleton-loaders";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -203,31 +121,6 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* Feature Sections Skeleton */}
-          <div className="space-y-12 pt-4">
-            {[1, 2, 3].map((section) => (
-              <div key={section} className="space-y-6">
-                <div className="space-y-2">
-                  <div className="h-7 w-48 bg-muted/50 rounded-lg" />
-                  <div className="h-4 w-72 bg-muted/30 rounded-md" />
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {[1, 2, 3, 4, 5, 6].slice(0, section === 1 ? 6 : 5).map((i) => (
-                    <div key={i} className="bg-background border border-border rounded-[20px] p-5 shadow-sm space-y-4">
-                      <div className="flex justify-between items-start">
-                        <div className="h-5 w-32 bg-muted/50 rounded-md" />
-                        <div className="w-5 h-5 bg-muted/30 rounded-md" />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="h-3 w-full bg-muted/10 rounded" />
-                        <div className="h-3 w-2/3 bg-muted/10 rounded" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </DashboardLayout>
     );
@@ -292,54 +185,110 @@ export default function AdminDashboard() {
         />
       </div>
 
-      {/* Sales Team Section */}
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Sales Team</h2>
-        <p className="text-muted-foreground">
-          Tools and insights for the sales team
-        </p>
+      <div className="grid gap-6 lg:grid-cols-2 mt-8 animate-in slide-in-from-bottom-4 duration-700">
+        {/* Recent Leads */}
+        <div className="bg-background border border-border rounded-[24px] overflow-hidden shadow-sm flex flex-col h-full">
+          <div className="p-6 border-b border-border flex justify-between items-center bg-muted/20">
+            <div>
+              <h3 className="text-lg font-bold text-foreground">Recent Leads</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Latest enquiries from the website</p>
+            </div>
+            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80" onClick={() => navigate("/admin/leads")}>
+              View All <ArrowRight className="ml-1 w-4 h-4" />
+            </Button>
+          </div>
+          <div className="flex-1">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 border-b border-border">
+                  <tr>
+                    <th className="text-left p-4 font-semibold text-muted-foreground">User</th>
+                    <th className="text-left p-4 font-semibold text-muted-foreground">Date</th>
+                    <th className="text-left p-4 font-semibold text-muted-foreground">Time</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {stats?.recentLeads?.length ? (
+                    stats.recentLeads.map((lead: any) => (
+                      <tr key={lead.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="p-4">
+                          <div className="flex flex-col">
+                            <span className="font-medium text-foreground">{lead.name}</span>
+                            <span className="text-xs text-muted-foreground">{lead.email}</span>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <span className="text-muted-foreground">
+                            {new Date(lead.time).toLocaleDateString([], { day: '2-digit', month: 'short', year: 'numeric' })}
+                          </span>
+                        </td>
+                        <td className="p-4 text-muted-foreground">
+                          {new Date(lead.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={3} className="p-12 text-center text-muted-foreground">No recent leads</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Bookings */}
+        <div className="bg-background border border-border rounded-[24px] overflow-hidden shadow-sm flex flex-col h-full">
+          <div className="p-6 border-b border-border flex justify-between items-center bg-muted/20">
+            <div>
+              <h3 className="text-lg font-bold text-foreground">Recent Bookings</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Latest successful transactions</p>
+            </div>
+            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80" onClick={() => navigate("/admin/sales-analytics")}>
+              View All <ArrowRight className="ml-1 w-4 h-4" />
+            </Button>
+          </div>
+          <div className="flex-1">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 border-b border-border">
+                  <tr>
+                    <th className="text-left p-4 font-semibold text-muted-foreground">Client</th>
+                    <th className="text-left p-4 font-semibold text-muted-foreground">Space</th>
+                    <th className="text-left p-4 font-semibold text-muted-foreground">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {stats?.recentBookings?.length ? (
+                    stats.recentBookings.map((booking: any) => (
+                      <tr key={booking.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="p-4">
+                          <div className="flex flex-col">
+                            <span className="font-medium text-foreground">{booking.userName}</span>
+                            <span className="text-xs text-muted-foreground truncate max-w-[150px]">{booking.userEmail}</span>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <span className="text-foreground truncate max-w-[120px] inline-block font-medium">{booking.spaceName}</span>
+                        </td>
+                        <td className="p-4 font-bold text-green-600">
+                          ₹{booking.amount.toLocaleString()}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={3} className="p-12 text-center text-muted-foreground">No recent bookings</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <FeatureSection
-        title="Sales Management"
-        description="Comprehensive tools for managing sales"
-        icon={<Target className="w-6 h-6 text-primary" />}
-        features={salesFeatures}
-      />
-
-      {/* Support Team Section */}
-      <div className="mb-4 mt-12">
-        <h2 className="text-2xl font-bold text-foreground mb-2">
-          Support Team
-        </h2>
-        <p className="text-muted-foreground">
-          Tools for client support and satisfaction
-        </p>
-      </div>
-
-      <FeatureSection
-        title="Support Operations"
-        description="Manage tickets and client support"
-        icon={<Ticket className="w-6 h-6 text-primary" />}
-        features={supportFeatures}
-      />
-
-      {/* Finance Team Section */}
-      <div className="mb-4 mt-12">
-        <h2 className="text-2xl font-bold text-foreground mb-2">
-          Finance & Accounts
-        </h2>
-        <p className="text-muted-foreground">
-          Financial management and reporting
-        </p>
-      </div>
-
-      <FeatureSection
-        title="Financial Management"
-        description="Complete financial control and reporting"
-        icon={<Wallet className="w-6 h-6 text-primary" />}
-        features={financeFeatures}
-      />
     </DashboardLayout>
   );
 }

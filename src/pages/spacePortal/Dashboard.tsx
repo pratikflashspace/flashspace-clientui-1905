@@ -16,8 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
-import { FeatureSection } from "@/components/dashboard/FeatureSection";
-import { StatsSkeleton, FeatureSectionSkeleton } from "@/components/ui/skeleton-loaders";
+import { StatsSkeleton } from "@/components/ui/skeleton-loaders";
 import { AddSpaceDialog } from "@/components/modals/AddSpaceDialog";
 import {
   fetchPartnerDashboard,
@@ -26,111 +25,6 @@ import {
 } from "@/services/spacePortal/spacePartner.service";
 import { Client } from "@/types/spacePortal/client";
 
-const spaceManagementFeatures = [
-  {
-    title: "Add Spaces",
-    description:
-      "Add spaces in different locations with photos, videos, and virtual tours",
-    href: "#add-space",
-  },
-  {
-    title: "Booking Calendar",
-    description:
-      "Check booking requests for on-demand options and manage availability",
-    href: "/spaceportal/booking-calendar",
-  },
-  {
-    title: "Real-time Notifications",
-    description:
-      "Get notified on each booking stage completion for your clients",
-    href: "/spaceportal/booking-calendar",
-  },
-];
-
-const clientManagementFeatures = [
-  {
-    title: "Client Details View",
-    description:
-      "See each client's unique ID, plan, KYC details, and agreement info",
-    href: "/spaceportal/clients",
-  },
-  {
-    title: "Direct Client Chat",
-    description:
-      "Connect with enquiring clients directly and close deals for higher revenue share",
-    href: "/spaceportal/client-enquiries",
-  },
-  {
-    title: "Mail & Visit Handling",
-    description: "Upload couriers received and track visits for each client",
-    href: "/spaceportal/mail-visits",
-  },
-];
-
-const aiFeatures = [
-  {
-    title: "Revenue Forecast",
-    description:
-      "AI-enabled forecasting for quarterly, monthly, and yearly revenue",
-    isAI: true,
-  },
-  {
-    title: "Renewal Analysis",
-    description:
-      "AI predicts client renewal probability based on behavior and activity",
-    isAI: true,
-  },
-  {
-    title: "AI Support Agent",
-    description:
-      "Ask anything about any client - agreement dates, meeting rooms used, and more",
-    isAI: true,
-  },
-  {
-    title: "Performance Suggestions",
-    description:
-      "AI-based suggestions to improve metrics and get better revenue",
-    isAI: true,
-  },
-];
-
-const financialFeatures = [
-  {
-    title: "Invoice Submission",
-    description: "Submit invoices and track payments received and due",
-    href: "/spaceportal/invoices-payments",
-  },
-  {
-    title: "Revenue Reports",
-    description: "Detailed reports on payments received till date",
-    href: "/spaceportal/invoices-payments",
-  },
-  {
-    title: "Feedback Dashboard",
-    description:
-      "Check client feedback, NPS scores, and improvement suggestions",
-    href: "/spaceportal/feedback-nps",
-  },
-];
-
-const teamFeatures = [
-  {
-    title: "Team Management",
-    description: "Add team members and assign specific access levels",
-    href: "/spaceportal/team-management",
-  },
-  {
-    title: "Tasks & Tickets",
-    description:
-      "View and assign client tickets to team members with deadlines",
-    href: "/spaceportal/tasks",
-  },
-  {
-    title: "Partner Profile",
-    description: "Manage company details, KYC, documentation, and bank details",
-    href: "/spaceportal/profile",
-  },
-];
 
 export default function Dashboard() {
   const [addSpaceOpen, setAddSpaceOpen] = useState(false);
@@ -202,10 +96,6 @@ export default function Dashboard() {
         </div>
 
         <StatsSkeleton count={4} />
-
-        <FeatureSectionSkeleton count={4} />
-        <FeatureSectionSkeleton count={3} />
-        <FeatureSectionSkeleton count={3} />
       </div>
     );
   }
@@ -245,55 +135,6 @@ export default function Dashboard() {
           icon={Calendar}
         />
       </div>
-
-      {/* Feature Sections */}
-      <FeatureSection
-        title="AI-Powered Insights"
-        description="Leverage AI for smarter business decisions"
-        features={aiFeatures}
-      />
-
-      <div
-        onClick={(e) => {
-          const target = e.target as HTMLElement;
-          const card = target.closest('[class*="rounded-xl"]');
-          if (card) {
-            const title = card.querySelector("h3")?.textContent;
-            if (title === "Add Spaces") {
-              e.stopPropagation();
-              setAddSpaceOpen(true);
-            }
-          }
-        }}
-      >
-        <FeatureSection
-          title="Space Management"
-          description="Manage all your workspace listings"
-          icon={<Building2 className="w-5 h-5 text-primary" />}
-          features={spaceManagementFeatures}
-        />
-      </div>
-
-      <FeatureSection
-        title="Client Management"
-        description="Handle client relationships effectively"
-        icon={<Users className="w-5 h-5 text-primary" />}
-        features={clientManagementFeatures}
-      />
-
-      <FeatureSection
-        title="Financial Management"
-        description="Track invoices, payments, and revenue"
-        icon={<CreditCard className="w-5 h-5 text-primary" />}
-        features={financialFeatures}
-      />
-
-      <FeatureSection
-        title="Team & Operations"
-        description="Manage your team and operations"
-        icon={<UserPlus className="w-5 h-5 text-primary" />}
-        features={teamFeatures}
-      />
 
       <AddSpaceDialog open={addSpaceOpen} onOpenChange={setAddSpaceOpen} />
     </div>

@@ -520,6 +520,12 @@ const MailAndVisits = () => {
                       Visitor
                     </th>
                     <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                      Visitor Email
+                    </th>
+                    <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
+                      Visitor Number
+                    </th>
+                    <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
                       Purpose
                     </th>
                     <th className="px-6 py-4 text-xs font-extrabold text-foreground uppercase tracking-wider">
@@ -531,7 +537,7 @@ const MailAndVisits = () => {
                   {visitRecords.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={7}
                         className="p-12 text-center text-muted-foreground italic"
                       >
                         No visit records found
@@ -551,8 +557,19 @@ const MailAndVisits = () => {
                         <td className="px-6 py-5 text-sm font-bold text-foreground">
                           {record.client}
                         </td>
-                        <td className="px-6 py-5 text-sm font-medium text-muted-foreground">
-                          {record.visitor}
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                              <User className="w-4 h-4 text-gray-400" />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-700">{record.visitor}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-[11px] font-bold text-gray-900">
+                          {record.visitorEmail || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-[11px] text-gray-500 font-medium">
+                          {record.visitorNumber || "N/A"}
                         </td>
                         <td className="px-6 py-5 text-sm font-bold text-foreground">
                           {record.purpose}

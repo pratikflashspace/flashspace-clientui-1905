@@ -180,10 +180,11 @@ export default function VisitRecords() {
                 <tr className="border-b border-gray-50 bg-gray-50/50">
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-24">ID</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor Email</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor Number</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Purpose</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Office</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Duration</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -215,6 +216,12 @@ export default function VisitRecords() {
                           <span className="text-sm font-semibold text-gray-700">{visit.visitor}</span>
                         </div>
                       </td>
+                      <td className="px-6 py-4 text-[11px] font-bold text-gray-900">
+                        {visit.visitorEmail || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-[11px] text-gray-500 font-medium">
+                        {visit.visitorNumber || "N/A"}
+                      </td>
                       <td className="px-6 py-4">
                         <span className="text-sm text-gray-500 font-medium">{visit.purpose}</span>
                       </td>
@@ -231,9 +238,6 @@ export default function VisitRecords() {
                             <Clock3 className="w-3 h-3" /> {formatTimeLabel(visit.date)}
                           </span>
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="text-sm text-gray-500 font-medium">15 mins</span>
                       </td>
                     </tr>
                   ))

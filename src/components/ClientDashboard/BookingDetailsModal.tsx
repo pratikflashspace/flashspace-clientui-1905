@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Booking } from "@/types/services";
 import { 
   X, MapPin, FileText, Loader2, Download, Upload, Eye, CheckCircle, 
-  AlertCircle, ChevronRight, Edit2, Check, ChevronDown
+  AlertCircle, ChevronRight, Edit2, Check, ChevronDown, Ticket
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import userDashboardService from "@/services/userDashboard.service";
 import toast from "react-hot-toast";
 import { getUploadedFileUrl } from "@/utils/fileUrl";
@@ -25,11 +26,12 @@ export default function BookingDetailsModal({
   formatCurrency,
   formatDate,
 }: BookingDetailsModalProps) {
-  const [step, setStep] = useState(
-    (booking.partnerRequestStatus === 'submitted' || 
-     booking.partnerRequestStatus === 'in_review' || 
-     booking.partnerRequestStatus === 'completed') ? 3 : 1
-  );
+  const navigate = useNavigate();
+  const [step, setStep] = useState(() => {
+    if (booking.partnerRequestStatus === 'completed') return 4;
+    if (booking.partnerRequestStatus === 'submitted' || booking.partnerRequestStatus === 'in_review') return 3;
+    return 1;
+  });
   const [kycProfile, setKycProfile] = useState<any>(null);
   const [individualProfile, setIndividualProfile] = useState<any>(null);
   const [businessProfiles, setBusinessProfiles] = useState<any[]>([]);
@@ -689,9 +691,9 @@ export default function BookingDetailsModal({
           )}
           <button
             onClick={handleNext}
-            className="flex-1 py-3 rounded-xl font-bold bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90 transition-all"
+            className="flex-1 py-3 rounded-xl font-bold bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90 transition-all flex items-center justify-center gap-2"
           >
-            {booking.partnerRequestStatus === 'not_started' ? 'Next Step' : 'View Agreement'}
+            Next Step <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -701,11 +703,16 @@ export default function BookingDetailsModal({
   const renderStep3 = () => {
     const draftAgreement = getBookingDoc("draft_agreement");
     const signedAgreement = getBookingDoc("signed_agreement");
-    const finalAgreement = getBookingDoc("final_agreement");
-    const isApproved = !!finalAgreement;
 
     return (
-      <div className="space-y-8">
+      <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+        <div className="bg-blue-50 text-blue-800 p-4 rounded-xl text-sm border border-blue-100 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+          <p>
+            Review the draft agreement and upload a signed copy to proceed.
+          </p>
+        </div>
+
         {/* 1. Draft Agreement */}
         <div className="bg-white border-2 border-gray-100 rounded-2xl p-5 shadow-sm relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -z-10"></div>
@@ -730,14 +737,6 @@ export default function BookingDetailsModal({
                 >
                   <Eye className="w-4 h-4" />
                 </a>
-                <a 
-                  href={getUploadedFileUrl(draftAgreement.fileUrl)} 
-                  download
-                  className="p-2.5 rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
-                  title="Download"
-                >
-                  <Download className="w-4 h-4" />
-                </a>
               </div>
             ) : (
               <span className="text-xs text-gray-400">Not Available</span>
@@ -755,11 +754,11 @@ export default function BookingDetailsModal({
             </h3>
             {signedAgreement && (
               <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
-                (isApproved || signedAgreement.status === 'approved' || signedAgreement.partnerReviewStatus === 'approved') ? 'bg-green-100 text-green-700' : 
+                (signedAgreement.status === 'approved' || signedAgreement.partnerReviewStatus === 'approved') ? 'bg-green-100 text-green-700' : 
                 (signedAgreement.status === 'rejected' || signedAgreement.partnerReviewStatus === 'rejected') ? 'bg-red-100 text-red-700' :
                 'bg-yellow-100 text-yellow-700'
               }`}>
-                {(isApproved || signedAgreement.status === 'approved' || signedAgreement.partnerReviewStatus === 'approved') ? 'Approved' : 
+                {(signedAgreement.status === 'approved' || signedAgreement.partnerReviewStatus === 'approved') ? 'Approved' : 
                  (signedAgreement.status === 'rejected' || signedAgreement.partnerReviewStatus === 'rejected') ? 'Rejected' : 
                  'Pending Approval'}
               </span>
@@ -806,11 +805,56 @@ export default function BookingDetailsModal({
           )}
         </div>
 
-        {/* 3. Supporting Documents */}
+        <div className="flex gap-3 pt-4 border-t border-gray-100">
+          <button
+            onClick={handlePrev}
+            className="flex-1 py-3 rounded-xl font-bold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all"
+          >
+            Back
+          </button>
+          <button
+            onClick={handleFinish}
+            className="flex-1 py-3 rounded-xl font-bold border border-[#35503F] text-[#35503F] hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+          >
+            <CheckCircle className="w-4 h-4" /> Update Request
+          </button>
+          <button
+            onClick={handleNext}
+            disabled={!(signedAgreement?.status === 'approved' || signedAgreement?.partnerReviewStatus === 'approved')}
+            className={`flex-1 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
+              (signedAgreement?.status === 'approved' || signedAgreement?.partnerReviewStatus === 'approved')
+                ? "bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90 shadow-lg"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+            }`}
+          >
+            Next Step <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderStep4 = () => {
+    const finalAgreement = getBookingDoc("final_agreement");
+    const isApproved = !!finalAgreement;
+
+    const handleRaiseTicket = () => {
+      navigate('/dashboard/support', { 
+        state: { 
+          bookingId: booking._id || booking.id, 
+          bookingNumber: booking.bookingNumber,
+          autoShowForm: true 
+        } 
+      });
+    };
+
+    return (
+      <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+        {/* Final Documents */}
         <div className={`bg-white border-2 border-gray-100 rounded-2xl p-5 shadow-sm ${!isApproved ? 'opacity-70' : ''}`}>
           <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center text-xs font-bold">3</span>
-            Download Supporting Documents
+            <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">1</span>
+            Download Final Documents
           </h3>
           {!isApproved && (
             <p className="text-xs text-amber-600 font-medium mb-4 bg-amber-50 p-2 rounded-lg">
@@ -860,12 +904,18 @@ export default function BookingDetailsModal({
           >
             Back
           </button>
-          <button
-            onClick={handleFinish}
-            className="flex-1 py-3 rounded-xl font-bold bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90 transition-all flex items-center justify-center gap-2"
-          >
-            <CheckCircle className="w-4 h-4" /> {booking.partnerRequestStatus === 'not_started' ? 'Finish' : 'Update Request'}
-          </button>
+          {booking.partnerRequestStatus === 'completed' ? (
+            <button
+              onClick={handleRaiseTicket}
+              className="flex-1 py-3 rounded-xl font-bold bg-[#FEF8C3] text-[#35503F] border border-[#35503F]/20 hover:bg-[#FEF8C3]/80 transition-all flex items-center justify-center gap-2 shadow-sm"
+            >
+              <Ticket className="w-4 h-4" /> Raise Ticket
+            </button>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center p-2 bg-gray-50 border border-dashed border-gray-200 rounded-xl">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Ticket applicable after acceptance</p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -939,24 +989,27 @@ export default function BookingDetailsModal({
       />
 
       <div className="flex items-center justify-between">
-            {['Booking Summary', 'KYC Documents', 'Agreements'].map((label, idx) => {
+            {['Booking Summary', 'KYC Documents', 'Draft Documents', 'Final Documents'].map((label, idx) => {
               const num = idx + 1;
               const isActive = step === num;
               const isPast = step > num;
               
               return (
                 <React.Fragment key={num}>
-                  <div className={`flex flex-col items-center ${isActive ? 'opacity-100' : isPast ? 'opacity-70' : 'opacity-40 grayscale'}`}>
+                  <button 
+                    onClick={() => setStep(num)}
+                    className={`flex flex-col items-center transition-all ${isActive ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
+                  >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mb-1.5 transition-all
                       ${isActive ? 'bg-[#35503F] text-[#FEF8C3] ring-4 ring-[#35503F]/20' : 
                         isPast ? 'bg-[#35503F] text-white' : 'bg-gray-200 text-gray-500'}`}
                     >
                       {isPast ? <Check className="w-4 h-4" /> : num}
                     </div>
-                    <span className="text-xs font-bold text-gray-700">{label}</span>
-                  </div>
-                  {num < 3 && (
-                    <div className={`flex-1 h-1 rounded-full mx-4 ${isPast ? 'bg-[#35503F]' : 'bg-gray-200'}`} />
+                    <span className="text-[10px] sm:text-xs font-bold text-gray-700 text-center">{label}</span>
+                  </button>
+                  {num < 4 && (
+                    <div className={`flex-1 h-1 rounded-full mx-1 sm:mx-4 ${isPast ? 'bg-[#35503F]' : 'bg-gray-200'}`} />
                   )}
                 </React.Fragment>
               );
@@ -969,6 +1022,7 @@ export default function BookingDetailsModal({
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
           {step === 3 && renderStep3()}
+          {step === 4 && renderStep4()}
         </div>
 
       </div>

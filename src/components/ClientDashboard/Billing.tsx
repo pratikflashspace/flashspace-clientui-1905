@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import userDashboardService from "@/services/userDashboard.service";
 import { Invoice, Booking } from "@/types/services";
 import { generateInvoicePDF } from "@/utils/pdfGenerator";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 import toast from "react-hot-toast";
 import {
   CreditCard,
@@ -111,6 +112,11 @@ export default function Billing() {
   };
 
   const handleDownloadPDF = async (invoice: Invoice) => {
+    if (invoice.pdfUrl) {
+      const url = getUploadedFileUrl(invoice.pdfUrl);
+      window.open(url, "_blank");
+      return;
+    }
     try {
       setDownloadingInvoiceId(invoice._id);
       await generateInvoicePDF(invoice, "download");
@@ -124,6 +130,14 @@ export default function Billing() {
   };
 
   const handlePreviewPDF = async (invoice: Invoice) => {
+    if (invoice.pdfUrl) {
+      const url = getUploadedFileUrl(invoice.pdfUrl);
+      setPreviewDocument({
+        title: `Invoice ${invoice.invoiceNumber || invoice._id}`,
+        url: url,
+      });
+      return;
+    }
     try {
       setPreviewingInvoiceId(invoice._id);
       const blobUrl = await generateInvoicePDF(invoice, "preview");

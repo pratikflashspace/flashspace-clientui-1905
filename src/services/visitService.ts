@@ -7,6 +7,8 @@ export interface VisitRecord {
   visitId: string;
   client: string;
   visitor: string;
+  visitorEmail?: string;
+  visitorNumber?: string;
   purpose: string;
   space: string;
   date: string;
@@ -18,6 +20,8 @@ export interface VisitRecord {
 export interface CreateVisitData {
   client: string;
   visitor: string;
+  visitorEmail?: string;
+  visitorNumber?: string;
   purpose: string;
   space: string;
   email: string;

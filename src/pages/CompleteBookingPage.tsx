@@ -16,6 +16,7 @@ import {
     openRazorpayCheckout,
     verifyPayment,
     reportPaymentFailure,
+    simulatePayment,
 } from '@/services/payment.service';
 import hotToast from 'react-hot-toast';
 import {
@@ -24,6 +25,7 @@ import {
     persistCheckoutState,
     readCheckoutState,
 } from '@/utils/checkoutSession';
+import axiosInstance from '@/services/api.service';
 
 // ─────────────────────────────────────────────
 // Types
@@ -234,6 +236,22 @@ const CompleteBookingPage = () => {
             return;
         }
         if (!spaceDetails || !selectedOption) return;
+
+        // --- CAPTURE BOOKING LEAD ---
+        try {
+            await axiosInstance.post('/api/leads/booking-lead', {
+                userId: user.id || (user as any)._id,
+                name: user.fullName || user.email.split('@')[0],
+                email: user.email,
+                phone: (user as any).phoneNumber,
+                spaceId: id!,
+                spaceName: spaceDetails.name,
+            });
+        } catch (err) {
+            console.error('Lead capture failed:', err);
+        }
+        // ----------------------------
+
         setPaymentLoading(true);
         try {
             const order = await createPaymentOrder(buildPayload());
@@ -284,6 +302,42 @@ const CompleteBookingPage = () => {
             });
         } catch (err: any) {
             hotToast.error(err?.message || 'Failed to open Razorpay. Please try again.');
+        } finally {
+            setPaymentLoading(false);
+        }
+    };
+
+    // ─── STEP 2b: Simulate payment (dev/test) ─
+    const handleSimulatePayment = async () => {
+        if (!paymentOrder || !spaceDetails) return;
+
+        // --- CAPTURE BOOKING LEAD ---
+        try {
+            await axiosInstance.post('/api/leads/booking-lead', {
+                userId: user!.id || (user as any)._id,
+                name: user!.fullName || user!.email.split('@')[0],
+                email: user!.email,
+                phone: (user as any).phoneNumber,
+                spaceId: id!,
+                spaceName: spaceDetails.name,
+            });
+        } catch (err) {
+            console.error('Lead capture failed:', err);
+        }
+        // ----------------------------
+
+        setPaymentLoading(true);
+        setShowPaymentModal(false);
+        try {
+            hotToast.loading('Simulating payment...', { id: 'sim' });
+            const result = await simulatePayment(paymentOrder.orderId);
+            hotToast.dismiss('sim');
+            if (appliedCoupon) await markCouponUsed(appliedCoupon.code).catch(() => { });
+            clearCheckoutState();
+            navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(planDisplayName)}&amount=${finalTotal}`);
+        } catch (err: any) {
+            hotToast.dismiss('sim');
+            hotToast.error(err?.message || 'Simulation failed.');
         } finally {
             setPaymentLoading(false);
         }
@@ -592,6 +646,15 @@ const CompleteBookingPage = () => {
                         >
                             <Shield className="w-4 h-4" />
                             Pay {formatCurrency(finalTotal)} with Razorpay
+                        </button>
+
+                        {/* Simulate button */}
+                        <button
+                            onClick={handleSimulatePayment}
+                            disabled={paymentLoading}
+                            className="w-full mt-3 py-3.5 border-2 border-dashed border-border text-muted-foreground hover:border-primary/60 hover:text-foreground font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm"
+                        >
+                            🧪 Simulate Payment (Test Mode)
                         </button>
 
 
