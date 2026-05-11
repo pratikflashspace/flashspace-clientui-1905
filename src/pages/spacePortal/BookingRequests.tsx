@@ -164,6 +164,8 @@ export default function BookingRequests() {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+  const [timeline, setTimeline] = useState("all");
   const [detailStep, setDetailStep] = useState(1);
   const [uploadTarget, setUploadTarget] = useState<{ bookingId: string; type: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -195,7 +197,7 @@ export default function BookingRequests() {
   }, []);
 
   const filtered = useMemo(() => {
-    return requests.filter((request) => {
+    let result = requests.filter((request) => {
       const effectiveKycStatus = getEffectiveKycStatus(request);
       const haystack = [
         request.bookingNumber,
@@ -205,14 +207,38 @@ export default function BookingRequests() {
         request.space.name,
         request.plan.name,
       ].join(" ").toLowerCase();
+      
       const matchesQuery = haystack.includes(query.toLowerCase());
       const matchesStatus =
         status === "all" ||
         request.status === status ||
         effectiveKycStatus === status;
-      return matchesQuery && matchesStatus;
+
+      let matchesTimeline = true;
+      if (timeline !== "all" && request.startDate) {
+        const start = new Date(request.startDate);
+        const now = new Date();
+        if (timeline === "this_month") {
+          matchesTimeline = start.getMonth() === now.getMonth() && start.getFullYear() === now.getFullYear();
+        } else if (timeline === "last_month") {
+          const lastMonth = new Date();
+          lastMonth.setMonth(now.getMonth() - 1);
+          matchesTimeline = start.getMonth() === lastMonth.getMonth() && start.getFullYear() === lastMonth.getFullYear();
+        }
+      }
+
+      return matchesQuery && matchesStatus && matchesTimeline;
     });
-  }, [requests, query, status]);
+
+    // Sorting
+    result.sort((a, b) => {
+      const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
+      const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
+      return sortBy === "newest" ? dateB - dateA : dateA - dateB;
+    });
+
+    return result;
+  }, [requests, query, status, sortBy, timeline]);
 
   const selected = filtered.find((request) => request.bookingId === selectedId);
 
@@ -434,36 +460,59 @@ export default function BookingRequests() {
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-[#718178]" size={16} />
             <select value={status} onChange={(e) => setStatus(e.target.value)} className="h-11 rounded-lg border border-[#2D3F33]/10 bg-[#f7f8f6] pl-9 pr-8 outline-none focus:border-[#2D3F33]">
               <option value="all">All Status</option>
-              <option value="pending_kyc">Pending KYC</option>
+              <option value="pending">Pending</option>
               <option value="active">Active</option>
-              <option value="approved">KYC Approved</option>
+            </select>
+          </div>
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-[#718178]" size={16} />
+            <select value={timeline} onChange={(e) => setTimeline(e.target.value)} className="h-11 rounded-lg border border-[#2D3F33]/10 bg-[#f7f8f6] pl-9 pr-8 outline-none focus:border-[#2D3F33]">
+              <option value="all">Anytime</option>
+              <option value="this_month">This Month</option>
+              <option value="last_month">Last Month</option>
+            </select>
+          </div>
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-[#718178]" size={16} />
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="h-11 rounded-lg border border-[#2D3F33]/10 bg-[#f7f8f6] pl-9 pr-8 outline-none focus:border-[#2D3F33]">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
             </select>
           </div>
         </div>
       </div>
 
-      <div className="max-w-md">
-        <div className="overflow-hidden rounded-xl border border-[#2D3F33]/10 bg-white shadow-sm">
-          <div className="border-b px-4 py-3">
-            <p className="font-bold text-[#10251a]">{filtered.length} Requests</p>
+      <div className="mt-6">
+        <div className="mb-4 flex items-center justify-between">
+          <p className="font-bold text-[#10251a] text-lg">{filtered.length} Requests</p>
+        </div>
+        
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-32 animate-pulse bg-gray-100 rounded-xl border border-[#2D3F33]/10" />
+            ))}
           </div>
-          <div className="max-h-[720px] overflow-y-auto">
-            {loading ? (
-              <p className="p-6 text-sm text-[#607067]">Loading requests...</p>
-            ) : filtered.length === 0 ? (
-              <p className="p-6 text-sm text-[#607067]">No booking requests found.</p>
-            ) : (
-              filtered.map((request) => (
-                (() => {
-                  const effectiveKycStatus = getEffectiveKycStatus(request);
-                  return (
+        ) : filtered.length === 0 ? (
+          <div className="rounded-xl border border-[#2D3F33]/10 bg-white p-8 text-center">
+            <p className="text-sm text-[#607067]">No booking requests found.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.map((request) => {
+              const effectiveKycStatus = getEffectiveKycStatus(request);
+              const isSelected = selected?.bookingId === request.bookingId;
+              
+              return (
                 <button
                   key={request.bookingId}
                   onClick={() => {
                     setSelectedId(request.bookingId);
                     setDetailStep(1);
                   }}
-                  className={`block w-full border-b px-4 py-4 text-left transition hover:bg-[#f7f8f6] ${selected?.bookingId === request.bookingId ? "bg-[#fff9d8]" : ""}`}
+                  className={`block w-full rounded-xl border border-[#2D3F33]/10 bg-white p-4 text-left transition hover:bg-[#f7f8f6] hover:shadow-md ${
+                    isSelected ? "bg-[#fff9d8] border-[#35503F]/30 shadow-sm" : ""
+                  }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 min-w-0">
@@ -478,18 +527,25 @@ export default function BookingRequests() {
                       <div className="min-w-0">
                         <p className="font-black text-[#10251a] truncate">{request.bookingNumber}</p>
                         <p className="mt-1 text-sm font-semibold text-[#2D3F33] truncate">{request.client.companyName || request.client.name}</p>
-                        <p className="text-xs text-[#607067] truncate">{request.space.name}</p>
+                        <div className="mt-1 flex items-center justify-between gap-2">
+                          <p className="text-[10px] font-bold text-[#607067] truncate">{request.space.name}</p>
+                          <p className="text-[10px] font-black text-[#35503F]/60 shrink-0">{formatDate(request.startDate)}</p>
+                        </div>
                       </div>
                     </div>
-                    <span className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase ${statusClass(effectiveKycStatus)}`}>{effectiveKycStatus}</span>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase ${statusClass(effectiveKycStatus)}`}>
+                      {effectiveKycStatus}
+                    </span>
+                    <ChevronRight size={14} className="text-[#2D3F33]/40" />
                   </div>
                 </button>
-                  );
-                })()
-              ))
-            )}
+              );
+            })}
           </div>
-        </div>
+        )}
+      </div>
 
         {selected && (
           (() => {
@@ -759,8 +815,7 @@ export default function BookingRequests() {
           })()
         )}
       </div>
-    </div>
-  );
+    );
 }
 
 function AgreementCard({

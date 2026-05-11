@@ -39,11 +39,6 @@ export const sidebarConfig = [
     icon: BarChart3,
   },
   {
-    label: "Summary Reports",
-    path: "/spaceportal/summary-analytics",
-    icon: Star, // Using Star or any other icon like FileText
-  },
-  {
     label: "My Spaces",
     path: "/spaceportal/space-management",
     icon: Building2,

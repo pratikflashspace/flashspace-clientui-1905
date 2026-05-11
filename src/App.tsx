@@ -16,7 +16,6 @@ import { ChatProvider } from "@/contexts/ChatContext";
 const Index = lazy(() => import("./pages/Index"));
 const Services = lazy(() => import("./pages/Services"));
 const ListYourSpace = lazy(() => import("./pages/ListYourSpace"));
-const ComingSoon = lazy(() => import("./pages/ComingSoon"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const VirtualOffice = lazy(() => import("./pages/services/VirtualOffice"));
 const OnDemand = lazy(() => import("./pages/services/OnDemand"));
@@ -82,6 +81,7 @@ const RevenueDashboard = lazy(() => import("./pages/admin/RevenueDashboard"));
 const Leaderboard = lazy(() => import("./pages/admin/Leaderboard"));
 const AdminAffiliateManagement = lazy(() => import("./pages/admin/AdminAffiliateManagement"));
 const AdminPartnerInvoices = lazy(() => import("./pages/admin/PartnerInvoices"));
+const AdminInvoices = lazy(() => import("./pages/admin/Invoices"));
 const DocumentManagement = lazy(() => import("./pages/admin/DocumentManagement"));
 const TrackProgress = lazy(() => import("./pages/admin/TrackProgress"));
 
@@ -329,7 +329,6 @@ const App = () => (
                         element={<ListYourSpace />}
                       />
                       <Route path="/partner" element={<PartnerWithUs />} />
-                      <Route path="/coming-soon" element={<ComingSoon />} />
                       <Route path="/start-chatting" element={<StartChatting />} />
 
                       {/* Protected Routes */}
@@ -409,7 +408,7 @@ const App = () => (
                           />
                           <Route
                             path="invoices"
-                            element={<Navigate to="/admin/partner-invoices" replace />}
+                            element={<AdminInvoices />}
                           />
                           <Route path="finance" element={<ReceivablePayable />} />
                           <Route path="balance" element={<BalanceSheet />} />

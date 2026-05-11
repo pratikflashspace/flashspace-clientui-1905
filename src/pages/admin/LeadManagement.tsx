@@ -34,6 +34,11 @@ const LeadManagement = () => {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
 
+  // Filter States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+  const [timeRange, setTimeRange] = useState({ start: "", end: "" });
+
   const fetchLeads = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
@@ -89,6 +94,17 @@ const LeadManagement = () => {
         }),
         notes: contact.message || (contact.city ? `City Focus: ${contact.city}` : "New lead from website."),
         rawStatus: contact.status || "pending",
+        enquiryDate: new Date(contact.createdAt).toLocaleDateString("en-IN", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }),
+        enquiryTime: new Date(contact.createdAt).toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        }),
+        rawCreatedAt: contact.createdAt,
       };
     });
 
@@ -152,10 +168,41 @@ const LeadManagement = () => {
   const warmLeads = leads.filter((l) => l.status === "warm");
   const coldLeads = leads.filter((l) => l.status === "cold");
 
-  // Stats
   const wonLeadsCount = leads.filter((l) => l.status === "won").length;
   const conversionRate =
     leads.length > 0 ? ((wonLeadsCount / leads.length) * 100).toFixed(1) : 0;
+
+  const filteredLeads = leads.filter((lead) => {
+    // Search query filter
+    const matchesSearch =
+      lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.phone.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (!matchesSearch) return false;
+
+    // Date range filter
+    if (dateRange.start || dateRange.end) {
+      const leadDate = new Date(lead.rawCreatedAt);
+      if (dateRange.start && leadDate < new Date(dateRange.start)) return false;
+      if (dateRange.end) {
+        const endDate = new Date(dateRange.end);
+        endDate.setHours(23, 59, 59, 999);
+        if (leadDate > endDate) return false;
+      }
+    }
+
+    // Time range filter
+    if (timeRange.start || timeRange.end) {
+      const leadDate = new Date(lead.rawCreatedAt);
+      const leadTimeStr = `${leadDate.getHours().toString().padStart(2, "0")}:${leadDate.getMinutes().toString().padStart(2, "0")}`;
+
+      if (timeRange.start && leadTimeStr < timeRange.start) return false;
+      if (timeRange.end && leadTimeStr > timeRange.end) return false;
+    }
+
+    return true;
+  });
 
   const renderLeadTable = (tableLeads: typeof leads) => (
     <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm">
@@ -171,6 +218,12 @@ const LeadManagement = () => {
               </th>
               <th className="text-left p-4 text-sm font-semibold text-foreground">
                 Mobile Number
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Date of Enquiry
+              </th>
+              <th className="text-left p-4 text-sm font-semibold text-foreground">
+                Time of Enquiry
               </th>
               <th className="text-left p-4 text-sm font-semibold text-foreground">
                 Actions
@@ -196,6 +249,16 @@ const LeadManagement = () => {
                 <td className="p-4">
                   <div className="text-sm text-muted-foreground">
                     {lead.phone}
+                  </div>
+                </td>
+                <td className="p-4">
+                  <div className="text-sm font-medium text-foreground">
+                    {lead.enquiryDate}
+                  </div>
+                </td>
+                <td className="p-4">
+                  <div className="text-sm font-medium text-foreground">
+                    {lead.enquiryTime}
                   </div>
                 </td>
                 <td className="p-4">
@@ -273,19 +336,74 @@ const LeadManagement = () => {
       </div>
 
       {/* Search & Filter */}
-      <div className="flex gap-4 mb-6">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search leads..." className="pl-10" />
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-wrap gap-4 items-end">
+          <div className="relative flex-1 min-w-[240px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search leads..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">Date Range</p>
+            <div className="flex items-center gap-2">
+              <Input
+                type="date"
+                className="w-[150px]"
+                value={dateRange.start}
+                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+              />
+              <span className="text-muted-foreground">-</span>
+              <Input
+                type="date"
+                className="w-[150px]"
+                value={dateRange.end}
+                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">Time Range</p>
+            <div className="flex items-center gap-2">
+              <Input
+                type="time"
+                className="w-[130px]"
+                value={timeRange.start}
+                onChange={(e) => setTimeRange(prev => ({ ...prev, start: e.target.value }))}
+              />
+              <span className="text-muted-foreground">-</span>
+              <Input
+                type="time"
+                className="w-[130px]"
+                value={timeRange.end}
+                onChange={(e) => setTimeRange(prev => ({ ...prev, end: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          {(searchQuery || dateRange.start || dateRange.end || timeRange.start || timeRange.end) && (
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setSearchQuery("");
+                setDateRange({ start: "", end: "" });
+                setTimeRange({ start: "", end: "" });
+              }}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Clear Filters
+            </Button>
+          )}
         </div>
-        <Button variant="outline">
-          <Filter className="w-4 h-4 mr-2" />
-          Filter
-        </Button>
       </div>
 
       <div className="mt-6">
-        {renderLeadTable(leads)}
+        {renderLeadTable(filteredLeads)}
       </div>
 
       {/* Lead View Modal */}

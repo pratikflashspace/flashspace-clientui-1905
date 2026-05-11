@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { adminService } from "@/services/admin.service";
+import { adminService, UserData } from "@/services/admin.service";
 import {
   Download,
   Eye,
@@ -11,6 +11,13 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
+  Upload,
+  Plus,
+  User as UserIcon,
+  FileText,
+  Loader2,
+  CheckCircle2,
+  Receipt,
 } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +33,8 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Invoice {
   _id: string;
@@ -44,6 +53,7 @@ interface Invoice {
   razorpayPaymentId?: string;
   fileUrl?: string;
   invoiceType?: string;
+  pdfUrl?: string;
   paymentDetails?: {
     paymentMethod?: string;
     amountPaid?: number;
@@ -103,6 +113,9 @@ const InvoiceViewModal = ({
   onOpenChange: (open: boolean) => void;
 }) => {
   if (!invoice) return null;
+  const isManual = invoice.invoiceType === "admin_manual";
+  const displayFileUrl = invoice.pdfUrl || invoice.fileUrl;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg p-0 overflow-hidden rounded-3xl border-border border shadow-2xl bg-background">
@@ -129,111 +142,81 @@ const InvoiceViewModal = ({
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {!isManual && (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+                  <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Space</p>
+                  <p className="font-medium text-foreground">
+                    {invoice.spaceName || "—"}
+                  </p>
+                </div>
+                <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+                  <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Service Type</p>
+                  <p className="font-medium text-foreground">
+                    {categoryLabel(invoice.paymentType)}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+                  <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Plan</p>
+                  <p className="font-medium text-foreground">
+                    {invoice.planName || "—"}
+                  </p>
+                </div>
+                <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
+                  <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Date</p>
+                  <p className="font-medium text-foreground">
+                    {invoice.createdAt
+                      ? format(new Date(invoice.createdAt), "dd MMM yyyy")
+                      : "—"}
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+          {isManual && (
             <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
-              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Space</p>
+              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Description</p>
               <p className="font-medium text-foreground">
-                {invoice.spaceName || "—"}
+                {invoice.paymentType || "Manual Invoice"}
               </p>
             </div>
-            <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
-              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Service Type</p>
-              <p className="font-medium text-foreground">
-                {categoryLabel(invoice.paymentType)}
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
-              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Plan</p>
-              <p className="font-medium text-foreground">
-                {invoice.planName || "—"}
-              </p>
-            </div>
-            <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
-              <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Date</p>
-              <p className="font-medium text-foreground">
-                {invoice.createdAt
-                  ? format(new Date(invoice.createdAt), "dd MMM yyyy")
-                  : "—"}
-              </p>
-            </div>
-          </div>
+          )}
           <div className="border-t border-border pt-5 mt-2">
             <div className="flex items-center justify-between gap-4">
               <p className="text-muted-foreground font-medium text-base">Total Amount</p>
               <p className="text-2xl font-black text-primary italic">
-                {formatCurrency(invoice.totalAmount)}
+                {formatCurrency(invoice.totalAmount || invoice.amount)}
               </p>
             </div>
-            <div className="mt-4 p-3 bg-muted/30 rounded-xl space-y-1 border border-border/50">
-              {invoice.razorpayOrderId && (
-                <p className="text-[10px] text-muted-foreground font-medium">
-                  Order ID: <span className="font-mono text-foreground/80">{invoice.razorpayOrderId}</span>
-                </p>
-              )}
-              {invoice.razorpayPaymentId && (
-                <p className="text-[10px] text-muted-foreground font-medium">
-                  Payment ID: <span className="font-mono text-foreground/80">{invoice.razorpayPaymentId}</span>
-                </p>
-              )}
-            </div>
-          </div>
-          {invoice.paymentDetails && (
-            <div className="border-t border-border pt-5">
-              <p className="text-xs uppercase font-bold tracking-wider text-muted-foreground mb-3">
-                Settlement Details
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="bg-emerald-50/60 p-3 rounded-xl border border-emerald-100">
-                  <p className="text-[10px] uppercase font-bold text-emerald-700 mb-1">
-                    Payment Method
+            {!isManual && (
+              <div className="mt-4 p-3 bg-muted/30 rounded-xl space-y-1 border border-border/50">
+                {invoice.razorpayOrderId && (
+                  <p className="text-[10px] text-muted-foreground font-medium">
+                    Order ID: <span className="font-mono text-foreground/80">{invoice.razorpayOrderId}</span>
                   </p>
-                  <p className="font-semibold text-foreground">
-                    {invoice.paymentDetails.paymentMethod || "-"}
+                )}
+                {invoice.razorpayPaymentId && (
+                  <p className="text-[10px] text-muted-foreground font-medium">
+                    Payment ID: <span className="font-mono text-foreground/80">{invoice.razorpayPaymentId}</span>
                   </p>
-                </div>
-                <div className="bg-emerald-50/60 p-3 rounded-xl border border-emerald-100">
-                  <p className="text-[10px] uppercase font-bold text-emerald-700 mb-1">
-                    Amount Paid
-                  </p>
-                  <p className="font-semibold text-foreground">
-                    {formatCurrency(
-                      invoice.paymentDetails.amountPaid || invoice.totalAmount,
-                    )}
-                  </p>
-                </div>
-                <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">
-                    Payment Date
-                  </p>
-                  <p className="font-medium text-foreground">
-                    {invoice.paymentDetails.paymentDate
-                      ? new Date(
-                          invoice.paymentDetails.paymentDate,
-                        ).toLocaleDateString("en-IN")
-                      : "-"}
-                  </p>
-                </div>
-                <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">
-                    UTR Number
-                  </p>
-                  <p className="font-mono text-xs font-semibold text-foreground">
-                    {invoice.paymentDetails.utrNumber || "-"}
-                  </p>
-                </div>
+                )}
               </div>
-              {invoice.paymentDetails.paymentProof && (
-                <a
-                  href={getUploadedFileUrl(invoice.paymentDetails.paymentProof)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-3 inline-flex h-9 items-center rounded-lg border border-border px-3 text-xs font-bold text-primary hover:bg-primary/10"
-                >
-                  View / Download Payment Proof
-                </a>
-              )}
+            )}
+          </div>
+          {displayFileUrl && (
+            <div className="pt-2">
+              <a
+                href={getUploadedFileUrl(displayFileUrl)}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full flex h-11 items-center justify-center rounded-xl border border-primary/20 bg-primary/5 text-sm font-bold text-primary hover:bg-primary/10 transition-colors"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                View / Download Invoice PDF
+              </a>
             </div>
           )}
         </div>
@@ -242,7 +225,266 @@ const InvoiceViewModal = ({
   );
 };
 
-// ─── Main Component ────────────────────────────────────────────────────────────
+// ─── Admin Invoice Upload Tab ──────────────────────────────────────────────────
+const AdminInvoiceUploadTab = () => {
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState("");
+  const [formData, setFormData] = useState({
+    invoiceNumber: `FS-${Date.now().toString().slice(-6)}`,
+    amount: "",
+    description: "",
+    dueDate: format(new Date(), "yyyy-MM-dd"),
+  });
+
+  const searchUsers = useCallback(async (query: string) => {
+    if (!query || query.length < 2) return;
+    setLoadingUsers(true);
+    try {
+      const res = await adminService.getAllUsers({ search: query, limit: 5 });
+      if (res.success) {
+        setUsers(res.data.users);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingUsers(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery) searchUsers(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchUsers]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) {
+      if (f.type !== "application/pdf") {
+        toast({ title: "Error", description: "Only PDF files are allowed", variant: "destructive" });
+        return;
+      }
+      setFile(f);
+      setFilePreview(f.name);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUser || !file || !formData.amount || !formData.description) {
+      toast({ title: "Warning", description: "Please fill all fields and select a user", variant: "destructive" });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const data = new FormData();
+      data.append("userId", selectedUser._id);
+      data.append("invoiceNumber", formData.invoiceNumber);
+      data.append("amount", formData.amount);
+      data.append("description", formData.description);
+      data.append("dueDate", formData.dueDate);
+      data.append("invoiceFile", file);
+
+      const res = await adminService.uploadAdminInvoice(data);
+      if (res.success) {
+        toast({ title: "Success", description: "Invoice uploaded successfully" });
+        // Reset form
+        setSelectedUser(null);
+        setFile(null);
+        setFilePreview("");
+        setFormData({
+          invoiceNumber: `FS-${Date.now().toString().slice(-6)}`,
+          amount: "",
+          description: "",
+          dueDate: format(new Date(), "yyyy-MM-dd"),
+        });
+      }
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to upload invoice", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8">
+        {/* Left: User Selection & File */}
+        <div className="space-y-6">
+          <div className="bg-background border border-border rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+              <UserIcon className="w-5 h-5 text-primary" />
+              1. Select User
+            </h3>
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search user by name or email..."
+                className="pl-10 h-12 rounded-xl"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {loadingUsers && <Loader2 className="absolute right-3 top-3.5 w-5 h-5 animate-spin text-primary" />}
+            </div>
+
+            {users.length > 0 && searchQuery && !selectedUser && (
+              <div className="border border-border rounded-xl overflow-hidden mb-4 bg-muted/20">
+                {users.map(u => (
+                  <button
+                    key={u._id}
+                    onClick={() => {
+                      setSelectedUser(u);
+                      setSearchQuery("");
+                      setUsers([]);
+                    }}
+                    className="w-full text-left p-3 hover:bg-primary/5 border-b border-border last:border-0 transition-colors flex items-center gap-3"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase">
+                      {u.fullName.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground">{u.fullName}</p>
+                      <p className="text-[10px] text-muted-foreground">{u.email}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {selectedUser && (
+              <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-sm uppercase">
+                    {selectedUser.fullName.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{selectedUser.fullName}</p>
+                    <p className="text-[10px] text-muted-foreground">{selectedUser.email}</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedUser(null)} className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive">
+                  <XCircle className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-background border border-border rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-primary" />
+              2. Upload PDF
+            </h3>
+            <div className="relative group">
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileChange}
+                className="absolute inset-0 opacity-0 z-10 cursor-pointer"
+              />
+              <div className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${file ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 hover:bg-primary/5'}`}>
+                {file ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <CheckCircle2 className="w-10 h-10 text-primary" />
+                    <p className="text-sm font-bold text-foreground">{filePreview}</p>
+                    <p className="text-[10px] text-muted-foreground">Click to change file</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                      <Upload className="w-6 h-6 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm font-bold">Drag & drop or click to upload</p>
+                    <p className="text-[10px] text-muted-foreground">PDF files only (Max 10MB)</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Invoice Details */}
+        <div className="bg-background border border-border rounded-3xl p-8 shadow-xl shadow-primary/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-8 opacity-5">
+            <Receipt className="w-32 h-32 text-primary" />
+          </div>
+          <h3 className="text-xl font-black text-foreground mb-8 uppercase tracking-widest italic">
+            Invoice <span className="text-primary">Details</span>
+          </h3>
+
+          <form onSubmit={handleSubmit} className="space-y-6 relative">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Invoice #</Label>
+                <Input
+                  className="h-12 bg-muted/30 border-border rounded-xl font-mono text-sm"
+                  value={formData.invoiceNumber}
+                  onChange={(e) => setFormData(p => ({ ...p, invoiceNumber: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Amount (INR)</Label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  className="h-12 bg-muted/30 border-border rounded-xl font-bold text-lg"
+                  value={formData.amount}
+                  onChange={(e) => setFormData(p => ({ ...p, amount: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Due Date</Label>
+              <Input
+                type="date"
+                className="h-12 bg-muted/30 border-border rounded-xl"
+                value={formData.dueDate}
+                onChange={(e) => setFormData(p => ({ ...p, dueDate: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Description / Remarks</Label>
+              <Textarea
+                placeholder="Briefly describe what this invoice is for..."
+                className="min-h-[120px] bg-muted/30 border-border rounded-2xl resize-none"
+                value={formData.description}
+                onChange={(e) => setFormData(p => ({ ...p, description: e.target.value }))}
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={uploading}
+              className="w-full h-14 rounded-2xl font-black text-base uppercase tracking-widest shadow-lg shadow-primary/30 transition-all hover:scale-[1.02] active:scale-95"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Plus className="w-5 h-5 mr-3" />
+                  Generate & Send Invoice
+                </>
+              )}
+            </Button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Main Invoices Page ────────────────────────────────────────────────────────────
 const Invoices = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -254,6 +496,7 @@ const Invoices = () => {
   const [total, setTotal] = useState(0);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("received");
 
   const limit = 10;
 
@@ -292,8 +535,10 @@ const Invoices = () => {
   };
 
   useEffect(() => {
-    fetchInvoices(page, statusFilter, typeFilter);
-  }, [page, statusFilter, typeFilter]);
+    if (activeTab === "received") {
+      fetchInvoices(page, statusFilter, typeFilter);
+    }
+  }, [page, statusFilter, typeFilter, activeTab]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -307,10 +552,16 @@ const Invoices = () => {
   };
 
   const handleDownload = (invoice: Invoice) => {
-    toast({
-      title: "Downloading Invoice",
-      description: `${invoice.invoiceNumber} is being prepared as PDF.`,
-    });
+    const url = getUploadedFileUrl(invoice.pdfUrl || invoice.fileUrl || "");
+    if (url) {
+      window.open(url, "_blank");
+    } else {
+      toast({
+        title: "Error",
+        description: "Invoice PDF not available",
+        variant: "destructive",
+      });
+    }
   };
 
   // Compute stats from fetched data
@@ -318,240 +569,176 @@ const Invoices = () => {
   const paidCount = invoices.filter(
     (i) => i.status === "completed" || i.status === "paid",
   ).length;
-  const failedCount = invoices.filter((i) => i.status === "failed").length;
   const totalRevenue = invoices
     .filter((i) => i.status === "completed" || i.status === "paid")
-    .reduce((sum, i) => sum + (i.totalAmount || 0), 0);
-
-  const pendingInvoices = invoices.filter((i) => i.status === "pending");
-  const paidInvoices = invoices.filter(
-    (i) => i.status === "completed" || i.status === "paid",
-  );
+    .reduce((sum, i) => sum + (i.totalAmount || i.amount || 0), 0);
 
   return (
     <DashboardLayout
       portalName="FlashSpace Admin"
-      portalDescription="Complete platform management"
+      portalDescription={activeTab === "received" ? "Complete platform management" : "Upload & send manual invoices to users"}
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
-          Invoice <span className="text-primary italic">Management</span>
-        </h1>
-        <p className="text-sm md:text-base text-muted-foreground mt-1">
-          Review and manage all client invoices and payments
-        </p>
-      </div>
+      <Tabs defaultValue="received" className="w-full" onValueChange={setActiveTab}>
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="animate-in fade-in slide-in-from-left-4 duration-500">
+            {activeTab === "received" ? (
+              <>
+                <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+                  Payment <span className="text-primary italic">Received</span>
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  Review and manage all client invoices and booking payments.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+                  Admin <span className="text-primary italic">Invoices</span>
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  Upload and issue manual invoices directly to users.
+                </p>
+              </>
+            )}
+          </div>
 
-      {/* Stats */}
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
-          <p className="text-2xl font-extrabold text-primary">
-            {loading ? "—" : pendingCount}
-          </p>
-          <p className="text-sm text-muted-foreground font-medium">Pending (This Page)</p>
-        </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-destructive/20 transition-colors">
-          <p className="text-2xl font-extrabold text-destructive">
-            {loading ? "—" : failedCount}
-          </p>
-          <p className="text-sm text-muted-foreground font-medium">Failed</p>
-        </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
-          <p className="text-2xl font-extrabold text-foreground">
-            {loading ? "—" : total}
-          </p>
-          <p className="text-sm text-muted-foreground font-medium">Total Invoices</p>
-        </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-emerald-200 transition-colors">
-          <p className="text-2xl font-extrabold text-emerald-600">
-            {loading ? "—" : formatCurrency(totalRevenue)}
-          </p>
-          <p className="text-sm text-muted-foreground font-medium">Cleared (This Page)</p>
-        </div>
-      </div>
-
-      {/* Search & Filter */}
-      <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-3 mb-6">
-        <div className="relative flex-1 md:max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search invoices..."
-            className="pl-10 h-11"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-3 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-          <select
-            value={typeFilter}
-            onChange={(e) => {
-              setTypeFilter(e.target.value);
-              setPage(1);
-            }}
-            className="flex-1 md:flex-none px-4 py-2 bg-background border border-border rounded-lg text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 min-w-[140px] appearance-none"
-          >
-            <option value="all">All Types</option>
-            <option value="virtual_office">Virtual Office</option>
-            <option value="coworking_space">Coworking Space</option>
-            <option value="meeting_room">Meeting Room</option>
-            <option value="partner_invoice">Partner Invoice</option>
-          </select>
-          <select
-            value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value);
-              setPage(1);
-            }}
-            className="flex-1 md:flex-none px-4 py-2 bg-background border border-border rounded-lg text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 min-w-[120px] appearance-none"
-          >
-            <option value="all">All Status</option>
-            <option value="completed">Paid</option>
-            <option value="pending">Pending</option>
-            <option value="failed">Failed</option>
-          </select>
-        </div>
-        <Button type="submit" variant="outline" className="h-11 shadow-sm px-6">
-          <Filter className="w-4 h-4 mr-2" />
-          Apply Filters
-        </Button>
-      </form>
-
-      <Tabs defaultValue="all" className="space-y-6">
-        <div className="overflow-x-auto pb-1 -mx-2 px-2 scrollbar-none">
-          <TabsList className="h-auto p-1 bg-muted/50 rounded-lg inline-flex w-full md:w-auto">
-            <TabsTrigger value="pending" className="px-5 py-2.5 text-sm">
-              Pending ({pendingInvoices.length})
+          <TabsList className="bg-muted/50 p-1 rounded-xl border border-border h-auto flex flex-wrap gap-1">
+            <TabsTrigger 
+              value="received" 
+              className="px-8 py-2.5 rounded-lg font-bold data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all"
+            >
+              Payment History
             </TabsTrigger>
-            <TabsTrigger value="paid" className="px-5 py-2.5 text-sm">Paid ({paidInvoices.length})</TabsTrigger>
-            <TabsTrigger value="all" className="px-5 py-2.5 text-sm">All Invoices</TabsTrigger>
+            <TabsTrigger 
+              value="upload" 
+              className="px-8 py-2.5 rounded-lg font-bold data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all"
+            >
+              Upload Invoice
+            </TabsTrigger>
           </TabsList>
         </div>
 
-        {/* ── Pending Tab ── */}
-        <TabsContent value="pending">
-          {loading ? (
-            <div className="p-10 text-center text-muted-foreground">
-              Loading…
-            </div>
-          ) : pendingInvoices.length === 0 ? (
-            <div className="bg-background border border-border rounded-xl p-10 text-center text-muted-foreground">
-              No pending invoices found.
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {pendingInvoices.map((invoice) => (
-                <div
-                  key={invoice._id}
-                  className="bg-background border border-border rounded-xl p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-primary/20 transition-colors"
-                >
-                  <div className="flex-1 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <span className="font-bold text-foreground text-sm tracking-tight">
-                        {invoice.invoiceNumber}
-                      </span>
-                      <div className="flex gap-2">
-                        <Badge variant="outline" className="text-[10px] h-5 py-0">
-                          {categoryLabel(invoice.paymentType)}
-                        </Badge>
-                        {getStatusBadge(invoice.status)}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-foreground font-semibold text-base leading-tight">
-                        {invoice.userName}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {invoice.userEmail}
-                      </p>
-                    </div>
-                    <p className="text-xs text-muted-foreground font-medium pt-1">
-                      {invoice.spaceName} · <span className="text-primary">{invoice.planName}</span>
-                    </p>
-                  </div>
-                  <div className="flex items-end md:items-center justify-between md:flex-col md:text-right border-t border-border/50 md:border-0 pt-3 md:pt-0">
-                    <div className="md:mb-1">
-                      <p className="text-xl md:text-2xl font-black text-foreground md:leading-none">
-                        {formatCurrency(invoice.totalAmount)}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground mt-1 font-medium">
-                        {format(new Date(invoice.createdAt), "dd MMM yyyy")}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleViewInvoice(invoice)}
-                        className="h-9 px-4 rounded-lg border-muted-foreground/20"
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        View
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDownload(invoice)}
-                        className="h-9 w-9 p-0 rounded-lg hover:bg-muted"
-                      >
-                        <Download className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
+        <TabsContent value="received" className="outline-none space-y-6">
+          {/* Stats */}
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+            <div className="bg-background border border-border rounded-2xl p-6 hover:border-primary/20 transition-all shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-primary/10 text-primary"><Clock className="w-6 h-6" /></div>
+                <div>
+                  <p className="text-2xl font-black text-foreground">{loading ? "—" : pendingCount}</p>
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Pending (This Page)</p>
                 </div>
-              ))}
+              </div>
             </div>
-          )}
-        </TabsContent>
+            <div className="bg-background border border-border rounded-2xl p-6 hover:border-emerald-200 transition-all shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-emerald-100 text-emerald-600"><CheckCircle2 className="w-6 h-6" /></div>
+                <div>
+                  <p className="text-2xl font-black text-emerald-600">{loading ? "—" : formatCurrency(totalRevenue)}</p>
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Cleared (This Page)</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-background border border-border rounded-2xl p-6 hover:border-primary/20 transition-all shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-muted text-foreground"><FileText className="w-6 h-6" /></div>
+                <div>
+                  <p className="text-2xl font-black text-foreground">{loading ? "—" : total}</p>
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Total Records</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        {/* ── Paid Tab ── */}
-        <TabsContent value="paid">
-          <InvoiceTable
-            invoices={paidInvoices}
-            loading={loading}
-            onView={handleViewInvoice}
-            onDownload={handleDownload}
-          />
-        </TabsContent>
+          {/* Search & Filter */}
+          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-3 mb-6">
+            <div className="relative flex-1 md:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search invoices..."
+                className="pl-10 h-12 rounded-xl"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-3">
+              <select
+                value={typeFilter}
+                onChange={(e) => {
+                  setTypeFilter(e.target.value);
+                  setPage(1);
+                }}
+                className="px-4 h-12 bg-background border border-border rounded-xl text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/20 appearance-none min-w-[140px]"
+              >
+                <option value="all">All Types</option>
+                <option value="virtual_office">Virtual Office</option>
+                <option value="coworking_space">Coworking</option>
+                <option value="meeting_room">Meeting Room</option>
+                <option value="admin_manual">Admin Manual</option>
+              </select>
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setPage(1);
+                }}
+                className="px-4 h-12 bg-background border border-border rounded-xl text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/20 appearance-none min-w-[120px]"
+              >
+                <option value="all">All Status</option>
+                <option value="completed">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+            <Button type="submit" variant="outline" className="h-12 px-6 rounded-xl font-bold">
+              <Filter className="w-4 h-4 mr-2" />
+              Filter
+            </Button>
+          </form>
 
-        {/* ── All Tab ── */}
-        <TabsContent value="all">
           <InvoiceTable
             invoices={invoices}
             loading={loading}
             onView={handleViewInvoice}
             onDownload={handleDownload}
           />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6 bg-muted/20 p-4 rounded-2xl border border-border">
+              <span className="text-sm text-muted-foreground">
+                Page <span className="font-bold text-foreground">{page}</span> of{" "}
+                <span className="font-bold text-foreground">{totalPages}</span>
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg h-9"
+                  disabled={page === 1}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg h-9"
+                  disabled={page === totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="upload" className="outline-none">
+          <AdminInvoiceUploadTab />
         </TabsContent>
       </Tabs>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-6">
-          <span className="text-sm text-muted-foreground">
-            Page <span className="font-bold text-foreground">{page}</span> of{" "}
-            <span className="font-bold text-foreground">{totalPages}</span>
-          </span>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page === 1}
-              onClick={() => setPage((p) => p - 1)}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page === totalPages}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      )}
 
       <InvoiceViewModal
         invoice={selectedInvoice}
@@ -576,179 +763,99 @@ const InvoiceTable = ({
 }) => {
   if (loading)
     return (
-      <div className="p-10 text-center text-muted-foreground">Loading…</div>
+      <div className="p-20 text-center flex flex-col items-center gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-primary opacity-20" />
+        <p className="text-muted-foreground font-medium italic">Loading invoices...</p>
+      </div>
     );
   if (invoices.length === 0)
     return (
-      <div className="bg-background border border-border rounded-xl p-10 text-center text-muted-foreground">
-        No invoices found.
+      <div className="bg-background border border-border rounded-3xl p-20 text-center flex flex-col items-center gap-4">
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+          <Receipt className="w-8 h-8 text-muted-foreground opacity-30" />
+        </div>
+        <p className="text-muted-foreground font-bold">No invoices found matching your filters.</p>
       </div>
     );
 
   return (
-    <div className="space-y-4">
-      {/* Desktop View */}
-      <div className="hidden lg:block bg-background border border-border rounded-xl overflow-hidden">
+    <div className="bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
+      <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Invoice ID
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Customer
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Service
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Amount
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Date
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Status
-              </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground text-right px-6">
-                Actions
-              </th>
+          <thead>
+            <tr className="bg-muted/30 border-b border-border">
+              <th className="text-left p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Invoice / ID</th>
+              <th className="text-left p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Client</th>
+              <th className="text-left p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Service / Type</th>
+              <th className="text-left p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Amount</th>
+              <th className="text-left p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground text-center">Status</th>
+              <th className="text-right p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground pr-8">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {invoices.map((invoice) => (
-              <tr
-                key={invoice._id}
-                className="border-t border-border hover:bg-muted/20 transition-colors"
-              >
-                <td className="p-4">
-                  <p className="font-bold text-foreground text-sm tracking-tight">
-                    {invoice.invoiceNumber}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground font-mono truncate max-w-[120px]">
-                    {invoice.razorpayOrderId}
-                  </p>
-                </td>
-                <td className="p-4">
-                  <p className="font-semibold text-foreground text-sm">
-                    {invoice.userName}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate max-w-[150px]">
-                    {invoice.userEmail}
-                  </p>
-                </td>
-                <td className="p-4">
-                  <p className="text-xs font-medium text-foreground truncate max-w-[150px]">
-                    {invoice.spaceName || "—"}
-                  </p>
-                  <Badge variant="outline" className="mt-1 text-[10px] h-5 py-0 px-2 font-medium">
-                    {categoryLabel(invoice.paymentType)}
-                  </Badge>
-                </td>
-                <td className="p-4 font-black text-foreground">
-                  {formatCurrency(invoice.totalAmount)}
-                </td>
-                <td className="p-4 text-muted-foreground text-xs font-medium">
-                  {invoice.createdAt
-                    ? format(new Date(invoice.createdAt), "dd MMM yyyy")
-                    : "—"}
-                </td>
-                <td className="p-4">{getStatusBadge(invoice.status)}</td>
-                <td className="p-4 text-right px-6">
-                  <div className="flex gap-2 justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onView(invoice)}
-                      className="h-8 w-8 p-0 rounded-lg"
-                    >
-                      <Eye className="w-4 h-4 text-muted-foreground" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onDownload(invoice)}
-                      className="h-8 w-8 p-0 rounded-lg"
-                    >
-                      <Download className="w-4 h-4 text-muted-foreground" />
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+          <tbody className="divide-y divide-border/50">
+            {invoices.map((invoice) => {
+              const isManual = invoice.invoiceType === "admin_manual";
+              return (
+                <tr key={invoice._id} className="hover:bg-muted/10 transition-colors group">
+                  <td className="p-5">
+                    <p className="font-bold text-foreground">{invoice.invoiceNumber}</p>
+                    <p className="text-[10px] text-muted-foreground font-mono truncate max-w-[140px]">
+                      {invoice.razorpayOrderId || "Manual Entry"}
+                    </p>
+                  </td>
+                  <td className="p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px] uppercase">
+                        {invoice.userName?.charAt(0) || "U"}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-foreground leading-tight">{invoice.userName}</p>
+                        <p className="text-[10px] text-muted-foreground">{invoice.userEmail}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-5">
+                    <p className="text-xs font-bold text-foreground truncate max-w-[150px]">
+                      {invoice.spaceName || "Direct Billing"}
+                    </p>
+                    <Badge variant="outline" className={`mt-1 text-[9px] h-4 py-0 leading-none px-1.5 font-bold uppercase ${isManual ? 'border-primary/30 text-primary bg-primary/5' : ''}`}>
+                      {categoryLabel(invoice.paymentType)}
+                    </Badge>
+                  </td>
+                  <td className="p-5">
+                    <p className="text-base font-black text-foreground">{formatCurrency(invoice.totalAmount || invoice.amount)}</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {invoice.createdAt ? format(new Date(invoice.createdAt), "dd MMM yyyy") : "—"}
+                    </p>
+                  </td>
+                  <td className="p-5 text-center">
+                    {getStatusBadge(invoice.status)}
+                  </td>
+                  <td className="p-5 text-right pr-8">
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onView(invoice)}
+                        className="h-9 w-9 p-0 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDownload(invoice)}
+                        className="h-9 w-9 p-0 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors"
+                      >
+                        <Download className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
-      </div>
-
-      {/* Mobile/Tablet View */}
-      <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-4">
-        {invoices.map((invoice) => (
-          <div
-            key={invoice._id}
-            className="bg-background border border-border rounded-xl p-4 space-y-4 hover:border-primary/20 transition-colors"
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-0.5">
-                  {invoice.invoiceNumber}
-                </p>
-                <h3 className="font-bold text-foreground leading-tight">
-                  {invoice.userName}
-                </h3>
-                <p className="text-xs text-muted-foreground truncate max-w-[200px]">
-                  {invoice.userEmail}
-                </p>
-              </div>
-              {getStatusBadge(invoice.status)}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 py-3 border-y border-border/50">
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Service</p>
-                <p className="text-xs font-semibold text-foreground leading-tight truncate">
-                  {invoice.spaceName || "—"}
-                </p>
-                <Badge variant="outline" className="mt-1 text-[9px] h-4 py-0 leading-none px-1.5">
-                  {categoryLabel(invoice.paymentType)}
-                </Badge>
-              </div>
-              <div className="text-right">
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Date</p>
-                <p className="text-xs font-semibold text-foreground">
-                  {invoice.createdAt ? format(new Date(invoice.createdAt), "dd MMM yyyy") : "—"}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-1">
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight leading-none mb-1">Total Amount</p>
-                <p className="text-xl font-black text-primary leading-none">
-                  {formatCurrency(invoice.totalAmount)}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onView(invoice)}
-                  className="h-10 px-4 rounded-xl border-muted-foreground/20 font-bold text-xs"
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  Details
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onDownload(invoice)}
-                  className="h-10 w-10 p-0 rounded-xl border-muted-foreground/20"
-                >
-                  <Download className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );

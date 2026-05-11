@@ -10,8 +10,8 @@ const footerLinks = {
     { label: "Business Setup", href: "/solutions/business-setup" },
   ],
   resources: [
-    { label: "Terms & Conditions", href: "/coming-soon" },
-    { label: "Refund Policy", href: "/coming-soon" },
+    { label: "Terms & Conditions", href: "/" },
+    { label: "Refund Policy", href: "/" },
   ],
   company: [
     { label: "Careers", href: "/career" },

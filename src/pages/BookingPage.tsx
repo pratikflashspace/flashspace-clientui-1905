@@ -42,6 +42,7 @@ import {
   openRazorpayCheckout,
   verifyPayment,
   reportPaymentFailure,
+  simulatePayment,
 } from "@/services/payment.service";
 import { API_CONFIG, API_ENDPOINTS } from "@/config/api.config";
 import axiosInstance from "@/services/api.service";
@@ -551,6 +552,21 @@ const BookingPage = () => {
     }
     if (!spaceDetails || !selectedPlanDetails) return;
 
+    // --- CAPTURE BOOKING LEAD ---
+    try {
+      await axiosInstance.post("/api/leads/booking-lead", {
+        userId: user.id || (user as any)._id,
+        name: user.fullName || userDetails.fullName || user.email.split("@")[0],
+        email: user.email,
+        phone: (user as any).phoneNumber || userDetails.phone,
+        spaceId: spaceDetails._id,
+        spaceName: spaceDetails.name,
+      });
+    } catch (err) {
+      console.error("Lead capture failed:", err);
+    }
+    // ----------------------------
+
     try {
       setPaymentLoading(true);
       const orderData = await createPaymentOrder({
@@ -679,6 +695,118 @@ const BookingPage = () => {
       toast({
         title: "Error",
         description: error?.message || "Failed to initiate payment.",
+        variant: "destructive",
+      });
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  const handleSimulatePayment = async () => {
+    if (!isAuthenticated || !user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to continue",
+        variant: "destructive",
+      });
+      persistCurrentCheckout();
+      navigate(getLoginRedirectUrl(checkoutReturnTo), {
+        state: { redirectTo: checkoutReturnTo },
+      });
+      return;
+    }
+    if (!spaceDetails || !selectedPlanDetails) return;
+
+    // --- CAPTURE BOOKING LEAD ---
+    try {
+      await axiosInstance.post("/api/leads/booking-lead", {
+        userId: user.id || (user as any)._id,
+        name: user.fullName || userDetails.fullName || user.email.split("@")[0],
+        email: user.email,
+        phone: (user as any).phoneNumber || userDetails.phone,
+        spaceId: spaceDetails._id,
+        spaceName: spaceDetails.name,
+      });
+    } catch (err) {
+      console.error("Lead capture failed:", err);
+    }
+    // ----------------------------
+
+    try {
+      setPaymentLoading(true);
+      const orderData = await createPaymentOrder({
+        userId: user.id || (user as any)._id,
+        userEmail: user.email,
+        userName: user.fullName || user.email.split("@")[0],
+        userPhone: (user as any).phoneNumber,
+        spaceId: spaceDetails._id,
+        spaceName: spaceDetails.name,
+        planName: selectedPlanDetails.name,
+        planKey: selectedPlanKey,
+        tenure: isCoworking ? 0 : selectedTenure,
+        yearlyPrice: isCoworking ? 0 : yearlyPrice,
+        totalAmount: finalPayableAmount,
+        discountPercent:
+          (isCoworking ? 0 : selectedOption.savingsPercent) +
+          (appliedCoupon?.discountValue || 0),
+        discountAmount:
+          (isCoworking ? 0 : selectedOption.savings) + couponDiscountAmount,
+        paymentType: getPaymentType() as any,
+        startDate: new Date(selectedStartDate).toISOString(),
+        holdId: searchParams.get("holdId") || undefined,
+        // ── Affiliate attribution ──────────────────────────────────
+        couponCode: appliedCoupon?.code || undefined,
+        affiliateId: appliedCoupon?.affiliateId || undefined,
+        // ──────────────────────────────────────────────────────────
+      });
+
+      toast({
+        title: "Simulating Payment...",
+        description: "Creating mock payment for testing",
+      });
+      const result = await simulatePayment(orderData.orderId);
+
+      hotToast.success("Payment Simulated! 🎉");
+
+      // Confirm booking if holdId exists
+      const holdId = searchParams.get("holdId");
+      if (holdId) {
+        try {
+          // Use axiosInstance to ensure cookies are sent
+          await axiosInstance.post(
+            API_ENDPOINTS.USER.SEAT_BOOKING_CONFIRM(holdId).replace(
+              /^\/api/,
+              "",
+            ),
+            { paymentId: result.paymentId },
+          );
+        } catch (e) {
+          console.error("Booking confirmation failed", e);
+        }
+      }
+
+      if (appliedCoupon) {
+        try {
+          await markCouponUsed(appliedCoupon.code, user?.id);
+        } catch (err) {
+          console.error("Failed to mark coupon used", err);
+        }
+      }
+
+      toast({
+        title: "Payment Simulated! 🎉",
+        description: "Mock booking has been created successfully",
+      });
+      clearCheckoutState();
+      navigate(
+        `/payment/success?orderId=${orderData.orderId}&paymentId=${result.paymentId}`,
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Payment simulation error:", error);
+      toast({
+        title: "Simulation Failed",
+        description: error?.message || "Failed to simulate payment.",
         variant: "destructive",
       });
     } finally {
@@ -1535,6 +1663,25 @@ const BookingPage = () => {
                     </span>
                   )}
                 </Button>
+
+                {/* Dev Mode Simulate Button */}
+                {isDevMode && (
+                  <Button
+                    onClick={handleSimulatePayment}
+                    disabled={paymentLoading}
+                    variant="outline"
+                    className="w-full mt-3 border-2 border-blue-400 text-blue-600 hover:bg-blue-50 font-semibold py-5 rounded-2xl"
+                  >
+                    {paymentLoading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Simulating...
+                      </span>
+                    ) : (
+                      "🧪 Simulate Payment (Dev)"
+                    )}
+                  </Button>
+                )}
 
 
 

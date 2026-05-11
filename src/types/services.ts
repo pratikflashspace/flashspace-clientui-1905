@@ -485,6 +485,7 @@ export interface Invoice {
   status: InvoiceStatus;
   dueDate?: string;
   paidAt?: string;
+  pdfUrl?: string;
   createdAt: string;
   user?: {
     _id?: string;
@@ -576,6 +577,8 @@ export interface VisitRecord {
   visitId: string;
   client: string;
   visitor: string;
+  visitorEmail?: string;
+  visitorNumber?: string;
   purpose: string;
   space: string;
   date: string;
