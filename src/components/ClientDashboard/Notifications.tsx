@@ -13,7 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 
-import { useNotifications, type INotification } from "@/contexts/NotificationContext";
+import { useNotifications, type INotification } from "@/contexts/NotificationProvider";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/services/auth.service";
 import { maskSpaceName } from "@/utils/masking";

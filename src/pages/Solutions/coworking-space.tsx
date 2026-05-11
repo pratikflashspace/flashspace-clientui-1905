@@ -28,12 +28,12 @@ import Footer from "@/components/Footer";
 import { FeatureCTA } from "@/components/sections/FeatureCTA";
 import { Stats } from "@/components/sections/Stats";
 import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
-import { BlogSection } from "@/components/sections/BlogSection";
+
 import { CTA } from "@/components/sections/CTA";
 
 const featureCoworking = "/coworking-illustrated-themed.jpg";
 const featureDayPasses = "/feature-day-passes.jpg";
-const featureMeetingRooms = "/feature-meeting-rooms.jpg";
+const featureMeetingRooms = "/coworking-meeting-room.jpg";
 const officeIllustrated = "/hero-illustrated.jpg";
 const videoTestimonial = "/business-setup-illustrated.jpg";
 
@@ -86,9 +86,9 @@ const amenities = [
 
 const aiCapabilities = [
   { id: "booking", label: "Smart Booking", icon: Zap, active: true },
-  { id: "compliance", label: "Compliance", icon: Shield, active: false },
-  { id: "access", label: "Access Control", icon: Sparkles, active: false },
-  { id: "analytics", label: "Analytics", icon: BarChart3, active: false },
+  { id: "compliance", label: "Compliance", icon: Shield, active: true },
+  { id: "access", label: "Access Control", icon: Sparkles, active: true },
+  { id: "analytics", label: "Analytics", icon: BarChart3, active: true },
 ];
 
 const CoworkingSpace = () => {
@@ -391,10 +391,10 @@ const CoworkingSpace = () => {
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {aiCapabilities.map((cap) => (
-                      <button key={cap.id} className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all ${cap.active ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}>
+                      <div key={cap.id} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground shadow-sm cursor-default">
                         <cap.icon className="w-4 h-4" />
                         {cap.label}
-                      </button>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -471,11 +471,7 @@ const CoworkingSpace = () => {
                 <img src={videoTestimonial} alt="Customer testimonial" className="w-full h-[400px] object-cover object-center transition-transform duration-500 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-foreground/40" />
                 <div className="absolute top-8 left-8"><span className="text-white/80 font-semibold tracking-wider">TECHSTART</span></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                    <Play className="w-8 h-8 text-white fill-white ml-1" />
-                  </motion.div>
-                </div>
+
               </motion.div>
 
               <blockquote className="max-w-3xl">
@@ -500,7 +496,7 @@ const CoworkingSpace = () => {
       <FeatureCTA />
       <Stats />
       <FounderTestimonial />
-      <BlogSection />
+
       <CTA />
       <Footer />
     </div>

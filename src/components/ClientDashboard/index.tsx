@@ -22,7 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNotifications } from "@/contexts/NotificationContext";
+import { useNotifications } from "@/contexts/NotificationProvider";
 import userDashboardService from "@/services/userDashboard.service";
 
 // Remove this type definition if useAuth already provides the correct user type

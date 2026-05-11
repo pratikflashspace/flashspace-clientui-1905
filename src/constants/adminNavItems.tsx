@@ -75,11 +75,6 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     icon: <Bell className="w-5 h-5" />,
   },
   {
-    label: "Affiliate Management",
-    href: "/admin/affiliates",
-    icon: <Network className="w-5 h-5" />,
-  },
-  {
     label: "Coupons & Vouchers",
     href: "/admin/coupons",
     icon: <Tag className="w-5 h-5" />,

@@ -13,7 +13,7 @@ import {
   UserIcon, Trash2
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
-import { useNotifications, NotificationType } from "@/contexts/NotificationContext";
+import { useNotifications } from "@/contexts/NotificationProvider";
 import { formatDistanceToNow } from 'date-fns';
 import Splash3dButton from '@/components/ui/3d-splash-button';
 import { Button } from '@/components/ui/button';

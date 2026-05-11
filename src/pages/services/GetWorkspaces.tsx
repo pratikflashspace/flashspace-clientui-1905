@@ -542,6 +542,10 @@ const WorkspaceCard = ({
 };
 
 const GetWorkspaces = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);

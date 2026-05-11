@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNotifications } from '../contexts/NotificationContext';
+import { useNotifications } from '../contexts/NotificationProvider';
 import { Bell, Check, Trash2, X } from 'lucide-react';
 import { format } from 'date-fns';
 

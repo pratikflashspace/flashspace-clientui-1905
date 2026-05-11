@@ -7,22 +7,20 @@ const footerLinks = {
     { label: "Virtual Office", href: "/services/virtual-office" },
     { label: "Coworking Space", href: "/services/coworking-space" },
     { label: "On Demand", href: "/services/on-demand" },
-    { label: "Business Setup", href: "/services/business-setup" },
+    { label: "Business Setup", href: "/solutions/business-setup" },
   ],
   resources: [
-    { label: "Documentation", href: "/coming-soon" },
-    { label: "Help Center", href: "/community" },
+    { label: "Terms & Conditions", href: "/coming-soon" },
+    { label: "Refund Policy", href: "/coming-soon" },
   ],
   company: [
-    { label: "About Us", href: "/about" },
     { label: "Careers", href: "/career" },
-    { label: "Pricing", href: "/services/virtual-office" },
     { label: "Privacy Policy", href: "/about" },
   ],
   community: [
     { label: "LinkedIn", href: "https://www.linkedin.com/company/flash-space/" },
     { label: "Twitter", href: "https://twitter.com/flashspace" },
-    { label: "Instagram", href: "https://instagram.com/flashspace" },
+    { label: "Instagram", href: "https://www.instagram.com/flashspace.ai/" },
   ],
 };
 

@@ -183,6 +183,21 @@ class AuthService {
   }
 
   /**
+   * Delete user account (Soft delete)
+   */
+  async deleteAccount(): Promise<AuthResponse> {
+    try {
+      const response = await axiosInstance.delete(API_ENDPOINTS.AUTH.DELETE_ACCOUNT);
+      return response.data as AuthResponse;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || 'Failed to delete account',
+      };
+    }
+  }
+
+  /**
    * Check authentication status
    */
   async checkAuth(): Promise<AuthResponse<{ isAuthenticated: boolean; user?: User }>> {
