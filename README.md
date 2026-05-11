@@ -28,7 +28,7 @@ A modern React-based web application for FlashSpace - a platform for coworking s
    ```
    Update `.env.local` with your configuration:
    ```env
-   VITE_API_BASE_URL=http://localhost:5000/api
+   VITE_API_BASE_URL=http://localhost:5001/api
    VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
    VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
    ```
@@ -251,7 +251,7 @@ const UserProfile = () => {
 
 ```env
 # API Configuration
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_BASE_URL=http://localhost:5001/api
 
 # Google Services
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_key

@@ -158,8 +158,8 @@ export default function SpacePartnerKycRequest({
     if (!url) return "";
     
     let cleanUrl = url;
-    if (cleanUrl.includes("localhost:5000")) {
-      cleanUrl = cleanUrl.replace(/https?:\/\/localhost:5000(\/api)?/, "");
+    if (cleanUrl.includes("localhost:5001")) {
+      cleanUrl = cleanUrl.replace(/https?:\/\/localhost:5001(\/api)?/, "");
     }
 
     return getUploadedFileUrl(cleanUrl);
