@@ -478,6 +478,10 @@ export interface Invoice {
   invoiceNumber: string;
   bookingNumber?: string;
   description: string;
+  spaceName?: string;
+  planName?: string;
+  tenure?: number;
+  tenureUnit?: string;
   subtotal: number;
   taxRate?: number;
   taxAmount?: number;

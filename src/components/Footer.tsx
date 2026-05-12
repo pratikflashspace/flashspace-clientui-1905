@@ -10,16 +10,16 @@ const footerLinks = {
     { label: "Business Setup", href: "/solutions/business-setup" },
   ],
   resources: [
-    { label: "Terms & Conditions", href: "/" },
-    { label: "Refund Policy", href: "/" },
+    { label: "Terms & Conditions", href: "/terms" },
+    { label: "Refund Policy", href: "/refund-policy" },
   ],
   company: [
     { label: "Careers", href: "/career" },
-    { label: "Privacy Policy", href: "/about" },
+    { label: "Privacy Policy", href: "/privacy" },
   ],
   community: [
     { label: "LinkedIn", href: "https://www.linkedin.com/company/flash-space/" },
-    { label: "Twitter", href: "https://twitter.com/flashspace" },
+    { label: "Twitter", href: "https://x.com/flashspaceai" },
     { label: "Instagram", href: "https://www.instagram.com/flashspace.ai/" },
   ],
 };
@@ -146,8 +146,8 @@ const Footer = () => {
           {/* Copyright */}
           <div className="space-y-4 lg:text-right">
             <div className="flex flex-wrap gap-4 text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] lg:justify-end">
-              <Link to="/about" className="hover:text-white transition-colors">Legal</Link>
-              <Link to="/about" className="hover:text-white transition-colors">Privacy</Link>
+              <Link to="/terms" className="hover:text-white transition-colors">Legal</Link>
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
               <Link to="/about" className="hover:text-white transition-colors">Cookies</Link>
             </div>
             <p className="text-[9px] sm:text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] sm:tracking-[0.3em]">

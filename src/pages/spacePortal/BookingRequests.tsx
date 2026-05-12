@@ -8,6 +8,7 @@ import {
   FileText,
   Filter,
   Check,
+  ChevronLeft,
   ChevronRight,
   MapPin,
   Search,
@@ -97,6 +98,8 @@ const DOC_LABELS: Record<string, string> = {
   other_support: "Supporting Document",
 };
 
+const REQUESTS_PER_PAGE = 18;
+
 const formatDate = (value?: string) => {
   if (!value) return "N/A";
   const date = new Date(value);
@@ -167,6 +170,7 @@ export default function BookingRequests() {
   const [sortBy, setSortBy] = useState("newest");
   const [timeline, setTimeline] = useState("all");
   const [detailStep, setDetailStep] = useState(1);
+  const [page, setPage] = useState(1);
   const [uploadTarget, setUploadTarget] = useState<{ bookingId: string; type: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -241,6 +245,21 @@ export default function BookingRequests() {
   }, [requests, query, status, sortBy, timeline]);
 
   const selected = filtered.find((request) => request.bookingId === selectedId);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / REQUESTS_PER_PAGE));
+  const visibleRequests = useMemo(() => {
+    const start = (page - 1) * REQUESTS_PER_PAGE;
+    return filtered.slice(start, start + REQUESTS_PER_PAGE);
+  }, [filtered, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, status, sortBy, timeline]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
 
   useEffect(() => {
     setDetailStep(1);
@@ -261,10 +280,10 @@ export default function BookingRequests() {
   }, [selected]);
 
   const metrics = useMemo(() => {
-    const pendingKyc = requests.filter((request) => getEffectiveKycStatus(request) !== "approved").length;
-    const signedPending = requests.filter((request) => request.agreement.signedAgreement?.status === "pending").length;
-    const finalReady = requests.filter((request) => request.agreement.finalAgreement).length;
-    return { total: requests.length, pendingKyc, signedPending, finalReady };
+    const approved = requests.filter((request) => getEffectiveKycStatus(request) === "approved").length;
+    const pending = requests.filter((request) => getEffectiveKycStatus(request) === "pending").length;
+    const rejected = requests.filter((request) => getEffectiveKycStatus(request) === "rejected").length;
+    return { total: requests.length, approved, pending, rejected };
   }, [requests]);
 
   const handleReviewKyc = async (
@@ -436,9 +455,9 @@ export default function BookingRequests() {
       <div className="grid gap-4 md:grid-cols-4">
         {[
           ["Total Requests", metrics.total, FileText],
-          ["KYC Pending", metrics.pendingKyc, Clock3],
-          ["Signed Review", metrics.signedPending, FileCheck2],
-          ["Final Ready", metrics.finalReady, CheckCircle2],
+          ["Approved Requests", metrics.approved, CheckCircle2],
+          ["Pending Requests", metrics.pending, Clock3],
+          ["Rejected Requests", metrics.rejected, XCircle],
         ].map(([label, value, Icon]: any) => (
           <div key={label} className="rounded-xl border border-[#2D3F33]/10 bg-white p-5 shadow-sm">
             <div className="flex items-center justify-between">
@@ -499,7 +518,7 @@ export default function BookingRequests() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((request) => {
+            {visibleRequests.map((request) => {
               const effectiveKycStatus = getEffectiveKycStatus(request);
               const isSelected = selected?.bookingId === request.bookingId;
               
@@ -543,6 +562,39 @@ export default function BookingRequests() {
                 </button>
               );
             })}
+          </div>
+        )}
+
+        {!loading && filtered.length > REQUESTS_PER_PAGE && (
+          <div className="mt-5 flex flex-col gap-3 rounded-xl border border-[#2D3F33]/10 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm font-bold text-[#607067]">
+              Showing {(page - 1) * REQUESTS_PER_PAGE + 1}-{Math.min(page * REQUESTS_PER_PAGE, filtered.length)} of {filtered.length}
+            </p>
+            <div className="flex items-center justify-between gap-2 sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={page === 1}
+                className="grid h-10 w-10 place-items-center rounded-lg border border-[#2D3F33]/10 text-[#2D3F33] transition hover:bg-[#f7f8f6] disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Previous page"
+                title="Previous page"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <span className="min-w-24 text-center text-sm font-black text-[#10251a]">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+                disabled={page === totalPages}
+                className="grid h-10 w-10 place-items-center rounded-lg border border-[#2D3F33]/10 text-[#2D3F33] transition hover:bg-[#f7f8f6] disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Next page"
+                title="Next page"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         )}
       </div>

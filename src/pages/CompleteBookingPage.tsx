@@ -16,6 +16,7 @@ import {
     openRazorpayCheckout,
     verifyPayment,
     reportPaymentFailure,
+    simulatePayment,
 } from '@/services/payment.service';
 import hotToast from 'react-hot-toast';
 import {
@@ -60,6 +61,7 @@ const CompleteBookingPage = () => {
     const [paymentLoading, setPaymentLoading] = useState(false);
     const [spaceDetails, setSpaceDetails] = useState<VirtualOfficeItem | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isDevMode] = useState(import.meta.env.DEV);
 
     // Tenure selection
     const [selectedTenure, setSelectedTenure] = useState<1 | 2 | 3>(1);
@@ -249,6 +251,18 @@ const CompleteBookingPage = () => {
         setPaymentLoading(true);
         try {
             const order = await createPaymentOrder(buildPayload());
+            
+            // Auto-simulate if in dev mode and keys are missing
+            if (order.devMode) {
+                hotToast.loading('Simulating payment...', { id: 'sim' });
+                const result = await simulatePayment(order.orderId);
+                hotToast.dismiss('sim');
+                if (appliedCoupon) await markCouponUsed(appliedCoupon.code).catch(() => { });
+                clearCheckoutState();
+                navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(planDisplayName)}&amount=${finalTotal}`);
+                return;
+            }
+
             await openRazorpayCheckout({
                 orderId: order.orderId,
                 amount: order.amount,
@@ -274,8 +288,8 @@ const CompleteBookingPage = () => {
                     }
                 },
                 onFailure: (err) => {
-                    reportPaymentFailure(paymentOrder.orderId, err.code, err.description);
-                    navigate(`/payment/failed?orderId=${paymentOrder.orderId}`);
+                    reportPaymentFailure(order.orderId, err.code, err.description);
+                    navigate(`/payment/failed?orderId=${order.orderId}`);
                 },
                 onDismiss: () => hotToast('Payment cancelled'),
             });
@@ -288,14 +302,22 @@ const CompleteBookingPage = () => {
 
     // ─── STEP 2b: Simulate payment (dev/test) ─
     const handleSimulatePayment = async () => {
-        if (!paymentOrder || !spaceDetails) return;
+        if (!isAuthenticated || !user) {
+            hotToast.error('Please login to continue');
+            persistCurrentCheckout();
+            navigate(getLoginRedirectUrl(checkoutReturnTo), {
+                state: { redirectTo: checkoutReturnTo },
+            });
+            return;
+        }
+        if (!spaceDetails) return;
 
         // --- CAPTURE BOOKING LEAD ---
         try {
             await axiosInstance.post('/api/leads/booking-lead', {
-                userId: user!.id || (user as any)._id,
-                name: user!.fullName || user!.email.split('@')[0],
-                email: user!.email,
+                userId: user.id || (user as any)._id,
+                name: user.fullName || user.email.split('@')[0],
+                email: user.email,
                 phone: (user as any).phoneNumber,
                 spaceId: id!,
                 spaceName: spaceDetails.name,
@@ -306,13 +328,17 @@ const CompleteBookingPage = () => {
         // ----------------------------
 
         setPaymentLoading(true);
-        setShowPaymentModal(false);
         try {
-            hotToast.loading('Simulating payment...', { id: 'sim' });
-            const result = await simulatePayment(paymentOrder.orderId);
+            hotToast.loading('Creating test order...', { id: 'sim' });
+            const order = await createPaymentOrder(buildPayload());
+            
+            hotToast.loading('Simulating payment success...', { id: 'sim' });
+            const result = await simulatePayment(order.orderId);
             hotToast.dismiss('sim');
+            
             if (appliedCoupon) await markCouponUsed(appliedCoupon.code).catch(() => { });
             clearCheckoutState();
+            hotToast.success('Test Payment Successful! 🎉');
             navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(planDisplayName)}&amount=${finalTotal}`);
         } catch (err: any) {
             hotToast.dismiss('sim');
@@ -564,6 +590,20 @@ const CompleteBookingPage = () => {
                                         'Proceed to Payment'
                                     )}
                                 </button>
+
+                                {isDevMode && (
+                                    <button
+                                        onClick={handleSimulatePayment}
+                                        disabled={paymentLoading}
+                                        className="w-full mt-2 py-3 border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-xs"
+                                    >
+                                        {paymentLoading ? (
+                                            <><Loader2 className="w-4 h-4 animate-spin" /> Simulating…</>
+                                        ) : (
+                                            'Test Payment (Dev Only)'
+                                        )}
+                                    </button>
+                                )}
 
                                 <p className="text-center text-[11px] text-muted-foreground">
                                     By proceeding, you agree to our{' '}

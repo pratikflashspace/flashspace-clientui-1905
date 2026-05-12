@@ -89,6 +89,8 @@ export interface BookingData {
   userId: string;
   spaceId: string;
   user?: {
+    _id?: string;
+    id?: string;
     fullName: string;
     email: string;
     profilePicture?: string;

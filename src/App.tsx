@@ -45,12 +45,14 @@ const CityListing = lazy(() => import("./pages/CityListing"));
 const AboutUs = lazy(() => import("./pages/AboutUs"));
 const HelpCenter = lazy(() => import("./pages/help/HelpCenter"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsConditions = lazy(() => import("./pages/TermsConditions"));
 const ClientDashboard = lazy(() => import("./components/ClientDashboard"));
 const WorkspaceDetail = lazy(() => import("./pages/WorkspaceDetail"));
 const BookingPage = lazy(() => import("./pages/BookingPage"));
 const CompleteBookingPage = lazy(() => import("./pages/CompleteBookingPage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const PaymentFailedPage = lazy(() => import("./pages/PaymentFailedPage"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 
 // Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -307,6 +309,8 @@ const App = () => (
                       <Route path="/about" element={<AboutUs />} />
                       <Route path="/help" element={<HelpCenter />} />
                       <Route path="/privacy" element={<PrivacyPolicy />} />
+                      <Route path="/terms" element={<TermsConditions />} />
+                      <Route path="/refund-policy" element={<RefundPolicy />} />
 
                       {/* Auth Routes */}
                       <Route path="/login" element={<Index openLogin={true} />} />
