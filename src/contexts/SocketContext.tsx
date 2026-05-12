@@ -34,7 +34,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         // Initialize socket connection
         const socketBaseUrl =
             import.meta.env.VITE_API_URL ||
-            (import.meta.env.DEV ? 'http://localhost:5000' : window.location.origin);
+            (import.meta.env.DEV ? 'http://localhost:5001' : window.location.origin);
 
         const socketInstance = io(socketBaseUrl, {
             withCredentials: true,

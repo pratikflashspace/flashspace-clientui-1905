@@ -65,11 +65,6 @@ export const sidebarConfig = [
     icon: MessageSquareText,
   },
   {
-    label: "Notifications",
-    path: "/spaceportal/notifications",
-    icon: Bell,
-  },
-  {
     label: "Feedback & NPS",
     path: "/spaceportal/feedback-nps",
     icon: Star,

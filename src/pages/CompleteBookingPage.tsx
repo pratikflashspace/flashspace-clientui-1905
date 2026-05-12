@@ -16,7 +16,6 @@ import {
     openRazorpayCheckout,
     verifyPayment,
     reportPaymentFailure,
-    simulatePayment,
 } from '@/services/payment.service';
 import hotToast from 'react-hot-toast';
 import {
@@ -55,7 +54,6 @@ const CompleteBookingPage = () => {
     const checkoutReturnTo = `${location.pathname}${location.search}${location.hash}`;
 
     const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-    const isDevMode = import.meta.env.DEV;
 
     // Data
     const [loading, setLoading] = useState(true);
@@ -78,8 +76,6 @@ const CompleteBookingPage = () => {
         affiliateId?: string;
     } | null>(null);
     const [couponLoading, setCouponLoading] = useState(false);
-    const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [paymentOrder, setPaymentOrder] = useState<any>(null);
 
     const persistCurrentCheckout = () => {
         persistCheckoutState(
@@ -225,8 +221,8 @@ const CompleteBookingPage = () => {
         affiliateId: appliedCoupon?.affiliateId,
     });
 
-    // ─── STEP 1: Open payment modal + create order ─
-    const handleOpenPaymentModal = async () => {
+    // ─── STEP 1: Process Payment ─
+    const handlePayment = async () => {
         if (!isAuthenticated || !user) {
             hotToast.error('Please login to continue with your booking');
             persistCurrentCheckout();
@@ -237,7 +233,6 @@ const CompleteBookingPage = () => {
         }
         if (!spaceDetails || !selectedOption) return;
 
-        // --- CAPTURE BOOKING LEAD ---
         try {
             await axiosInstance.post('/api/leads/booking-lead', {
                 userId: user.id || (user as any)._id,
@@ -250,31 +245,15 @@ const CompleteBookingPage = () => {
         } catch (err) {
             console.error('Lead capture failed:', err);
         }
-        // ----------------------------
 
         setPaymentLoading(true);
         try {
             const order = await createPaymentOrder(buildPayload());
-            setPaymentOrder(order);
-            setShowPaymentModal(true);
-        } catch (err: any) {
-            hotToast.error(err?.message || 'Failed to initiate payment. Please try again.');
-        } finally {
-            setPaymentLoading(false);
-        }
-    };
-
-    // ─── STEP 2a: Pay with Razorpay ───────────
-    const handleRazorpayPayment = async () => {
-        if (!paymentOrder || !spaceDetails || !user) return;
-        setPaymentLoading(true);
-        setShowPaymentModal(false);
-        try {
             await openRazorpayCheckout({
-                orderId: paymentOrder.orderId,
-                amount: paymentOrder.amount,
-                currency: paymentOrder.currency,
-                keyId: paymentOrder.keyId,
+                orderId: order.orderId,
+                amount: order.amount,
+                currency: order.currency,
+                keyId: order.keyId,
                 userEmail: user.email,
                 userName: user.fullName || user.email,
                 userPhone: (user as any).phoneNumber,
@@ -575,12 +554,12 @@ const CompleteBookingPage = () => {
 
                                 {/* CTA */}
                                 <button
-                                    onClick={handleOpenPaymentModal}
+                                    onClick={handlePayment}
                                     disabled={paymentLoading}
                                     className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md disabled:opacity-70"
                                 >
                                     {paymentLoading ? (
-                                        <><Loader2 className="w-4 h-4 animate-spin" /> Creating order…</>
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
                                     ) : (
                                         'Proceed to Payment'
                                     )}
@@ -598,73 +577,7 @@ const CompleteBookingPage = () => {
 
             <Footer />
 
-            {/* ── PAYMENT METHOD MODAL ── */}
-            {showPaymentModal && paymentOrder && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-                    <div className="bg-card border border-border rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
-                        {/* Close */}
-                        <button
-                            onClick={() => setShowPaymentModal(false)}
-                            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-muted hover:bg-muted/80 transition-colors"
-                        >
-                            <X className="w-4 h-4 text-muted-foreground" />
-                        </button>
-
-                        {/* Header */}
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
-                                <CreditCard className="w-5 h-5 text-primary" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-bold text-foreground">Complete Payment</h2>
-                                <p className="text-sm text-muted-foreground">Choose how you'd like to pay</p>
-                            </div>
-                        </div>
-
-                        {/* Amount banner */}
-                        <div className="bg-foreground rounded-2xl p-5 mb-6 text-background">
-                            <p className="text-sm text-background/70 mb-1">Amount to Pay</p>
-                            <p className="text-3xl font-extrabold">{formatCurrency(finalTotal)}</p>
-                            <p className="text-xs text-background/70 mt-1">{planDisplayName} · {selectedTenure} Year{selectedTenure > 1 ? 's' : ''}</p>
-                        </div>
-
-                        {/* Available methods (info only) */}
-                        <div className="space-y-2 mb-6">
-                            {['UPI (GPay, PhonePe, Paytm)', 'Credit / Debit Card', 'Net Banking (50+ Banks)'].map((m, i) => (
-                                <div key={i} className="flex items-center justify-between px-4 py-3 bg-muted/40 border border-border rounded-xl text-sm text-muted-foreground">
-                                    <span>{m}</span>
-                                    <Check className="w-3.5 h-3.5 text-green-500" />
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Razorpay Pay button */}
-                        <button
-                            onClick={handleRazorpayPayment}
-                            disabled={paymentLoading}
-                            className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70"
-                        >
-                            <Shield className="w-4 h-4" />
-                            Pay {formatCurrency(finalTotal)} with Razorpay
-                        </button>
-
-                        {/* Simulate button */}
-                        <button
-                            onClick={handleSimulatePayment}
-                            disabled={paymentLoading}
-                            className="w-full mt-3 py-3.5 border-2 border-dashed border-border text-muted-foreground hover:border-primary/60 hover:text-foreground font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm"
-                        >
-                            🧪 Simulate Payment (Test Mode)
-                        </button>
-
-
-
-                        <p className="text-center text-[10px] text-muted-foreground mt-4 flex items-center justify-center gap-1">
-                            <Shield className="w-3 h-3" /> Secured by 256-bit SSL · PCI DSS Compliant
-                        </p>
-                    </div>
-                </div>
-            )}
+            {/* Removed Payment Modal - Going direct to Razorpay */}
         </div>
     );
 };

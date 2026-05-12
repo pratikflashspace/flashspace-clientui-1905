@@ -137,7 +137,6 @@ const getNotificationVisualMeta = (
 
 export default function Notifications() {
   const {
-    notifications,
     markAllRead,
     markRead,
     deleteNotification,
@@ -146,46 +145,50 @@ export default function Notifications() {
   } = useSpacePortalNotifications();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeView, setActiveView] = useState<"recent" | "deleted">("recent");
-  const [deletedNotifications, setDeletedNotifications] = useState<
-    SpacePortalNotification[]
-  >([]);
-  const [loadingDeleted, setLoadingDeleted] = useState(false);
+  
+  const [recentNotifications, setRecentNotifications] = useState<SpacePortalNotification[]>([]);
+  const [deletedNotifications, setDeletedNotifications] = useState<SpacePortalNotification[]>([]);
+  
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+    pages: 1
+  });
+  
+  const [loading, setLoading] = useState(false);
 
-  const unreadCount = useMemo(
-    () => notifications.filter((item) => !item.read && !item.archived).length,
-    [notifications],
-  );
-
-  const fetchDeletedNotifications = async () => {
-    setLoadingDeleted(true);
+  const fetchNotifications = async (page = 1) => {
+    setLoading(true);
     try {
+      const archived = activeView === "deleted" ? "only" : "false";
       const response = await fetch(
-        `${API_CONFIG.BASE_URL}/api/notifications?archived=only`,
+        `${API_CONFIG.BASE_URL}/api/notifications?archived=${archived}&page=${page}&limit=10`,
         { credentials: "include" },
       );
       const data = await response.json();
-      if (data.success && Array.isArray(data.data)) {
-        setDeletedNotifications(data.data.map(mapNotification));
+      if (data.success) {
+        const mapped = data.data.map(mapNotification);
+        if (activeView === "deleted") {
+          setDeletedNotifications(mapped);
+        } else {
+          setRecentNotifications(mapped);
+        }
+        setPagination(data.pagination || { total: mapped.length, page: 1, limit: 10, pages: 1 });
       }
     } catch (error) {
-      console.error("[SpacePortal] Failed to fetch deleted notifications:", error);
+      console.error("[SpacePortal] Failed to fetch notifications:", error);
     } finally {
-      setLoadingDeleted(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (activeView === "deleted") {
-      fetchDeletedNotifications();
-    }
+    fetchNotifications(1);
   }, [activeView]);
 
   const filteredNotifications = useMemo(() => {
-    const source =
-      activeView === "deleted"
-        ? deletedNotifications
-        : notifications.filter((notification) => !notification.archived);
-
+    const source = activeView === "deleted" ? deletedNotifications : recentNotifications;
     const query = searchQuery.trim().toLowerCase();
     if (!query) return source;
 
@@ -197,30 +200,36 @@ export default function Notifications() {
         description.toLowerCase().includes(query)
       );
     });
-  }, [activeView, deletedNotifications, notifications, searchQuery]);
+  }, [activeView, deletedNotifications, recentNotifications, searchQuery]);
 
   const handleDelete = async (notification: SpacePortalNotification) => {
     await deleteNotification(notification.id);
-    setDeletedNotifications((prev) => [
-      { ...notification, archived: true, read: true },
-      ...prev.filter((item) => item.id !== notification.id),
-    ]);
+    setRecentNotifications(prev => prev.filter(n => n.id !== notification.id));
+    // If we're on recent view, we might want to refetch or just remove
+    if (activeView === "recent" && recentNotifications.length <= 1 && pagination.page > 1) {
+      fetchNotifications(pagination.page - 1);
+    }
   };
 
   const handleRestore = async (notification: SpacePortalNotification) => {
-    setDeletedNotifications((prev) =>
-      prev.filter((item) => item.id !== notification.id),
-    );
-
     try {
       await fetch(`${API_CONFIG.BASE_URL}/api/notifications/${notification.id}/archive`, {
         method: "PATCH",
         credentials: "include",
       });
+      setDeletedNotifications(prev => prev.filter(n => n.id !== notification.id));
       restoreNotification({ ...notification, archived: false }, 0);
+      if (activeView === "deleted" && deletedNotifications.length <= 1 && pagination.page > 1) {
+        fetchNotifications(pagination.page - 1);
+      }
     } catch (error) {
       console.error("[SpacePortal] Failed to restore notification:", error);
-      await fetchDeletedNotifications();
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= pagination.pages) {
+      fetchNotifications(newPage);
     }
   };
 
@@ -241,8 +250,11 @@ export default function Notifications() {
 
               <button
                 type="button"
-                onClick={markAllRead}
-                disabled={notifications.length === 0 || unreadCount === 0}
+                onClick={async () => {
+                  await markAllRead();
+                  fetchNotifications(pagination.page);
+                }}
+                disabled={recentNotifications.length === 0}
                 className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-6 py-2.5 font-bold text-gray-700 shadow-sm transition-all hover:bg-gray-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Mark all as read
@@ -283,13 +295,13 @@ export default function Notifications() {
                 </div>
               </div>
               <div className="text-sm font-bold uppercase tracking-wider text-gray-400">
-                {filteredNotifications.length} total
+                {pagination.total} total
               </div>
             </div>
 
             <div className="mt-4">
-              {loadingDeleted && activeView === "deleted" ? (
-                <EmptyState text="Loading deleted notifications..." />
+              {loading ? (
+                <EmptyState text="Loading notifications..." />
               ) : filteredNotifications.length === 0 ? (
                 <EmptyState text="No notifications found" />
               ) : (
@@ -300,7 +312,10 @@ export default function Notifications() {
                       notification={notification}
                       deletedView={activeView === "deleted"}
                       onNavigate={() => navigateToNotification?.(notification)}
-                      onMarkRead={() => markRead(notification.id)}
+                      onMarkRead={async () => {
+                        await markRead(notification.id);
+                        fetchNotifications(pagination.page);
+                      }}
                       onDelete={() => handleDelete(notification)}
                       onRestore={() => handleRestore(notification)}
                     />
@@ -308,6 +323,56 @@ export default function Notifications() {
                 </div>
               )}
             </div>
+
+            {/* Pagination UI */}
+            {pagination.pages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <button
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                  disabled={pagination.page === 1 || loading}
+                  className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-all"
+                >
+                  Previous
+                </button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, pagination.pages) }).map((_, i) => {
+                    let pageNum = i + 1;
+                    // Simple windowing logic
+                    if (pagination.pages > 5 && pagination.page > 3) {
+                      pageNum = pagination.page - 2 + i;
+                      if (pageNum + (5-i-1) > pagination.pages) {
+                        pageNum = pagination.pages - 4 + i;
+                      }
+                    }
+                    if (pageNum <= 0) return null;
+                    if (pageNum > pagination.pages) return null;
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${
+                          pagination.page === pageNum
+                            ? "bg-[#35503F] text-white shadow-md"
+                            : "bg-white border border-gray-100 text-gray-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                  disabled={pagination.page === pagination.pages || loading}
+                  className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-all"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </section>
         </div>
       </div>
