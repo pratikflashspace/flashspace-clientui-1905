@@ -170,6 +170,11 @@ export default function Documents() {
     };
 
     const handleDownloadPDF = async (invoice: Invoice) => {
+        if (invoice.pdfUrl) {
+            handleDownload(getUploadedFileUrl(invoice.pdfUrl), `Invoice_${invoice.invoiceNumber || invoice._id}.pdf`);
+            return;
+        }
+
         try {
             setIsGenerating(invoice._id);
             // Wait a tiny bit for the UI to update to loading state
@@ -185,6 +190,15 @@ export default function Documents() {
     };
 
     const handlePreviewInvoice = async (invoice: Invoice) => {
+        if (invoice.pdfUrl) {
+            setPreviewDocument({
+                title: `Invoice ${invoice.invoiceNumber || invoice._id}`,
+                url: getUploadedFileUrl(invoice.pdfUrl),
+                type: 'pdf'
+            });
+            return;
+        }
+
         try {
             setIsPreviewing(invoice._id);
             // Wait a tiny bit for the UI to update to loading state

@@ -24,7 +24,12 @@ import { MeetingRoomItem } from "@/types/services";
 import { SpaceDetailSkeleton } from "@/components/ui/skeleton-loaders";
 import ImageGalleryModal from "../ui/ImageGalleryModal";
 import { useAuth } from "@/contexts/AuthContext";
-import { createPaymentOrder, verifyPayment } from "@/services/payment.service";
+import {
+  createPaymentOrder,
+  verifyPayment,
+  openRazorpayCheckout,
+  reportPaymentFailure,
+} from "@/services/payment.service";
 import hotToast from "react-hot-toast";
 import {
   clearCheckoutState,
@@ -135,8 +140,6 @@ const MeetingRoomSpaceComponent = () => {
 
   const getPhotos = () => {
     if (!spaceDetails) return DEFAULT_PHOTOS;
-    // For mock, we often usually have just one image, so let's duplicate it or add placeholders
-    // to fill the gallery grid
     const main = spaceDetails.image || DEFAULT_PHOTOS[0];
     return [
       main,
@@ -193,22 +196,36 @@ const MeetingRoomSpaceComponent = () => {
         paymentType: "meeting_room" as any,
       });
 
-      // 2. Simulate Payment Success (as per request/reference)
-      // For meeting rooms, we often use simulation or direct Razorpay.
-      // If we want actual Razorpay, we'd call openRazorpayCheckout.
-      // But based on the merged code, it seems simulation/test was intended for this component.
-      await new Promise((r) => setTimeout(r, 1500));
-
-      const result = await verifyPayment({
-        razorpay_order_id: order.orderId,
-        razorpay_payment_id: `pay_test_${Date.now()}`,
-        razorpay_signature: "test_signature_dev",
-        devMode: true,
+      // 2. Open Razorpay Checkout
+      await openRazorpayCheckout({
+        orderId: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        keyId: order.keyId,
+        userEmail: user.email,
+        userName: user.fullName || user.email,
+        userPhone: (user as any).phoneNumber || "9876543210",
+        spaceName: spaceDetails.name,
+        planName: `${hours} Hour Meeting Room Booking`,
+        onSuccess: async (response) => {
+          try {
+            const result = await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+            clearCheckoutState();
+            navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(`${hours} Hour Meeting Room Booking`)}&amount=${totalPrice}`);
+          } catch (err) {
+            hotToast.error("Payment verification failed. Please contact support.");
+          }
+        },
+        onFailure: (err) => {
+          reportPaymentFailure(order.orderId, err.code, err.description);
+          navigate(`/payment/failed?orderId=${order.orderId}`);
+        },
+        onDismiss: () => hotToast("Payment cancelled"),
       });
-
-      clearCheckoutState();
-      navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(`${hours} Hour Meeting Room Booking`)}&amount=${totalPrice}`);
-      // navigate('/bookings'); // Optional: redirect to bookings
     } catch (error: any) {
       console.error(error);
       hotToast.error(error.message || "Booking failed");

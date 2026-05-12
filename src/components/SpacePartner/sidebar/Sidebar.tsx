@@ -123,8 +123,12 @@ export default function Sidebar({
             className="rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#3FA69E]/30"
             aria-label="Go to Space Portal dashboard"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2D3F33] text-sm font-bold text-[#FDE68A]">
-              FS
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm border border-[#2D3F33]/10 p-1.5">
+              <img
+                src="/Logo/Flashspace Logo.png"
+                alt="FS"
+                className="w-full h-full object-contain"
+              />
             </div>
           </NavLink>
 
@@ -140,36 +144,36 @@ export default function Sidebar({
           ) : null}
         </div>
       ) : (
-        <div className="mb-6 flex items-start justify-between gap-4">
+        <div className="mb-6 flex items-center justify-center gap-4 relative">
           <NavLink
             to="/spaceportal/dashboard"
             className="rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#3FA69E]/30"
             aria-label="Go to Space Portal dashboard"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2D3F33] text-sm font-bold text-[#FDE68A]">
-                FS
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-[#164e4e] dark:text-white">flashspace</h1>
-                <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">Space Partner Portal</p>
-              </div>
+            <div className="flex flex-col items-center gap-2">
+              <img
+                src="/Logo/Flashspace Logo.png"
+                alt="Flashspace"
+                className="h-10 w-auto object-contain"
+              />
+              {!isCollapsed && (
+                <div className="text-center">
+                  <p className="text-[10px] text-[#164e4e]/70 dark:text-gray-400 font-bold uppercase tracking-wider">Space Partner Portal</p>
+                </div>
+              )}
             </div>
           </NavLink>
 
-          <div className="flex items-center gap-2">
-
-            {onClose ? (
-              <button
-                type="button"
-                onClick={onClose}
-                aria-label="Close sidebar"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D3F33]/20 dark:border-white/10 text-[#164e4e] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 lg:hidden"
-              >
-                <X size={18} />
-              </button>
-            ) : null}
-          </div>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close sidebar"
+              className="absolute right-0 top-1/2 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-[#2D3F33]/20 dark:border-white/10 text-[#164e4e] dark:text-gray-200 hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 lg:hidden"
+            >
+              <X size={18} />
+            </button>
+          )}
         </div>
       )}
 

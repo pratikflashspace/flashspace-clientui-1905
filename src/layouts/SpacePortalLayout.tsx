@@ -648,9 +648,11 @@ export default function SpacePortalLayout() {
    */
   const notificationsProviderValue = useMemo(() => {
     const base = API_CONFIG.BASE_URL;
+    const unreadCount = notifications.filter(n => !n.read && !n.archived).length;
 
     return {
       notifications,
+      unreadCount,
 
       markAllRead: () =>
         {

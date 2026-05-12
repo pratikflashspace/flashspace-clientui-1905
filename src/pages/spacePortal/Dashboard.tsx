@@ -18,6 +18,7 @@ import {
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { StatsSkeleton } from "@/components/ui/skeleton-loaders";
 import { AddSpaceDialog } from "@/components/modals/AddSpaceDialog";
+import { PartnerNotificationBell } from "@/components/SpacePartner/PartnerNotificationBell";
 import {
   fetchPartnerDashboard,
   fetchAllPartnerSpaces,
@@ -103,13 +104,18 @@ export default function Dashboard() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl">
-          Space Partner <span className="text-primary italic">Dashboard</span>
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your workspace listings, clients, and revenue
-        </p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl">
+            Space Partner <span className="text-primary italic">Dashboard</span>
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your workspace listings, clients, and revenue
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <PartnerNotificationBell />
+        </div>
       </div>
 
       {/* Stats Grid */}
