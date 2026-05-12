@@ -595,6 +595,46 @@ const BookingPage = () => {
         // ──────────────────────────────────────────────────────────
       });
 
+      // Auto-simulate if in dev mode and keys are missing
+      if ((orderData as any).devMode) {
+        toast({
+          title: "Simulating Payment...",
+          description: "Keys are missing, using mock payment",
+        });
+        const result = await simulatePayment(orderData.orderId);
+
+        // Confirm booking if holdId exists
+        const holdId = searchParams.get("holdId");
+        if (holdId) {
+          try {
+            await axiosInstance.post(
+              API_ENDPOINTS.USER.SEAT_BOOKING_CONFIRM(holdId).replace(
+                /^\/api/,
+                "",
+              ),
+              { paymentId: result.paymentId },
+            );
+          } catch (e) {
+            console.error("Booking confirmation failed", e);
+          }
+        }
+
+        if (appliedCoupon) {
+          try {
+            await markCouponUsed(appliedCoupon.code, user?.id);
+          } catch (err) {
+            console.error("Failed to mark coupon used", err);
+          }
+        }
+
+        hotToast.success("Payment Successful (Simulated)! 🎉");
+        clearCheckoutState();
+        navigate(
+          `/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}`,
+        );
+        return;
+      }
+
       await openRazorpayCheckout({
         orderId: orderData.orderId,
         amount: orderData.amount,

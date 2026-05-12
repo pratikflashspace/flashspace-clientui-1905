@@ -49,22 +49,22 @@ export default function Dashboard() {
       ]);
 
       const clients: Client[] = dashboardRes?.data?.clients || [];
-      const spaces = spacesRes?.data || [];
+      const stats = dashboardRes?.data?.stats || {};
       const requests = requestsRes?.data || [];
 
-      // Calculate Revenue from deal values
-      const totalRevenue = clients.reduce(
-        (sum, c) => sum + (c.dealValue || 0),
-        0,
-      );
+      // Prefer backend-calculated revenue if available, fallback to frontend calc
+      const totalRevenue = stats.monthlyRevenue !== undefined 
+        ? stats.monthlyRevenue 
+        : clients.reduce((sum, c) => sum + (c.dealValue || 0), 0);
+
       const formattedRevenue =
         totalRevenue >= 100000
           ? `₹${(totalRevenue / 100000).toFixed(1)}L`
           : `₹${totalRevenue.toLocaleString()}`;
 
       setMetrics({
-        activeSpaces: spaces.length || 0,
-        totalClients: clients.length || 0,
+        activeSpaces: stats.activeSpaces !== undefined ? stats.activeSpaces : (spacesRes?.data?.length || 0),
+        totalClients: stats.totalClients !== undefined ? stats.totalClients : clients.length,
         monthlyRevenue: formattedRevenue,
         pendingBookings: requests.length || 0,
       });

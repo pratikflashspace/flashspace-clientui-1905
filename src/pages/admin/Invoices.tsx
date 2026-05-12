@@ -102,6 +102,24 @@ const formatCurrency = (amount: number) =>
 const categoryLabel = (raw: string) =>
   (raw || "").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
+const getServiceSpaceName = (invoice: Invoice) =>
+  invoice.spaceName ||
+  (invoice.invoiceType === "admin_manual" ? "Uploaded Invoice" : "Direct Billing");
+
+const getServicePlanName = (invoice: Invoice) =>
+  invoice.planName ||
+  (invoice.invoiceType === "admin_manual"
+    ? "Uploaded Invoice"
+    : categoryLabel(invoice.paymentType) || "Booked Plan");
+
+const shouldShowPaymentType = (invoice: Invoice) =>
+  invoice.invoiceType !== "admin_manual" && invoice.paymentType !== "manual_invoice";
+
+const getInvoiceReferenceId = (invoice: Invoice) => {
+  const referenceId = invoice.razorpayOrderId;
+  return referenceId && referenceId !== "MANUAL" ? referenceId : "";
+};
+
 // ─── Inline Invoice View Modal ─────────────────────────────────────────────────
 const InvoiceViewModal = ({
   invoice,
@@ -148,21 +166,26 @@ const InvoiceViewModal = ({
                 <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
                   <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Space</p>
                   <p className="font-medium text-foreground">
-                    {invoice.spaceName || "—"}
+                    {getServiceSpaceName(invoice)}
                   </p>
                 </div>
                 <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
                   <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Service Type</p>
-                  <p className="font-medium text-foreground">
-                    {categoryLabel(invoice.paymentType)}
+                  <p className="font-medium text-foreground leading-tight">
+                    {getServicePlanName(invoice)}
                   </p>
+                  {shouldShowPaymentType(invoice) && (
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      {categoryLabel(invoice.paymentType)}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
                   <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-wider mb-1">Plan</p>
                   <p className="font-medium text-foreground">
-                    {invoice.planName || "—"}
+                    {getServicePlanName(invoice)}
                   </p>
                 </div>
                 <div className="bg-muted/50 p-3 rounded-xl border border-border/50">
@@ -193,9 +216,9 @@ const InvoiceViewModal = ({
             </div>
             {!isManual && (
               <div className="mt-4 p-3 bg-muted/30 rounded-xl space-y-1 border border-border/50">
-                {invoice.razorpayOrderId && (
+                {getInvoiceReferenceId(invoice) && (
                   <p className="text-[10px] text-muted-foreground font-medium">
-                    Order ID: <span className="font-mono text-foreground/80">{invoice.razorpayOrderId}</span>
+                    Order ID: <span className="font-mono text-foreground/80">{getInvoiceReferenceId(invoice)}</span>
                   </p>
                 )}
                 {invoice.razorpayPaymentId && (
@@ -227,41 +250,70 @@ const InvoiceViewModal = ({
 
 // ─── Admin Invoice Upload Tab ──────────────────────────────────────────────────
 const AdminInvoiceUploadTab = () => {
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [bookings, setBookings] = useState<BookingData[]>([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<BookingData | null>(null);
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState("");
   const [formData, setFormData] = useState({
-    invoiceNumber: `FS-${Date.now().toString().slice(-6)}`,
+    invoiceNumber: "",
     amount: "",
     description: "",
-    dueDate: format(new Date(), "yyyy-MM-dd"),
+    paymentDate: format(new Date(), "yyyy-MM-dd"),
   });
 
-  const searchUsers = useCallback(async (query: string) => {
-    if (!query || query.length < 2) return;
-    setLoadingUsers(true);
+  const fetchBookings = useCallback(async (query?: string) => {
+    setLoadingBookings(true);
     try {
-      const res = await adminService.getAllUsers({ search: query, limit: 5 });
+      const res = await adminService.getAllBookings({ limit: 100 });
       if (res.success) {
-        setUsers(res.data.users);
+        if (query && query.length >= 2) {
+          const filtered = res.data.bookings.filter(b => 
+            b.bookingNumber.toLowerCase().includes(query.toLowerCase()) ||
+            (b.user?.fullName || "").toLowerCase().includes(query.toLowerCase()) ||
+            (b.user?.email || "").toLowerCase().includes(query.toLowerCase())
+          );
+          setBookings(filtered);
+        } else {
+          setBookings(res.data.bookings);
+        }
       }
     } catch (err) {
       console.error(err);
     } finally {
-      setLoadingUsers(false);
+      setLoadingBookings(false);
     }
   }, []);
 
   useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
-      if (searchQuery) searchUsers(searchQuery);
+      if (searchQuery) fetchBookings(searchQuery);
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchQuery, searchUsers]);
+  }, [searchQuery, fetchBookings]);
+
+  const handleBookingSelect = (booking: BookingData) => {
+    setSelectedBooking(booking);
+    setSearchQuery("");
+    setBookings([]);
+    
+    // Auto generate invoice number and description
+    const timestamp = Date.now().toString().slice(-4);
+    const invNumber = `INV-${booking.bookingNumber}-${timestamp}`;
+    
+    setFormData(prev => ({
+      ...prev,
+      invoiceNumber: invNumber,
+      description: `Manual Invoice for booking ${booking.bookingNumber} (${booking.plan?.name || ""})`,
+      amount: booking.amount?.toString() || booking.plan?.price?.toString() || ""
+    }));
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -277,33 +329,41 @@ const AdminInvoiceUploadTab = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedUser || !file || !formData.amount || !formData.description) {
-      toast({ title: "Warning", description: "Please fill all fields and select a user", variant: "destructive" });
+    if (!selectedBooking || !file || !formData.amount || !formData.description) {
+      toast({ title: "Warning", description: "Please select a booking and fill all fields", variant: "destructive" });
       return;
     }
 
     setUploading(true);
     try {
       const data = new FormData();
-      data.append("userId", selectedUser._id);
+      const selectedUserId =
+        selectedBooking.userId ||
+        selectedBooking.user?._id ||
+        selectedBooking.user?.id;
+
+      if (selectedUserId) {
+        data.append("userId", selectedUserId);
+      }
+      data.append("bookingId", selectedBooking._id);
       data.append("invoiceNumber", formData.invoiceNumber);
       data.append("amount", formData.amount);
       data.append("description", formData.description);
-      data.append("dueDate", formData.dueDate);
+      data.append("paymentDate", formData.paymentDate);
       data.append("invoiceFile", file);
 
       const res = await adminService.uploadAdminInvoice(data);
       if (res.success) {
         toast({ title: "Success", description: "Invoice uploaded successfully" });
         // Reset form
-        setSelectedUser(null);
+        setSelectedBooking(null);
         setFile(null);
         setFilePreview("");
         setFormData({
-          invoiceNumber: `FS-${Date.now().toString().slice(-6)}`,
+          invoiceNumber: "",
           amount: "",
           description: "",
-          dueDate: format(new Date(), "yyyy-MM-dd"),
+          paymentDate: format(new Date(), "yyyy-MM-dd"),
         });
       }
     } catch (err) {
@@ -320,56 +380,52 @@ const AdminInvoiceUploadTab = () => {
         <div className="space-y-6">
           <div className="bg-background border border-border rounded-2xl p-6 shadow-sm">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <UserIcon className="w-5 h-5 text-primary" />
-              1. Select User
+              <Receipt className="w-5 h-5 text-primary" />
+              1. Select Booking
             </h3>
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search user by name or email..."
+                placeholder="Search booking # or client name..."
                 className="pl-10 h-12 rounded-xl"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              {loadingUsers && <Loader2 className="absolute right-3 top-3.5 w-5 h-5 animate-spin text-primary" />}
+              {loadingBookings && <Loader2 className="absolute right-3 top-3.5 w-5 h-5 animate-spin text-primary" />}
             </div>
 
-            {users.length > 0 && searchQuery && !selectedUser && (
-              <div className="border border-border rounded-xl overflow-hidden mb-4 bg-muted/20">
-                {users.map(u => (
+            {bookings.length > 0 && searchQuery && !selectedBooking && (
+              <div className="border border-border rounded-xl overflow-hidden mb-4 bg-muted/20 max-h-[250px] overflow-y-auto">
+                {bookings.map(b => (
                   <button
-                    key={u._id}
-                    onClick={() => {
-                      setSelectedUser(u);
-                      setSearchQuery("");
-                      setUsers([]);
-                    }}
+                    key={b._id}
+                    onClick={() => handleBookingSelect(b)}
                     className="w-full text-left p-3 hover:bg-primary/5 border-b border-border last:border-0 transition-colors flex items-center gap-3"
                   >
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase">
-                      {u.fullName.charAt(0)}
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px] uppercase">
+                      {b.bookingNumber.slice(-2)}
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground">{u.fullName}</p>
-                      <p className="text-[10px] text-muted-foreground">{u.email}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-foreground truncate">{b.bookingNumber}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{b.user?.fullName} • {b.plan?.name}</p>
                     </div>
                   </button>
                 ))}
               </div>
             )}
 
-            {selectedUser && (
+            {selectedBooking && (
               <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-sm uppercase">
-                    {selectedUser.fullName.charAt(0)}
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-black text-xs uppercase">
+                    {selectedBooking.bookingNumber.slice(-4)}
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-foreground">{selectedUser.fullName}</p>
-                    <p className="text-[10px] text-muted-foreground">{selectedUser.email}</p>
+                    <p className="text-sm font-bold text-foreground">{selectedBooking.bookingNumber}</p>
+                    <p className="text-[10px] text-muted-foreground">{selectedBooking.user?.fullName} ({selectedBooking.user?.email})</p>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setSelectedUser(null)} className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive">
+                <Button variant="ghost" size="sm" onClick={() => setSelectedBooking(null)} className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive">
                   <XCircle className="w-4 h-4" />
                 </Button>
               </div>
@@ -419,6 +475,13 @@ const AdminInvoiceUploadTab = () => {
           </h3>
 
           <form onSubmit={handleSubmit} className="space-y-6 relative">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Selected Client</Label>
+              <div className="h-12 bg-muted/30 border border-border rounded-xl flex items-center px-4 font-bold text-sm text-foreground/70">
+                {selectedBooking?.user?.fullName || "No booking selected"}
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Invoice #</Label>
@@ -441,13 +504,13 @@ const AdminInvoiceUploadTab = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Due Date</Label>
-              <Input
-                type="date"
-                className="h-12 bg-muted/30 border-border rounded-xl"
-                value={formData.dueDate}
-                onChange={(e) => setFormData(p => ({ ...p, dueDate: e.target.value }))}
-              />
+                <Label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Payment Date</Label>
+                <Input
+                  type="date"
+                  className="h-12 bg-muted/30 border-border rounded-xl"
+                  value={formData.paymentDate}
+                  onChange={(e) => setFormData(p => ({ ...p, paymentDate: e.target.value }))}
+                />
             </div>
 
             <div className="space-y-2">
@@ -800,7 +863,7 @@ const InvoiceTable = ({
                   <td className="p-5">
                     <p className="font-bold text-foreground">{invoice.invoiceNumber}</p>
                     <p className="text-[10px] text-muted-foreground font-mono truncate max-w-[140px]">
-                      {invoice.razorpayOrderId || "Manual Entry"}
+                      {getInvoiceReferenceId(invoice)}
                     </p>
                   </td>
                   <td className="p-5">
@@ -815,12 +878,17 @@ const InvoiceTable = ({
                     </div>
                   </td>
                   <td className="p-5">
-                    <p className="text-xs font-bold text-foreground truncate max-w-[150px]">
-                      {invoice.spaceName || "Direct Billing"}
+                    <p className="text-xs font-bold text-foreground truncate max-w-[180px]">
+                      {getServiceSpaceName(invoice)}
                     </p>
-                    <Badge variant="outline" className={`mt-1 text-[9px] h-4 py-0 leading-none px-1.5 font-bold uppercase ${isManual ? 'border-primary/30 text-primary bg-primary/5' : ''}`}>
-                      {categoryLabel(invoice.paymentType)}
-                    </Badge>
+                    <p className="mt-1 text-[11px] font-semibold text-muted-foreground truncate max-w-[180px]">
+                      {getServicePlanName(invoice)}
+                    </p>
+                    {shouldShowPaymentType(invoice) && (
+                      <Badge variant="outline" className="mt-1 text-[9px] h-4 py-0 leading-none px-1.5 font-bold uppercase">
+                        {categoryLabel(invoice.paymentType)}
+                      </Badge>
+                    )}
                   </td>
                   <td className="p-5">
                     <p className="text-base font-black text-foreground">{formatCurrency(invoice.totalAmount || invoice.amount)}</p>

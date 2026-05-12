@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeft, ChevronRight, Home, Menu, X } from "lucide-react";
 
+const FLASHSPACE_LOGO_URL =
+  "https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png";
+
 interface NavItem {
   label: string;
   href: string;
@@ -83,20 +86,19 @@ export const DashboardLayout = ({
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
           <div className="p-6 border-b border-border">
-            <Link to="/" className="flex items-baseline mb-4">
-              <span
+            <Link
+              to="/"
+              className={cn("flex items-center mb-4", collapsed && "justify-center")}
+              aria-label="FlashSpace home"
+            >
+              <img
+                src={FLASHSPACE_LOGO_URL}
+                alt="FlashSpace Logo"
                 className={cn(
-                  "font-extrabold tracking-tight text-foreground transition-all uppercase",
-                  collapsed ? "text-xl" : "text-2xl",
+                  "w-auto object-contain transition-all dark:invert",
+                  collapsed ? "h-7 max-w-10" : "h-9 max-w-[170px]",
                 )}
-              >
-                {collapsed ? "f" : "FLASH"}
-              </span>
-              {!collapsed && (
-                <span className="text-xl font-extrabold tracking-tight text-primary italic">
-                  space
-                </span>
-              )}
+              />
             </Link>
             {!collapsed && (
               <div>
@@ -203,10 +205,11 @@ export const DashboardLayout = ({
         {/* Mobile Top Bar (Only visible when sidebar needs toggle) */}
         <header className="lg:hidden h-16 bg-white/80 backdrop-blur-md border-b border-border sticky top-0 z-30 flex items-center justify-between px-4 shrink-0">
           <div className="flex flex-col">
-            <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight uppercase">
-              <span className="text-foreground">FLASH</span>
-              <span className="text-primary italic lowercase">space</span>
-            </div>
+            <img
+              src={FLASHSPACE_LOGO_URL}
+              alt="FlashSpace Logo"
+              className="h-8 w-auto max-w-[150px] object-contain dark:invert"
+            />
             <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest leading-none">
               {portalName}
             </p>

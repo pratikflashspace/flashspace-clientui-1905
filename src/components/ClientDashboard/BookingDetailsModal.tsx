@@ -28,7 +28,7 @@ export default function BookingDetailsModal({
 }: BookingDetailsModalProps) {
   const navigate = useNavigate();
   const [step, setStep] = useState(() => {
-    if (booking.partnerRequestStatus === 'completed') return 4;
+    if (booking.status === 'active' || booking.partnerRequestStatus === 'completed') return 4;
     if (booking.partnerRequestStatus === 'submitted' || booking.partnerRequestStatus === 'in_review') return 3;
     return 1;
   });
@@ -836,7 +836,7 @@ export default function BookingDetailsModal({
 
   const renderStep4 = () => {
     const finalAgreement = getBookingDoc("final_agreement");
-    const isApproved = !!finalAgreement;
+    const isApproved = !!finalAgreement || booking.status === 'active';
 
     const handleRaiseTicket = () => {
       navigate('/dashboard/support', { 
@@ -904,7 +904,7 @@ export default function BookingDetailsModal({
           >
             Back
           </button>
-          {booking.partnerRequestStatus === 'completed' ? (
+          {booking.status === 'active' ? (
             <button
               onClick={handleRaiseTicket}
               className="flex-1 py-3 rounded-xl font-bold bg-[#FEF8C3] text-[#35503F] border border-[#35503F]/20 hover:bg-[#FEF8C3]/80 transition-all flex items-center justify-center gap-2 shadow-sm"

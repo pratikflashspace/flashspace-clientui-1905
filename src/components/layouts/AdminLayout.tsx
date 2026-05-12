@@ -30,6 +30,9 @@ import {
 import { adminService } from "@/services/admin.service";
 import { cn } from "@/lib/utils";
 
+const FLASHSPACE_LOGO_URL =
+  "https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png";
+
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -223,18 +226,19 @@ export default function AdminLayout() {
       >
         {/* Sidebar Header */}
         <div className="h-auto py-8 px-6 flex flex-col items-start gap-1">
-          <Link to="/" className="flex items-baseline gap-0.5 mb-2 group">
-            <span className={cn(
-              "font-extrabold tracking-tight text-teal-950 transition-all uppercase",
-              isSidebarOpen ? "text-2xl" : "text-xl"
-            )}>
-              {isSidebarOpen ? "FLASH" : "F"}
-            </span>
-            {isSidebarOpen && (
-              <span className="text-xl font-extrabold tracking-tight text-primary italic lowercase">
-                space
-              </span>
-            )}
+          <Link
+            to="/"
+            className={cn("flex items-center mb-2 group", !isSidebarOpen && "w-full justify-center")}
+            aria-label="FlashSpace home"
+          >
+            <img
+              src={FLASHSPACE_LOGO_URL}
+              alt="FlashSpace Logo"
+              className={cn(
+                "w-auto object-contain transition-all",
+                isSidebarOpen ? "h-9 max-w-[170px]" : "h-7 max-w-10",
+              )}
+            />
           </Link>
           {isSidebarOpen && (
             <>
@@ -341,9 +345,11 @@ export default function AdminLayout() {
           <aside className="fixed inset-y-0 left-0 w-72 bg-white text-gray-900 flex flex-col shadow-2xl animate-in slide-in-from-left duration-300">
             {/* Header */}
             <div className="py-8 px-6 flex flex-col items-start gap-1 border-b border-gray-100">
-              <span className="text-2xl font-extrabold tracking-tighter text-teal-950">
-                flashspace
-              </span>
+              <img
+                src={FLASHSPACE_LOGO_URL}
+                alt="FlashSpace Logo"
+                className="h-9 w-auto max-w-[170px] object-contain"
+              />
               <h2 className="text-sm font-bold text-gray-900 mt-2">
                 FlashSpace Admin
               </h2>
@@ -433,10 +439,11 @@ export default function AdminLayout() {
           <>
             <header className="lg:hidden h-20 bg-transparent flex items-center justify-between px-4 md:px-12 pt-6 transition-all duration-300">
               <div className="flex flex-col">
-                <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight uppercase">
-                  <span className="text-foreground">FLASH</span>
-                  <span className="text-primary italic lowercase">space</span>
-                </div>
+                <img
+                  src={FLASHSPACE_LOGO_URL}
+                  alt="FlashSpace Logo"
+                  className="h-8 w-auto max-w-[150px] object-contain"
+                />
                 <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest leading-none">
                   Admin Portal
                 </p>

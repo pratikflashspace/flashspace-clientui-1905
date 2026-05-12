@@ -44,9 +44,23 @@ export default function Documents() {
         return ['.mp4', '.webm', '.ogg', '.mov', '.mkv', '.avi', '.mp3', '.m4v'].some(ext => lowerUrl.endsWith(ext));
     };
 
+    const getInvoiceDescription = (invoice: Invoice) => {
+        const linkedBooking = bookings.find(
+            (booking) => booking.bookingNumber === invoice.bookingNumber || booking._id === (invoice as any).booking
+        );
+        const spaceName = invoice.spaceName || linkedBooking?.spaceSnapshot?.name;
+        const planName = invoice.planName || linkedBooking?.plan?.name;
+        const tenure = invoice.tenure || linkedBooking?.plan?.tenure;
+        const tenureUnit = invoice.tenureUnit || linkedBooking?.plan?.tenureUnit || "months";
+        const tenureLabel = tenure ? `${tenure} ${tenureUnit}` : "";
+
+        return [spaceName, planName, tenureLabel].filter(Boolean).join(" - ") || invoice.description || "Service Booking";
+    };
+
     const filteredInvoices = invoices.filter(invoice => {
         const matchesSearch = invoice.invoiceNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             invoice.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            getInvoiceDescription(invoice).toLowerCase().includes(searchQuery.toLowerCase()) ||
             invoice.status?.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesFilter = filterStatus === "all" || invoice.status?.toLowerCase() === filterStatus;
         return matchesSearch && matchesFilter;
@@ -515,7 +529,7 @@ export default function Documents() {
                                                     {format(new Date(invoice.createdAt), "MMM dd, yyyy")}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-700">
-                                                    {invoice.description || "Service Booking"}
+                                                    {getInvoiceDescription(invoice)}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className="font-medium text-gray-900">₹{invoice.total?.toLocaleString() || 0}</span>

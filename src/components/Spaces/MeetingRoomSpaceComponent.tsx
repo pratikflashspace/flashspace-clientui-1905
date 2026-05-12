@@ -29,6 +29,7 @@ import {
   verifyPayment,
   openRazorpayCheckout,
   reportPaymentFailure,
+  simulatePayment,
 } from "@/services/payment.service";
 import hotToast from "react-hot-toast";
 import {
@@ -63,6 +64,7 @@ const MeetingRoomSpaceComponent = () => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isDevMode] = useState(import.meta.env.DEV);
 
   const persistCurrentCheckout = () => {
     persistCheckoutState(
@@ -196,6 +198,18 @@ const MeetingRoomSpaceComponent = () => {
         paymentType: "meeting_room" as any,
       });
 
+      // Auto-simulate if in dev mode and keys are missing
+      if (order.devMode) {
+        hotToast.loading("Simulating payment...", { id: "sim" });
+        const result = await simulatePayment(order.orderId);
+        hotToast.dismiss("sim");
+        clearCheckoutState();
+        navigate(
+          `/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(`${hours} Hour Meeting Room Booking`)}&amount=${totalPrice}`,
+        );
+        return;
+      }
+
       // 2. Open Razorpay Checkout
       await openRazorpayCheckout({
         orderId: order.orderId,
@@ -215,9 +229,13 @@ const MeetingRoomSpaceComponent = () => {
               razorpay_signature: response.razorpay_signature,
             });
             clearCheckoutState();
-            navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(`${hours} Hour Meeting Room Booking`)}&amount=${totalPrice}`);
+            navigate(
+              `/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(`${hours} Hour Meeting Room Booking`)}&amount=${totalPrice}`,
+            );
           } catch (err) {
-            hotToast.error("Payment verification failed. Please contact support.");
+            hotToast.error(
+              "Payment verification failed. Please contact support.",
+            );
           }
         },
         onFailure: (err) => {
@@ -229,6 +247,57 @@ const MeetingRoomSpaceComponent = () => {
     } catch (error: any) {
       console.error(error);
       hotToast.error(error.message || "Booking failed");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleSimulatePayment = async () => {
+    if (!user) {
+      hotToast.error("Please login to continue");
+      persistCurrentCheckout();
+      navigate(getLoginRedirectUrl(checkoutReturnTo), {
+        state: { redirectTo: checkoutReturnTo },
+      });
+      return;
+    }
+
+    if (!spaceDetails) return;
+
+    setIsProcessing(true);
+    try {
+      const totalPrice = getTotalPrice();
+      hotToast.loading("Creating test order...", { id: "sim" });
+
+      const order = await createPaymentOrder({
+        userId: user.id || (user as any)._id,
+        userEmail: user.email,
+        userName: user.fullName || "User",
+        userPhone: (user as any).phoneNumber || "9876543210",
+        spaceId: spaceDetails._id,
+        spaceName: spaceDetails.name,
+        planName: `${hours} Hour Meeting Room Booking`,
+        planKey: "meeting_hourly",
+        tenure: 1,
+        yearlyPrice: totalPrice,
+        totalAmount: totalPrice,
+        discountPercent: 0,
+        discountAmount: 0,
+        paymentType: "meeting_room" as any,
+      });
+
+      hotToast.loading("Simulating payment success...", { id: "sim" });
+      const result = await simulatePayment(order.orderId);
+      hotToast.dismiss("sim");
+
+      clearCheckoutState();
+      hotToast.success("Test Payment Successful! 🎉");
+      navigate(
+        `/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(spaceDetails.name)}&planName=${encodeURIComponent(`${hours} Hour Meeting Room Booking`)}&amount=${totalPrice}`,
+      );
+    } catch (error: any) {
+      hotToast.dismiss("sim");
+      hotToast.error(error.message || "Simulation failed");
     } finally {
       setIsProcessing(false);
     }
@@ -541,6 +610,16 @@ const MeetingRoomSpaceComponent = () => {
                     ? "Processing Payment..."
                     : `Pay ₹${totalPrice}`}
                 </button>
+
+                {isDevMode && (
+                  <button
+                    onClick={handleSimulatePayment}
+                    disabled={isProcessing}
+                    className="w-full mt-2 py-3 border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-xs"
+                  >
+                    {isProcessing ? "Simulating..." : "Test Payment (Dev Only)"}
+                  </button>
+                )}
                 <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
                   <ShieldCheck className="w-3 h-3" /> Secure Payment via
                   Razorpay
