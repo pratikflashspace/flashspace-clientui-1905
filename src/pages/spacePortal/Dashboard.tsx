@@ -23,6 +23,7 @@ import {
   fetchPartnerDashboard,
   fetchAllPartnerSpaces,
   fetchPartnerActiveRequests,
+  fetchBookingAnalytics,
 } from "@/services/spacePortal/spacePartner.service";
 import { Client } from "@/types/spacePortal/client";
 
@@ -42,20 +43,24 @@ export default function Dashboard() {
   const loadDashboardData = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const [dashboardRes, spacesRes, requestsRes] = await Promise.all([
+      const [dashboardRes, spacesRes, requestsRes, analyticsRes] = await Promise.all([
         fetchPartnerDashboard(),
         fetchAllPartnerSpaces(),
         fetchPartnerActiveRequests(),
+        fetchBookingAnalytics(),
       ]);
 
       const clients: Client[] = dashboardRes?.data?.clients || [];
       const stats = dashboardRes?.data?.stats || {};
       const requests = requestsRes?.data || [];
+      const analytics = analyticsRes?.data?.summary || {};
 
-      // Prefer backend-calculated revenue if available, fallback to frontend calc
-      const totalRevenue = stats.monthlyRevenue !== undefined 
-        ? stats.monthlyRevenue 
-        : clients.reduce((sum, c) => sum + (c.dealValue || 0), 0);
+      // Priority: 1. Analytics Service (most accurate) 2. Dashboard Stats 3. Clients Deal Value (fallback)
+      const totalRevenue = analytics.revenueThisMonth !== undefined
+        ? analytics.revenueThisMonth
+        : (stats.monthlyRevenue !== undefined
+          ? stats.monthlyRevenue
+          : clients.reduce((sum, c) => sum + (c.dealValue || 0), 0));
 
       const formattedRevenue =
         totalRevenue >= 100000

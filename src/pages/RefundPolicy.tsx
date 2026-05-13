@@ -122,38 +122,6 @@ const RefundPolicy = () => {
             </div>
           </section>
 
-          {/* 24-Hour Guarantee */}
-          <section className="bg-gradient-to-br from-[#35503F] to-[#2D3F33] rounded-[32px] p-8 sm:p-12 text-[#FEF8C3]">
-            <h2 className="text-2xl font-bold mb-6">
-              The 24-Hour Satisfaction Guarantee
-            </h2>
-            <p className="text-lg opacity-90 mb-8 leading-relaxed">
-              We offer a 100% money-back guarantee (minus a 1.5% processing fee) if you are unsatisfied
-              within the first 24 hours of booking.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-[#EDB003] rounded-full" />
-                  Booking must be made directly via our website.
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-[#EDB003] rounded-full" />
-                  Request must be submitted within 24 hours.
-                </li>
-              </ul>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-[#EDB003] rounded-full" />
-                  KYC must be complete, accurate, and approved.
-                </li>
-                <li className="flex items-center gap-2 text-white/60 italic">
-                  Note: Official delivery takes 48-72 hours.
-                </li>
-              </ul>
-            </div>
-          </section>
-
           {/* How to Request */}
           <section className="text-center space-y-6">
             <h2 className="text-2xl font-bold text-[#35503F]">
