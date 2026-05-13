@@ -617,9 +617,10 @@ const MyBookings: React.FC = () => {
         </div>
 
         {/* Filters Bar */}
-        <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
+        <div className="flex flex-col xl:flex-row justify-between gap-6 items-stretch xl:items-center">
           {/* Service Type Tabs - Better scroll behavior on mobile */}
-          <div className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
+          <div className="w-full xl:w-fit min-w-0">
+            <div className="flex w-full xl:w-fit min-w-0 p-1 rounded-xl shadow-sm bg-gray-100/80 overflow-x-auto whitespace-nowrap scroll-smooth">
             {[
               { id: "all", label: "All", icon: null },
               {
@@ -633,20 +634,21 @@ const MyBookings: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all shrink-0 ${activeTab === tab.id
+                className={`flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-lg text-[11px] 2xl:text-xs font-bold transition-all shrink-0 ${activeTab === tab.id
                   ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
                   }`}
               >
-                {tab.icon && <tab.icon className="w-4 h-4" />}
+                {tab.icon && <tab.icon className="w-3.5 h-3.5" />}
                 {tab.label}
               </button>
             ))}
+            </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center w-full xl:w-auto">
             {/* Search */}
-            <div className="relative flex-1 lg:w-80">
+            <div className="relative flex-1 xl:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"

@@ -91,8 +91,8 @@ export default function Coupons() {
 
   const fetchClients = async () => {
     try {
-      // Fetching users with 'user' role or simply all users to select from
-      const response = await adminService.getAllUsers({ role: "user" });
+      // Fetching all users to select from without role filtering
+      const response = await adminService.getAllUsers({ limit: 1000 });
       if (response.success && response.data) {
         setClients(response.data.users || []);
       }
@@ -224,7 +224,7 @@ export default function Coupons() {
               />
             </div>
 
-            <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+            <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
               <div className="relative flex-1 md:flex-none">
                 <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <select
@@ -476,7 +476,7 @@ export default function Coupons() {
                 </button>
               </div>
  
-              <form onSubmit={handleCreateCoupon} className="p-6 md:p-8 space-y-6 overflow-y-auto scrollbar-none">
+              <form onSubmit={handleCreateCoupon} className="p-6 md:p-8 space-y-6 overflow-y-auto">
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground ml-1 flex items-center gap-2">
@@ -532,7 +532,7 @@ export default function Coupons() {
                               placeholder="Search client by name or email..."
                               className="rounded-t-xl"
                             />
-                            <CommandList className="max-h-[200px] overflow-y-auto scrollbar-none">
+                            <CommandList className="max-h-[300px] overflow-y-auto">
                               <CommandEmpty>No client found.</CommandEmpty>
                               <CommandGroup>
                                 {clients.map((client) => {
