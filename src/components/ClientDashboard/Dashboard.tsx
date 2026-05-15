@@ -458,15 +458,15 @@ export default function Dashboard() {
           {statsCards.map((card, idx) => (
             <div
               key={idx}
-              className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md flex items-start justify-between"
+              className="bg-white py-8 px-6 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg flex items-start justify-between"
             >
               <div>
-                <p className={`mb-1 ${card.isSmall ? "text-xl font-bold" : "text-3xl font-extrabold"} ${card.valueColor || "text-[#35503F]"}`}>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{card.title}</p>
+                <p className={`${card.isSmall ? "text-xl font-bold" : "text-3xl font-extrabold"} ${card.valueColor || "text-[#35503F]"}`}>
                   {card.value}
                 </p>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{card.title}</p>
               </div>
-              <div className="p-2.5 bg-gray-50 rounded-2xl text-[#35503F]">
+              <div className="p-2.5 bg-gray-50 rounded-xl text-[#35503F]">
                 <card.icon className="w-5 h-5 opacity-70" />
               </div>
             </div>
@@ -498,11 +498,11 @@ export default function Dashboard() {
                       key={booking._id}
                       className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all group relative"
                     >
-                      {/* Header: ID & Status */}
+                      {/* Header: Space ID & Status */}
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                            {booking.bookingNumber || "BO-2024-XXX"}
+                            {getWorkspaceDisplayName(booking)}
                           </span>
                           <span
                             className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border ${booking.type === "VirtualOffice" ||
@@ -534,13 +534,12 @@ export default function Dashboard() {
                       {/* Main Content */}
                       <div className="mb-5">
                         <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#35503F] transition-colors line-clamp-1">
-                          {getWorkspaceDisplayName(booking)}
+                          {booking.bookingNumber || "Booking ID"}
                         </h3>
                         <div className="flex items-start gap-2 text-gray-500 text-xs mb-3 h-8">
                           <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-[#35503F]" />
                           <span className="line-clamp-2">
-                            {booking.spaceSnapshot?.address},{" "}
-                            {booking.spaceSnapshot?.city}
+                            {booking.spaceSnapshot?.city} — {booking.spaceSnapshot?.address?.split(",")[0]}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-xs text-gray-500">

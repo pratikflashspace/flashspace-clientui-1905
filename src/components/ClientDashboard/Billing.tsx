@@ -324,23 +324,23 @@ export default function Billing() {
 
         {/* Stats Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-green-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{formatCurrency(stats.totalPaid)}</p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Paid</p>
+          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-green-400">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Paid</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">{formatCurrency(stats.totalPaid)}</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-orange-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{formatCurrency(stats.pendingAmount)}</p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending Dues</p>
+          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-orange-400">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pending Dues</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">{formatCurrency(stats.pendingAmount)}</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-blue-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{stats.activeSubscriptions}</p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Subscriptions</p>
+          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-blue-400">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Active Subscriptions</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">{stats.activeSubscriptions}</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-purple-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">
+          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-purple-400">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Next Billing</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">
               {stats.nextBilling ? formatDate(stats.nextBilling) : "-"}
             </p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Next Billing</p>
           </div>
         </div>
 
@@ -414,32 +414,32 @@ export default function Billing() {
 
         {/* Content */}
         {activeTab === "invoices" && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-left py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider">
                       Invoice ID
                     </th>
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-left py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider">
                       Service
                     </th>
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-left py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-left py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider">
                       Amount
                     </th>
-                    <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-left py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="text-right py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="text-right py-4 px-6 text-xs font-bold text-gray-400 uppercase tracking-wider">
                       Action
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-gray-100">
                   {filteredInvoices.length === 0 ? (
                     <tr>
                       <td
@@ -593,7 +593,7 @@ export default function Billing() {
                   return (
                     <div
                       key={sub._id}
-                      className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
+                      className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all"
                     >
                       <div className="flex flex-col justify-between h-full gap-4">
                         <div>
@@ -624,19 +624,16 @@ export default function Billing() {
                           </p>
                         </div>
 
-                        <div className="pt-4 border-t border-gray-50 flex items-center justify-between">
-                          <div>
+                        <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                          <div className="flex items-baseline gap-1">
                             <p className="text-lg font-bold text-gray-900">
                               {formatCurrency(sub.plan.price)}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 font-medium">
                               /{sub.plan.tenure}{" "}
                               {sub.plan.tenureUnit || "months"}
                             </p>
                           </div>
-                          <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                            Manage
-                          </button>
                         </div>
                       </div>
                     </div>

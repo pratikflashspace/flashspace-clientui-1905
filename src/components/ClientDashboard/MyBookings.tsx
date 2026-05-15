@@ -523,12 +523,12 @@ const MyBookings: React.FC = () => {
 
   // Price Unit Helper
   const getPriceUnit = (unit?: string) => {
-    if (!unit) return "/mo";
+    if (!unit) return "/year";
     const normalizedUnit = unit.toLowerCase();
     if (normalizedUnit.includes("hour")) return "/hr";
     if (normalizedUnit.includes("day")) return "/day";
-    if (normalizedUnit.includes("year")) return "/yr";
-    if (normalizedUnit.includes("month")) return "/mo";
+    if (normalizedUnit.includes("year")) return "/year";
+    if (normalizedUnit.includes("month")) return "/year";
     return `/${unit}`;
   };
 
@@ -584,35 +584,35 @@ const MyBookings: React.FC = () => {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">
+          <div className="bg-white py-8 px-6 rounded-2xl shadow-md border border-gray-200 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Bookings</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">
               {bookingStats.total}
             </p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Bookings</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-[#10B981]">
-            <p className="text-3xl font-extrabold text-[#10B981] mb-1">
+          <div className="bg-white py-8 px-6 rounded-2xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-[#10B981]">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Active</p>
+            <p className="text-3xl font-extrabold text-[#10B981]">
               {bookingStats.active}
             </p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Active</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">
+          <div className="bg-white py-8 px-6 rounded-2xl shadow-md border border-gray-200 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Virtual Offices</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">
               {bookingStats.virtualOffice}
             </p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Virtual Offices</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">
+          <div className="bg-white py-8 px-6 rounded-2xl shadow-md border border-gray-200 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Coworking</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">
               {bookingStats.coworking}
             </p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Coworking</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">
+          <div className="bg-white py-8 px-6 rounded-2xl shadow-md border border-gray-200 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">On Demand</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">
               {bookingStats.meetingRoom}
             </p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">On Demand</p>
           </div>
         </div>
 
@@ -769,7 +769,7 @@ const MyBookings: React.FC = () => {
               return (
                 <div
                   key={booking._id}
-                  className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group relative"
+                  className="bg-white rounded-2xl p-4 shadow-md border border-gray-200 hover:shadow-lg transition-shadow group relative"
                 >
                   {/* Header: ID & Status */}
                   <div className="flex items-center justify-between mb-3">
@@ -777,8 +777,26 @@ const MyBookings: React.FC = () => {
                       <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
                         {booking.bookingNumber || "BO-2024-XXX"}
                       </span>
+                    </div>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConfig.bg} ${statusConfig.text}`}
+                    >
+                      {(() => {
+                        const Icon = statusConfig.icon;
+                        return <Icon className="w-3 h-3" />;
+                      })()}
+                      {statusConfig.label}
+                    </span>
+                  </div>
+
+                  {/* Main Content */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-base font-bold text-gray-900 group-hover:text-[#35503F] transition-colors line-clamp-1">
+                        {getWorkspaceDisplayName(booking)}
+                      </h3>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${booking.type === "VirtualOffice" ||
+                        className={`px-2 py-0.5 rounded-full text-[9px] font-medium border shrink-0 ${booking.type === "VirtualOffice" ||
                           booking.type === "virtual_office"
                           ? "bg-gray-50 border-gray-200 text-gray-600"
                           : booking.type === "MeetingRoom" ||
@@ -796,27 +814,33 @@ const MyBookings: React.FC = () => {
                             : "Coworking"}
                       </span>
                     </div>
-                    <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusConfig.bg} ${statusConfig.text}`}
-                    >
-                      {(() => {
-                        const Icon = statusConfig.icon;
-                        return <Icon className="w-3 h-3" />;
-                      })()}
-                      {statusConfig.label}
-                    </span>
-                  </div>
-
-                  {/* Main Content */}
-                  <div className="mb-4">
-                    <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-[#35503F] transition-colors line-clamp-1">
-                      {getWorkspaceDisplayName(booking)}
-                    </h3>
                     <div className="flex items-start gap-1.5 text-gray-500 text-xs mb-2 h-8">
                       <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0 text-[#35503F]" />
                       <span className="line-clamp-2">
-                        {booking.spaceSnapshot?.address},{" "}
-                        {booking.spaceSnapshot?.city}
+                        {(() => {
+                          const address = booking.spaceSnapshot?.address || "";
+                          const city = booking.spaceSnapshot?.city || "";
+                          if (!address) return city;
+                          
+                          const parts = address.split(",").map(p => p.trim());
+                          // Filter out generic parts (floors, plot numbers, pincodes, country)
+                          const skipPattern = /^([0-9]*\s*(floor|level|plot|off|unit|cabin|shop|room|flat|apartment|h\.no|no\.|block|pocket|phase|st|nd|rd|th|india))\b/i;
+                          const numericPattern = /^[0-9\-\s\+/]+$/;
+                          
+                          const filtered = parts.filter(p => {
+                            const clean = p.toLowerCase();
+                            if (skipPattern.test(clean)) return false;
+                            if (numericPattern.test(clean)) return false;
+                            if (clean === city.toLowerCase()) return false;
+                            if (clean === "india") return false;
+                            return true;
+                          });
+                          
+                          // Take top 4 significant parts (e.g., Building + Road + Area + Sector)
+                          const shortDetails = filtered.slice(0, 4).join(", ");
+                          
+                          return shortDetails ? `${city} - ${shortDetails}` : city;
+                        })()}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-gray-500">
@@ -829,23 +853,23 @@ const MyBookings: React.FC = () => {
 
                     {/* Auto-renewal Status */}
                     {(booking.status === "active" || booking.status === "pending_payment" || booking.autoRenew) && (
-                      <div className="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-green-50/50 border border-green-100 rounded-xl w-fit">
-                        <div className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-green-700 uppercase tracking-tight">
+                      <div className="mt-2.5 flex items-center gap-1 px-2 py-1 bg-green-50/50 border border-green-100 rounded-lg w-fit">
+                        <div className="flex h-1 w-1 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-[9px] font-semibold text-green-700 uppercase tracking-tight">
                           Renewal on {formatDate(booking.endDate || "")}
                         </span>
                       </div>
                     )}
                   </div>
 
-                  <div className="h-px bg-gray-100 my-3" />
+                  <div className="h-px bg-gray-200 my-3" />
 
                   {/* Footer: Price & Actions */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-base font-bold text-gray-900">
+                      <p className="text-lg font-extrabold text-gray-900">
                         {formatCurrency(booking.plan.price)}
-                        <span className="text-xs font-normal text-gray-500">
+                        <span className="text-xs font-bold text-gray-500">
                           {getPriceUnit(booking.plan.tenureUnit)}
                         </span>
                       </p>

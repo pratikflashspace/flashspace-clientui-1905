@@ -138,7 +138,7 @@ export default function MailRecords() {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
           <CheckCircle2 className="w-3 h-3" />
-          {status === "Collected" ? "Collected" : "Marked as Received"}
+          Collected
         </span>
       );
     }
@@ -209,60 +209,63 @@ export default function MailRecords() {
 
         {/* Stats Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-yellow-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{stats.pending}</p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending Pickup</p>
+          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-yellow-400">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pending Pickup</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">{stats.pending}</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-blue-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{stats.forwarded}</p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Forwarded</p>
+          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-blue-400">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Forwarded</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">{stats.forwarded}</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-green-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{stats.collected}</p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Collected</p>
+          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-green-400">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Collected</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">{stats.collected}</p>
           </div>
         </div>
 
         {/* Navigation Tabs and Search */}
         <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
-          <div className="flex gap-1 p-1 bg-gray-50 rounded-2xl border border-gray-100">
+          <div className="relative flex gap-1 p-1 bg-gray-100/50 backdrop-blur-md rounded-2xl border border-gray-200/50 shadow-inner overflow-hidden lg:w-[600px]">
+            {/* Sliding Indicator */}
+            <div 
+              className="absolute inset-y-1 transition-all duration-300 ease-out bg-white rounded-xl shadow-md"
+              style={{
+                left: activeTab === "received" ? "4px" : activeTab === "forwarded" ? "calc(33.33% + 2px)" : "calc(66.66% + 2px)",
+                width: "calc(33.33% - 4px)"
+              }}
+            />
+            
             <button
               onClick={() => { setActiveTab("received"); setPage(1); }}
-              className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                activeTab === "received"
-                  ? "bg-[#35503F] text-[#FEF8C3] shadow-md"
-                  : "text-gray-500 hover:text-[#35503F] hover:bg-white"
+              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors duration-300 ${
+                activeTab === "received" ? "text-[#35503F]" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               Received Mail
             </button>
             <button
               onClick={() => { setActiveTab("forwarded"); setPage(1); }}
-              className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                activeTab === "forwarded"
-                  ? "bg-[#35503F] text-[#FEF8C3] shadow-md"
-                  : "text-gray-500 hover:text-[#35503F] hover:bg-white"
+              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors duration-300 ${
+                activeTab === "forwarded" ? "text-[#35503F]" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               Forwarded Mail
             </button>
             <button
               onClick={() => { setActiveTab("collected"); setPage(1); }}
-              className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                activeTab === "collected"
-                  ? "bg-[#35503F] text-[#FEF8C3] shadow-md"
-                  : "text-gray-500 hover:text-[#35503F] hover:bg-white"
+              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors duration-300 ${
+                activeTab === "collected" ? "text-[#35503F]" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               Collected Mail
             </button>
           </div>
 
-          <div className="relative flex-1 lg:w-80">
+          <div className="relative lg:w-96">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search sender, ID, or office city..."
+              placeholder="Search sender, ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border border-gray-100 focus:outline-none focus:ring-4 focus:ring-[#35503F]/10 text-sm font-medium transition-all"
@@ -281,14 +284,17 @@ export default function MailRecords() {
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Type</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Office</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Received</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Action</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Document</th>
+                  {activeTab !== "collected" && (
+                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Action</th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filteredMails.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-20 text-center">
+                    <td colSpan={activeTab === "collected" ? 7 : 8} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
                           <Mail className="w-8 h-8 text-gray-300" />
@@ -322,46 +328,52 @@ export default function MailRecords() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-500 font-medium">{formatDate(mail.received)}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
                         {getStatusBadge(mail)}
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-3">
-                          {mail.documentUrl && (
-                            <button
-                              onClick={() => window.open(resolveDocumentUrl(mail.documentUrl), "_blank")}
-                              title="View Document"
-                              className="p-2 text-gray-400 hover:text-[#35503F] hover:bg-gray-100 rounded-lg transition-all"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                          )}
-                          {mail.status !== "Collected" && (
-                            <div className="flex gap-2">
-                              {mail.clientDecision !== "Forward Requested" && mail.status === "Pending Action" && (
-                                <button 
-                                  className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-900 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95"
-                                  onClick={() => handleForward(mail._id)}
-                                  disabled={forwardingIds.has(mail._id)}
-                                >
-                                  {forwardingIds.has(mail._id) ? (
-                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                  ) : null}
-                                  Please Forward
-                                </button>
-                              )}
-                              {(mail.clientDecision === "Forward Requested" || mail.status === "Forwarded") && mail.userCollectedStatus !== "Collected" && (
-                                <button 
-                                  className="inline-flex items-center px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-xl text-sm font-bold hover:bg-[#35503F]/90 transition-all shadow-sm active:scale-95"
-                                  onClick={() => handleMarkAsCollected(mail._id)}
-                                >
-                                  Collected
-                                </button>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        {mail.documentUrl ? (
+                          <button
+                            onClick={() => window.open(resolveDocumentUrl(mail.documentUrl), "_blank")}
+                            title="View Document"
+                            className="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-[#35503F] hover:bg-gray-100 rounded-lg transition-all"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        ) : (
+                          <span className="text-xs text-gray-300">—</span>
+                        )}
                       </td>
+                      {activeTab !== "collected" && (
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex items-center justify-center gap-3">
+                            {mail.status !== "Collected" && (
+                              <div className="flex gap-2">
+                                {mail.clientDecision !== "Forward Requested" && mail.status === "Pending Action" && (
+                                  <button 
+                                    className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-900 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95 whitespace-nowrap"
+                                    onClick={() => handleForward(mail._id)}
+                                    disabled={forwardingIds.has(mail._id)}
+                                  >
+                                    {forwardingIds.has(mail._id) ? (
+                                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                    ) : null}
+                                    Please Forward
+                                  </button>
+                                )}
+                                {(mail.clientDecision === "Forward Requested" || mail.status === "Forwarded") && mail.userCollectedStatus !== "Collected" && (
+                                  <button 
+                                    className="inline-flex items-center px-4 py-2 bg-[#35503F] text-[#FEF8C3] rounded-xl text-sm font-bold hover:bg-[#35503F]/90 transition-all shadow-sm active:scale-95 whitespace-nowrap"
+                                    onClick={() => handleMarkAsCollected(mail._id)}
+                                  >
+                                    Collected
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))
                 )}
