@@ -183,34 +183,34 @@ const TrackProgress = () => {
 
       <div className="bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full min-w-[1000px]">
+          <table className="w-full min-w-[950px]">
             <thead className="bg-muted/40 border-b border-border text-nowrap">
               <tr>
-                <th className="text-left p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   Booking ID
                 </th>
-                <th className="text-left p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   User Name
                 </th>
-                <th className="text-left p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   Space Booked
                 </th>
-                <th className="text-center p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  KYC Approved by Admin
+                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  KYC Admin
                 </th>
-                <th className="text-center p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground text-wrap max-w-[150px]">
-                  KYC Approved by Partner
+                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  KYC Partner
                 </th>
-                <th className="text-center p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   Draft Sent
                 </th>
-                <th className="text-center p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   Draft Signed
                 </th>
-                <th className="text-center p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   Agreement
                 </th>
-                <th className="text-center p-5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   Support Docs
                 </th>
               </tr>
@@ -219,45 +219,47 @@ const TrackProgress = () => {
               {paginatedData.length > 0 ? (
                 paginatedData.map((item) => (
                   <tr key={item.id} className="hover:bg-muted/20 transition-colors group">
-                    <td className="p-5">
-                      <span className="font-mono text-xs font-bold text-primary px-2 py-1 bg-primary/5 rounded border border-primary/10">
+                    <td className="px-4 py-4">
+                      <span className="font-mono text-[10px] font-bold text-primary px-1.5 py-0.5 bg-primary/5 rounded border border-primary/10">
                         {item.bookingId}
                       </span>
                     </td>
-                    <td className="p-5">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8 ring-2 ring-background shadow-sm">
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-7 w-7 ring-2 ring-background shadow-sm">
                           {item.profilePicture && (
                             <AvatarImage src={item.profilePicture} alt={item.userName} className="object-cover" />
                           )}
-                          <AvatarFallback className="bg-primary/10 text-primary font-bold text-[10px]">
+                          <AvatarFallback className="bg-primary/10 text-primary font-bold text-[9px]">
                             {item.userName?.split(" ").map(n => n[0]).join("").toUpperCase() || "CL"}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="font-semibold text-foreground">{item.userName}</span>
+                        <span className="font-bold text-xs text-foreground line-clamp-1">{item.userName}</span>
                       </div>
                     </td>
-                    <td className="p-5 text-sm font-medium">{item.spaceBooked}</td>
-                    <td className="p-5">
+                    <td className="px-4 py-4 text-[11px] font-medium text-muted-foreground line-clamp-1 max-w-[150px]" title={item.spaceBooked}>
+                      {item.spaceBooked}
+                    </td>
+                    <td className="px-4 py-4">
                       <div className="flex justify-center">
                         <StatusIndicator approved={item.userKycApprovedByAdmin} label="Admin" />
                       </div>
                     </td>
-                    <td className="p-5">
+                    <td className="px-4 py-4">
                       <div className="flex justify-center">
                         <StatusIndicator approved={item.userKycApprovedBySpace} label="Space" />
                       </div>
                     </td>
-                    <td className="p-5 text-center">
+                    <td className="px-4 py-4 text-center">
                       <BooleanIndicator value={item.draftSubmitted} trueLabel="Sent" falseLabel="No Draft" />
                     </td>
-                    <td className="p-5 text-center">
+                    <td className="px-4 py-4 text-center">
                       <BooleanIndicator value={item.draftVerified} trueLabel="Verified" falseLabel="Pending" />
                     </td>
-                    <td className="p-5 text-center">
+                    <td className="px-4 py-4 text-center">
                       <BooleanIndicator value={item.agreementReceived} trueLabel="Received" falseLabel="Missing" />
                     </td>
-                    <td className="p-5 text-center">
+                    <td className="px-4 py-4 text-center">
                       <BooleanIndicator value={item.supportingDocReceived} trueLabel="Received" falseLabel="Missing" />
                     </td>
                   </tr>

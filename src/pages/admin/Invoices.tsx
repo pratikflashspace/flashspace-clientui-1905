@@ -657,7 +657,7 @@ const Invoices = () => {
             ) : (
               <>
                 <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-                  Admin <span className="text-primary italic">Invoices</span>
+                  Invoice <span className="text-primary italic">Management</span>
                 </h1>
                 <p className="text-muted-foreground mt-2">
                   Upload and issue manual invoices directly to users.

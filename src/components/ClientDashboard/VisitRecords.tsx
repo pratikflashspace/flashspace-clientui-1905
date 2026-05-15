@@ -85,10 +85,10 @@ export default function VisitRecords() {
   const filteredVisits = visits.filter((v) => {
     return (
       searchQuery === "" ||
-      v.visitor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.visitId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.space.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.purpose.toLowerCase().includes(searchQuery.toLowerCase())
+      (v.visitor || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (v.visitId || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (v.space || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (v.purpose || "").toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
 
@@ -143,24 +143,24 @@ export default function VisitRecords() {
 
         {/* Stats Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{totalVisits}</p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Visits</p>
+          <div className="bg-white py-8 px-6 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Visits</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">{totalVisits}</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-[#35503F]">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{officialVisits}</p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Official Visits</p>
+          <div className="bg-white py-8 px-6 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-[#35503F]">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Official Visits</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">{officialVisits}</p>
           </div>
-          <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md border-l-4 border-l-blue-400">
-            <p className="text-3xl font-extrabold text-[#35503F] mb-1">{deliveryVisits}</p>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Deliveries</p>
+          <div className="bg-white py-8 px-6 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-blue-400">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Deliveries</p>
+            <p className="text-3xl font-extrabold text-[#35503F]">{deliveryVisits}</p>
           </div>
         </div>
 
         <div className="space-y-6">
           <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
             {/* Search Bar */}
-            <div className="relative flex-1 lg:w-80">
+            <div className="relative lg:w-96">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
@@ -173,11 +173,11 @@ export default function VisitRecords() {
           </div>
 
         {/* Visits Table */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-md overflow-hidden">
           <div className="overflow-x-auto min-h-[400px]">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-50 bg-gray-50/50">
+                <tr className="border-b border-gray-100 bg-gray-50">
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-24">ID</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor Email</th>
@@ -187,10 +187,10 @@ export default function VisitRecords() {
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-100">
                 {filteredVisits.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-20 text-center">
+                    <td colSpan={7} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
                           <Clock className="w-8 h-8 text-gray-300" />
@@ -206,7 +206,7 @@ export default function VisitRecords() {
                   filteredVisits.map((visit) => (
                     <tr key={visit._id} className="hover:bg-gray-50/30 transition-colors group">
                       <td className="px-6 py-4">
-                        <span className="text-sm font-bold text-gray-900">#{visit._id.slice(-6).toUpperCase()}</span>
+                        <span className="text-sm font-bold text-gray-900">#{visit._id ? visit._id.slice(-6).toUpperCase() : "N/A"}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">

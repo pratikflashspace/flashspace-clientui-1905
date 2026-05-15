@@ -313,14 +313,11 @@ const LeadManagement = () => {
                   <h3 className="text-xl font-bold text-foreground">{selectedLead.name}</h3>
                   <p className="text-muted-foreground text-sm">Added: {selectedLead.lastActivity}</p>
                 </div>
-                {getStatusBadge(selectedLead.status)}
+                {getPaymentStatusBadge(selectedLead.paymentStatus)}
               </div>
 
               <div className="bg-muted/30 rounded-lg p-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">AI Score</span>
-                  <span className={`font-bold text-xl ${getScoreColor(selectedLead.score)}`}>{selectedLead.score}/100</span>
-                </div>
+
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Interest</span>
                   <Badge variant="outline">{selectedLead.interest}</Badge>
