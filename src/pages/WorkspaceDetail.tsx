@@ -267,7 +267,7 @@ const getPhotos = () => {
 
         <button
           onClick={handleBookNow}
-          className="w-full py-3.5 rounded-[10px] bg-primary text-primary-foreground font-medium text-base hover:bg-primary/85 active:bg-primary/75 transition-colors"
+          className="w-full py-3.5 rounded-[10px] bg-[#FEF8C5] text-[#36503F] font-bold text-base hover:bg-[#F7ED9A] active:bg-[#EFE282] transition-colors"
         >
           Book Now
         </button>
@@ -391,7 +391,7 @@ const getPhotos = () => {
                         setSelectedDate(d);
                         setShowCalendar(false);
                       }}
-                      className={`p-1.5 text-xs rounded-md ${isSel ? "bg-primary text-primary-foreground font-bold" : "hover:bg-muted text-foreground"}`}
+                      className={`p-1.5 text-xs rounded-md ${isSel ? "bg-[#FEF8C5] text-[#36503F] font-bold" : "hover:bg-muted text-foreground"}`}
                     >
                       {d.getDate()}
                     </button>
@@ -404,7 +404,7 @@ const getPhotos = () => {
 
         <button
           onClick={handleBookNow}
-          className="w-full py-3.5 rounded-[10px] bg-primary text-primary-foreground font-medium text-base hover:bg-primary/90 transition-colors"
+          className="w-full py-3.5 rounded-[10px] bg-[#FEF8C5] text-[#36503F] font-bold text-base hover:bg-[#F7ED9A] transition-colors"
         >
           Book Now
         </button>
@@ -428,15 +428,9 @@ const getPhotos = () => {
         return;
       }
 
-      const executeBooking = async () => {
-        navigate(
-          `/booking/${data._id}?hours=${hours}&price=${totalPrice}&type=on-demand&direct=true`,
-        );
-      };
+      
 
-      setPendingBookingAction(() => executeBooking);
-      setShowLeadModal(true);
-      return;
+      
     };
 
     return (
@@ -493,7 +487,7 @@ const getPhotos = () => {
                         setSelectedDate(d);
                         setShowCalendar(false);
                       }}
-                      className={`p-1 text-xs rounded ${isSel ? "bg-primary text-primary-foreground font-bold" : "hover:bg-muted text-foreground"}`}
+                      className={`p-1 text-xs rounded ${isSel ? "bg-[#FEF8C5] text-[#36503F] font-bold" : "hover:bg-muted text-foreground"}`}
                     >
                       {d.getDate()}
                     </button>
@@ -562,7 +556,7 @@ const getPhotos = () => {
           </p>
           <button
             onClick={() => navigate("/get-workspaces")}
-            className="px-4 py-2 rounded-[8px] bg-primary text-primary-foreground text-sm font-medium"
+            className="px-4 py-2 rounded-[8px] bg-[#FEF8C5] text-[#36503F] text-sm font-bold hover:bg-[#F7ED9A] transition-colors"
           >
             Back to Spaces
           </button>
@@ -602,7 +596,7 @@ const getPhotos = () => {
             <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
               {data.spaceId || data.name}
             </h1>
-            <span className="bg-primary text-primary-foreground bg-[#2D3F33] px-3 py-1 rounded-full text-xs font-semibold">
+            <span className="bg-[#2D3F33] text-white px-3 py-1 rounded-full text-xs font-semibold">
               {type.replace("-", " ").toUpperCase()}
             </span>
           </div>

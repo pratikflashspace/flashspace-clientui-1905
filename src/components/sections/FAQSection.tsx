@@ -141,8 +141,8 @@ export const FAQSection = () => {
     };
 
     return (
-        <section className="py-16 sm:py-20 lg:py-28 bg-background overflow-hidden">
-            <div className="container mx-auto px-4 lg:px-8">
+        <section className="py-12 sm:py-16 lg:py-24 bg-[#FAFAF7] overflow-hidden">
+            <div className="fs-container">
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}
@@ -150,13 +150,13 @@ export const FAQSection = () => {
                     viewport={{ once: true }}
                     className="text-center mb-10"
                 >
-                    <span className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground mb-3 block">
+                    <span className="fs-tag mb-3">
                         FAQ
                     </span>
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-3 px-2">
+                    <h2 className="text-3xl sm:text-4xl font-bold tracking-[-0.02em] text-[#1A1A1A] mb-3 px-2">
                         Everything You Need to Know
                     </h2>
-                    <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto px-4">
+                    <p className="text-[#6B8F78] text-sm sm:text-base max-w-lg mx-auto px-4">
                         Get instant answers to the most common questions about our solutions and services.
                     </p>
                 </motion.div>
@@ -171,7 +171,7 @@ export const FAQSection = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -40 }}
                                 transition={{ duration: 0.25 }}
-                                className="flex flex-col sm:flex-row items-stretch sm:items-center bg-card rounded-2xl sm:rounded-full border border-border overflow-hidden p-1 sm:p-0"
+                                className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-xl sm:rounded-full border border-[#D4E0D0] overflow-hidden p-1 sm:p-0"
                             >
                                 <div className="relative flex-1">
                                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -188,7 +188,7 @@ export const FAQSection = () => {
                                         setAiMode(true);
                                         setTimeout(() => aiInputRef.current?.focus(), 100);
                                     }}
-                                    className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-sm font-medium sm:mr-1.5 hover:bg-primary/90 transition-colors shrink-0 mt-1 sm:mt-0"
+                                    className="flex items-center justify-center gap-2 border border-[#36503F] text-[#36503F] px-5 py-2.5 sm:py-2 rounded-full text-sm font-semibold sm:mr-1.5 hover:bg-[#F0F4EE] transition-colors shrink-0 mt-1 sm:mt-0"
                                 >
                                     <Sparkles className="w-4 h-4" />
                                     Chat with AI
@@ -201,7 +201,7 @@ export const FAQSection = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 40 }}
                                 transition={{ duration: 0.25 }}
-                                className="flex flex-col sm:flex-row items-stretch sm:items-center bg-card rounded-2xl sm:rounded-full border border-primary/40 overflow-hidden shadow-[0_0_12px_-4px_hsl(var(--primary)/0.3)] p-1 sm:p-0"
+                                className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-xl sm:rounded-full border border-[#36503F] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.08)] p-1 sm:p-0"
                             >
                                 <div className="flex items-center gap-2 px-4 border-b sm:border-b-0 sm:border-r border-border shrink-0 py-2 sm:py-3">
                                     <Sparkles className="w-4 h-4 text-primary" />
@@ -238,7 +238,7 @@ export const FAQSection = () => {
                                             }
                                         }}
                                         disabled={!aiQuery.trim()}
-                                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-2 rounded-xl sm:rounded-full text-sm font-medium hover:bg-primary/90 transition-colors shrink-0 disabled:opacity-40"
+                                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#36503F] text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-[#2a3f32] transition-colors shrink-0 disabled:opacity-40"
                                     >
                                         <Search className="w-4 h-4" />
                                         Ask
@@ -256,8 +256,8 @@ export const FAQSection = () => {
                             key={cat.value}
                             onClick={() => setActiveCategory(cat.value)}
                             className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${activeCategory === cat.value
-                                    ? "border-primary/30 bg-primary/10 text-foreground"
-                                    : "border-border bg-card text-muted-foreground hover:text-foreground hover:border-primary/20"
+                                    ? "border-[#36503F] bg-[#F0F4EE] text-[#36503F]"
+                                    : "border-[#D4E0D0] bg-white text-[#6B8F78] hover:text-[#36503F] hover:border-[#36503F]"
                                 }`}
                         >
                             {cat.label}
@@ -269,13 +269,13 @@ export const FAQSection = () => {
                 <div className="relative">
                     <button
                         onClick={() => scroll("left")}
-                        className="absolute -left-4 lg:-left-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors hidden sm:flex"
+                        className="absolute -left-4 lg:-left-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white border border-[#D4E0D0] shadow-md flex items-center justify-center text-[#36503F] transition-colors hidden sm:flex"
                     >
                         <ChevronLeft className="w-5 h-5" />
                     </button>
                     <button
                         onClick={() => scroll("right")}
-                        className="absolute -right-4 lg:-right-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors hidden sm:flex"
+                        className="absolute -right-4 lg:-right-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white border border-[#D4E0D0] shadow-md flex items-center justify-center text-[#36503F] transition-colors hidden sm:flex"
                     >
                         <ChevronRight className="w-5 h-5" />
                     </button>
@@ -293,15 +293,15 @@ export const FAQSection = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: i * 0.04 }}
-                                className="min-w-[300px] max-w-[320px] flex-shrink-0 snap-start rounded-2xl border border-border bg-card p-6 flex flex-col"
+                                className="min-w-[300px] max-w-[320px] flex-shrink-0 snap-start rounded-xl border border-[#D4E0D0] bg-white p-6 flex flex-col transition-all hover:border-[#36503F] hover:shadow-[0_4px_24px_rgba(54,80,63,0.08)]"
                             >
-                                <span className="text-[10px] uppercase tracking-widest text-primary font-medium mb-3">
+                                <span className="text-xs uppercase tracking-[0.08em] text-[#36503F] font-medium mb-3">
                                     {faq.category}
                                 </span>
-                                <h3 className="text-[15px] font-semibold text-foreground leading-snug mb-3">
+                                <h3 className="text-[15px] font-semibold text-[#1A1A1A] leading-snug mb-3" style={{ fontFamily: "'Inter', sans-serif" }}>
                                     {faq.question}
                                 </h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                                <p className="text-sm text-[#6B8F78] leading-relaxed flex-1">
                                     {faq.answer}
                                 </p>
                             </motion.div>

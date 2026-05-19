@@ -60,9 +60,9 @@ const LogoCard = ({ logo, index }: { logo: LogoItem; index: number }) => {
     >
       {/* Glassmorphic background card */}
       <div
-        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
         style={{
-          background: "linear-gradient(135deg, hsla(142, 20%, 50%, 0.04), hsla(54, 96%, 88%, 0.06))",
+          background: "#F0F4EE",
           backdropFilter: "blur(8px)",
         }}
       />
@@ -145,71 +145,32 @@ export const TrustedByFilmstrip = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative py-6 sm:py-8 lg:py-10 overflow-hidden"
-      style={{ background: "linear-gradient(180deg, hsl(60, 30%, 97%) 0%, hsl(60, 25%, 95%) 50%, hsl(60, 30%, 97%) 100%)" }}
+      className="relative py-8 overflow-hidden bg-[#FAFAF7]"
     >
-      {/* Subtle decorative gradient orbs */}
-      <div
-        className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full pointer-events-none"
-        style={{
-          background: "radial-gradient(circle, hsla(142, 25%, 50%, 0.04) 0%, transparent 70%)",
-          transform: "translate(-50%, -60%)",
-        }}
-      />
-      <div
-        className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full pointer-events-none"
-        style={{
-          background: "radial-gradient(circle, hsla(54, 96%, 60%, 0.05) 0%, transparent 70%)",
-          transform: "translate(50%, 50%)",
-        }}
-      />
-
       {/* Header */}
-      <div className="relative z-10 max-w-4xl mx-auto px-6 mb-4 sm:mb-6 text-center">
+      <div className="relative z-10 fs-container mb-5 sm:mb-7 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
           className="flex flex-col items-center gap-2.5"
         >
-          {/* Decorative line + badge */}
-          <div className="flex items-center gap-3">
-            <div
-              className="h-[1px] w-8 sm:w-12"
-              style={{ background: "linear-gradient(90deg, transparent, hsl(142, 20%, 60%))" }}
-            />
-            <span
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-[0.18em]"
-              style={{
-                background: "linear-gradient(135deg, hsla(142, 20%, 50%, 0.08), hsla(54, 96%, 88%, 0.12))",
-                color: "hsl(142, 20%, 35%)",
-                border: "1px solid hsla(142, 20%, 50%, 0.12)",
-              }}
-            >
-              <span
-                className="w-1.5 h-1.5 rounded-full animate-pulse"
-                style={{ backgroundColor: "hsl(142, 40%, 45%)" }}
-              />
-              Trusted by 5000+ Businesses
-            </span>
-            <div
-              className="h-[1px] w-8 sm:w-12"
-              style={{ background: "linear-gradient(90deg, hsl(142, 20%, 60%), transparent)" }}
-            />
-          </div>
+          <h2 className="inline-flex items-center rounded-full border border-[#D4E0D0] bg-[#F0F4EE] px-4 py-2 text-sm sm:text-base font-semibold uppercase tracking-[0.14em] text-[#36503F]">
+            Trusted by 5000+ Businesses
+          </h2>
         </motion.div>
       </div>
 
       {/* Logo scroll rows */}
-      <div className="relative z-10 space-y-2 sm:space-y-3">
+      <div className="relative z-10 fs-container space-y-2 sm:space-y-3 overflow-hidden">
         {/* Smooth gradient fades on edges */}
         <div
           className="absolute top-0 left-0 w-20 sm:w-36 lg:w-48 h-full z-20 pointer-events-none"
-          style={{ background: "linear-gradient(to right, hsl(60, 30%, 97%), transparent)" }}
+          style={{ background: "linear-gradient(to right, #FAFAF7, transparent)" }}
         />
         <div
           className="absolute top-0 right-0 w-20 sm:w-36 lg:w-48 h-full z-20 pointer-events-none"
-          style={{ background: "linear-gradient(to left, hsl(60, 30%, 97%), transparent)" }}
+          style={{ background: "linear-gradient(to left, #FAFAF7, transparent)" }}
         />
 
         <motion.div

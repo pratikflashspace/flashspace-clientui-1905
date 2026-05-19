@@ -92,18 +92,19 @@ export const PlanLocationsShowcase = () => {
     const canNext = slideIndex < totalPages - 1;
 
     return (
-        <section className="py-16 sm:py-20 lg:py-[100px] bg-muted/30 overflow-hidden">
-            <div className="container mx-auto px-4 lg:px-8">
+        <section className="py-12 sm:py-16 lg:py-24 bg-white overflow-hidden">
+            <div className="fs-container">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     className="mb-8 sm:mb-12 text-center"
                 >
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-3 px-2">
+                    <span className="fs-tag mb-4">Popular spaces</span>
+                    <h2 className="text-3xl sm:text-4xl lg:text-4xl font-bold tracking-[-0.02em] text-[#1A1A1A] mb-3 px-2">
                         Everything Your Business Needs, Pan India
                     </h2>
-                    <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto px-4">
+                    <p className="text-[#6B8F78] text-sm sm:text-base max-w-lg mx-auto px-4">
                         Flexible workspace and business solutions tailored to your needs.
                     </p>
                 </motion.div>
@@ -111,7 +112,7 @@ export const PlanLocationsShowcase = () => {
                 {/* Tabs + Slider arrows */}
                 <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-10 gap-6">
                     <div className="hidden lg:block w-32" />
-                    <div className="bg-[#F4F4F2] rounded-xl sm:rounded-[14px] px-4 sm:px-6 py-3 sm:py-4 inline-block max-w-full overflow-x-auto scrollbar-hide">
+                    <div className="bg-[#FAFAF7] rounded-xl px-4 sm:px-6 py-3 sm:py-4 inline-block max-w-full overflow-x-auto scrollbar-hide border border-[#D4E0D0]">
                         <div className="relative">
                             <div className="flex gap-6 sm:gap-9 whitespace-nowrap">
                                 {services.map((s, i) => (
@@ -127,7 +128,7 @@ export const PlanLocationsShowcase = () => {
                                         {i === activeIndex && (
                                             <motion.div
                                                 layoutId="active-tab-underline"
-                                                className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full"
+                                                className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#36503F] rounded-full"
                                                 transition={{ duration: 0.25, ease: "easeOut" }}
                                             />
                                         )}
@@ -143,14 +144,14 @@ export const PlanLocationsShowcase = () => {
                         <button
                             onClick={() => setSlideIndex((p) => Math.max(0, p - 1))}
                             disabled={!canPrev}
-                            className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-muted/50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="w-10 h-10 rounded-full border border-[#D4E0D0] flex items-center justify-center text-[#36503F] hover:bg-[#F0F4EE] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button
                             onClick={() => setSlideIndex((p) => Math.min(totalPages - 1, p + 1))}
                             disabled={!canNext}
-                            className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-foreground hover:bg-muted/50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="w-10 h-10 rounded-full border border-[#D4E0D0] flex items-center justify-center text-[#36503F] hover:bg-[#F0F4EE] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>

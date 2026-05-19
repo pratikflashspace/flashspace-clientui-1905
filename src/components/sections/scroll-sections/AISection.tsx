@@ -73,8 +73,8 @@ export const AISection = () => {
                                 <button
                                     key={cap.id}
                                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all ${cap.active
-                                        ? "bg-primary text-primary-foreground shadow-sm"
-                                        : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+                                        ? "bg-[#FEF8C5] text-[#36503F] shadow-sm"
+                                        : "bg-[#FAFAF7] text-[#36503F] border border-[#D4E0D0] hover:bg-[#F0F4EE] hover:text-[#36503F]"
                                         }`}
                                 >
                                     <cap.icon className="w-4 h-4" />

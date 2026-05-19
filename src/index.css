@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -10,40 +10,39 @@
   :root {
     /* Core Brand Colors - Light Theme */
     font-family: "Inter", sans-serif;
-    --background: 0 0% 97%;
-    --foreground: 150 20% 15%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
 
     /* Card System */
-    --card: 0 0% 100%;
-    --card-foreground: 150 20% 15%;
-    --card-hover: 210 40% 98%;
+    --card: 60 23% 97%;
+    --card-foreground: 0 0% 10%;
+    --card-hover: 60 23% 97%;
 
     /* Popover System */
     --popover: 0 0% 100%;
     --popover-foreground: 150 20% 15%;
 
-    /* Brand Primary - Deep forest green #35503f */
-    --primary: 142 20% 26%;
-    --primary-foreground: 54 97% 88%;
-    --primary-glow: 45 96% 57%;
+    /* FlashSpace v2 design system */
+    --primary: 143 20% 26%;
+    --primary-foreground: 143 20% 26%;
+    --primary-glow: 143 20% 26%;
 
-    /* Brand Accent - Soft yellow #fef8c4 */
-    --accent: 54 96% 88%;
-    --accent-foreground: 150 20% 15%;
-    --accent-glow: 48 100% 77%;
+    --accent: 58 99% 70%;
+    --accent-foreground: 143 20% 26%;
+    --accent-glow: 58 99% 70%;
 
     /* Secondary Colors */
-    --secondary: 54 96% 88%;
-    --secondary-foreground: 150 20% 15%;
+    --secondary: 107 25% 95%;
+    --secondary-foreground: 143 20% 26%;
 
     /* Muted Colors */
-    --muted: 60 15% 95%;
-    --muted-foreground: 150 10% 45%;
+    --muted: 60 23% 97%;
+    --muted-foreground: 143 16% 49%;
 
     /* Interactive Elements */
-    --border: 60 15% 90%;
-    --input: 60 15% 90%;
-    --ring: 142 20% 26%;
+    --border: 107 25% 85%;
+    --input: 107 25% 85%;
+    --ring: 143 20% 26%;
 
     /* Destructive */
     --destructive: 0 84% 60%;
@@ -99,6 +98,14 @@
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --radius: 0.75rem;
+    --flash-canvas: #FFFFFF;
+    --flash-surface: #FAFAF7;
+    --flash-forest: #36503F;
+    --flash-yellow: #FEF8C5;
+    --flash-ink: #1A1A1A;
+    --flash-forest-10: #F0F4EE;
+    --flash-forest-30: #D4E0D0;
+    --flash-forest-60: #6B8F78;
 
     --sidebar-background: 142 20% 26%;
     --sidebar-foreground: 0 0% 100%;
@@ -184,8 +191,9 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "InterTight", "Lato", system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
     min-height: 100vh;
+    color: var(--flash-ink);
   }
 
   /* Typography system */
@@ -193,13 +201,13 @@
   h2,
   h3,
   h4 {
-    font-family: "InterTight", system-ui, sans-serif;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   }
 
   h1 {
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: -0.03em;
-    line-height: 1.1;
+    line-height: 1.15;
   }
 
   h2 {
@@ -209,9 +217,9 @@
   }
 
   h3 {
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
   }
 
   h4 {
@@ -221,11 +229,103 @@
 
   p,
   li {
-    line-height: 1.6;
+    line-height: 1.7;
   }
 }
 
 @layer components {
+  .fs-container {
+    width: min(100% - 32px, 1200px);
+    margin-inline: auto;
+  }
+
+  @media (min-width: 768px) {
+    .fs-container {
+      width: min(100% - 64px, 1200px);
+    }
+  }
+
+  .fs-tag {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--flash-forest-30);
+    border-radius: 999px;
+    background: var(--flash-forest-10);
+    color: var(--flash-forest);
+    padding: 4px 12px;
+    font: 600 11px/1.5 "Inter", sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .fs-primary-btn,
+  .fs-secondary-btn,
+  .fs-ghost-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 14px 28px;
+    font: 700 14px/1 "Inter", sans-serif;
+    transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+  }
+
+  .fs-primary-btn {
+    background: var(--flash-yellow);
+    color: var(--flash-forest);
+    border: 1px solid var(--flash-yellow);
+  }
+
+  .fs-primary-btn:hover {
+    background: #F7ED9A;
+    transform: scale(1.01);
+  }
+
+  .fs-primary-btn:active {
+    transform: scale(0.99);
+  }
+
+  .fs-secondary-btn {
+    background: transparent;
+    color: var(--flash-forest);
+    border: 1.5px solid var(--flash-forest);
+    font-weight: 600;
+  }
+
+  .fs-secondary-btn:hover {
+    background: var(--flash-forest-10);
+  }
+
+  .fs-ghost-btn {
+    color: var(--flash-forest);
+    padding: 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .fs-ghost-btn:hover {
+    text-decoration: underline;
+  }
+
+  .fs-card {
+    background: var(--flash-surface);
+    border: 1px solid var(--flash-forest-30);
+    border-radius: 12px;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .fs-card:hover {
+    border-color: var(--flash-forest);
+    box-shadow: 0 4px 24px rgba(54, 80, 63, 0.08);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--flash-forest) !important;
+    box-shadow: 0 0 0 3px rgba(54, 80, 63, 0.10) !important;
+  }
 
   /* Illustrated section background */
   .illustrated-bg {
@@ -1155,3 +1255,4 @@ html.lenis body {
 .toast-animate-out {
   animation: toast-exit 0.3s ease-in forwards;
 }
+

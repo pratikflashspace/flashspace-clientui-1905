@@ -374,7 +374,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
           <div className="flex gap-2 mt-auto">
             <button
               onClick={handleCardClick}
-              className="flex-[1.4] bg-primary text-primary-foreground text-sm font-normal py-2.5 px-4 rounded-xl hover:bg-primary/90 transition-all active:scale-[0.98]"
+              className="flex-[1.4] bg-[#FEF8C5] text-[#36503F] text-sm font-bold py-2.5 px-4 rounded-full hover:bg-[#F7ED9A] transition-all active:scale-[0.98]"
             >
               Get Best Price
             </button>

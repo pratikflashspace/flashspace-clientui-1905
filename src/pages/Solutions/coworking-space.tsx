@@ -134,7 +134,7 @@ const CoworkingSpace = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#f8f7f4" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#FAFAF7" }}>
       <Header />
 
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-16 overflow-hidden">
@@ -149,7 +149,7 @@ const CoworkingSpace = () => {
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }} className="flex flex-wrap items-center justify-center gap-4 mt-8">
             <div ref={searchRef} className="relative">
-              <div className="flex items-center h-12 rounded-xl border border-foreground/10 bg-white overflow-hidden shadow-lg" style={{ width: 400, maxWidth: "90vw" }}>
+              <div className="flex items-center h-12 rounded-xl border border-[#D4E0D0] bg-white overflow-hidden shadow-lg" style={{ width: 400, maxWidth: "90vw" }}>
                 <button 
                   onClick={() => navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`)}
                   className="p-4 text-muted-foreground hover:text-foreground transition-colors shrink-0"
@@ -195,7 +195,7 @@ const CoworkingSpace = () => {
             <Button
               size="lg"
               variant="outline"
-              className="font-semibold px-8 h-12 rounded-xl border-foreground/20 text-foreground hover:bg-foreground/5 hover:border-foreground/30 bg-transparent"
+              className="font-semibold px-8 h-12 rounded-xl border-[#36503F]/30 text-[#36503F] hover:bg-[#F0F4EE] hover:border-[#36503F]/40 bg-transparent"
               onClick={() => navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`)}
             >
               Explore Spaces <ArrowRight className="w-4 h-4 ml-1" />
@@ -235,7 +235,7 @@ const CoworkingSpace = () => {
                 <img src={featureCoworking} alt="Coworking space" className="w-full h-[350px] lg:h-[420px] object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
-                  <span className="text-primary-foreground/70 text-sm font-semibold uppercase tracking-wider mb-2 block">Coworking</span>
+                  <span className="text-white/75 text-sm font-semibold uppercase tracking-wider mb-2 block">Coworking</span>
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
                     Flexible desks & cabins
                     <br />
@@ -252,7 +252,7 @@ const CoworkingSpace = () => {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="group border-primary/30 hover:bg-primary/5 font-semibold"
+                  className="group border-[#36503F]/30 text-[#36503F] hover:bg-[#F0F4EE] font-semibold"
                   onClick={() => navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`)}
                 >
                   Browse Coworking Spaces
@@ -262,9 +262,9 @@ const CoworkingSpace = () => {
 
               <div className="grid sm:grid-cols-2 gap-6">
                 {coworkingFeatures.map((f, i) => (
-                  <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="p-6 rounded-2xl bg-card border border-border flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                      <f.icon className="w-5 h-5 text-primary" />
+                  <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="p-6 rounded-2xl bg-white border border-[#D4E0D0] flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-[#F0F4EE] flex items-center justify-center shrink-0">
+                      <f.icon className="w-5 h-5 text-[#36503F]" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground mb-1">{f.title}</h4>
@@ -292,7 +292,7 @@ const CoworkingSpace = () => {
           <section ref={assignRef("amenities")} id="amenities" className="py-12 lg:py-16 border-t border-border/50">
             <div className="space-y-10 px-6 lg:px-8">
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <span className="text-primary text-sm font-semibold uppercase tracking-wider mb-3 block">On Demand</span>
+                <span className="text-[#36503F] text-sm font-semibold uppercase tracking-wider mb-3 block">On Demand</span>
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground leading-tight tracking-tight mb-4">
                   Book by the hour
                   <br />
@@ -341,7 +341,7 @@ const CoworkingSpace = () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {amenities.map((a, i) => (
                   <motion.div key={a.label} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border">
-                    <a.icon className="w-5 h-5 text-primary" />
+                    <a.icon className="w-5 h-5 text-[#36503F]" />
                     <span className="text-sm font-medium text-foreground">{a.label}</span>
                   </motion.div>
                 ))}
@@ -377,7 +377,7 @@ const CoworkingSpace = () => {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="group border-primary/30 hover:bg-primary/5 font-semibold"
+                    className="group border-[#36503F]/30 text-[#36503F] hover:bg-[#F0F4EE] font-semibold"
                     onClick={() => navigate("/start-chatting")}
                   >
                     Learn more
@@ -385,13 +385,13 @@ const CoworkingSpace = () => {
                   </Button>
                 </div>
                 <div>
-                  <div className="text-sm text-primary uppercase tracking-wider mb-4 font-semibold">Capabilities</div>
+                  <div className="text-sm text-[#36503F] uppercase tracking-wider mb-4 font-semibold">Capabilities</div>
                   <h3 className="text-xl lg:text-2xl font-medium text-foreground mb-6 tracking-tight">
                     Built to handle the most complex requirements.
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {aiCapabilities.map((cap) => (
-                      <div key={cap.id} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground shadow-sm cursor-default">
+                      <div key={cap.id} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-[#FEF8C5] text-[#36503F] shadow-sm cursor-default">
                         <cap.icon className="w-4 h-4" />
                         {cap.label}
                       </div>
@@ -405,17 +405,17 @@ const CoworkingSpace = () => {
                   <div className="lg:col-span-2 p-6 border-r border-border">
                     <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent/70 flex items-center justify-center text-white font-bold">AP</div>
+                        <div className="w-10 h-10 rounded-full bg-[#36503F] flex items-center justify-center text-white font-bold">AP</div>
                         <div>
                           <span className="font-semibold text-foreground block">Amit Patel</span>
                           <span className="text-xs text-muted-foreground">Mumbai HQ • Hot Desk</span>
                         </div>
                       </div>
-                      <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">✓ Active</span>
+                      <span className="text-xs px-2 py-1 bg-[#F0F4EE] text-[#36503F] rounded-full font-medium">✓ Active</span>
                     </div>
                     <div className="space-y-4">
                       <div className="flex gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-accent/70 flex-shrink-0" />
+                        <div className="w-8 h-8 rounded-full bg-[#36503F] flex-shrink-0" />
                         <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm">
                           <p className="text-sm text-foreground">Hi, I need to book a meeting room for 10 people tomorrow afternoon. Is there anything available?</p>
                         </div>
@@ -425,10 +425,10 @@ const CoworkingSpace = () => {
                         <span className="text-xs text-muted-foreground">1m ago</span>
                       </div>
                       <div className="flex gap-3 justify-end">
-                        <div className="bg-primary/10 border border-primary/20 rounded-2xl rounded-tr-sm px-4 py-3 max-w-md">
+                        <div className="bg-[#F0F4EE] border border-[#D4E0D0] rounded-2xl rounded-tr-sm px-4 py-3 max-w-md">
                           <div className="flex items-center gap-2 mb-2">
-                            <Bot className="w-4 h-4 text-primary" />
-                            <span className="text-xs font-semibold text-primary">Flash AI</span>
+                            <Bot className="w-4 h-4 text-[#36503F]" />
+                            <span className="text-xs font-semibold text-[#36503F]">Flash AI</span>
                           </div>
                           <p className="text-sm text-foreground">I found 3 meeting rooms available tomorrow 2-5 PM. Conference Room A (12 seats) has video conferencing. Shall I book it?</p>
                         </div>
@@ -437,13 +437,13 @@ const CoworkingSpace = () => {
                   </div>
                   <div className="p-6 bg-muted/30">
                     <div className="flex items-center gap-4 mb-6">
-                      <button className="text-sm font-semibold text-foreground border-b-2 border-primary pb-1">Details</button>
+                      <button className="text-sm font-semibold text-foreground border-b-2 border-[#36503F] pb-1">Details</button>
                       <button className="text-sm text-muted-foreground font-medium">AI Assist</button>
                     </div>
                     <div className="space-y-4">
-                      <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl">
+                      <div className="p-4 bg-[#F0F4EE] border border-[#D4E0D0] rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <MessageSquare className="w-4 h-4 text-primary" />
+                          <MessageSquare className="w-4 h-4 text-[#36503F]" />
                           <h4 className="font-semibold text-foreground">Booking Request</h4>
                         </div>
                         <p className="text-sm text-muted-foreground">Meeting room for 10 people. Suggested: Conference Room A with VC setup.</p>

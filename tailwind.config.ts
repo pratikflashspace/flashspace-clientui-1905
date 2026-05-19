@@ -16,7 +16,7 @@ export default {
       center: true,
       padding: "2rem",
       screens: {
-        "2xl": "1400px",
+        "2xl": "1200px",
       },
     },
     extend: {
@@ -60,11 +60,10 @@ export default {
         gold: "hsl(var(--gold))",
       },
       fontFamily: {
-        // Use Inter for everything
-        header: ["Inter", "sans-serif"],
+        header: ["Plus Jakarta Sans", "sans-serif"],
         content: ["Inter", "sans-serif"],
         sans: ["Inter", "sans-serif"],
-        grotesk: ["Inter", "sans-serif"],
+        grotesk: ["Plus Jakarta Sans", "sans-serif"],
         mono: [
           "Geist Mono",
           "ui-monospace",
