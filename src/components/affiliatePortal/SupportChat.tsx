@@ -48,7 +48,10 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
       // Local API Call simulation
       const response = await fetch(`${apiBaseUrl}/api/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "x-flashspace-csrf": "true",
+        },
         body: JSON.stringify({ message: currentInput }),
       });
 

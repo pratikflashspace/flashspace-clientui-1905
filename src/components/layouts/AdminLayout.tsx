@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Outlet, NavLink, useNavigate, useLocation, Link } from "react-router-dom";
+import ErrorBoundary from "@/components/ErrorBoundary";
+
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
@@ -213,7 +215,11 @@ export default function AdminLayout() {
   );
 
   if (isDashboardPage) {
-    return <Outlet />;
+    return (
+      <ErrorBoundary>
+        <Outlet />
+      </ErrorBoundary>
+    );
   }
 
   return (
@@ -461,7 +467,9 @@ export default function AdminLayout() {
             {/* Page Content */}
             <main className="flex-1 px-4 md:px-12 py-6">
               <div className="max-w-7xl mx-auto">
-                <Outlet />
+                <ErrorBoundary>
+                  <Outlet />
+                </ErrorBoundary>
               </div>
             </main>
           </>

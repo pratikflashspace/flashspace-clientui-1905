@@ -171,8 +171,8 @@ export default function TeamManagement() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
-            Team <span className="text-primary italic">Members</span>
+          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+            Team <span className="text-[#4A6D56] italic">Members</span>
           </h1>
           <p className="text-muted-foreground mt-2">
             Add team members and share login credentials securely.
@@ -201,6 +201,9 @@ export default function TeamManagement() {
                   <tr>
                     <th className="text-left p-4 text-sm font-bold text-foreground">
                       Member
+                    </th>
+                    <th className="text-left p-4 text-sm font-bold text-foreground">
+                      Login Password
                     </th>
                     <th className="text-left p-4 text-sm font-bold text-foreground">
                       Role
@@ -242,31 +245,27 @@ export default function TeamManagement() {
                               <div className="text-xs text-muted-foreground">
                                 {member.email}
                               </div>
-                              <div className="text-xs text-muted-foreground mt-0.5">
-                                {member.phoneNumber || "N/A"}
-                              </div>
-                              <div className="mt-1 flex items-center gap-2">
-                                <span className="text-xs text-muted-foreground">
-                                  Password:{" "}
-                                  <span className="font-semibold text-foreground">
-                                    {member.loginPassword || "Not available"}
-                                  </span>
-                                </span>
-                                {member.loginPassword ? (
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-6 rounded-md px-2 text-[11px]"
-                                    onClick={() =>
-                                      void copyToClipboard(member.loginPassword as string, `${member.name} password`)
-                                    }
-                                  >
-                                    Copy
-                                  </Button>
-                                ) : null}
-                              </div>
                             </div>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-foreground font-semibold">
+                              {member.loginPassword || "Not available"}
+                            </span>
+                            {member.loginPassword ? (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="h-6 rounded-md px-2 text-[10px]"
+                                onClick={() =>
+                                  void copyToClipboard(member.loginPassword as string, `${member.name} password`)
+                                }
+                              >
+                                Copy
+                              </Button>
+                            ) : null}
                           </div>
                         </td>
                         <td className="p-4">
@@ -311,7 +310,7 @@ export default function TeamManagement() {
                   ) : (
                     <tr className="border-t border-border">
                       <td
-                        colSpan={5}
+                        colSpan={6}
                         className="p-10 text-sm text-muted-foreground text-center"
                       >
                         No team members added yet.

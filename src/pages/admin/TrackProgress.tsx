@@ -28,14 +28,14 @@ interface TrackProgressData {
 const StatusIndicator = ({ approved, label }: { approved: boolean; label: string }) => {
   if (approved) {
     return (
-      <div className="flex items-center gap-1.5 text-green-600 font-medium text-xs">
+      <div className="flex items-center gap-1.5 text-green-600 font-semibold text-sm">
         <CheckCircle2 className="w-4 h-4" />
         <span>Approved</span>
       </div>
     );
   }
   return (
-    <div className="flex items-center gap-1.5 text-amber-500 font-medium text-xs">
+    <div className="flex items-center gap-1.5 text-amber-500 font-semibold text-sm">
       <Clock className="w-4 h-4" />
       <span>Pending</span>
     </div>
@@ -45,13 +45,13 @@ const StatusIndicator = ({ approved, label }: { approved: boolean; label: string
 const BooleanIndicator = ({ value, trueLabel = "Yes", falseLabel = "No" }: { value: boolean; trueLabel?: string; falseLabel?: string }) => {
   if (value) {
     return (
-      <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none shadow-none">
+      <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none shadow-none text-xs font-bold px-2 py-0.5">
         {trueLabel}
       </Badge>
     );
   }
   return (
-    <Badge variant="outline" className="text-muted-foreground border-dashed">
+    <Badge variant="outline" className="text-muted-foreground border-dashed text-xs font-semibold px-2 py-0.5">
       {falseLabel}
     </Badge>
   );
@@ -186,31 +186,31 @@ const TrackProgress = () => {
           <table className="w-full min-w-[950px]">
             <thead className="bg-muted/40 border-b border-border text-nowrap">
               <tr>
-                <th className="text-left px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Booking ID
                 </th>
-                <th className="text-left px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   User Name
                 </th>
-                <th className="text-left px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Space Booked
                 </th>
-                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   KYC Admin
                 </th>
-                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   KYC Partner
                 </th>
-                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Draft Sent
                 </th>
-                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Draft Signed
                 </th>
-                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Agreement
                 </th>
-                <th className="text-center px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Support Docs
                 </th>
               </tr>
@@ -220,7 +220,7 @@ const TrackProgress = () => {
                 paginatedData.map((item) => (
                   <tr key={item.id} className="hover:bg-muted/20 transition-colors group">
                     <td className="px-4 py-4">
-                      <span className="font-mono text-[10px] font-bold text-primary px-1.5 py-0.5 bg-primary/5 rounded border border-primary/10">
+                      <span className="font-mono text-xs font-bold text-primary px-1.5 py-0.5 bg-primary/5 rounded border border-primary/10">
                         {item.bookingId}
                       </span>
                     </td>
@@ -230,14 +230,14 @@ const TrackProgress = () => {
                           {item.profilePicture && (
                             <AvatarImage src={item.profilePicture} alt={item.userName} className="object-cover" />
                           )}
-                          <AvatarFallback className="bg-primary/10 text-primary font-bold text-[9px]">
+                          <AvatarFallback className="bg-primary/10 text-primary font-bold text-[10px]">
                             {item.userName?.split(" ").map(n => n[0]).join("").toUpperCase() || "CL"}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="font-bold text-xs text-foreground line-clamp-1">{item.userName}</span>
+                        <span className="font-bold text-sm text-foreground line-clamp-1">{item.userName}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-[11px] font-medium text-muted-foreground line-clamp-1 max-w-[150px]" title={item.spaceBooked}>
+                    <td className="px-4 py-4 text-xs font-semibold text-muted-foreground line-clamp-1 max-w-[150px]" title={item.spaceBooked}>
                       {item.spaceBooked}
                     </td>
                     <td className="px-4 py-4">

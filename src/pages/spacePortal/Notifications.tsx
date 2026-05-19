@@ -215,6 +215,9 @@ export default function Notifications() {
     try {
       await fetch(`${API_CONFIG.BASE_URL}/api/notifications/${notification.id}/archive`, {
         method: "PATCH",
+        headers: {
+          "x-flashspace-csrf": "true",
+        },
         credentials: "include",
       });
       setDeletedNotifications(prev => prev.filter(n => n.id !== notification.id));

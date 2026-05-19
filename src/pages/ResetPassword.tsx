@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle, Eye, EyeOff, KeyRound, Loader2 } from "lucide-r
 import { authService } from "@/services/auth.service";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { validatePassword } from "@/utils/passwordValidation";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -35,8 +36,9 @@ const ResetPassword = () => {
       return;
     }
 
-    if (passwords.password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    const passwordCheck = validatePassword(passwords.password);
+    if (!passwordCheck.isValid) {
+      setError(passwordCheck.message);
       return;
     }
 

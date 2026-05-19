@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 import Sidebar from "@/components/SpacePartner/sidebar/Sidebar";
 import TopBar from "@/components/SpacePartner/topbar/Topbar";
-import Footer from "@/components/SpacePartner/footer/Footer";
 
 import { SpacePortalSearchProvider } from "@/contexts/SpacePortalSearchContext";
 import { SpacePortalNotificationsProvider } from "@/contexts/SpacePortalNotificationsContext";
@@ -254,7 +254,7 @@ export default function SpacePortalLayout() {
     highlight ? (
       <>
         {lead}{" "}
-        <span className="text-[#2D3F33] dark:text-[#FDE68A]">{highlight}</span>
+        <span className="text-[#4A6D56] italic">{highlight}</span>
       </>
     ) : (
       lead
@@ -860,13 +860,11 @@ export default function SpacePortalLayout() {
 
             {/* Page Content */}
             <main className="relative mt-4 flex-1 px-3 pb-6 sm:mt-6 sm:px-5 lg:px-8">
-              <Outlet />
+              <ErrorBoundary>
+                <Outlet />
+              </ErrorBoundary>
             </main>
 
-            {/* Footer */}
-            <div className="px-3 pb-4 sm:px-5 sm:pb-6 lg:px-8">
-              <Footer />
-            </div>
           </div>
         </div>
       </SpacePortalSearchProvider>

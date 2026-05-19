@@ -433,8 +433,8 @@ const Notifications = () => {
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="space-y-1">
-                <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
-                  My <span className="text-primary italic">Notifications</span>
+                <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+                  My <span className="text-[#4A6D56] italic">Notifications</span>
                 </h1>
                 <p className="text-sm md:text-base text-gray-500 font-medium">
                   Stay updated with all your workspace activities

@@ -274,6 +274,34 @@ export default function SpacePartnerKycRequest({
                 <div className="space-y-1">
                   {[
                     {
+                      id: "company_registration",
+                      label: "Company Registration",
+                      url: kyc.companyRegistrationUrl,
+                      status: kyc.companyRegistrationStatus,
+                      type: "company_registration",
+                    },
+                    {
+                      id: "gst_certificate",
+                      label: "GST Certificate",
+                      url: kyc.gstCertificateUrl,
+                      status: kyc.gstCertificateStatus,
+                      type: "gst_certificate",
+                    },
+                    {
+                      id: "bank_details_proof",
+                      label: "Bank Details Proof",
+                      url: kyc.bankDetailsProofUrl,
+                      status: kyc.bankDetailsProofStatus,
+                      type: "bank_details_proof",
+                    },
+                    {
+                      id: "address_proof",
+                      label: "Address Proof",
+                      url: kyc.addressProofUrl,
+                      status: kyc.addressProofStatus,
+                      type: "address_proof",
+                    },
+                    {
                       id: "aadhaar",
                       label: "Aadhaar",
                       url: kyc.aadhaarImageUrl,
@@ -314,7 +342,11 @@ export default function SpacePartnerKycRequest({
                     ))}
                   {!kyc.aadhaarImageUrl &&
                     !kyc.panImageUrl &&
-                    !kyc.videoKycUrl && (
+                    !kyc.videoKycUrl &&
+                    !kyc.companyRegistrationUrl &&
+                    !kyc.gstCertificateUrl &&
+                    !kyc.bankDetailsProofUrl &&
+                    !kyc.addressProofUrl && (
                       <div className="p-2 text-xs text-muted-foreground italic">
                         No documents uploaded yet
                       </div>

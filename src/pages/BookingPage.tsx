@@ -668,6 +668,7 @@ const BookingPage = () => {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
+                      "x-flashspace-csrf": "true",
                       ...(token ? { Authorization: `Bearer ${token}` } : {}),
                     },
                     body: JSON.stringify({

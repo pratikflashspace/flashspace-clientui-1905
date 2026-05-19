@@ -125,8 +125,8 @@ export default function VisitRecords() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
-              Visit <span className="text-primary italic">Records</span>
+            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+              Visit Records
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Track all visits made to your registered virtual office
@@ -177,17 +177,17 @@ export default function VisitRecords() {
           <div className="overflow-x-auto min-h-[400px]">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-24">ID</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor Email</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor Number</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Purpose</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Office</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
+                <tr className="border-b border-gray-200 bg-gray-50/80">
+                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider w-24">ID</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor Email</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Visitor Number</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Purpose</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Office</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-wider">Date & Time</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-200/60">
                 {filteredVisits.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-6 py-20 text-center">
@@ -216,10 +216,10 @@ export default function VisitRecords() {
                           <span className="text-sm font-semibold text-gray-700">{visit.visitor}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-[11px] font-bold text-gray-900">
+                      <td className="px-6 py-4 text-sm font-bold text-gray-900">
                         {visit.visitorEmail || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-[11px] text-gray-500 font-medium">
+                      <td className="px-6 py-4 text-sm text-gray-500 font-medium">
                         {visit.visitorNumber || "N/A"}
                       </td>
                       <td className="px-6 py-4">

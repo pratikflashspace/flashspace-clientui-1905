@@ -107,8 +107,8 @@ export default function SummaryAnalytics() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
-        <h1 className="text-4xl">
-          Summary <span className="text-primary italic">Reports</span>
+        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+          Summary <span className="text-[#4A6D56] italic">Reports</span>
         </h1>
         <p className="text-muted-foreground mt-2">
           Overview of activity across all your spaces
@@ -206,7 +206,7 @@ function StatCard({ title, value, icon: Icon, color, bg, onClick }: any) {
   return (
     <div 
       onClick={onClick}
-      className="bg-background border border-border rounded-2xl p-6 shadow-sm hover:translate-y-[-2px] transition-all duration-300 cursor-pointer group active:scale-95"
+      className="bg-background border border-[#DDE5DA] rounded-2xl p-10 shadow-sm hover:translate-y-[-2px] transition-all duration-300 cursor-pointer group active:scale-95"
     >
       <div className="flex items-center justify-between mb-4">
         <div className={`p-3 rounded-xl ${bg} ${color} group-hover:scale-110 transition-transform`}>

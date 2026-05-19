@@ -194,7 +194,7 @@ export default function ClientDetails() {
       <div className="rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[#10251A]">
+            <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
               {client.companyName}
             </h1>
 
@@ -216,32 +216,6 @@ export default function ClientDetails() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={() =>
-                handleOpenLink(client.agreement.agreementUrl, "Agreement")
-              }
-              className="flex items-center justify-center gap-2 rounded-xl border border-[#DDE5DA] bg-white px-5 py-3 text-sm font-semibold text-[#35503F] hover:bg-[#F8FAF7]"
-            >
-              <Download size={16} />
-              Download Agreement
-            </button>
-
-            <button
-              type="button"
-              onClick={() => document.getElementById("agreement-upload")?.click()}
-              className="flex items-center justify-center gap-2 rounded-xl border border-[#DDE5DA] bg-white px-5 py-3 text-sm font-semibold text-[#35503F] hover:bg-[#F8FAF7]"
-            >
-              <Upload size={16} />
-              Upload Final Agreement
-            </button>
-            <input
-              id="agreement-upload"
-              type="file"
-              className="hidden"
-              accept=".pdf,.doc,.docx"
-              onChange={handleAgreementUpload}
-            />
 
           </div>
         </div>
@@ -620,10 +594,15 @@ function ClientStatusBadge({ status }: { status: string }) {
  * KYC Status Badge
  */
 function KycStatusBadge({ status }: { status: string }) {
-  const config =
-    status === "VERIFIED"
-      ? { className: "bg-emerald-50 text-emerald-700", label: `KYC: ${status}` }
-      : { className: "bg-amber-50 text-amber-700", label: `KYC: ${status}` };
+  const isApproved =
+    status === "VERIFIED" ||
+    status === "APPROVED" ||
+    status === "Approved" ||
+    status === "Verified";
+
+  const config = isApproved
+    ? { className: "bg-emerald-50 text-emerald-700", label: `KYC: ${status}` }
+    : { className: "bg-amber-50 text-amber-700", label: `KYC: ${status}` };
 
   return <Badge label={config.label} className={config.className} />;
 }
@@ -632,12 +611,15 @@ function KycStatusBadge({ status }: { status: string }) {
  * Booking Status Badge
  */
 function BookingStatusBadge({ status }: { status: string }) {
-  const config =
-    status === "CONFIRMED"
-      ? { className: "bg-emerald-50 text-emerald-700", label: status }
-      : status === "PENDING"
-        ? { className: "bg-amber-50 text-amber-700", label: status }
-        : { className: "bg-rose-50 text-rose-700", label: status };
+  const s = String(status || "").toUpperCase();
+  const isGreen = s === "ACTIVE" || s === "CONFIRMED";
+  const isYellow = s === "PENDING" || s === "PENDING_PAYMENT";
+
+  const config = isGreen
+    ? { className: "bg-emerald-50 text-emerald-700", label: status }
+    : isYellow
+      ? { className: "bg-amber-50 text-amber-700", label: status }
+      : { className: "bg-rose-50 text-rose-700", label: status };
 
   return <Badge label={config.label} className={config.className} />;
 }

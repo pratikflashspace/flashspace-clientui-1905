@@ -437,8 +437,8 @@ export default function Dashboard() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
-              Welcome back, <span className="text-primary italic">{user?.fullName?.split(" ")[0] || "Customer"}</span>
+            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+              Welcome back, <span className="text-[#4A6D56] italic">{user?.fullName?.split(" ")[0] || "Customer"}</span>
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your workspace subscriptions and track your orders
@@ -477,7 +477,7 @@ export default function Dashboard() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-[#35503F] tracking-tight">
-                Manage <span className="italic">Bookings</span>
+                Manage <span className="text-[#4A6D56] italic">Bookings</span>
               </h2>
 
             </div>
@@ -496,7 +496,7 @@ export default function Dashboard() {
                   return (
                     <div
                       key={booking._id}
-                      className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all group relative"
+                      className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative"
                     >
                       {/* Header: Space ID & Status */}
                       <div className="flex items-center justify-between mb-4">
@@ -507,11 +507,8 @@ export default function Dashboard() {
                           <span
                             className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border ${booking.type === "VirtualOffice" ||
                               booking.type === "virtual_office"
-                              ? "bg-gray-50 border-gray-200 text-gray-600"
-                              : booking.type === "MeetingRoom" ||
-                                booking.type === "meeting_room"
-                                ? "bg-purple-50 border-purple-100 text-purple-600"
-                                : "bg-blue-50 border-blue-100 text-blue-600"
+                                ? "bg-gray-50 border-gray-200 text-gray-600"
+                                : "bg-gray-50 border-gray-200 text-gray-600"
                               }`}
                           >
                             {booking.type === "VirtualOffice" ||

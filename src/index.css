@@ -798,6 +798,38 @@
   overscroll-behavior-y: contain;
 }
 
+/* Scrollbar hover utility - prevents layout shift */
+.scrollbar-hover-only {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.scrollbar-hover-only::-webkit-scrollbar {
+  width: 8px; /* Increased width for better interaction */
+}
+
+.scrollbar-hover-only::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-hover-only::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 20px;
+}
+
+.scrollbar-hover-only:hover {
+  scrollbar-color: hsl(var(--primary) / 0.3) transparent;
+}
+
+.scrollbar-hover-only:hover::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.3); /* Slightly more visible */
+}
+
+.scrollbar-hover-only:hover::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.5); /* Even more visible when dragging */
+}
+
 .scrollbar-custom::-webkit-scrollbar,
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;

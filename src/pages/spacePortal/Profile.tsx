@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Building2,
   Mail,
@@ -21,7 +21,9 @@ import {
   X,
   Save,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { getSafeImageUrl } from "@/utils/imageUrl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -125,32 +127,29 @@ export default function Profile() {
         toast.success("Document uploaded successfully");
         fetchData();
       }
-    } catch (error) {
-      toast.error("Failed to upload document");
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to upload document");
     } finally {
       setIsUploading(false);
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 py-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="max-w-7xl mx-auto space-y-6 py-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header Section */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-3">
-           <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-             <UserIcon className="w-6 h-6" />
-           </div>
-           <h1 className="text-4xl font-black tracking-tight text-foreground">
-             Profile & <span className="text-primary italic">KYC</span>
-           </h1>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+            Profile & <span className="text-[#4A6D56] italic">KYC</span>
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your company profile and KYC documents
+          </p>
         </div>
-        <p className="text-muted-foreground font-medium ml-1">
-          Manage your company profile and KYC documents
-        </p>
       </div>
 
       <Tabs defaultValue="company" className="w-full">
-        <TabsList className="bg-muted/50 p-1 rounded-2xl border border-border/50 mb-8 inline-flex">
+        <TabsList className="bg-muted/50 p-1 rounded-2xl border border-border/50 mb-4 inline-flex">
           <TabsTrigger value="company" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm font-bold text-sm transition-all">
             Company Profile
           </TabsTrigger>
@@ -164,7 +163,12 @@ export default function Profile() {
 
         {/* --- COMPANY PROFILE TAB --- */}
         <TabsContent value="company">
-          <Card className="border-none shadow-2xl shadow-primary/5 rounded-[40px] overflow-hidden bg-background">
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <Card className="border border-primary/20 shadow-xl shadow-primary/5 rounded-3xl overflow-hidden bg-background">
             <CardHeader className="px-10 pt-10 pb-6 flex flex-row items-center justify-between border-b border-border/50">
               <div className="space-y-1">
                 <CardTitle className="text-2xl font-black">Company Information</CardTitle>
@@ -201,8 +205,8 @@ export default function Profile() {
                 )}
               </div>
             </CardHeader>
-            <CardContent className="p-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <EditableBlock 
                   label="Company Name" 
                   value={editForm.companyName} 
@@ -244,18 +248,24 @@ export default function Profile() {
               </div>
             </CardContent>
           </Card>
+          </motion.div>
         </TabsContent>
 
         {/* --- KYC DOCUMENTS TAB --- */}
         <TabsContent value="kyc">
-          <Card className="border-none shadow-2xl shadow-primary/5 rounded-[40px] overflow-hidden bg-background">
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <Card className="border border-primary/20 shadow-xl shadow-primary/5 rounded-3xl overflow-hidden bg-background">
             <CardHeader className="px-10 pt-10 pb-6 flex flex-row items-center justify-between border-b border-border/50">
               <div className="space-y-1">
                 <CardTitle className="text-2xl font-black">KYC Documents</CardTitle>
                 <CardDescription className="font-medium text-sm">Upload and manage your verification documents</CardDescription>
               </div>
             </CardHeader>
-            <CardContent className="p-10 space-y-4">
+            <CardContent className="p-6 space-y-4">
                <DocumentRow 
                 title="Company Registration Certificate" 
                 status={kycData?.companyRegistrationStatus} 
@@ -286,11 +296,17 @@ export default function Profile() {
               />
             </CardContent>
           </Card>
+          </motion.div>
         </TabsContent>
 
         {/* --- BANK DETAILS TAB --- */}
         <TabsContent value="bank">
-          <Card className="border-none shadow-2xl shadow-primary/5 rounded-[40px] overflow-hidden bg-background">
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <Card className="border border-primary/20 shadow-xl shadow-primary/5 rounded-3xl overflow-hidden bg-background">
             <CardHeader className="px-10 pt-10 pb-6 flex flex-row items-center justify-between border-b border-border/50">
               <div className="space-y-1">
                 <CardTitle className="text-2xl font-black">Bank Account Details</CardTitle>
@@ -327,8 +343,8 @@ export default function Profile() {
                 )}
               </div>
             </CardHeader>
-            <CardContent className="p-10 space-y-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <CardContent className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <EditableBlock 
                   label="Account Holder Name" 
                   value={bankForm.accountHolderName} 
@@ -386,6 +402,7 @@ export default function Profile() {
               )}
             </CardContent>
           </Card>
+          </motion.div>
         </TabsContent>
       </Tabs>
     </div>
@@ -394,13 +411,13 @@ export default function Profile() {
 
 function InfoBlock({ label, value, icon: Icon }: { label: string; value: string; icon: any }) {
     return (
-      <div className="space-y-3 group">
+      <div className="space-y-1.5 group">
         <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">{label}</label>
         <div className="relative group/field">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-muted-foreground transition-all duration-300">
-            <Icon className="w-5 h-5" />
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground transition-all duration-300">
+            <Icon className="w-4 h-4" />
           </div>
-          <div className="w-full h-14 bg-muted/30 border border-border/50 rounded-2xl flex items-center px-16 font-bold text-foreground/90 transition-all duration-300">
+          <div className="w-full h-11 bg-muted/30 border border-border/50 rounded-xl flex items-center px-12 text-sm font-bold text-foreground/90 transition-all duration-300">
             {value}
           </div>
         </div>
@@ -422,21 +439,21 @@ function EditableBlock({
     icon: any 
   }) {
     return (
-      <div className="space-y-3 group animate-in fade-in duration-300">
+      <div className="space-y-1.5 group animate-in fade-in duration-300">
         <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">{label}</label>
         <div className="relative group/field">
-          <div className={`absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${isEditing ? 'bg-primary/10 text-primary' : 'bg-muted/50 text-muted-foreground'}`}>
-            <Icon className="w-5 h-5" />
+          <div className={`absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${isEditing ? 'bg-primary/10 text-primary' : 'bg-muted/50 text-muted-foreground'}`}>
+            <Icon className="w-4 h-4" />
           </div>
           {isEditing ? (
             <Input 
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              className="w-full h-14 pl-16 rounded-2xl font-bold border-primary/30 focus-visible:ring-primary/20 bg-background shadow-sm"
+              className="w-full h-11 pl-12 rounded-xl text-sm font-bold border-primary/30 focus-visible:ring-primary/20 bg-background shadow-sm"
               placeholder={`Enter ${label}`}
             />
           ) : (
-            <div className="w-full h-14 bg-muted/30 border border-border/50 rounded-2xl flex items-center px-16 font-bold text-foreground/90 group-hover/field:border-primary/20 transition-all duration-300">
+            <div className="w-full h-11 bg-muted/30 border border-border/50 rounded-xl flex items-center px-12 text-sm font-bold text-foreground/90 group-hover/field:border-primary/20 transition-all duration-300">
               {value || "Not Set"}
             </div>
           )}
@@ -458,45 +475,56 @@ function DocumentRow({
     url?: string;
     onUpload: (file: File) => void 
   }) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleUploadClick = () => {
+      fileInputRef.current?.click();
+    };
+
     return (
-      <div className="flex flex-col sm:flex-row items-center justify-between p-5 rounded-3xl border border-border/50 hover:border-primary/20 hover:bg-primary/[0.02] transition-all group">
-        <div className="flex items-center gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-            <FileText className="w-6 h-6" />
+      <div className="flex flex-col sm:flex-row items-center justify-between p-4 rounded-2xl border border-border/50 hover:border-primary/20 hover:bg-primary/[0.02] transition-all group">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+            <FileText className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="font-black text-foreground">{title}</h4>
-            <p className="text-xs font-medium text-muted-foreground">{date}</p>
+            <h4 className="font-bold text-sm text-foreground">{title}</h4>
+            <p className="text-[11px] font-medium text-muted-foreground">{date}</p>
           </div>
         </div>
         
-        <div className="flex items-center gap-4 mt-4 sm:mt-0">
+        <div className="flex items-center gap-3 mt-3 sm:mt-0">
           {getStatusBadge(status)}
           <div className="flex items-center gap-2">
             {url && (
-              <a href={url} target="_blank" rel="noreferrer">
+              <a href={getSafeImageUrl(url)} target="_blank" rel="noreferrer">
                 <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10 text-primary" title="View Document">
                   <Eye className="w-4 h-4" />
                 </Button>
               </a>
             )}
             
-            <label className="cursor-pointer">
-              <input 
-                type="file" 
-                className="hidden" 
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) onUpload(file);
-                }}
-              />
-              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10 text-primary" title={url ? "Replace Document" : "Upload Document"}>
-                <Upload className="w-4 h-4" />
-              </Button>
-            </label>
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              className="hidden" 
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) onUpload(file);
+              }}
+            />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-xl hover:bg-primary/10 text-primary" 
+              title={url ? "Replace Document" : "Upload Document"}
+              onClick={handleUploadClick}
+            >
+              <Upload className="w-4 h-4" />
+            </Button>
 
             {url && (
-              <a href={url} download target="_blank" rel="noreferrer">
+              <a href={getSafeImageUrl(url)} download target="_blank" rel="noreferrer">
                 <Button variant="ghost" size="icon" className="rounded-xl hover:bg-primary/10 text-primary" title="Download Document">
                   <Download className="w-4 h-4" />
                 </Button>

@@ -6,6 +6,7 @@ import { getPropertyBookingsForPartner } from "@/services/property.service";
 import { userDashboardService } from "@/services/userDashboard.service";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Users,
   CalendarCheck,
@@ -18,11 +19,13 @@ import {
   MapPin,
   Building2,
   ChevronLeft,
+  ChevronRight,
   CalendarDays,
   ReceiptText,
   UserRound,
   ExternalLink,
   Mail,
+  Phone,
 } from "lucide-react";
 import {
   AreaChart,
@@ -84,6 +87,8 @@ type PartnerBooking = {
   userId?: string;
   clientUserId?: string;
   clientCompanyName?: string;
+  clientEmail?: string;
+  clientPhone?: string;
   daysRemaining?: number;
 };
 
@@ -146,10 +151,15 @@ const getClientName = (booking: PartnerBooking) =>
     : "") ||
   "Client";
 
-const getClientContact = (booking: PartnerBooking) =>
-  (typeof booking?.user === "object" && booking?.user
-    ? booking.user.email || booking.user.phone || booking.user.phoneNumber
-    : "") || "";
+const getClientEmail = (booking: PartnerBooking) =>
+  booking?.clientEmail ||
+  (typeof booking?.user === "object" && booking?.user ? booking.user.email : "") ||
+  "";
+
+const getClientPhone = (booking: PartnerBooking) =>
+  booking?.clientPhone ||
+  (typeof booking?.user === "object" && booking?.user ? booking.user.phone || booking.user.phoneNumber : "") ||
+  "";
 
 const getBookingStatus = (booking: PartnerBooking) =>
   String(booking?.status || "unknown").toLowerCase();
@@ -262,6 +272,10 @@ export default function BookingAnalytics() {
     };
   }, []);
 
+  // Pagination for Client Bookings Table
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const analytics = analyticsData?.data;
 
   const bookingClientLookup = useMemo(() => {
@@ -300,15 +314,20 @@ export default function BookingAnalytics() {
     return fallback?.companyName || fallback?.contactName || fallback?.email || directName;
   };
 
-  const resolveClientContact = (booking: PartnerBooking) => {
-    const directContact = getClientContact(booking);
-    if (directContact) return directContact;
-
+  const resolveClientEmail = (booking: PartnerBooking) => {
     const fallback =
       bookingClientLookup[String(booking._id || "").trim()] ||
       bookingClientLookup[String(booking.bookingNumber || "").trim()];
 
-    return fallback?.email || fallback?.phone || "";
+    return booking?.clientEmail || fallback?.email || getClientEmail(booking);
+  };
+
+  const resolveClientPhone = (booking: PartnerBooking) => {
+    const fallback =
+      bookingClientLookup[String(booking._id || "").trim()] ||
+      bookingClientLookup[String(booking.bookingNumber || "").trim()];
+
+    return booking?.clientPhone || fallback?.phone || getClientPhone(booking);
   };
 
   const growth = useMemo(() => {
@@ -381,6 +400,16 @@ export default function BookingAnalytics() {
       revenue,
     };
   }, [selectedBookings, bookingClientLookup]);
+
+  const totalPages = Math.ceil(selectedBookings.length / itemsPerPage);
+  const paginatedBookings = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return selectedBookings.slice(startIndex, startIndex + itemsPerPage);
+  }, [selectedBookings, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [propertyId]);
 
   if (analyticsLoading || spacesLoading) {
     return (
@@ -519,68 +548,84 @@ export default function BookingAnalytics() {
                   </Badge>
                 </div>
 
-                <div className="mt-6 overflow-x-auto">
-                  <table className="w-full min-w-[860px] border-collapse text-left text-sm">
-                    <thead>
-                      <tr className="border-b border-border text-muted-foreground">
-                        <th className="py-3 pr-4">Booking</th>
-                        <th className="py-3 pr-4">Client</th>
-                        <th className="py-3 pr-4">Plan</th>
-                        <th className="py-3 pr-4">Date</th>
-                        <th className="py-3 pr-4">Status</th>
-                        <th className="py-3 text-right">Amount</th>
-                        <th className="py-3 text-right">Action</th>
+                <div className="mt-6 overflow-x-auto custom-scrollbar">
+                  <table className="w-full min-w-[1000px] border-collapse text-left text-base">
+                    <thead className="bg-[#F8FAF7]">
+                      <tr className="border-b border-border text-muted-foreground uppercase tracking-widest text-[11px] font-black">
+                        <th className="p-5">Booking ID</th>
+                        <th className="p-5">Client Information</th>
+                        <th className="p-5">Plan</th>
+                        <th className="p-5">Start Date</th>
+                        <th className="p-5">Status</th>
+                        <th className="p-5 text-right">Revenue</th>
+                        <th className="p-5 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {selectedBookings.map((booking) => {
+                    <tbody className="divide-y divide-[#EEF1EC]">
+                      {paginatedBookings.map((booking) => {
                         const clientId = resolveClientId(booking);
                         const clientName = resolveClientName(booking);
-                        const clientContact = resolveClientContact(booking);
+                        const clientEmail = resolveClientEmail(booking);
+                        const clientPhone = resolveClientPhone(booking);
                         const amount = toBookingAmount(booking);
                         const status = getBookingStatus(booking);
 
                         return (
                           <tr
                             key={booking._id || booking.bookingNumber}
-                            className="border-b border-border/60 hover:bg-muted/30 transition-colors"
+                            className="hover:bg-[#F8FAF7] transition-colors group"
                           >
-                            <td className="py-4 pr-4 font-semibold text-foreground">
-                              {booking.bookingNumber || booking._id || "Booking"}
+                            <td className="p-5 whitespace-nowrap">
+                              <span className="font-mono text-xs font-bold text-primary px-3 py-1.5 bg-[#EAF6EF] rounded-xl border border-primary/10">
+                                {booking.bookingNumber || (booking._id ? booking._id.slice(-8).toUpperCase() : "FS-B-NEW")}
+                              </span>
                             </td>
-                            <td className="py-4 pr-4">
-                              <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                  <UserRound className="h-4 w-4" />
+                            <td className="p-5">
+                              <div className="flex items-center gap-4">
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/5 text-primary border border-primary/10 group-hover:bg-primary group-hover:text-white transition-all">
+                                  <UserRound className="h-5 w-5" />
                                 </div>
-                                <div>
-                                  <p className="font-semibold text-foreground">
+                                <div className="min-w-0">
+                                  <p className="font-extrabold text-[#10251A] truncate text-base">
                                     {clientName}
                                   </p>
-                                  <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                                    {clientContact && (
-                                      <span className="inline-flex items-center gap-1">
+                                  <div className="flex flex-col gap-0.5 mt-1">
+                                    {clientEmail && (
+                                      <div className="flex items-center gap-1.5 text-xs font-medium text-[#607067]">
                                         <Mail className="h-3 w-3" />
-                                        {clientContact}
-                                      </span>
+                                        <span className="truncate">{clientEmail}</span>
+                                      </div>
+                                    )}
+                                    {clientPhone && (
+                                      <div className="flex items-center gap-1.5 text-xs font-medium text-[#607067]">
+                                        <Phone className="h-3 w-3" />
+                                        <span className="truncate">{clientPhone}</span>
+                                      </div>
                                     )}
                                   </div>
                                 </div>
                               </div>
                             </td>
-                            <td className="py-4 pr-4 text-muted-foreground">
-                              {booking.plan?.name || "Plan"}
+                            <td className="p-5">
+                              <p className="font-bold text-[#10251A] text-sm">{booking.plan?.name || "Premium Plan"}</p>
+                              <p className="text-[10px] text-[#607067] font-bold uppercase mt-0.5">
+                                {booking.plan?.tenure} {booking.plan?.tenureUnit} Subscription
+                              </p>
                             </td>
-                            <td className="py-4 pr-4 text-muted-foreground">
-                              {formatDate(booking.startDate || booking.createdAt)}
+                            <td className="p-5 whitespace-nowrap">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-[#10251A] text-sm">{formatDate(booking.startDate || booking.createdAt)}</span>
+                                <span className="text-[10px] text-[#607067] font-bold uppercase">Booking Date</span>
+                              </div>
                             </td>
-                            <td className="py-4 pr-4">
+                            <td className="p-5">
                               <BookingBadge status={status} />
                             </td>
-                            <td className="py-4 text-right font-extrabold text-foreground">
-                              {formatCurrency(amount)}
+                            <td className="p-5 text-right">
+                              <p className="font-black text-[#10251A] text-lg">{formatCurrency(amount)}</p>
+                              <p className="text-[10px] text-emerald-600 font-bold uppercase">Total Value</p>
                             </td>
-                            <td className="py-4 text-right">
+                            <td className="p-5 text-right">
                               {(() => {
                                 const params = new URLSearchParams();
                                 if (booking.bookingNumber) {
@@ -594,13 +639,13 @@ export default function BookingAnalytics() {
                                   : "/spaceportal/clients";
 
                                 return (
-                              <button
-                                onClick={() => navigate(clientsRoute)}
-                                className="inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                View Client
-                                <ExternalLink className="h-3.5 w-3.5" />
-                              </button>
+                                  <button
+                                    onClick={() => navigate(clientsRoute)}
+                                    className="inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-xs font-black text-primary hover:bg-primary hover:text-white hover:shadow-md transition-all whitespace-nowrap"
+                                  >
+                                    View Client
+                                    <ExternalLink className="h-3.5 w-3.5" />
+                                  </button>
                                 );
                               })()}
                             </td>
@@ -609,6 +654,48 @@ export default function BookingAnalytics() {
                       })}
                     </tbody>
                   </table>
+
+                  {/* Pagination Controls */}
+                  {selectedBookings.length > itemsPerPage && (
+                    <div className="p-6 border-t border-[#EEF1EC] flex flex-col items-center gap-4 bg-[#F8FAF7] pb-8">
+                      <p className="text-xs font-bold text-[#677E73] order-2 sm:order-1">
+                        Showing <span className="text-[#10251A]">{Math.min((currentPage - 1) * itemsPerPage + 1, selectedBookings.length)}</span> to <span className="text-[#10251A]">{Math.min(currentPage * itemsPerPage, selectedBookings.length)}</span> of <span className="text-[#10251A]">{selectedBookings.length}</span> entries
+                      </p>
+                      <div className="flex items-center gap-2 order-1 sm:order-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                          disabled={currentPage === 1}
+                          className="font-bold rounded-xl border-[#DDE5DA] bg-white h-9 px-4 hover:bg-[#F8FAF7]"
+                        >
+                          <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+                        </Button>
+                        <div className="flex items-center gap-1.5">
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                            <Button
+                              key={page}
+                              variant={currentPage === page ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(page)}
+                              className={`w-9 h-9 p-0 rounded-xl font-bold transition-all ${currentPage === page ? 'shadow-md bg-[#2D3F33] text-[#FDE68A]' : 'border-[#DDE5DA] bg-white hover:bg-[#F8FAF7]'}`}
+                            >
+                              {page}
+                            </Button>
+                          )).slice(Math.max(0, currentPage - 3), Math.min(totalPages, currentPage + 2))}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                          disabled={currentPage === totalPages}
+                          className="font-bold rounded-xl border-[#DDE5DA] bg-white h-9 px-4 hover:bg-[#F8FAF7]"
+                        >
+                          Next <ChevronRight className="w-4 h-4 ml-1" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
 
                   {selectedBookings.length === 0 && (
                     <div className="py-16 text-center">
@@ -693,8 +780,8 @@ export default function BookingAnalytics() {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
-        <h1 className="text-4xl">
-          Booking <span className="text-primary italic">Analytics</span>
+        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+          Booking <span className="text-[#4A6D56] italic">Analytics</span>
         </h1>
         <p className="text-muted-foreground mt-2">
           Comprehensive breakdown of your revenue, bookings, and space
@@ -795,53 +882,53 @@ export default function BookingAnalytics() {
           </div>
         </div>
 
-        <div className="bg-background border border-border rounded-2xl p-6 shadow-sm flex flex-col">
-          <h2 className="text-lg font-bold text-foreground uppercase tracking-wider opacity-70 mb-6">
-            Summary
+        <div className="bg-background border border-border rounded-2xl p-5 shadow-sm flex flex-col h-fit">
+          <h2 className="text-sm font-black text-foreground uppercase tracking-widest opacity-60 mb-4">
+            Revenue Summary
           </h2>
 
-          <div className="space-y-8 flex-1">
+          <div className="space-y-5 flex-1">
             <div>
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-0.5">
                 Current Month
               </p>
-              <p className="text-4xl font-extrabold text-foreground tracking-tight">
+              <p className="text-2xl font-black text-[#10251A] tracking-tight">
                 {formatCurrency(analytics?.summary?.revenueThisMonth)}
               </p>
             </div>
 
             <div>
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-0.5">
                 Previous Month
               </p>
-              <p className="text-2xl font-bold text-muted-foreground opacity-60">
+              <p className="text-lg font-extrabold text-muted-foreground opacity-50">
                 {formatCurrency(analytics?.summary?.revenueLastMonth)}
               </p>
             </div>
 
             <div
-              className={`p-4 rounded-xl flex items-center justify-between ${growth >= 0 ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}
+              className={`p-3.5 rounded-xl flex items-center justify-between ${growth >= 0 ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}
             >
               <div className="flex items-center gap-2">
-                <TrendingUp size={20} className={growth < 0 ? "rotate-180" : ""} />
-                <span className="font-extrabold text-lg">Growth Rate</span>
+                <TrendingUp size={16} className={growth < 0 ? "rotate-180" : ""} />
+                <span className="font-black text-sm uppercase tracking-tight">Growth Rate</span>
               </div>
-              <span className="text-2xl font-black">{growth.toFixed(1)}%</span>
+              <span className="text-xl font-black">{growth.toFixed(1)}%</span>
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-border space-y-4">
-            <div className="flex justify-between items-center text-sm">
-              <span className="font-bold text-muted-foreground">
-                Average Order Value
+          <div className="mt-5 pt-5 border-t border-border space-y-3">
+            <div className="flex justify-between items-center text-xs">
+              <span className="font-black text-muted-foreground uppercase tracking-tight">
+                Avg. Order Value
               </span>
-              <span className="font-extrabold text-foreground">₹4,250</span>
+              <span className="font-black text-[#10251A]">₹4,250</span>
             </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="font-bold text-muted-foreground">
-                Target Completion
+            <div className="flex justify-between items-center text-xs">
+              <span className="font-black text-muted-foreground uppercase tracking-tight">
+                Target Progress
               </span>
-              <span className="font-extrabold text-emerald-600">84%</span>
+              <span className="font-black text-emerald-600">84%</span>
             </div>
           </div>
         </div>

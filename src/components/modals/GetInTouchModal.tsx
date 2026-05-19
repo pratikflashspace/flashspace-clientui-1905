@@ -74,6 +74,7 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
               headers: {
                 "Content-Type": "application/json",
                 "x-api-key": "flashspace123", // must match backend
+                "x-flashspace-csrf": "true",
               },
               body: JSON.stringify({
                 name: name,

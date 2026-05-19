@@ -1429,7 +1429,16 @@ export default function KYCVerification() {
           </div>
 
           {/* Stepper Navigation */}
-          <div className="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar py-2">
+          <div className="relative flex items-center justify-between p-1 bg-gray-200/60 shadow-inner rounded-3xl border border-gray-300/30 overflow-x-auto no-scrollbar py-1">
+            {/* Sliding Indicator */}
+            <div 
+              className="absolute inset-y-1 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] bg-white rounded-2xl shadow-lg ring-1 ring-black/5"
+              style={{
+                width: `calc(${100 / steps.length}% - 8px)`,
+                left: `calc(${steps.findIndex(s => s.id === activeStep) * (100 / steps.length)}% + 4px)`,
+              }}
+            />
+            
             {steps.map((step, idx) => {
               const isActive = activeStep === step.id;
               const isAccessible = isStepAccessible(step.id as VerificationStep);
@@ -1440,18 +1449,18 @@ export default function KYCVerification() {
                   key={step.id}
                   disabled={!isAccessible}
                   onClick={() => setActiveStep(step.id as VerificationStep)}
-                  className={`flex flex-col items-center gap-3 min-w-[100px] group transition-all ${
+                  className={`relative z-10 flex flex-col items-center justify-center py-4 min-w-[80px] flex-1 group transition-all ${
                     !isAccessible ? "opacity-40 grayscale cursor-not-allowed" : "cursor-pointer"
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 ${
                     isActive
-                      ? "bg-[#35503F] text-[#FEF8C3] shadow-lg shadow-[#35503F]/20 scale-110"
-                      : "bg-gray-50 text-gray-400 group-hover:bg-gray-100 group-hover:text-gray-600"
+                      ? "bg-[#35503F] text-[#FEF8C3] shadow-md scale-105"
+                      : "text-gray-400 group-hover:text-gray-600"
                   }`}>
-                    <StepIcon className="w-6 h-6" />
+                    <StepIcon className="w-5 h-5" />
                   </div>
-                  <span className={`text-[10px] font-bold uppercase tracking-widest text-center transition-all ${
+                  <span className={`text-[9px] mt-1.5 font-bold uppercase tracking-widest text-center transition-all duration-500 ${
                     isActive ? "text-[#35503F]" : "text-gray-400"
                   }`}>
                     {step.label}

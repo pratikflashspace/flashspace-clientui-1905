@@ -312,8 +312,8 @@ export default function Billing() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
-              Billing & <span className="text-primary italic">Payments</span>
+            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+              Billing & Payments
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your invoices, active subscriptions, and payment history
@@ -346,24 +346,42 @@ export default function Billing() {
 
         {/* Navigation Tabs and Search */}
         <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
-          <div className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
-            {[
-              { id: "invoices", label: "Invoices" },
-              { id: "subscriptions", label: "Subscriptions" },
-              { id: "payments", label: "Payment Methods" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <div className="relative flex p-1 rounded-2xl shadow-inner bg-gray-200/60 w-full lg:w-[600px] overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth h-auto border border-gray-300/30">
+            {/* Sliding Indicator */}
+            <div 
+              className="absolute inset-y-1 transition-all duration-300 ease-out bg-white rounded-xl shadow-lg ring-1 ring-black/5"
+              style={{
+                left: activeTab === "invoices" ? "4px" : 
+                      activeTab === "subscriptions" ? "calc(33.33% + 4px)" : 
+                      "calc(66.66% + 4px)",
+                width: "calc(33.33% - 8px)"
+              }}
+            />
+            
+            <button
+              onClick={() => setActiveTab("invoices")}
+              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ${
+                activeTab === "invoices" ? "text-[#35503F] font-black" : "text-gray-500 font-bold hover:text-gray-700"
+              }`}
+            >
+              Invoices
+            </button>
+            <button
+              onClick={() => setActiveTab("subscriptions")}
+              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ${
+                activeTab === "subscriptions" ? "text-[#35503F] font-black" : "text-gray-500 font-bold hover:text-gray-700"
+              }`}
+            >
+              Subscriptions
+            </button>
+            <button
+              onClick={() => setActiveTab("payments")}
+              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm transition-all duration-300 ${
+                activeTab === "payments" ? "text-[#35503F] font-black" : "text-gray-500 font-bold hover:text-gray-700"
+              }`}
+            >
+              Payments
+            </button>
           </div>
 
           {activeTab === "invoices" && (
@@ -593,7 +611,7 @@ export default function Billing() {
                   return (
                     <div
                       key={sub._id}
-                      className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all"
+                      className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 hover:border-[#35503F]/40 hover:shadow-lg transition-all"
                     >
                       <div className="flex flex-col justify-between h-full gap-4">
                         <div>

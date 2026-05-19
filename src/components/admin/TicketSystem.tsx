@@ -617,7 +617,7 @@ export default function TicketSystem() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 mb-8">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
           <p className="text-2xl font-extrabold text-foreground">
             {stats.open}
@@ -629,12 +629,6 @@ export default function TicketSystem() {
             {stats.in_progress}
           </p>
           <p className="text-sm text-muted-foreground">In Progress</p>
-        </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-red-200 transition-colors">
-          <p className="text-2xl font-extrabold text-red-600">
-            {stats.escalated}
-          </p>
-          <p className="text-sm text-muted-foreground">Escalated</p>
         </div>
         <div className="bg-background border border-border rounded-xl p-5 hover:border-green-200 transition-colors">
           <p className="text-2xl font-extrabold text-green-600">

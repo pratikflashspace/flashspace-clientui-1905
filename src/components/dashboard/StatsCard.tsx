@@ -20,7 +20,7 @@ export const StatsCard = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "bg-background border border-border rounded-xl p-4 sm:p-6 shadow-soft",
+        "bg-background border border-[#DDE5DA] rounded-xl p-4 sm:p-6 shadow-soft",
         className,
       )}
     >

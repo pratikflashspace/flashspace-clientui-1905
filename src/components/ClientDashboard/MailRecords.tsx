@@ -191,8 +191,8 @@ export default function MailRecords() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
-              Mail <span className="text-primary italic">Records</span>
+            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+              Mail Records
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Track all mail and parcels received at your virtual office
@@ -225,36 +225,36 @@ export default function MailRecords() {
 
         {/* Navigation Tabs and Search */}
         <div className="flex flex-col lg:flex-row justify-between gap-6 items-stretch lg:items-center">
-          <div className="relative flex gap-1 p-1 bg-gray-100/50 backdrop-blur-md rounded-2xl border border-gray-200/50 shadow-inner overflow-hidden lg:w-[600px]">
+          <div className="relative flex p-1 bg-gray-200/60 shadow-inner rounded-2xl border border-gray-300/30 overflow-hidden lg:w-[600px]">
             {/* Sliding Indicator */}
             <div 
-              className="absolute inset-y-1 transition-all duration-300 ease-out bg-white rounded-xl shadow-md"
+              className="absolute inset-y-1 transition-all duration-300 ease-out bg-white rounded-xl shadow-lg ring-1 ring-black/5"
               style={{
-                left: activeTab === "received" ? "4px" : activeTab === "forwarded" ? "calc(33.33% + 2px)" : "calc(66.66% + 2px)",
-                width: "calc(33.33% - 4px)"
+                left: activeTab === "received" ? "4px" : activeTab === "forwarded" ? "calc(33.33% + 4px)" : "calc(66.66% + 4px)",
+                width: "calc(33.33% - 8px)"
               }}
             />
             
             <button
               onClick={() => { setActiveTab("received"); setPage(1); }}
-              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors duration-300 ${
-                activeTab === "received" ? "text-[#35503F]" : "text-gray-500 hover:text-gray-700"
+              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm transition-colors duration-300 ${
+                activeTab === "received" ? "text-[#35503F] font-black" : "text-gray-500 font-bold hover:text-gray-700"
               }`}
             >
               Received Mail
             </button>
             <button
               onClick={() => { setActiveTab("forwarded"); setPage(1); }}
-              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors duration-300 ${
-                activeTab === "forwarded" ? "text-[#35503F]" : "text-gray-500 hover:text-gray-700"
+              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm transition-colors duration-300 ${
+                activeTab === "forwarded" ? "text-[#35503F] font-black" : "text-gray-500 font-bold hover:text-gray-700"
               }`}
             >
               Forwarded Mail
             </button>
             <button
               onClick={() => { setActiveTab("collected"); setPage(1); }}
-              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors duration-300 ${
-                activeTab === "collected" ? "text-[#35503F]" : "text-gray-500 hover:text-gray-700"
+              className={`relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm transition-colors duration-300 ${
+                activeTab === "collected" ? "text-[#35503F] font-black" : "text-gray-500 font-bold hover:text-gray-700"
               }`}
             >
               Collected Mail
@@ -274,24 +274,24 @@ export default function MailRecords() {
         </div>
 
         {/* Mails Table */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto min-h-[400px]">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-50 bg-gray-50/50">
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Sender</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Office</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Received</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Status</th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Document</th>
+                <tr className="border-b border-gray-200 bg-gray-50/80">
+                  <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider">ID</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider">Sender</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider">Office</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider">Received</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Status</th>
+                  <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Document</th>
                   {activeTab !== "collected" && (
-                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Action</th>
+                    <th className="px-6 py-5 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Action</th>
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-200/60">
                 {filteredMails.length === 0 ? (
                   <tr>
                     <td colSpan={activeTab === "collected" ? 7 : 8} className="px-6 py-20 text-center">

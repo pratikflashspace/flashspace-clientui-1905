@@ -36,7 +36,7 @@ export default function Tickets() {
     try {
       const res = await partnerTicketService.getPartnerTickets(1, 100);
       if (res.success && res.data) {
-        setTickets(res.data.tickets);
+        setTickets(res.data.tickets || []);
       }
     } catch (error) {
       console.error("Failed to fetch tickets", error);
@@ -98,20 +98,21 @@ export default function Tickets() {
 
   const stats = useMemo(() => {
     const total = tickets.length;
-    const inProgress = tickets.filter(t => {
-      const s = (t.status || "").toUpperCase();
-      return s === "OPEN" || s === "IN_PROGRESS" || s === "ESCALATED";
+    const inProgress = tickets.filter((t) => {
+      const s = (t.status || "").toLowerCase();
+      return s === "open" || s === "in_progress" || s === "escalated";
     }).length;
-    const resolvedCount = tickets.filter(t => {
-      const s = (t.status || "").toUpperCase();
-      return s === "RESOLVED";
+    
+    const resolved = tickets.filter((t) => {
+      const s = (t.status || "").toLowerCase();
+      return s === "resolved" || s === "closed";
     }).length;
 
     // Dynamic Avg Response Time calculation
-    let avgTimeStr = "N/A";
+    let avgTimeStr = "0.0 hrs";
     const ticketsForStats = tickets.filter(t => {
       const hasReply = t.messages && t.messages.some(m => m.sender !== 'user');
-      const isResolved = (t.status || "").toUpperCase() === "RESOLVED" || t.resolvedAt;
+      const isResolved = (t.status || "").toLowerCase() === "resolved" || t.resolvedAt;
       return hasReply || isResolved;
     });
 
@@ -133,17 +134,17 @@ export default function Tickets() {
       }, 0);
 
       const avgMs = totalDiff / ticketsForStats.length;
-      const mins = Math.floor(avgMs / 60000);
-      const hours = Math.floor(mins / 60);
-      const days = Math.floor(hours / 24);
+      const totalMinutes = Math.round(avgMs / 60000);
 
-      if (days > 0) avgTimeStr = `${days}d ${hours % 24}h`;
-      else if (hours > 0) avgTimeStr = `${hours}h ${mins % 60}m`;
-      else if (mins > 0) avgTimeStr = `${mins}m`;
-      else avgTimeStr = "< 1m";
+      if (totalMinutes < 60) {
+        avgTimeStr = `${totalMinutes} min${totalMinutes !== 1 ? "s" : ""}`;
+      } else {
+        const hours = (totalMinutes / 60).toFixed(1);
+        avgTimeStr = `${hours} hr${Number(hours) !== 1 ? "s" : ""}`;
+      }
     }
 
-    return { total, inProgress, resolved: resolvedCount, avgTime: avgTimeStr };
+    return { total, inProgress, resolved, avgResponse: avgTimeStr };
   }, [tickets]);
   const filteredTickets = useMemo(() => {
     return tickets.filter((t) => {
@@ -159,8 +160,8 @@ export default function Tickets() {
 
       const matchesTab =
         activeTab === "inprogress"
-          ? (status === "OPEN" || status === "IN_PROGRESS")
-          : (status === "RESOLVED");
+          ? (status === "OPEN" || status === "IN_PROGRESS" || status === "ESCALATED")
+          : (status === "RESOLVED" || status === "CLOSED");
 
       return matchesQuery && matchesCategory && matchesTab;
     });
@@ -210,7 +211,7 @@ export default function Tickets() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-[#164e4e]">
+        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
           Tickets
         </h1>
         <p className="text-muted-foreground mt-2">
@@ -219,23 +220,39 @@ export default function Tickets() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {[
-          { label: "Total Tickets", value: stats.total, icon: MessageSquare, color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "In Progress", value: stats.inProgress, icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
-          { label: "Resolved", value: stats.resolved, icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Avg Response Time", value: stats.avgTime, icon: Zap, color: "text-purple-600", bg: "bg-purple-50" },
-        ].map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center`}>
-              <stat.icon className={`w-6 h-6 ${stat.color}`} />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-              <p className="text-sm text-slate-500 font-medium">{stat.label}</p>
-            </div>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-[#2D3F33]/15 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[105px] hover:shadow-md transition-all">
+          <p className="text-3xl font-extrabold text-[#0D1B2A] dark:text-white mb-1.5 leading-none">
+            {stats.total}
+          </p>
+          <p className="text-sm font-medium text-[#7A8A81] dark:text-gray-400">
+            Total Tickets
+          </p>
+        </div>
+        <div className="bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-[#2D3F33]/15 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[105px] hover:shadow-md transition-all">
+          <p className="text-3xl font-extrabold text-[#0D1B2A] dark:text-white mb-1.5 leading-none">
+            {stats.inProgress}
+          </p>
+          <p className="text-sm font-medium text-[#7A8A81] dark:text-gray-400">
+            In Progress
+          </p>
+        </div>
+        <div className="bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-[#2D3F33]/15 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[105px] hover:shadow-md transition-all">
+          <p className="text-3xl font-extrabold text-[#0D1B2A] dark:text-white mb-1.5 leading-none">
+            {stats.resolved}
+          </p>
+          <p className="text-sm font-medium text-[#7A8A81] dark:text-gray-400">
+            Resolved
+          </p>
+        </div>
+        <div className="bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-[#2D3F33]/15 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[105px] hover:shadow-md transition-all">
+          <p className="text-3xl font-extrabold text-[#0D1B2A] dark:text-white mb-1.5 leading-none">
+            {stats.avgResponse}
+          </p>
+          <p className="text-sm font-medium text-[#7A8A81] dark:text-gray-400">
+            Avg Response Time
+          </p>
+        </div>
       </div>
 
       {/* Tabs and Filters */}

@@ -176,8 +176,8 @@ export default function Support() {
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
-              Help & <span className="text-primary italic">Support</span>
+            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+              Help & <span className="text-[#4A6D56] italic">Support</span>
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Get help with your virtual office and coworking services
