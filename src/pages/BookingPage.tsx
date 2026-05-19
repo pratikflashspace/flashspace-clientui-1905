@@ -883,7 +883,7 @@ const BookingPage = () => {
             </p>
             <Button
               onClick={() => navigate(-1)}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="bg-[#FEF865] hover:bg-[#f5e84a] text-[#36503F] font-bold"
             >
               Go Back
             </Button>

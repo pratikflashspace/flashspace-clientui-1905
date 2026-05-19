@@ -420,15 +420,15 @@ const CompleteBookingPage = () => {
                                     >
                                         {/* Popular badge */}
                                         {opt.popular && (
-                                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FEF865] text-[#36503F] text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-sm">
                                                 Most Popular
                                             </span>
                                         )}
 
                                         {/* Selected checkmark */}
                                         {selectedTenure === opt.years && (
-                                            <span className="absolute top-3 right-3 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-                                                <Check className="w-3 h-3 text-primary-foreground" strokeWidth={3} />
+                                            <span className="absolute top-3 right-3 w-5 h-5 bg-[#36503F] rounded-full flex items-center justify-center">
+                                                <Check className="w-3 h-3 text-white" strokeWidth={3} />
                                             </span>
                                         )}
 
@@ -549,7 +549,7 @@ const CompleteBookingPage = () => {
                                         <button
                                             onClick={handleApplyCoupon}
                                             disabled={couponLoading || !couponCode.trim()}
-                                            className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                                            className="px-4 py-2 bg-[#FEF865] text-[#36503F] text-sm font-bold rounded-lg hover:bg-[#f5e84a] disabled:opacity-50 transition-colors"
                                         >
                                             {couponLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
                                         </button>
@@ -595,7 +595,11 @@ const CompleteBookingPage = () => {
                                     <button
                                         onClick={handleSimulatePayment}
                                         disabled={paymentLoading}
+<<<<<<< HEAD
                                         className="w-full mt-2 py-3 border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-xs"
+=======
+                                        className="w-full py-4 bg-[#FEF865] hover:bg-[#f5e84a] text-[#36503F] font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md disabled:opacity-70"
+>>>>>>> dbe510a (new Ui)
                                     >
                                         {paymentLoading ? (
                                             <><Loader2 className="w-4 h-4 animate-spin" /> Simulating…</>
@@ -617,7 +621,75 @@ const CompleteBookingPage = () => {
 
             <Footer />
 
+<<<<<<< HEAD
             {/* Removed Payment Modal - Going direct to Razorpay */}
+=======
+            {/* ── PAYMENT METHOD MODAL ── */}
+            {showPaymentModal && paymentOrder && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+                    <div className="bg-card border border-border rounded-3xl shadow-2xl w-full max-w-md p-8 relative">
+                        {/* Close */}
+                        <button
+                            onClick={() => setShowPaymentModal(false)}
+                            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                        >
+                            <X className="w-4 h-4 text-muted-foreground" />
+                        </button>
+
+                        {/* Header */}
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 bg-primary/15 rounded-xl flex items-center justify-center">
+                                <CreditCard className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-foreground">Complete Payment</h2>
+                                <p className="text-sm text-muted-foreground">Choose how you'd like to pay</p>
+                            </div>
+                        </div>
+
+                        {/* Amount banner */}
+                        <div className="bg-foreground rounded-2xl p-5 mb-6 text-background">
+                            <p className="text-sm text-background/70 mb-1">Amount to Pay</p>
+                            <p className="text-3xl font-extrabold">{formatCurrency(finalTotal)}</p>
+                            <p className="text-xs text-background/70 mt-1">{planDisplayName} · {selectedTenure} Year{selectedTenure > 1 ? 's' : ''}</p>
+                        </div>
+
+                        {/* Available methods (info only) */}
+                        <div className="space-y-2 mb-6">
+                            {['UPI (GPay, PhonePe, Paytm)', 'Credit / Debit Card', 'Net Banking (50+ Banks)'].map((m, i) => (
+                                <div key={i} className="flex items-center justify-between px-4 py-3 bg-muted/40 border border-border rounded-xl text-sm text-muted-foreground">
+                                    <span>{m}</span>
+                                    <Check className="w-3.5 h-3.5 text-green-500" />
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Razorpay Pay button */}
+                        <button
+                            onClick={handleRazorpayPayment}
+                            disabled={paymentLoading}
+                            className="w-full py-4 bg-[#FEF865] hover:bg-[#f5e84a] text-[#36503F] font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70"
+                        >
+                            <Shield className="w-4 h-4" />
+                            Pay {formatCurrency(finalTotal)} with Razorpay
+                        </button>
+
+                        {/* Simulate button */}
+                        <button
+                            onClick={handleSimulatePayment}
+                            disabled={paymentLoading}
+                            className="w-full mt-3 py-3.5 border-2 border-dashed border-border text-muted-foreground hover:border-primary/60 hover:text-foreground font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm"
+                        >
+                            🧪 Simulate Payment (Test Mode)
+                        </button>
+
+                        <p className="text-center text-[10px] text-muted-foreground mt-4 flex items-center justify-center gap-1">
+                            <Shield className="w-3 h-3" /> Secured by 256-bit SSL · PCI DSS Compliant
+                        </p>
+                    </div>
+                </div>
+            )}
+>>>>>>> dbe510a (new Ui)
         </div>
     );
 };
