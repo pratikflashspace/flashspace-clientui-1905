@@ -226,7 +226,7 @@ const MySpaces = () => {
             isActive: activeState === "active",
             status: activeState,
             approvalStatus: approvalState,
-            rating: prop.avgRating || 4.5,
+            rating: prop.avgRating && prop.avgRating > 0 ? prop.avgRating : 4.8,
             image: getSafeImageUrl(
               prop.image ||
                 (prop.images && prop.images.length > 0 ? prop.images[0] : null),
@@ -388,8 +388,8 @@ const MySpaces = () => {
     <div className="flex-1">
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-            My <span className="text-primary italic">Spaces</span>
+          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+            My <span className="text-[#4A6D56] italic">Spaces</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage all your workspace listings

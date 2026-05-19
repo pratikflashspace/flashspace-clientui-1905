@@ -6,6 +6,7 @@ import { authService } from "@/services/auth.service";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
+import { validatePassword } from "@/utils/passwordValidation";
 
 import {
   ArrowLeft,
@@ -84,8 +85,9 @@ export default function Settings() {
       return;
     }
 
-    if (passwordForm.newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters");
+    const passwordCheck = validatePassword(passwordForm.newPassword);
+    if (!passwordCheck.isValid) {
+      toast.error(passwordCheck.message);
       return;
     }
 

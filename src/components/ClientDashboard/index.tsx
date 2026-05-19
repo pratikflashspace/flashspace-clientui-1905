@@ -23,6 +23,8 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications } from "@/contexts/NotificationProvider";
+import ErrorBoundary from "@/components/ErrorBoundary";
+
 import userDashboardService from "@/services/userDashboard.service";
 
 // Remove this type definition if useAuth already provides the correct user type
@@ -155,29 +157,48 @@ export default function ClientDashboard() {
             isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
           )}
         >
-          <div className={`flex flex-col h-full ${isSidebarCollapsed ? "px-2 py-6" : "p-6"}`}>
+          <div className={`flex flex-col h-full`}>
             {/* Logo */}
             <div
-              className={`flex items-center gap-2 mb-6 cursor-pointer ${isSidebarCollapsed ? "justify-center" : "justify-between"}`}
+              className={cn(
+                "flex flex-col items-start gap-1 cursor-pointer transition-all",
+                isSidebarCollapsed ? "px-2 py-6 items-center" : "p-6 pb-8"
+              )}
               onClick={() => navigate("/")}
               title="Back to Home"
             >
-              <img
-                src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
-                alt="FlashSpace Logo"
-                className={`w-auto object-contain ${isSidebarCollapsed ? "h-7" : "h-8"}`}
-              />
-              <button
-                className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center justify-between w-full">
+                <img
+                  src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
+                  alt="FlashSpace Logo"
+                  className={`w-auto object-contain ${isSidebarCollapsed ? "h-7" : "h-9"}`}
+                />
+                {!isSidebarCollapsed && (
+                  <button
+                    className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+              {!isSidebarCollapsed && (
+                <div className="mt-2 pl-3 space-y-0.5">
+                  <p className="text-sm font-bold text-[#1F2E26] dark:text-white leading-none">Customer Portal</p>
+                  <p className="text-[11px] text-[#677E73] dark:text-gray-400 font-medium leading-tight">Manage your workspace subscriptions</p>
+                </div>
+              )}
             </div>
 
+            {/* Horizontal Separator Line */}
+            <div className="border-b border-gray-100 w-full" />
+
           {/* Main Navigation */}
-          <nav className="flex-1 overflow-y-auto">
-            <ul className="space-y-1">
+          <nav className="flex-1 overflow-y-auto scrollbar-hover-only py-4">
+            <ul className={cn("space-y-1", isSidebarCollapsed ? "px-2" : "px-2")}>
               {mainMenuItems.map((item, idx) => {
                 const isActive = activeIndex === idx;
                 const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
@@ -189,10 +210,10 @@ export default function ClientDashboard() {
                     <button
                       onClick={() => handleNavigation(idx)}
                       title={isSidebarCollapsed ? item.name : undefined}
-                      className={`relative w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${isSidebarCollapsed ? "justify-center px-2 py-3" : "px-4 py-3"
+                      className={`relative w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${isSidebarCollapsed ? "justify-center px-2 py-3" : "px-4 py-2.5"
                         } ${isActive
                           ? "bg-[#35503F] text-[#FEF8C3] shadow-sm"
-                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                          : "text-gray-600 hover:bg-gray-100 hover:text-black"
                         }`}
                     >
                       <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#FEF8C3]" : "text-gray-400"}`} />
@@ -228,7 +249,7 @@ export default function ClientDashboard() {
           </nav>
 
           {/* Bottom Actions */}
-          <div className="mt-auto pt-4 border-t border-gray-100 space-y-2">
+          <div className={cn("mt-auto pt-4 border-t border-gray-100 space-y-2", isSidebarCollapsed ? "px-2 pb-4" : "px-4 pb-4")}>
             {/* Collapse Toggle (Desktop) */}
             <button
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -338,7 +359,9 @@ export default function ClientDashboard() {
           </header>
 
           <div className="flex-1 p-0">
-            {mainContent}
+            <ErrorBoundary>
+              {mainContent}
+            </ErrorBoundary>
           </div>
         </main>
       </div>

@@ -86,6 +86,7 @@ export const LeadCollectionModal = ({
       }, {
         headers: {
           'x-api-key': import.meta.env.VITE_LEAD_API_KEY || 'flashspace123',
+          'x-flashspace-csrf': 'true',
         },
       });
 

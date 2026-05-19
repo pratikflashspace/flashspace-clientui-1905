@@ -10,6 +10,10 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
+  TrendingUp,
+  Users,
+  CheckCircle2,
+  Clock,
 } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +51,15 @@ const LeadManagement = () => {
   // Pagination State
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, pages: 1 });
 
+  // Stats State
+  const [stats, setStats] = useState({
+    total: 0,
+    paid: 0,
+    pending: 0,
+    cancelled: 0,
+    conversionRate: 0,
+  });
+
   const fetchLeads = async (page = pagination.page, silent = false) => {
     if (!silent) setLoading(true);
     try {
@@ -62,9 +75,11 @@ const LeadManagement = () => {
       
       const contacts = response?.data?.data || [];
       const paginationData = response?.data?.pagination || { page: 1, limit: 10, total: 0, pages: 1 };
+      const statsData = response?.data?.stats || { total: 0, paid: 0, pending: 0, cancelled: 0, conversionRate: 0 };
       
       processLeads(contacts);
       setPagination(paginationData);
+      setStats(statsData);
     } catch (error) {
       console.error("Failed to fetch leads", error);
       if (!silent) {
@@ -162,6 +177,7 @@ const LeadManagement = () => {
         )
       );
       toast({ title: "Status updated", description: `Lead marked as ${status}.` });
+      void fetchLeads(pagination.page, true);
     } catch (error) {
       console.error("Failed to update lead status", error);
       toast({ title: "Error", description: "Failed to update lead status.", variant: "destructive" });
@@ -251,10 +267,47 @@ const LeadManagement = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-4 mb-8">
-        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
-          <p className="text-2xl font-extrabold text-foreground">{pagination.total}</p>
-          <p className="text-sm text-muted-foreground">Total Leads</p>
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="bg-background border border-border rounded-2xl p-5 shadow-sm flex items-center justify-between group hover:border-primary/35 transition-all">
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-muted-foreground">Total Leads</p>
+            <p className="text-3xl font-extrabold text-foreground tracking-tight">{stats.total}</p>
+          </div>
+          <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100/50">
+            <Users className="w-6 h-6" />
+          </div>
+        </div>
+
+        <div className="bg-background border border-border rounded-2xl p-5 shadow-sm flex items-center justify-between group hover:border-primary/35 transition-all">
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-muted-foreground">Converted (Paid)</p>
+            <p className="text-3xl font-extrabold text-foreground tracking-tight">{stats.paid}</p>
+          </div>
+          <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100/50">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
+        </div>
+
+        <div className="bg-background border border-border rounded-2xl p-5 shadow-sm flex items-center justify-between group hover:border-primary/35 transition-all">
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-muted-foreground">Pending Leads</p>
+            <p className="text-3xl font-extrabold text-foreground tracking-tight">{stats.pending}</p>
+          </div>
+          <div className="h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 border border-amber-100/50">
+            <Clock className="w-6 h-6" />
+          </div>
+        </div>
+
+        <div className="bg-background border border-border rounded-2xl p-5 shadow-sm flex items-center justify-between group hover:border-primary/35 transition-all">
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-muted-foreground">Conversion Rate</p>
+            <p className="text-3xl font-extrabold text-foreground tracking-tight">
+              {stats.conversionRate}%
+            </p>
+          </div>
+          <div className="h-12 w-12 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 border border-violet-100/50">
+            <TrendingUp className="w-6 h-6" />
+          </div>
         </div>
       </div>
 

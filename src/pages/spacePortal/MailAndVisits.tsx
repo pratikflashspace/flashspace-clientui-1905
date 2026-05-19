@@ -183,8 +183,8 @@ const MailAndVisits = () => {
       {/* Header */}
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl">
-            Mail & <span className="text-primary italic">Visits</span>
+          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+            Mail & <span className="text-[#4A6D56] italic">Visits</span>
           </h1>
           <p className="text-muted-foreground mt-2">
             Track and manage front-desk interactions for your clients
@@ -448,7 +448,7 @@ const MailAndVisits = () => {
 
             {/* Pagination for Mail */}
             {mailPagination.total > 0 && (
-              <div className="px-6 py-4 border-t border-border flex flex-col sm:flex-row items-center justify-between bg-muted/20 gap-4">
+              <div className="px-6 py-4 border-t border-border flex flex-col items-center justify-center bg-muted/20 gap-3">
                 <p className="text-xs text-muted-foreground font-medium">
                   Showing {(mailPagination.page - 1) * 10 + 1} to{" "}
                   {Math.min(mailPagination.page * 10, mailPagination.total)} of{" "}
@@ -586,7 +586,7 @@ const MailAndVisits = () => {
 
             {/* Pagination for Visits */}
             {visitPagination.total > 0 && (
-              <div className="px-6 py-4 border-t border-border flex flex-col sm:flex-row items-center justify-between bg-muted/20 gap-4">
+              <div className="px-6 py-4 border-t border-border flex flex-col items-center justify-center bg-muted/20 gap-3">
                 <p className="text-xs text-muted-foreground font-medium">
                   Showing {(visitPagination.page - 1) * 10 + 1} to{" "}
                   {Math.min(visitPagination.page * 10, visitPagination.total)} of{" "}

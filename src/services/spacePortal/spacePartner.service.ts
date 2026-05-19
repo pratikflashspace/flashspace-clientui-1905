@@ -793,11 +793,12 @@ export const updateKycBank = async (data: any) => {
 export const uploadKycDoc = async (documentType: string, file: File) => {
   try {
     const formData = new FormData();
-    formData.append("file", file);
     formData.append("documentType", documentType);
+    formData.append("file", file);
     const response = await axiosInstance.post("/api/spacePartner/kyc/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
+        "x-flashspace-csrf": "true",
       },
     });
     return response.data;

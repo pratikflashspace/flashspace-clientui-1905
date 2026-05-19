@@ -23,7 +23,7 @@ import { userDashboardService } from "@/services/userDashboard.service";
 
 type BookingFilters = {
   search: string;
-  subscriptionStatus: string;
+  kycStatus: string;
   workspace: string;
   city: string;
   space: string;
@@ -41,17 +41,16 @@ type SelectedClient = Omit<Client, "status"> & {
 
 const emptyFilters: BookingFilters = {
   search: "",
-  subscriptionStatus: "ALL",
+  kycStatus: "ALL",
   workspace: "ALL",
   city: "ALL",
   space: "ALL",
 };
 
-const statusOptions = [
-  { label: "All Status", value: "ALL" },
-  { label: "Active", value: "ACTIVE" },
-  { label: "Expiring Soon", value: "EXPIRING_SOON" },
-  { label: "Inactive", value: "INACTIVE" },
+const kycStatusOptions = [
+  { label: "All KYC Status", value: "ALL" },
+  { label: "Verified", value: "VERIFIED" },
+  { label: "Pending", value: "PENDING" },
 ];
 
 const normalize = (value?: string | number | null) =>
@@ -134,9 +133,7 @@ export default function Clients() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedClient, setSelectedClient] = useState<SelectedClient | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [draftFilters, setDraftFilters] = useState<BookingFilters>(emptyFilters);
-  const [appliedFilters, setAppliedFilters] =
-    useState<BookingFilters>(emptyFilters);
+  const [filters, setFilters] = useState<BookingFilters>(emptyFilters);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -188,23 +185,23 @@ export default function Clients() {
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
       const matchesSearch =
-        includesText(client.contactName, appliedFilters.search) ||
-        includesText(client.email, appliedFilters.search) ||
-        includesText(client.phone, appliedFilters.search) ||
-        includesText(client.companyName, appliedFilters.search) ||
-        includesText(client.invoiceNumber, appliedFilters.search) ||
-        includesText(client.bookingNumber, appliedFilters.search) ||
-        includesText(client.space, appliedFilters.search);
+        includesText(client.contactName, filters.search) ||
+        includesText(client.email, filters.search) ||
+        includesText(client.phone, filters.search) ||
+        includesText(client.companyName, filters.search) ||
+        includesText(client.invoiceNumber, filters.search) ||
+        includesText(client.bookingNumber, filters.search) ||
+        includesText(client.space, filters.search);
 
       return (
         matchesSearch &&
-        isSameOption(appliedFilters.subscriptionStatus, client.status) &&
-        isSameOption(appliedFilters.workspace, client.workspace) &&
-        isSameOption(appliedFilters.city, client.city) &&
-        isSameOption(appliedFilters.space, client.space)
+        isSameOption(filters.kycStatus, client.kycStatus) &&
+        isSameOption(filters.workspace, client.workspace) &&
+        isSameOption(filters.city, client.city) &&
+        isSameOption(filters.space, client.space)
       );
     });
-  }, [clients, appliedFilters]);
+  }, [clients, filters]);
 
   const totalPages = Math.max(1, Math.ceil(filteredClients.length / pageSize));
   const safePage = Math.min(page, totalPages);
@@ -249,19 +246,14 @@ export default function Clients() {
 
   useEffect(() => {
     setPage(1);
-  }, [appliedFilters, pageSize]);
+  }, [filters, pageSize]);
 
   const handleFilterChange = (key: keyof BookingFilters, value: string) => {
-    setDraftFilters((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const applyFilters = () => {
-    setAppliedFilters(draftFilters);
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const resetFilters = () => {
-    setDraftFilters(emptyFilters);
-    setAppliedFilters(emptyFilters);
+    setFilters(emptyFilters);
   };
 
   const exportRows = () => {
@@ -346,16 +338,15 @@ export default function Clients() {
 
     if (!searchValue) return;
 
-    setDraftFilters((prev) => ({ ...prev, search: searchValue }));
-    setAppliedFilters((prev) => ({ ...prev, search: searchValue }));
+    setFilters((prev) => ({ ...prev, search: searchValue }));
     setPage(1);
   }, [clients, location.search]);
 
   return (
     <div className="flex-1 animate-in fade-in duration-500">
       <div className="mb-7">
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
-          Client <span className="text-primary italic">Bookings</span>
+        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+          Client <span className="text-[#4A6D56] italic">Bookings</span>
         </h1>
         <p className="mt-2 text-sm font-medium text-muted-foreground">
           View every booking linked to your spaces.
@@ -399,22 +390,22 @@ export default function Clients() {
             </p>
           </div>
         </div>
-        <div className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 xl:items-end">
+        <div className="grid min-w-0 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 xl:items-end">
           <FilterInput
             label="Search"
             placeholder="Name, email, phone, company, invoice"
-            value={draftFilters.search}
+            value={filters.search}
             onChange={(value) => handleFilterChange("search", value)}
           />
           <FilterSelect
-            label="Status"
-            value={draftFilters.subscriptionStatus}
-            onChange={(value) => handleFilterChange("subscriptionStatus", value)}
-            options={statusOptions}
+            label="KYC Status"
+            value={filters.kycStatus}
+            onChange={(value) => handleFilterChange("kycStatus", value)}
+            options={kycStatusOptions}
           />
           <FilterSelect
             label="Workspaces"
-            value={draftFilters.workspace}
+            value={filters.workspace}
             onChange={(value) => handleFilterChange("workspace", value)}
             options={[
               { label: "Workspaces", value: "ALL" },
@@ -423,7 +414,7 @@ export default function Clients() {
           />
           <FilterSelect
             label="Cities"
-            value={draftFilters.city}
+            value={filters.city}
             onChange={(value) => handleFilterChange("city", value)}
             options={[
               { label: "Cities", value: "ALL" },
@@ -432,22 +423,19 @@ export default function Clients() {
           />
           <FilterSelect
             label="Space"
-            value={draftFilters.space}
+            value={filters.space}
             onChange={(value) => handleFilterChange("space", value)}
             options={[
               { label: "Space", value: "ALL" },
               ...spaceOptions.map((value) => ({ label: value, value })),
             ]}
           />
-          <Button onClick={applyFilters} className="h-11 w-full rounded-xl px-6 font-bold">
-            Apply
-          </Button>
           <Button
             onClick={resetFilters}
-            variant="ghost"
-            className="h-11 w-full rounded-xl px-6 font-bold"
+            variant="outline"
+            className="h-11 w-full rounded-xl border-[#C9D8CF] bg-white px-6 font-bold hover:bg-slate-50 transition-colors"
           >
-            Reset
+            Reset Filters
           </Button>
         </div>
       </div>
@@ -649,7 +637,7 @@ function BookingRow({
 
   return (
     <article className="group bg-white px-5 py-4 transition-colors hover:bg-[#F8FAF7]">
-      <div className="grid gap-4 xl:grid-cols-[minmax(210px,1.15fr)_minmax(210px,1fr)_minmax(240px,1.2fr)_minmax(200px,auto)] xl:items-center">
+      <div className="grid gap-4 xl:grid-cols-[minmax(210px,1.15fr)_minmax(210px,1fr)_minmax(380px,1.9fr)_minmax(120px,auto)] xl:items-center">
         <div className="min-w-0">
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9 shrink-0 ring-2 ring-background shadow-sm">
@@ -695,7 +683,7 @@ function BookingRow({
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-[96px_minmax(120px,1fr)_minmax(100px,0.8fr)]">
+        <div className="grid gap-3 sm:grid-cols-4 xl:grid-cols-[90px_minmax(110px,1.2fr)_minmax(90px,1fr)_95px]">
           <div>
             <p className="mb-1 text-[9px] font-extrabold uppercase tracking-widest text-[#8A9A91]">
               Workspace
@@ -726,6 +714,20 @@ function BookingRow({
               <p className="mt-0.5 text-[11px] font-medium text-[#677E73]">
                 {cleanLocation.sub}
               </p>
+            )}
+          </div>
+          <div>
+            <p className="mb-1 text-[9px] font-extrabold uppercase tracking-widest text-[#8A9A91]">
+              KYC Status
+            </p>
+            {client.kycStatus === "VERIFIED" ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-center text-[10px] font-bold leading-tight text-emerald-700">
+                <CheckCircle2 className="h-3 w-3 text-emerald-600 shrink-0" /> Verified
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-center text-[10px] font-bold leading-tight text-amber-700">
+                Pending
+              </span>
             )}
           </div>
         </div>

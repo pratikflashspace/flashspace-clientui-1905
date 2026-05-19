@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TableSkeleton } from "@/components/ui/skeleton-loaders";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle2, Clock, Loader2, RotateCcw, Search } from "lucide-react";
+import { CheckCircle2, Clock, Loader2, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TrackProgressData {
@@ -25,14 +25,14 @@ interface TrackProgressData {
 const StatusIndicator = ({ approved }: { approved: boolean; label: string }) => {
   if (approved) {
     return (
-      <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-xs">
+      <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-sm">
         <CheckCircle2 className="w-4 h-4" />
         <span>Approved</span>
       </div>
     );
   }
   return (
-    <div className="flex items-center gap-1.5 text-amber-500 font-bold text-xs">
+    <div className="flex items-center gap-1.5 text-amber-500 font-bold text-sm">
       <Clock className="w-4 h-4" />
       <span>Pending</span>
     </div>
@@ -57,17 +57,15 @@ const BooleanIndicator = ({ value, trueLabel = "Yes", falseLabel = "No" }: { val
 const TrackProgress = () => {
   const [data, setData] = useState<TrackProgressData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const fetchData = async (isRefresh = false, silent = false) => {
+  const fetchData = async (silent = false) => {
     if (!silent) {
-      if (isRefresh) setRefreshing(true);
-      else setLoading(true);
+      setLoading(true);
     }
     try {
       const response = await getTrackProgressData();
@@ -86,7 +84,6 @@ const TrackProgress = () => {
     } finally {
       if (!silent) {
         setLoading(false);
-        setRefreshing(false);
       }
     }
   };
@@ -98,7 +95,7 @@ const TrackProgress = () => {
   // Polling for real-time updates
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchData(false, true);
+      fetchData(true);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -137,8 +134,8 @@ const TrackProgress = () => {
   return (
     <div className="flex-1 animate-in fade-in duration-500">
       <div className="mb-7">
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
-          Track <span className="text-primary italic">Progress</span>
+        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+          Track <span className="text-[#4A6D56] italic">Progress</span>
         </h1>
         <p className="mt-2 text-sm font-medium text-muted-foreground">
           Monitor the lifecycle progress of all your space bookings.
@@ -155,49 +152,36 @@ const TrackProgress = () => {
             className="pl-10 h-11 rounded-xl border-[#DDE5DA] bg-white text-sm font-medium focus:ring-primary"
           />
         </div>
-        <Button
-          variant="outline"
-          onClick={() => void fetchData(true)}
-          disabled={refreshing}
-          className="h-11 px-6 font-bold rounded-xl border-[#DDE5DA] bg-white hover:bg-slate-50 text-[#1F2E26]"
-        >
-          {refreshing ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <RotateCcw className="w-4 h-4 mr-2" />
-          )}
-          Refresh Data
-        </Button>
       </div>
 
       <div className="bg-white border border-[#DDE5DA] rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full min-w-[1000px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[1000px] border-collapse text-left text-base">
             <thead className="bg-[#F8FAF7]">
               <tr className="border-b border-[#DDE5DA] text-[#1F2E26]">
-                <th className="p-5 text-[11px] font-extrabold uppercase tracking-widest">
+                <th className="p-5 whitespace-nowrap text-[13px] font-extrabold uppercase tracking-widest">
                   Booking ID
                 </th>
-                <th className="p-5 text-[11px] font-extrabold uppercase tracking-widest">
+                <th className="p-5 whitespace-nowrap text-[13px] font-extrabold uppercase tracking-widest">
                   User Name
                 </th>
-                <th className="p-5 text-[11px] font-extrabold uppercase tracking-widest">
+                <th className="p-5 whitespace-nowrap text-[13px] font-extrabold uppercase tracking-widest">
                   Space Booked
                 </th>
-                <th className="p-5 text-center text-[11px] font-extrabold uppercase tracking-widest">
+                <th className="p-5 whitespace-nowrap text-center text-[13px] font-extrabold uppercase tracking-widest">
                   KYC (Admin)
                 </th>
 
-                <th className="p-5 text-center text-[11px] font-extrabold uppercase tracking-widest">
+                <th className="p-5 whitespace-nowrap text-center text-[13px] font-extrabold uppercase tracking-widest">
                   Draft Agreement
                 </th>
-                <th className="p-5 text-center text-[11px] font-extrabold uppercase tracking-widest">
+                <th className="p-5 whitespace-nowrap text-center text-[13px] font-extrabold uppercase tracking-widest">
                   Signed Agreement
                 </th>
-                <th className="p-5 text-center text-[11px] font-extrabold uppercase tracking-widest">
+                <th className="p-5 whitespace-nowrap text-center text-[13px] font-extrabold uppercase tracking-widest">
                   Agreement
                 </th>
-                <th className="p-5 text-center text-[11px] font-extrabold uppercase tracking-widest">
+                <th className="p-5 whitespace-nowrap text-center text-[13px] font-extrabold uppercase tracking-widest">
                   Support Docs
                 </th>
               </tr>
@@ -206,12 +190,12 @@ const TrackProgress = () => {
               {paginatedData.length > 0 ? (
                 paginatedData.map((item) => (
                   <tr key={item.id} className="hover:bg-[#F8FAF7] transition-colors group">
-                    <td className="p-5">
+                    <td className="p-5 whitespace-nowrap">
                       <span className="font-mono text-[11px] font-bold text-primary px-2.5 py-1 bg-[#EAF6EF] rounded-lg border border-primary/10">
                         {item.bookingId}
                       </span>
                     </td>
-                    <td className="p-5">
+                    <td className="p-5 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8 ring-2 ring-background shadow-sm">
                           {item.profilePicture && (
@@ -224,7 +208,7 @@ const TrackProgress = () => {
                         <span className="font-bold text-[#1F2E26]">{item.userName}</span>
                       </div>
                     </td>
-                    <td className="p-5 text-xs font-bold text-[#677E73]">{item.spaceBooked}</td>
+                    <td className="p-5 text-sm font-bold text-[#677E73] whitespace-nowrap">{item.spaceBooked}</td>
                     <td className="p-5 text-center">
                       <div className="flex justify-center">
                         <StatusIndicator approved={item.userKycApprovedByAdmin} label="Admin" />

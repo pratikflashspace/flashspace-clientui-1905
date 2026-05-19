@@ -57,10 +57,13 @@ const ReviewModal: React.FC<ReviewModalProps> = ({
           toast.error(response.message || "Failed to update review");
         }
       } else {
-        const spaceModel =
-          booking.type === "virtual_office"
-            ? "VirtualOffice"
-            : "CoworkingSpace";
+        let spaceModel = "CoworkingSpace";
+        const normalizedType = String(booking.type || "").toLowerCase();
+        if (normalizedType === "virtual_office" || normalizedType === "virtualoffice") {
+          spaceModel = "VirtualOffice";
+        } else if (normalizedType === "meeting_room" || normalizedType === "meetingroom") {
+          spaceModel = "MeetingRoom";
+        }
 
         const response = await reviewService.createReview({
           spaceId: booking.spaceId,

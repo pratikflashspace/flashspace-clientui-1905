@@ -1,5 +1,5 @@
-import axios, { isAxiosError } from "axios";
-import { API } from "@/api";
+import { isAxiosError } from "axios";
+import axiosInstance from "@/lib/axios";
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -21,10 +21,9 @@ export const upsertSpaceUserKycBusinessInfo = async (
   payload: UpsertSpaceUserKycBusinessInfoPayload,
 ): Promise<SpaceUserKycResponse> => {
   try {
-    const response = await axios.put<ApiResponse<SpaceUserKycResponse>>(
-      `${API.domain}/api/spacePartner/kyc/business-info`,
+    const response = await axiosInstance.put<ApiResponse<SpaceUserKycResponse>>(
+      "/api/spacePartner/kyc/business-info",
       payload,
-      { withCredentials: true },
     );
 
     if (response.status === 200 && response.data.success) {
@@ -53,11 +52,8 @@ export const getAllSpacePartnerKyc = async (): Promise<
   SpaceUserKycResponse[]
 > => {
   try {
-    const response = await axios.get<ApiResponse<SpaceUserKycResponse[]>>(
-      `${API.domain}/api/admin/spacePartner/kyc`,
-      {
-        withCredentials: true,
-      },
+    const response = await axiosInstance.get<ApiResponse<SpaceUserKycResponse[]>>(
+      "/api/admin/spacePartner/kyc",
     );
     if (response.status === 200 && response.data.success) {
       return response.data.data ?? [];
@@ -91,8 +87,20 @@ export type SpaceUserKycResponse = {
   aadhaarImageRejectMessage?: string;
   panImageRejectMessage?: string;
   videoKycRejectMessage?: string;
-  overallStatus?: "pending" | "approved" | "rejected" | "resubmit";
-  kycStatus?: "pending" | "approved" | "rejected" | "resubmit";
+  companyRegistrationUrl?: string;
+  gstCertificateUrl?: string;
+  bankDetailsProofUrl?: string;
+  addressProofUrl?: string;
+  companyRegistrationStatus?: "pending" | "approved" | "rejected" | "not_started";
+  gstCertificateStatus?: "pending" | "approved" | "rejected" | "not_started";
+  bankDetailsProofStatus?: "pending" | "approved" | "rejected" | "not_started";
+  addressProofStatus?: "pending" | "approved" | "rejected" | "not_started";
+  companyRegistrationRejectMessage?: string;
+  gstCertificateRejectMessage?: string;
+  bankDetailsProofRejectMessage?: string;
+  addressProofRejectMessage?: string;
+  overallStatus?: "pending" | "approved" | "rejected" | "resubmit" | "not_started";
+  kycStatus?: "pending" | "approved" | "rejected" | "resubmit" | "not_started";
   overallRejectMessage?: string;
   // Business info fields
   companyName?: string;
@@ -109,11 +117,8 @@ export type SpaceUserKycResponse = {
 export const getMySpaceUserKyc =
   async (): Promise<SpaceUserKycResponse | null> => {
     try {
-      const response = await axios.get<ApiResponse<SpaceUserKycResponse>>(
-        `${API.domain}/api/spacePartner/kyc`,
-        {
-          withCredentials: true,
-        },
+      const response = await axiosInstance.get<ApiResponse<SpaceUserKycResponse>>(
+        "/api/spacePartner/kyc",
       );
 
       if (response.status === 200 && response.data.success) {
@@ -146,10 +151,9 @@ export const getMySpaceUserKyc =
 
 export const submitSpaceUserKyc = async (): Promise<SpaceUserKycResponse> => {
   try {
-    const response = await axios.post<ApiResponse<SpaceUserKycResponse>>(
-      `${API.domain}/api/spacePartner/kyc/submit`,
+    const response = await axiosInstance.post<ApiResponse<SpaceUserKycResponse>>(
+      "/api/spacePartner/kyc/submit",
       {},
-      { withCredentials: true },
     );
 
     if (response.status === 200 && response.data.success) {
@@ -183,10 +187,9 @@ export const upsertSpaceUserKyc = async (
   payload: UpsertSpaceUserKycPayload,
 ): Promise<SpaceUserKycResponse> => {
   try {
-    const response = await axios.put<ApiResponse<SpaceUserKycResponse>>(
-      `${API.domain}/api/spacePartner/kyc`,
+    const response = await axiosInstance.put<ApiResponse<SpaceUserKycResponse>>(
+      "/api/spacePartner/kyc",
       payload,
-      { withCredentials: true },
     );
 
     if (response.status === 200 && response.data.success) {
@@ -223,15 +226,9 @@ export const uploadSpaceUserKycFile = async (
     formData.append("documentType", documentType);
     formData.append("file", file);
 
-    const response = await axios.post<ApiResponse<SpaceUserKycResponse>>(
-      `${API.domain}/api/spacePartner/kyc/upload`,
+    const response = await axiosInstance.post<ApiResponse<SpaceUserKycResponse>>(
+      "/api/spacePartner/kyc/upload",
       formData,
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      },
     );
 
     if (response.status === 201 && response.data.success) {
@@ -253,3 +250,4 @@ export const uploadSpaceUserKycFile = async (
     throw new Error(message);
   }
 };
+

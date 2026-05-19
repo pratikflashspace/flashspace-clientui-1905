@@ -11,6 +11,7 @@ export const axiosInstance = axios.create({
   withCredentials: true, // Critical: enables sending cookies with cross-origin requests
   headers: {
     'Content-Type': 'application/json',
+    'x-flashspace-csrf': 'true', // CSRF Protection Header
   },
 });
 

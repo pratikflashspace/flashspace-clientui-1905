@@ -104,7 +104,7 @@ export default function TicketsAndTasks() {
     try {
       const ticketRes = await partnerTicketService.getPartnerTickets(1, 100);
       if (ticketRes.success && ticketRes.data) {
-        setTickets(ticketRes.data.tickets);
+        setTickets(ticketRes.data.tickets || []);
       }
 
 
@@ -299,14 +299,19 @@ export default function TicketsAndTasks() {
   };
 
   const stats = useMemo(() => {
-    const open = tickets.filter((t) => (t.status || "").toLowerCase() === "open").length;
-    const inProgress = tickets.filter((t) =>
-      ["in_progress", "escalated"].includes((t.status || "").toLowerCase())
-    ).length;
-    const pendingTasks = tasks.length;
+    const total = tickets.length;
+    const inProgress = tickets.filter((t) => {
+      const s = (t.status || "").toLowerCase();
+      return s === "open" || s === "in_progress" || s === "escalated";
+    }).length;
+    
+    const resolved = tickets.filter((t) => {
+      const s = (t.status || "").toLowerCase();
+      return s === "resolved" || s === "closed";
+    }).length;
 
     // Dynamic Avg Response Time calculation
-    let avgTimeStr = "N/A";
+    let avgTimeStr = "0.0 hrs";
     const ticketsForStats = tickets.filter(t => {
       const hasReply = t.messages && t.messages.some(m => m.sender !== 'user');
       const isResolved = (t.status || "").toLowerCase() === "resolved" || t.resolvedAt;
@@ -331,17 +336,17 @@ export default function TicketsAndTasks() {
       }, 0);
       
       const avgMs = totalDiff / ticketsForStats.length;
-      const mins = Math.floor(avgMs / 60000);
-      const hours = Math.floor(mins / 60);
-      const days = Math.floor(hours / 24);
-      
-      if (days > 0) avgTimeStr = `${days}d ${hours % 24}h`;
-      else if (hours > 0) avgTimeStr = `${hours}h ${mins % 60}m`;
-      else if (mins > 0) avgTimeStr = `${mins}m`;
-      else avgTimeStr = "< 1m";
+      const totalMinutes = Math.round(avgMs / 60000);
+
+      if (totalMinutes < 60) {
+        avgTimeStr = `${totalMinutes} min${totalMinutes !== 1 ? "s" : ""}`;
+      } else {
+        const hours = (totalMinutes / 60).toFixed(1);
+        avgTimeStr = `${hours} hr${Number(hours) !== 1 ? "s" : ""}`;
+      }
     }
 
-    return { open, inProgress, pendingTasks, avgResponse: avgTimeStr };
+    return { total, inProgress, resolved, avgResponse: avgTimeStr };
   }, [tickets, tasks]);
 
   if (loading) {
@@ -357,8 +362,8 @@ export default function TicketsAndTasks() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-4xl">
-            Tickets & <span className="text-primary italic">Tasks</span>
+          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+            Tickets & <span className="text-[#4A6D56] italic">Tasks</span>
           </h1>
           <p className="text-[#164e4e]/70 dark:text-gray-400 mt-1">
             Manage your support tickets and daily team tasks
@@ -380,36 +385,36 @@ export default function TicketsAndTasks() {
 
       {/* Stats */}
       <div className="grid gap-5 sm:grid-cols-4 mb-10">
-        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
-            {stats.open}
+        <div className="bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-[#2D3F33]/15 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[105px] hover:shadow-md transition-all">
+          <p className="text-3xl font-extrabold text-[#0D1B2A] dark:text-white mb-1.5 leading-none">
+            {stats.total}
           </p>
-          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
-            Open Tickets
+          <p className="text-sm font-medium text-[#7A8A81] dark:text-gray-400">
+            Total Tickets
           </p>
         </div>
-        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
+        <div className="bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-[#2D3F33]/15 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[105px] hover:shadow-md transition-all">
+          <p className="text-3xl font-extrabold text-[#0D1B2A] dark:text-white mb-1.5 leading-none">
             {stats.inProgress}
           </p>
-          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
+          <p className="text-sm font-medium text-[#7A8A81] dark:text-gray-400">
             In Progress
           </p>
         </div>
-        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
-            {stats.pendingTasks}
+        <div className="bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-[#2D3F33]/15 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[105px] hover:shadow-md transition-all">
+          <p className="text-3xl font-extrabold text-[#0D1B2A] dark:text-white mb-1.5 leading-none">
+            {stats.resolved}
           </p>
-          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
-            Pending Tasks
+          <p className="text-sm font-medium text-[#7A8A81] dark:text-gray-400">
+            Resolved
           </p>
         </div>
-        <div className="bg-white dark:bg-[#0f0f0f] border border-[#2D3F33]/10 dark:border-white/10 rounded-2xl p-6 shadow-sm">
-          <p className="text-2xl font-bold text-[#164e4e] dark:text-white">
+        <div className="bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-[#2D3F33]/15 dark:border-white/10 rounded-2xl p-6 flex flex-col justify-between min-h-[105px] hover:shadow-md transition-all">
+          <p className="text-3xl font-extrabold text-[#0D1B2A] dark:text-white mb-1.5 leading-none">
             {stats.avgResponse}
           </p>
-          <p className="text-sm text-[#164e4e]/70 dark:text-gray-400">
-            Avg Response
+          <p className="text-sm font-medium text-[#7A8A81] dark:text-gray-400">
+            Avg Response Time
           </p>
         </div>
       </div>

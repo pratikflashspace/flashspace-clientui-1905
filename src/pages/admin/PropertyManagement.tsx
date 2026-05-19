@@ -20,6 +20,7 @@ import { AdminPageSkeleton, TableSkeleton } from "@/components/ui/skeleton-loade
 import { toast } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
+import { cn } from "@/lib/utils";
 
 import {
   getPropertyById,

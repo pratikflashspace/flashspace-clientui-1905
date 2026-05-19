@@ -93,8 +93,8 @@ const FeedbackNPS = () => {
   return (
     <div className="animate-in fade-in duration-500">
       <div className="mb-8">
-        <h1 className="text-4xl">
-          Feedback & <span className="text-primary italic">NPS</span>
+        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+          Feedback & <span className="text-[#4A6D56] italic">NPS</span>
         </h1>
         <p className="text-muted-foreground mt-2">
           Monitor client satisfaction and feedback

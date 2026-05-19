@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   CheckCircle2,
   Clock3,
@@ -162,8 +163,9 @@ const getEffectiveKycStatus = (request: BookingRequest) => {
 };
 
 export default function BookingRequests() {
+  const [searchParams] = useSearchParams();
   const [requests, setRequests] = useState<BookingRequest[]>([]);
-  const [selectedId, setSelectedId] = useState<string>("");
+  const [selectedId, setSelectedId] = useState<string>(searchParams.get("bookingId") || "");
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
@@ -446,8 +448,8 @@ export default function BookingRequests() {
       <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={handleUpload} />
 
       <div>
-        <h1 className="text-4xl font-black tracking-tight text-[#10251a]">
-          Booking <span className="text-primary italic">Requests</span>
+        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+          Booking <span className="text-[#4A6D56] italic">Requests</span>
         </h1>
         <p className="mt-2 text-[#557064]">Verify KYC, exchange agreements, and publish final booking documents.</p>
       </div>

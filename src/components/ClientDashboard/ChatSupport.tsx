@@ -392,7 +392,7 @@ export default function ChatSupport() {
             {/* Main Header */}
             <div className="bg-white border-b border-gray-100 px-8 py-10 shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm z-10">
                 <div>
-                    <h2 className="text-3xl font-black text-[#35503F] tracking-tight text-center md:text-left">Support <span className="text-primary italic">& Tickets</span></h2>
+                    <h2 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight text-center md:text-left">Support <span className="text-[#4A6D56] italic">& Tickets</span></h2>
                     <p className="text-gray-500 font-medium text-sm mt-1 text-center md:text-left">Manage your support queries and interactions.</p>
                 </div>
 

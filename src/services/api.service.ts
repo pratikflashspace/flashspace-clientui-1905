@@ -1,5 +1,8 @@
 import axios from "axios";
 
+// Set global axios defaults for security headers
+axios.defaults.headers.common["x-flashspace-csrf"] = "true";
+
 /**
  * Central API Service Configuration
  * Handles all HTTP requests with centralized error handling and base URL management
@@ -22,6 +25,7 @@ const axiosInstance = axios.create({
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
+    "x-flashspace-csrf": "true",
   },
 });
 

@@ -11,6 +11,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { NotificationProvider } from "./contexts/NotificationProvider";
 import { ChatProvider } from "@/contexts/ChatContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // --- Lazy Loaded Pages (Optimized Bundle) ---
 const Index = lazy(() => import("./pages/Index"));
@@ -124,7 +125,7 @@ const LeaderBoard = lazy(() => import("./pages/affiliatePortal/LeaderBoard"));
 const Support = lazy(() => import("./pages/affiliatePortal/Support"));
 const AffiliateKYC = lazy(() => import("./pages/affiliatePortal/KYC"));
 const AffiliateNotifications = lazy(() => import("./pages/affiliatePortal/Notifications"));
-const AffiliateClientManagement = lazy(() => import("./pages/affiliatePortal/AffiliateClientManagement"));
+const AffiliateClientManagement = lazy(() => import("@/pages/affiliatePortal/AffiliateClientManagement"));
 
 import MouseFollower from "./components/MouseFollower";
 import ScrollToTop from "./components/ScrollToTop";
@@ -191,8 +192,9 @@ const App = () => (
                   <ScrollToTop />
                   {/* <MouseFollower/> */}
                   <Suspense fallback={<LoadingScreen />}>
-                    <Routes>
-                      {/* Public Routes */}
+                    <ErrorBoundary>
+                      <Routes>
+                        {/* Public Routes */}
 
                       <Route path="/" element={<Index />} />
                       <Route path="/services" element={<Services />} />
@@ -583,7 +585,8 @@ const App = () => (
                       {/* 404 Route */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
-                  </Suspense>
+                  </ErrorBoundary>
+                </Suspense>
                 </ChatProvider>
             </NotificationProvider>
           </SocketProvider>

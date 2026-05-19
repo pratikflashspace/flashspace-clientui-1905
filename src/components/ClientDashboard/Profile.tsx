@@ -21,6 +21,7 @@ import {
   AlertCircle,
   RefreshCw,
   ShieldCheck,
+  Eye,
 } from "lucide-react";
 import { Country, State, City } from "country-state-city";
 import { toast } from "sonner";
@@ -43,7 +44,7 @@ interface ProfileDataState {
 }
 
 const Profile: React.FC = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, refreshProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<"personal" | "company" | "kyc">(
     "personal",
@@ -200,6 +201,24 @@ const Profile: React.FC = () => {
 
     fetchProfileData();
   }, [user]);
+
+  // Double polling on mount to fetch and sync latest user profile details (cover image, profile picture)
+  useEffect(() => {
+    refreshProfile();
+
+    const t1 = setTimeout(() => {
+      refreshProfile();
+    }, 800);
+
+    const t2 = setTimeout(() => {
+      refreshProfile();
+    }, 2000);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
 
   const fetchPincodeDetails = async (pincode: string) => {
     if (pincode.length !== 6) return;
@@ -444,9 +463,35 @@ const Profile: React.FC = () => {
     { id: "company", label: "Company Details", icon: Building2 },
   ];
 
+  const [imagePreview, setImagePreview] = useState<{ url: string; title: string } | null>(null);
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
+        {/* Image Preview Modal */}
+        {imagePreview && (
+          <div 
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-200"
+            onClick={() => setImagePreview(null)}
+          >
+            <button 
+              className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all z-[110]"
+              onClick={() => setImagePreview(null)}
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="relative max-w-5xl w-full h-full flex flex-col items-center justify-center gap-4">
+              <img 
+                src={imagePreview.url} 
+                alt={imagePreview.title} 
+                className="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl shadow-black/50"
+                onClick={(e) => e.stopPropagation()}
+              />
+              <p className="text-white/80 font-bold text-lg tracking-wide">{imagePreview.title}</p>
+            </div>
+          </div>
+        )}
+
         {/* Loading State */}
         {loading && (
           <div className="flex items-center justify-center min-h-[400px]">
@@ -476,8 +521,8 @@ const Profile: React.FC = () => {
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="space-y-1">
-                <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
-                  My <span className="text-primary italic">Profile</span>
+                <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+                  My Profile
                 </h1>
                 <p className="text-sm md:text-base text-gray-500 font-medium">
                   Manage your personal information and company details
@@ -513,16 +558,24 @@ const Profile: React.FC = () => {
             {/* Profile Info Card */}
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             {/* Cover Image */}
-            <div className="h-48 relative group/cover">
+            <div className="h-48 relative group/cover cursor-pointer overflow-hidden">
               {user?.coverImage ? (
                 <img 
                   src={user.coverImage.startsWith('http') ? user.coverImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.coverImage}`} 
                   alt="Cover" 
-                  className="w-full h-full object-cover" 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover/cover:scale-110" 
+                  onClick={() => setImagePreview({ 
+                    url: user.coverImage!.startsWith('http') ? user.coverImage! : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.coverImage}`, 
+                    title: "Cover Picture" 
+                  })}
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-r from-[#35503F]/20 to-[#35503F]/5" />
               )}
+              
+              <div className="absolute inset-0 bg-black/0 group-hover/cover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover/cover:opacity-100" onClick={() => user?.coverImage && setImagePreview({ url: user.coverImage.startsWith('http') ? user.coverImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.coverImage}`, title: "Cover Picture" })}>
+                <Eye className="w-8 h-8 text-white" />
+              </div>
               
               <label className="absolute bottom-4 right-4 w-12 h-12 bg-white border border-gray-100 rounded-2xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all shadow-lg text-[#35503F] z-20 group-hover/cover:scale-105">
                 <Camera className="w-6 h-6" />
@@ -556,12 +609,18 @@ const Profile: React.FC = () => {
                 <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-16 relative z-10">
                   {/* Profile Image */}
                   <div className="relative group">
-                    <div className="w-32 h-32 rounded-3xl bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02] relative">
+                    <div 
+                      className="w-32 h-32 rounded-3xl bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02] relative cursor-pointer"
+                      onClick={() => profileImage && setImagePreview({ 
+                        url: profileImage.startsWith('http') ? profileImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${profileImage}`, 
+                        title: "Profile Picture" 
+                      })}
+                    >
                       {profileImage ? (
                         <img 
                           src={profileImage.startsWith('http') ? profileImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${profileImage}`} 
                           alt="Profile" 
-                          className="w-full h-full object-cover" 
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-50 flex items-center justify-center">
@@ -569,6 +628,10 @@ const Profile: React.FC = () => {
                         </div>
                       )}
                       
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <Eye className="w-6 h-6 text-white" />
+                      </div>
+
                       {uploadingImage && (
                         <div className="absolute inset-0 bg-black/20 flex items-center justify-center backdrop-blur-[2px]">
                           <Loader2 className="w-8 h-8 text-white animate-spin" />
@@ -605,7 +668,16 @@ const Profile: React.FC = () => {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 w-fit max-w-full overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth">
+            <div className="relative flex p-1 rounded-2xl shadow-inner bg-gray-200/60 w-fit max-w-full overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth h-auto border border-gray-300/30">
+              {/* Sliding Indicator */}
+              <div 
+                className="absolute inset-y-1 transition-all duration-300 ease-out bg-white rounded-xl shadow-lg ring-1 ring-black/5"
+                style={{
+                  left: activeTab === "personal" ? "4px" : activeTab === "kyc" ? "calc(33.33% + 4px)" : "calc(66.66% + 4px)",
+                  width: "calc(33.33% - 8px)"
+                }}
+              />
+              
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -613,10 +685,10 @@ const Profile: React.FC = () => {
                     setActiveTab(tab.id as typeof activeTab);
                     setIsEditing(false);
                   }}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                  className={`relative z-10 flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
                     activeTab === tab.id
-                      ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+                      ? "text-[#35503F] font-black"
+                      : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   <tab.icon className="w-4 h-4" />

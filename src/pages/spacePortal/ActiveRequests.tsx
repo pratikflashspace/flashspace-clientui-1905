@@ -140,8 +140,8 @@ export default function ActiveRequests() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-4xl">
-            Active <span className="text-primary italic">Requests</span>
+          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
+            Active <span className="text-[#4A6D56] italic">Requests</span>
           </h1>
           <p className="text-muted-foreground mt-2 text-lg">
             Manage incoming booking requests and coordinate with prospective

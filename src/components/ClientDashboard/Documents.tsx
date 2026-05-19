@@ -17,6 +17,7 @@ export default function Documents() {
     const [isPreviewing, setIsPreviewing] = useState<string | null>(null);
     const [previewDocument, setPreviewDocument] = useState<{ title: string; url: string; type: string } | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
+    const [activeTab, setActiveTab] = useState("invoice");
     const [filterStatus, setFilterStatus] = useState("all");
 
     const [currentInvoicePage, setCurrentInvoicePage] = useState(1);
@@ -295,8 +296,8 @@ export default function Documents() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#35503F] tracking-tight">
-              Docu<span className="text-primary italic">ments</span>
+            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+              Documents
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your agreements, invoices, and KYC documents
@@ -350,31 +351,43 @@ export default function Documents() {
           </div>
         </div>
 
-        <Tabs defaultValue="invoice" className="w-full space-y-6">
-          <TabsList className="flex p-1.5 rounded-2xl shadow-sm bg-gray-100/80 w-fit max-w-full overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth h-auto">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+          <TabsList className="relative flex p-1 rounded-2xl shadow-inner bg-gray-200/60 w-full lg:w-[800px] overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth h-auto border border-gray-300/30">
+            {/* Sliding Indicator */}
+            <div 
+              className="absolute inset-y-1 transition-all duration-300 ease-out bg-white rounded-xl shadow-lg ring-1 ring-black/5"
+              style={{
+                left: activeTab === "agreement" ? "4px" : 
+                      activeTab === "invoice" ? "calc(25% + 4px)" : 
+                      activeTab === "kyc" ? "calc(50% + 4px)" : 
+                      "calc(75% + 4px)",
+                width: "calc(25% - 8px)"
+              }}
+            />
+            
             <TabsTrigger
               value="agreement"
-              className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+              className="relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:text-[#35503F] data-[state=active]:font-black text-gray-500 hover:text-gray-700 bg-transparent shadow-none border-none ring-0 focus-visible:ring-0"
             >
               Agreement
             </TabsTrigger>
             <TabsTrigger
               value="invoice"
-              className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+              className="relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:text-[#35503F] data-[state=active]:font-black text-gray-500 hover:text-gray-700 bg-transparent shadow-none border-none ring-0 focus-visible:ring-0"
             >
               Invoice
             </TabsTrigger>
             <TabsTrigger
               value="kyc"
-              className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+              className="relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:text-[#35503F] data-[state=active]:font-black text-gray-500 hover:text-gray-700 bg-transparent shadow-none border-none ring-0 focus-visible:ring-0"
             >
               KYC Documents
             </TabsTrigger>
             <TabsTrigger
               value="supporting"
-              className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-black/5 text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
+              className="relative z-10 flex-1 px-4 py-2.5 rounded-xl text-sm font-bold transition-all data-[state=active]:text-[#35503F] data-[state=active]:font-black text-gray-500 hover:text-gray-700 bg-transparent shadow-none border-none ring-0 focus-visible:ring-0"
             >
-              Supporting Documents
+              Supporting Docs
             </TabsTrigger>
           </TabsList>
 
@@ -399,15 +412,15 @@ export default function Documents() {
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="bg-gray-50/80 border-b border-gray-100">
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Booking No.</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Space Name</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Document Name</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Date</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600 text-right">Action</th>
+                                        <tr className="bg-gray-50/80 border-b border-gray-200">
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Booking No.</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Space Name</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Document Name</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Date</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500 text-right">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100">
+                                    <tbody className="divide-y divide-gray-200/60">
                                         {paginatedAgreements.map((doc, idx) => (
                                             <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-6 py-4 font-bold text-[#35503F]">{doc.bookingNumber}</td>
@@ -504,16 +517,16 @@ export default function Documents() {
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="bg-gray-50/80 border-b border-gray-100">
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Invoice No.</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Date</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Description</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Amount</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Status</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600 text-right">Action</th>
+                                        <tr className="bg-gray-50/80 border-b border-gray-200">
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Invoice No.</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Date</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Description</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Amount</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Status</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500 text-right">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100">
+                                    <tbody className="divide-y divide-gray-200/60">
                                         {filteredInvoices.length === 0 ? (
                                             <tr>
                                                 <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
@@ -622,16 +635,16 @@ export default function Documents() {
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="bg-gray-50/80 border-b border-gray-100">
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Belongs To</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Document Name</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Type</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Upload Date</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600">Status</th>
-                                            <th className="px-6 py-4 text-sm font-semibold text-gray-600 text-right">Action</th>
+                                        <tr className="bg-gray-50/80 border-b border-gray-200">
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Belongs To</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Document Name</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Type</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Upload Date</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500">Status</th>
+                                            <th className="px-6 py-5 text-sm font-bold text-gray-500 text-right">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100">
+                                    <tbody className="divide-y divide-gray-200/60">
                                         {filteredKycDocuments.length === 0 ? (
                                             <tr>
                                                 <td colSpan={6} className="px-6 py-8 text-center text-gray-500">

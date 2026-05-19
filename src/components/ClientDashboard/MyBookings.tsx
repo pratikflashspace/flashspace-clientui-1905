@@ -96,6 +96,10 @@ const MyBookings: React.FC = () => {
     null,
   );
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 6;
+
   const fetchBookings = async (isSilent = false) => {
     if (!isSilent) setLoading(true);
     setError(null);
@@ -109,15 +113,15 @@ const MyBookings: React.FC = () => {
       const response = await userDashboardService.getBookings({
         type: activeTab === "all" ? undefined : (typeMap[activeTab] as any),
         status: statusFilter === "all" ? undefined : statusFilter,
+        page: currentPage,
+        limit: itemsPerPage,
       });
       if (response.success && response.data) {
         setBookings(response.data);
 
-        // Only update stats if we are fetching "all" without filters, 
-        // to prevent filtered tab requests from overriding global stats.
+        // Only update stats if we are fetching "all" without filters
         if (activeTab === "all" && statusFilter === "all") {
           let stats = response.stats;
-          // Fallback: compute stats from data if API stats are missing or all zeros
           const isStatsEmpty = !stats || (
             stats.total === 0 &&
             stats.active === 0 &&
@@ -143,8 +147,10 @@ const MyBookings: React.FC = () => {
 
         if (response.pagination) {
           setTotalCount(response.pagination.total);
+          setTotalPages(response.pagination.pages || Math.ceil(response.pagination.total / itemsPerPage));
         } else {
           setTotalCount(response.data.length);
+          setTotalPages(1);
         }
       } else {
         if (!isSilent) setError(response.message || "Failed to load bookings");
@@ -157,6 +163,10 @@ const MyBookings: React.FC = () => {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, statusFilter]);
+
+  useEffect(() => {
     fetchBookings();
 
     // Set up polling every 5 seconds
@@ -165,7 +175,7 @@ const MyBookings: React.FC = () => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [activeTab, statusFilter]);
+  }, [activeTab, statusFilter, currentPage]);
 
   useEffect(() => {
     const openBookingId = searchParams.get("openBooking");
@@ -567,7 +577,7 @@ const MyBookings: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
             <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
-              My <span className="text-[#35503F] italic">Bookings</span>
+              My Bookings
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your virtual offices and coworking spaces
@@ -769,7 +779,7 @@ const MyBookings: React.FC = () => {
               return (
                 <div
                   key={booking._id}
-                  className="bg-white rounded-2xl p-4 shadow-md border border-gray-200 hover:shadow-lg transition-shadow group relative"
+                  className="bg-white rounded-2xl p-4 shadow-md border border-gray-200 hover:border-[#35503F]/40 hover:shadow-lg transition-all group relative"
                 >
                   {/* Header: ID & Status */}
                   <div className="flex items-center justify-between mb-3">
@@ -799,10 +809,7 @@ const MyBookings: React.FC = () => {
                         className={`px-2 py-0.5 rounded-full text-[9px] font-medium border shrink-0 ${booking.type === "VirtualOffice" ||
                           booking.type === "virtual_office"
                           ? "bg-gray-50 border-gray-200 text-gray-600"
-                          : booking.type === "MeetingRoom" ||
-                            booking.type === "meeting_room"
-                            ? "bg-purple-50 border-purple-100 text-purple-600"
-                            : "bg-blue-50 border-blue-100 text-blue-600"
+                          : "bg-gray-50 border-gray-200 text-gray-600"
                           }`}
                       >
                         {booking.type === "VirtualOffice" ||
@@ -935,6 +942,48 @@ const MyBookings: React.FC = () => {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Pagination UI */}
+        {totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 pb-12 border-t border-gray-100">
+            <div className="text-sm font-medium text-gray-500">
+              Showing page <span className="text-[#35503F] font-bold">{currentPage}</span> of <span className="text-[#35503F] font-bold">{totalPages}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-all"
+              >
+                <ChevronDown className="w-4 h-4 rotate-90" /> Previous
+              </button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${
+                      currentPage === page
+                        ? "bg-[#35503F] text-[#FEF8C3] shadow-md"
+                        : "text-gray-500 hover:bg-gray-100"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-all"
+              >
+                Next <ChevronDown className="w-4 h-4 -rotate-90" />
+              </button>
+            </div>
           </div>
         )}
 

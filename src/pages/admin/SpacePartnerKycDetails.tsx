@@ -34,6 +34,7 @@ import {
   Mail,
   MapPin,
   Building2,
+  CreditCard,
 } from "lucide-react";
 import { KYCDetailSkeleton } from "@/components/ui/skeleton-loaders";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
@@ -96,6 +97,10 @@ const DOC_STATUS_KEY_MAP: Record<
   aadhaar_image: "aadhaarImageStatus",
   pan_image: "panImageStatus",
   video_kyc: "videoKycStatus",
+  company_registration: "companyRegistrationStatus",
+  gst_certificate: "gstCertificateStatus",
+  bank_details_proof: "bankDetailsProofStatus",
+  address_proof: "addressProofStatus",
 };
 
 const DOC_REJECT_KEY_MAP: Record<
@@ -105,6 +110,10 @@ const DOC_REJECT_KEY_MAP: Record<
   aadhaar_image: "aadhaarImageRejectMessage",
   pan_image: "panImageRejectMessage",
   video_kyc: "videoKycRejectMessage",
+  company_registration: "companyRegistrationRejectMessage",
+  gst_certificate: "gstCertificateRejectMessage",
+  bank_details_proof: "bankDetailsProofRejectMessage",
+  address_proof: "addressProofRejectMessage",
 };
 
 const mergeKycResponse = (
@@ -419,22 +428,19 @@ export default function SpacePartnerKycDetails() {
     }
 
     if (!request) return false;
-    // If videoKycStatus is not required, only check aadhaar and pan
-    if (
-      request.videoKycUrl === undefined ||
-      request.videoKycUrl === null ||
-      request.videoKycUrl === ""
-    ) {
-      return [request.aadhaarImageStatus, request.panImageStatus].every(
-        (s) => s === "approved",
-      );
-    }
-    // If videoKycUrl exists, require all three to be approved
-    return [
-      request.aadhaarImageStatus,
-      request.panImageStatus,
-      request.videoKycStatus,
-    ].every((s) => s === "approved");
+
+    // Check statuses of all uploaded documents
+    const requiredDocs: string[] = [];
+    if (request.aadhaarImageUrl) requiredDocs.push(request.aadhaarImageStatus || "pending");
+    if (request.panImageUrl) requiredDocs.push(request.panImageStatus || "pending");
+    if (request.videoKycUrl) requiredDocs.push(request.videoKycStatus || "pending");
+    if (request.companyRegistrationUrl) requiredDocs.push(request.companyRegistrationStatus || "pending");
+    if (request.gstCertificateUrl) requiredDocs.push(request.gstCertificateStatus || "pending");
+    if (request.bankDetailsProofUrl) requiredDocs.push(request.bankDetailsProofStatus || "pending");
+    if (request.addressProofUrl) requiredDocs.push(request.addressProofStatus || "pending");
+
+    if (requiredDocs.length === 0) return false;
+    return requiredDocs.every((status) => status === "approved");
   }, [request, propertyId, focusedProperty]);
 
   if (loading || !request) {
@@ -558,6 +564,104 @@ export default function SpacePartnerKycDetails() {
                     <span className="text-muted-foreground text-xs sm:text-sm">Aadhaar Number:</span>
                     <span className="font-bold text-foreground font-mono">
                       {request.aadhaarNumber || "N/A"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Space Details (Business Info) */}
+              <div className="bg-background rounded-2xl shadow-sm border border-border p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Building2 className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-foreground">Space Details</h3>
+                </div>
+                <div className="space-y-4 text-sm">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Company Name:</span>
+                    <span className="font-bold text-foreground text-right">
+                      {request.companyName || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Company Type:</span>
+                    <span className="font-bold text-foreground capitalize">
+                      {request.companyType || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Industry:</span>
+                    <span className="font-bold text-foreground">
+                      {request.industry || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">GST Number:</span>
+                    <span className="font-bold text-foreground font-mono">
+                      {request.gstNumber || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">CIN/Registration:</span>
+                    <span className="font-bold text-foreground font-mono">
+                      {request.cinRegistrationNumber || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Registered Address:</span>
+                    <span className="font-bold text-foreground break-all sm:break-normal text-right sm:max-w-[180px]">
+                      {request.registeredAddress || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Contact Phone:</span>
+                    <span className="font-bold text-foreground font-mono">
+                      {request.contactPhone || "N/A"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bank Details */}
+              <div className="bg-background rounded-2xl shadow-sm border border-border p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <CreditCard className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-foreground">Bank Details</h3>
+                </div>
+                <div className="space-y-4 text-sm">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Holder Name:</span>
+                    <span className="font-bold text-foreground text-right">
+                      {request.accountHolderName || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Bank Name:</span>
+                    <span className="font-bold text-foreground">
+                      {request.bankName || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Account Number:</span>
+                    <span className="font-bold text-foreground font-mono">
+                      {request.accountNumber || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">IFSC Code:</span>
+                    <span className="font-bold text-foreground font-mono">
+                      {request.ifscCode || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Branch:</span>
+                    <span className="font-bold text-foreground">
+                      {request.branch || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                    <span className="text-muted-foreground text-xs sm:text-sm">Account Type:</span>
+                    <span className="font-bold text-foreground">
+                      {request.accountType || "N/A"}
                     </span>
                   </div>
                 </div>
@@ -760,6 +864,34 @@ export default function SpacePartnerKycDetails() {
                     </div>
                   ))
                 : [
+                    {
+                      id: "company_registration",
+                      keyUrl: "companyRegistrationUrl" as keyof SpaceUserKycResponse,
+                      keyStatus: "companyRegistrationStatus" as keyof SpaceUserKycResponse,
+                      title: "Company Registration Certificate",
+                      docType: "company_registration" as SpaceUserKycDocumentType,
+                    },
+                    {
+                      id: "gst_certificate",
+                      keyUrl: "gstCertificateUrl" as keyof SpaceUserKycResponse,
+                      keyStatus: "gstCertificateStatus" as keyof SpaceUserKycResponse,
+                      title: "GST Certificate",
+                      docType: "gst_certificate" as SpaceUserKycDocumentType,
+                    },
+                    {
+                      id: "bank_details_proof",
+                      keyUrl: "bankDetailsProofUrl" as keyof SpaceUserKycResponse,
+                      keyStatus: "bankDetailsProofStatus" as keyof SpaceUserKycResponse,
+                      title: "Bank Details Proof",
+                      docType: "bank_details_proof" as SpaceUserKycDocumentType,
+                    },
+                    {
+                      id: "address_proof",
+                      keyUrl: "addressProofUrl" as keyof SpaceUserKycResponse,
+                      keyStatus: "addressProofStatus" as keyof SpaceUserKycResponse,
+                      title: "Address Proof",
+                      docType: "address_proof" as SpaceUserKycDocumentType,
+                    },
                     {
                       id: "video",
                       keyUrl: "videoKycUrl" as keyof SpaceUserKycResponse,
