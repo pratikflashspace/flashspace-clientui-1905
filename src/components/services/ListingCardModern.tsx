@@ -230,13 +230,17 @@ const ListingCardModern = memo<ListingCardModernProps>(
           {/* Availability Badge */}
           {!item.popular && (
             <div className="absolute top-3 left-3 z-10">
-              <span className="bg-primary text-primary-foreground text-[10px] font-normal px-2.5 py-1 rounded-full shadow-sm">
+              <span className="bg-white/95 backdrop-blur-sm text-[#1F2E26] text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg border border-black/5 flex items-center gap-1.5 uppercase tracking-tight">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+                </span>
                 Available Now
               </span>
             </div>
           )}
 
-          {/* Availability Badge */}
+          {/* Bottom Availability Badge */}
           {item.availability && (
             <div className="absolute bottom-3 left-3">
               <span className="bg-white/95 backdrop-blur-sm text-gray-700 text-xs px-2.5 py-1 rounded-full font-medium shadow-sm">
@@ -374,7 +378,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
           <div className="flex gap-2 mt-auto">
             <button
               onClick={handleCardClick}
-              className="flex-[1.4] bg-[#FEF8C5] text-[#36503F] text-sm font-bold py-2.5 px-4 rounded-full hover:bg-[#F7ED9A] transition-all active:scale-[0.98]"
+              className="flex-[1.4] bg-[#36503F] text-[#FEF8C5] text-sm font-bold py-2.5 px-4 rounded-full hover:bg-[#1F2E26] transition-all active:scale-[0.98]"
             >
               Get Best Price
             </button>
@@ -383,7 +387,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
                 e.stopPropagation();
                 window.dispatchEvent(new CustomEvent('open-contact-modal'));
               }}
-              className="flex-1 flex items-center justify-center gap-1.5 border border-border text-sm font-normal text-foreground py-2.5 px-2 rounded-xl hover:bg-muted/50 transition-all active:scale-[0.98]"
+              className="flex-1 flex items-center justify-center gap-1.5 border border-[#36503F] bg-[#36503F] text-sm font-semibold text-[#FEF8C5] py-2.5 px-2 rounded-xl hover:bg-[#1F2E26] transition-all active:scale-[0.98]"
             >
               <Phone className="w-4 h-4" />
               Contact Sales

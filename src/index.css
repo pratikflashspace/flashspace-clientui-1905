@@ -272,13 +272,13 @@
   }
 
   .fs-primary-btn {
-    background: var(--flash-yellow);
-    color: var(--flash-forest);
-    border: 1px solid var(--flash-yellow);
+    background: var(--flash-forest);
+    color: var(--flash-yellow);
+    border: 1px solid var(--flash-forest);
   }
 
   .fs-primary-btn:hover {
-    background: #F7ED9A;
+    background: #1F2E26;
     transform: scale(1.01);
   }
 
@@ -287,25 +287,27 @@
   }
 
   .fs-secondary-btn {
-    background: transparent;
-    color: var(--flash-forest);
+    background: var(--flash-forest);
+    color: var(--flash-yellow);
     border: 1.5px solid var(--flash-forest);
     font-weight: 600;
   }
 
   .fs-secondary-btn:hover {
-    background: var(--flash-forest-10);
+    background: #1F2E26;
   }
 
   .fs-ghost-btn {
-    color: var(--flash-forest);
-    padding: 0;
+    background: var(--flash-forest);
+    color: var(--flash-yellow);
+    border: 1px solid var(--flash-forest);
+    padding: 10px 18px;
     font-size: 13px;
     font-weight: 600;
   }
 
   .fs-ghost-btn:hover {
-    text-decoration: underline;
+    background: #1F2E26;
   }
 
   .fs-card {
@@ -556,6 +558,22 @@
 
   100% {
     transform: translateX(-50%);
+  }
+}
+
+@keyframes header-glass-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translateX(calc(100vw + 160px)) skewX(-12deg);
+    opacity: 0;
   }
 }
 

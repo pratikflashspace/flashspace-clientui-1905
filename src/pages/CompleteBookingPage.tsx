@@ -549,7 +549,7 @@ const CompleteBookingPage = () => {
                                         <button
                                             onClick={handleApplyCoupon}
                                             disabled={couponLoading || !couponCode.trim()}
-                                            className="px-4 py-2 bg-[#FEF865] text-[#36503F] text-sm font-bold rounded-lg hover:bg-[#f5e84a] disabled:opacity-50 transition-colors"
+                                            className="px-4 py-2 bg-[#36503F] text-[#FEF8C5] text-sm font-bold rounded-lg hover:bg-[#1F2E26] disabled:opacity-50 transition-colors"
                                         >
                                             {couponLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
                                         </button>
@@ -582,7 +582,7 @@ const CompleteBookingPage = () => {
                                 <button
                                     onClick={handlePayment}
                                     disabled={paymentLoading}
-                                    className="w-full py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md disabled:opacity-70"
+                                    className="w-full py-4 bg-[#36503F] hover:bg-[#1F2E26] text-[#FEF8C5] font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm shadow-sm hover:shadow-md disabled:opacity-70"
                                 >
                                     {paymentLoading ? (
                                         <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
@@ -595,7 +595,7 @@ const CompleteBookingPage = () => {
                                     <button
                                         onClick={handleSimulatePayment}
                                         disabled={paymentLoading}
-                                        className="w-full mt-2 py-3 border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-xs"
+                                        className="w-full mt-2 py-3 border-2 border-dashed border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-xs"
                                     >
                                         {paymentLoading ? (
                                             <><Loader2 className="w-4 h-4 animate-spin" /> Simulating…</>

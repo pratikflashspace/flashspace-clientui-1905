@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, CalendarDays, FileCheck, Globe2, Headphones, Users } from "lucide-react";
+import { ArrowRight, Building2, CalendarDays, FileCheck, Headphones, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const productCards = [
@@ -6,7 +6,6 @@ const productCards = [
   { title: "Coworking Space", body: "Flexible desks and private cabins in verified workspaces across major Indian cities.", icon: Users, href: "/services/coworking-space" },
   { title: "Meeting Rooms", body: "Professional rooms by the hour for interviews, reviews, client calls, and team sessions.", icon: CalendarDays, href: "/solutions/meeting-rooms" },
   { title: "Business Setup", body: "NOC, agreements, utility bills, and address documents prepared for regulatory use.", icon: FileCheck, href: "/services/business-setup" },
-  { title: "Global Access", body: "Coordinate workspace needs across branches, cities, and distributed teams from one account.", icon: Globe2, href: "/solutions/on-demand" },
   { title: "Support Desk", body: "Real operations support before, during, and after your workspace or address booking.", icon: Headphones, href: "/help" },
 ];
 import { Link } from "react-router-dom";

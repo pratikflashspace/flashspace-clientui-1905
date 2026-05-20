@@ -22,11 +22,20 @@ export const CTA = () => {
             Ready to transform your business setup?
           </h2>
 
-          <div className="mx-auto mt-8 grid max-w-3xl gap-6 text-left sm:grid-cols-3">
+          <div className="mx-auto mt-12 grid max-w-4xl gap-5 text-left sm:grid-cols-3 sm:gap-6">
             {highlights.map((item) => (
-              <div key={item.tag}>
-                <span className="fs-tag mb-3">{item.tag}</span>
-                <p className="text-sm font-medium leading-[1.6] text-[#1A1A1A]">{item.text}</p>
+              <div
+                key={item.tag}
+                className="group flex flex-col justify-between rounded-[24px] border border-[#D4E0D0]/80 bg-white p-6 shadow-[0_8px_24px_rgba(31,46,38,0.02)] transition-all duration-300 hover:-translate-y-1 hover:border-[#6B8F78]/40 hover:shadow-[0_12px_32px_rgba(31,46,38,0.06)]"
+              >
+                <div className="flex flex-col items-center text-center">
+                  <span className="inline-flex items-center rounded-full bg-[#EEF2EE] px-3 py-1.5 text-xs font-bold tracking-wide text-[#36503F] transition-colors group-hover:bg-[#36503F] group-hover:text-[#FEF8C5]">
+                    {item.tag}
+                  </span>
+                  <p className="mt-5 text-[15px] font-medium leading-relaxed text-[#1F2E26]">
+                    {item.text}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

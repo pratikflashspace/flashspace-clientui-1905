@@ -7,6 +7,7 @@ import { LoginModal } from "@/components/auth/LoginModal";
 import { SignupModal } from "@/components/auth/SignupModal";
 import { PartnerChoiceModal } from "@/components/auth/PartnerChoiceModal";
 import { GetInTouchModal } from "@/components/modals/GetInTouchModal";
+import { getUploadedFileUrl } from "@/utils/fileUrl";
 import {
     getDefaultLoginUrl,
     getLoginRedirectUrl,
@@ -218,15 +219,34 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
         setIsSignupOpen(true);
     };
 
+    const profilePictureUrl = user?.profilePicture
+        ? getUploadedFileUrl(user.profilePicture)
+        : "";
+
   return (
     <>
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-[100] h-14 border-b border-transparent bg-[#FAFAF7] transition-all duration-300 md:h-16",
-          scrolled && "border-white/15 bg-[#FAFAF7]/90 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-xl supports-[backdrop-filter]:bg-[#FAFAF7]/95"
+          "fixed inset-x-0 top-0 z-[100] h-14 border-b border-transparent bg-[#FAFAF7] transition-[background-color,box-shadow,border-color,backdrop-filter] duration-500 ease-out md:h-16",
+          scrolled && "border-[#36503F]/10 bg-[#FAFAF7]/70 shadow-[0_12px_36px_rgba(54,80,63,0.12)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[#FAFAF7]/65"
         )}
       >
-        <div className="fs-container flex h-full items-center justify-between">
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-0 transition-opacity duration-500",
+            scrolled ? "opacity-100" : "opacity-0"
+          )}
+        >
+          <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.58),rgba(255,255,255,0.24)_38%,rgba(254,248,197,0.18)_62%,rgba(54,80,63,0.08))]" />
+          <div className="absolute -left-28 top-0 h-full w-28 -skew-x-12 bg-white/35 blur-md animate-[header-glass-sweep_3s_ease-in-out_infinite]" />
+        </div>
+        <div
+          className={cn(
+            "pointer-events-none absolute bottom-0 left-0 h-[2px] w-full origin-center scale-x-0 bg-gradient-to-r from-transparent via-[#36503F]/35 to-transparent opacity-0 transition-all duration-500",
+            scrolled && "scale-x-100 opacity-100"
+          )}
+        />
+        <div className="fs-container relative z-10 flex h-full items-center justify-between">
           <Link
             to="/"
             aria-label="FlashSpace home"
@@ -252,7 +272,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                   <button
                     type="button"
                     onClick={() => setIsSolutionsOpen((value) => !value)}
-                    className="flex items-center gap-1 text-sm font-medium text-white/75 transition-colors hover:text-white"
+                    className="flex items-center gap-1 text-sm font-medium text-[#36503F] transition-colors hover:text-[#1F2E26]"
                   >
                     {item.label}
                     <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", isSolutionsOpen && "rotate-180")} />
@@ -281,7 +301,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                 <Link
                   key={item.label}
                   to={item.href}
-                  className="text-sm font-medium text-white/75 transition-colors hover:text-white"
+                  className="text-sm font-medium text-[#36503F] transition-colors hover:text-[#1F2E26]"
                 >
                   {item.label}
                 </Link>
@@ -292,7 +312,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsContactOpen(true)}
-              className="hidden rounded-full bg-[#FEF8C5] px-5 py-2 text-[13px] font-bold text-[#36503F] transition-transform hover:scale-[1.01] active:scale-[0.99] sm:inline-flex"
+              className="hidden rounded-full bg-[#36503F] px-5 py-2 text-[13px] font-bold text-[#FEF8C5] transition-transform hover:scale-[1.01] hover:bg-[#1F2E26] active:scale-[0.99] sm:inline-flex"
             >
               Get started
             </button>
@@ -301,12 +321,19 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
               <div ref={userMenuRef} className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen((value) => !value)}
-                  className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 p-1 pr-2 text-white"
+                  className="flex items-center rounded-full border border-[#36503F]/20 bg-[#36503F]/5 p-1 text-[#36503F]"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-[#36503F]">
-                    {user?.fullName?.charAt(0).toUpperCase() || "U"}
+                  <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white text-sm font-bold text-[#36503F]">
+                    {profilePictureUrl ? (
+                      <img
+                        src={profilePictureUrl}
+                        alt={user?.fullName || "User"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      user?.fullName?.charAt(0).toUpperCase() || "U"
+                    )}
                   </span>
-                  <ChevronDown className={cn("h-4 w-4 transition-transform", isUserMenuOpen && "rotate-180")} />
                 </button>
 
                 {isUserMenuOpen && (
@@ -328,7 +355,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                 )}
               </div>
             ) : (
-              <button onClick={() => navigate("/login")} className="hidden text-sm font-medium text-white/75 hover:text-white sm:inline-flex">
+              <button onClick={() => navigate("/login")} className="hidden text-sm font-medium text-[#36503F] hover:text-[#1F2E26] sm:inline-flex">
                 Sign in
               </button>
             )}
@@ -336,7 +363,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
             <button
               onClick={() => setIsMenuOpen(true)}
               aria-label="Open menu"
-              className="flex h-10 w-10 items-center justify-center rounded-full text-white lg:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-[#36503F] lg:hidden"
             >
               <Menu className="h-5 w-5" />
             </button>
@@ -389,7 +416,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
               )
             ))}
           </nav>
-          <button onClick={() => { closeDrawer(); setIsContactOpen(true); }} className="mt-8 w-full rounded-full bg-[#FEF8C5] px-5 py-3 text-sm font-bold text-[#36503F]">
+          <button onClick={() => { closeDrawer(); setIsContactOpen(true); }} className="mt-8 w-full rounded-full border border-[#FEF8C5]/70 bg-[#36503F] px-5 py-3 text-sm font-bold text-[#FEF8C5] hover:bg-[#1F2E26]">
             Get started
           </button>
         </aside>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Check, Search, Sparkles } from "lucide-react";
 
-const heroIllustrated = "/hero-illustrated.jpg";
+const heroImage = "/heroimage.png";
 const popularCities = ["Ahmedabad", "Bangalore", "Chennai", "Delhi", "Gurgaon", "Hyderabad", "Mumbai", "Noida", "Pune"];
 const otherCities = ["Agra", "Aluva", "Ambala", "Amritsar", "Bhopal", "Chandigarh", "Coimbatore", "Faridabad", "Ghaziabad", "Indore", "Jaipur", "Kochi", "Kolkata", "Lucknow", "Nagpur", "Rajkot", "Surat", "Vadodara", "Vijayawada", "Visakhapatnam"];
 
@@ -31,7 +31,7 @@ export const HeroWithSearch = () => {
 
   return (
     <section className="bg-white pt-14 md:pt-16">
-      <div className="fs-container grid items-center gap-12 py-16 md:py-24 lg:grid-cols-2 lg:pb-24 lg:pt-32">
+      <div className="fs-container grid items-center gap-12 pb-16 pt-8 md:pb-20 md:pt-12 lg:grid-cols-[0.92fr_1.08fr] lg:pb-24 lg:pt-16">
         <div className="mx-auto max-w-[680px] text-center lg:mx-0 lg:text-left">
           <span className="fs-tag">Business workspace platform</span>
           <h1 className="mt-6 text-[40px] font-extrabold leading-[1.15] tracking-[-0.03em] text-[#1A1A1A] sm:text-5xl lg:text-[56px]">
@@ -51,7 +51,7 @@ export const HeroWithSearch = () => {
           </div>
 
           <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs font-medium text-[#6B8F78] sm:gap-6 lg:justify-start">
-            {["GST-ready addresses", "Real Indian support", "68+ cities"].map((item) => (
+            {["GST-ready addresses", "Real Indian support", "80+ cities"].map((item) => (
               <span key={item} className="inline-flex items-center gap-2">
                 <Check className="h-4 w-4 text-[#36503F]" /> {item}
               </span>
@@ -92,7 +92,7 @@ export const HeroWithSearch = () => {
                 <button onClick={submitSearch} className="fs-secondary-btn h-12 px-5 py-0">
                   Search
                 </button>
-                <button onClick={() => setAiMode(true)} className="inline-flex h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold text-[#36503F] hover:underline">
+                <button onClick={() => setAiMode(true)} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#36503F] px-5 text-sm font-semibold text-[#FEF8C5] hover:bg-[#1F2E26]">
                   <Sparkles className="h-4 w-4" /> AI help
                 </button>
               </div>
@@ -109,7 +109,7 @@ export const HeroWithSearch = () => {
                     autoFocus
                   />
                 </label>
-                <button onClick={() => { setAiMode(false); setAiQuery(""); }} className="h-12 px-4 text-sm font-semibold text-[#6B8F78] hover:text-[#1A1A1A]">
+                <button onClick={() => { setAiMode(false); setAiQuery(""); }} className="h-12 rounded-full bg-[#36503F] px-4 text-sm font-semibold text-[#FEF8C5] hover:bg-[#1F2E26]">
                   Cancel
                 </button>
                 <button onClick={() => aiQuery.trim() && navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`)} className="fs-secondary-btn h-12 px-5 py-0">
@@ -121,8 +121,8 @@ export const HeroWithSearch = () => {
         </div>
 
         <div className="hidden lg:block">
-          <div className="aspect-[5/4] overflow-hidden rounded-[20px] border border-[#D4E0D0] bg-[#FAFAF7]">
-            <img src={heroIllustrated} alt="Modern FlashSpace workspace" className="h-full w-full object-cover" />
+          <div className="aspect-[3/2] overflow-hidden rounded-[20px] border border-[#D4E0D0] bg-[#FAFAF7]">
+            <img src={heroImage} alt="Modern FlashSpace workspace" className="h-full w-full object-cover" />
           </div>
         </div>
       </div>

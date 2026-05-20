@@ -10,19 +10,19 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md hover:shadow-lg",
+          "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-md hover:shadow-lg",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border-2 border-input bg-background hover:bg-accent hover:text-accent-foreground hover:border-primary/50",
+          "border-2 border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] hover:text-[#FEF8C5] hover:border-[#1F2E26]",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26]",
+        ghost: "text-[#36503F] hover:bg-[#36503F] hover:text-[#FEF8C5]",
+        link: "text-[#36503F] underline-offset-4 hover:underline",
         // Hero variants for landing page
-        hero: "bg-foreground text-background hover:bg-foreground/90 shadow-lg hover:shadow-xl",
+        hero: "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-lg hover:shadow-xl",
         heroOutline:
-          "border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground/5 hover:border-foreground/40",
+          "border-2 border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] hover:border-[#1F2E26]",
         // White variants for dark backgrounds
         white:
           "bg-white text-foreground hover:bg-white/90 shadow-lg hover:shadow-xl",

@@ -29,8 +29,8 @@ const WorkspaceCollectionsSection = () => {
         "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=400&h=300&fit=crop",
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop"
       ],
-      bgColor: "bg-blue-50",
-      accentColor: "bg-blue-600"
+      bgColor: "bg-[#F0F4EE]",
+      accentColor: "bg-[#36503F]"
     },
     {
       icon: Users,
@@ -41,8 +41,8 @@ const WorkspaceCollectionsSection = () => {
         "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=400&h=300&fit=crop",
         "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=400&h=300&fit=crop"
       ],
-      bgColor: "bg-purple-50",
-      accentColor: "bg-purple-600"
+      bgColor: "bg-[#F0F4EE]",
+      accentColor: "bg-[#36503F]"
     },
     {
       icon: Presentation,
@@ -53,8 +53,8 @@ const WorkspaceCollectionsSection = () => {
         "https://images.unsplash.com/photo-1517502884422-41e157d2ed22?w=400&h=300&fit=crop",
         "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400&h=300&fit=crop"
       ],
-      bgColor: "bg-amber-50",
-      accentColor: "bg-amber-600"
+      bgColor: "bg-[#F0F4EE]",
+      accentColor: "bg-[#36503F]"
     }
   ];
 
@@ -132,7 +132,7 @@ const WorkspaceCollectionsSection = () => {
                 <div className="p-8">
                   {/* Icon badge */}
                   <div className={`inline-flex items-center justify-center w-14 h-14 ${collection.accentColor} rounded-xl shadow-lg mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <IconComponent className="w-7 h-7 text-white" strokeWidth={2} />
+                    <IconComponent className="w-7 h-7 text-[#FEF8C5]" strokeWidth={2} />
                   </div>
 
                   {/* Title */}
@@ -148,8 +148,8 @@ const WorkspaceCollectionsSection = () => {
                   {/* CTA Button */}
                   <button className={`
                     inline-flex items-center gap-2 px-6 py-3 
-                    ${collection.accentColor} text-white font-semibold rounded-xl
-                    hover:shadow-lg transition-all duration-300
+                    bg-[#36503F] text-[#FEF8C5] font-semibold rounded-xl
+                    hover:bg-[#1F2E26] hover:shadow-lg transition-all duration-300
                     group-hover:gap-4
                   `}>
                     Try it Now

@@ -1,18 +1,75 @@
+import { useEffect, useRef, useState } from "react";
+import { useInView } from "framer-motion";
+
 const stats = [
-  { value: "5,000+", label: "Happy clients" },
-  { value: "100+", label: "Partner spaces" },
-  { value: "68+", label: "Indian cities" },
-  { value: "98%", label: "Satisfaction rate" },
+  { value: 5000, suffix: "+", label: "Happy clients" },
+  { value: 100, suffix: "+", label: "Partner spaces" },
+  { value: 80, suffix: "+", label: "Indian cities" },
+  { value: 98, suffix: "%", label: "Satisfaction rate" },
 ];
 
+const formatValue = (value: number, suffix: string) => {
+  return `${Math.round(value).toLocaleString("en-IN")}${suffix}`;
+};
+
+const CounterValue = ({
+  value,
+  suffix,
+  start,
+}: {
+  value: number;
+  suffix: string;
+  start: boolean;
+}) => {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    if (!start) return;
+
+    let frameId = 0;
+    const duration = 1400;
+    const startedAt = performance.now();
+
+    const tick = (now: number) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+
+      setDisplayValue(value * eased);
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(tick);
+      }
+    };
+
+    frameId = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(frameId);
+  }, [start, value]);
+
+  return <>{formatValue(displayValue, suffix)}</>;
+};
+
 export const Stats = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
+
   return (
-    <section className="bg-[#F0F4EE] py-8">
+    <section ref={sectionRef} className="bg-[#F0F4EE] py-8">
       <div className="fs-container grid grid-cols-2 divide-x-0 divide-y divide-[#D4E0D0] md:grid-cols-4 md:divide-x md:divide-y-0">
-        {stats.map((stat) => (
+        {stats.map((stat, index) => (
           <div key={stat.label} className="px-4 py-6 text-center md:py-2">
-            <div className="text-[32px] font-bold leading-none text-[#36503F] md:text-[40px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              {stat.value}
+            <div
+              className="text-[32px] font-bold leading-none text-[#36503F] md:text-[40px]"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                transitionDelay: `${index * 90}ms`,
+              }}
+            >
+              <CounterValue
+                value={stat.value}
+                suffix={stat.suffix}
+                start={isInView}
+              />
             </div>
             <div className="mt-2 text-[13px] font-medium text-[#6B8F78]">{stat.label}</div>
           </div>
