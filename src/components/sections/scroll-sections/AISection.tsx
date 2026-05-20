@@ -5,7 +5,7 @@ import { ArrowUpRight, Sparkles, Zap, Shield, BarChart3, MessageSquare, Bot, Clo
 import { Link } from "react-router-dom";
 
 // Using high-quality placeholders as requested
-const officeIllustrated = "/ai-workspace-office.png";
+const officeIllustrated = "/home9.png";
 
 const capabilities = [
     { id: "booking", label: "Smart Booking", icon: Zap, active: true },
@@ -23,24 +23,24 @@ export const AISection = () => {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="relative rounded-3xl overflow-hidden illustrated-overlay"
+                    className="relative rounded-xl overflow-hidden illustrated-overlay"
                 >
                     <img
                         src={officeIllustrated}
                         alt="Premium private office illustration"
                         className="w-full h-[400px] lg:h-[500px] object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
 
                     <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-4">
-                            <Sparkles className="w-4 h-4 text-secondary-foreground" />
-                            <span className="text-white/90 text-sm font-medium">AI-Powered</span>
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1F2E26]/40 backdrop-blur-md border border-[#FEF8C5]/30 mb-4">
+                            <Sparkles className="w-4 h-4 text-[#FEF8C5]" />
+                            <span className="text-[#FEF8C5] text-sm font-bold uppercase tracking-widest">AI-Powered</span>
                         </div>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
+                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#FEF8C5] leading-tight tracking-tight">
                             Flash, The #1 AI
                             <br />
-                            <span className="text-white/70">for End to End Business Solutions.</span>
+                            <span className="text-[#FEF8C5]/70 font-bold">for End to End Business Solutions.</span>
                         </h2>
                     </div>
                 </motion.div>
@@ -97,18 +97,18 @@ export const AISection = () => {
                         <div className="lg:col-span-2 p-6 border-r border-border">
                             <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent/70 flex items-center justify-center text-white font-bold">AP</div>
+                                    <div className="w-10 h-10 rounded-full bg-[#36503F] flex items-center justify-center text-white font-bold">AP</div>
                                     <div>
                                         <span className="font-semibold text-foreground block">Amit Patel</span>
                                         <span className="text-xs text-muted-foreground">Mumbai HQ • Hot Desk</span>
                                     </div>
                                 </div>
-                                <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">✓ Active</span>
+                                <span className="text-xs px-2 py-1 bg-[#F0F4EE] text-[#36503F] rounded-full font-medium">✓ Active</span>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="flex gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-accent/70 flex-shrink-0" />
+                                    <div className="w-8 h-8 rounded-full bg-[#36503F] flex-shrink-0" />
                                     <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm">
                                         <p className="text-sm text-foreground">Hi, I need to book a meeting room for 10 people tomorrow afternoon. Is there anything available?</p>
                                     </div>
@@ -118,10 +118,10 @@ export const AISection = () => {
                                     <span className="text-xs text-muted-foreground">1m ago</span>
                                 </div>
                                 <div className="flex gap-3 justify-end">
-                                    <div className="bg-primary/10 border border-primary/20 rounded-2xl rounded-tr-sm px-4 py-3 max-w-md">
+                                    <div className="bg-[#F0F4EE] border border-[#D4E0D0] rounded-2xl rounded-tr-sm px-4 py-3 max-w-md">
                                         <div className="flex items-center gap-2 mb-2">
-                                            <Bot className="w-4 h-4 text-primary" />
-                                            <span className="text-xs font-semibold text-primary">Flash AI</span>
+                                            <Bot className="w-4 h-4 text-[#36503F]" />
+                                            <span className="text-xs font-semibold text-[#36503F]">Flash AI</span>
                                         </div>
                                         <p className="text-sm text-foreground">I found 3 meeting rooms available tomorrow 2-5 PM. Conference Room A (12 seats) has video conferencing. Shall I book it?</p>
                                     </div>
@@ -132,14 +132,14 @@ export const AISection = () => {
                         {/* Details panel */}
                         <div className="p-6 bg-muted/30">
                             <div className="flex items-center gap-4 mb-6">
-                                <button className="text-sm font-semibold text-foreground border-b-2 border-primary pb-1">Details</button>
+                                <button className="text-sm font-semibold text-foreground border-b-2 border-[#36503F] pb-1">Details</button>
                                 <button className="text-sm text-muted-foreground font-medium">AI Assist</button>
                             </div>
 
                             <div className="space-y-4">
-                                <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl">
+                                <div className="p-4 bg-[#F0F4EE] border border-[#D4E0D0] rounded-xl">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <MessageSquare className="w-4 h-4 text-primary" />
+                                        <MessageSquare className="w-4 h-4 text-[#36503F]" />
                                         <h4 className="font-semibold text-foreground">Booking Request</h4>
                                     </div>
                                     <p className="text-sm text-muted-foreground">

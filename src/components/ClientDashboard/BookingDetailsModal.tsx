@@ -27,11 +27,7 @@ export default function BookingDetailsModal({
   formatDate,
 }: BookingDetailsModalProps) {
   const navigate = useNavigate();
-  const [step, setStep] = useState(() => {
-    if (booking.status === 'active' || booking.partnerRequestStatus === 'completed') return 4;
-    if (booking.partnerRequestStatus === 'submitted' || booking.partnerRequestStatus === 'in_review') return 3;
-    return 1;
-  });
+  const [step, setStep] = useState(1);
   const [kycProfile, setKycProfile] = useState<any>(null);
   const [individualProfile, setIndividualProfile] = useState<any>(null);
   const [businessProfiles, setBusinessProfiles] = useState<any[]>([]);

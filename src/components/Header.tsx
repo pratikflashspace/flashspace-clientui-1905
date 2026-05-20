@@ -9,9 +9,9 @@ import { PartnerChoiceModal } from "@/components/auth/PartnerChoiceModal";
 import { GetInTouchModal } from "@/components/modals/GetInTouchModal";
 import { getUploadedFileUrl } from "@/utils/fileUrl";
 import {
-    getDefaultLoginUrl,
-    getLoginRedirectUrl,
-    isCheckoutReturnPath,
+  getDefaultLoginUrl,
+  getLoginRedirectUrl,
+  isCheckoutReturnPath,
 } from "@/utils/checkoutSession";
 
 interface HeaderProps {
@@ -48,28 +48,28 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
   const [signupRole, setSignupRole] = useState<"user" | "partner" | "affiliate">("user");
   const solutionsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-    const currentRoute = `${location.pathname}${location.search}${location.hash}`;
-    const loginRedirectTo = (() => {
-        const params = new URLSearchParams(location.search);
-        const requested = params.get("redirectTo") || params.get("redirect");
-        if (isCheckoutReturnPath(requested)) return requested;
-        if (
-            location.pathname !== "/login" &&
-            location.pathname !== "/signup" &&
-            isCheckoutReturnPath(currentRoute)
-        ) {
-            return currentRoute;
-        }
-        return "/";
-    })();
-    const loginUrl = isCheckoutReturnPath(currentRoute)
-        ? getLoginRedirectUrl(currentRoute)
-        : getDefaultLoginUrl();
+  const currentRoute = `${location.pathname}${location.search}${location.hash}`;
+  const loginRedirectTo = (() => {
+    const params = new URLSearchParams(location.search);
+    const requested = params.get("redirectTo") || params.get("redirect");
+    if (isCheckoutReturnPath(requested)) return requested;
+    if (
+      location.pathname !== "/login" &&
+      location.pathname !== "/signup" &&
+      isCheckoutReturnPath(currentRoute)
+    ) {
+      return currentRoute;
+    }
+    return "/";
+  })();
+  const loginUrl = isCheckoutReturnPath(currentRoute)
+    ? getLoginRedirectUrl(currentRoute)
+    : getDefaultLoginUrl();
 
-    const handleLoginSuccess = () => {
-        setIsLoginOpen(false);
-        navigate(loginRedirectTo, { replace: location.pathname === "/login" });
-    };
+  const handleLoginSuccess = () => {
+    setIsLoginOpen(false);
+    navigate(loginRedirectTo, { replace: location.pathname === "/login" });
+  };
 
   const closeDrawer = () => setIsMenuOpen(false);
 
@@ -80,148 +80,148 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (solutionsRef.current && !solutionsRef.current.contains(event.target as Node)) {
-                setIsSolutionsOpen(false);
-            }
-            if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-                setIsUserMenuOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (solutionsRef.current && !solutionsRef.current.contains(event.target as Node)) {
+        setIsSolutionsOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    useEffect(() => {
-        setIsLoginOpen(openLogin);
-    }, [openLogin]);
+  useEffect(() => {
+    setIsLoginOpen(openLogin);
+  }, [openLogin]);
 
-    useEffect(() => {
-        setIsSignupOpen(openSignup);
-    }, [openSignup]);
+  useEffect(() => {
+    setIsSignupOpen(openSignup);
+  }, [openSignup]);
 
-    const isModalOpenRef = useRef(isContactOpen);
-    useEffect(() => {
-        isModalOpenRef.current = isContactOpen;
-    }, [isContactOpen]);
+  const isModalOpenRef = useRef(isContactOpen);
+  useEffect(() => {
+    isModalOpenRef.current = isContactOpen;
+  }, [isContactOpen]);
 
-    useEffect(() => {
-        // Rule 1: Show after 10 seconds on site (once per session)
-        const hasFilled = localStorage.getItem("hasFilledGetInTouch");
-        const hasShownInitial = sessionStorage.getItem("hasShownInitialGetInTouch");
-        if (!hasShownInitial && !hasFilled) {
-            let sessionStartTime = sessionStorage.getItem("sessionStartTime");
-            if (!sessionStartTime) {
-                sessionStartTime = Date.now().toString();
-                sessionStorage.setItem("sessionStartTime", sessionStartTime);
-            }
+  useEffect(() => {
+    // Rule 1: Show after 10 seconds on site (once per session)
+    const hasFilled = localStorage.getItem("hasFilledGetInTouch");
+    const hasShownInitial = sessionStorage.getItem("hasShownInitialGetInTouch");
+    if (!hasShownInitial && !hasFilled) {
+      let sessionStartTime = sessionStorage.getItem("sessionStartTime");
+      if (!sessionStartTime) {
+        sessionStartTime = Date.now().toString();
+        sessionStorage.setItem("sessionStartTime", sessionStartTime);
+      }
 
-            const elapsed = Date.now() - parseInt(sessionStartTime);
-            const remaining = Math.max(0, 10000 - elapsed);
+      const elapsed = Date.now() - parseInt(sessionStartTime);
+      const remaining = Math.max(0, 10000 - elapsed);
 
-            const timer = setTimeout(() => {
-                const alreadyShown = sessionStorage.getItem("hasShownInitialGetInTouch");
-                const hasFilledLatest = localStorage.getItem("hasFilledGetInTouch");
-                if (!alreadyShown && !hasFilledLatest) {
-                    setIsContactOpen(true);
-                    sessionStorage.setItem("hasShownInitialGetInTouch", "true");
-                }
-            }, remaining);
-
-            // Cleanup Rule 1 timer on unmount
-            return () => clearTimeout(timer);
+      const timer = setTimeout(() => {
+        const alreadyShown = sessionStorage.getItem("hasShownInitialGetInTouch");
+        const hasFilledLatest = localStorage.getItem("hasFilledGetInTouch");
+        if (!alreadyShown && !hasFilledLatest) {
+          setIsContactOpen(true);
+          sessionStorage.setItem("hasShownInitialGetInTouch", "true");
         }
-    }, []);
+      }, remaining);
 
-    useEffect(() => {
-        const handleOpenContact = () => setIsContactOpen(true);
-        window.addEventListener('open-contact-modal', handleOpenContact);
-        return () => window.removeEventListener('open-contact-modal', handleOpenContact);
-    }, []);
+      // Cleanup Rule 1 timer on unmount
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
-    useEffect(() => {
-        // Rule 2: Show every time the user is inactive for 60 seconds
-        let inactivityTimer: NodeJS.Timeout;
+  useEffect(() => {
+    const handleOpenContact = () => setIsContactOpen(true);
+    window.addEventListener('open-contact-modal', handleOpenContact);
+    return () => window.removeEventListener('open-contact-modal', handleOpenContact);
+  }, []);
 
-        const showInactivityModal = () => {
-            const hasFilled = localStorage.getItem("hasFilledGetInTouch");
-            if (!isModalOpenRef.current && !hasFilled) {
-                setIsContactOpen(true);
-            }
-        };
+  useEffect(() => {
+    // Rule 2: Show every time the user is inactive for 60 seconds
+    let inactivityTimer: NodeJS.Timeout;
 
-        const resetInactivityTimer = () => {
-            if (inactivityTimer) clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(showInactivityModal, 60000); // 60 seconds of inactivity
-        };
-
-        const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
-
-        // Initial timer start
-        resetInactivityTimer();
-
-        // Set up listeners for activity
-        activityEvents.forEach(event => {
-            window.addEventListener(event, resetInactivityTimer);
-        });
-
-        return () => {
-            if (inactivityTimer) clearTimeout(inactivityTimer);
-            activityEvents.forEach(event => {
-                window.removeEventListener(event, resetInactivityTimer);
-            });
-        };
-    }, []);
-
-
-
-    useEffect(() => {
-        // Rule 4: Show after 10 seconds on space detail pages (once per space)
-        const isSpaceDetail = location.pathname.startsWith("/space/") ||
-            location.pathname.startsWith("/coworking-space/") ||
-            location.pathname.startsWith("/meeting-room/");
-
-        if (!isSpaceDetail) return;
-
-        const spaceId = location.pathname.split("/").pop();
-        if (!spaceId) return;
-
-        const sessionKey = `hasShownSpacePopup_${spaceId}`;
-        const alreadyShown = sessionStorage.getItem(sessionKey);
-        const hasFilled = localStorage.getItem("hasFilledGetInTouch");
-        if (alreadyShown || hasFilled) return;
-
-        const timer = setTimeout(() => {
-            const hasFilledLatest = localStorage.getItem("hasFilledGetInTouch");
-            if (!isModalOpenRef.current && !hasFilledLatest) {
-                setIsContactOpen(true);
-                sessionStorage.setItem(sessionKey, "true");
-            }
-        }, 10000); // 10 seconds
-
-        return () => clearTimeout(timer);
-    }, [location.pathname]);
-
-    const handleNavigation = (href: string) => {
-        if (href.startsWith("#")) {
-            const element = document.querySelector(href);
-            element?.scrollIntoView({ behavior: "smooth", block: "start" });
-        } else {
-            navigate(href);
-        }
-        setIsMenuOpen(false);
+    const showInactivityModal = () => {
+      const hasFilled = localStorage.getItem("hasFilledGetInTouch");
+      if (!isModalOpenRef.current && !hasFilled) {
+        setIsContactOpen(true);
+      }
     };
 
-    const openPartnerSignup = (role: 'partner' | 'affiliate') => {
-        setSignupRole(role);
-        setIsPartnerChoiceOpen(false);
-        setIsSignupOpen(true);
+    const resetInactivityTimer = () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(showInactivityModal, 60000); // 60 seconds of inactivity
     };
 
-    const profilePictureUrl = user?.profilePicture
-        ? getUploadedFileUrl(user.profilePicture)
-        : "";
+    const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
+
+    // Initial timer start
+    resetInactivityTimer();
+
+    // Set up listeners for activity
+    activityEvents.forEach(event => {
+      window.addEventListener(event, resetInactivityTimer);
+    });
+
+    return () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      activityEvents.forEach(event => {
+        window.removeEventListener(event, resetInactivityTimer);
+      });
+    };
+  }, []);
+
+
+
+  useEffect(() => {
+    // Rule 4: Show after 10 seconds on space detail pages (once per space)
+    const isSpaceDetail = location.pathname.startsWith("/space/") ||
+      location.pathname.startsWith("/coworking-space/") ||
+      location.pathname.startsWith("/meeting-room/");
+
+    if (!isSpaceDetail) return;
+
+    const spaceId = location.pathname.split("/").pop();
+    if (!spaceId) return;
+
+    const sessionKey = `hasShownSpacePopup_${spaceId}`;
+    const alreadyShown = sessionStorage.getItem(sessionKey);
+    const hasFilled = localStorage.getItem("hasFilledGetInTouch");
+    if (alreadyShown || hasFilled) return;
+
+    const timer = setTimeout(() => {
+      const hasFilledLatest = localStorage.getItem("hasFilledGetInTouch");
+      if (!isModalOpenRef.current && !hasFilledLatest) {
+        setIsContactOpen(true);
+        sessionStorage.setItem(sessionKey, "true");
+      }
+    }, 10000); // 10 seconds
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
+  const handleNavigation = (href: string) => {
+    if (href.startsWith("#")) {
+      const element = document.querySelector(href);
+      element?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      navigate(href);
+    }
+    setIsMenuOpen(false);
+  };
+
+  const openPartnerSignup = (role: 'partner' | 'affiliate') => {
+    setSignupRole(role);
+    setIsPartnerChoiceOpen(false);
+    setIsSignupOpen(true);
+  };
+
+  const profilePictureUrl = user?.profilePicture
+    ? getUploadedFileUrl(user.profilePicture)
+    : "";
 
   return (
     <>
@@ -312,7 +312,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsContactOpen(true)}
-              className="hidden rounded-full bg-[#36503F] px-5 py-2 text-[13px] font-bold text-[#FEF8C5] transition-transform hover:scale-[1.01] hover:bg-[#1F2E26] active:scale-[0.99] sm:inline-flex"
+              className="hidden rounded-full bg-[#36503F] px-5 py-2 text-[13px] font-semibold text-[#FEF8C5] transition-transform hover:scale-[1.01] hover:bg-[#1F2E26] active:scale-[0.99] sm:inline-flex"
             >
               Get started
             </button>

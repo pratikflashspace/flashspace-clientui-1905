@@ -5,7 +5,7 @@ import { ArrowUpRight, Wifi, Coffee, Users, Monitor } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Using high-quality placeholder as requested
-const featureCoworking = "/coworking-illustrated-themed.jpg";
+const featureCoworking = "/home4.jpg";
 
 const amenities = [
     { icon: Wifi, label: "High-speed WiFi" },
@@ -23,20 +23,20 @@ export const CoworkingSection = () => {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="relative rounded-3xl overflow-hidden"
+                    className="relative rounded-xl overflow-hidden"
                 >
                     <img
                         src={featureCoworking}
                         alt="Coworking space"
                         className="w-full h-[350px] lg:h-[420px] object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
-                        <span className="text-primary-foreground/70 text-sm font-semibold uppercase tracking-wider mb-2 block">Coworking</span>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
+                        <span className="text-[#FEF8C5] text-sm font-bold uppercase tracking-widest mb-2 block">Coworking</span>
+                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#FEF8C5] leading-tight tracking-tight">
                             Flexible desks & cabins
                             <br />
-                            <span className="text-white/70">for every team size.</span>
+                            <span className="text-[#FEF8C5]/70 font-bold">for every team size.</span>
                         </h2>
                     </div>
                 </motion.div>

@@ -33,9 +33,9 @@ export const HeroWithSearch = () => {
     <section className="bg-white pt-14 md:pt-16">
       <div className="fs-container grid items-center gap-12 pb-16 pt-8 md:pb-20 md:pt-12 lg:grid-cols-[0.92fr_1.08fr] lg:pb-24 lg:pt-16">
         <div className="mx-auto max-w-[680px] text-center lg:mx-0 lg:text-left">
-          <span className="fs-tag">Business workspace platform</span>
+
           <h1 className="mt-6 text-[40px] font-extrabold leading-[1.15] tracking-[-0.03em] text-[#1A1A1A] sm:text-5xl lg:text-[56px]">
-            Workspaces and business addresses that move at <span className="text-[#36503F]">startup speed</span>
+            World's #1 AI Enabled<br /><span className="text-[#36503F]">Business Solutions Platform.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-[480px] text-base font-normal leading-[1.7] text-[#6B8F78] lg:mx-0">
             Choose virtual offices, coworking seats, compliant business addresses, and on-demand meeting rooms across India.
@@ -43,7 +43,7 @@ export const HeroWithSearch = () => {
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
             <button onClick={() => navigate("/services/virtual-office")} className="fs-primary-btn w-full sm:w-auto">
-              Explore spaces <ArrowRight className="h-4 w-4" />
+              Explore Spaces <ArrowRight className="h-4 w-4" />
             </button>
             <button onClick={() => navigate("/start-chatting")} className="fs-secondary-btn w-full sm:w-auto">
               Ask Flash AI
