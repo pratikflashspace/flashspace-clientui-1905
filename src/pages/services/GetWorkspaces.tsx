@@ -372,7 +372,7 @@ const WorkspaceCard = ({
                 e.stopPropagation();
                 handleNavigate();
               }}
-              className="py-2 px-8 text-xs font-bold rounded-full bg-[#FEF8C5] text-[#36503F] hover:bg-[#F7ED9A] transition-all duration-200 whitespace-nowrap flex-[1.4]"
+              className="py-2 px-8 text-xs font-bold rounded-full bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 whitespace-nowrap flex-[1.4]"
             >
               Get Best Price
             </button>
@@ -381,7 +381,7 @@ const WorkspaceCard = ({
                 e.stopPropagation();
                 window.dispatchEvent(new CustomEvent('open-contact-modal'));
               }}
-              className="py-2 px-4 text-xs font-medium rounded-lg border border-border text-foreground hover:bg-muted transition-all duration-200 flex items-center gap-1 whitespace-nowrap flex-1"
+              className="py-2 px-4 text-xs font-semibold rounded-lg border border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 flex items-center gap-1 whitespace-nowrap flex-1"
             >
               <Phone className="w-3 h-3" /> Contact Sales
             </button>
@@ -521,7 +521,7 @@ const WorkspaceCard = ({
               e.stopPropagation();
               handleNavigate();
             }}
-            className="flex-[1.4] py-2.5 px-4 text-xs font-bold rounded-full bg-[#FEF8C5] text-[#36503F] hover:bg-[#F7ED9A] transition-all duration-200"
+            className="flex-[1.4] py-2.5 px-4 text-xs font-bold rounded-full bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200"
           >
             Get Best Price
           </button>
@@ -530,7 +530,7 @@ const WorkspaceCard = ({
               e.stopPropagation();
               setIsContactModalOpen(true);
             }}
-            className="flex-1 py-2.5 text-xs font-medium rounded-lg border border-border text-foreground hover:bg-muted transition-all duration-200 flex items-center justify-center gap-1.5"
+            className="flex-1 py-2.5 text-xs font-semibold rounded-lg border border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 flex items-center justify-center gap-1.5"
           >
             <Phone className="w-3 h-3" /> Contact Sales
           </button>

@@ -1690,7 +1690,7 @@ const BookingPage = () => {
                 <Button
                   onClick={handleProceedToPayment}
                   disabled={paymentLoading}
-                  className="w-full py-6 bg-gradient-to-r from-teal-600 to-emerald-500 text-white rounded-2xl font-bold text-lg hover:from-teal-700 hover:to-emerald-600 transition-all duration-300 shadow-lg shadow-teal-200/50 hover:shadow-xl disabled:opacity-70"
+                  className="w-full py-6 bg-[#36503F] text-[#FEF8C5] rounded-2xl font-bold text-lg hover:bg-[#1F2E26] transition-all duration-300 shadow-lg shadow-[rgba(54,80,63,0.18)] hover:shadow-xl disabled:opacity-70"
                 >
                   {paymentLoading ? (
                     <span className="flex items-center justify-center gap-2">
@@ -1711,7 +1711,7 @@ const BookingPage = () => {
                     onClick={handleSimulatePayment}
                     disabled={paymentLoading}
                     variant="outline"
-                    className="w-full mt-3 border-2 border-blue-400 text-blue-600 hover:bg-blue-50 font-semibold py-5 rounded-2xl"
+                    className="w-full mt-3 border-2 border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] font-semibold py-5 rounded-2xl"
                   >
                     {paymentLoading ? (
                       <span className="flex items-center gap-2">
@@ -1742,7 +1742,7 @@ const BookingPage = () => {
                   ? () => navigate(-1)
                   : goBack
               }
-              className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all text-sm shadow-sm"
+              className="flex items-center gap-2 px-6 py-3 bg-[#36503F] border border-[#36503F] text-[#FEF8C5] rounded-xl font-semibold hover:bg-[#1F2E26] transition-all text-sm shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               {currentStep === 1 || (isDirect && currentStep === 4)
@@ -1756,7 +1756,7 @@ const BookingPage = () => {
                 disabled={!canProceed()}
                 className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-md
                    ${canProceed()
-                    ? "bg-gradient-to-r from-teal-600 to-emerald-500 text-white hover:from-teal-700 hover:to-emerald-600 shadow-teal-200/50 hover:shadow-lg"
+                    ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-[rgba(54,80,63,0.18)] hover:shadow-lg"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
                   }`}
               >

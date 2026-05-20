@@ -434,7 +434,7 @@ const SpaceComponent = () => {
                 disabled={spaceDetails.availability?.toLowerCase() === 'unavailable'}
                 className={`w-full py-3 rounded-lg font-bold text-lg transition ${spaceDetails.availability?.toLowerCase() === 'unavailable'
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-[#FFD43B] hover:bg-[#eec635] text-black'
+                  : 'bg-[#36503F] hover:bg-[#1F2E26] text-[#FEF8C5]'
                   }`}
               >
                 {spaceDetails.availability?.toLowerCase() === 'unavailable' ? 'Unavailable' : 'Book Now'}

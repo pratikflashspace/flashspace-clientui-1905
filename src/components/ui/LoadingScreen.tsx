@@ -11,7 +11,7 @@ const LoadingScreen: React.FC = () => {
           {/* Outer animated ring */}
           <div className="absolute inset-0 border-[3px] border-t-[#2D3F33] border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin duration-700"></div>
           {/* Secondary ring for complexity */}
-          <div className="absolute inset-2 border-[2px] border-b-[#EDB003] border-t-transparent border-r-transparent border-l-transparent rounded-full animate-spin-reverse duration-1000"></div>
+          <div className="absolute inset-2 border-[2px] border-b-[#FEF8C5] border-t-transparent border-r-transparent border-l-transparent rounded-full animate-spin-reverse duration-1000"></div>
         </div>
         
         {/* Brand Label */}

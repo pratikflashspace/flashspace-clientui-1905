@@ -188,7 +188,7 @@ export const FAQSection = () => {
                                         setAiMode(true);
                                         setTimeout(() => aiInputRef.current?.focus(), 100);
                                     }}
-                                    className="flex items-center justify-center gap-2 border border-[#36503F] text-[#36503F] px-5 py-2.5 sm:py-2 rounded-full text-sm font-semibold sm:mr-1.5 hover:bg-[#F0F4EE] transition-colors shrink-0 mt-1 sm:mt-0"
+                                    className="flex items-center justify-center gap-2 border border-[#36503F] bg-[#36503F] text-[#FEF8C5] px-5 py-2.5 sm:py-2 rounded-full text-sm font-semibold sm:mr-1.5 hover:bg-[#1F2E26] transition-colors shrink-0 mt-1 sm:mt-0"
                                 >
                                     <Sparkles className="w-4 h-4" />
                                     Chat with AI
@@ -227,7 +227,7 @@ export const FAQSection = () => {
                                 <div className="flex items-center gap-2 sm:mr-1.5">
                                     <button
                                         onClick={() => { setAiMode(false); setAiQuery(""); }}
-                                        className="flex-1 sm:flex-none text-muted-foreground hover:text-foreground text-sm px-3 py-2.5 transition-colors shrink-0"
+                                        className="flex-1 sm:flex-none rounded-full bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] text-sm px-3 py-2.5 transition-colors shrink-0"
                                     >
                                         Cancel
                                     </button>
@@ -238,7 +238,7 @@ export const FAQSection = () => {
                                             }
                                         }}
                                         disabled={!aiQuery.trim()}
-                                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#36503F] text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-[#2a3f32] transition-colors shrink-0 disabled:opacity-40"
+                                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#36503F] text-[#FEF8C5] px-5 py-2 rounded-full text-sm font-medium hover:bg-[#1F2E26] transition-colors shrink-0 disabled:opacity-40"
                                     >
                                         <Search className="w-4 h-4" />
                                         Ask
@@ -256,8 +256,8 @@ export const FAQSection = () => {
                             key={cat.value}
                             onClick={() => setActiveCategory(cat.value)}
                             className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${activeCategory === cat.value
-                                    ? "border-[#36503F] bg-[#F0F4EE] text-[#36503F]"
-                                    : "border-[#D4E0D0] bg-white text-[#6B8F78] hover:text-[#36503F] hover:border-[#36503F]"
+                                    ? "border-[#36503F] bg-[#36503F] text-[#FEF8C5]"
+                                    : "border-[#D4E0D0] bg-white text-[#36503F] hover:border-[#36503F] hover:bg-[#F0F4EE]"
                                 }`}
                         >
                             {cat.label}
@@ -269,13 +269,13 @@ export const FAQSection = () => {
                 <div className="relative">
                     <button
                         onClick={() => scroll("left")}
-                        className="absolute -left-4 lg:-left-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white border border-[#D4E0D0] shadow-md flex items-center justify-center text-[#36503F] transition-colors hidden sm:flex"
+                        className="absolute -left-4 lg:-left-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-[#36503F] border border-[#36503F] shadow-md flex items-center justify-center text-[#FEF8C5] transition-colors hover:bg-[#1F2E26] hidden sm:flex"
                     >
                         <ChevronLeft className="w-5 h-5" />
                     </button>
                     <button
                         onClick={() => scroll("right")}
-                        className="absolute -right-4 lg:-right-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white border border-[#D4E0D0] shadow-md flex items-center justify-center text-[#36503F] transition-colors hidden sm:flex"
+                        className="absolute -right-4 lg:-right-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-[#36503F] border border-[#36503F] shadow-md flex items-center justify-center text-[#FEF8C5] transition-colors hover:bg-[#1F2E26] hidden sm:flex"
                     >
                         <ChevronRight className="w-5 h-5" />
                     </button>

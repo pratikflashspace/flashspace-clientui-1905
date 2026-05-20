@@ -419,7 +419,7 @@ const CoworkingSpaceComponent = () => {
                                 key={day}
                                 onClick={() => { if (!isPast) { setSelectedDate(date); setShowCalendar(false); } }}
                                 disabled={isPast}
-                                className={`aspect-square flex items-center justify-center text-[11px] rounded transition ${isSelected ? 'bg-[#FFD43B] text-black font-bold shadow-sm' :
+                                className={`aspect-square flex items-center justify-center text-[11px] rounded transition ${isSelected ? 'bg-[#36503F] text-[#FEF8C5] font-bold shadow-sm' :
                                   isPast ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100 font-medium'
                                   }`}
                               >
@@ -451,7 +451,7 @@ const CoworkingSpaceComponent = () => {
                   disabled={spaceDetails.availability?.toLowerCase() === 'unavailable'}
                   className={`w-full py-3 rounded-lg font-bold text-lg transition ${spaceDetails.availability?.toLowerCase() === 'unavailable'
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-[#FFD43B] hover:bg-[#eec635] text-black'
+                    : 'bg-[#36503F] hover:bg-[#1F2E26] text-[#FEF8C5]'
                     }`}
                 >
                   {spaceDetails.availability?.toLowerCase() === 'unavailable' ? 'Unavailable' : 'Book Now'}

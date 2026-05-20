@@ -267,7 +267,7 @@ const getPhotos = () => {
 
         <button
           onClick={handleBookNow}
-          className="w-full py-3.5 rounded-[10px] bg-[#FEF8C5] text-[#36503F] font-bold text-base hover:bg-[#F7ED9A] active:bg-[#EFE282] transition-colors"
+          className="w-full py-3.5 rounded-[10px] bg-[#36503F] text-[#FEF8C5] font-bold text-base hover:bg-[#1F2E26] active:bg-[#17211B] transition-colors"
         >
           Book Now
         </button>
@@ -277,7 +277,7 @@ const getPhotos = () => {
 
         <button
           onClick={() => window.dispatchEvent(new CustomEvent('open-contact-modal'))}
-          className="w-full mt-3 py-3 rounded-[10px] border border-border text-foreground text-sm font-medium flex items-center justify-center gap-2 hover:bg-muted/60 hover:border-border active:bg-muted transition-colors"
+          className="w-full mt-3 py-3 rounded-[10px] border border-[#36503F] bg-[#36503F] text-[#FEF8C5] text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#1F2E26] active:bg-[#17211B] transition-colors"
         >
           <Phone className="w-4 h-4" /> Contact Sales
         </button>
@@ -391,7 +391,7 @@ const getPhotos = () => {
                         setSelectedDate(d);
                         setShowCalendar(false);
                       }}
-                      className={`p-1.5 text-xs rounded-md ${isSel ? "bg-[#FEF8C5] text-[#36503F] font-bold" : "hover:bg-muted text-foreground"}`}
+                      className={`p-1.5 text-xs rounded-md ${isSel ? "bg-[#36503F] text-[#FEF8C5] font-bold" : "hover:bg-muted text-foreground"}`}
                     >
                       {d.getDate()}
                     </button>
@@ -404,7 +404,7 @@ const getPhotos = () => {
 
         <button
           onClick={handleBookNow}
-          className="w-full py-3.5 rounded-[10px] bg-[#FEF8C5] text-[#36503F] font-bold text-base hover:bg-[#F7ED9A] transition-colors"
+          className="w-full py-3.5 rounded-[10px] bg-[#36503F] text-[#FEF8C5] font-bold text-base hover:bg-[#1F2E26] transition-colors"
         >
           Book Now
         </button>
@@ -487,7 +487,7 @@ const getPhotos = () => {
                         setSelectedDate(d);
                         setShowCalendar(false);
                       }}
-                      className={`p-1 text-xs rounded ${isSel ? "bg-[#FEF8C5] text-[#36503F] font-bold" : "hover:bg-muted text-foreground"}`}
+                      className={`p-1 text-xs rounded ${isSel ? "bg-[#36503F] text-[#FEF8C5] font-bold" : "hover:bg-muted text-foreground"}`}
                     >
                       {d.getDate()}
                     </button>
@@ -524,7 +524,7 @@ const getPhotos = () => {
         <button
           onClick={handleBookNow}
           disabled={isProcessing}
-          className={`w-full font-bold py-3.5 rounded-[10px] transition-all duration-300 ${isProcessing ? "bg-muted text-muted-foreground cursor-not-allowed" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+          className={`w-full font-bold py-3.5 rounded-[10px] transition-all duration-300 ${isProcessing ? "bg-muted text-muted-foreground cursor-not-allowed" : "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26]"}`}
         >
           {isProcessing ? "Processing Payment..." : `Pay ₹${totalPrice}`}
         </button>
@@ -556,7 +556,7 @@ const getPhotos = () => {
           </p>
           <button
             onClick={() => navigate("/get-workspaces")}
-            className="px-4 py-2 rounded-[8px] bg-[#FEF8C5] text-[#36503F] text-sm font-bold hover:bg-[#F7ED9A] transition-colors"
+            className="px-4 py-2 rounded-[8px] bg-[#36503F] text-[#FEF8C5] text-sm font-bold hover:bg-[#1F2E26] transition-colors"
           >
             Back to Spaces
           </button>

@@ -29,7 +29,7 @@ const Footer = () => {
   const isVisible = useScrollAnimation("footer");
 
   return (
-    <footer id="footer" className="bg-[#36503F] text-white border-t border-white/10 overflow-hidden">
+    <footer id="footer" className="bg-[#1F2E26] text-white border-t border-[#FEF8C5]/25 overflow-hidden">
       {/* Links Section */}
       <div className={cn(
         "container mx-auto px-4 sm:px-6 py-12 sm:py-16",
@@ -37,8 +37,8 @@ const Footer = () => {
       )}>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-4 sm:gap-8 lg:gap-12">
           {/* Solutions */}
-          <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
-            <h4 className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
+          <div className="border-l border-[#FEF8C5]/25 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
+            <h4 className="text-[9px] sm:text-[10px] font-bold text-[#FEF8C5] uppercase tracking-[0.2em]">
               Solutions
             </h4>
             <ul className="space-y-4">
@@ -46,7 +46,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className="text-sm text-white/70 hover:text-[#FEF8C5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FEF8C5] rounded"
+                    className="text-sm text-white hover:text-[#FEF8C5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FEF8C5] rounded"
                   >
                     {link.label}
                   </Link>
@@ -56,8 +56,8 @@ const Footer = () => {
           </div>
 
           {/* Resources */}
-          <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
-            <h4 className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
+          <div className="border-l border-[#FEF8C5]/25 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
+            <h4 className="text-[9px] sm:text-[10px] font-bold text-[#FEF8C5] uppercase tracking-[0.2em]">
               Resources
             </h4>
             <ul className="space-y-4">
@@ -65,7 +65,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className="text-sm text-white/70 hover:text-[#FEF8C5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FEF8C5] rounded"
+                    className="text-sm text-white hover:text-[#FEF8C5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FEF8C5] rounded"
                   >
                     {link.label}
                   </Link>
@@ -75,8 +75,8 @@ const Footer = () => {
           </div>
 
           {/* Company */}
-          <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
-            <h4 className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
+          <div className="border-l border-[#FEF8C5]/25 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
+            <h4 className="text-[9px] sm:text-[10px] font-bold text-[#FEF8C5] uppercase tracking-[0.2em]">
               Company
             </h4>
             <ul className="space-y-4">
@@ -84,7 +84,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className="text-sm text-white/70 hover:text-[#FEF8C5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FEF8C5] rounded"
+                    className="text-sm text-white hover:text-[#FEF8C5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FEF8C5] rounded"
                   >
                     {link.label}
                   </Link>
@@ -94,8 +94,8 @@ const Footer = () => {
           </div>
 
           {/* Community */}
-          <div className="border-l border-white/10 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
-            <h4 className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
+          <div className="border-l border-[#FEF8C5]/25 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
+            <h4 className="text-[9px] sm:text-[10px] font-bold text-[#FEF8C5] uppercase tracking-[0.2em]">
               Community
             </h4>
             <ul className="space-y-4">
@@ -106,14 +106,14 @@ const Footer = () => {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-white/70 hover:text-[#FEF8C5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FEF8C5] rounded"
+                      className="text-sm text-white hover:text-[#FEF8C5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FEF8C5] rounded"
                     >
                       {link.label}
                     </a>
                   ) : (
                     <Link
                       to={link.href}
-                      className="text-sm text-white/70 hover:text-[#FEF8C5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FEF8C5] rounded"
+                      className="text-sm text-white hover:text-[#FEF8C5] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FEF8C5] rounded"
                     >
                       {link.label}
                     </Link>
@@ -127,7 +127,7 @@ const Footer = () => {
 
       {/* Bottom Section */}
       <div className={cn(
-        "container mx-auto px-4 sm:px-6 py-10 lg:py-16 border-t border-white/10",
+        "container mx-auto px-4 sm:px-6 py-10 lg:py-16 border-t border-[#FEF8C5]/25",
         getAnimationClasses(isVisible, "fadeIn", 400)
       )}>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12">
@@ -136,18 +136,18 @@ const Footer = () => {
             <img
               src="/Logo/Flashspace Logo.png"
               alt="FlashSpace"
-              className="h-10 sm:h-16 lg:h-20 w-auto brightness-0 invert opacity-40 group-hover:opacity-100 transition-opacity"
+              className="h-10 sm:h-16 lg:h-20 w-auto brightness-0 invert transition-opacity"
             />
           </Link>
 
           {/* Copyright */}
           <div className="space-y-4 lg:text-right">
-            <div className="flex flex-wrap gap-4 text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] lg:justify-end">
+            <div className="flex flex-wrap gap-4 text-[10px] font-bold text-[#FEF8C5] uppercase tracking-[0.2em] lg:justify-end">
               <Link to="/terms" className="hover:text-[#FEF8C5] transition-colors">Legal</Link>
               <Link to="/privacy" className="hover:text-[#FEF8C5] transition-colors">Privacy</Link>
               <Link to="/about" className="hover:text-[#FEF8C5] transition-colors">Cookies</Link>
             </div>
-            <p className="text-[9px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] sm:tracking-[0.3em]">
+            <p className="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-[0.2em] sm:tracking-[0.3em]">
               © {currentYear} FlashSpace Technologies Private Limited.
             </p>
           </div>

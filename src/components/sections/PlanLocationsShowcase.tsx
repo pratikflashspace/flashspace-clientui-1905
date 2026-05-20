@@ -144,14 +144,14 @@ export const PlanLocationsShowcase = () => {
                         <button
                             onClick={() => setSlideIndex((p) => Math.max(0, p - 1))}
                             disabled={!canPrev}
-                            className="w-10 h-10 rounded-full border border-[#D4E0D0] flex items-center justify-center text-[#36503F] hover:bg-[#F0F4EE] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="w-10 h-10 rounded-full border border-[#36503F] bg-[#36503F] flex items-center justify-center text-[#FEF8C5] hover:bg-[#1F2E26] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                             <ChevronLeft className="w-5 h-5" />
                         </button>
                         <button
                             onClick={() => setSlideIndex((p) => Math.min(totalPages - 1, p + 1))}
                             disabled={!canNext}
-                            className="w-10 h-10 rounded-full border border-[#D4E0D0] flex items-center justify-center text-[#36503F] hover:bg-[#F0F4EE] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="w-10 h-10 rounded-full border border-[#36503F] bg-[#36503F] flex items-center justify-center text-[#FEF8C5] hover:bg-[#1F2E26] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                             <ChevronRight className="w-5 h-5" />
                         </button>
@@ -212,7 +212,7 @@ export const PlanLocationsShowcase = () => {
                                     key={i}
                                     onClick={() => setSlideIndex(i)}
                                     className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                                        i === slideIndex ? "bg-primary w-4" : "bg-muted-foreground/30"
+                                        i === slideIndex ? "bg-[#36503F] w-4" : "bg-[#36503F]/30"
                                     }`}
                                 />
                             ))}

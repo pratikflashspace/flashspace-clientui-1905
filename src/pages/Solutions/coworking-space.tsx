@@ -391,7 +391,7 @@ const CoworkingSpace = () => {
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {aiCapabilities.map((cap) => (
-                      <div key={cap.id} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-[#FEF8C5] text-[#36503F] shadow-sm cursor-default">
+                      <div key={cap.id} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-[#36503F] text-[#FEF8C5] shadow-sm cursor-default">
                         <cap.icon className="w-4 h-4" />
                         {cap.label}
                       </div>

@@ -105,7 +105,7 @@ const categories = [
   },
   {
     title: "Locations & Cities",
-    description: "Find workspaces across 68+ cities in India.",
+    description: "Find workspaces across 80+ cities in India.",
     icon: MapPin,
     links: [
       "Search by city",
@@ -209,7 +209,7 @@ const faqGroups = [
     faqs: [
       {
         q: "What is FlashSpace?",
-        a: "FlashSpace is a B2B workspace platform offering virtual offices, coworking spaces, on-demand workspaces, and business setup services across 68+ cities in India.",
+        a: "FlashSpace is a B2B workspace platform offering virtual offices, coworking spaces, on-demand workspaces, and business setup services across 80+ cities in India.",
       },
       {
         q: "How do I create an account?",
@@ -217,7 +217,7 @@ const faqGroups = [
       },
       {
         q: "Is FlashSpace available in my city?",
-        a: "We operate in 68+ cities across India. Use the Locations page or search by city name to check availability in your area.",
+        a: "We operate in 80+ cities across India. Use the Locations page or search by city name to check availability in your area.",
       },
     ],
   },
@@ -344,7 +344,7 @@ const communityQuestions = [
       {
         author: "FlashSpace Team",
         avatar: "FS",
-        text: "Day passes give you access to any coworking space in our network. You can book a desk at any location across 68+ cities through the app or website. Each pass is valid for one full working day.",
+        text: "Day passes give you access to any coworking space in our network. You can book a desk at any location across 80+ cities through the app or website. Each pass is valid for one full working day.",
         time: "20 hours ago",
         isOfficial: true,
       },

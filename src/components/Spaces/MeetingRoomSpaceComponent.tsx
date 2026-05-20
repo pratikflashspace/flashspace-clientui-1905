@@ -604,7 +604,7 @@ const MeetingRoomSpaceComponent = () => {
                 <button
                   onClick={handleBookNow}
                   disabled={isProcessing}
-                  className={`w-full font-bold py-3 rounded-lg transition-all duration-300 ${isProcessing ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-black text-white hover:bg-[#EDB003] hover:text-black"}`}
+                  className={`w-full font-bold py-3 rounded-lg transition-all duration-300 ${isProcessing ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26]"}`}
                 >
                   {isProcessing
                     ? "Processing Payment..."
@@ -615,7 +615,7 @@ const MeetingRoomSpaceComponent = () => {
                   <button
                     onClick={handleSimulatePayment}
                     disabled={isProcessing}
-                    className="w-full mt-2 py-3 border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-xs"
+                    className="w-full mt-2 py-3 border-2 border-dashed border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-xs"
                   >
                     {isProcessing ? "Simulating..." : "Test Payment (Dev Only)"}
                   </button>

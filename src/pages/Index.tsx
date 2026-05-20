@@ -3,6 +3,8 @@ import { HeroWithSearch } from "@/components/sections/HeroWithSearch";
 import { ScrollNavLayout } from "@/components/sections/ScrollNavLayout";
 import { PlanLocationsShowcase } from "@/components/sections/PlanLocationsShowcase";
 import { FeatureCTA } from "@/components/sections/FeatureCTA";
+import { ScaleSection } from "@/components/sections/ScaleSection";
+import { MetricsOverview } from "@/components/sections/MetricsOverview";
 import { Stats } from "@/components/sections/Stats";
 import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
 import { FAQSection } from "@/components/sections/FAQSection";
@@ -40,16 +42,22 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
       <Header openLogin={openLogin} openSignup={openSignup} />
       <main className="flex-1 w-full relative">
         <HeroWithSearch />
+        <FadeInSection>
+          <Stats />
+        </FadeInSection>
         <TrustedByFilmstrip />
         <FadeInSection>
           <PlanLocationsShowcase />
         </FadeInSection>
         <ScrollNavLayout />
         <FadeInSection>
-          <FeatureCTA />
+          <ScaleSection />
         </FadeInSection>
         <FadeInSection>
-          <Stats />
+          <MetricsOverview />
+        </FadeInSection>
+        <FadeInSection>
+          <FeatureCTA />
         </FadeInSection>
         <FadeInSection>
           <FounderTestimonial />
