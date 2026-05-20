@@ -4,7 +4,6 @@ import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { isCheckoutReturnPath } from "@/utils/checkoutSession";
-import { getDefaultDashboard } from "@/utils/roleRedirection";
 
 const Login = () => {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -27,12 +26,8 @@ const Login = () => {
     : requestedRedirect;
 
   const handleLoginSuccess = useCallback(() => {
-    if (isDefaultRedirect && user) {
-      navigate(getDefaultDashboard(user.role), { replace: true });
-    } else {
-      navigate(redirectTo, { replace: true });
-    }
-  }, [navigate, redirectTo, isDefaultRedirect, user]);
+    navigate(isDefaultRedirect ? "/" : redirectTo, { replace: true });
+  }, [navigate, redirectTo, isDefaultRedirect]);
 
   if (isLoading) {
     return (
@@ -43,7 +38,7 @@ const Login = () => {
   }
 
   if (isAuthenticated && user) {
-    const finalDest = isDefaultRedirect ? getDefaultDashboard(user.role) : redirectTo;
+    const finalDest = isDefaultRedirect ? "/" : redirectTo;
     return <Navigate to={finalDest} replace />;
   }
 

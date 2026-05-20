@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff, Loader2, Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import { GoogleLoginButton } from './GoogleLoginButton';
-import { getDefaultDashboard } from '@/utils/roleRedirection';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -19,7 +18,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       if (onSuccess) {
         onSuccess();
       } else {
-        navigate(getDefaultDashboard(user.role), { replace: true });
+        navigate('/', { replace: true });
       }
     }
   }, [isAuthenticated, isLoading, navigate, onSuccess, user]);
