@@ -242,7 +242,6 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
           <nav className="hidden items-center gap-8 lg:flex">
             {navItems.map((item) =>
               item.hasDropdown ? (
-<<<<<<< HEAD
                 <div
                   key={item.label}
                   ref={solutionsRef}
@@ -263,33 +262,15 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                     "absolute left-1/2 top-full w-56 -translate-x-1/2 pt-4 transition-all duration-200",
                     isSolutionsOpen ? "visible opacity-100" : "invisible opacity-0"
                   )}>
-=======
-                <div key={item.label} className="group relative">
-                  <Link
-                    to={item.href}
-                    className="flex items-center gap-1 text-sm font-medium text-white/75 transition-colors hover:text-white"
-                  >
-                    {item.label}
-                    <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
-                  </Link>
-
-                  <div className="invisible absolute left-1/2 top-full w-56 -translate-x-1/2 pt-4 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100">
->>>>>>> dbe510a (new Ui)
                     <div className="rounded-xl border border-white/15 bg-[#36503F]/95 p-2 shadow-[0_14px_34px_rgba(0,0,0,0.22)] backdrop-blur-xl">
                       {solutionItems.map((solution) => (
                         <Link
                           key={solution.label}
                           to={solution.href}
-<<<<<<< HEAD
                           onClick={() => setIsSolutionsOpen(false)}
                           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-white/85 transition-colors hover:bg-white/10 hover:text-white"
                         >
                           <solution.icon className="h-4 w-4 text-[#FEF8C5]" />
-=======
-                          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-white/85 transition-colors hover:bg-white/10 hover:text-white"
-                        >
-                          <solution.icon className="h-4 w-4 text-[#FEF865]" />
->>>>>>> dbe510a (new Ui)
                           {solution.label}
                         </Link>
                       ))}
@@ -381,11 +362,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
             {navItems.map((item, index) => (
               item.hasDropdown ? (
                 <div key={item.label} className="rounded-lg px-2 py-3">
-<<<<<<< HEAD
                   <p className="mb-3 text-base font-medium text-[#FEF8C5]">{item.label}</p>
-=======
-                  <p className="mb-3 text-base font-medium text-[#FEF865]">{item.label}</p>
->>>>>>> dbe510a (new Ui)
                   <div className="space-y-1">
                     {solutionItems.map((solution) => (
                       <Link
@@ -394,11 +371,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                         onClick={closeDrawer}
                         className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-white/85 hover:bg-white/10 hover:text-white"
                       >
-<<<<<<< HEAD
                         <solution.icon className="h-4 w-4 text-[#FEF8C5]" />
-=======
-                        <solution.icon className="h-4 w-4 text-[#FEF865]" />
->>>>>>> dbe510a (new Ui)
                         {solution.label}
                       </Link>
                     ))}
@@ -409,11 +382,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                   key={item.label}
                   to={item.href}
                   onClick={closeDrawer}
-<<<<<<< HEAD
                   className={cn("rounded-lg px-2 py-3 text-base font-medium text-white", index === 0 && "text-[#FEF8C5]")}
-=======
-                  className={cn("rounded-lg px-2 py-3 text-base font-medium text-white", index === 0 && "text-[#FEF865]")}
->>>>>>> dbe510a (new Ui)
                 >
                   {item.label}
                 </Link>
