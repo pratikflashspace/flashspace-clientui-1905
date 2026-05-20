@@ -51,7 +51,7 @@ export const ScaleSection = () => {
             Unprecedented Scale
           </motion.p>
           <motion.h2
-            className="text-4xl font-semibold leading-[1.12] tracking-normal text-[#FEF8C5] sm:text-5xl lg:text-6xl"
+            className="text-[36px] font-semibold leading-[1.12] tracking-normal text-[#FEF8C5]"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -60,7 +60,7 @@ export const ScaleSection = () => {
             FlashSpace is built for modern businesses.
           </motion.h2>
           <motion.p
-            className="mt-8 max-w-xl text-lg leading-8 text-white/75 sm:text-xl"
+            className="mt-8 max-w-xl text-sm leading-relaxed text-white/75 sm:text-base"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -95,7 +95,7 @@ export const ScaleSection = () => {
         >
           <div className="mb-10 flex flex-wrap items-end gap-3">
             <motion.span
-              className="text-6xl font-black leading-none text-white sm:text-7xl"
+              className="text-2xl font-black leading-none text-white sm:text-3xl"
               initial={{ opacity: 0, scale: 0.88 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -104,7 +104,7 @@ export const ScaleSection = () => {
               24x
             </motion.span>
             <motion.span
-              className="pb-2 text-2xl font-bold text-white/75 sm:text-3xl"
+              className="text-lg font-bold text-white/75 sm:text-xl"
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -169,10 +169,10 @@ export const ScaleSection = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.86 + index * 0.1 }}
                 >
-                  <div className="text-3xl font-black text-white">
+                  <div className="text-xl lg:text-2xl font-black text-white">
                     {stat.value}
                   </div>
-                  <div className="mt-1 text-sm text-white/55 sm:text-base">
+                  <div className="mt-1 text-xs text-white/55 sm:text-sm">
                     {stat.label}
                   </div>
                 </motion.div>

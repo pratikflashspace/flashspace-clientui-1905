@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { FeatureCTA } from "@/components/sections/FeatureCTA";
+
 import { Stats } from "@/components/sections/Stats";
 import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
 
@@ -493,7 +493,7 @@ const CoworkingSpace = () => {
         </div>
       </div>
 
-      <FeatureCTA />
+
       <Stats />
       <FounderTestimonial />
 

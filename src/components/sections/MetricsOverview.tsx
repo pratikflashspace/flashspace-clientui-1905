@@ -46,7 +46,7 @@ export const MetricsOverview = () => {
           transition={{ duration: 0.55 }}
           className="mb-16 text-center"
         >
-          <p className="text-xl font-medium text-[#6B8F78] sm:text-2xl">
+          <p className="text-base font-medium text-[#6B8F78] sm:text-lg">
             Our commitment to excellence reflected in every metric
           </p>
         </motion.div>
@@ -65,10 +65,10 @@ export const MetricsOverview = () => {
                 +23% this quarter
               </div>
 
-              <div className="mt-6 text-5xl font-black leading-none tracking-tight sm:mt-8 sm:text-6xl">
+              <div className="mt-6 text-3xl font-black leading-none tracking-tight sm:mt-8 sm:text-4xl">
                 5,000+
               </div>
-              <h3 className="mt-2 text-lg font-medium sm:mt-3 sm:text-xl">Happy Clients</h3>
+              <h3 className="mt-2 text-base font-medium sm:mt-3 sm:text-lg">Happy Clients</h3>
             </div>
             <p className="mt-8 text-xs leading-relaxed text-[#FEF8C5]/80 sm:mt-10 sm:text-sm">
               Trusted by businesses of all sizes, from startups to Fortune 500
@@ -93,7 +93,7 @@ export const MetricsOverview = () => {
                     <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                   </div>
                   <div>
-                    <div className="mt-3 text-2xl font-black leading-none text-[#1F2E26] sm:mt-4 sm:text-3xl">
+                    <div className="mt-3 text-xl font-black leading-none text-[#1F2E26] sm:mt-4 sm:text-2xl">
                       {stat.value}
                     </div>
                     <p className="mt-1 text-sm text-[#6B8F78] sm:mt-1.5 sm:text-base">{stat.label}</p>
@@ -116,7 +116,7 @@ export const MetricsOverview = () => {
           >
             <div>
               <div className="mb-5 flex items-start justify-between gap-3 sm:mb-6">
-                <h3 className="text-lg font-black text-[#1F2E26] sm:text-xl">
+                <h3 className="text-base font-black text-[#1F2E26] sm:text-lg">
                   Service Distribution
                 </h3>
                 <span className="shrink-0 rounded-full bg-[#EEF2EE] px-2.5 py-1 text-[10px] text-[#6B8F78] transition-colors duration-300 group-hover:bg-[#36503F] group-hover:text-[#FEF8C5] sm:text-xs">
@@ -152,14 +152,14 @@ export const MetricsOverview = () => {
             <div className="mt-5 border-t border-[#D4E0D0]/70 pt-4 sm:mt-6 sm:pt-5">
               <div className="flex items-end justify-between gap-4">
                 <div>
-                  <p className="text-sm font-medium text-[#6B8F78] sm:text-base">
+                  <p className="text-xs font-medium text-[#6B8F78] sm:text-sm">
                     Total Coverage
                   </p>
                   <p className="mt-0.5 text-[10px] text-[#8A9A8D] sm:mt-1 sm:text-xs">
                     All services combined
                   </p>
                 </div>
-                <div className="text-2xl font-black text-[#36503F] sm:text-3xl">100%</div>
+                <div className="text-xl font-black text-[#36503F] sm:text-2xl">100%</div>
               </div>
             </div>
           </motion.article>

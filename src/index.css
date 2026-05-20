@@ -180,7 +180,8 @@
     @apply border-border;
   }
 
-  html, body {
+  html,
+  body {
     overflow-x: clip;
     max-width: 100%;
     width: 100vw;
@@ -267,7 +268,7 @@
     gap: 8px;
     border-radius: 999px;
     padding: 14px 28px;
-    font: 700 14px/1 "Inter", sans-serif;
+    font: 600 14px/1 "Inter", sans-serif;
     transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
   }
 
@@ -602,18 +603,24 @@
 }
 
 @keyframes gentle-bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-8px);
   }
 }
 
 @keyframes typing-bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }
@@ -924,7 +931,8 @@
 }
 
 .scrollbar-hover-only::-webkit-scrollbar {
-  width: 8px; /* Increased width for better interaction */
+  width: 8px;
+  /* Increased width for better interaction */
 }
 
 .scrollbar-hover-only::-webkit-scrollbar-track {
@@ -941,11 +949,13 @@
 }
 
 .scrollbar-hover-only:hover::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.3); /* Slightly more visible */
+  background: hsl(var(--primary) / 0.3);
+  /* Slightly more visible */
 }
 
 .scrollbar-hover-only:hover::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.5); /* Even more visible when dragging */
+  background: hsl(var(--primary) / 0.5);
+  /* Even more visible when dragging */
 }
 
 .scrollbar-custom::-webkit-scrollbar,
@@ -1240,15 +1250,18 @@ html.lenis body {
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
 }
+
 @keyframes toast-enter {
   0% {
     transform: translateY(-20px) scale(0.9);
     opacity: 0;
   }
+
   60% {
     transform: translateY(5px) scale(1.02);
     opacity: 1;
   }
+
   100% {
     transform: translateY(0) scale(1);
     opacity: 1;
@@ -1260,6 +1273,7 @@ html.lenis body {
     transform: scale(1);
     opacity: 1;
   }
+
   100% {
     transform: scale(0.9);
     opacity: 0;
@@ -1273,4 +1287,3 @@ html.lenis body {
 .toast-animate-out {
   animation: toast-exit 0.3s ease-in forwards;
 }
-

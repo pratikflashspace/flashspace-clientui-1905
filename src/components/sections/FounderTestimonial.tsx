@@ -56,15 +56,15 @@ export const FounderTestimonial = () => {
             transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
             className="flex flex-col items-center"
           >
-            <blockquote className="max-w-[980px] text-balance text-2xl font-medium leading-[1.28] tracking-normal text-white sm:text-3xl lg:text-4xl">
+            <blockquote className="max-w-[980px] text-balance text-lg font-medium leading-[1.28] tracking-normal text-white sm:text-xl lg:text-2xl">
               "{active.quote}"
             </blockquote>
 
             <div className="mt-20">
-              <p className="text-lg font-extrabold text-white sm:text-xl">
+              <p className="text-sm font-extrabold text-white sm:text-base">
                 {active.name}
               </p>
-              <p className="mt-2 text-sm text-[#FEF8C5]/45 sm:text-base">
+              <p className="mt-2 text-[11px] text-[#FEF8C5]/45 sm:text-xs">
                 {active.role}
               </p>
             </div>
@@ -78,11 +78,10 @@ export const FounderTestimonial = () => {
               type="button"
               aria-label={`Show testimonial ${index + 1}`}
               onClick={() => setActiveIndex(index)}
-              className={`h-3 rounded-full transition-all duration-300 ${
-                activeIndex === index
-                  ? "w-8 bg-[#EDB003]"
-                  : "w-3 bg-white/20 hover:bg-white/35"
-              }`}
+              className={`h-3 rounded-full transition-all duration-300 ${activeIndex === index
+                ? "w-8 bg-[#EDB003]"
+                : "w-3 bg-white/20 hover:bg-white/35"
+                }`}
             />
           ))}
         </div>

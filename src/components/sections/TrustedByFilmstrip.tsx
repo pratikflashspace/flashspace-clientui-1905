@@ -147,19 +147,7 @@ export const TrustedByFilmstrip = () => {
       ref={sectionRef}
       className="relative py-8 overflow-hidden bg-[#FAFAF7]"
     >
-      {/* Header */}
-      <div className="relative z-10 fs-container mb-5 sm:mb-7 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-          className="flex flex-col items-center gap-2.5"
-        >
-          <h2 className="inline-flex items-center rounded-full border border-[#D4E0D0] bg-[#F0F4EE] px-4 py-2 text-sm sm:text-base font-semibold uppercase tracking-[0.14em] text-[#36503F]">
-            Trusted by 5000+ Businesses
-          </h2>
-        </motion.div>
-      </div>
+
 
       {/* Logo scroll rows */}
       <div className="relative z-10 fs-container space-y-2 sm:space-y-3 overflow-hidden">

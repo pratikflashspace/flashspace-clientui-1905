@@ -81,8 +81,8 @@ const PaymentSuccessPage = () => {
         <div className="max-w-lg w-full text-center py-12">
           {/* Success Animation */}
           <div className="mb-8">
-            <div className="w-24 h-24 mx-auto bg-green-500/10 rounded-full flex items-center justify-center animate-bounce-slow">
-              <CheckCircle className="w-14 h-14 text-green-500" />
+            <div className="w-24 h-24 mx-auto bg-[#F0F4EE] rounded-full flex items-center justify-center animate-bounce-slow">
+              <CheckCircle className="w-14 h-14 text-[#36503F]" />
             </div>
           </div>
 
@@ -92,7 +92,7 @@ const PaymentSuccessPage = () => {
             Your booking has been confirmed.
           </p>
           {paymentDetails?.bookingId && (
-            <div className="flex items-center justify-center gap-2 text-primary font-medium mb-8 bg-primary/5 py-2 px-4 rounded-full w-fit mx-auto animate-pulse">
+            <div className="flex items-center justify-center gap-2 text-[#36503F] font-bold mb-8 bg-[#F0F4EE] py-2 px-4 rounded-full w-fit mx-auto animate-pulse">
               <Clock className="w-4 h-4" />
               <p className="text-sm">Redirecting to My Bookings in {countdown} seconds...</p>
             </div>
@@ -101,7 +101,7 @@ const PaymentSuccessPage = () => {
           {/* Order Details Card */}
           <div className="bg-card border border-border rounded-xl p-6 mb-8 text-left shadow-sm">
             <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-primary" />
+              <Building2 className="w-5 h-5 text-[#36503F]" />
               Booking Details
             </h3>
 
@@ -160,7 +160,7 @@ const PaymentSuccessPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               onClick={() => navigate(paymentDetails?.bookingId ? `/dashboard/my-bookings?openBooking=${paymentDetails.bookingId}` : '/dashboard/my-bookings')}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3"
+              className="bg-[#36503F] hover:bg-[#1F2E26] text-[#FEF8C5] font-bold px-6 py-3 border-none"
             >
               <Calendar className="w-4 h-4 mr-2" />
               View My Bookings
@@ -168,7 +168,7 @@ const PaymentSuccessPage = () => {
             <Button 
               variant="outline"
               onClick={() => navigate('/')}
-              className="border-border text-foreground font-semibold px-6 py-3"
+              className="border-[#36503F]/30 text-[#36503F] hover:bg-[#F0F4EE] font-semibold px-6 py-3"
             >
               <Home className="w-4 h-4 mr-2" />
               Go Home
@@ -177,7 +177,7 @@ const PaymentSuccessPage = () => {
 
           {/* Help Text */}
           <p className="text-sm text-muted-foreground mt-8">
-            Need help? <Link to="/contact" className="text-primary hover:underline">Contact Support</Link>
+            Need help? <Link to="/contact" className="text-[#36503F] font-semibold hover:underline">Contact Support</Link>
           </p>
         </div>
       </main>

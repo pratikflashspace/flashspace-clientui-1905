@@ -100,7 +100,6 @@ export const PlanLocationsShowcase = () => {
                     viewport={{ once: true }}
                     className="mb-8 sm:mb-12 text-center"
                 >
-                    <span className="fs-tag mb-4">Popular spaces</span>
                     <h2 className="text-3xl sm:text-4xl lg:text-4xl font-bold tracking-[-0.02em] text-[#1A1A1A] mb-3 px-2">
                         Everything Your Business Needs, Pan India
                     </h2>
@@ -109,57 +108,30 @@ export const PlanLocationsShowcase = () => {
                     </p>
                 </motion.div>
 
-                {/* Tabs + Slider arrows */}
-                <div className="flex flex-col sm:flex-row items-center justify-between mb-8 sm:mb-10 gap-6">
-                    <div className="hidden lg:block w-32" />
-                    <div className="bg-[#FAFAF7] rounded-xl px-4 sm:px-6 py-3 sm:py-4 inline-block max-w-full overflow-x-auto scrollbar-hide border border-[#D4E0D0]">
-                        <div className="relative">
-                            <div className="flex gap-6 sm:gap-9 whitespace-nowrap">
-                                {services.map((s, i) => (
-                                    <button
-                                        key={s.name}
-                                        onClick={() => { setActiveIndex(i); setSlideIndex(0); }}
-                                        className={`relative pb-2 sm:pb-3 text-sm sm:text-[15px] transition-colors duration-250 ease-out cursor-pointer border-none outline-none bg-transparent ${i === activeIndex
-                                            ? "font-medium text-foreground"
-                                            : "font-normal text-muted-foreground hover:text-foreground/70"
-                                            }`}
-                                    >
-                                        {s.name}
-                                        {i === activeIndex && (
-                                            <motion.div
-                                                layoutId="active-tab-underline"
-                                                className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#36503F] rounded-full"
-                                                transition={{ duration: 0.25, ease: "easeOut" }}
-                                            />
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="absolute bottom-0 left-0 right-0 h-px bg-border/50" />
-                        </div>
-                    </div>
-
-                    {/* Arrow buttons - hidden on mobile/tablet as sliding is handled by user */}
-                    <div className="hidden lg:flex gap-2">
+                {/* Cards Container */}
+                <div className="relative group">
+                    {/* Left Arrow */}
+                    <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 -left-8 xl:-left-16 z-10">
                         <button
                             onClick={() => setSlideIndex((p) => Math.max(0, p - 1))}
                             disabled={!canPrev}
-                            className="w-10 h-10 rounded-full border border-[#36503F] bg-[#36503F] flex items-center justify-center text-[#FEF8C5] hover:bg-[#1F2E26] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="w-10 h-10 rounded-full border border-[#36503F] bg-[#36503F] flex items-center justify-center text-[#FEF8C5] hover:bg-[#1F2E26] shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                         >
-                            <ChevronLeft className="w-5 h-5" />
+                            <ChevronLeft className="w-5 h-5 pr-0.5" />
                         </button>
+                    </div>
+
+                    {/* Right Arrow */}
+                    <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 -right-8 xl:-right-16 z-10">
                         <button
                             onClick={() => setSlideIndex((p) => Math.min(totalPages - 1, p + 1))}
                             disabled={!canNext}
-                            className="w-10 h-10 rounded-full border border-[#36503F] bg-[#36503F] flex items-center justify-center text-[#FEF8C5] hover:bg-[#1F2E26] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="w-10 h-10 rounded-full border border-[#36503F] bg-[#36503F] flex items-center justify-center text-[#FEF8C5] hover:bg-[#1F2E26] shadow-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                         >
-                            <ChevronRight className="w-5 h-5" />
+                            <ChevronRight className="w-5 h-5 pl-0.5" />
                         </button>
                     </div>
-                </div>
 
-                {/* Cards Container */}
-                <div className="relative">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={`${active.name}-${slideIndex}-${screenSize}`}

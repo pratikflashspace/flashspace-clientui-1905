@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import { HeroWithSearch } from "@/components/sections/HeroWithSearch";
 import { ScrollNavLayout } from "@/components/sections/ScrollNavLayout";
 import { PlanLocationsShowcase } from "@/components/sections/PlanLocationsShowcase";
-import { FeatureCTA } from "@/components/sections/FeatureCTA";
+
 import { ScaleSection } from "@/components/sections/ScaleSection";
 import { MetricsOverview } from "@/components/sections/MetricsOverview";
 import { Stats } from "@/components/sections/Stats";
@@ -57,7 +57,7 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
           <MetricsOverview />
         </FadeInSection>
         <FadeInSection>
-          <FeatureCTA />
+
         </FadeInSection>
         <FadeInSection>
           <FounderTestimonial />
