@@ -30,8 +30,8 @@ const navItems = [
 ];
 
 const solutionItems = [
-  { label: "Virtual Space", href: "/solutions/virtual-office", icon: Building2 },
-  { label: "Coworking Space", href: "/solutions/coworking-space", icon: Users },
+  { label: "Virtual Office", href: "/solutions/virtual-office" },
+  { label: "Coworking Space", href: "/solutions/coworking-space" },
 ];
 
 const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNode => {
@@ -290,7 +290,6 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                           onClick={() => setIsSolutionsOpen(false)}
                           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-white/85 transition-colors hover:bg-white/10 hover:text-white"
                         >
-                          <solution.icon className="h-4 w-4 text-[#FEF8C5]" />
                           {solution.label}
                         </Link>
                       ))}
@@ -398,7 +397,6 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                         onClick={closeDrawer}
                         className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-white/85 hover:bg-white/10 hover:text-white"
                       >
-                        <solution.icon className="h-4 w-4 text-[#FEF8C5]" />
                         {solution.label}
                       </Link>
                     ))}

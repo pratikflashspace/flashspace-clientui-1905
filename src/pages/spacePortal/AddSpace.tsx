@@ -158,6 +158,7 @@ export default function AddSpace() {
 
   const [propertyData, setPropertyData] = useState({
     name: "",
+    spaceId: "",
     address: "",
     city: "",
     area: "",
@@ -218,6 +219,7 @@ export default function AddSpace() {
         const prop = await propertyService.getPropertyById(targetId);
         setPropertyData({
           name: prop.name || "",
+          spaceId: prop.spaceId || "",
           address: prop.address || "",
           city: prop.city || "",
           area: prop.area || "",
@@ -939,6 +941,17 @@ export default function AddSpace() {
                }
              }}
              className={errors.name ? "border-destructive ring-destructive" : ""}
+           />
+        </div>
+
+        <div className="space-y-2">
+           <label className="text-[10px] uppercase tracking-widest font-black text-muted-foreground ml-1">Space ID</label>
+           <Input
+             placeholder="e.g. SP-12345"
+             value={propertyData.spaceId}
+             onChange={(e) => {
+               setPropertyData({ ...propertyData, spaceId: e.target.value });
+             }}
            />
         </div>
 

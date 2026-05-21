@@ -24,7 +24,7 @@
 
     /* FlashSpace v2 design system */
     --primary: 143 20% 26%;
-    --primary-foreground: 143 20% 26%;
+    --primary-foreground: 0 0% 100%;
     --primary-glow: 143 20% 26%;
 
     --accent: 58 99% 70%;
