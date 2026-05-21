@@ -850,7 +850,7 @@ export default function SpacePortalLayout() {
               <div className="flex items-center justify-end px-4 pt-4 lg:hidden">
                 <button
                   onClick={() => setIsSidebarOpen(true)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#2D3F33]/20 bg-white shadow-sm text-[#164e4e] hover:bg-[#FDE68A] hover:border-[#FDE68A]/50 transition-colors"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#2D3F33]/20 bg-white shadow-sm text-[#164e4e] hover:bg-[#FEF8C5] hover:border-[#FEF8C5]/50 transition-colors"
                   title="Open sidebar"
                 >
                   <Menu size={22} />

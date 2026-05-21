@@ -268,7 +268,7 @@ const TrackProgress = () => {
                     variant={currentPage === page ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(page)}
-                    className={`w-9 h-9 p-0 rounded-xl font-bold ${currentPage === page ? 'shadow-md bg-[#2D3F33] text-[#FDE68A]' : 'border-[#DDE5DA] bg-white'}`}
+                    className={`w-9 h-9 p-0 rounded-xl font-bold ${currentPage === page ? 'shadow-md bg-[#2D3F33] text-[#FEF8C5]' : 'border-[#DDE5DA] bg-white'}`}
                   >
                     {page}
                   </Button>

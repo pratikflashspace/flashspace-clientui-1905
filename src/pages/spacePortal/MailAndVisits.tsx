@@ -240,14 +240,14 @@ const MailAndVisits = () => {
             <TabsTrigger
               value="mail"
               onClick={() => setActiveTab("mail")}
-              className="rounded-lg px-8 py-2 font-bold data-[state=active]:bg-[#2D3F33] data-[state=active]:text-[#FDE68A] data-[state=active]:shadow-sm transition-all"
+              className="rounded-lg px-8 py-2 font-bold data-[state=active]:bg-[#2D3F33] data-[state=active]:text-[#FEF8C5] data-[state=active]:shadow-sm transition-all"
             >
               Mail Records
             </TabsTrigger>
             <TabsTrigger
               value="visits"
               onClick={() => setActiveTab("visits")}
-              className="rounded-lg px-8 py-2 font-bold data-[state=active]:bg-[#2D3F33] data-[state=active]:text-[#FDE68A] data-[state=active]:shadow-sm transition-all"
+              className="rounded-lg px-8 py-2 font-bold data-[state=active]:bg-[#2D3F33] data-[state=active]:text-[#FEF8C5] data-[state=active]:shadow-sm transition-all"
             >
               Visit Records
             </TabsTrigger>
@@ -478,7 +478,7 @@ const MailAndVisits = () => {
                             size="sm"
                             onClick={() => fetchMails(p)}
                             className={`h-8 w-8 p-0 rounded-lg text-xs font-bold transition-all ${
-                              mailPagination.page === p ? "bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90" : "hover:bg-primary/10"
+                              mailPagination.page === p ? "bg-[#2D3F33] text-[#FEF8C5] hover:bg-[#2D3F33]/90" : "hover:bg-primary/10"
                             }`}
                           >
                             {p}
@@ -616,7 +616,7 @@ const MailAndVisits = () => {
                             size="sm"
                             onClick={() => fetchVisits(p)}
                             className={`h-8 w-8 p-0 rounded-lg text-xs font-bold transition-all ${
-                              visitPagination.page === p ? "bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90" : "hover:bg-primary/10"
+                              visitPagination.page === p ? "bg-[#2D3F33] text-[#FEF8C5] hover:bg-[#2D3F33]/90" : "hover:bg-primary/10"
                             }`}
                           >
                             {p}

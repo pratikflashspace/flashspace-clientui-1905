@@ -25,7 +25,7 @@ interface HeaderProps {
 const navItems = [
   { label: "Solutions", href: "/solutions/virtual-office", hasDropdown: true },
   { label: "Workspaces", href: "/services/virtual-office" },
-  { label: "Business Setup", href: "/solutions/business-setup" },
+  { label: "Business Setup", href: "/services/business-setup" },
   { label: "Partners", href: "/partner" },
 ];
 

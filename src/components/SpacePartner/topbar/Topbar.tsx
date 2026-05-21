@@ -91,7 +91,7 @@ function NotificationButton({
       <Bell className="h-4 w-4 sm:h-[18px] sm:w-[18px]" />
 
       {unreadCount > 0 ? (
-        <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-[#2D3F33] px-1 text-[9px] font-bold text-[#FDE68A] shadow-sm sm:h-5 sm:min-w-[1.25rem] sm:px-1.5 sm:text-[10px]">
+        <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-[#2D3F33] px-1 text-[9px] font-bold text-[#FEF8C5] shadow-sm sm:h-5 sm:min-w-[1.25rem] sm:px-1.5 sm:text-[10px]">
           {unreadCount > 9 ? "9+" : unreadCount}
         </span>
       ) : null}
@@ -137,7 +137,7 @@ function ProfileMenu({
             </div>
           ) : null}
 
-          <ChevronDown className="h-3.5 w-3.5 text-[#164e4e]/70 dark:text-gray-400 transition-transform duration-300 group-hover:translate-y-0.5 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] sm:h-4 sm:w-4" />
+          <ChevronDown className="h-3.5 w-3.5 text-[#164e4e]/70 dark:text-gray-400 transition-transform duration-300 group-hover:translate-y-0.5 group-hover:text-[#2D3F33] dark:group-hover:text-[#FEF8C5] sm:h-4 sm:w-4" />
         </button>
       </DropdownMenuTrigger>
 

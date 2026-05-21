@@ -456,7 +456,6 @@ const CoworkingSpaceComponent = () => {
                 >
                   {spaceDetails.availability?.toLowerCase() === 'unavailable' ? 'Unavailable' : 'Book Now'}
                 </button>
-                <p className="text-center text-xs text-gray-400 mt-4">You won't be charged yet</p>
               </div>
             </div>
 

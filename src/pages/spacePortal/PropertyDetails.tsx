@@ -223,7 +223,7 @@ export default function PropertyDetails() {
                 {property.status?.toUpperCase() || "ACTIVE"}
               </Badge>
               {property.kycStatus === "approved" && (
-                <Badge className="bg-[#FDE68A] hover:bg-[#FDE68A] text-[#0A2A1E] border-none px-3 py-1 font-bold flex gap-1 items-center">
+                <Badge className="bg-[#FEF8C5] hover:bg-[#FEF8C5] text-[#0A2A1E] border-none px-3 py-1 font-bold flex gap-1 items-center">
                   <CheckCircle2 size={12} /> VERIFIED
                 </Badge>
               )}

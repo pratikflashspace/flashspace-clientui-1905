@@ -38,7 +38,7 @@ export default function SelectBox({
           <SelectItem
             key={opt.value}
             value={opt.value}
-            className="rounded-lg px-3 py-2 text-sm font-medium text-[#164e4e] dark:text-gray-100 focus:bg-[#2D3F33]/10 dark:focus:bg-white/10 focus:text-[#164e4e] dark:focus:text-white data-[state=checked]:bg-[#2D3F33]/10 data-[state=checked]:text-[#2D3F33] dark:data-[state=checked]:text-[#FDE68A]"
+            className="rounded-lg px-3 py-2 text-sm font-medium text-[#164e4e] dark:text-gray-100 focus:bg-[#2D3F33]/10 dark:focus:bg-white/10 focus:text-[#164e4e] dark:focus:text-white data-[state=checked]:bg-[#2D3F33]/10 data-[state=checked]:text-[#2D3F33] dark:data-[state=checked]:text-[#FEF8C5]"
           >
             {opt.label}
           </SelectItem>

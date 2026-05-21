@@ -388,9 +388,9 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMen
                   key={item.label}
                   onClick={() => handleNavigation(item.href, item.label)}
                   className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
-                    } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FDE68A] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
+                    } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FEF8C5] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
                 >
-                  <item.icon className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
+                  <item.icon className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FEF8C5] transition-colors duration-300" />
                   {!iconOnly && <span>{item.label}</span>}
                 </button>
               ))}
@@ -401,9 +401,9 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMen
               <button
                 onClick={() => handleNavigation("/services/virtual-office", "Get Workspaces")}
                 className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
-                  } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FDE68A] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
+                  } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FEF8C5] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
               >
-                <Building className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
+                <Building className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FEF8C5] transition-colors duration-300" />
                 {!iconOnly && <span>Get Workspaces</span>}
               </button>
 
@@ -415,9 +415,9 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMen
                   key={item.label}
                   onClick={() => handleNavigation(item.href, item.label)}
                   className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
-                    } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FDE68A] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
+                    } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FEF8C5] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
                 >
-                  <item.icon className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
+                  <item.icon className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FEF8C5] transition-colors duration-300" />
                   {!iconOnly && <span>{item.label}</span>}
                 </button>
               ))}
@@ -430,9 +430,9 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMen
                   key={item.label}
                   onClick={() => handleNavigation(item.href, item.label)}
                   className={`group w-full flex items-center ${iconOnly ? "justify-center" : "gap-3 text-left"
-                    } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FDE68A] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
+                    } py-2.5 px-3 text-[15px] font-medium text-[#485753] dark:text-slate-100 hover:text-[#2D3F33] dark:hover:text-[#FEF8C5] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300`}
                 >
-                  <item.icon className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FDE68A] transition-colors duration-300" />
+                  <item.icon className="w-5 h-5 text-[#7a8682] dark:text-gray-400 group-hover:text-[#2D3F33] dark:group-hover:text-[#FEF8C5] transition-colors duration-300" />
                   {!iconOnly && <span>{item.label}</span>}
                 </button>
               ))}
@@ -450,7 +450,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMen
                     onOpenLogin();
                     onClose();
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 text-[15px] font-bold text-[#2D3F33] dark:text-white border-2 border-[#2D3F33]/10 dark:border-white/10 rounded-xl hover:bg-[#2D3F33] hover:text-[#FDE68A] dark:hover:bg-white/5 transition-all duration-300"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 text-[15px] font-bold text-[#2D3F33] dark:text-white border-2 border-[#2D3F33]/10 dark:border-white/10 rounded-xl hover:bg-[#2D3F33] hover:text-[#FEF8C5] dark:hover:bg-white/5 transition-all duration-300"
                 >
                   Log In / Sign Up
                 </button>
@@ -465,7 +465,7 @@ const SidebarMenu = ({ isOpen, onClose, onOpenLogin, onOpenContact }: SidebarMen
                     handleNavigation("#contact");
                   }
                 }}
-                className="w-full rounded-[20px] bg-[#2D3F33] text-[#FDE68A] font-bold py-4 text-[15px] hover:bg-[#344C3D] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-md hover:shadow-lg"
+                className="w-full rounded-[20px] bg-[#2D3F33] text-[#FEF8C5] font-bold py-4 text-[15px] hover:bg-[#344C3D] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 Get Consultation
               </button>

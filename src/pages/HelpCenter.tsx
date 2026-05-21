@@ -78,7 +78,7 @@ const categories = [
     },
     {
         title: "Locations & Cities",
-        description: "Find workspaces across 80+ cities in India.",
+        description: "Find workspaces across 20+ states in India.",
         icon: MapPin,
         links: ["Search by city", "Workspace amenities", "Operating hours", "View all →"],
     },
@@ -151,9 +151,9 @@ const faqGroups = [
     {
         label: "General",
         faqs: [
-            { q: "What is FlashSpace?", a: "FlashSpace is a B2B workspace platform offering virtual offices, coworking spaces, on-demand workspaces, and business setup services across 80+ cities in India." },
+            { q: "What is FlashSpace?", a: "FlashSpace is a B2B workspace platform offering virtual offices, coworking spaces, on-demand workspaces, and business setup services across 20+ states in India." },
             { q: "How do I create an account?", a: "Click 'Get Started' on the homepage, enter your business email, verify it, and complete your profile. You can start booking workspaces immediately." },
-            { q: "Is FlashSpace available in my city?", a: "We operate in 80+ cities across India. Use the Locations page or search by city name to check availability in your area." },
+            { q: "Is FlashSpace available in my city?", a: "We operate in 20+ states across India. Use the Locations page or search by city name to check availability in your area." },
         ],
     },
     {
@@ -219,7 +219,7 @@ const communityQuestions = [
         time: "1 day ago",
         question: "How do day passes work? Can I use them at any location across cities?",
         answers: [
-            { author: "FlashSpace Team", avatar: "FS", text: "Day passes give you access to any coworking space in our network. You can book a desk at any location across 80+ cities through the app or website. Each pass is valid for one full working day.", time: "20 hours ago", isOfficial: true },
+            { author: "FlashSpace Team", avatar: "FS", text: "Day passes give you access to any coworking space in our network. You can book a desk at any location across 20+ states through the app or website. Each pass is valid for one full working day.", time: "20 hours ago", isOfficial: true },
         ],
     },
 ];

@@ -105,7 +105,7 @@ export default function MonthView({
                     <span
                       className={`flex h-8 w-8 items-center justify-center rounded-xl text-sm font-extrabold transition-all duration-300 z-10 relative ${
                         isDayToday
-                          ? "bg-[#2D3F33] text-[#FDE68A] shadow-lg scale-110"
+                          ? "bg-[#2D3F33] text-[#FEF8C5] shadow-lg scale-110"
                           : !isCurrentMonth
                             ? "text-muted-foreground/40"
                             : "text-foreground group-hover:text-primary"

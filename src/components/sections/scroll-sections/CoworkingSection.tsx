@@ -76,7 +76,7 @@ export const CoworkingSection = () => {
                 {/* Stats */}
                 <div className="flex flex-wrap gap-8 lg:gap-16 pt-8 border-t border-border/50">
                     {[
-                        { value: "500+", label: "Coworking locations" },
+                        { value: "100+", label: "Coworking locations" },
                         { value: "₹4,999", label: "Starting price/month" },
                         { value: "24/7", label: "Access available" },
                     ].map((stat) => (

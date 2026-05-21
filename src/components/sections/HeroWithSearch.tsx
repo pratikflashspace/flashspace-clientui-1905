@@ -51,7 +51,7 @@ export const HeroWithSearch = () => {
           </div>
 
           <div className="mt-6 flex flex-wrap justify-center gap-4 text-xs font-medium text-[#6B8F78] sm:gap-6 lg:justify-start">
-            {["GST-ready addresses", "Real Indian support", "80+ cities"].map((item) => (
+            {["GST-ready addresses", "Real Indian support", "20+ states"].map((item) => (
               <span key={item} className="inline-flex items-center gap-2">
                 <Check className="h-4 w-4 text-[#36503F]" /> {item}
               </span>
@@ -72,7 +72,7 @@ export const HeroWithSearch = () => {
                       }}
                       onKeyDown={(event) => event.key === "Enter" && submitSearch()}
                       placeholder="Search city or workspace"
-                      className="w-full bg-transparent text-sm text-[#1A1A1A] outline-none placeholder:text-[#6B8F78]"
+                      className="w-full bg-transparent text-sm text-[#1A1A1A] outline-none border-none focus:ring-0 focus:outline-none placeholder:text-[#6B8F78]"
                     />
                   </label>
                   {showLocationDropdown && locationSearch && matches.length > 0 && (
@@ -105,7 +105,7 @@ export const HeroWithSearch = () => {
                     onChange={(event) => setAiQuery(event.target.value)}
                     onKeyDown={(event) => event.key === "Enter" && aiQuery.trim() && navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`)}
                     placeholder="Ask about spaces, plans, GST..."
-                    className="w-full bg-transparent text-sm outline-none placeholder:text-[#6B8F78]"
+                    className="w-full bg-transparent text-sm outline-none border-none focus:ring-0 focus:outline-none placeholder:text-[#6B8F78]"
                     autoFocus
                   />
                 </label>

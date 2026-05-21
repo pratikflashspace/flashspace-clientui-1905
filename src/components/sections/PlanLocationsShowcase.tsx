@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ListingCardModern from "@/components/services/ListingCardModern";
-import { getAllCoworkingSpaces } from "@/services/coworkingSpace.service";
-import { CoworkingSpaceItem } from "@/types/services";
+import { getAllVirtualOffices } from "@/services/virtualOffice.service";
+import { VirtualOfficeItem } from "@/types/services";
 
 // Using local high-quality assets from the public folder
 const spaceHsr = "/card-koramangala.jpg";
@@ -34,7 +34,7 @@ const POPULAR_SPACE_IDS = ["FSDL01", "FSBLR05", "FSGUR03", "FSNOD04", "FSHYD01",
 export const PlanLocationsShowcase = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [slideIndex, setSlideIndex] = useState(0);
-    const [dynamicSpaces, setDynamicSpaces] = useState<CoworkingSpaceItem[]>([]);
+    const [dynamicSpaces, setDynamicSpaces] = useState<VirtualOfficeItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [screenSize, setScreenSize] = useState<"mobile" | "tablet" | "desktop">("desktop");
     const navigate = useNavigate();
@@ -57,7 +57,7 @@ export const PlanLocationsShowcase = () => {
 
     const handleGetBestPrice = (item: any, isDynamic: boolean) => {
         if (isDynamic) {
-            navigate(`/coworking-space/${item._id}`);
+            navigate(`/space/${item._id}`);
         } else {
             navigate(`/Solutions/virtual-office`);
         }
@@ -67,14 +67,15 @@ export const PlanLocationsShowcase = () => {
         const fetchSpaces = async () => {
             setIsLoading(true);
             try {
-                const spaces = await getAllCoworkingSpaces(100);
+                const response = await getAllVirtualOffices(100);
+                const spaces = response.offices;
                 const filteredSpaces = POPULAR_SPACE_IDS
                     .map(id => spaces.find(s => s.spaceId === id))
-                    .filter(Boolean) as CoworkingSpaceItem[];
+                    .filter(Boolean) as VirtualOfficeItem[];
 
                 setDynamicSpaces(filteredSpaces);
             } catch (error) {
-                console.error("Error fetching coworking spaces for showcase:", error);
+                console.error("Error fetching virtual offices for showcase:", error);
             } finally {
                 setIsLoading(false);
             }

@@ -48,7 +48,7 @@ export default function MonthDatesView({
         >
           {/* Date Header with vertical line accent */}
           <div className="flex items-center gap-4 mb-4">
-            <div className="flex flex-col items-center justify-center w-14 h-14 rounded-2xl bg-[#2D3F33] text-[#FDE68A] shadow-xl border border-white/10 shrink-0">
+            <div className="flex flex-col items-center justify-center w-14 h-14 rounded-2xl bg-[#2D3F33] text-[#FEF8C5] shadow-xl border border-white/10 shrink-0">
               <span className="text-xl font-extrabold">{format(new Date(dateKey), "dd")}</span>
               <span className="text-[10px] font-bold uppercase tracking-tighter opacity-70">{format(new Date(dateKey), "MMM")}</span>
             </div>
