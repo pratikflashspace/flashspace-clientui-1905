@@ -136,7 +136,7 @@ const Footer = () => {
             <img
               src="/Logo/Flashspace Logo.png"
               alt="FlashSpace"
-              className="h-10 sm:h-16 lg:h-20 w-auto brightness-0 invert transition-opacity"
+              className="h-10 sm:h-16 lg:h-20 w-auto brightness-0 invert transition-opacity opacity-70 hover:opacity-100"
             />
           </Link>
 
@@ -148,7 +148,7 @@ const Footer = () => {
               <Link to="/about" className="hover:text-[#FEF8C5] transition-colors">Cookies</Link>
             </div>
             <p className="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-[0.2em] sm:tracking-[0.3em]">
-              © {currentYear} FlashSpace Technologies Private Limited.
+              © {currentYear} Stirring Minds Services Private Limited.
             </p>
           </div>
         </div>

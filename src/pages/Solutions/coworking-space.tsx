@@ -31,10 +31,10 @@ import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
 
 import { CTA } from "@/components/sections/CTA";
 
-const featureCoworking = "/coworking-illustrated-themed.jpg";
-const featureDayPasses = "/feature-day-passes.jpg";
+const featureCoworking = "/home4.jpg";
+const featureDayPasses = "/home10.jpg";
 const featureMeetingRooms = "/coworking-meeting-room.jpg";
-const officeIllustrated = "/hero-illustrated.jpg";
+const officeIllustrated = "/home9.png";
 const videoTestimonial = "/business-setup-illustrated.jpg";
 
 const availableCities = [
@@ -150,7 +150,7 @@ const CoworkingSpace = () => {
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }} className="flex flex-wrap items-center justify-center gap-4 mt-8">
             <div ref={searchRef} className="relative">
               <div className="flex items-center h-12 rounded-xl border border-[#D4E0D0] bg-white overflow-hidden shadow-lg" style={{ width: 400, maxWidth: "90vw" }}>
-                <button 
+                <button
                   onClick={() => navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`)}
                   className="p-4 text-muted-foreground hover:text-foreground transition-colors shrink-0"
                 >
@@ -177,13 +177,13 @@ const CoworkingSpace = () => {
               {showSuggestions && filteredCities.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-foreground/10 rounded-xl shadow-lg z-50 overflow-hidden py-1">
                   {filteredCities.map((city) => (
-                    <button 
-                      key={city} 
-                      onClick={() => { 
-                        setCityQuery(city); 
+                    <button
+                      key={city}
+                      onClick={() => {
+                        setCityQuery(city);
                         setShowSuggestions(false);
                         navigate(`/services/coworking-space?city=${encodeURIComponent(city)}`);
-                      }} 
+                      }}
                       className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-foreground/5 transition-colors"
                     >
                       {city}
@@ -276,7 +276,7 @@ const CoworkingSpace = () => {
 
               <div className="flex flex-wrap gap-8 lg:gap-16 pt-8 border-t border-border/50">
                 {[
-                  { value: "500+", label: "Coworking locations" },
+                  { value: "100+", label: "Coworking locations" },
                   { value: "₹4,999", label: "Starting price/month" },
                   { value: "24/7", label: "Access available" },
                 ].map((stat) => (

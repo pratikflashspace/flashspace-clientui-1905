@@ -271,9 +271,7 @@ const getPhotos = () => {
         >
           Book Now
         </button>
-        <p className="text-center text-[12px] text-muted-foreground mt-2">
-          You won't be charged yet
-        </p>
+
 
         <button
           onClick={() => window.dispatchEvent(new CustomEvent('open-contact-modal'))}

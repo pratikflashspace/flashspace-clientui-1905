@@ -376,7 +376,7 @@ export default function TicketsAndTasks() {
               description: "This feature will be available shortly.",
             })
           }
-          className="bg-[#2D3F33] hover:bg-[#2D3F33]/90 text-[#FDE68A] font-bold rounded-xl shadow-lg transition-all active:scale-95 px-6"
+          className="bg-[#2D3F33] hover:bg-[#2D3F33]/90 text-[#FEF8C5] font-bold rounded-xl shadow-lg transition-all active:scale-95 px-6"
         >
           <Plus className="w-5 h-5 mr-1" />
           Create Task
@@ -423,13 +423,13 @@ export default function TicketsAndTasks() {
         <TabsList className="bg-[#2D3F33]/10 dark:bg-white/5 p-1 rounded-xl w-fit">
           <TabsTrigger
             value="tickets"
-            className="rounded-lg px-6 py-2 font-bold data-[state=active]:bg-[#2D3F33] data-[state=active]:text-[#FDE68A] data-[state=active]:shadow-sm transition-all"
+            className="rounded-lg px-6 py-2 font-bold data-[state=active]:bg-[#2D3F33] data-[state=active]:text-[#FEF8C5] data-[state=active]:shadow-sm transition-all"
           >
             Client Tickets
           </TabsTrigger>
           <TabsTrigger
             value="tasks"
-            className="rounded-lg px-6 py-2 font-bold data-[state=active]:bg-[#2D3F33] data-[state=active]:text-[#FDE68A] data-[state=active]:shadow-sm transition-all"
+            className="rounded-lg px-6 py-2 font-bold data-[state=active]:bg-[#2D3F33] data-[state=active]:text-[#FEF8C5] data-[state=active]:shadow-sm transition-all"
           >
             Team Tasks
           </TabsTrigger>
@@ -557,7 +557,7 @@ export default function TicketsAndTasks() {
                               {ticket.assignee?.profilePicture && (
                                 <AvatarImage src={ticket.assignee.profilePicture} alt={ticket.assignee.fullName} className="object-cover" />
                               )}
-                              <AvatarFallback className="text-[10px] bg-[#2D3F33]/10 text-[#2D3F33] dark:text-[#FDE68A] font-bold uppercase">
+                              <AvatarFallback className="text-[10px] bg-[#2D3F33]/10 text-[#2D3F33] dark:text-[#FEF8C5] font-bold uppercase">
                                 {ticket.assignee?.fullName
                                   ?.split(" ")
                                   .map((n) => n[0])
@@ -603,7 +603,7 @@ export default function TicketsAndTasks() {
                             variant="outline"
                             size="sm"
                             onClick={() => setActiveTicket(ticket)}
-                            className="rounded-xl text-[#2D3F33] dark:text-[#FDE68A] hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 gap-1.5"
+                            className="rounded-xl text-[#2D3F33] dark:text-[#FEF8C5] hover:bg-[#2D3F33]/5 dark:hover:bg-white/5 gap-1.5"
                           >
                             <Eye className="w-4 h-4" />
                             View Details
@@ -645,7 +645,7 @@ export default function TicketsAndTasks() {
                         onClick={() => setCurrentPage(i + 1)}
                         className={`h-8 w-8 p-0 text-xs font-bold rounded-lg ${
                           currentPage === i + 1 
-                            ? "bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90" 
+                            ? "bg-[#2D3F33] text-[#FEF8C5] hover:bg-[#2D3F33]/90" 
                             : "text-[#164e4e]/60 hover:bg-[#2D3F33]/5"
                         }`}
                       >
@@ -879,9 +879,9 @@ export default function TicketsAndTasks() {
                   <div className="flex flex-col items-start gap-1 mt-2 animate-in fade-in slide-in-from-left-2 duration-300">
                     <div className="bg-white dark:bg-[#1a1a1a] border border-[#2D3F33]/10 dark:border-white/10 px-4 py-2.5 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-2">
                       <div className="flex gap-1">
-                        <div className="w-1.5 h-1.5 bg-[#2D3F33] dark:bg-[#FDE68A] rounded-full" style={{ animation: 'typing-bounce 1s infinite' }} />
-                        <div className="w-1.5 h-1.5 bg-[#2D3F33] dark:bg-[#FDE68A] rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.2s' }} />
-                        <div className="w-1.5 h-1.5 bg-[#2D3F33] dark:bg-[#FDE68A] rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.4s' }} />
+                        <div className="w-1.5 h-1.5 bg-[#2D3F33] dark:bg-[#FEF8C5] rounded-full" style={{ animation: 'typing-bounce 1s infinite' }} />
+                        <div className="w-1.5 h-1.5 bg-[#2D3F33] dark:bg-[#FEF8C5] rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.2s' }} />
+                        <div className="w-1.5 h-1.5 bg-[#2D3F33] dark:bg-[#FEF8C5] rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.4s' }} />
                       </div>
                       <span className="text-[10px] font-black text-[#2D3F33]/60 dark:text-gray-400 uppercase tracking-widest">
                         {typingUser} is typing...
@@ -927,7 +927,7 @@ export default function TicketsAndTasks() {
                     <Button
                       onClick={handleSendMessage}
                       disabled={(!messageInput.trim() && selectedFiles.length === 0)}
-                      className="bg-[#2D3F33] text-[#FDE68A] hover:bg-[#2D3F33]/90 rounded-xl"
+                      className="bg-[#2D3F33] text-[#FEF8C5] hover:bg-[#2D3F33]/90 rounded-xl"
                     >
                       <Send className="w-4 h-4" />
                     </Button>
@@ -972,7 +972,7 @@ export default function TicketsAndTasks() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-[#2D3F33]/5 dark:bg-white/5 flex items-center justify-center text-[#2D3F33] dark:text-[#FDE68A] group-hover:bg-[#2D3F33] group-hover:text-[#FDE68A] transition-colors">
+                      <div className="w-12 h-12 rounded-2xl bg-[#2D3F33]/5 dark:bg-white/5 flex items-center justify-center text-[#2D3F33] dark:text-[#FEF8C5] group-hover:bg-[#2D3F33] group-hover:text-[#FEF8C5] transition-colors">
                         <Clock className="w-6 h-6" />
                       </div>
                       <div>
@@ -1010,7 +1010,7 @@ export default function TicketsAndTasks() {
                             "Reviewing requests for this space category will be enabled in the next update.",
                         })
                       }
-                      className="bg-[#2D3F33] hover:bg-[#2D3F33]/90 text-[#FDE68A] rounded-xl h-8 text-xs font-bold px-4"
+                      className="bg-[#2D3F33] hover:bg-[#2D3F33]/90 text-[#FEF8C5] rounded-xl h-8 text-xs font-bold px-4"
                     >
                       Review Request
                     </Button>

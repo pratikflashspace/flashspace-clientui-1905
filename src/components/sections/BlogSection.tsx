@@ -19,7 +19,7 @@ const blogPosts = [
 export const BlogSection = () => {
     return (
         <section className="py-10 lg:py-14 bg-background border-t border-border">
-            <div className="container mx-auto px-4 lg:px-8">
+            <div className="fs-container">
                 <div className="grid lg:grid-cols-[180px_1fr] gap-8 lg:gap-12">
                     {/* Left Label */}
                     <motion.div

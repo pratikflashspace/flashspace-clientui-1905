@@ -17,10 +17,10 @@ export default function CalendarHeader({
     <div className="flex flex-col gap-6 rounded-2xl border border-secondary/20 bg-[#2D3F33] p-6 shadow-2xl sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 rounded-xl bg-[#3FA69E]/20 flex items-center justify-center border border-[#3FA69E]/30 shrink-0">
-          <CalendarDays className="h-6 w-6 text-[#FDE68A]" />
+          <CalendarDays className="h-6 w-6 text-[#FEF8C5]" />
         </div>
         <div>
-          <h2 className="text-xl font-extrabold text-[#FDE68A] tracking-tight uppercase">
+          <h2 className="text-xl font-extrabold text-[#FEF8C5] tracking-tight uppercase">
             Schedule <span className="italic text-[#3FA69E]">Overview</span>
           </h2>
           <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mt-0.5">
@@ -40,7 +40,7 @@ export default function CalendarHeader({
 
           <button
             onClick={onToday}
-            className="px-6 py-2 rounded-lg text-xs font-bold text-[#FDE68A] hover:bg-white/5 transition-all active:scale-95 uppercase tracking-wider"
+            className="px-6 py-2 rounded-lg text-xs font-bold text-[#FEF8C5] hover:bg-white/5 transition-all active:scale-95 uppercase tracking-wider"
           >
             Current
           </button>

@@ -187,14 +187,14 @@ export default function AboutUs() {
 
           <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 pb-20 md:px-10 lg:grid-cols-2 lg:items-center">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger} className="space-y-7">
-              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#164e4e] dark:text-[#FDE68A]">
+              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#164e4e] dark:text-[#FEF8C5]">
                 <span className="h-2 w-2 rounded-full bg-current" />
                 Welcome to FlashSpace
               </motion.div>
 
               <motion.h1 variants={fadeUp} className="text-5xl font-bold leading-tight tracking-tight text-slate-900 dark:text-slate-100 md:text-6xl lg:text-7xl">
                 Redefining <br />
-                <span className="text-[#164e4e] dark:text-[#FDE68A]">Workspace</span> Experiences
+                <span className="text-[#164e4e] dark:text-[#FEF8C5]">Workspace</span> Experiences
               </motion.h1>
 
               <motion.p variants={fadeUp} className="max-w-xl text-lg leading-relaxed text-slate-700 dark:text-slate-300">
@@ -202,13 +202,13 @@ export default function AboutUs() {
               </motion.p>
 
               <motion.div variants={fadeUp} className="flex w-full flex-wrap gap-4 pt-2">
-                <Button className={`${primaryButtonClass} w-full sm:w-auto bg-[#2D3F33] text-[#FDE68A] hover:bg-[#344C3D]`}>
+                <Button className={`${primaryButtonClass} w-full sm:w-auto bg-[#2D3F33] text-[#FEF8C5] hover:bg-[#344C3D]`}>
                   Start Your Journey
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => document.getElementById("location-section")?.scrollIntoView({ behavior: "smooth" })}
-                  className={`${outlineButtonClass} w-full sm:w-auto border-[#2D3F33] text-[#2D3F33] hover:bg-[#2D3F33] hover:text-[#FDE68A] dark:border-[#FDE68A] dark:text-[#FDE68A] dark:hover:bg-[#FDE68A] dark:hover:text-[#1f2e26]`}
+                  className={`${outlineButtonClass} w-full sm:w-auto border-[#2D3F33] text-[#2D3F33] hover:bg-[#2D3F33] hover:text-[#FEF8C5] dark:border-[#FEF8C5] dark:text-[#FEF8C5] dark:hover:bg-[#FEF8C5] dark:hover:text-[#1f2e26]`}
                 >
                   Explore Locations
                 </Button>
@@ -262,9 +262,9 @@ export default function AboutUs() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="mb-16 text-center">
               <h2 className="text-4xl font-bold text-slate-900 dark:text-slate-100 md:text-5xl">
-                Why Choose <span className="text-[#164e4e] dark:text-[#FDE68A]">FlashSpace?</span>
+                Why Choose <span className="text-[#164e4e] dark:text-[#FEF8C5]">FlashSpace?</span>
               </h2>
-              <div className="mx-auto mt-4 h-1.5 w-24 rounded-full bg-[#164e4e] dark:bg-[#FDE68A]" />
+              <div className="mx-auto mt-4 h-1.5 w-24 rounded-full bg-[#164e4e] dark:bg-[#FEF8C5]" />
               <p className="mx-auto mt-6 max-w-2xl text-xl text-slate-700 dark:text-slate-300">
                 We deliver more than just space. We provide the ecosystem for your success, designed for the future of work.
               </p>
@@ -287,12 +287,12 @@ export default function AboutUs() {
                   </div>
                   <div className="space-y-3 p-5">
                     <div className="text-xs font-semibold text-slate-500 dark:text-slate-400">0{idx + 1}</div>
-                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#164e4e]/10 text-[#164e4e] dark:bg-[#FDE68A]/10 dark:text-[#FDE68A]">
+                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#164e4e]/10 text-[#164e4e] dark:bg-[#FEF8C5]/10 dark:text-[#FEF8C5]">
                       <card.icon className="h-5 w-5" strokeWidth={1.5} />
                     </div>
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{card.title}</h3>
                     <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">{card.desc}</p>
-                    <p className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.1em] text-[#164e4e] dark:text-[#FDE68A]">
+                    <p className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.1em] text-[#164e4e] dark:text-[#FEF8C5]">
                       Explore <ArrowRight className="h-3.5 w-3.5" />
                     </p>
                   </div>
@@ -327,7 +327,7 @@ export default function AboutUs() {
                     <img src={t.img} alt={t.title} className="h-40 w-full object-cover" />
                   </div>
                   <div>
-                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#164e4e] dark:text-[#FDE68A]">{t.year}</p>
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#164e4e] dark:text-[#FEF8C5]">{t.year}</p>
                     <h3 className="mb-3 text-2xl font-bold text-slate-900 dark:text-slate-100">{t.title}</h3>
                     <p className="text-slate-700 dark:text-slate-300">{t.details}</p>
                   </div>
@@ -349,7 +349,7 @@ export default function AboutUs() {
               <div>
                 <Button
                   variant="outline"
-                  className={`${outlineButtonClass} border-[#2D3F33] text-[#2D3F33] hover:bg-[#2D3F33] hover:text-[#FDE68A] dark:border-[#FDE68A] dark:text-[#FDE68A] dark:hover:bg-[#FDE68A] dark:hover:text-[#1f2e26]`}
+                  className={`${outlineButtonClass} border-[#2D3F33] text-[#2D3F33] hover:bg-[#2D3F33] hover:text-[#FEF8C5] dark:border-[#FEF8C5] dark:text-[#FEF8C5] dark:hover:bg-[#FEF8C5] dark:hover:text-[#1f2e26]`}
                 >
                   View All Spaces
                 </Button>
@@ -378,7 +378,7 @@ export default function AboutUs() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="mb-16 text-center">
               <h2 className="mb-6 text-4xl font-bold text-slate-900 dark:text-slate-100">
-                Our Core <span className="text-[#164e4e] dark:text-[#FDE68A]">Values</span>
+                Our Core <span className="text-[#164e4e] dark:text-[#FEF8C5]">Values</span>
               </h2>
               <p className="mx-auto max-w-2xl text-xl text-slate-700 dark:text-slate-300">
                 Principles that guide our decisions and shape our culture.
@@ -393,7 +393,7 @@ export default function AboutUs() {
                   whileHover={{ y: -4 }}
                   className="rounded-[1.5rem] border border-border bg-card p-8 shadow-sm"
                 >
-                  <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#164e4e]/10 text-[#164e4e] dark:bg-[#FDE68A]/10 dark:text-[#FDE68A]">
+                  <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#164e4e]/10 text-[#164e4e] dark:bg-[#FEF8C5]/10 dark:text-[#FEF8C5]">
                     <v.icon className="h-7 w-7" strokeWidth={1.5} />
                   </div>
                   <h3 className="mb-4 text-2xl font-bold text-slate-900 dark:text-slate-100">{v.title}</h3>
@@ -434,7 +434,7 @@ export default function AboutUs() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp} className="mb-16">
               <h2 className="mb-6 text-4xl font-bold text-slate-900 dark:text-slate-100 md:text-5xl">
-                Find <span className="text-[#164e4e] dark:text-[#FDE68A]">Us</span>
+                Find <span className="text-[#164e4e] dark:text-[#FEF8C5]">Us</span>
               </h2>
               <p className="max-w-2xl text-xl text-slate-700 dark:text-slate-300">
                 Located in the heart of the city, our flagship center is designed to be your perfect base of operations.
@@ -453,7 +453,7 @@ export default function AboutUs() {
 
                 <div className="space-y-8">
                   <div className="group flex items-start gap-4">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#164e4e]/10 text-[#164e4e] transition-colors group-hover:bg-[#164e4e] group-hover:text-white dark:bg-[#FDE68A]/10 dark:text-[#FDE68A] dark:group-hover:bg-[#FDE68A] dark:group-hover:text-[#1f2e26]">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#164e4e]/10 text-[#164e4e] transition-colors group-hover:bg-[#164e4e] group-hover:text-white dark:bg-[#FEF8C5]/10 dark:text-[#FEF8C5] dark:group-hover:bg-[#FEF8C5] dark:group-hover:text-[#1f2e26]">
                       <MapPin className="h-6 w-6" strokeWidth={1.5} />
                     </div>
                     <div>
@@ -489,7 +489,7 @@ export default function AboutUs() {
                 </div>
 
                 <div className="mt-10 border-t border-border pt-8">
-                  <Button className={`${primaryButtonClass} w-full bg-[#2D3F33] text-[#FDE68A] hover:bg-[#344C3D]`}>
+                  <Button className={`${primaryButtonClass} w-full bg-[#2D3F33] text-[#FEF8C5] hover:bg-[#344C3D]`}>
                     Get Directions
                   </Button>
                 </div>

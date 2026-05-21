@@ -55,7 +55,7 @@ const TestimonialsSection = () => {
 
   const testimonials = [
     {
-      text: "FlashSpace transformed our expansion strategy. With their virtual offices across 100+ cities, we established presence in key markets without the overhead costs.",
+      text: "FlashSpace transformed our expansion strategy. With their virtual offices across 20+ states, we established presence in key markets without the overhead costs.",
       author: "Rajesh Kumar",
       position: "CEO, TechStart Solutions",
       company: "Mumbai",
@@ -209,10 +209,10 @@ const TestimonialsSection = () => {
                   className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#EDB003] mb-2 group-hover:scale-110 transition-transform duration-300"
                   style={{ fontFamily: "Poppins" }}
                 >
-                  100+
+                  20+
                 </div>
                 <div className="text-gray-600 dark:text-gray-400 font-content text-sm">
-                  Cities Covered
+                  States Covered
                 </div>
               </div>
               <div className="group">

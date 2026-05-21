@@ -23,7 +23,7 @@ export default function StatCard({
           </p>
         </div>
 
-        <div className="rounded-xl bg-[#2D3F33]/10 dark:bg-white/10 p-2 text-[#2D3F33] dark:text-[#FDE68A] sm:p-3 [&>svg]:h-5 [&>svg]:w-5 sm:[&>svg]:h-6 sm:[&>svg]:w-6">
+        <div className="rounded-xl bg-[#2D3F33]/10 dark:bg-white/10 p-2 text-[#2D3F33] dark:text-[#FEF8C5] sm:p-3 [&>svg]:h-5 [&>svg]:w-5 sm:[&>svg]:h-6 sm:[&>svg]:w-6">
           {icon}
         </div>
       </div>
@@ -32,14 +32,14 @@ export default function StatCard({
         <div className="mt-3 flex items-center gap-2 text-xs sm:text-sm">
           <span
             className={`font-semibold ${
-              trend === "up" ? "text-[#2D3F33] dark:text-[#FDE68A]" : "text-rose-600"
+              trend === "up" ? "text-[#2D3F33] dark:text-[#FEF8C5]" : "text-rose-600"
             }`}
           >
             {trend === "up" ? "↗" : "↘"}
           </span>
           <span
             className={`font-semibold ${
-              trend === "up" ? "text-[#2D3F33] dark:text-[#FDE68A]" : "text-rose-600"
+              trend === "up" ? "text-[#2D3F33] dark:text-[#FEF8C5]" : "text-rose-600"
             }`}
           >
             {trendLabel}

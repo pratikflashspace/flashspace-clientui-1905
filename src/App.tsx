@@ -217,7 +217,7 @@ const App = () => (
                       />
                       <Route
                         path="/services/business-setup"
-                        element={<BusinessSetup />}
+                        element={<GetWorkspaces />}
                       />
                       <Route
                         path="/Solutions/virtual-office"

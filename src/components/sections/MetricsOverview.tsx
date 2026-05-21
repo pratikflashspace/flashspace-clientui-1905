@@ -10,8 +10,8 @@ const statCards = [
   },
   {
     icon: MapPin,
-    value: "80+",
-    label: "Cities",
+    value: "20+",
+    label: "States",
     change: "+8%",
   },
   {
@@ -22,7 +22,7 @@ const statCards = [
   },
   {
     icon: Clock3,
-    value: "<3 days",
+    value: "<5 days",
     label: "Avg. Setup Time",
     change: "-40%",
   },
@@ -37,8 +37,8 @@ const distribution = [
 
 export const MetricsOverview = () => {
   return (
-    <section className="bg-[#FAFAF7] px-4 py-16 sm:px-6 lg:px-10 lg:py-20">
-      <div className="mx-auto max-w-7xl w-full">
+    <section className="bg-[#FAFAF7] px-4 sm:px-6 lg:px-28 py-16 lg:py-20">
+      <div className="fs-container w-full">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -450,7 +450,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
                 background: rgba(255,255,255,0.95);
                 padding: 4px 8px; border-radius: 12px;
                 display: flex; align-items: center; gap: 4px;
-                font-size: 12px; font-weight: 600;
+                font-size: 12px; font-weight: 500;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.15);
               ">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="#F1B922" stroke="#F1B922" stroke-width="1">
@@ -488,7 +488,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
               <button class="view-details-btn" style="
                 background: #35503F; color: white; border: none;
                 padding: 8px 16px; border-radius: 10px;
-                font-size: 12px; font-weight: 600; cursor: pointer;
+                font-size: 12px; font-weight: 500; cursor: pointer;
                 transition: opacity 0.2s;
               " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
                 View
@@ -611,12 +611,12 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
             maxZoom: 16.5,
             duration: 1200
           });
-          
+
           // If the markers are so far apart that we zoomed out to see full India (zoom < 5),
           // focus back on the center point instead.
           const currentZoom = map.current?.getZoom() || 0;
           if (currentZoom < 6) {
-             map.current?.flyTo({ center: [center.lng, center.lat], zoom: 11, duration: 1000 });
+            map.current?.flyTo({ center: [center.lng, center.lat], zoom: 11, duration: 1000 });
           }
         });
       }
@@ -649,11 +649,10 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
               <button
                 key={key}
                 onClick={() => handleStyleChange(key as MapStyle)}
-                className={`px-4 py-3 text-left transition-all duration-200 border-b border-gray-100 last:border-b-0 ${
-                  currentStyle === key
+                className={`px-4 py-3 text-left transition-all duration-200 border-b border-gray-100 last:border-b-0 ${currentStyle === key
                     ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-inner'
                     : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50'
-                }`}
+                  }`}
                 title={value.description}
               >
                 <div className="flex items-center gap-3">

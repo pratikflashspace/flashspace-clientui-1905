@@ -678,7 +678,7 @@ export default function BookingAnalytics() {
                               variant={currentPage === page ? "default" : "outline"}
                               size="sm"
                               onClick={() => setCurrentPage(page)}
-                              className={`w-9 h-9 p-0 rounded-xl font-bold transition-all ${currentPage === page ? 'shadow-md bg-[#2D3F33] text-[#FDE68A]' : 'border-[#DDE5DA] bg-white hover:bg-[#F8FAF7]'}`}
+                              className={`w-9 h-9 p-0 rounded-xl font-bold transition-all ${currentPage === page ? 'shadow-md bg-[#2D3F33] text-[#FEF8C5]' : 'border-[#DDE5DA] bg-white hover:bg-[#F8FAF7]'}`}
                             >
                               {page}
                             </Button>

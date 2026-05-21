@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 const scaleStats = [
   { value: "98%", label: "Satisfaction rate" },
   { value: "5K+", label: "Happy clients" },
-  { value: "80+", label: "Cities" },
+  { value: "20+", label: "States" },
 ];
 
 export const ScaleSection = () => {
   return (
-    <section className="relative overflow-hidden bg-[#1F2E26] py-20 text-white sm:py-24 lg:py-28">
+    <section className="relative overflow-hidden bg-[#1F2E26] px-4 py-20 text-white sm:py-24 lg:px-10 lg:py-28">
       <motion.div
         className="pointer-events-none absolute inset-y-0 left-8 hidden w-16 border-x border-[#FEF8C5]/5 lg:block"
         initial={{ opacity: 0, y: -40 }}

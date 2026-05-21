@@ -105,7 +105,7 @@ function MiniMonthGrid({
     >
       {/* Header */}
       <div className="bg-muted/50 px-4 py-3 border-b border-border flex justify-between items-center group-hover:bg-[#2D3F33] transition-colors duration-300">
-        <h3 className="font-extrabold text-foreground tracking-tight group-hover:text-[#FDE68A] transition-colors uppercase text-xs">
+        <h3 className="font-extrabold text-foreground tracking-tight group-hover:text-[#FEF8C5] transition-colors uppercase text-xs">
           {format(monthDate, "MMMM")}
         </h3>
         <span className="text-[10px] font-bold text-muted-foreground group-hover:text-primary transition-colors">

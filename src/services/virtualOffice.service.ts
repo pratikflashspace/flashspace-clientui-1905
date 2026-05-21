@@ -102,12 +102,14 @@ export const getVirtualOfficesByCity = async (
 /**
  * Get all virtual offices (optionally paginated by backend defaults)
  */
-export const getAllVirtualOffices = async (): Promise<{
+export const getAllVirtualOffices = async (limit?: number): Promise<{
   offices: VirtualOfficeItem[];
   pagination?: PaginationMeta;
 }> => {
   try {
-    const response = await axiosInstance.get("/virtualOffice/getAll");
+    const params: any = {};
+    if (limit) params.limit = limit;
+    const response = await axiosInstance.get("/virtualOffice/getAll", { params });
     const data = response.data as ApiResponse<any>;
 
     if ([200, 201].includes(response.status) && data.success) {

@@ -44,7 +44,7 @@ const sidebarItems = [
 ];
 
 const voFeatures = [
-  { icon: MapPin, title: "Premium Business Address", desc: "Get a prestigious address in top business districts across 100+ cities." },
+  { icon: MapPin, title: "Premium Business Address", desc: "Get a prestigious address in top business districts across 20+ states." },
   { icon: Mail, title: "Mail Handling & Forwarding", desc: "Professional mail management with scanning and forwarding services." },
   { icon: Phone, title: "Dedicated Phone Line", desc: "Local phone number with call answering and forwarding." },
   { icon: FileText, title: "GST & Business Registration", desc: "Use your virtual office address for company registration and compliance." },
@@ -438,7 +438,7 @@ const VirtualOffice = () => {
 
               <div className="flex flex-wrap gap-8 lg:gap-16 pt-8 border-t border-border/50">
                 {[
-                  { value: "100+", label: "Cities covered" },
+                  { value: "20+", label: "States covered" },
                   { value: "₹699", label: "Starting price/month" },
                   { value: "2-3 days", label: "Activation time" },
                 ].map((stat) => (
@@ -596,7 +596,7 @@ const VirtualOffice = () => {
               {
                 step: "01",
                 title: "Choose Your Plan & City",
-                description: "Select from Business Address, GST Registration, or Mailing Address plans. Pick a premium location across 100+ Indian cities.",
+                description: "Select from Business Address, GST Registration, or Mailing Address plans. Pick a premium location across 20+ Indian states.",
                 cardTitle: "Business Address & GST Registration",
                 cardText: "Get a prestigious address in a prime commercial district for company registration, branding, and seamless GST registration — with all compliance documentation handled.",
               },

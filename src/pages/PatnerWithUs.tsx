@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, animate, useInView } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,8 +64,8 @@ const benefits = [
 ];
 
 const stats = [
-  { value: "500+", label: "Partner Spaces" },
-  { value: "68+", label: "Cities" },
+  { value: "100+", label: "Partner Spaces" },
+  { value: "20+", label: "States" },
   { value: "95%", label: "Partner Retention" },
   { value: "3x", label: "Average Revenue Lift" },
 ];
@@ -82,6 +83,32 @@ const staggerContainerProps = {
   viewport: { once: true, margin: "-100px" },
   transition: { staggerChildren: 0.1 },
 } as const;
+
+const AnimatedCounter = ({ value }: { value: string }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  
+  const numMatches = value.match(/\d+/);
+  const num = numMatches ? parseInt(numMatches[0], 10) : 0;
+  const suffix = value.replace(/\d+/g, '');
+
+  useEffect(() => {
+    if (isInView && ref.current) {
+      const controls = animate(0, num, {
+        duration: 2,
+        ease: "easeOut",
+        onUpdate(val) {
+          if (ref.current) {
+            ref.current.textContent = Math.floor(val) + suffix;
+          }
+        }
+      });
+      return () => controls.stop();
+    }
+  }, [isInView, num, suffix]);
+
+  return <span ref={ref}>0{suffix}</span>;
+};
 
 const PartnerWithUs = () => {
   const [formData, setFormData] = useState({
@@ -149,18 +176,17 @@ const PartnerWithUs = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 border border-slate-100 text-[#334d3d] text-sm font-semibold mb-8 shadow-sm"
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FAFAF7] border border-[#D4E0D0] text-[#36503F] text-sm font-semibold mb-8 shadow-sm"
               >
-                <Zap className="w-4 h-4" />
-                <span>India's #1 Workspace Network</span>
+                
               </motion.div>
 
-              <h1 className="text-5xl lg:text-8xl font-medium tracking-tight mb-8 leading-[1.05] text-[#1A1A1A]">
+              <h1 className="text-[40px] sm:text-5xl lg:text-[56px] font-medium tracking-tight mb-8 leading-[1.05] text-[#1A1A1A]">
                 Partner with us. <br />
-                <span className="text-[#334d3d]">Grow your business.</span>
+                <span className="text-[#36503F]">Grow your business.</span>
               </h1>
 
-              <p className="text-lg lg:text-2xl text-slate-500 max-w-2xl mx-auto mb-12 leading-relaxed font-normal">
+              <p className="text-lg lg:text-2xl text-[#6B8F78] max-w-2xl mx-auto mb-12 leading-relaxed font-normal">
                 Join our network of verified professionals. List your space,
                 reach thousands of clients, and leverage our AI-powered growth
                 tools.
@@ -174,7 +200,7 @@ const PartnerWithUs = () => {
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
                   size="lg"
-                  className="bg-[#334d3d] text-white hover:bg-[#26392d] font-bold px-10 h-14 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto"
+                  className="bg-[#36503F] text-white hover:bg-[#1F2E26] font-bold px-10 h-14 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto"
                 >
                   List Your Space <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
@@ -182,7 +208,7 @@ const PartnerWithUs = () => {
                   onClick={() => setIsMeetingModalOpen(true)}
                   size="lg"
                   variant="ghost"
-                  className="font-semibold px-8 h-14 rounded-2xl text-slate-600 hover:text-[#334d3d] hover:bg-slate-50 transition-all duration-300"
+                  className="font-semibold px-8 h-14 rounded-2xl text-[#6B8F78] hover:text-[#36503F] hover:bg-[#FAFAF7] transition-all duration-300"
                 >
                   Talk to Our Team
                 </Button>
@@ -219,10 +245,10 @@ const PartnerWithUs = () => {
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className="text-center group"
                 >
-                  <div className="text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-2 group-hover:text-[#334d3d] transition-colors duration-300">
-                    {stat.value}
+                  <div className="text-4xl lg:text-5xl font-bold text-[#1A1A1A] mb-2 group-hover:text-[#36503F] transition-colors duration-300">
+                    <AnimatedCounter value={stat.value} />
                   </div>
-                  <div className="text-xs lg:text-sm text-slate-400 font-bold uppercase tracking-widest">
+                  <div className="text-xs lg:text-sm text-[#6B8F78] font-bold uppercase tracking-widest">
                     {stat.label}
                   </div>
                 </motion.div>
@@ -238,7 +264,7 @@ const PartnerWithUs = () => {
               <h2 className="text-4xl lg:text-5xl font-bold text-[#1A1A1A] tracking-tight mb-6">
                 Why partner with us?
               </h2>
-              <p className="text-slate-500 text-xl max-w-2xl mx-auto leading-relaxed">
+              <p className="text-[#6B8F78] text-xl max-w-2xl mx-auto leading-relaxed">
                 We provide the technology, reach, and support you need to scale
                 your workspace business effortlessly.
               </p>
@@ -279,15 +305,15 @@ const PartnerWithUs = () => {
                     whileHover={{ y: -8 }}
                     className="p-10 rounded-3xl border border-border glass-card hover:bg-primary/[0.02] hover:border-primary/20 hover:shadow-2xl transition-all duration-500 group relative overflow-hidden"
                   >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#334d3d]/[0.03] rounded-bl-full -mr-10 -mt-10 group-hover:bg-[#334d3d]/[0.08] transition-colors duration-500" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#36503F]/[0.03] rounded-bl-full -mr-10 -mt-10 group-hover:bg-[#36503F]/[0.08] transition-colors duration-500" />
 
-                    <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-[#334d3d] transition-all duration-500">
-                      <Icon className="w-7 h-7 text-[#334d3d] group-hover:text-white transition-colors duration-500" />
+                    <div className="w-14 h-14 rounded-2xl bg-[#FAFAF7] flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-[#36503F] transition-all duration-500">
+                      <Icon className="w-7 h-7 text-[#36503F] group-hover:text-white transition-colors duration-500" />
                     </div>
                     <h3 className="text-2xl font-bold text-[#1A1A1A] mb-4">
                       {b.title}
                     </h3>
-                    <p className="text-slate-500 text-lg leading-relaxed">
+                    <p className="text-[#6B8F78] text-lg leading-relaxed">
                       {b.description}
                     </p>
                   </motion.div>
@@ -315,7 +341,7 @@ const PartnerWithUs = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 }}
                   style={{ originX: 0 }}
-                  className="h-[2px] bg-gradient-to-r from-slate-100 via-[#334d3d]/20 to-slate-100 w-full"
+                  className="h-[2px] bg-gradient-to-r from-slate-100 via-[#36503F]/20 to-slate-100 w-full"
                 />
               </div>
 
@@ -354,16 +380,16 @@ const PartnerWithUs = () => {
                   >
                     <motion.div
                       whileHover={{ rotate: 5, scale: 1.1 }}
-                      className="w-14 h-14 rounded-full bg-white flex items-center justify-center mb-8 border border-slate-100 shadow-sm group-hover:border-[#334d3d]/30 group-hover:shadow-md transition-all duration-300 relative z-10"
+                      className="w-14 h-14 rounded-full bg-white flex items-center justify-center mb-8 border border-[#D4E0D0] shadow-sm group-hover:border-[#36503F]/30 group-hover:shadow-md transition-all duration-300 relative z-10"
                     >
-                      <item.Icon className="w-6 h-6 text-[#334d3d]" />
+                      <item.Icon className="w-6 h-6 text-[#36503F]" />
                     </motion.div>
 
                     <motion.span
                       initial={{ opacity: 0 }}
                       whileInView={{ opacity: 1 }}
                       transition={{ delay: 0.2 + i * 0.2 }}
-                      className="text-xs font-bold text-slate-500 uppercase tracking-[0.3em] mb-3 group-hover:text-[#334d3d] transition-colors"
+                      className="text-xs font-bold text-[#6B8F78] uppercase tracking-[0.3em] mb-3 group-hover:text-[#36503F] transition-colors"
                     >
                       Step {item.step}
                     </motion.span>
@@ -371,12 +397,12 @@ const PartnerWithUs = () => {
                     <h3 className="text-2xl font-bold text-[#1A1A1A] mb-4 group-hover:translate-y-[-2px] transition-transform duration-300">
                       {item.title}
                     </h3>
-                    <p className="text-slate-500 leading-relaxed text-base max-w-[240px] group-hover:text-slate-600 transition-colors">
+                    <p className="text-[#6B8F78] leading-relaxed text-base max-w-[240px] group-hover:text-[#6B8F78] transition-colors">
                       {item.desc}
                     </p>
 
                     {/* Hover Glow Effect */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-[#334d3d]/[0.02] rounded-full blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-[#36503F]/[0.02] rounded-full blur-[40px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
                   </motion.div>
                 ))}
               </motion.div>
@@ -395,10 +421,10 @@ const PartnerWithUs = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                <h2 className="text-5xl lg:text-7xl font-bold text-[#1a2d1d] tracking-tight mb-6">
+                <h2 className="text-5xl lg:text-7xl font-bold text-[#1A1A1A] tracking-tight mb-6">
                   List your space today
                 </h2>
-                <p className="text-[#334d3d] text-xl lg:text-2xl leading-relaxed mb-12">
+                <p className="text-[#36503F] text-xl lg:text-2xl leading-relaxed mb-12">
                   Fill in your details and our partnership team will get in touch
                   within 24 hours.
                 </p>
@@ -418,10 +444,10 @@ const PartnerWithUs = () => {
                       transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
                       className="flex items-center gap-5"
                     >
-                      <div className="w-7 h-7 rounded-full border-[#1a2d1d]/30 border flex items-center justify-center shrink-0">
-                        <CheckCircle2 className="w-4 h-4 text-[#1a2d1d]" />
+                      <div className="w-7 h-7 rounded-full border-[#1A1A1A]/30 border flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-4 h-4 text-[#1A1A1A]" />
                       </div>
-                      <span className="text-lg text-[#1a2d1d] font-medium">
+                      <span className="text-lg text-[#1A1A1A] font-medium">
                         {point}
                       </span>
                     </motion.div>
@@ -445,10 +471,10 @@ const PartnerWithUs = () => {
                       key={s.label}
                       className="bg-[#FEFCE8] rounded-[2rem] p-8 text-center flex flex-col justify-center items-center shadow-sm"
                     >
-                      <div className="text-3xl font-bold text-[#334d3d] mb-1">
+                      <div className="text-3xl font-bold text-[#36503F] mb-1">
                         {s.value}
                       </div>
-                      <div className="text-sm text-[#334d3d] font-medium leading-tight">
+                      <div className="text-sm text-[#36503F] font-medium leading-tight">
                         {s.label}
                       </div>
                     </div>
@@ -458,14 +484,15 @@ const PartnerWithUs = () => {
 
               {/* Right Column - Form Container */}
               <motion.div
-                initial={{ opacity: 1, y: 20, scale: 1 }}
+                initial={{ opacity: 0, y: 20, scale: 0.98 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                whileHover={{ y: -5, boxShadow: "0 25px 50px -12px rgba(0,0,0,0.15)" }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="lg:mt-16 bg-white border border-black/20 rounded-[2.5rem] p-8 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden"
+                className="lg:mt-16 bg-white border border-black/20 rounded-[2.5rem] p-8 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden transition-all duration-500"
               >
                 {/* Subtle Form Background Glow */}
-                {/* <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#334d3d]/[0.03] blur-[60px] rounded-full pointer-events-none" /> */}
+                {/* <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#36503F]/[0.03] blur-[60px] rounded-full pointer-events-none" /> */}
 
                 <form
                   onSubmit={handleSubmit}
@@ -483,7 +510,7 @@ const PartnerWithUs = () => {
                         }
                         placeholder="John Doe"
                         required
-                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
+                        className="h-12 bg-white border border-[#D4E0D0] rounded-2xl focus-visible:ring-1 focus-visible:ring-[#36503F] transition-all placeholder:text-[#6B8F78]"
                       />
                     </div>
                     <div className="space-y-2.5">
@@ -498,7 +525,7 @@ const PartnerWithUs = () => {
                         }
                         placeholder="john@workspace.com"
                         required
-                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
+                        className="h-12 bg-white border border-[#D4E0D0] rounded-2xl focus-visible:ring-1 focus-visible:ring-[#36503F] transition-all placeholder:text-[#6B8F78]"
                       />
                     </div>
                   </div>
@@ -516,7 +543,7 @@ const PartnerWithUs = () => {
                         }
                         placeholder="+91 98765 43210"
                         required
-                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
+                        className="h-12 bg-white border border-[#D4E0D0] rounded-2xl focus-visible:ring-1 focus-visible:ring-[#36503F] transition-all placeholder:text-[#6B8F78]"
                       />
                     </div>
                     <div className="space-y-2.5">
@@ -533,7 +560,7 @@ const PartnerWithUs = () => {
                         }
                         placeholder="Your Workspace Name"
                         required
-                        className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
+                        className="h-12 bg-white border border-[#D4E0D0] rounded-2xl focus-visible:ring-1 focus-visible:ring-[#36503F] transition-all placeholder:text-[#6B8F78]"
                       />
                     </div>
                   </div>
@@ -549,7 +576,7 @@ const PartnerWithUs = () => {
                       }
                       placeholder="e.g. Delhi, Mumbai, Bangalore"
                       required
-                      className="h-14 bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all placeholder:text-slate-400"
+                      className="h-12 bg-white border border-[#D4E0D0] rounded-2xl focus-visible:ring-1 focus-visible:ring-[#36503F] transition-all placeholder:text-[#6B8F78]"
                     />
                   </div>
 
@@ -564,23 +591,25 @@ const PartnerWithUs = () => {
                       }
                       placeholder="Tell us about your space..."
                       rows={5}
-                      className="bg-[#F8F9FA] border border-slate-200 rounded-2xl focus-visible:ring-1 focus-visible:ring-[#334d3d] transition-all p-4 placeholder:text-slate-400"
+                      className="bg-white border border-[#D4E0D0] rounded-2xl focus-visible:ring-1 focus-visible:ring-[#36503F] transition-all p-4 placeholder:text-[#6B8F78]"
                     />
                   </div>
 
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-[#334d3d] text-[#FDE68A] hover:bg-[#26392d] h-16 rounded-2xl font-bold text-lg shadow-xl shadow-[#334d3d]/20 transition-all duration-300 flex items-center justify-center gap-2"
-                  >
-                    {isSubmitting ? (
-                      "Submitting..."
-                    ) : (
-                      <>
-                        Submit Application <ArrowRight className="w-5 h-5" />
-                      </>
-                    )}
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] h-16 rounded-2xl font-bold text-lg shadow-xl shadow-[#36503F]/20 transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        "Submitting..."
+                      ) : (
+                        <>
+                          Submit Application <ArrowRight className="w-5 h-5" />
+                        </>
+                      )}
+                    </Button>
+                  </motion.div>
                 </form>
               </motion.div>
             </div>
