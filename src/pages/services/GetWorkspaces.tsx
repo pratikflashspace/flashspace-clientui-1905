@@ -684,6 +684,8 @@ const GetWorkspaces = () => {
             if (heading === "FSSAI Registration") imgPath = "/business1.png";
             else if (heading === "Startup India Registration") imgPath = "/business2.png";
             else if (heading === "Company Registration") imgPath = "/business3.png";
+            else if (heading === "MSME / Udyam Registration") imgPath = "/business4.png";
+            else if (heading === "GST Registration") imgPath = "/business5.png";
             return {
               id: `bs-${i+1}`,
               name: heading,
