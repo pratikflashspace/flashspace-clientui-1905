@@ -5,7 +5,15 @@ import { format } from 'date-fns';
 
 import { useNavigate } from 'react-router-dom';
 
-export const NotificationBell: React.FC = () => {
+type NotificationBellProps = {
+    buttonClassName?: string;
+    iconClassName?: string;
+};
+
+export const NotificationBell: React.FC<NotificationBellProps> = ({
+    buttonClassName = "relative p-2 text-gray-600 hover:text-[#36503F] transition-colors",
+    iconClassName = "w-6 h-6",
+}) => {
     const navigate = useNavigate();
     const { notifications, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications, handleNavigate } = useNotifications();
     const [isOpen, setIsOpen] = useState(false);
@@ -34,9 +42,9 @@ export const NotificationBell: React.FC = () => {
             {/* Bell Icon */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors"
+                className={buttonClassName}
             >
-                <Bell className="w-6 h-6" />
+                <Bell className={iconClassName} />
                 {visibleUnreadCount > 0 && (
                     <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full min-w-[18px] text-center">
                         {visibleUnreadCount}
@@ -49,7 +57,7 @@ export const NotificationBell: React.FC = () => {
                 <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden">
                     {/* Header */}
                     <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-[#fcfcfc]">
-                        <h3 className="text-sm font-semibold text-[#1a2f24]">Notifications</h3>
+                        <h3 className="text-sm font-semibold text-[#36503F]">Notifications</h3>
                         <div className="flex gap-3">
                             {visibleUnreadCount > 0 && (
                                 <button
@@ -57,7 +65,7 @@ export const NotificationBell: React.FC = () => {
                                         e.preventDefault();
                                         markAllAsRead();
                                     }}
-                                    className="text-xs text-[#0d3b2e] hover:text-[#D96832] flex items-center gap-1 font-medium transition-colors"
+                                    className="text-xs text-[#36503F] hover:text-[#2a3d30] flex items-center gap-1 font-medium transition-colors"
                                     title="Mark all as read"
                                 >
                                     <Check className="w-3.5 h-3.5" /> Mark all read
@@ -88,7 +96,7 @@ export const NotificationBell: React.FC = () => {
                               visibleNotifications.slice(0, 10).map(n => (
                                   <div
                                       key={n._id}
-                                      className={`group p-4 hover:bg-gray-50/80 transition-colors cursor-pointer relative ${!n.read ? 'bg-[#f0f9f4]' : 'bg-white'}`}
+                                      className={`group p-4 hover:bg-gray-50/80 transition-colors cursor-pointer relative ${!n.read ? 'bg-[#36503F]/5' : 'bg-white'}`}
                                       onClick={() => {
                                           markAsRead(n._id);
                                           handleNavigate(n);
@@ -140,7 +148,7 @@ export const NotificationBell: React.FC = () => {
                                             window.location.href = '/dashboard/notifications';
                                         }
                                     }}
-                                    className="w-full py-2 text-xs font-medium text-[#0d3b2e] hover:bg-[#0d3b2e]/5 rounded-md transition-colors"
+                                    className="w-full py-2 text-xs font-medium text-[#36503F] hover:bg-[#36503F]/5 rounded-md transition-colors"
                                 >
                                     View All Notifications
                                 </button>

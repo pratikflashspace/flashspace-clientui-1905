@@ -2,32 +2,25 @@ import { TrendingUp } from "lucide-react";
 
 const StatCardDashboard = ({ label, value, trend, icon: Icon, delay }: any) => (
     <div
-        className="bg-[#f8f8f8] p-5 md:p-6 rounded-2xl border border-gray-200 shadow transition-all duration-300 group animate-fade-in-up min-h-[140px] md:h-[160px] flex flex-col justify-between"
+        className="bg-[#f8f8f8] px-8 py-7 rounded-2xl border border-gray-200 shadow transition-all duration-300 animate-fade-in-up"
         style={{ animationDelay: `${delay}ms` }}
     >
-        {/* Header: Label and Icon */}
-        <div className="flex justify-between items-start">
-            <span className="text-[#677e73] font-medium text-sm">{label}</span>
-            <div className="w-8 h-8 flex items-center justify-center bg-[#f8f8f8] rounded-full transition-colors group-hover:bg-[#e2e8f0]">
+        <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-[#6B8F78]">{label}</span>
+            <div className="w-8 h-8 rounded-lg bg-[#36503F]/10 flex items-center justify-center">
                 <Icon
-                    size={18}
-                    className="text-[#677e73]"
+                    className="w-4 h-4 text-[#36503F]"
                 />
             </div>
         </div>
-
-        {/* Value and Trend Container */}
-        <div className="flex flex-col gap-2 mt-auto">
-            <h3 className="text-[30px] font-black text-[#1f2e26] leading-none" style={{ fontFamily: "'Inter Tight', sans-serif" }}>
-                {value}
-            </h3>
-            {trend && (
-                <div className="flex items-center gap-1.5 text-sm font-bold text-[#248f4B]">
-                    <TrendingUp size={16} />
-                    <span>{trend}</span>
-                </div>
-            )}
+        <div className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">
+            {value}
         </div>
+        {trend && (
+            <div className="mt-2 text-sm font-medium text-[#6B8F78]">
+                {trend}
+            </div>
+        )}
     </div>
 );
 

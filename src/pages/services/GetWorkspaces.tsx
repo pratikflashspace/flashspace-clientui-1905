@@ -270,11 +270,11 @@ const WorkspaceCard = ({
   };
 
   if (view === "list") {
-    return (
-      <div
-        onClick={handleNavigate}
-        className="flex gap-4 cursor-pointer group bg-card rounded-2xl border border-border/60 p-4 shadow-soft hover:shadow-soft-lg transition-all duration-200"
-      >
+      return (
+        <div
+          onClick={type !== "business-setup" ? handleNavigate : undefined}
+          className={`flex gap-4 group bg-card rounded-2xl border border-border/60 p-4 shadow-soft transition-all duration-200 ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
+        >
         {/* Image — fixed size, never shrinks */}
         <div className="relative w-36 h-auto min-h-[120px] flex-shrink-0 rounded-xl overflow-hidden self-stretch">
           <img
@@ -406,8 +406,8 @@ const WorkspaceCard = ({
   // Grid view
   return (
     <div
-      onClick={handleNavigate}
-      className="cursor-pointer group bg-card rounded-2xl border border-border/60 shadow-soft hover:shadow-soft-lg transition-all duration-200 overflow-hidden flex flex-col"
+      onClick={type !== "business-setup" ? handleNavigate : undefined}
+      className={`group bg-card rounded-2xl border border-border/60 shadow-soft transition-all duration-200 overflow-hidden flex flex-col ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
     >
       {/* Image Section */}
       <div className="relative h-52 overflow-hidden">
@@ -674,18 +674,20 @@ const GetWorkspaces = () => {
         if (workspaceType === "business-setup") {
           const headings = [
             "GST Registration",
-            "Company Registration",
+            "Company Registration (LLP/OPC/Pvt Ltd)",
             "FSSAI Registration",
             "Startup India Registration",
             "MSME / Udyam Registration"
           ];
           const demoBusinessSetups = headings.map((heading, i) => {
             let imgPath = `/home${i+1}.jpg`;
-            if (heading === "FSSAI Registration") imgPath = "/business1.png";
-            else if (heading === "Startup India Registration") imgPath = "/business2.png";
-            else if (heading === "Company Registration") imgPath = "/business3.png";
-            else if (heading === "MSME / Udyam Registration") imgPath = "/business4.png";
-            else if (heading === "GST Registration") imgPath = "/business5.png";
+            let price = "4999";
+            if (heading === "FSSAI Registration") { imgPath = "/business1.png"; price = "2999"; }
+            else if (heading === "Startup India Registration") { imgPath = "/business2.png"; price = "1499"; }
+            else if (heading.includes("Company Registration")) { imgPath = "/business3.png"; price = "11999"; }
+            else if (heading === "MSME / Udyam Registration") { imgPath = "/business4.png"; price = "1499"; }
+            else if (heading === "GST Registration") { imgPath = "/business5.png"; price = "2499"; }
+            
             return {
               id: `bs-${i+1}`,
               name: heading,
@@ -694,7 +696,7 @@ const GetWorkspaces = () => {
               rating: 4.8 + (i % 3) * 0.1,
               reviews: 120 + i * 15,
               tags: ["Company Registration", "GST Setup", "Compliance"],
-              plans: [{ label: "Starting at", price: `₹${4999 + i * 500}` }],
+              plans: [{ label: "Starting at", price: `₹${price}` }],
               image: imgPath,
               images: [imgPath],
               popular: i < 2,

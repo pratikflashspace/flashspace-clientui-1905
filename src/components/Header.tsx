@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Building2, ChevronDown, LayoutDashboard, LogOut, Menu, Settings, Users, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,6 +36,7 @@ const solutionItems = [
 
 const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNode => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -96,6 +97,10 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
   useEffect(() => {
     setIsLoginOpen(openLogin);
   }, [openLogin]);
+
+  useEffect(() => {
+    setIsUserMenuOpen(false);
+  }, [location.pathname, isAuthenticated]);
 
   useEffect(() => {
     setIsSignupOpen(openSignup);

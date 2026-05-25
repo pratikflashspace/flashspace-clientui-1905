@@ -23,9 +23,9 @@ export const deleteCoupon = async (id: string): Promise<void> => {
     await axiosInstance.delete(`${COUPON_BASE}/${id}`);
 };
 
-export const validateCoupon = async (code: string): Promise<ValidateCouponResponse> => {
+export const validateCoupon = async (code: string, spaceName?: string): Promise<ValidateCouponResponse> => {
     try {
-        const response = await axiosInstance.post<ValidateCouponResponse>(`${COUPON_BASE}/validate`, { code });
+        const response = await axiosInstance.post<ValidateCouponResponse>(`${COUPON_BASE}/validate`, { code, spaceName });
         return response.data;
     } catch (error: any) {
         if (error.response && error.response.data) {

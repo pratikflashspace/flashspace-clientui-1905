@@ -24,10 +24,11 @@ const AffiliateLayout = () => {
         if (path.includes("affiliate-invoices")) return "Invoices";
         if (path.includes("lead-management")) return "Lead Management";
         if (path.includes("quotation-generator")) return "Quotation Generator";
+        if (path.includes("coupons")) return "Coupons and Vouchers";
         if (path.includes("marketing-tools")) return "Marketing Tools";
         if (path.includes("leaderboard")) return "Leaderboard";
         if (path.includes("support")) return "Support";
-        if (path.includes("kyc")) return "KYC Verification";
+        if (path.includes("kyc")) return "Profile and KYC";
         if (path.includes("notifications")) return "Notifications";
         return "Dashboard"; // Default
     };
@@ -61,6 +62,9 @@ const AffiliateLayout = () => {
             case "Quotation Generator":
                 navigate("/affiliate-portal/quotation-generator");
                 break;
+            case "Coupons and Vouchers":
+                navigate("/affiliate-portal/coupons");
+                break;
             case "Marketing Tools":
                 navigate("/affiliate-portal/marketing-tools");
                 break;
@@ -70,7 +74,7 @@ const AffiliateLayout = () => {
             case "Support":
                 navigate("/affiliate-portal/support");
                 break;
-            case "KYC Verification":
+            case "Profile and KYC":
                 navigate("/affiliate-portal/kyc");
                 break;
             case "Notifications":
@@ -82,7 +86,7 @@ const AffiliateLayout = () => {
     };
 
     return (
-        <div className="flex h-screen bg-[#F7F7F6] overflow-hidden font-sans" data-lenis-prevent>
+        <div className="flex h-screen bg-[#FAFAF7] overflow-hidden font-sans" data-lenis-prevent>
             {/* 1. Sidebar */}
             <Sidebar
                 isMobileOpen={isMobileOpen}
@@ -96,25 +100,15 @@ const AffiliateLayout = () => {
             {/* 2. Main Content Wrapper */}
             <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden relative transition-all duration-300">
                 {/* --- Header (Mobile/Tablet/Laptop Only) --- */}
-                <header className="xl:hidden bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 shrink-0 z-30 relative shadow-sm">
-                    <div className="flex flex-col">
-                        <div className="flex items-center gap-1 font-extrabold text-xl tracking-tight">
-                            <span className="text-slate-900">flash</span>
-                            <span className="text-primary italic">space</span>
-                        </div>
-                        <p className="hidden sm:block text-[10px] text-gray-400 mt-0.5 font-bold uppercase tracking-widest leading-none">
-                            Affiliate Portal
-                        </p>
+                <header className="xl:hidden bg-white border-b border-[#edede6] h-16 flex items-center justify-between px-4 shrink-0 z-30 relative shadow-sm">
+                    <div className="flex items-center">
+                        <img src="/Logo/Flashspace Logo.png" alt="FlashSpace Logo" className="h-8 w-auto" />
                     </div>
-<button
+                    <button
                         onClick={() => setIsMobileOpen(true)}
-                        className="group relative flex flex-col items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 hover:bg-[#FEF8C3] hover:shadow-sm"
+                        className="group relative flex flex-col items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 hover:bg-gray-100"
                     >
-                        <div className="flex flex-col gap-1 items-center justify-center">
-                            <span className="w-5 h-0.5 bg-gray-600 rounded-full transition-all group-hover:bg-[#2D3F33] group-hover:w-6"></span>
-                            <span className="w-6 h-0.5 bg-gray-600 rounded-full transition-all group-hover:bg-[#2D3F33] group-hover:w-4"></span>
-                            <span className="w-5 h-0.5 bg-gray-600 rounded-full transition-all group-hover:bg-[#2D3F33] group-hover:w-6"></span>
-                        </div>
+                        <Menu className="w-6 h-6 text-gray-700" />
                     </button>
                 </header>
 

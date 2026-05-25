@@ -394,7 +394,7 @@ const BookingPage = () => {
     }
     setCouponLoading(true);
     try {
-      const result = await validateCoupon(couponCode);
+      const result = await validateCoupon(couponCode, spaceDetails?.name);
       if (result.valid && result.data) {
         setAppliedCoupon({
           code: result.data.code,

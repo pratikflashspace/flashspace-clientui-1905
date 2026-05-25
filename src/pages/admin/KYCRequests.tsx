@@ -64,6 +64,7 @@ interface KYCRequest {
     email: string;
     phoneNumber?: string;
     profilePicture?: string;
+    role?: string;
   } | null;
   personalInfo?: {
     fullName?: string;
@@ -496,11 +497,20 @@ export default function KYCRequests() {
     request.user?.email || request.personalInfo?.email || "";
 
   const filteredRequests = requests.filter((request) => {
+    // DEBUG: print user role
+    console.log("KYC Request ID:", request._id, "User Role:", request.user?.role);
+    
     const search = userSearchTerm.trim().toLowerCase();
     const statusMatches =
       kycStatusFilter === "all" || request.overallStatus === kycStatusFilter;
 
     if (!statusMatches) return false;
+    
+    // Filter based on active tab
+    const isAffiliate = request.user?.role === "affiliate";
+    if (activeTab === "users" && isAffiliate) return false;
+    if (activeTab === "affiliates" && !isAffiliate) return false;
+
     if (!search) return true;
 
     return [
@@ -876,9 +886,17 @@ export default function KYCRequests() {
                       <Briefcase className="w-4 h-4 mr-2" />
                       Partner KYC
                     </TabsTrigger>
+                    <TabsTrigger
+                      value="affiliates"
+                      className="flex-1 md:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-bold ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-[#35503f] data-[state=active]:shadow-md"
+                    >
+                      <Briefcase className="w-4 h-4 mr-2" />
+                      Affiliate KYC
+                    </TabsTrigger>
                 </TabsList>
               </div>
-              <TabsContent value="users" className="space-y-6">
+              { (activeTab === "users" || activeTab === "affiliates") && (
+                <TabsContent value={activeTab} className="space-y-6">
                 <div className="grid gap-3 lg:grid-cols-[1fr_180px_150px_auto]">
                   <div className="relative">
                     <Search className="w-5 h-5 text-muted-foreground/70 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -1263,6 +1281,7 @@ export default function KYCRequests() {
                   </>
                 )}
               </TabsContent>
+              )}
 
               <TabsContent value="partners" className="space-y-6">
                 <SpacePartnerKycRequest />

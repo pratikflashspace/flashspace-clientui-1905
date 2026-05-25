@@ -16,8 +16,12 @@ export interface Coupon {
     expiryDate: string;
     createdBy: string;
     usedAt?: string;
+    usedBy?: string[];
+    isAffiliateCoupon?: boolean;
+    affiliateId?: string;
     createdAt: string;
     updatedAt: string;
+    applicableSpace?: string;
 }
 
 export interface CreateCouponDTO {
@@ -25,6 +29,7 @@ export interface CreateCouponDTO {
     discountValue: number;
     expiryDate: string;
     manualCode?: string;
+    applicableSpace?: string;
 }
 
 export interface ValidateCouponResponse {

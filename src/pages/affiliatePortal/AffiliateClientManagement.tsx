@@ -190,7 +190,7 @@ const AffiliateClientManagement: React.FC = () => {
         <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-slate-900">Client Management</h1>
+                <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Client Management</h1>
                 <p className="text-gray-500 text-sm mt-1">
                     Clients who booked through your affiliate coupon code.{" "}
                     <span className="font-medium text-[#5aa39c]">{stats.commissionRate}% commission</span> on paid amount.

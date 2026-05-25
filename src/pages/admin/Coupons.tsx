@@ -548,7 +548,7 @@ export default function Coupons() {
                                         });
                                         setOpenCombobox(false);
                                       }}
-                                      className="cursor-pointer py-3 aria-selected:bg-muted text-foreground"
+                                      className="cursor-pointer py-3 aria-selected:bg-[#35503f]/10 aria-selected:text-[#35503f] text-foreground"
                                     >
                                       <UserIcon
                                         className={cn(

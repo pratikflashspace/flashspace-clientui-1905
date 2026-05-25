@@ -196,13 +196,18 @@ const Dashboard = () => {
     }, [selectedInsight, isLoadingInsight]);
 
     // 3 stat cards: Total Earnings (dynamic), Total Clients (dynamic), Pending Payout (static)
-    const formatCurrency = (v: number) =>
-        new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(v);
+    const formatFullINR = (value: number) => {
+        return value.toLocaleString("en-IN", {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 0,
+        });
+    };
 
     const stats = [
         {
             label: "Total Earnings",
-            value: totalCommission !== null ? formatCurrency(totalCommission) : "—",
+            value: totalCommission !== null ? formatFullINR(totalCommission) : "—",
             trend: "Commission @ 15% of paid amount",
             icon: BadgePercent,
         },
@@ -214,7 +219,7 @@ const Dashboard = () => {
         },
         {
             label: "Pending Payout",
-            value: "₹0",
+            value: formatFullINR(0),
             trend: null,
             icon: Wallet,
         },
@@ -317,20 +322,21 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] p-8 lg:p-12 font-sans animate-fade-in relative">
-            <div className="w-full space-y-10">
+        <div className="min-h-screen bg-[#FAFAF7] p-4 md:p-6 lg:p-8 font-sans animate-fade-in relative">
+            <div className="max-w-7xl mx-auto space-y-8">
                 {/* 1. Page Header */}
-                <div className="animate-fade-in-down mb-10">
-                    <h1 className="text-[2.25rem] font-black text-[#1a2d1d] tracking-tight leading-none mb-3">
-                        Affiliate <span className="text-[#35503F]">Dashboard</span>
+                <div className="animate-fade-in-down">
+                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                        <span className="text-[#1A1A1A]">Affiliate </span>
+                        <span className="text-[#4A6D56] italic">Dashboard</span>
                     </h1>
-                    <p className="text-lg text-[#64748b] font-medium tracking-tight">
+                    <p className="mt-2 text-lg font-medium text-[#6B8F78] tracking-tight">
                         Track your referrals, revenue, and performance
                     </p>
                 </div>
 
                 {/* 2. Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {stats.map((stat, idx) => (
                         <StatCardDashboard
                             key={idx}
@@ -341,11 +347,11 @@ const Dashboard = () => {
                 </div>
 
                 <div className="space-y-6 pt-6">
-                    <div className="space-y-1.5">
-                        <h2 className="text-2xl font-bold text-[#1a2d1d] tracking-tight">
+                    <div className="space-y-0.5">
+                        <h2 className="text-2xl font-extrabold tracking-tight text-[#1A1A1A]">
                             AI-Powered Insights
                         </h2>
-                        <p className="text-base text-[#64748b] font-medium">
+                        <p className="text-sm font-medium text-[#6B8F78]">
                             Leverage AI to maximize your earnings
                         </p>
                     </div>
@@ -420,12 +426,12 @@ const Dashboard = () => {
                             <div className="flex items-center gap-2">
                                 <Sparkles
                                     size={18}
-                                    className="text-[#334D3D] fill-[#334D3D]"
+                                    className="text-[#36503F] fill-[#36503F]"
                                 />
-                                <h3 className="font-bold text-slate-800 text-lg">
+                                <h3 className="font-bold text-[#1A1A1A] text-lg">
                                     {INSIGHT_DATA[selectedInsight].title}
                                 </h3>
-                                <span className="px-2 py-0.5 bg-gray-100 rounded text-[10px] font-bold text-gray-500 uppercase tracking-wider ml-1">
+                                <span className="px-2 py-0.5 bg-[#F0F4EE] rounded text-[10px] font-bold text-[#36503F] uppercase tracking-wider ml-1">
                                     AI Powered
                                 </span>
                             </div>
@@ -443,22 +449,22 @@ const Dashboard = () => {
                             {isLoadingInsight ? (
                                 <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 animate-fade-in">
                                     <div className="relative">
-                                        <div className="w-16 h-16 border-4 border-[#eaf4f3] border-t-[#334D3D] rounded-full animate-spin"></div>
+                                        <div className="w-16 h-16 border-4 border-[#eaf4f3] border-t-[#36503F] rounded-full animate-spin"></div>
                                         <div className="absolute inset-0 flex items-center justify-center">
                                             <Sparkles
                                                 size={20}
-                                                className="text-[#334D3D] animate-pulse"
+                                                className="text-[#36503F] animate-pulse"
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <p className="text-slate-800 font-medium text-lg">
+                                        <p className="text-[#1A1A1A] font-bold text-lg">
                                             {
                                                 INSIGHT_DATA[selectedInsight]
                                                     .loadingText
                                             }
                                         </p>
-                                        <p className="text-gray-400 text-sm mt-1">
+                                        <p className="text-[#6B8F78] font-medium text-sm mt-1">
                                             Processing data points...
                                         </p>
                                     </div>
@@ -476,25 +482,25 @@ const Dashboard = () => {
                                                 className="flex justify-between items-start group"
                                             >
                                                 <div>
-                                                    <p className="text-sm font-bold text-slate-800 mb-1">
+                                                    <p className="text-sm font-bold text-[#1A1A1A] mb-1">
                                                         {metric.label}
                                                     </p>
-                                                    <p className="text-xs text-gray-500">
+                                                    <p className="text-xs font-medium text-[#6B8F78]">
                                                         {metric.subtext}
                                                     </p>
                                                 </div>
                                                 <div className="text-right">
                                                     {metric.isHighlight ? (
-                                                        <span className="text-[#334D3D] font-bold text-lg">
+                                                        <span className="text-[#36503F] font-extrabold text-lg">
                                                             {metric.value}
                                                         </span>
                                                     ) : (
                                                         <div className="flex items-center justify-end gap-2">
-                                                            <span className="font-bold text-lg text-slate-900">
+                                                            <span className="font-extrabold text-lg text-[#1A1A1A]">
                                                                 {metric.value}
                                                             </span>
                                                             {metric.trend && (
-                                                                <span className="bg-green-50 text-green-600 text-[10px] font-bold px-1.5 py-0.5 rounded border border-green-100 flex items-center gap-0.5">
+                                                                <span className="bg-[#F0F4EE] text-[#36503F] text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#D4E0D0] flex items-center gap-0.5">
                                                                     <ArrowUpRight
                                                                         size={
                                                                             10
@@ -513,16 +519,16 @@ const Dashboard = () => {
                                     </div>
 
                                     {/* AI Recommendation Box */}
-                                    <div className="bg-[#eaf4f3]/50 border border-[#334D3D]/20 rounded-xl p-4 flex gap-3 items-start">
+                                    <div className="bg-[#F0F4EE] border border-[#D4E0D0] rounded-xl p-4 flex gap-3 items-start">
                                         <Lightbulb
                                             size={20}
-                                            className="text-[#334D3D] shrink-0 mt-0.5"
+                                            className="text-[#36503F] shrink-0 mt-0.5"
                                         />
                                         <div>
-                                            <p className="text-xs font-bold text-[#334D3D] mb-1">
+                                            <p className="text-xs font-bold text-[#36503F] mb-1">
                                                 AI Recommendation
                                             </p>
-                                            <p className="text-sm text-slate-700 leading-relaxed">
+                                            <p className="text-sm text-[#1A1A1A] font-medium leading-relaxed">
                                                 {
                                                     INSIGHT_DATA[
                                                         selectedInsight
@@ -536,7 +542,7 @@ const Dashboard = () => {
                                     <div className="pt-2 flex justify-end">
                                         <button
                                             onClick={handleRefresh}
-                                            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 shadow-sm rounded-lg text-sm font-semibold text-gray-600 hover:text-[#334D3D] hover:border-[#334D3D] transition-all"
+                                            className="flex items-center gap-2 px-4 py-2 bg-white border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] rounded-lg text-sm font-semibold text-[#1A1A1A] hover:border-[#36503F]/60 transition-all"
                                         >
                                             <RefreshCw size={14} /> Refresh
                                             Insights

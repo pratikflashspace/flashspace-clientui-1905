@@ -136,12 +136,19 @@ const DashboardRevenue = () => {
     }
 
     const formatShortINR = (val: number) => {
-        if (val >= 100000) return `₹${(val / 100000).toFixed(1)}L`;
-        if (val >= 1000) return `₹${(val / 1000).toFixed(0)}K`;
-        return `₹${val}`;
+        const sign = val < 0 ? "-" : "";
+        const amount = Math.abs(val);
+        const compact = (unit: number, suffix: string) => {
+            const floored = Math.floor((amount / unit) * 10) / 10;
+            return `${sign}${floored.toFixed(1).replace(/\.0$/, "")}${suffix}`;
+        };
+        if (amount >= 10000000) return compact(10000000, "Cr");
+        if (amount >= 100000) return compact(100000, "L");
+        if (amount >= 1000) return compact(1000, "K");
+        return `${sign}${amount.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
     };
 
-    const formatFullINR = (val: number) => `₹${val.toLocaleString("en-IN")}`;
+    const formatFullINR = (val: number) => `Rs ${val.toLocaleString("en-IN")}`;
 
     const lastMonth = stats.monthlyEarnings && stats.monthlyEarnings.length > 0
         ? stats.monthlyEarnings[stats.monthlyEarnings.length - 1]
@@ -195,10 +202,10 @@ const DashboardRevenue = () => {
             <div className="max-w-[1400px] mx-auto space-y-12">
                 {/* 1. Header */}
                 <div className="animate-fade-in-down">
-                    <h1 className="text-[2.25rem] font-black text-[#1a2d1d] tracking-tight leading-none mb-3">
-                        Revenue <span className="text-[#35503F] italic">Dashboard</span>
+                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                        Revenue <span className="text-[#4A6D56] italic">Dashboard</span>
                     </h1>
-                    <p className="text-lg text-[#64748b] font-medium tracking-tight">
+                    <p className="mt-2 text-lg font-medium text-[#6B8F78] tracking-tight">
                         Track your earnings and commission trends
                     </p>
                 </div>
@@ -249,31 +256,7 @@ const DashboardRevenue = () => {
                     </div>
                 </div>
 
-                {/* 4. AI Insight Footer */}
-                <div className="bg-[#f8f8f8] border border-gray-200 p-10 rounded-[3rem] animate-slide-up relative overflow-hidden shadow">
-                    <div className="relative z-10 w-full flex flex-col sm:flex-row gap-8 items-start sm:items-center">
-                        <div className="bg-[#f1f5f9] p-5 rounded-2xl shadow shrink-0">
-                            <Sparkles className="w-8 h-8 text-[#334D3D]" />
-                        </div>
-                        <div className="flex-1 space-y-3">
-                            <div className="flex items-center gap-3">
-                                <h4 className="font-black text-[#1a2d1d] text-[1.25rem] tracking-tight">AI Performance Insight</h4>
-                                {stats.momGrowth !== undefined && stats.momGrowth > 0 && (
-                                    <span className="bg-[#f0fdf4] text-[#10b981] border border-[#bcf0da] text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
-                                        Growing {stats.momGrowth}% MoM
-                                    </span>
-                                )}
-                            </div>
-                            <p className="text-[#64748b] text-[16px] leading-relaxed font-medium max-w-4xl">
-                                {stats.momGrowth !== undefined && stats.momGrowth > 0 ? (
-                                    <>Your earnings have grown <strong>{stats.momGrowth}%</strong> compared to last month. You've successfully converted <strong>{stats.convertedClients || 0} clients</strong> so far. Keep up the momentum to maximize your 15% commission rate, and focus on your Hot Leads pipeline to ensure this month's payouts peak.</>
-                                ) : (
-                                    <>You've successfully converted <strong>{stats.convertedClients || 0} clients</strong> and have a 15% recurring commission rate. Focus on engaging your Warm and Hot leads to see Month-over-Month growth.</>
-                                )}
-                            </p>
-                        </div>
-                    </div>
-                </div>
+
 
                 {/* Global CSS for Animations */}
                 <style>{`
@@ -314,3 +297,4 @@ const DashboardRevenue = () => {
 };
 
 export default DashboardRevenue;
+

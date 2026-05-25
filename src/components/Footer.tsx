@@ -6,7 +6,6 @@ const footerLinks = {
   solutions: [
     { label: "Virtual Office", href: "/services/virtual-office" },
     { label: "Coworking Space", href: "/services/coworking-space" },
-    { label: "On Demand", href: "/services/on-demand" },
     { label: "Business Setup", href: "/solutions/business-setup" },
   ],
   resources: [
@@ -142,10 +141,9 @@ const Footer = () => {
 
           {/* Copyright */}
           <div className="space-y-4 lg:text-right">
-            <div className="flex flex-wrap gap-4 text-[10px] font-bold text-[#FEF8C5] uppercase tracking-[0.2em] lg:justify-end">
-              <Link to="/terms" className="hover:text-[#FEF8C5] transition-colors">Legal</Link>
-              <Link to="/privacy" className="hover:text-[#FEF8C5] transition-colors">Privacy</Link>
-              <Link to="/about" className="hover:text-[#FEF8C5] transition-colors">Cookies</Link>
+            <div className="flex flex-wrap gap-4 text-xs sm:text-sm font-bold text-[#FEF8C5] uppercase tracking-[0.2em] lg:justify-end">
+              <Link to="/terms" className="hover:text-white transition-colors">Legal</Link>
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
             </div>
             <p className="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-[0.2em] sm:tracking-[0.3em]">
               © {currentYear} Stirring Minds Services Private Limited.
